@@ -1,0 +1,18 @@
+------------------------------------------------------------------------------------------------------------------------------------
+                                  OS TYPE
+'uix'                                                        OS_type     = Operating System, UIX or WIN
+                                  INPUT OPTIONS
+'./'                                                         Path_InPut  = input path
+'solver.dat'                                                 File_Solver = name of solver options file        
+1                                                            Nl          = number of grid levels used          
+'tube'                                                       File_Mesh   = basename of mesh file                   
+'tube'                                                       File_BC     = basename of boundary conditions file    
+'sod'                                                        File_Init   = basename of initial conditions file     
+                                  OUTPUT OPTIONS
+'output/'                                                    Path_OutPut   = output path
+'sod'                                                        File_Sol      = basename of solution file
+10                                                           screen_out    = console refresh frequency
+10                                                           sol_out       = actual solution output frequency
+20                                                           restart_out   = restart output frequency
+1                                                            probe_out     = probes output frequency
+------------------------------------------------------------------------------------------------------------------------------------

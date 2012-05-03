@@ -1,0 +1,136 @@
+#!/bin/bash
+#-----------------------------------------------------------------------------------------------------------------------------------
+#  PROGRAM NAME:  fmake
+#          FILE:  fmake
+#
+#         USAGE:  ./fmake [options [args]]  
+# 
+#   DESCRIPTION:  Small script for easy creation of makefile for Fortran 90-2k projects
+# 
+#  REQUIREMENTS:  standard bash env
+#               
+#        AUTHOR:  Stefano Zaghi, 
+#       CREATED:  03/30/2011 05:54:24 PM CEST
+#       LICENSE:  This program is free software; you can redistribute it and/or modify it under the terms of version 3 of the 
+#                 GNU General Public License published by the Free Software Foundation (http://www.gnu.org/licenses/gpl.html)
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+# some useful variables
+VERSION=0.1
+SRC=./src/
+MHEAD=header
+MFILE=makefile
+FSEP=$(printf "%131s")
+SEP=${FSEP// /-}
+SEP="#"$SEP
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+# functions definition
+function print_usage {
+  echo "fmake $VERSION: a small script for easy creation of makefile for Fortran 90-2k projects"
+  echo
+  echo "Usage: `basename $0` [options [args]]"
+  echo
+  echo "Options:"
+  echo "  -h"
+  echo "    print this help message"
+  echo
+  echo "  -s [dir]"
+  echo "    dir = directory containing source files .f90[2k]; default directory name is './src/'"
+  echo
+  echo "  -m [makefile]"
+  echo "    makefile = file name of the output makefile; default file name is 'makefile'"
+  echo
+  echo "  -header [header]"
+  echo "    header = file containing the (optional) 'user defined header' of makefile; default file name is 'header'"
+  echo "    Note that if no header file is used a very basic header of the makefile is automatically created by fmake"
+}
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+# parsing command line
+if [ $# -eq 0 ] ; then
+  print_usage
+  exit 0
+fi
+while [ "$1" != "" ]; do
+  case $1 in
+    -s) 
+      shift; SRC=$1; shift 
+      ;;
+    -m) 
+      shift; MFILE=$1; shift 
+      ;;
+    -header) 
+      shift; MHEAD=$1; shift 
+      ;;
+    -h) 
+      print_usage
+      exit 0
+      ;;
+    *)
+      echo 'Attenzione:'
+      echo 'switch "'$1'" sconosciuto!'
+      print_usage
+      exit 1
+      ;;
+  esac
+done
+# makefile creation
+if [ -f $MHEAD ] ; then
+  cat $MHEAD > $MFILE
+else
+  echo "#!/usr/bin/make" > $MFILE
+  echo $SEP >> $MFILE
+  echo "DOBJ=      # compiled objects directory" >> $MFILE
+  echo "COMPILER=  # compiler name" >> $MFILE
+  echo "OPTC=      # compiling options" >> $MFILE
+  echo "OPTL=      # linking options" >> $MFILE
+  echo "LIBS=      # external libraries to be linked" >> $MFILE
+  echo $SEP >> $MFILE
+fi
+echo >> $MFILE
+echo $SEP >> $MFILE
+echo "# rules of linking and compiling" >> $MFILE
+echo 'COTEXT  = -e "\033[1;31m Compiling\033[0m\033[1m $(<F)\033[0m"' >> $MFILE
+echo 'LITEXT  = -e "\033[1;31m Assembling\033[0m\033[1m $@\033[0m"' >> $MFILE
+echo 'LCEXES  = $(shell echo $(EXES) | tr '"'[:upper:]' '[:lower:]')" >> $MFILE
+echo 'EXESPO  = $(addsuffix .o,$(LCEXES))' >> $MFILE
+echo 'EXESOBJ = $(addprefix $(DOBJ),$(EXESPO))' >> $MFILE
+echo >> $MFILE
+# linking rules
+for f in $( ls $SRC*.f90 ) ; do
+  EXE=`grep -i '^ *program ' $f | awk '{print $2}'`
+  if [ "$EXE" != "" ] ; then
+    DEP=`echo $EXE | tr '[:upper:]' '[:lower:]' | sed s/$/\.o/ | awk  '{print "$(DOBJ)"$1}'`
+    echo "\$(DEXE)$EXE : PRINTINFO \$(MKDIRS) $DEP" >> $MFILE
+    echo "	@rm -f \$(filter-out $DEP,\$(EXESOBJ))" >> $MFILE
+    echo "	@echo | tee -a make.log" >> $MFILE
+    echo "	@echo \$(LITEXT) | tee -a make.log" >> $MFILE
+    echo "	@\$(FC) \$(OPTSL) \$(DOBJ)*.o \$(LIBS) -o \$@ 1>> diagnostic_messages 2>> error_messages" >> $MFILE
+    echo "EXES := \$(EXES) $EXE" >> $MFILE
+    echo >> $MFILE
+  fi
+done
+# compiling rules
+for f in $( ls $SRC*.f90 ) ; do
+  DEP=`grep -i '^ *use ' $f | grep -vi 'omp_lib' | grep -vi 'mpi' | awk '{print $2}' | sed s/,// | tr '[:upper:]' '[:lower:]' | sed s/$/\.o/ | awk  '{print "$(DOBJ)"$1}'`
+  RULE="\$(DOBJ)"`basename $f .f90 | tr '[:upper:]' '[:lower:]'`.o
+  FF=`basename $f`
+  if [ "$DEP" = "" ] ; then
+    echo "$RULE : $FF" >> $MFILE
+  else
+    echo "$RULE : $FF \\" >> $MFILE
+    echo -e "	"$DEP | sed "s/ / \\\\\n\t/g" >> $MFILE
+    uniq $MFILE > $MFILE"_uniq"
+    mv -f $MFILE"_uniq" $MFILE
+  fi
+  echo "	@echo \$(COTEXT) | tee -a make.log" >> $MFILE
+  echo "	@\$(FC) \$(OPTSC) \$< -o \$@ 1>> diagnostic_messages 2>> error_messages" >> $MFILE
+  echo >> $MFILE
+done
+echo $SEP >> $MFILE
+exit 0
+#-----------------------------------------------------------------------------------------------------------------------------------

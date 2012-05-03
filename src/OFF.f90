@@ -1,22 +1,21 @@
+!> @brief   @off is an Open source Finite volume Fluid dynamics code.
+!> @version   0.0.1
+!> @date      2012-04-24
+!> @copyright GNU Public License version 3.
+!> @todo \b MultiGrid: Test MultiGrid algorithm
+!> @todo \b AMR: Test Adaptive Mesh Refinement
+!> @todo \b CompleteImporter: Complete the importers
+!> @todo \b DocImprove: Improve the documentation
+!> @todo \b DocMakeFile: Create the documentation of makefile
 program OFF
-!-----------------------------------------------------------------------------------------------------------------------------------
-!(doc)CNAME{OFF, Open Finite volume Fluidynamics code}
-!(doc)AUTHORS{Stefano Zaghi}
-!(doc)VERSION{v0.0.5}
-! TODOS
-! TODO: complete documentation
-! TODO: control metrics subroutines
-! TODO: introduce adaptive mesh refinement
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                        ! Integers and reals precision definition.
 USE Data_Type_BC, init_bc=>init                         ! Definition of Type_BC.
 USE Data_Type_Globals                                   ! Definition of Type_Global and Type_Block.
 USE Data_Type_OS                                        ! Definition of Type_OS.
 USE Data_Type_Primitive, init_prim=>init, set_prim=>set ! Definition of Type_Primitive.
-USE Data_Type_Probe, init_probe=>init                   ! Definition of Type_Probe.
-USE Data_Type_Tensor, init_ten=>init                    ! Definition of Type_Tensor.
+USE Data_Type_Probe                                     ! Definition of Type_Probe.
+USE Data_Type_Tensor                                    ! Definition of Type_Tensor.
 USE Data_Type_Time                                      ! Definition of Type_Time.
 USE Lib_Fluidynamic, only: primitive2conservative, &    ! Function for converting primitive variables to conservative ones.
                            conservative2primitive, &    ! Function for converting conservative variables to primitive ones.
@@ -37,24 +36,24 @@ USE Lib_Parallel,    only: Nthreads, &                  ! Number of threads.
                            procmap_load                 ! Function for loading the proc/blocks and local/global blocks maps.
 #ifdef MPI2
 USE MPI                                                 ! MPI runtime library.
-USE Lib_Parallel,    only: Init_sendrecv                ! Subroutine for initialize send/recive comunications.
+USE Lib_Parallel,    only: Init_sendrecv                ! Subroutine for initialize send/receive communications.
 #endif
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
-type(Type_Global)::             global         ! Global-level data.
-type(Type_Block), allocatable:: block(:,:)     ! Block-level data [1:Nb,1:Nl].
-integer(I_P)::                  b              ! Blocks counter.
-integer(I_P)::                  l              ! Grid levels counter.
-integer(I_P)::                  err            ! Error traping flag: 0 no errors, >0 error occours.
-integer(I_P)::                  lockfile       ! Locking unit file.
-real::                          partial(1:10)  ! Partial time counters for code profiling
-character(20)::                 date           ! Actual date.
-integer(I_P)::                  myrank         ! Actual rank process.
-integer(I_P)::                  Nprb = 0_I_P   ! Number of probes.
-type(Type_Probe), allocatable:: probes(:)      ! Probes [1:Nprb].
-integer(I_P)::                  unitprobe      ! Probes unit file.
+type(Type_Global)::             global         !< Global-level data.
+type(Type_Block), allocatable:: block(:,:)     !< Block-level data [1:Nb,1:Nl].
+integer(I_P)::                  b              !< Blocks counter.
+integer(I_P)::                  l              !< Grid levels counter.
+integer(I_P)::                  err            !< Error trapping flag: 0 no errors, >0 error occurs.
+integer(I_P)::                  lockfile       !< Locking unit file.
+real::                          partial(1:10)  !< Partial time counters for code profiling
+character(20)::                 date           !< Actual date.
+integer(I_P)::                  myrank         !< Actual rank process.
+integer(I_P)::                  Nprb = 0_I_P   !< Number of probes.
+type(Type_Probe), allocatable:: probes(:)      !< Probes [1:Nprb].
+integer(I_P)::                  unitprobe      !< Probes unit file.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -117,23 +116,20 @@ call MPI_FINALIZE(err)
 stop
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @brief Subroutine for initializing the simulation according to the input options.
   subroutine off_init()
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! The subroutine off_init initialize the simulation according to the input options.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P)::    b              ! Blocks counter.
-  integer(I_P)::    l              ! Grid levels counter.
-  integer(I_P)::    c              ! Cell and variable counter.
-  integer(I_P)::    Nca = 0        ! Number of command line arguments.
-  character(60)::   File_Option    ! Global option file name.
-  character(500)::  varname_res    ! Variables name for the gnuplot residuals file.
-  character(DI_P):: Ncstr          ! String containing current number id of conservative variables.
-  real::            instant0 = 0.0 ! The Crono starting instant (used for timing the code).
-  integer(I_P)::    UnitFree       ! Free logic unit.
-  logical::         is_file        ! Flag for inquiring the presence of file.
+  integer(I_P)::    b              !< Blocks counter.
+  integer(I_P)::    l              !< Grid levels counter.
+  integer(I_P)::    c              !< Cell and variable counter.
+  integer(I_P)::    Nca = 0        !< Number of command line arguments.
+  character(60)::   File_Option    !< Global option file name.
+  character(500)::  varname_res    !< Variables name for the gnuplot residuals file.
+  character(DI_P):: Ncstr          !< String containing current number id of conservative variables.
+  real::            instant0 = 0.0 !< The Crono starting instant (used for timing the code).
+  integer(I_P)::    UnitFree       !< Free logic unit.
+  logical::         is_file        !< Flag for inquiring the presence of file.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -419,20 +415,17 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine off_init
 
+  !> @brief Function for loading global file options.
   function load_option_file(myrank,filename,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for loading global file options.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank   ! Actual rank process.
-  character(*),      intent(IN)::    filename ! Name of file where option variables are saved.
-  type(Type_Global), intent(INOUT):: global   ! Global-level data.
-  integer(I_P)::                     err      ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                     UnitFree ! Free logic unit.
-  logical::                          is_file  ! Flag for inquiring the presence of file.
-  character(3)::                     os_type  ! Type operating system.
+  integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
+  character(*),      intent(IN)::    filename !< Name of file where option variables are saved.
+  type(Type_Global), intent(INOUT):: global   !< Global-level data.
+  integer(I_P)::                     err      !< Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     UnitFree !< Free logic unit.
+  logical::                          is_file  !< Flag for inquiring the presence of file.
+  character(3)::                     os_type  !< Type operating system.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

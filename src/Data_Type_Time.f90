@@ -1,8 +1,7 @@
+!> This module contains the definition of Type_Time and its procedures.
+!> This derived type is useful for handling time and date
+!> @todo \b DocComplete: Complete the documentation of internal procedures
 module Data_Type_Time
-!-----------------------------------------------------------------------------------------------------------------------------------
-!!This module contains Data_Type_Time, a class for handling time and date
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision ! Integers and reals precision definition.
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -11,7 +10,6 @@ USE IR_Precision ! Integers and reals precision definition.
 implicit none
 save
 private
-public:: Type_Time
 public:: operator (/=)
 public:: operator (<)
 public:: operator (<=)
@@ -24,32 +22,38 @@ public:: Crono
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-type:: Type_Time
-  integer(I_P) Days    ! Number of days.
-  integer(I_P) Hours   ! Number of hours.
-  integer(I_P) Minutes ! Number of minutes.
-  real(R_P)    Seconds ! Number of seconds.
+!> Derived type containing time variables.
+type, public:: Type_Time
+  integer(I_P) Days    !< Number of days.
+  integer(I_P) Hours   !< Number of hours.
+  integer(I_P) Minutes !< Number of minutes.
+  real(R_P)    Seconds !< Number of seconds.
 endtype Type_Time
-real:: instant0 = 0.0 ! The Crono starting instant (used for timing the code).
+real:: instant0 = 0.0 !< The Crono starting instant (used for timing the code).
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!!Conditional operators overloading.
+!> @brief Not-equal-to boolean operator (/=) overloading.
 interface operator (/=)
   module procedure not_eq
 endinterface
+!> @brief Lower-than boolean operator (<) overloading.
 interface operator (<)
   module procedure low
 endinterface
+!> @brief Lower-equal-than boolean operator (<=) overloading.
 interface operator (<=)
   module procedure low_eq
 endinterface
+!> @brief Equal-to boolean operator (==) overloading.
 interface operator (==)
   module procedure eq
 endinterface
+!> @brief Higher-equal-than boolean operator (>=) overloading.
 interface operator (>=)
   module procedure great_eq
 endinterface
+!> @brief Higher-than boolean operator (>) overloading.
 interface operator (>)
   module procedure great
 endinterface
@@ -245,17 +249,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction great
 
+  !> Function for getting actual date and returning it into a string.
+  !> @return \b Date_String character(20) variable.
   function Get_Date_String() result(Date_String)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for getting actual date and returning it into a string.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  character(20):: Date_String                  ! String with actual date.
-  integer(I_P)::  Date_Integer(1:8)            ! Integer array for handling the date.
-  character(4)::  Year                         ! Dummy variable for year string.
-  character(2)::  Day,Month,Hour,Minute,Second ! Dummies variables for day, month, hour, minute and second strings.
+  character(20):: Date_String                  !< String with actual date.
+  integer(I_P)::  Date_Integer(1:8)            !< Integer array for handling the date.
+  character(4)::  Year                         !< Dummy variable for year string.
+  character(2)::  Day,Month,Hour,Minute,Second !< Dummies variables for day, month, hour, minute and second strings.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -274,15 +276,13 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Get_Date_String
 
+  !> Function for converting seconds to Type_Time (days,hours,minutes,seconds) derived type.
+  !> @return \b Time type(Type_Time) variable.
   function Seconds_To_Time(seconds) result(Time)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for converting seconds to time (days,hours,minutes,seconds) format.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN):: seconds ! Number of seconds.
-  type(Type_Time)::       Time    ! Time in days,hours,minutes,seconds format.
+  real(R_P), intent(IN):: seconds !< Number of seconds.
+  type(Type_Time)::       Time    !< Time in days,hours,minutes,seconds format.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -294,16 +294,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Seconds_To_Time
 
+  !> A simple stop/watch function.
+  !> @return \b seconds real variable.
   function Crono(start,instant1) result(seconds)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for time measuring.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  logical, intent(IN), optional:: start    ! Flag for starting time measurament.
-  real,    intent(IN), optional:: instant1 ! Starting instant1 (external supplied) different from instant0.
-  real::                          seconds  ! Seconds from instant0 or instant1.
+  logical, intent(IN), optional:: start    !< Flag for starting time measurament.
+  real,    intent(IN), optional:: instant1 !< Starting instant1 (external supplied) different from instant0.
+  real::                          seconds  !< Seconds from instant0 or instant1.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

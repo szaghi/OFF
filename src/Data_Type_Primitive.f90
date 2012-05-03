@@ -1,12 +1,13 @@
+!> This module contains the definition of Type_Primitive and its procedures.
+!> Type_Primitive is a derived type that handles primitive fluid dynamic variables.
+!> @note The operators of assignment (=), multiplication (*), division (/), sum (+) and subtraction (-) have been overloaded.
+!> Therefore this module provides a far-complete algebra based on Type_Primitive derived type. This algebra simplifies the
+!> numerical integration of Partial Differential Equations (PDE) systems based on primitive formulation.
+!> @todo \b DocComplete: Complete the documentation of internal procedures
 module Data_Type_Primitive
-!-----------------------------------------------------------------------------------------------------------------------------------
-!!This module contains Data_Type_Primitive, a derived type that handles primitive fluidynamic variables.
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                ! Integers and reals precision definition.
 USE Data_Type_Vector,                         & ! Definition of Type_Vector.
-                      init_vector   => init,  & ! Function for initializing Type_Vector.
                       set_vector    => set,   & ! Function for setting Type_Vector.
                       get_vector    => get,   & ! Function for getting Type_Vector.
                       write_vector  => write, & ! Function for writing Type_Vector.
@@ -16,7 +17,6 @@ USE Data_Type_Vector,                         & ! Definition of Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 private
-public:: Type_Primitive
 public:: init,set,free
 public:: write,read
 public:: assignment (=)
@@ -28,172 +28,316 @@ public:: prim2array,array2prim
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!!Type_Primivite definition:
-type:: Type_Primitive
+!> Derived type containing primitive variables.
+!> @note This derived type can represent multi species fluids. The density component, \b r, is a dynamic memory component defined
+!> as an allocatable 1D array. \b r is allocated at runtime with the number of initial species that constitute the initial fluid
+!> mixture. Due to the presence of a dynamic component a freeing memory "method" for this component is necessary. Before deallocate
+!> a variable defined as Type_Primitive the free function must be invoked to free the memory of the dynamic component.
+type, public:: Type_Primitive
   sequence
-  real(R_P), allocatable:: r(:)       ! Density of single species [1:Ns].
-  type(Type_Vector)::      v          ! Velocity vector.
-  real(R_P)::              p = 0._R_P ! Pressure.
-  real(R_P)::              d = 0._R_P ! Density = sum(r(1:Ns)).
-  real(R_P)::              g = 0._R_P ! Specific heats ratio cp/cv.
+  real(R_P), allocatable:: r(:)       !< Density of single species [1:Ns].
+  type(Type_Vector)::      v          !< Velocity vector.
+  real(R_P)::              p = 0._R_P !< Pressure.
+  real(R_P)::              d = 0._R_P !< Density = sum(r(1:Ns)).
+  real(R_P)::              g = 0._R_P !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
 endtype Type_Primitive
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!!Init overloading.
+!> @brief Subroutine for initializing Type_Primitive variable.
+!> It is a generic interface to 4 different subroutines as it can be used for initializing scalar variables, 1D/2D or 3D arrays.
+!> The calling signatures are:
+!> @code ...
+!> integer(I_P):: Ns
+!> real(R_P):: r(1:Ns)
+!> type(Type_Vector):: v
+!> real(R_P):: p,d,g
+!> type(Type_Primitive):: prim_scal,prim_1D(10),prim_2D(10,2),prim_3D(10,2,3)
+!> ...
+!> ! initializing prim_scal, prim_1D, prim_2D and prim_3D
+!> call init(r,v,p,d,g,Ns,prim_scal)
+!> call init(r,v,p,d,g,Ns,prim_1D)
+!> call init(r,v,p,d,g,Ns,prim_2D)
+!> call init(r,v,p,d,g,Ns,prim_3D)
+!> ... @endcode
+!> @note r,v,p,d,g,Ns are optional.
 interface init
-  module procedure Init_Scalar,  & ! scalar
-                   Init_Array1D, & ! array1D
-                   Init_Array2D, & ! array2D
-                   Init_Array3D    ! array3D
+  module procedure Init_Scalar,Init_Array1D,Init_Array2D,Init_Array3D
 endinterface
-!!Set overloading.
+!> @brief Subroutine for setting Type_Primitive variable.
+!> It is a generic interface to 4 different subroutines as it can be used for setting scalar variables, 1D/2D or 3D arrays.
+!> The calling signatures are:
+!> @code ...
+!> integer(I_P):: Ns
+!> real(R_P):: r(1:Ns)
+!> type(Type_Vector):: v
+!> real(R_P):: p,d,g
+!> type(Type_Primitive):: prim_scal,prim_1D(10),prim_2D(10,2),prim_3D(10,2,3)
+!> ...
+!> ! setting prim_scal, prim_1D, prim_2D and prim_3D
+!> call set(r,v,p,d,g,Ns,prim_scal)
+!> call set(r,v,p,d,g,Ns,prim_1D)
+!> call set(r,v,p,d,g,Ns,prim_2D)
+!> call set(r,v,p,d,g,Ns,prim_3D)
+!> ... @endcode
+!> @note r,v,p,d,g,Ns are optional.
 interface set
-  module procedure Set_Scalar,  & ! scalar
-                   Set_Array1D, & ! array1D
-                   Set_Array2D, & ! array2D
-                   Set_Array3D    ! array3D
+  module procedure Set_Scalar,Set_Array1D,Set_Array2D,Set_Array3D
 endinterface
-!!Free overloading.
+!> @brief Function for freeing the memory of Type_Primitive \em dynamic components.
+!> This is a generic interface to 4 functions as it can be used for scalar variables, 1D/2D or 3D arrays. The calling signatures
+!> are:
+!> @code ...
+!> integer(I4P):: err
+!> type(Type_Primitive):: prim_scal,prim_1D(10),prim_2D(10,2),prim_3D(10,2,3)
+!> ...
+!> ! freeing dynamic components memory of prim_scal, prim_1D, prim_2D, and prim_3D
+!> err = free(prim_scal)
+!> err = free(prim_1D)
+!> err = free(prim_2D)
+!> err = free(prim_3D)
+!> ... @endcode
 interface free
-  module procedure Free_Scalar,  & ! scalar
-                   Free_Array1D, & ! array1D
-                   Free_Array2D, & ! array2D
-                   Free_Array3D    ! array3D
+  module procedure Free_Scalar,Free_Array1D,Free_Array2D,Free_Array3D
 endinterface
-!!Write overloading.
+!> @brief Write overloading of Type_Primitive variable.
+!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for writing scalar variables,
+!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
+!> @code ...
+!> integer(I4P):: err,unit
+!> character(1):: format="*"
+!> type(Type_Primitive):: prim_scal,prim_1D(10),prim_2D(10,2),prim_3D(10,2,3)
+!> ...
+!> ! formatted writing of prim_scal, prim_1D, prim_2D and prim_3D
+!> err = write(unit,format,prim_scal)
+!> err = write(unit,format,prim_1D)
+!> err = write(unit,format,prim_2D)
+!> err = write(unit,format,prim_3D)
+!> ! binary writing of prim_scal, prim_1D, prim_2D and prim_3D
+!> err = write(unit,prim_scal)
+!> err = write(unit,prim_1D)
+!> err = write(unit,prim_2D)
+!> err = write(unit,prim_3D)
+!> ... @endcode
 interface write
-  module procedure Write_Bin_Scalar,    & ! binary scalar
-                   Write_Ascii_Scalar,  & ! ascii scalar
-                   Write_Bin_Array1D,   & ! binary array1D
-                   Write_Ascii_Array1D, & ! ascii array1D
-                   Write_Bin_Array2D,   & ! binary array2D
-                   Write_Ascii_Array2D, & ! ascii array2D
-                   Write_Bin_Array3D,   & ! binary array3D
-                   Write_Ascii_Array3D    ! ascii array3D
+  module procedure Write_Bin_Scalar, Write_Ascii_Scalar
+  module procedure Write_Bin_Array1D,Write_Ascii_Array1D
+  module procedure Write_Bin_Array2D,Write_Ascii_Array2D
+  module procedure Write_Bin_Array3D,Write_Ascii_Array3D
 endinterface
-!!Read overloading.
+!> @brief Read overloading of Type_Primitive variable.
+!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for reading scalar variables,
+!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
+!> @code ...
+!> integer(I4P):: err,unit
+!> character(1):: format="*"
+!> type(Type_Primitive):: prim_scal,prim_1D(10),prim_2D(10,2),prim_3D(10,2,3)
+!> ...
+!> ! formatted reading of prim_scal, prim_1D, prim_2D and prim_3D
+!> err = read(unit,format,prim_scal)
+!> err = read(unit,format,prim_1D)
+!> err = read(unit,format,prim_2D)
+!> err = read(unit,format,prim_3D)
+!> ! binary reading of prim_scal, prim_1D, prim_2D and prim_3D
+!> err = read(unit,prim_scal)
+!> err = read(unit,prim_1D)
+!> err = read(unit,prim_2D)
+!> err = read(unit,prim_3D)
+!> ... @endcode
 interface read
-  module procedure Read_Bin_Scalar,    & ! binary scalar
-                   Read_Ascii_Scalar,  & ! ascii scalar
-                   Read_Bin_Array1D,   & ! binary array1D
-                   Read_Ascii_Array1D, & ! ascii array1D
-                   Read_Bin_Array2D,   & ! binary array2D
-                   Read_Ascii_Array2D, & ! ascii array2D
-                   Read_Bin_Array3D,   & ! binary array3D
-                   Read_Ascii_Array3D    ! ascii array3D
+  module procedure Read_Bin_Scalar, Read_Ascii_Scalar
+  module procedure Read_Bin_Array1D,Read_Ascii_Array1D
+  module procedure Read_Bin_Array2D,Read_Ascii_Array2D
+  module procedure Read_Bin_Array3D,Read_Ascii_Array3D
 endinterface
-!!Assigment (=) overloading.
+!> @brief Assignment operator (=) overloading.
 interface assignment (=)
-  module procedure assign_prim,     &
+  module procedure assign_prim
 #ifdef r16p
-                   assign_ScalR16P, &
+  module procedure assign_ScalR16P
 #endif
-                   assign_ScalR8P,  &
-                   assign_ScalR4P,  &
-                   assign_ScalI8P,  &
-                   assign_ScalI4P,  &
-                   assign_ScalI2P,  &
-                   assign_ScalI1P
+  module procedure assign_ScalR8P
+  module procedure assign_ScalR4P
+  module procedure assign_ScalI8P
+  module procedure assign_ScalI4P
+  module procedure assign_ScalI2P
+  module procedure assign_ScalI1P
 end interface
-!!Multiplication (*) overloading.
+!> @brief Multiplication operator (*) overloading.
+!> @note The admissible multiplications are:
+!>       - Type_Primitive * Type_Primitive: each component of first primitive variable (prim1) is multiplied for the
+!>         corresponding component of the second one (prim2), i.e. \n
+!>         \f$ {\rm result\%r = prim1\%r*prim2\%r} \f$ \n
+!>         \f$ {\rm result\%v = prim1\%v*prim2\%v} \f$ \n
+!>         \f$ {\rm result\%p = prim1\%p*prim2\%p} \f$ \n
+!>         \f$ {\rm result\%d = prim1\%d*prim2\%d} \f$ \n
+!>         \f$ {\rm result\%g = prim1\%g*prim2\%g} \f$ \n
+!>       - scalar number (real or integer of any kinds defined in IR_Precision module) * Type_Primitive: each component of
+!>         Type_Primitive is multiplied for the scalar, i.e. \n
+!>         \f$ {\rm result\%r = prim\%r*scalar} \f$ \n
+!>         \f$ {\rm result\%v = prim\%v*scalar} \f$ \n
+!>         \f$ {\rm result\%p = prim\%p*scalar} \f$ \n
+!>         \f$ {\rm result\%d = prim\%d*scalar} \f$ \n
+!>         \f$ {\rm result\%g = prim\%g*scalar} \f$ \n
+!>       - Type_Primitive * scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>         Type_Primitive is multiplied for the scalar, i.e. \n
+!>         \f$ {\rm result\%r = prim\%r*scalar} \f$ \n
+!>         \f$ {\rm result\%v = prim\%v*scalar} \f$ \n
+!>         \f$ {\rm result\%p = prim\%p*scalar} \f$ \n
+!>         \f$ {\rm result\%d = prim\%d*scalar} \f$ \n
+!>         \f$ {\rm result\%g = prim\%g*scalar} \f$ \n
 interface operator (*)
-  module procedure prim_mul_prim,     &
+  module procedure prim_mul_prim
 #ifdef r16p
-                   ScalR16P_mul_prim, &
+  module procedure ScalR16P_mul_prim
 #endif
-                   ScalR8P_mul_prim,  &
-                   ScalR4P_mul_prim,  &
-                   ScalI8P_mul_prim,  &
-                   ScalI4P_mul_prim,  &
-                   ScalI2P_mul_prim,  &
-                   ScalI1P_mul_prim,  &
+  module procedure ScalR8P_mul_prim
+  module procedure ScalR4P_mul_prim
+  module procedure ScalI8P_mul_prim
+  module procedure ScalI4P_mul_prim
+  module procedure ScalI2P_mul_prim
+  module procedure ScalI1P_mul_prim
 #ifdef r16p
-                   prim_mul_ScalR16P, &
+  module procedure prim_mul_ScalR16P
 #endif
-                   prim_mul_ScalR8P,  &
-                   prim_mul_ScalR4P,  &
-                   prim_mul_ScalI8P,  &
-                   prim_mul_ScalI4P,  &
-                   prim_mul_ScalI2P,  &
-                   prim_mul_ScalI1P
+  module procedure prim_mul_ScalR8P
+  module procedure prim_mul_ScalR4P
+  module procedure prim_mul_ScalI8P
+  module procedure prim_mul_ScalI4P
+  module procedure prim_mul_ScalI2P
+  module procedure prim_mul_ScalI1P
 endinterface
-!!Division (/) overloading.
+!> @brief Division operator (/) overloading.
+!> @note The admissible divisions are:
+!>       - Type_Primitive / Type_Primitive: each component of first primitive variable (prim1) is divided for the
+!>         corresponding component of the second one (prim2), i.e. \n
+!>         \f$ {\rm result\%r = \frac{prim1\%r}{prim2\%r}} \f$ \n
+!>         \f$ {\rm result\%v = \frac{prim1\%v}{prim2\%v}} \f$ \n
+!>         \f$ {\rm result\%p = \frac{prim1\%p}{prim2\%p}} \f$ \n
+!>         \f$ {\rm result\%d = \frac{prim1\%d}{prim2\%d}} \f$ \n
+!>         \f$ {\rm result\%g = \frac{prim1\%g}{prim2\%g}} \f$ \n
+!>       - Type_Primitive / scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>         Type_Primitive is divided for the scalar, i.e. \n
+!>         \f$ {\rm result\%r = \frac{prim\%r}{scalar}} \f$ \n
+!>         \f$ {\rm result\%v = \frac{prim\%v}{scalar}} \f$ \n
+!>         \f$ {\rm result\%p = \frac{prim\%p}{scalar}} \f$ \n
+!>         \f$ {\rm result\%d = \frac{prim\%d}{scalar}} \f$ \n
+!>         \f$ {\rm result\%g = \frac{prim\%g}{scalar}} \f$ \n
 interface operator (/)
-  module procedure prim_div_prim,     &
+  module procedure prim_div_prim
 #ifdef r16p
-                   prim_div_ScalR16P, &
+  module procedure prim_div_ScalR16P
 #endif
-                   prim_div_ScalR8P,  &
-                   prim_div_ScalR4P,  &
-                   prim_div_ScalI8P,  &
-                   prim_div_ScalI4P,  &
-                   prim_div_ScalI2P,  &
-                   prim_div_ScalI1P
+  module procedure prim_div_ScalR8P
+  module procedure prim_div_ScalR4P
+  module procedure prim_div_ScalI8P
+  module procedure prim_div_ScalI4P
+  module procedure prim_div_ScalI2P
+  module procedure prim_div_ScalI1P
 endinterface
-!!Sum (+) overloading.
+!> @brief Sum operator (+) overloading.
+!> @note The admissible summations are:
+!>       - Type_Primitive + Type_Primitive: each component of first primitive variable (prim1) is summed with the
+!>         corresponding component of the second one (prim2), i.e. \n
+!>         \f$ {\rm result\%r = prim1\%r+prim2\%r} \f$ \n
+!>         \f$ {\rm result\%v = prim1\%v+prim2\%v} \f$ \n
+!>         \f$ {\rm result\%p = prim1\%p+prim2\%p} \f$ \n
+!>         \f$ {\rm result\%d = prim1\%d+prim2\%d} \f$ \n
+!>         \f$ {\rm result\%g = prim1\%g+prim2\%g} \f$ \n
+!>       - scalar number (real or integer of any kinds defined in IR_Precision module) + Type_Primitive: each component of
+!>         Type_Primitive is summed with the scalar, i.e. \n
+!>         \f$ {\rm result\%r = prim\%r+scalar} \f$ \n
+!>         \f$ {\rm result\%v = prim\%v+scalar} \f$ \n
+!>         \f$ {\rm result\%p = prim\%p+scalar} \f$ \n
+!>         \f$ {\rm result\%d = prim\%d+scalar} \f$ \n
+!>         \f$ {\rm result\%g = prim\%g+scalar} \f$ \n
+!>       - Type_Primitive + scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>         Type_Primitive is summed with the scalar, i.e. \n
+!>         \f$ {\rm result\%r = prim\%r+scalar} \f$ \n
+!>         \f$ {\rm result\%v = prim\%v+scalar} \f$ \n
+!>         \f$ {\rm result\%p = prim\%p+scalar} \f$ \n
+!>         \f$ {\rm result\%d = prim\%d+scalar} \f$ \n
+!>         \f$ {\rm result\%g = prim\%g+scalar} \f$ \n
 interface operator (+)
-  module procedure positive_prim,     &
-                   prim_sum_prim,     &
+  module procedure positive_prim
+  module procedure prim_sum_prim
 #ifdef r16p
-                   ScalR16P_sum_prim, &
+  module procedure ScalR16P_sum_prim
 #endif
-                   ScalR8P_sum_prim,  &
-                   ScalR4P_sum_prim,  &
-                   ScalI8P_sum_prim,  &
-                   ScalI4P_sum_prim,  &
-                   ScalI2P_sum_prim,  &
-                   ScalI1P_sum_prim,  &
+  module procedure ScalR8P_sum_prim
+  module procedure ScalR4P_sum_prim
+  module procedure ScalI8P_sum_prim
+  module procedure ScalI4P_sum_prim
+  module procedure ScalI2P_sum_prim
+  module procedure ScalI1P_sum_prim
 #ifdef r16p
-                   prim_sum_ScalR16P, &
+  module procedure prim_sum_ScalR16P
 #endif
-                   prim_sum_ScalR8P,  &
-                   prim_sum_ScalR4P,  &
-                   prim_sum_ScalI8P,  &
-                   prim_sum_ScalI4P,  &
-                   prim_sum_ScalI2P,  &
-                   prim_sum_ScalI1P
+  module procedure prim_sum_ScalR8P
+  module procedure prim_sum_ScalR4P
+  module procedure prim_sum_ScalI8P
+  module procedure prim_sum_ScalI4P
+  module procedure prim_sum_ScalI2P
+  module procedure prim_sum_ScalI1P
 endinterface
-!!Subtraction (-) overloading.
+!> @brief Subtraction operator (-) overloading.
+!> @note The admissible subtractions are:
+!>       - Type_Primitive - Type_Primitive: each component of first primitive variable (prim1) is subtracted with the
+!>         corresponding component of the second one (prim2), i.e. \n
+!>         \f$ {\rm result\%r = prim1\%r-prim2\%r} \f$ \n
+!>         \f$ {\rm result\%v = prim1\%v-prim2\%v} \f$ \n
+!>         \f$ {\rm result\%p = prim1\%p-prim2\%p} \f$ \n
+!>         \f$ {\rm result\%d = prim1\%d-prim2\%d} \f$ \n
+!>         \f$ {\rm result\%g = prim1\%g-prim2\%g} \f$ \n
+!>       - scalar number (real or integer of any kinds defined in IR_Precision module) - Type_Primitive: each component of
+!>         Type_Primitive is subtracted with the scalar, i.e. \n
+!>         \f$ {\rm result\%r = scalar-prim\%r} \f$ \n
+!>         \f$ {\rm result\%v = scalar-prim\%v} \f$ \n
+!>         \f$ {\rm result\%p = scalar-prim\%p} \f$ \n
+!>         \f$ {\rm result\%d = scalar-prim\%d} \f$ \n
+!>         \f$ {\rm result\%g = scalar-prim\%g} \f$ \n
+!>       - Type_Primitive - scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>         Type_Primitive is subtracted with the scalar, i.e. \n
+!>         \f$ {\rm result\%r = prim\%r-scalar} \f$ \n
+!>         \f$ {\rm result\%v = prim\%v-scalar} \f$ \n
+!>         \f$ {\rm result\%p = prim\%p-scalar} \f$ \n
+!>         \f$ {\rm result\%d = prim\%d-scalar} \f$ \n
+!>         \f$ {\rm result\%g = prim\%g-scalar} \f$ \n
 interface operator (-)
-  module procedure negative_prim,     &
-                   prim_sub_prim,     &
+  module procedure negative_prim
+  module procedure prim_sub_prim
 #ifdef r16p
-                   ScalR16P_sub_prim, &
+  module procedure ScalR16P_sub_prim
 #endif
-                   ScalR8P_sub_prim,  &
-                   ScalR4P_sub_prim,  &
-                   ScalI8P_sub_prim,  &
-                   ScalI4P_sub_prim,  &
-                   ScalI2P_sub_prim,  &
-                   ScalI1P_sub_prim,  &
+  module procedure ScalR8P_sub_prim
+  module procedure ScalR4P_sub_prim
+  module procedure ScalI8P_sub_prim
+  module procedure ScalI4P_sub_prim
+  module procedure ScalI2P_sub_prim
+  module procedure ScalI1P_sub_prim
 #ifdef r16p
-                   prim_sub_ScalR16P, &
+  module procedure prim_sub_ScalR16P
 #endif
-                   prim_sub_ScalR8P,  &
-                   prim_sub_ScalR4P,  &
-                   prim_sub_ScalI8P,  &
-                   prim_sub_ScalI4P,  &
-                   prim_sub_ScalI2P,  &
-                   prim_sub_ScalI1P
+  module procedure prim_sub_ScalR8P
+  module procedure prim_sub_ScalR4P
+  module procedure prim_sub_ScalI8P
+  module procedure prim_sub_ScalI4P
+  module procedure prim_sub_ScalI2P
+  module procedure prim_sub_ScalI1P
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  ! init
+  !>Subroutine for initializing components of Type_Primitive (scalar) variable.
   pure subroutine Init_Scalar(r,v,p,d,g,Ns,prim)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for initializing Type_Primitive (scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),            intent(IN), optional:: r(:)
-  type(Type_Vector),    intent(IN), optional:: v
-  real(R_P),            intent(IN), optional:: p
-  real(R_P),            intent(IN), optional:: d
-  real(R_P),            intent(IN), optional:: g
-  integer(I_P),         intent(IN)::           Ns
-  type(Type_Primitive), intent(INOUT)::        prim
+  real(R_P),            intent(IN), optional:: r(:) !< Density of single species [1:Ns].
+  type(Type_Vector),    intent(IN), optional:: v    !< Velocity vector.
+  real(R_P),            intent(IN), optional:: p    !< Pressure.
+  real(R_P),            intent(IN), optional:: d    !< Density = sum(r(1:Ns)).
+  real(R_P),            intent(IN), optional:: g    !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
+  integer(I_P),         intent(IN)::           Ns   !< Number of species.
+  type(Type_Primitive), intent(INOUT)::        prim !< Primitive initialized data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -207,21 +351,18 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Init_Scalar
 
+  !>Subroutine for initializing components of Type_Primitive (array 1D) variable.
   pure subroutine Init_Array1D(r,v,p,d,g,Ns,prim)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for initializing Type_Primitive (array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),            intent(IN), optional:: r(:)
-  type(Type_Vector),    intent(IN), optional:: v
-  real(R_P),            intent(IN), optional:: p
-  real(R_P),            intent(IN), optional:: d
-  real(R_P),            intent(IN), optional:: g
-  integer(I_P),         intent(IN)::           Ns
-  type(Type_Primitive), intent(INOUT)::        prim(:)
-  integer(I4P)::                               i
+  real(R_P),            intent(IN), optional:: r(:)    !< Density of single species [1:Ns].
+  type(Type_Vector),    intent(IN), optional:: v       !< Velocity vector.
+  real(R_P),            intent(IN), optional:: p       !< Pressure.
+  real(R_P),            intent(IN), optional:: d       !< Density = sum(r(1:Ns)).
+  real(R_P),            intent(IN), optional:: g       !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
+  integer(I_P),         intent(IN)::           Ns      !< Number of species.
+  type(Type_Primitive), intent(INOUT)::        prim(:) !< Primitive initialized data.
+  integer(I4P)::                               i       !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -237,21 +378,18 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Init_Array1D
 
+  !>Subroutine for initializing components of Type_Primitive (array 3D) variable.
   pure subroutine Init_Array2D(r,v,p,d,g,Ns,prim)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for initializing Type_Primitive (array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),            intent(IN), optional:: r(:)
-  type(Type_Vector),    intent(IN), optional:: v
-  real(R_P),            intent(IN), optional:: p
-  real(R_P),            intent(IN), optional:: d
-  real(R_P),            intent(IN), optional:: g
-  integer(I_P),         intent(IN)::           Ns
-  type(Type_Primitive), intent(INOUT)::        prim(:,:)
-  integer(I4P)::                               i,j
+  real(R_P),            intent(IN), optional:: r(:)      !< Density of single species [1:Ns].
+  type(Type_Vector),    intent(IN), optional:: v         !< Velocity vector.
+  real(R_P),            intent(IN), optional:: p         !< Pressure.
+  real(R_P),            intent(IN), optional:: d         !< Density = sum(r(1:Ns)).
+  real(R_P),            intent(IN), optional:: g         !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
+  integer(I_P),         intent(IN)::           Ns        !< Number of species.
+  type(Type_Primitive), intent(INOUT)::        prim(:,:) !< Primitive initialized data.
+  integer(I4P)::                               i,j       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -269,21 +407,18 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Init_Array2D
 
+  !>Subroutine for initializing components of Type_Primitive (array 3D) variable.
   pure subroutine Init_Array3D(r,v,p,d,g,Ns,prim)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for initializing Type_Primitive (array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),            intent(IN), optional:: r(:)
-  type(Type_Vector),    intent(IN), optional:: v
-  real(R_P),            intent(IN), optional:: p
-  real(R_P),            intent(IN), optional:: d
-  real(R_P),            intent(IN), optional:: g
-  integer(I_P),         intent(IN)::           Ns
-  type(Type_Primitive), intent(INOUT)::        prim(:,:,:)
-  integer(I4P)::                               i,j,k
+  real(R_P),            intent(IN), optional:: r(:)        !< Density of single species [1:Ns].
+  type(Type_Vector),    intent(IN), optional:: v           !< Velocity vector.
+  real(R_P),            intent(IN), optional:: p           !< Pressure.
+  real(R_P),            intent(IN), optional:: d           !< Density = sum(r(1:Ns)).
+  real(R_P),            intent(IN), optional:: g           !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
+  integer(I_P),         intent(IN)::           Ns          !< Number of species.
+  type(Type_Primitive), intent(INOUT)::        prim(:,:,:) !< Primitive initialized data.
+  integer(I4P)::                               i,j,k       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -303,7 +438,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Init_Array3D
 
-  ! set
+  !>Subroutine for setting components of Type_Primitive (scalar) variable.
   pure subroutine Set_Scalar(r,v,p,d,g,prim)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Subroutine for setting Type_Primitive (scalar).
@@ -311,12 +446,12 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),            intent(IN), optional:: r(:)
-  type(Type_Vector),    intent(IN), optional:: v
-  real(R_P),            intent(IN), optional:: p
-  real(R_P),            intent(IN), optional:: d
-  real(R_P),            intent(IN), optional:: g
-  type(Type_Primitive), intent(INOUT)::        prim
+  real(R_P),            intent(IN), optional:: r(:) !< Density of single species [1:Ns].
+  type(Type_Vector),    intent(IN), optional:: v    !< Velocity vector.
+  real(R_P),            intent(IN), optional:: p    !< Pressure.
+  real(R_P),            intent(IN), optional:: d    !< Density = sum(r(1:Ns)).
+  real(R_P),            intent(IN), optional:: g    !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
+  type(Type_Primitive), intent(INOUT)::        prim !< Primitive set data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -331,6 +466,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Set_Scalar
 
+  !>Subroutine for setting components of Type_Primitive (array 1D) variable.
   pure subroutine Set_Array1D(r,v,p,d,g,prim)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Subroutine for setting Type_Primitive (array 1D).
@@ -338,13 +474,13 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),            intent(IN), optional:: r(:)
-  type(Type_Vector),    intent(IN), optional:: v
-  real(R_P),            intent(IN), optional:: p
-  real(R_P),            intent(IN), optional:: d
-  real(R_P),            intent(IN), optional:: g
-  type(Type_Primitive), intent(INOUT)::        prim(:)
-  integer(I4P)::                               i
+  real(R_P),            intent(IN), optional:: r(:)    !< Density of single species [1:Ns].
+  type(Type_Vector),    intent(IN), optional:: v       !< Velocity vector.
+  real(R_P),            intent(IN), optional:: p       !< Pressure.
+  real(R_P),            intent(IN), optional:: d       !< Density = sum(r(1:Ns)).
+  real(R_P),            intent(IN), optional:: g       !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
+  type(Type_Primitive), intent(INOUT)::        prim(:) !< Primitive set data.
+  integer(I4P)::                               i       !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -361,6 +497,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Set_Array1D
 
+  !>Subroutine for setting components of Type_Primitive (array 2D) variable.
   pure subroutine Set_Array2D(r,v,p,d,g,prim)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Subroutine for setting Type_Primitive (array 2D).
@@ -368,13 +505,13 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),            intent(IN), optional:: r(:)
-  type(Type_Vector),    intent(IN), optional:: v
-  real(R_P),            intent(IN), optional:: p
-  real(R_P),            intent(IN), optional:: d
-  real(R_P),            intent(IN), optional:: g
-  type(Type_Primitive), intent(INOUT)::        prim(:,:)
-  integer(I4P)::                               i,j
+  real(R_P),            intent(IN), optional:: r(:)      !< Density of single species [1:Ns].
+  type(Type_Vector),    intent(IN), optional:: v         !< Velocity vector.
+  real(R_P),            intent(IN), optional:: p         !< Pressure.
+  real(R_P),            intent(IN), optional:: d         !< Density = sum(r(1:Ns)).
+  real(R_P),            intent(IN), optional:: g         !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
+  type(Type_Primitive), intent(INOUT)::        prim(:,:) !< Primitive set data.
+  integer(I4P)::                               i,j       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -393,6 +530,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Set_Array2D
 
+  !>Subroutine for setting components of Type_Primitive (array 3D) variable.
   pure subroutine Set_Array3D(r,v,p,d,g,prim)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Subroutine for setting Type_Primitive (array 3D).
@@ -400,13 +538,13 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),            intent(IN), optional:: r(:)
-  type(Type_Vector),    intent(IN), optional:: v
-  real(R_P),            intent(IN), optional:: p
-  real(R_P),            intent(IN), optional:: d
-  real(R_P),            intent(IN), optional:: g
-  type(Type_Primitive), intent(INOUT)::        prim(:,:,:)
-  integer(I4P)::                               i,j,k
+  real(R_P),            intent(IN), optional:: r(:)        !< Density of single species [1:Ns].
+  type(Type_Vector),    intent(IN), optional:: v           !< Velocity vector.
+  real(R_P),            intent(IN), optional:: p           !< Pressure.
+  real(R_P),            intent(IN), optional:: d           !< Density = sum(r(1:Ns)).
+  real(R_P),            intent(IN), optional:: g           !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
+  type(Type_Primitive), intent(INOUT)::        prim(:,:,:) !< Primitive set data.
+  integer(I4P)::                               i,j,k       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -427,7 +565,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Set_Array3D
 
-  ! free dynamic memory
+  !>Function for freeing the memory of Type_Primitive \em dynamic components (scalar).
+  !> @return \b err integer(I4P) variable.
   function Free_Scalar(prim) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for freeing the memory of Type_Primitive (scalar).
@@ -435,8 +574,8 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Primitive), intent(INOUT):: prim
-  integer(I4P)::                        err  ! Error traping flag: 0 no errors, >0 error occours.
+  type(Type_Primitive), intent(INOUT):: prim !< Primitive data.
+  integer(I4P)::                        err  !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -446,6 +585,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Free_Scalar
 
+  !>Function for freeing the memory of Type_Primitive \em dynamic components (array 1D).
+  !> @return \b err integer(I4P) variable.
   function Free_Array1D(prim) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for freeing the memory of Type_Primitive (array 1D).
@@ -453,9 +594,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Primitive), intent(INOUT):: prim(:)
-  integer(I4P)::                        err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I4P)::                        i
+  type(Type_Primitive), intent(INOUT):: prim(:) !< Primitive data.
+  integer(I4P)::                        err     !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I4P)::                        i       !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -467,6 +608,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Free_Array1D
 
+  !>Function for freeing the memory of Type_Primitive \em dynamic components (array 2D).
+  !> @return \b err integer(I4P) variable.
   function Free_Array2D(prim) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for freeing the memory of Type_Primitive (array 2D).
@@ -474,9 +617,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Primitive), intent(INOUT):: prim(:,:)
-  integer(I4P)::                        err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I4P)::                        i,j
+  type(Type_Primitive), intent(INOUT):: prim(:,:) !< Primitive data.
+  integer(I4P)::                        err       !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I4P)::                        i,j       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -490,6 +633,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Free_Array2D
 
+  !>Function for freeing the memory of Type_Primitive \em dynamic components (array 3D).
+  !> @return \b err integer(I4P) variable.
   function Free_Array3D(prim) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for freeing the memory of Type_Primitive (array 3D).
@@ -497,9 +642,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Primitive), intent(INOUT):: prim(:,:,:)
-  integer(I4P)::                        err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I4P)::                        i,j,k
+  type(Type_Primitive), intent(INOUT):: prim(:,:,:) !< Primitive data.
+  integer(I4P)::                        err         !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I4P)::                        i,j,k       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -515,6 +660,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Free_Array3D
 
+  !>Function for freeing the memory of Type_Primitive \em dynamic components (array 4D).
+  !> @return \b err integer(I4P) variable.
   function Free_Array4D(prim) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for freeing the memory of Type_Primitive (array 4D).
@@ -522,9 +669,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Primitive), intent(INOUT):: prim(:,:,:,:)
-  integer(I4P)::                        err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I4P)::                        i,j,k,p
+  type(Type_Primitive), intent(INOUT):: prim(:,:,:,:) !< Primitive data.
+  integer(I4P)::                        err           !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I4P)::                        i,j,k,p       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -552,7 +699,7 @@ contains
   implicit none
   integer(I4P),         intent(IN):: unit ! logic unit
   type(Type_Primitive), intent(IN):: prim
-  integer(I4P)::                     err  ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                     err  ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -575,7 +722,7 @@ contains
   integer(I4P),         intent(IN):: unit   ! logic unit
   character(*),         intent(IN):: format ! format specifier
   type(Type_Primitive), intent(IN):: prim
-  integer(I4P)::                     err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -606,7 +753,7 @@ contains
   implicit none
   integer(I4P),         intent(IN):: unit    ! logic unit
   type(Type_Primitive), intent(IN):: prim(:)
-  integer(I4P)::                     err     ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                     err     ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I4P)::                     Ni,i
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -631,7 +778,7 @@ contains
   integer(I4P),         intent(IN):: unit    ! logic unit
   character(*),         intent(IN):: format
   type(Type_Primitive), intent(IN):: prim(:)
-  integer(I4P)::                     err     ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                     err     ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I4P)::                     Ni,i
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -664,7 +811,7 @@ contains
   implicit none
   integer(I4P),         intent(IN):: unit     ! logic unit
   type(Type_Primitive), intent(IN):: prim(:,:)
-  integer(I4P)::                     err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                     err      ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I4P)::                     Ni,Nj,i,j
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -690,7 +837,7 @@ contains
   integer(I4P),         intent(IN):: unit      ! logic unit
   character(*),         intent(IN):: format
   type(Type_Primitive), intent(IN):: prim(:,:)
-  integer(I4P)::                     err       ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                     err       ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I4P)::                     Ni,Nj,i,j
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -724,7 +871,7 @@ contains
   implicit none
   integer(I4P),         intent(IN):: unit        ! logic unit
   type(Type_Primitive), intent(IN):: prim(:,:,:)
-  integer(I4P)::                     err         ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                     err         ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I4P)::                     Ni,Nj,Nk,i,j,k
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -751,7 +898,7 @@ contains
   integer(I4P),         intent(IN):: unit        ! logic unit
   character(*),         intent(IN):: format
   type(Type_Primitive), intent(IN):: prim(:,:,:)
-  integer(I4P)::                     err         ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                     err         ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I4P)::                     Ni,Nj,Nk,i,j,k
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -787,7 +934,7 @@ contains
   implicit none
   integer(I4P),         intent(IN)::    unit ! logic unit
   type(Type_Primitive), intent(INOUT):: prim
-  integer(I4P)::                        err  ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                        err  ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -810,7 +957,7 @@ contains
   integer(I4P),         intent(IN)::    unit   ! logic unit
   character(*),         intent(IN)::    format ! format specifier
   type(Type_Primitive), intent(INOUT):: prim
-  integer(I4P)::                        err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                        err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -841,7 +988,7 @@ contains
   implicit none
   integer(I4P),         intent(IN)::    unit    ! logic unit
   type(Type_Primitive), intent(INOUT):: prim(:)
-  integer(I4P)::                        err     ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                        err     ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I4P)::                        Ni,i
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -866,7 +1013,7 @@ contains
   integer(I4P),         intent(IN)::    unit    ! logic unit
   character(*),         intent(IN)::    format  ! format specifier
   type(Type_Primitive), intent(INOUT):: prim(:)
-  integer(I4P)::                        err     ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                        err     ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I4P)::                        Ni,i
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -899,7 +1046,7 @@ contains
   implicit none
   integer(I4P),         intent(IN)::    unit      ! logic unit
   type(Type_Primitive), intent(INOUT):: prim(:,:)
-  integer(I4P)::                        err       ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                        err       ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I4P)::                        Ni,Nj,i,j
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -925,7 +1072,7 @@ contains
   integer(I4P),         intent(IN)::    unit     ! logic unit
   character(*),         intent(IN)::    format   ! format specifier
   type(Type_Primitive), intent(INOUT):: prim(:,:)
-  integer(I4P)::                        err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                        err      ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I4P)::                        Ni,Nj,i,j
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -959,7 +1106,7 @@ contains
   implicit none
   integer(I4P),         intent(IN)::    unit        ! logic unit
   type(Type_Primitive), intent(INOUT):: prim(:,:,:)
-  integer(I4P)::                        err        ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                        err        ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I4P)::                        Ni,Nj,Nk,Ns,i,j,k,s
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -987,7 +1134,7 @@ contains
   integer(I4P),         intent(IN)::    unit        ! logic unit
   character(*),         intent(IN)::    format      ! format specifier
   type(Type_Primitive), intent(INOUT):: prim(:,:,:)
-  integer(I4P)::                        err         ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                        err         ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I4P)::                        Ni,Nj,Nk,i,j,k
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2460,16 +2607,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sub_ScalI1P
 
+  !>Function for converting derived type Type_Primitive to 1D array.
+  !> @return \b array real(R_P), dimension(1:size(prim\%r)+6) variable.
   pure function prim2array(prim) result(array)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for converting derived type Type_Primitive to array.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Primitive), intent(IN):: prim
-  real(R_P)::                        array(1:size(prim%r)+6)
-  integer(I_P)::                     Ns
+  type(Type_Primitive), intent(IN):: prim                    !< Derived type primitive data.
+  real(R_P)::                        array(1:size(prim%r)+6) !< Primitive data in the form 1D array.
+  integer(I_P)::                     Ns                      !< Number of species.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2485,6 +2630,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim2array
 
+  !>Function for converting 1D array to derived type Type_Primitive.
+  !> @return \b prim type(Type_Primitive) variable.
   pure function array2prim(array) result(prim)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for converting array to derived type Type_Primitive.
@@ -2492,13 +2639,13 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN):: array(:)
-  type(Type_Primitive)::  prim
-  integer(I_P)::          Ns
+  real(R_P), intent(IN):: array(:) !< Primitive data in the form 1D array.
+  type(Type_Primitive)::  prim     !< Derived type primitive data.
+  integer(I_P)::          Ns       !< Number of species.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  Ns = ubound(array,dim=1)-6
+  Ns = size(array)-6
   if (allocated(prim%r)) deallocate(prim%r)  ; allocate(prim%r(1:Ns))
   prim%r   = array(1:Ns)
   prim%v%x = array(Ns+1)

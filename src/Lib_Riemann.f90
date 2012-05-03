@@ -1,9 +1,6 @@
+!> This module contains procedures for computing the solution of a Riemann Problem.
+!> @todo \b DocComplete: Complete the documentation of internal procedures
 module Lib_Riemann
-!-----------------------------------------------------------------------------------------------------------------------------------
-! The module Lib_Riemann contains subroutines and functions for computing the solution of a Riemann Problem.
-! states U1,U4
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                             ! precision of integers and reals
 USE Lib_Thermodynamic_Laws_Ideal, only: E, & ! Function for computing total energy.
@@ -763,28 +760,24 @@ contains
   endfunction Harten_limiter
 
   ! subroutines for evaluating the smoothness of cell or interface
+  !> Function for evaluating the smoothness of an interface using a Riemann solver-like algorithm.
   function chk_smooth_z(p1,r1,u1,g1,p4,r4,u4,g4) result(smooth)
   !-------------------------------------------------------------------------------------------------------------------------------
-  ! Function for evaluating the smoothness of an interface using a Riemann solver-like algorithm:
-  ! the result is .false. if a shock is recognized, .true. otherwise.
-  !-------------------------------------------------------------------------------------------------------------------------------
-
-  !-------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN):: p1     ! Pressure of state 1.
-  real(R_P), intent(IN):: r1     ! Density of state 1.
-  real(R_P), intent(IN):: u1     ! Velocity of state 1.
-  real(R_P), intent(IN):: g1     ! Specific heats ratio of state 1.
-  real(R_P), intent(IN):: p4     ! Pressure of state 4.
-  real(R_P), intent(IN):: r4     ! Density of state 4.
-  real(R_P), intent(IN):: u4     ! Velocity of state 4.
-  real(R_P), intent(IN):: g4     ! Specific heats ratio of state 4.
-  logical::               smooth ! Logical flag for testing the smoothness of the stencil.
-  real(R_P)::             a1,a4  ! Speeds of sound of states 1 and 4.
-  real(R_P)::             pmin   ! min(p1,p4).
-  real(R_P)::             pmax   ! max(p1,p4).
-  real(R_P)::             u23    ! Velocity of intermediate states.
-  real(R_P)::             p23    ! Pressure of intermediate states.
+  real(R_P), intent(IN):: p1     !< Pressure of state 1.
+  real(R_P), intent(IN):: r1     !< Density of state 1.
+  real(R_P), intent(IN):: u1     !< Velocity of state 1.
+  real(R_P), intent(IN):: g1     !< Specific heats ratio of state 1.
+  real(R_P), intent(IN):: p4     !< Pressure of state 4.
+  real(R_P), intent(IN):: r4     !< Density of state 4.
+  real(R_P), intent(IN):: u4     !< Velocity of state 4.
+  real(R_P), intent(IN):: g4     !< Specific heats ratio of state 4.
+  logical::               smooth !< Logical flag for testing the smoothness of the stencil.
+  real(R_P)::             a1,a4  !< Speeds of sound of states 1 and 4.
+  real(R_P)::             pmin   !< min(p1,p4).
+  real(R_P)::             pmax   !< max(p1,p4).
+  real(R_P)::             u23    !< Velocity of intermediate states.
+  real(R_P)::             p23    !< Pressure of intermediate states.
   !-------------------------------------------------------------------------------------------------------------------------------
 
   !-------------------------------------------------------------------------------------------------------------------------------
@@ -807,23 +800,23 @@ contains
   !-------------------------------------------------------------------------------------------------------------------------------
   endfunction chk_smooth_z
 
+  !> Function for evaluating the smoothness of a cell using a discontinuity detector based on slope limiter function.
   function chk_smooth_limiter(pm1,pp1,rm1,rp1,um1,up1,gm1,gp1) result(smooth)
   !-------------------------------------------------------------------------------------------------------------------------------
-  ! Function for evaluating the smoothness of a cell using a discontinuity detector based on slope limiter function:
-  ! the result is .false. if a discontinuity is recognized, .true. otherwise.
-  !-------------------------------------------------------------------------------------------------------------------------------
-
-  !-------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN):: pm1,pp1 ! Upwind and downwind difference of pressure.
-  real(R_P), intent(IN):: rm1,rp1 ! Upwind and downwind difference of density.
-  real(R_P), intent(IN):: um1,up1 ! Upwind and downwind difference of speed.
-  real(R_P), intent(IN):: gm1,gp1 ! Upwind and downwind difference of specific heats ratio.
-  logical::               smooth  ! Logical flag for testing the smoothness of the stencil.
-  real(R_P)::             p_limit ! Smoothness limit (1 => smooth) of stencil according to pressure values.
-  real(R_P)::             r_limit ! Smoothness limit (1 => smooth) of stencil according to density values.
-  real(R_P)::             u_limit ! Smoothness limit (1 => smooth) of stencil according to speed values.
-  real(R_P)::             g_limit ! Smoothness limit (1 => smooth) of stencil according to g values.
+  real(R_P), intent(IN):: pm1     !< Upwind difference of pressure.
+  real(R_P), intent(IN):: pp1     !< Downwind difference of pressure.
+  real(R_P), intent(IN):: rm1     !< Upwind difference of density.
+  real(R_P), intent(IN):: rp1     !< Downwind difference of density.
+  real(R_P), intent(IN):: um1     !< Upwind difference of speed.
+  real(R_P), intent(IN):: up1     !< Downwind difference of speed.
+  real(R_P), intent(IN):: gm1     !< Upwind difference of specific heats ratio.
+  real(R_P), intent(IN):: gp1     !< Downwind difference of specific heats ratio.
+  logical::               smooth  !< Logical flag for testing the smoothness of the stencil.
+  real(R_P)::             p_limit !< Smoothness limit (1 => smooth) of stencil according to pressure values.
+  real(R_P)::             r_limit !< Smoothness limit (1 => smooth) of stencil according to density values.
+  real(R_P)::             u_limit !< Smoothness limit (1 => smooth) of stencil according to speed values.
+  real(R_P)::             g_limit !< Smoothness limit (1 => smooth) of stencil according to g values.
   !-------------------------------------------------------------------------------------------------------------------------------
 
   !-------------------------------------------------------------------------------------------------------------------------------
@@ -851,41 +844,37 @@ contains
   !-------------------------------------------------------------------------------------------------------------------------------
   endfunction chk_smooth_limiter
 
+  !> Function for evaluating the smoothness of a cell using the Liu's entropy conditions.
   function chk_smooth_liu(pm1,rm1,um1,gm1,cpm1,cvm1,     &
                           p1, r1, u1m,u1p, g1, cp1, cv1, &
                           pp1,rp1,up1,gp1,cpp1,cvp1) result(smooth)
   !-------------------------------------------------------------------------------------------------------------------------------
-  ! Function for evaluating the smoothness of a cell using the Liu's entropy conditions:
-  ! the result is .false. if a shock is recognized, .true. otherwise.
-  !-------------------------------------------------------------------------------------------------------------------------------
-
-  !-------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN):: pm1      ! Pressure of state i-1.
-  real(R_P), intent(IN):: rm1      ! Density of state i-1.
-  real(R_P), intent(IN):: um1      ! Velocity of state i-1.
-  real(R_P), intent(IN):: gm1      ! Specific heats ratio of state i-1.
-  real(R_P), intent(IN):: cpm1     ! Specific heats cp of state i-1.
-  real(R_P), intent(IN):: cvm1     ! Specific heats cv of state i-1.
-  real(R_P), intent(IN):: p1       ! Pressure of state i.
-  real(R_P), intent(IN):: r1       ! Density of state i.
-  real(R_P), intent(IN):: u1m      ! Velocity of state i at left interface.
-  real(R_P), intent(IN):: u1p      ! Velocity of state i at left interface.
-  real(R_P), intent(IN):: g1       ! Specific heats ratio of state i.
-  real(R_P), intent(IN):: cp1      ! Specific heats cp of state i.
-  real(R_P), intent(IN):: cv1      ! Specific heats cv of state i.
-  real(R_P), intent(IN):: pp1      ! Pressure of state i+1.
-  real(R_P), intent(IN):: rp1      ! Density of state i+1.
-  real(R_P), intent(IN):: up1      ! Velocity of state i+1.
-  real(R_P), intent(IN):: gp1      ! Specific heats ratio of state i+1.
-  real(R_P), intent(IN):: cpp1     ! Specific heats cp of state i+1.
-  real(R_P), intent(IN):: cvp1     ! Specific heats cv of state i+1.
-  logical::               smooth   ! Logical flag for testing the smoothness of the stencil.
-  real(R_P)::             a1,a4    ! Speeds of sound of states 1 and 4.
-  real(R_P)::             u_roe    ! Velocity of Roe average state.
-  real(R_P)::             a_roe    ! Speed of sound of Roe average state.
-  logical::               smooth_l ! Logical flag for testing the smoothness across the left interface.
-  logical::               smooth_r ! Logical flag for testing the smoothness across the right interface.
+  real(R_P), intent(IN):: pm1      !< Pressure of state i-1.
+  real(R_P), intent(IN):: rm1      !< Density of state i-1.
+  real(R_P), intent(IN):: um1      !< Velocity of state i-1.
+  real(R_P), intent(IN):: gm1      !< Specific heats ratio of state i-1.
+  real(R_P), intent(IN):: cpm1     !< Specific heats cp of state i-1.
+  real(R_P), intent(IN):: cvm1     !< Specific heats cv of state i-1.
+  real(R_P), intent(IN):: p1       !< Pressure of state i.
+  real(R_P), intent(IN):: r1       !< Density of state i.
+  real(R_P), intent(IN):: u1m      !< Velocity of state i at left interface.
+  real(R_P), intent(IN):: u1p      !< Velocity of state i at left interface.
+  real(R_P), intent(IN):: g1       !< Specific heats ratio of state i.
+  real(R_P), intent(IN):: cp1      !< Specific heats cp of state i.
+  real(R_P), intent(IN):: cv1      !< Specific heats cv of state i.
+  real(R_P), intent(IN):: pp1      !< Pressure of state i+1.
+  real(R_P), intent(IN):: rp1      !< Density of state i+1.
+  real(R_P), intent(IN):: up1      !< Velocity of state i+1.
+  real(R_P), intent(IN):: gp1      !< Specific heats ratio of state i+1.
+  real(R_P), intent(IN):: cpp1     !< Specific heats cp of state i+1.
+  real(R_P), intent(IN):: cvp1     !< Specific heats cv of state i+1.
+  logical::               smooth   !< Logical flag for testing the smoothness of the stencil.
+  real(R_P)::             a1,a4    !< Speeds of sound of states 1 and 4.
+  real(R_P)::             u_roe    !< Velocity of Roe average state.
+  real(R_P)::             a_roe    !< Speed of sound of Roe average state.
+  logical::               smooth_l !< Logical flag for testing the smoothness across the left interface.
+  logical::               smooth_r !< Logical flag for testing the smoothness across the right interface.
   !-------------------------------------------------------------------------------------------------------------------------------
 
   !-------------------------------------------------------------------------------------------------------------------------------
@@ -1778,30 +1767,27 @@ contains
   endsubroutine Z_WavesSpeed14
 
   ! Riemann Solvers
+  !> Approximate Riemann solver based on (local) Lax-Friedrichs (known also as Rusanov) algorithm.
   elemental subroutine Riem_Solver_LaxFriedrichs(p1,r1,u1,g1,p4,r4,u4,g4,F_r,F_u,F_E)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for computing the interface fluxes by means of the (local) Lax-Friedrichs (known also as Rusanov) approximation.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN)::  p1             ! Pressure of state 1.
-  real(R_P), intent(IN)::  r1             ! Density of state 1.
-  real(R_P), intent(IN)::  u1             ! Velocity of state 1.
-  real(R_P), intent(IN)::  g1             ! Specific heats ratio of state 1.
-  real(R_P), intent(IN)::  p4             ! Pressure of state 4.
-  real(R_P), intent(IN)::  r4             ! Density of state 4.
-  real(R_P), intent(IN)::  u4             ! Velocity of state 4.
-  real(R_P), intent(IN)::  g4             ! Specific heats ratio of state 4.
-  real(R_P), intent(OUT):: F_r            ! Flux of mass conservation.
-  real(R_P), intent(OUT):: F_u            ! Flux of momentum conservation.
-  real(R_P), intent(OUT):: F_E            ! Flux of energy conservation.
-  real(R_P)::              a1,a4          ! Speed of sound of state 1 and 4.
-  real(R_P)::              S1,S4          ! Maximum wave speed of state 1 and 4.
-  real(R_P)::              S              ! Contact discontinuity wave speed.
-  real(R_P)::              lmax           ! Maximum wave speed estimation.
-  real(R_P)::              F_r1,F_u1,F_E1 ! Fluxes of state 1.
-  real(R_P)::              F_r4,F_u4,F_E4 ! Fluxes of state 4.
+  real(R_P), intent(IN)::  p1             !< Pressure of state 1.
+  real(R_P), intent(IN)::  r1             !< Density of state 1.
+  real(R_P), intent(IN)::  u1             !< Velocity of state 1.
+  real(R_P), intent(IN)::  g1             !< Specific heats ratio of state 1.
+  real(R_P), intent(IN)::  p4             !< Pressure of state 4.
+  real(R_P), intent(IN)::  r4             !< Density of state 4.
+  real(R_P), intent(IN)::  u4             !< Velocity of state 4.
+  real(R_P), intent(IN)::  g4             !< Specific heats ratio of state 4.
+  real(R_P), intent(OUT):: F_r            !< Flux of mass conservation.
+  real(R_P), intent(OUT):: F_u            !< Flux of momentum conservation.
+  real(R_P), intent(OUT):: F_E            !< Flux of energy conservation.
+  real(R_P)::              a1,a4          !< Speed of sound of state 1 and 4.
+  real(R_P)::              S1,S4          !< Maximum wave speed of state 1 and 4.
+  real(R_P)::              S              !< Contact discontinuity wave speed.
+  real(R_P)::              lmax           !< Maximum wave speed estimation.
+  real(R_P)::              F_r1,F_u1,F_E1 !< Fluxes of state 1.
+  real(R_P)::              F_r4,F_u4,F_E4 !< Fluxes of state 4.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1831,31 +1817,28 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Riem_Solver_LaxFriedrichs
 
+  !> Approximate Riemann solver based on Primitive Variables Linearization algorithm.
   subroutine Riem_Solver_PVL(p1,r1,u1,g1,p4,r4,u4,g4,F_r,F_u,F_E)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Approximate Riemann solver based on Primitive Variables Linearization approximation.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN)::  p1    ! Pressure of state 1.
-  real(R_P), intent(IN)::  r1    ! Density of state 1.
-  real(R_P), intent(IN)::  u1    ! Velocity of state 1.
-  real(R_P), intent(IN)::  g1    ! Specific heats ratio of state 1.
-  real(R_P), intent(IN)::  p4    ! Pressure of state 4.
-  real(R_P), intent(IN)::  r4    ! Density of state 4.
-  real(R_P), intent(IN)::  u4    ! Velocity of state 4.
-  real(R_P), intent(IN)::  g4    ! Specific heats ratio of state 4.
-  real(R_P), intent(OUT):: F_r   ! Flux of mass conservation.
-  real(R_P), intent(OUT):: F_u   ! Flux of momentum conservation.
-  real(R_P), intent(OUT):: F_E   ! Flux of energy conservation.
-  real(R_P)::              a1,a4 ! Speed of sound of state 1 and 4.
-  real(R_P)::              S1,S2 ! Left signal velocities.
-  real(R_P)::              S4,S3 ! Right signal velocities.
-  real(R_P)::              S     ! Velocity of intermediate states.
-  real(R_P)::              p23   ! Pressure of intermediate states.
-  real(R_P)::              r2    ! Density of state 2.
-  real(R_P)::              r3    ! Density of state 3.
+  real(R_P), intent(IN)::  p1    !< Pressure of state 1.
+  real(R_P), intent(IN)::  r1    !< Density of state 1.
+  real(R_P), intent(IN)::  u1    !< Velocity of state 1.
+  real(R_P), intent(IN)::  g1    !< Specific heats ratio of state 1.
+  real(R_P), intent(IN)::  p4    !< Pressure of state 4.
+  real(R_P), intent(IN)::  r4    !< Density of state 4.
+  real(R_P), intent(IN)::  u4    !< Velocity of state 4.
+  real(R_P), intent(IN)::  g4    !< Specific heats ratio of state 4.
+  real(R_P), intent(OUT):: F_r   !< Flux of mass conservation.
+  real(R_P), intent(OUT):: F_u   !< Flux of momentum conservation.
+  real(R_P), intent(OUT):: F_E   !< Flux of energy conservation.
+  real(R_P)::              a1,a4 !< Speed of sound of state 1 and 4.
+  real(R_P)::              S1,S2 !< Left signal velocities.
+  real(R_P)::              S4,S3 !< Right signal velocities.
+  real(R_P)::              S     !< Velocity of intermediate states.
+  real(R_P)::              p23   !< Pressure of intermediate states.
+  real(R_P)::              r2    !< Density of state 2.
+  real(R_P)::              r3    !< Density of state 3.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1876,31 +1859,28 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Riem_Solver_PVL
 
+  !> Approximate Riemann solver based on Two Rarefactions algorithm.
   subroutine Riem_Solver_TR(p1,r1,u1,g1,p4,r4,u4,g4,F_r,F_u,F_E)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Approximate Riemann solver based on Two Rarefactions approximation.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN)::  p1    ! Pressure of state 1.
-  real(R_P), intent(IN)::  r1    ! Density of state 1.
-  real(R_P), intent(IN)::  u1    ! Velocity of state 1.
-  real(R_P), intent(IN)::  g1    ! Specific heats ratio of state 1.
-  real(R_P), intent(IN)::  p4    ! Pressure of state 4.
-  real(R_P), intent(IN)::  r4    ! Density of state 4.
-  real(R_P), intent(IN)::  u4    ! Velocity of state 4.
-  real(R_P), intent(IN)::  g4    ! Specific heats ratio of state 4.
-  real(R_P), intent(OUT):: F_r   ! Flux of mass conservation.
-  real(R_P), intent(OUT):: F_u   ! Flux of momentum conservation.
-  real(R_P), intent(OUT):: F_E   ! Flux of energy conservation.
-  real(R_P)::              a1,a4 ! Speed of sound of state 1 and 4.
-  real(R_P)::              S1,S2 ! Left signal velocities.
-  real(R_P)::              S4,S3 ! Right signal velocities.
-  real(R_P)::              S     ! Velocity of intermediate states.
-  real(R_P)::              p23   ! Pressure of intermediate states.
-  real(R_P)::              r2    ! Density of state 2.
-  real(R_P)::              r3    ! Density of state 3.
+  real(R_P), intent(IN)::  p1    !< Pressure of state 1.
+  real(R_P), intent(IN)::  r1    !< Density of state 1.
+  real(R_P), intent(IN)::  u1    !< Velocity of state 1.
+  real(R_P), intent(IN)::  g1    !< Specific heats ratio of state 1.
+  real(R_P), intent(IN)::  p4    !< Pressure of state 4.
+  real(R_P), intent(IN)::  r4    !< Density of state 4.
+  real(R_P), intent(IN)::  u4    !< Velocity of state 4.
+  real(R_P), intent(IN)::  g4    !< Specific heats ratio of state 4.
+  real(R_P), intent(OUT):: F_r   !< Flux of mass conservation.
+  real(R_P), intent(OUT):: F_u   !< Flux of momentum conservation.
+  real(R_P), intent(OUT):: F_E   !< Flux of energy conservation.
+  real(R_P)::              a1,a4 !< Speed of sound of state 1 and 4.
+  real(R_P)::              S1,S2 !< Left signal velocities.
+  real(R_P)::              S4,S3 !< Right signal velocities.
+  real(R_P)::              S     !< Velocity of intermediate states.
+  real(R_P)::              p23   !< Pressure of intermediate states.
+  real(R_P)::              r2    !< Density of state 2.
+  real(R_P)::              r3    !< Density of state 3.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1921,31 +1901,28 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Riem_Solver_TR
 
+  !> Approximate Riemann solver based on Two Shocks algorithm.
   elemental subroutine Riem_Solver_TS(p1,r1,u1,g1,p4,r4,u4,g4,F_r,F_u,F_E)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Approximate Riemann solver based on Two Shocks approximation.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN)::  p1    ! Pressure of state 1.
-  real(R_P), intent(IN)::  r1    ! Density of state 1.
-  real(R_P), intent(IN)::  u1    ! Velocity of state 1.
-  real(R_P), intent(IN)::  g1    ! Specific heats ratio of state 1.
-  real(R_P), intent(IN)::  p4    ! Pressure of state 4.
-  real(R_P), intent(IN)::  r4    ! Density of state 4.
-  real(R_P), intent(IN)::  u4    ! Velocity of state 4.
-  real(R_P), intent(IN)::  g4    ! Specific heats ratio of state 4.
-  real(R_P), intent(OUT):: F_r   ! Flux of mass conservation.
-  real(R_P), intent(OUT):: F_u   ! Flux of momentum conservation.
-  real(R_P), intent(OUT):: F_E   ! Flux of energy conservation.
-  real(R_P)::              a1,a4 ! Speed of sound of state 1 and 4.
-  real(R_P)::              S1,S2 ! Left signal velocities.
-  real(R_P)::              S4,S3 ! Right signal velocities.
-  real(R_P)::              S     ! Velocity of intermediate states.
-  real(R_P)::              p23   ! Pressure of intermediate states.
-  real(R_P)::              r2    ! Density of state 2.
-  real(R_P)::              r3    ! Density of state 3.
+  real(R_P), intent(IN)::  p1    !< Pressure of state 1.
+  real(R_P), intent(IN)::  r1    !< Density of state 1.
+  real(R_P), intent(IN)::  u1    !< Velocity of state 1.
+  real(R_P), intent(IN)::  g1    !< Specific heats ratio of state 1.
+  real(R_P), intent(IN)::  p4    !< Pressure of state 4.
+  real(R_P), intent(IN)::  r4    !< Density of state 4.
+  real(R_P), intent(IN)::  u4    !< Velocity of state 4.
+  real(R_P), intent(IN)::  g4    !< Specific heats ratio of state 4.
+  real(R_P), intent(OUT):: F_r   !< Flux of mass conservation.
+  real(R_P), intent(OUT):: F_u   !< Flux of momentum conservation.
+  real(R_P), intent(OUT):: F_E   !< Flux of energy conservation.
+  real(R_P)::              a1,a4 !< Speed of sound of state 1 and 4.
+  real(R_P)::              S1,S2 !< Left signal velocities.
+  real(R_P)::              S4,S3 !< Right signal velocities.
+  real(R_P)::              S     !< Velocity of intermediate states.
+  real(R_P)::              p23   !< Pressure of intermediate states.
+  real(R_P)::              r2    !< Density of state 2.
+  real(R_P)::              r3    !< Density of state 3.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1972,34 +1949,31 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Riem_Solver_TS
 
+  !> Approximate Riemann solver based on Adaptive (non iterative) PVL-TR-TS algorithm.
   subroutine Riem_Solver_APRS(p1,r1,u1,g1,p4,r4,u4,g4,F_r,F_u,F_E)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Approximate Riemann solver based on Adaptive (non iterative) PVL-TR-TS approximation.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN)::  p1          ! Pressure of state 1.
-  real(R_P), intent(IN)::  r1          ! Density of state 1.
-  real(R_P), intent(IN)::  u1          ! Velocity of state 1.
-  real(R_P), intent(IN)::  g1          ! Specific heats ratio of state 1.
-  real(R_P), intent(IN)::  p4          ! Pressure of state 4.
-  real(R_P), intent(IN)::  r4          ! Density of state 4.
-  real(R_P), intent(IN)::  u4          ! Velocity of state 4.
-  real(R_P), intent(IN)::  g4          ! Specific heats ratio of state 4.
-  real(R_P), intent(OUT):: F_r         ! Flux of mass conservation.
-  real(R_P), intent(OUT):: F_u         ! Flux of momentum conservation.
-  real(R_P), intent(OUT):: F_E         ! Flux of energy conservation.
-  real(R_P)::              a1,a4       ! Speed of sound of state 1 and 4.
-  real(R_P)::              gm1_1,gm1_4 ! g-1 of state 1 and 4.
-  real(R_P)::              pmin        ! min(p1,p4).
-  real(R_P)::              pmax        ! max(p1,p4).
-  real(R_P)::              S1,S2       ! Left signal velocities.
-  real(R_P)::              S4,S3       ! Right signal velocities.
-  real(R_P)::              S           ! Velocity of intermediate states.
-  real(R_P)::              p23         ! Pressure of intermediate states.
-  real(R_P)::              r2          ! Density and speed of sound of state 2.
-  real(R_P)::              r3          ! Density and speed of sound of state 3.
+  real(R_P), intent(IN)::  p1          !< Pressure of state 1.
+  real(R_P), intent(IN)::  r1          !< Density of state 1.
+  real(R_P), intent(IN)::  u1          !< Velocity of state 1.
+  real(R_P), intent(IN)::  g1          !< Specific heats ratio of state 1.
+  real(R_P), intent(IN)::  p4          !< Pressure of state 4.
+  real(R_P), intent(IN)::  r4          !< Density of state 4.
+  real(R_P), intent(IN)::  u4          !< Velocity of state 4.
+  real(R_P), intent(IN)::  g4          !< Specific heats ratio of state 4.
+  real(R_P), intent(OUT):: F_r         !< Flux of mass conservation.
+  real(R_P), intent(OUT):: F_u         !< Flux of momentum conservation.
+  real(R_P), intent(OUT):: F_E         !< Flux of energy conservation.
+  real(R_P)::              a1,a4       !< Speed of sound of state 1 and 4.
+  real(R_P)::              gm1_1,gm1_4 !< g-1 of state 1 and 4.
+  real(R_P)::              pmin        !< min(p1,p4).
+  real(R_P)::              pmax        !< max(p1,p4).
+  real(R_P)::              S1,S2       !< Left signal velocities.
+  real(R_P)::              S4,S3       !< Right signal velocities.
+  real(R_P)::              S           !< Velocity of intermediate states.
+  real(R_P)::              p23         !< Pressure of intermediate states.
+  real(R_P)::              r2          !< Density and speed of sound of state 2.
+  real(R_P)::              r3          !< Density and speed of sound of state 3.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2038,32 +2012,29 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Riem_Solver_APRS
 
+  !> Approximate Riemann solver based on Adaptive (non iterative) LF-TR algorithm.
   subroutine Riem_Solver_ALFR(p1,r1,u1,g1,p4,r4,u4,g4,F_r,F_u,F_E)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Approximate Riemann solver based on Adaptive (non iterative) LF-TR approximation.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN)::  p1                ! Pressure of state 1.
-  real(R_P), intent(IN)::  r1                ! Density of state 1.
-  real(R_P), intent(IN)::  u1                ! Velocity of state 1.
-  real(R_P), intent(IN)::  g1                ! Specific heats ratio of state 1.
-  real(R_P), intent(IN)::  p4                ! Pressure of state 4.
-  real(R_P), intent(IN)::  r4                ! Density of state 4.
-  real(R_P), intent(IN)::  u4                ! Velocity of state 4.
-  real(R_P), intent(IN)::  g4                ! Specific heats ratio of state 4.
-  real(R_P), intent(OUT):: F_r               ! Flux of mass conservation.
-  real(R_P), intent(OUT):: F_u               ! Flux of momentum conservation.
-  real(R_P), intent(OUT):: F_E               ! Flux of energy conservation.
-  real(R_P)::              a1,a2,a3,a4       ! Speed of sound of state 1, 2, 3 and 4.
-  real(R_P)::              gm1_1,delta1,eta1 ! g-1, (g-1)/2, 2*g/(g-1)
-  real(R_P)::              gm1_4,delta4,eta4 ! g-1, (g-1)/2, 2*g/(g-1)
-  real(R_P)::              p2,r2             ! Primitive variables of state 2.
-  real(R_P)::              p3,r3             ! Primitive variables of state 3.
-  real(R_P)::              S1,S2             ! Left signal velocities.
-  real(R_P)::              S4,S3             ! Right signal velocities.
-  logical::                RCR               ! Flag for identifing Two Rarefactions condition.
+  real(R_P), intent(IN)::  p1                !< Pressure of state 1.
+  real(R_P), intent(IN)::  r1                !< Density of state 1.
+  real(R_P), intent(IN)::  u1                !< Velocity of state 1.
+  real(R_P), intent(IN)::  g1                !< Specific heats ratio of state 1.
+  real(R_P), intent(IN)::  p4                !< Pressure of state 4.
+  real(R_P), intent(IN)::  r4                !< Density of state 4.
+  real(R_P), intent(IN)::  u4                !< Velocity of state 4.
+  real(R_P), intent(IN)::  g4                !< Specific heats ratio of state 4.
+  real(R_P), intent(OUT):: F_r               !< Flux of mass conservation.
+  real(R_P), intent(OUT):: F_u               !< Flux of momentum conservation.
+  real(R_P), intent(OUT):: F_E               !< Flux of energy conservation.
+  real(R_P)::              a1,a2,a3,a4       !< Speed of sound of state 1, 2, 3 and 4.
+  real(R_P)::              gm1_1,delta1,eta1 !< g-1, (g-1)/2, 2*g/(g-1)
+  real(R_P)::              gm1_4,delta4,eta4 !< g-1, (g-1)/2, 2*g/(g-1)
+  real(R_P)::              p2,r2             !< Primitive variables of state 2.
+  real(R_P)::              p3,r3             !< Primitive variables of state 3.
+  real(R_P)::              S1,S2             !< Left signal velocities.
+  real(R_P)::              S4,S3             !< Right signal velocities.
+  logical::                RCR               !< Flag for identifying Two Rarefactions condition.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2126,6 +2097,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Riem_Solver_ALFR
 
+  !> Approximate Riemann solver based on HLLC algorithm.
+  !> @note Five variants are provided: HLLCb, using BCLC estimation of waves speed, HLLCc using CVL algorithm, HLLCp using PVL
+  !> algorithm, HLLCt using TR algorithm and HLLCz using Z one.
   elemental subroutine Riem_Solver_HLLC(p1,r1,u1,g1, &
 #if defined RSHLLCb
                                         cp1,cv1,     &
@@ -2136,43 +2110,37 @@ contains
 #endif
                                         F_r,F_u,F_E)
   !--------------------------------------------------------------------------------------------------------------------------------
-  ! The subroutine Riem_Solver_HLLC solves the Riemann problem between the state 1 and 4 using the HLLC solver. Five variants are
-  ! provided: HLLCb, using BCLC estimation of waves speed, HLLCc using CVL algorithm, HLLCp using PVL algorithm, HLLCt using TR
-  ! algorithm and HLLCz using Z one.
-  !--------------------------------------------------------------------------------------------------------------------------------
-
-  !--------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN)::  p1    ! Pressure of state 1.
-  real(R_P), intent(IN)::  r1    ! Density of state 1.
-  real(R_P), intent(IN)::  u1    ! Velocity of state 1.
-  real(R_P), intent(IN)::  g1    ! Specific heats ratio of state 1.
+  real(R_P), intent(IN)::  p1    !< Pressure of state 1.
+  real(R_P), intent(IN)::  r1    !< Density of state 1.
+  real(R_P), intent(IN)::  u1    !< Velocity of state 1.
+  real(R_P), intent(IN)::  g1    !< Specific heats ratio of state 1.
 #if defined RSHLLCb
-  real(R_P), intent(IN)::  cp1   ! Specific heats cp of state 1.
-  real(R_P), intent(IN)::  cv1   ! Specific heats cv of state 1.
+  real(R_P), intent(IN)::  cp1   !< Specific heats cp of state 1.
+  real(R_P), intent(IN)::  cv1   !< Specific heats cv of state 1.
 #endif
-  real(R_P), intent(IN)::  p4    ! Pressure of state 4.
-  real(R_P), intent(IN)::  r4    ! Density of state 4.
-  real(R_P), intent(IN)::  u4    ! Velocity of state 4.
-  real(R_P), intent(IN)::  g4    ! Specific heats ratio of state 4
+  real(R_P), intent(IN)::  p4    !< Pressure of state 4.
+  real(R_P), intent(IN)::  r4    !< Density of state 4.
+  real(R_P), intent(IN)::  u4    !< Velocity of state 4.
+  real(R_P), intent(IN)::  g4    !< Specific heats ratio of state 4
 #if defined RSHLLCb
-  real(R_P), intent(IN)::  cp4   ! Specific heats cp of state 4.
-  real(R_P), intent(IN)::  cv4   ! Specific heats cv of state 4.
+  real(R_P), intent(IN)::  cp4   !< Specific heats cp of state 4.
+  real(R_P), intent(IN)::  cv4   !< Specific heats cv of state 4.
 #endif
-  real(R_P), intent(OUT):: F_r   ! Flux of mass conservation.
-  real(R_P), intent(OUT):: F_u   ! Flux of momentum conservation.
-  real(R_P), intent(OUT):: F_E   ! Flux of energy conservation.
-  real(R_P)::              a1,a4 ! Speed of sound of state 1 and 4.
-  real(R_P)::              S1,S4 ! Left and right wave speeds.
-  real(R_P)::              S     ! Contact discontinuity wave speed.
-  real(R_P)::              U1S   ! Mass conservation.
-  real(R_P)::              U2S   ! Momentum conservation.
-  real(R_P)::              U3S   ! Energy conservation.
-  real(R_P)::              E1    ! Entalpy and internal energy of left state.
-  real(R_P)::              E4    ! Entalpy and internal energy of right state.
+  real(R_P), intent(OUT):: F_r   !< Flux of mass conservation.
+  real(R_P), intent(OUT):: F_u   !< Flux of momentum conservation.
+  real(R_P), intent(OUT):: F_E   !< Flux of energy conservation.
+  real(R_P)::              a1,a4 !< Speed of sound of state 1 and 4.
+  real(R_P)::              S1,S4 !< Left and right wave speeds.
+  real(R_P)::              S     !< Contact discontinuity wave speed.
+  real(R_P)::              U1S   !< Mass conservation.
+  real(R_P)::              U2S   !< Momentum conservation.
+  real(R_P)::              U3S   !< Energy conservation.
+  real(R_P)::              E1    !< Entalpy and internal energy of left state.
+  real(R_P)::              E4    !< Entalpy and internal energy of right state.
 #ifdef VACUUM
-  real(R_P)::              d1,d4 ! 2/(g-1) of state 1 and 4.
-  real(R_P)::              S2,S3 ! Left and right speeds of vacuum fronts.
+  real(R_P)::              d1,d4 !< 2/(g-1) of state 1 and 4.
+  real(R_P)::              S2,S3 !< Left and right speeds of vacuum fronts.
 #endif
   !--------------------------------------------------------------------------------------------------------------------------------
 
@@ -2252,42 +2220,39 @@ contains
   !--------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Riem_Solver_HLLC
 
+  !> Approximate Riemann solver based on Roe linearization.
+  !> @note The Harten-Hyman entropy fix is used to avoid shock-expansions (entropy violation).
   elemental subroutine Riem_Solver_Roe(p1,r1,u1,g1,cp1,cv1,p4,r4,u4,g4,cp4,cv4,F_r,F_u,F_E)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Approximate Riemann solver based on Roe linearization. The Harten-Hyman entropy fix is used to avoid shock-expansions (entropy
-  ! violation).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN)::  p1              ! Pressure of state 1.
-  real(R_P), intent(IN)::  r1              ! Density of state 1.
-  real(R_P), intent(IN)::  u1              ! Velocity of state 1.
-  real(R_P), intent(IN)::  g1              ! Specific heats ratio of state 1.
-  real(R_P), intent(IN)::  cp1             ! Specific heats cp of state 1.
-  real(R_P), intent(IN)::  cv1             ! Specific heats cv of state 1.
-  real(R_P), intent(IN)::  p4              ! pressure of state 4.
-  real(R_P), intent(IN)::  r4              ! Density of state 4.
-  real(R_P), intent(IN)::  u4              ! Velocity of state 4.
-  real(R_P), intent(IN)::  g4              ! Specific heats ratio of state 4.
-  real(R_P), intent(IN)::  cp4             ! Specific heats cp of state 4.
-  real(R_P), intent(IN)::  cv4             ! Specific heats cv of state 4.
-  real(R_P), intent(OUT):: F_r             ! Flux of mass conservation.
-  real(R_P), intent(OUT):: F_u             ! Flux of momentum conservation.
-  real(R_P), intent(OUT):: F_E             ! Flux of energy conservation.
-  real(R_P)::              a1,a4           ! Speed of sound of state 1 and 4.
-  real(R_P)::              S1,S2           ! Left signal velocities.
-  real(R_P)::              S4,S3           ! Right signal velocities.
-  real(R_P)::              S               ! Velocity of intermediate states.
-  real(R_P)::              F_r1,F_u1,F_E1  ! Fluxes of state 1.
-  real(R_P)::              F_r4,F_u4,F_E4  ! Fluxes of state 4.
-  real(R_P)::              Dr              ! Density difference  Dr = r4-r1.
-  real(R_P)::              Du              ! Velocity difference Du = u4-u1.
-  real(R_P)::              Dp              ! Pressure difference Dp = p4-p1.
-  real(R_P)::              r_r,u_r,a_r,H_r ! Roe's state.
-  real(R_P)::              aa1,aa2,aa3     ! Wawes amplitudes Roe's estimation.
-  real(R_P)::              ll1,ll2,ll3     ! Wawes speeds Roe's estimation.
-  real(R_P)::              ls1,    ls3     ! Wawes speeds Roe's estimation with entropy fix of Harten-Hyman.
+  real(R_P), intent(IN)::  p1              !< Pressure of state 1.
+  real(R_P), intent(IN)::  r1              !< Density of state 1.
+  real(R_P), intent(IN)::  u1              !< Velocity of state 1.
+  real(R_P), intent(IN)::  g1              !< Specific heats ratio of state 1.
+  real(R_P), intent(IN)::  cp1             !< Specific heats cp of state 1.
+  real(R_P), intent(IN)::  cv1             !< Specific heats cv of state 1.
+  real(R_P), intent(IN)::  p4              !< pressure of state 4.
+  real(R_P), intent(IN)::  r4              !< Density of state 4.
+  real(R_P), intent(IN)::  u4              !< Velocity of state 4.
+  real(R_P), intent(IN)::  g4              !< Specific heats ratio of state 4.
+  real(R_P), intent(IN)::  cp4             !< Specific heats cp of state 4.
+  real(R_P), intent(IN)::  cv4             !< Specific heats cv of state 4.
+  real(R_P), intent(OUT):: F_r             !< Flux of mass conservation.
+  real(R_P), intent(OUT):: F_u             !< Flux of momentum conservation.
+  real(R_P), intent(OUT):: F_E             !< Flux of energy conservation.
+  real(R_P)::              a1,a4           !< Speed of sound of state 1 and 4.
+  real(R_P)::              S1,S2           !< Left signal velocities.
+  real(R_P)::              S4,S3           !< Right signal velocities.
+  real(R_P)::              S               !< Velocity of intermediate states.
+  real(R_P)::              F_r1,F_u1,F_E1  !< Fluxes of state 1.
+  real(R_P)::              F_r4,F_u4,F_E4  !< Fluxes of state 4.
+  real(R_P)::              Dr              !< Density difference  Dr = r4-r1.
+  real(R_P)::              Du              !< Velocity difference Du = u4-u1.
+  real(R_P)::              Dp              !< Pressure difference Dp = p4-p1.
+  real(R_P)::              r_r,u_r,a_r,H_r !< Roe's state.
+  real(R_P)::              aa1,aa2,aa3     !< Wawes amplitudes Roe's estimation.
+  real(R_P)::              ll1,ll2,ll3     !< Wawes speeds Roe's estimation.
+  real(R_P)::              ls1,    ls3     !< Wawes speeds Roe's estimation with entropy fix of Harten-Hyman.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2356,36 +2321,33 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Riem_Solver_Roe
 
+  !> Exact Riemann solver based on iterative solution of u-function.
   subroutine Riem_Solver_Exact_U(p1,r1,u1,g1,p4,r4,u4,g4,F_r,F_u,F_E)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for solving Riemann problem with exact method based on iterative solution of u-function.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN)::  p1                      ! Pressure of state 1.
-  real(R_P), intent(IN)::  r1                      ! Density of state 1.
-  real(R_P), intent(IN)::  u1                      ! U speed of state 1.
-  real(R_P), intent(IN)::  g1                      ! Specific heats ratio of state 1.
-  real(R_P), intent(IN)::  p4                      ! Pressure of state 4.
-  real(R_P), intent(IN)::  r4                      ! Density of state 4.
-  real(R_P), intent(IN)::  u4                      ! U speed of state 4.
-  real(R_P), intent(IN)::  g4                      ! Specific heats ratio of state 4.
-  real(R_P), intent(OUT):: F_r                     ! Flux of mass conservation.
-  real(R_P), intent(OUT):: F_u                     ! Flux of momentum conservation.
-  real(R_P), intent(OUT):: F_E                     ! Flux of energy conservation.
-  real(R_P)::              a1,a2,a3,a4             ! Speed of sound of state 1, 2, 3 and 4.
-  real(R_P)::              gm1_1,gp1_1,delta1,eta1 ! g-1, g+1, (g-1)/2, 2*g/(g-1)
-  real(R_P)::              gm1_4,gp1_4,delta4,eta4 ! g-1, g+1, (g-1)/2, 2*g/(g-1)
-  real(R_P)::              p2,r2                   ! Primitive variables of state 2.
-  real(R_P)::              p3,r3                   ! Primitive variables of state 3.
-  real(R_P)::              dp2,dp3                 ! Derivate of pessure (dp/du) of state 2 and 3.
-  real(R_P)::              u23                     ! Speed of state 2 and 3.
-  real(R_P)::              S1                      ! Downstream front of C1 wave.
-  real(R_P)::              S2                      ! Upstream front of C1 wave.
-  real(R_P)::              S3                      ! Downstream front of C2 wave.
-  real(R_P)::              S4                      ! Upstream front of C1 wave.
-  real(R_P)::              dum,alfa,beta           ! Dummies coefficients.
+  real(R_P), intent(IN)::  p1                      !< Pressure of state 1.
+  real(R_P), intent(IN)::  r1                      !< Density of state 1.
+  real(R_P), intent(IN)::  u1                      !< U speed of state 1.
+  real(R_P), intent(IN)::  g1                      !< Specific heats ratio of state 1.
+  real(R_P), intent(IN)::  p4                      !< Pressure of state 4.
+  real(R_P), intent(IN)::  r4                      !< Density of state 4.
+  real(R_P), intent(IN)::  u4                      !< U speed of state 4.
+  real(R_P), intent(IN)::  g4                      !< Specific heats ratio of state 4.
+  real(R_P), intent(OUT):: F_r                     !< Flux of mass conservation.
+  real(R_P), intent(OUT):: F_u                     !< Flux of momentum conservation.
+  real(R_P), intent(OUT):: F_E                     !< Flux of energy conservation.
+  real(R_P)::              a1,a2,a3,a4             !< Speed of sound of state 1, 2, 3 and 4.
+  real(R_P)::              gm1_1,gp1_1,delta1,eta1 !< g-1, g+1, (g-1)/2, 2*g/(g-1)
+  real(R_P)::              gm1_4,gp1_4,delta4,eta4 !< g-1, g+1, (g-1)/2, 2*g/(g-1)
+  real(R_P)::              p2,r2                   !< Primitive variables of state 2.
+  real(R_P)::              p3,r3                   !< Primitive variables of state 3.
+  real(R_P)::              dp2,dp3                 !< Derivate of pessure (dp/du) of state 2 and 3.
+  real(R_P)::              u23                     !< Speed of state 2 and 3.
+  real(R_P)::              S1                      !< Downstream front of C1 wave.
+  real(R_P)::              S2                      !< Upstream front of C1 wave.
+  real(R_P)::              S3                      !< Downstream front of C2 wave.
+  real(R_P)::              S4                      !< Upstream front of C1 wave.
+  real(R_P)::              dum,alfa,beta           !< Dummies coefficients.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

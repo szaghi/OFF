@@ -1,12 +1,14 @@
+!> This module contains the definition of Type_Conservative and its procedures.
+!> Type_Conservative is a derived type that handles conservative fluid dynamic variables.
+!> @note The operators of assignment (=), multiplication (*), division (/), sum (+) and subtraction (-) have been overloaded.
+!> Therefore this module provides a far-complete algebra based on Type_Conservative derived type. This algebra simplifies the
+!> numerical integration of Partial Differential Equations (PDE) systems based on conservative formulation.
+!> @todo \b WriteRead: Complete the write and read functions
+!> @todo \b DocComplete: Complete the documentation of internal procedures
 module Data_Type_Conservative
-!-----------------------------------------------------------------------------------------------------------------------------------
-!!This module contains Data_Type_Conservative, a derived type that handles conservative fluidynamic variables.
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                              ! Integers and reals precision definition.
 USE Data_Type_Vector,                       & ! Definition of Type_Vector.
-                      init_vector => init,  & ! Function for initializing Type_Vector.
                       set_vector  => set,   & ! Function for setting Type_Vector.
                       get_vector  => get      ! Function for getting Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -14,7 +16,6 @@ USE Data_Type_Vector,                       & ! Definition of Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 private
-public:: Type_Conservative
 public:: init,set,free
 !public:: write,read
 public:: assignment (=)
@@ -26,149 +27,243 @@ public:: cons2array,array2cons
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!!Type_Conservative definition:
-type:: Type_Conservative
+!> Derived type containing conservative variables.
+!> @note This derived type can represent multi species fluids. The density component, \b rs, is a dynamic memory component defined
+!> as an allocatable 1D array. \b rs is allocated at runtime with the number of initial species that constitute the initial fluid
+!> mixture. Due to the presence of a dynamic component a freeing memory "method" for this component is necessary. Before deallocate
+!> a variable defined as Type_Conservative the free function must be invoked to free the memory of the dynamic component.
+type, public:: Type_Conservative
   sequence
-  real(R_P), allocatable:: rs(:)       ! Density of single species [1:Ns].
-  type(Type_Vector)::      rv          ! Momentum vector.
-  real(R_P)::              re = 0._R_P ! Product of density for total internal energy (sum(r)*E).
+  real(R_P), allocatable:: rs(:)       !< Density of single species [1:Ns].
+  type(Type_Vector)::      rv          !< Momentum vector.
+  real(R_P)::              re = 0._R_P !< Product of density for total internal energy (sum(r)*E).
 endtype Type_Conservative
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!!Init overloading.
+!> @brief Subroutine for initializing Type_Conservative variable.
+!> It is a generic interface to 5 different subroutines as it can be used for initializing scalar variables, 1D/2D/3D or 4D arrays.
+!> The calling signatures are:
+!> @code ...
+!> integer(I_P):: Ns
+!> real(R_P):: rs(1:Ns)
+!> type(Type_Vector):: rv
+!> real(R_P):: re
+!> type(Type_Conservative):: cons_scal,cons_1D(10),cons_2D(10,2),cons_3D(10,2,3),cons_4D(10,2,3,4)
+!> ...
+!> ! initializing cons_scal, cons_1D, cons_2D, cons_3D  and cons_4D
+!> call init(rs,rv,re,Ns,cons_scal)
+!> call init(rs,rv,re,Ns,cons_1D)
+!> call init(rs,rv,re,Ns,cons_2D)
+!> call init(rs,rv,re,Ns,cons_3D)
+!> call init(rs,rv,re,Ns,cons_4D)
+!> ... @endcode
+!> @note rs,rv,re,Ns are optional.
 interface init
-  module procedure Init_Scalar,  & ! scalar
-                   Init_Array1D, & ! array1D
-                   Init_Array2D, & ! array2D
-                   Init_Array3D, & ! array3D
-                   Init_Array4D    ! array4D
+  module procedure Init_Scalar,Init_Array1D,Init_Array2D,Init_Array3D,Init_Array4D
 endinterface
-!!Set overloading.
+!> @brief Subroutine for setting Type_Conservative variable.
+!> It is a generic interface to 5 different subroutines as it can be used for setting scalar variables, 1D/2D/3D or 4D arrays.
+!> The calling signatures are:
+!> @code ...
+!> integer(I_P):: Ns
+!> real(R_P):: rs(1:Ns)
+!> type(Type_Vector):: rv
+!> real(R_P):: re
+!> type(Type_Conservative):: cons_scal,cons_1D(10),cons_2D(10,2),cons_3D(10,2,3),cons_4D(10,2,3,4)
+!> ...
+!> ! setting cons_scal, cons_1D, cons_2D, cons_3D  and cons_4D
+!> call set(rs,rv,re,Ns,cons_scal)
+!> call set(rs,rv,re,Ns,cons_1D)
+!> call set(rs,rv,re,Ns,cons_2D)
+!> call set(rs,rv,re,Ns,cons_3D)
+!> call set(rs,rv,re,Ns,cons_4D)
+!> ... @endcode
+!> @note rs,rv,re,Ns are optional.
 interface set
-  module procedure Set_Scalar,  & ! scalar
-                   Set_Array1D, & ! array1D
-                   Set_Array2D, & ! array2D
-                   Set_Array3D, & ! array3D
-                   Set_Array4D    ! array4D
+  module procedure Set_Scalar,Set_Array1D,Set_Array2D,Set_Array3D,Set_Array4D
 endinterface
-!!Free overloading.
+!> @brief Function for freeing the memory of Type_Conservative \em dynamic components.
+!> This is a generic interface to 5 functions as it can be used for scalar variables, 1D/2D/3D or 4D arrays. The calling signatures
+!> are:
+!> @code ...
+!> integer(I4P):: err
+!> type(Type_Conservative):: cons_scal,cons_1D(10),cons_2D(10,2),cons_3D(10,2,3),cons_4D(10,2,3,4)
+!> ...
+!> ! freeing dynamic components memory of cons_scal, cons_1D, cons_2D, cons_3D  and cons_4D
+!> err = free(cons_scal)
+!> err = free(cons_1D)
+!> err = free(cons_2D)
+!> err = free(cons_3D)
+!> err = free(cons_4D)
+!> ... @endcode
 interface free
-  module procedure Free_Scalar,  & ! scalar
-                   Free_Array1D, & ! array1D
-                   Free_Array2D, & ! array2D
-                   Free_Array3D, & ! array3D
-                   Free_Array4D    ! array4D
+  module procedure Free_Scalar,Free_Array1D,Free_Array2D,Free_Array3D,Free_Array4D
 endinterface
-!!Assigment (=) overloading.
+!> @brief Assignment operator (=) overloading.
 interface assignment (=)
-  module procedure assign_cons,     &
+  module procedure assign_cons
 #ifdef r16p
-                   assign_ScalR16P, &
+  module procedure assign_ScalR16P
 #endif
-                   assign_ScalR8P,  &
-                   assign_ScalR4P,  &
-                   assign_ScalI8P,  &
-                   assign_ScalI4P,  &
-                   assign_ScalI2P,  &
-                   assign_ScalI1P
+  module procedure assign_ScalR8P
+  module procedure assign_ScalR4P
+  module procedure assign_ScalI8P
+  module procedure assign_ScalI4P
+  module procedure assign_ScalI2P
+  module procedure assign_ScalI1P
 end interface
-!!Multiplication (*) overloading.
+!> @brief Multiplication operator (*) overloading.
+!> @note The admissible multiplications are:
+!>       - Type_Conservative * Type_Conservative: each component of first conservative variable (cons1) is multiplied for the
+!>         corresponding component of the second one (cons2), i.e. \n
+!>         \f$ {\rm result\%rs = cons1\%rs*cons2\%rs} \f$ \n
+!>         \f$ {\rm result\%rv = cons1\%rv*cons2\%rv} \f$ \n
+!>         \f$ {\rm result\%re = cons1\%re*cons2\%re} \f$ \n
+!>       - scalar number (real or integer of any kinds defined in IR_Precision module) * Type_Conservative: each component of
+!>         Type_Conservative is multiplied for the scalar, i.e. \n
+!>         \f$ {\rm result\%rs = cons\%rs*scalar} \f$ \n
+!>         \f$ {\rm result\%rv = cons\%rv*scalar} \f$ \n
+!>         \f$ {\rm result\%re = cons\%re*scalar} \f$ \n
+!>       - Type_Conservative * scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>         Type_Conservative is multiplied for the scalar, i.e. \n
+!>         \f$ {\rm result\%rs = cons\%rs*scalar} \f$ \n
+!>         \f$ {\rm result\%rv = cons\%rv*scalar} \f$ \n
+!>         \f$ {\rm result\%re = cons\%re*scalar} \f$ \n
 interface operator (*)
-  module procedure cons_mul_cons,     &
+  module procedure cons_mul_cons
 #ifdef r16p
-                   ScalR16P_mul_cons, &
+  module procedure ScalR16P_mul_cons
 #endif
-                   ScalR8P_mul_cons,  &
-                   ScalR4P_mul_cons,  &
-                   ScalI8P_mul_cons,  &
-                   ScalI4P_mul_cons,  &
-                   ScalI2P_mul_cons,  &
-                   ScalI1P_mul_cons,  &
+  module procedure ScalR8P_mul_cons
+  module procedure ScalR4P_mul_cons
+  module procedure ScalI8P_mul_cons
+  module procedure ScalI4P_mul_cons
+  module procedure ScalI2P_mul_cons
+  module procedure ScalI1P_mul_cons
 #ifdef r16p
-                   cons_mul_ScalR16P, &
+  module procedure cons_mul_ScalR16P
 #endif
-                   cons_mul_ScalR8P,  &
-                   cons_mul_ScalR4P,  &
-                   cons_mul_ScalI8P,  &
-                   cons_mul_ScalI4P,  &
-                   cons_mul_ScalI2P,  &
-                   cons_mul_ScalI1P
+  module procedure cons_mul_ScalR8P
+  module procedure cons_mul_ScalR4P
+  module procedure cons_mul_ScalI8P
+  module procedure cons_mul_ScalI4P
+  module procedure cons_mul_ScalI2P
+  module procedure cons_mul_ScalI1P
 endinterface
-!!Division (/) overloading.
+!> @brief Division operator (/) overloading.
+!> @note The admissible divisions are:
+!>       - Type_Conservative / Type_Conservative: each component of first conservative variable (cons1) is divided for the
+!>         corresponding component of the second one (cons2): i.e. \n
+!>         \f$ {\rm result\%rs = \frac{cons1\%rs}{cons2\%rs}} \f$ \n
+!>         \f$ {\rm result\%rv = \frac{cons1\%rv}{cons2\%rv}} \f$ \n
+!>         \f$ {\rm result\%re = \frac{cons1\%re}{cons2\%re}} \f$ \n
+!>       - Type_Conservative / scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>         Type_Conservative is divided for the scalar, i.e. \n
+!>         \f$ {\rm result\%rs = \frac{cons\%rs}{scalar}} \f$ \n
+!>         \f$ {\rm result\%rv = \frac{cons\%rv}{scalar}} \f$ \n
+!>         \f$ {\rm result\%re = \frac{cons\%re}{scalar}} \f$ \n
 interface operator (/)
-  module procedure cons_div_cons,     &
+  module procedure cons_div_cons
 #ifdef r16p
-                   cons_div_ScalR16P, &
+  module procedure cons_div_ScalR16P
 #endif
-                   cons_div_ScalR8P,  &
-                   cons_div_ScalR4P,  &
-                   cons_div_ScalI8P,  &
-                   cons_div_ScalI4P,  &
-                   cons_div_ScalI2P,  &
-                   cons_div_ScalI1P
+  module procedure cons_div_ScalR8P
+  module procedure cons_div_ScalR4P
+  module procedure cons_div_ScalI8P
+  module procedure cons_div_ScalI4P
+  module procedure cons_div_ScalI2P
+  module procedure cons_div_ScalI1P
 endinterface
-!!Sum (+) overloading.
+!> @brief Sum operator (+) overloading.
+!> @note The admissible summations are:
+!>       - Type_Conservative + Type_Conservative: each component of first conservative variable (cons1) is summed with the
+!>         corresponding component of the second one (cons2): i.e. \n
+!>         \f$ {\rm result\%rs = cons1\%rs+cons2\%rs} \f$ \n
+!>         \f$ {\rm result\%rv = cons1\%rv+cons2\%rv} \f$ \n
+!>         \f$ {\rm result\%re = cons1\%re+cons2\%re} \f$ \n
+!>       - scalar number (real or integer of any kinds defined in IR_Precision module) + Type_Conservative: each component of
+!>         Type_Conservative is summed for the scalar, i.e. \n
+!>         \f$ {\rm result\%rs = cons\%rs+scalar} \f$ \n
+!>         \f$ {\rm result\%rv = cons\%rv+scalar} \f$ \n
+!>         \f$ {\rm result\%re = cons\%re+scalar} \f$ \n
+!>       - Type_Conservative + scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>         Type_Conservative is summed for the scalar, i.e. \n
+!>         \f$ {\rm result\%rs = cons\%rs+scalar} \f$ \n
+!>         \f$ {\rm result\%rv = cons\%rv+scalar} \f$ \n
+!>         \f$ {\rm result\%re = cons\%re+scalar} \f$ \n
 interface operator (+)
-  module procedure positive_cons,     &
-                   cons_sum_cons,     &
+  module procedure positive_cons
+  module procedure cons_sum_cons
 #ifdef r16p
-                   ScalR16P_sum_cons, &
+  module procedure ScalR16P_sum_cons
 #endif
-                   ScalR8P_sum_cons,  &
-                   ScalR4P_sum_cons,  &
-                   ScalI8P_sum_cons,  &
-                   ScalI4P_sum_cons,  &
-                   ScalI2P_sum_cons,  &
-                   ScalI1P_sum_cons,  &
+  module procedure ScalR8P_sum_cons
+  module procedure ScalR4P_sum_cons
+  module procedure ScalI8P_sum_cons
+  module procedure ScalI4P_sum_cons
+  module procedure ScalI2P_sum_cons
+  module procedure ScalI1P_sum_cons
 #ifdef r16p
-                   cons_sum_ScalR16P, &
+  module procedure cons_sum_ScalR16P
 #endif
-                   cons_sum_ScalR8P,  &
-                   cons_sum_ScalR4P,  &
-                   cons_sum_ScalI8P,  &
-                   cons_sum_ScalI4P,  &
-                   cons_sum_ScalI2P,  &
-                   cons_sum_ScalI1P
+  module procedure cons_sum_ScalR8P
+  module procedure cons_sum_ScalR4P
+  module procedure cons_sum_ScalI8P
+  module procedure cons_sum_ScalI4P
+  module procedure cons_sum_ScalI2P
+  module procedure cons_sum_ScalI1P
 endinterface
-!!Subtraction (-) overloading.
+!> @brief Subtraction operator (-) overloading.
+!> @note The admissible subtractions are:
+!>       - Type_Conservative - Type_Conservative: each component of first conservative variable (cons1) is subtracted with the
+!>         corresponding component of the second one (cons2): i.e. \n
+!>         \f$ {\rm result\%rs = cons1\%rs-cons2\%rs} \f$ \n
+!>         \f$ {\rm result\%rv = cons1\%rv-cons2\%rv} \f$ \n
+!>         \f$ {\rm result\%re = cons1\%re-cons2\%re} \f$ \n
+!>       - scalar number (real or integer of any kinds defined in IR_Precision module) - Type_Conservative: each component of
+!>         Type_Conservative is subtracted with the scalar, i.e. \n
+!>         \f$ {\rm result\%rs = scalar-cons\%rs} \f$ \n
+!>         \f$ {\rm result\%rv = scalar-cons\%rv} \f$ \n
+!>         \f$ {\rm result\%re = scalar-cons\%re} \f$ \n
+!>       - Type_Conservative - scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>         Type_Conservative is subtracted with the scalar, i.e. \n
+!>         \f$ {\rm result\%rs = cons\%rs-scalar} \f$ \n
+!>         \f$ {\rm result\%rv = cons\%rv-scalar} \f$ \n
+!>         \f$ {\rm result\%re = cons\%re-scalar} \f$ \n
 interface operator (-)
-  module procedure negative_cons,     &
-                   cons_sub_cons,     &
+  module procedure negative_cons
+  module procedure cons_sub_cons
 #ifdef r16p
-                   ScalR16P_sub_cons, &
+  module procedure ScalR16P_sub_cons
 #endif
-                   ScalR8P_sub_cons,  &
-                   ScalR4P_sub_cons,  &
-                   ScalI8P_sub_cons,  &
-                   ScalI4P_sub_cons,  &
-                   ScalI2P_sub_cons,  &
-                   ScalI1P_sub_cons,  &
+  module procedure ScalR8P_sub_cons
+  module procedure ScalR4P_sub_cons
+  module procedure ScalI8P_sub_cons
+  module procedure ScalI4P_sub_cons
+  module procedure ScalI2P_sub_cons
+  module procedure ScalI1P_sub_cons
 #ifdef r16p
-                   cons_sub_ScalR16P, &
+  module procedure cons_sub_ScalR16P
 #endif
-                   cons_sub_ScalR8P,  &
-                   cons_sub_ScalR4P,  &
-                   cons_sub_ScalI8P,  &
-                   cons_sub_ScalI4P,  &
-                   cons_sub_ScalI2P,  &
-                   cons_sub_ScalI1P
+  module procedure cons_sub_ScalR8P
+  module procedure cons_sub_ScalR4P
+  module procedure cons_sub_ScalI8P
+  module procedure cons_sub_ScalI4P
+  module procedure cons_sub_ScalI2P
+  module procedure cons_sub_ScalI1P
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  ! init
+  !>Subroutine for initializing components of Type_Conservative (scalar) variable.
   pure subroutine Init_Scalar(rs,rv,re,Ns,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for initializing Type_Conservative (scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),               intent(IN), optional:: rs(:)
-  type(Type_Vector),       intent(IN), optional:: rv
-  real(R_P),               intent(IN), optional:: re
-  integer(I_P),            intent(IN)::           Ns
-  type(Type_Conservative), intent(INOUT)::        cons
+  real(R_P),               intent(IN), optional:: rs(:) !< Density of single species [1:Ns].
+  type(Type_Vector),       intent(IN), optional:: rv    !< Momentum vector.
+  real(R_P),               intent(IN), optional:: re    !< Product of density for total internal energy (sum(r)*E).
+  integer(I_P),            intent(IN)::           Ns    !< Number of species.
+  type(Type_Conservative), intent(INOUT)::        cons  !< Conservative initialized data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -180,19 +275,16 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Init_Scalar
 
+  !>Subroutine for initializing components of Type_Conservative (array 1D) variable.
   pure subroutine Init_Array1D(rs,rv,re,Ns,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for initializing Type_Conservative (array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),               intent(IN), optional:: rs(:)
-  type(Type_Vector),       intent(IN), optional:: rv
-  real(R_P),               intent(IN), optional:: re
-  integer(I_P),            intent(IN)::           Ns
-  type(Type_Conservative), intent(INOUT)::        cons(:)
-  integer(I4P)::                                  i
+  real(R_P),               intent(IN), optional:: rs(:)   !< Density of single species [1:Ns].
+  type(Type_Vector),       intent(IN), optional:: rv      !< Momentum vector.
+  real(R_P),               intent(IN), optional:: re      !< Product of density for total internal energy (sum(r)*E).
+  integer(I_P),            intent(IN)::           Ns      !< Number of species.
+  type(Type_Conservative), intent(INOUT)::        cons(:) !< Conservative initialized data.
+  integer(I4P)::                                  i       !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -206,19 +298,16 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Init_Array1D
 
+  !>Subroutine for initializing components of Type_Conservative (array 2D) variable.
   pure subroutine Init_Array2D(rs,rv,re,Ns,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for initializing Type_Conservative (array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),               intent(IN), optional:: rs(:)
-  type(Type_Vector),       intent(IN), optional:: rv
-  real(R_P),               intent(IN), optional:: re
-  integer(I_P),            intent(IN)::           Ns
-  type(Type_Conservative), intent(INOUT)::        cons(:,:)
-  integer(I4P)::                                  i,j
+  real(R_P),               intent(IN), optional:: rs(:)     !< Density of single species [1:Ns].
+  type(Type_Vector),       intent(IN), optional:: rv        !< Momentum vector.
+  real(R_P),               intent(IN), optional:: re        !< Product of density for total internal energy (sum(r)*E).
+  integer(I_P),            intent(IN)::           Ns        !< Number of species.
+  type(Type_Conservative), intent(INOUT)::        cons(:,:) !< Conservative initialized data.
+  integer(I4P)::                                  i,j       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -234,19 +323,16 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Init_Array2D
 
+  !>Subroutine for initializing components of Type_Conservative (array 3D) variable.
   pure subroutine Init_Array3D(rs,rv,re,Ns,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for initializing Type_Conservative (array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),               intent(IN), optional:: rs(:)
-  type(Type_Vector),       intent(IN), optional:: rv
-  real(R_P),               intent(IN), optional:: re
-  integer(I_P),            intent(IN)::           Ns
-  type(Type_Conservative), intent(INOUT)::        cons(:,:,:)
-  integer(I4P)::                                  i,j,k
+  real(R_P),               intent(IN), optional:: rs(:)       !< Density of single species [1:Ns].
+  type(Type_Vector),       intent(IN), optional:: rv          !< Momentum vector.
+  real(R_P),               intent(IN), optional:: re          !< Product of density for total internal energy (sum(r)*E).
+  integer(I_P),            intent(IN)::           Ns          !< Number of species.
+  type(Type_Conservative), intent(INOUT)::        cons(:,:,:) !< Conservative initialized data.
+  integer(I4P)::                                  i,j,k       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -264,19 +350,16 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Init_Array3D
 
+  !>Subroutine for initializing components of Type_Conservative (array 4D) variable.
   pure subroutine Init_Array4D(rs,rv,re,Ns,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for initializing Type_Conservative (array 4D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),               intent(IN), optional:: rs(:)
-  type(Type_Vector),       intent(IN), optional:: rv
-  real(R_P),               intent(IN), optional:: re
-  integer(I_P),            intent(IN)::           Ns
-  type(Type_Conservative), intent(INOUT)::        cons(:,:,:,:)
-  integer(I4P)::                                  i,j,k,p
+  real(R_P),               intent(IN), optional:: rs(:)         !< Density of single species [1:Ns].
+  type(Type_Vector),       intent(IN), optional:: rv            !< Momentum vector.
+  real(R_P),               intent(IN), optional:: re            !< Product of density for total internal energy (sum(r)*E).
+  integer(I_P),            intent(IN)::           Ns            !< Number of species.
+  type(Type_Conservative), intent(INOUT)::        cons(:,:,:,:) !< Conservative initialized data.
+  integer(I4P)::                                  i,j,k,p       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -297,18 +380,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Init_Array4D
 
-  ! set
+  !>Subroutine for setting components of Type_Conservative (scalar) variable.
   pure subroutine Set_Scalar(rs,rv,re,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for setting Type_Conservative (scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),               intent(IN), optional:: rs(:)
-  type(Type_Vector),       intent(IN), optional:: rv
-  real(R_P),               intent(IN), optional:: re
-  type(Type_Conservative), intent(INOUT)::        cons
+  real(R_P),               intent(IN), optional:: rs(:) !< Density of single species [1:Ns].
+  type(Type_Vector),       intent(IN), optional:: rv    !< Momentum vector.
+  real(R_P),               intent(IN), optional:: re    !< Product of density for total internal energy (sum(r)*E).
+  type(Type_Conservative), intent(INOUT)::        cons  !< Conservative set data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -321,18 +400,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Set_Scalar
 
+  !>Subroutine for setting components of Type_Conservative (array 1D) variable.
   pure subroutine Set_Array1D(rs,rv,re,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for setting Type_Conservative (array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),               intent(IN), optional:: rs(:)
-  type(Type_Vector),       intent(IN), optional:: rv
-  real(R_P),               intent(IN), optional:: re
-  type(Type_Conservative), intent(INOUT)::        cons(:)
-  integer(I4P)::                                  i
+  real(R_P),               intent(IN), optional:: rs(:)   !< Density of single species [1:Ns].
+  type(Type_Vector),       intent(IN), optional:: rv      !< Momentum vector.
+  real(R_P),               intent(IN), optional:: re      !< Product of density for total internal energy (sum(r)*E).
+  type(Type_Conservative), intent(INOUT)::        cons(:) !< Conservative set data.
+  integer(I4P)::                                  i       !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -347,18 +423,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Set_Array1D
 
+  !>Subroutine for setting components of Type_Conservative (array 2D) variable.
   pure subroutine Set_Array2D(rs,rv,re,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for setting Type_Conservative (array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),               intent(IN), optional:: rs(:)
-  type(Type_Vector),       intent(IN), optional:: rv
-  real(R_P),               intent(IN), optional:: re
-  type(Type_Conservative), intent(INOUT)::        cons(:,:)
-  integer(I4P)::                                  i,j
+  real(R_P),               intent(IN), optional:: rs(:)     !< Density of single species [1:Ns].
+  type(Type_Vector),       intent(IN), optional:: rv        !< Momentum vector.
+  real(R_P),               intent(IN), optional:: re        !< Product of density for total internal energy (sum(r)*E).
+  type(Type_Conservative), intent(INOUT)::        cons(:,:) !< Conservative set data.
+  integer(I4P)::                                  i,j       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -375,18 +448,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Set_Array2D
 
+  !>Subroutine for setting components of Type_Conservative (array 3D) variable.
   pure subroutine Set_Array3D(rs,rv,re,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for setting Type_Conservative (array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),               intent(IN), optional:: rs(:)
-  type(Type_Vector),       intent(IN), optional:: rv
-  real(R_P),               intent(IN), optional:: re
-  type(Type_Conservative), intent(INOUT)::        cons(:,:,:)
-  integer(I4P)::                                  i,j,k
+  real(R_P),               intent(IN), optional:: rs(:)       !< Density of single species [1:Ns].
+  type(Type_Vector),       intent(IN), optional:: rv          !< Momentum vector.
+  real(R_P),               intent(IN), optional:: re          !< Product of density for total internal energy (sum(r)*E).
+  type(Type_Conservative), intent(INOUT)::        cons(:,:,:) !< Conservative set data.
+  integer(I4P)::                                  i,j,k       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -405,18 +475,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Set_Array3D
 
+  !>Subroutine for setting components of Type_Conservative (array 4D) variable.
   pure subroutine Set_Array4D(rs,rv,re,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for setting Type_Conservative (array 4D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),               intent(IN), optional:: rs(:)
-  type(Type_Vector),       intent(IN), optional:: rv
-  real(R_P),               intent(IN), optional:: re
-  type(Type_Conservative), intent(INOUT)::        cons(:,:,:,:)
-  integer(I4P)::                                  i,j,k,p
+  real(R_P),               intent(IN), optional:: rs(:)         !< Density of single species [1:Ns].
+  type(Type_Vector),       intent(IN), optional:: rv            !< Momentum vector.
+  real(R_P),               intent(IN), optional:: re            !< Product of density for total internal energy (sum(r)*E).
+  type(Type_Conservative), intent(INOUT)::        cons(:,:,:,:) !< Conservative set data.
+  integer(I4P)::                                  i,j,k,p       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -438,16 +505,13 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Set_Array4D
 
-  ! free dynamic memory
+  !>Function for freeing the memory of Type_Conservative \em dynamic components (scalar).
+  !> @return \b err integer(I4P) variable.
   function Free_Scalar(cons) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_Conservative (scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Conservative), intent(INOUT):: cons
-  integer(I4P)::                           err  ! Error traping flag: 0 no errors, >0 error occours.
+  type(Type_Conservative), intent(INOUT):: cons !< Conservative data.
+  integer(I4P)::                           err  ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -457,16 +521,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Free_Scalar
 
+  !>Function for freeing the memory of Type_Conservative \em dynamic components (array 1D).
+  !> @return \b err integer(I4P) variable.
   function Free_Array1D(cons) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_Conservative (array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Conservative), intent(INOUT):: cons(:)
-  integer(I4P)::                           err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I4P)::                           i
+  type(Type_Conservative), intent(INOUT):: cons(:) !< Conservative data.
+  integer(I4P)::                           err     !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I4P)::                           i       !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -478,16 +540,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Free_Array1D
 
+  !>Function for freeing the memory of Type_Conservative \em dynamic components (array 2D).
+  !> @return \b err integer(I4P) variable.
   function Free_Array2D(cons) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_Conservative (array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Conservative), intent(INOUT):: cons(:,:)
-  integer(I4P)::                           err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I4P)::                           i,j
+  type(Type_Conservative), intent(INOUT):: cons(:,:) !< Conservative data.
+  integer(I4P)::                           err       !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I4P)::                           i,j       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -501,16 +561,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Free_Array2D
 
+  !>Function for freeing the memory of Type_Conservative \em dynamic components (array 3D).
+  !> @return \b err integer(I4P) variable.
   function Free_Array3D(cons) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_Conservative (array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Conservative), intent(INOUT):: cons(:,:,:)
-  integer(I4P)::                           err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I4P)::                           i,j,k
+  type(Type_Conservative), intent(INOUT):: cons(:,:,:) !< Conservative data.
+  integer(I4P)::                           err         !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I4P)::                           i,j,k       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -526,16 +584,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Free_Array3D
 
+  !>Function for freeing the memory of Type_Conservative \em dynamic components (array 4D).
+  !> @return \b err integer(I4P) variable.
   function Free_Array4D(cons) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_Conservative (array 4D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Conservative), intent(INOUT):: cons(:,:,:,:)
-  integer(I4P)::                           err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I4P)::                           i,j,k,p
+  type(Type_Conservative), intent(INOUT):: cons(:,:,:,:) !< Conservative data.
+  integer(I4P)::                           err           !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I4P)::                           i,j,k,p       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1873,16 +1929,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sub_ScalI1P
 
+  !>Function for converting derived type Type_Conservative to 1D array.
+  !> @return \b array real(R_P), dimension(1:size(cons\%rs)+4) variable.
   pure function cons2array(cons) result(array)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for converting derived type Type_Conservative to array.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Conservative), intent(IN):: cons
-  real(R_P)::                           array(1:size(cons%rs)+4)
-  integer(I_P)::                        Ns
+  type(Type_Conservative), intent(IN):: cons                     !< Derived type conservative data.
+  real(R_P)::                           array(1:size(cons%rs)+4) !< Conservative data in the form 1D array.
+  integer(I_P)::                        Ns                       !< Number of species.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1896,20 +1950,18 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons2array
 
+  !>Function for converting 1D array to derived type Type_Conservative.
+  !> @return \b cons type(Type_Conservative) variable.
   pure function array2cons(array) result(cons)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for converting array to derived type Type_Conservative.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN)::   array(:)
-  type(Type_Conservative):: cons
-  integer(I_P)::            Ns
+  real(R_P), intent(IN)::   array(:) !< Conservative data in the form 1D array.
+  type(Type_Conservative):: cons     !< Derived type conservative data.
+  integer(I_P)::            Ns       !< Number of species.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  Ns = ubound(array,dim=1)-4
+  Ns = size(array)-4
   if (allocated(cons%rs)) deallocate(cons%rs) ; allocate(cons%rs(1:Ns))
   cons%rs   = array(1:Ns)
   cons%rv%x = array(Ns+1)

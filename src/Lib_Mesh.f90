@@ -1,7 +1,5 @@
+!> This module contains mesh procedures.
 module Lib_Mesh
-!-----------------------------------------------------------------------------------------------------------------------------------
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision      ! Integers and reals precision definition.
 USE Data_Type_BC      ! Definition of Type_BC.
@@ -17,15 +15,12 @@ public:: mesh_metrics
 public:: mesh_metrics_correction
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> Subroutine for computing cell center coordinates from cell nodes ones.
   subroutine node2center(block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for computing cell center coordinates from cell nodes ones.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Block), intent(INOUT):: block ! Block-level data.
-  integer(I_P)::                    i,j,k
+  type(Type_Block), intent(INOUT):: block !< Block-level data.
+  integer(I_P)::                    i,j,k !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -68,20 +63,17 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine node2center
 
+  !> Subroutine for computing the metrics of blocks.
   subroutine mesh_metrics(block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for computing the metrics of block.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Block), intent(INOUT):: block             ! Block-level data.
-  type(Type_Vector)::               NFS,s1,s2,nd,db   ! Dummy vector variables.
-  real(R_P)::                       signi,signj,signk ! Dummy variables for checking the directions of normals.
-  real(R_P)::                       Vx,Vy,Vz          ! Dummy variables for computing volume.
-  real(R_P)::                       xp,yp,zp          ! Dummy variables for computing face coordinates.
-  real(R_P)::                       xm,ym,zm          ! Dummy variables for computing face coordinates.
-  integer(I_P)::                    i,j,k             ! Counters.
+  type(Type_Block), intent(INOUT):: block             !< Block-level data.
+  type(Type_Vector)::               NFS,s1,s2,nd,db   !< Dummy vector variables.
+  real(R_P)::                       signi,signj,signk !< Dummy variables for checking the directions of normals.
+  real(R_P)::                       Vx,Vy,Vz          !< Dummy variables for computing volume.
+  real(R_P)::                       xp,yp,zp          !< Dummy variables for computing face coordinates.
+  real(R_P)::                       xm,ym,zm          !< Dummy variables for computing face coordinates.
+  integer(I_P)::                    i,j,k             !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -246,20 +238,17 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine mesh_metrics
 
+  !> Subroutine for correcting the metrics of natural (and negative volume) boundary conditions cells.
   subroutine mesh_metrics_correction(block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for correcting the metrics of natural (and negative volume) boundary conditions cells.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Block), intent(INOUT):: block    ! Block-level data.
-  logical::                         correct  ! Flag for inquiring if metrics must be corrected.
-  logical::                         wall     ! Flag for inquiring if bc is "wall-type": different corrections must be used.
-  real(R_P)::                       tm       ! Tangential metrics parameter (-1 for wall-type bc).
-  real(R_P)::                       sn       ! Normal metrics coefficient correction.
-  integer(I_P)::                    Ni,Nj,Nk ! Dimensions of the block.
-  integer(I_P)::                    i,j,k    ! Counters.
+  type(Type_Block), intent(INOUT):: block    !< Block-level data.
+  logical::                         correct  !< Flag for inquiring if metrics must be corrected.
+  logical::                         wall     !< Flag for inquiring if bc is "wall-type": different corrections must be used.
+  real(R_P)::                       tm       !< Tangential metrics parameter (-1 for wall-type bc).
+  real(R_P)::                       sn       !< Normal metrics coefficient correction.
+  integer(I_P)::                    Ni,Nj,Nk !< Dimensions of the block.
+  integer(I_P)::                    i,j,k    !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

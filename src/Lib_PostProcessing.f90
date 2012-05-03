@@ -1,8 +1,5 @@
+!> This module contains the definition of procedures and variables useful for post-process the OFF data.
 module Lib_PostProcessing
-!-----------------------------------------------------------------------------------------------------------------------------------
-! The module Lib_PostProcessing contains the definition of functions and subroutines for post-process the OFF data.
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision        ! Integers and reals precision definition.
 USE Data_Type_Globals   ! Definition of Type_Global and Type_Block.
@@ -21,14 +18,15 @@ public:: vtk_output
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-type:: Type_PP_Format
-  logical:: binary = .true.  ! Binary or ascii post-process file.
-  logical:: node   = .true.  ! Node or cell data location.
-  logical:: bc     = .false. ! Saving or not boundary conditions cells.
-  logical:: tec    = .true.  ! Tecplot file.
-  logical:: vtk    = .false. ! VTK file.
+!> Derived type containing the post-processing options.
+type, public:: Type_PP_Format
+  logical:: binary = .true.  !< Binary or ascii post-process file.
+  logical:: node   = .true.  !< Node or cell data location.
+  logical:: bc     = .false. !< Saving or not boundary conditions cells.
+  logical:: tec    = .true.  !< Tecplot file.
+  logical:: vtk    = .false. !< VTK file.
 endtype Type_PP_Format
-type(Type_PP_Format):: pp_format
+type(Type_PP_Format):: pp_format !< Post-processing format options.
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   subroutine interpolate_primitive(global,block,P)
@@ -168,33 +166,32 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine compute_dimensions
 
+  !> Function for writing OFF block data to Tecplot file.
   function tec_output(meshonly,global,block,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for writing Tecplot file.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  logical,           intent(IN)::    meshonly                           ! Flag for post-process only mesh.
-  type(Type_Global), intent(IN)::    global                             ! Global-level data.
-  type(Type_Block),  intent(INOUT):: block(1:global%mesh%Nb)            ! Block-level data.
-  character(*),      intent(IN)::    filename                           ! File name of the output file.
-  integer(I_P)::                     err                                ! Error traping flag: 0 no errors, >0 error occours.
+  logical,           intent(IN)::    meshonly                           !< Flag for post-process only mesh.
+  type(Type_Global), intent(IN)::    global                             !< Global-level data.
+  type(Type_Block),  intent(INOUT):: block(1:global%mesh%Nb)            !< Block-level data.
+  character(*),      intent(IN)::    filename                           !< File name of the output file.
+  integer(I_P)::                     err                                !< Error trapping flag: 0 no errors, >0 error occurs.
+#ifdef TECIO
   integer(I_P), external::           tecini112,    &                    ! |
                                      tecauxstr112, &                    ! |
                                      teczne112,    &                    ! | Tecplot external functions.
                                      tecdat112,    &                    ! |
                                      tecend112                          ! |
-  character(1), parameter::          tecendrec = char(0)                ! End-character for binary-record end.
-  character(500)::                   tecvarname                         ! Variables name for tecplot header file.
-  character(500)::                   teczoneheader                      ! Tecplot string of zone header.
-  character(500)::                   tecvarform                         ! Format for variables for tecplot file.
-  integer(I_P)::                     tecvarloc(1:3+global%fluid%Np)     ! Tecplot array of variables location.
-  character(500)::                   tecvarlocstr                       ! Tecplot string of variables location.
-  integer(I_P)::                     tecnull(1:3+global%fluid%Np)       ! Tecplot null array.
-  integer(I_P)::                     tecunit                            ! Free logic unit of tecplot file.
-  integer(I_P)::                     nvar                               ! Number of variables saved.
-  integer(I_P)::                     b                                  ! Counter.
+#endif
+  character(1), parameter::          tecendrec = char(0)                !< End-character for binary-record end.
+  character(500)::                   tecvarname                         !< Variables name for tecplot header file.
+  character(500)::                   teczoneheader                      !< Tecplot string of zone header.
+  character(500)::                   tecvarform                         !< Format for variables for tecplot file.
+  integer(I_P)::                     tecvarloc(1:3+global%fluid%Np)     !< Tecplot array of variables location.
+  character(500)::                   tecvarlocstr                       !< Tecplot string of variables location.
+  integer(I_P)::                     tecnull(1:3+global%fluid%Np)       !< Tecplot null array.
+  integer(I_P)::                     tecunit                            !< Free logic unit of tecplot file.
+  integer(I_P)::                     nvar                               !< Number of variables saved.
+  integer(I_P)::                     b                                  !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -202,8 +199,13 @@ contains
   call tec_init()
   ! initializing tecplot file
   if (pp_format%binary) then
+#ifdef TECIO
     err = tecini112(tecendrec,trim(tecvarname)//tecendrec,trim(filename)//tecendrec,'.'//tecendrec,0,0,1)
     err = tecauxstr112("Time"//tecendrec,trim(str(n=global%fluid%t))//tecendrec)
+#else
+    write(stderr,'(A)') 'Error: your are trying to save binary tecplot file without compiling against the Tecplot library.'
+    stop
+#endif
   else
     write(tecunit,'(A)',iostat=err)trim(tecvarname)
   endif
@@ -213,7 +215,12 @@ contains
   enddo
   ! finalizing tecplot file
   if (pp_format%binary) then
+#ifdef TECIO
     err = tecend112()
+#else
+    write(stderr,'(A)') 'Error: your are trying to save binary tecplot file without compiling against the Tecplot library.'
+    stop
+#endif
   else
     close(tecunit)
   endif
@@ -296,7 +303,7 @@ contains
     integer(I_P),      intent(IN)::    b                       ! Block number.
     type(Type_Global), intent(IN)::    global                  ! Global-level data.
     type(Type_Block),  intent(INOUT):: block                   ! Block-level data.
-    integer(I_P)::                     err                     ! Error traping flag: 0 no errors, >0 error occours.
+    integer(I_P)::                     err                     ! Error trapping flag: 0 no errors, >0 error occurs.
     type(Type_Primitive)::             P(0:block%mesh%Ni, &    ! |
                                          0:block%mesh%Nj, &    ! | Primitive variables intepolated at nodes.
                                          0:block%mesh%Nk)      ! |
@@ -345,6 +352,7 @@ contains
     endif
     ! writing the block data
     if (pp_format%binary) then
+#ifdef TECIO
       err = teczne112('n_'//trim(strz(nz_pad=10,n=global%fluid%n))//'-b_'//trim(strz(nz_pad=4,n=b))//tecendrec, &
                       0,                                                                                        &
                       ni2-ni1+1,                                                                                &
@@ -366,6 +374,10 @@ contains
                       tecvarloc(1:nvar),                                                                        &
                       tecnull(1:nvar),                                                                          &
                       0)
+#else
+      write(stderr,'(A)') 'Error: your are trying to save binary tecplot file without compiling against the Tecplot library.'
+      stop
+#endif
       err=tec_dat(N=nnode,dat=block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%x)
       err=tec_dat(N=nnode,dat=block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%y)
       err=tec_dat(N=nnode,dat=block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%z)
@@ -441,29 +453,31 @@ contains
     implicit none
     integer(I_P), intent(IN):: N        ! Number of data to save.
     real(R_P),    intent(IN):: dat(1:N) ! Data to save.
-    integer(I_P)::             err      ! Error traping flag: 0 no errors, >0 error occours.
+    integer(I_P)::             err      ! Error trapping flag: 0 no errors, >0 error occurs.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
+#ifdef TECIO
     err = tecdat112(N,dat,1)
+#else
+    write(stderr,'(A)') 'Error: your are trying to save binary tecplot file without compiling against the Tecplot library.'
+    stop
+#endif
     return
     !-------------------------------------------------------------------------------------------------------------------------------
     endfunction tec_dat
   endfunction tec_output
 
+  !> Function for writing OFF block data to VTK file.
   function vtk_output(meshonly,global,block,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for writing VTK file.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  logical,           intent(IN)::    meshonly                ! Flag for post-process only mesh.
-  type(Type_Global), intent(IN)::    global                  ! Global-level data.
-  type(Type_Block),  intent(INOUT):: block(1:global%mesh%Nb) ! Block-level data.
-  character(*),      intent(IN)::    filename                ! File name of the output file.
-  integer(I_P)::                     err                     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                     b                       ! Counter.
+  logical,           intent(IN)::    meshonly                !< Flag for post-process only mesh.
+  type(Type_Global), intent(IN)::    global                  !< Global-level data.
+  type(Type_Block),  intent(INOUT):: block(1:global%mesh%Nb) !< Block-level data.
+  character(*),      intent(IN)::    filename                !< File name of the output file.
+  integer(I_P)::                     err                     !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                     b                       !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -490,7 +504,7 @@ contains
     type(Type_Global), intent(IN)::    global                  ! Global-level data.
     type(Type_Block),  intent(INOUT):: block                   ! Block-level data.
     character(*),      intent(IN)::    filename                ! File name of the output block file.
-    integer(I_P)::                     err                     ! Error traping flag: 0 no errors, >0 error occours.
+    integer(I_P)::                     err                     ! Error trapping flag: 0 no errors, >0 error occurs.
     type(Type_Primitive)::             P(0:block%mesh%Ni,   &  ! |
                                          0:block%mesh%Nj,   &  ! | Primitive variables intepolated at nodes.
                                          0:block%mesh%Nk)      ! |

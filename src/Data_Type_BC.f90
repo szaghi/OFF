@@ -1,8 +1,6 @@
+!> @brief This module contains the definition of Type_BC and its procedures.
+!> Type_BC is a derived type containing all boundary conditions informations.
 module Data_Type_BC
-!-----------------------------------------------------------------------------------------------------------------------------------
-! The module Data_Type_BC contains the definition of Type_BC and its functions and subroutines.
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                             ! Integers and reals precision definition.
 USE, intrinsic:: ISO_FORTRAN_ENV, only: stderr => ERROR_UNIT ! Standard output/error logical units.
@@ -23,111 +21,146 @@ public:: bc_in1_str,bc_in1
 public:: bc_in2_str,bc_in2
 public:: Nbc
 public:: bc_list,bc_list_str
-public:: Type_Adj
-public:: Type_BC
 public:: init,set,get,free
 public:: write,read
 public:: get_bc_id,get_bc_str
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-! Type id paramters
-character(3), parameter:: bc_nan_str = 'NAN' ! Definition of non-assigned boundary condition parameter string.
-integer(I_P), parameter:: bc_nan     =-1_I_P ! Definition of non-assigned boundary condition parameter id.
-character(3), parameter:: bc_ref_str = 'REF' ! Definition of reflective boundary condition parameter string.
-integer(I_P), parameter:: bc_ref     = 1_I_P ! Definition of reflective boundary condition parameter id.
-character(3), parameter:: bc_ext_str = 'EXT' ! Definition of extrapolation boundary condition parameter string.
-integer(I_P), parameter:: bc_ext     = 2_I_P ! Definition of extrapolation boundary condition parameter id.
-character(3), parameter:: bc_per_str = 'PER' ! Definition of periodic boundary condition parameter string.
-integer(I_P), parameter:: bc_per     = 3_I_P ! Definition of periodic boundary condition parameter id.
-character(3), parameter:: bc_adj_str = 'ADJ' ! Definition of adjacent boundary condition parameter string.
-integer(I_P), parameter:: bc_adj     = 4_I_P ! Definition of adjacent boundary condition parameter id.
-character(3), parameter:: bc_in1_str = 'IN1' ! Definition of inflow 1 boundary condition parameter string.
-integer(I_P), parameter:: bc_in1     = 5_I_P ! Definition of inflow 1 boundary condition parameter id.
-character(3), parameter:: bc_in2_str = 'IN2' ! Definition of inflow 2 boundary condition parameter string.
-integer(I_P), parameter:: bc_in2     = 6_I_P ! Definition of inflow 2 boundary condition parameter id.
-integer(I_P), parameter:: Nbc = 7            ! Number of possible boundary conditions.
-character(3), parameter:: bc_list_str(1:Nbc) = (/ bc_nan_str, &
-                                                  bc_ref_str, &
-                                                  bc_ext_str, &
-                                                  bc_per_str, &
-                                                  bc_adj_str, &
-                                                  bc_in1_str, &
-                                                  bc_in2_str /) ! Boundary conditions string list.
-integer(I_P), parameter:: bc_list    (1:Nbc) = (/ bc_nan, &
-                                                  bc_ref, &
-                                                  bc_ext, &
-                                                  bc_per, &
-                                                  bc_adj, &
-                                                  bc_in1, &
-                                                  bc_in2 /) ! Boundary conditions list.
-! Definition of adjacent boundary condition
-type:: Type_Adj
+! Type id parameters
+character(3), parameter:: bc_nan_str = 'NAN' !< Definition of non-assigned boundary condition parameter string.
+integer(I_P), parameter:: bc_nan     =-1_I_P !< Definition of non-assigned boundary condition parameter id.
+character(3), parameter:: bc_ref_str = 'REF' !< Definition of reflective boundary condition parameter string.
+integer(I_P), parameter:: bc_ref     = 1_I_P !< Definition of reflective boundary condition parameter id.
+character(3), parameter:: bc_ext_str = 'EXT' !< Definition of extrapolation boundary condition parameter string.
+integer(I_P), parameter:: bc_ext     = 2_I_P !< Definition of extrapolation boundary condition parameter id.
+character(3), parameter:: bc_per_str = 'PER' !< Definition of periodic boundary condition parameter string.
+integer(I_P), parameter:: bc_per     = 3_I_P !< Definition of periodic boundary condition parameter id.
+character(3), parameter:: bc_adj_str = 'ADJ' !< Definition of adjacent boundary condition parameter string.
+integer(I_P), parameter:: bc_adj     = 4_I_P !< Definition of adjacent boundary condition parameter id.
+character(3), parameter:: bc_in1_str = 'IN1' !< Definition of inflow 1 boundary condition parameter string.
+integer(I_P), parameter:: bc_in1     = 5_I_P !< Definition of inflow 1 boundary condition parameter id.
+character(3), parameter:: bc_in2_str = 'IN2' !< Definition of inflow 2 boundary condition parameter string.
+integer(I_P), parameter:: bc_in2     = 6_I_P !< Definition of inflow 2 boundary condition parameter id.
+integer(I_P), parameter:: Nbc = 7            !< Number of possible boundary conditions.
+character(3), parameter:: bc_list_str(1:Nbc) = &
+                                             (/ bc_nan_str, &
+                                                bc_ref_str, &
+                                                bc_ext_str, &
+                                                bc_per_str, &
+                                                bc_adj_str, &
+                                                bc_in1_str, &
+                                                bc_in2_str  &
+                                              /) !< Boundary conditions string list.
+integer(I_P), parameter:: bc_list    (1:Nbc) = &
+                                             (/ bc_nan, &
+                                                bc_ref, &
+                                                bc_ext, &
+                                                bc_per, &
+                                                bc_adj, &
+                                                bc_in1, &
+                                                bc_in2  &
+                                              /) !< Boundary conditions list.
+!> Derived type containing adjacent boundary condition.
+type, public:: Type_Adj
   sequence
-  integer(I_P):: b = 0_I_P ! b index of connected block.
-  integer(I_P):: i = 0_I_P ! i index of connected block.
-  integer(I_P):: j = 0_I_P ! j index of connected block.
-  integer(I_P):: k = 0_I_P ! k index of connected block.
+  integer(I_P):: b = 0_I_P !< b index of adjacent block.
+  integer(I_P):: i = 0_I_P !< i index of adjacent block.
+  integer(I_P):: j = 0_I_P !< j index of adjacent block.
+  integer(I_P):: k = 0_I_P !< k index of adjacent block.
 endtype Type_Adj
-! Definition of Type_BC
-type:: Type_BC
-  integer(I_P)::                tp = bc_ext ! Type of boundary condition (bc_nan,bc_ref,bc_ext...).
-  integer(I_P),   allocatable:: inf         ! Auxiliary infos for inlfow-type  boundary condition:
-                                            ! 1)"tp = bc_in1": supersonic inflow steady conditions
-                                            !   it is the index array of inflow boundary conditions; inflow 1 conditions (primitive
-                                            !   variables) are stored in array "in1" so the boundary conditions can be accessed by:
-                                            !   in1(1:Np,inf);
-                                            ! 2)"tp = bc_in2": supersonic inflow unsteady conditions
-                                            !   it is the index array of inflow boundary conditions; inflow 2 conditions (primitive
-                                            !   variables) are stored in array "in2" so the boundary conditions can be accessed by:
-                                            !   in2(1:Np,n,inf)
-  type(Type_Adj), allocatable:: adj         ! Connection indexes for adjacent boundary condition.
+!> Derived type containing boundary conditions informations.
+!> @note \b bc_in1 type conditions: supersonic inflow steady conditions \n
+!>   the component \b inf is the index array of inflow boundary conditions; inflow 1 conditions (primitive variables) are stored in
+!>   array "in1" so the boundary conditions can be accessed by: @code in1(1:Np,inf) @endcode
+!> @note \b bc_in2 type conditions: supersonic inflow unsteady conditions \n
+!>   the component \b inf is the index array of inflow boundary conditions; inflow 2 conditions (primitive variables) are stored in
+!>   array "in2" so the boundary conditions can be accessed by: @code in2(1:Np,n,inf) @endcode where n is the time step counter.
+type, public:: Type_BC
+  integer(I_P)::                tp = bc_ext !< Type of boundary condition (bc_nan,bc_ref,bc_ext...).
+  integer(I_P),   allocatable:: inf         !< Auxiliary informations for inflow-type  boundary condition.
+  type(Type_Adj), allocatable:: adj         !< Connection indexes for adjacent boundary condition.
 endtype Type_BC
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!!Free overloading.
+!> @brief Function for freeing the memory of Type_BC \em dynamic components.
+!> This is a generic interface to 4 functions as it can be used for scalar variables, 1D/2D or 3D arrays. The calling signatures
+!> are:
+!> @code ...
+!> integer(I4P):: err
+!> type(Type_BC):: bc_scal,bc_1D(10),bc_2D(10,2),bc_3D(10,2,3)
+!> ...
+!> ! freeing dynamic components memory of bc_scal, bc_1D, bc_2D and bc_3D
+!> err = free(bc_scal)
+!> err = free(bc_1D)
+!> err = free(bc_2D)
+!> err = free(bc_3D)
+!> ... @endcode
 interface free
-  module procedure Free_Scalar,  & ! scalar
-                   Free_Array1D, & ! array1D
-                   Free_Array2D, & ! array2D
-                   Free_Array3D    ! array3D
+  module procedure Free_Scalar,Free_Array1D,Free_Array2D,Free_Array3D
 endinterface
-!!Write overloading.
+!> @brief Write overloading of Type_BC variable.
+!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for writing scalar variables,
+!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
+!> @code ...
+!> integer(I4P):: err,unit
+!> character(1):: format="*"
+!> type(Type_BC):: bc_scal,bc_1D(10),bc_2D(10,2),bc_3D(10,2,3)
+!> ...
+!> ! formatted writing of bc_scal, bc_1D, bc_2D and bc_3D
+!> err = write(unit,format,bc_scal)
+!> err = write(unit,format,bc_1D)
+!> err = write(unit,format,bc_2D)
+!> err = write(unit,format,bc_3D)
+!> ! binary writing of bc_scal, bc_1D, bc_2D and bc_3D
+!> err = write(unit,bc_scal)
+!> err = write(unit,bc_1D)
+!> err = write(unit,bc_2D)
+!> err = write(unit,bc_3D)
+!> ... @endcode
 interface write
-  module procedure Write_Bin_Scalar,        & ! binary scalar
-                   Write_Ascii_Scalar,      & ! ascii scalar
-                   Write_Bin_Vectorial1D,   & ! binary vectorial 1D
-                   Write_Ascii_Vectorial1D, & ! ascii vectorial 1D
-                   Write_Bin_Vectorial2D,   & ! binary vectorial 2D
-                   Write_Ascii_Vectorial2D, & ! ascii vectorial 2D
-                   Write_Bin_Vectorial3D,   & ! binary vectorial 3D
-                   Write_Ascii_Vectorial3D    ! ascii vectorial 3D
+  module procedure Write_Bin_Scalar,     Write_Ascii_Scalar
+  module procedure Write_Bin_Array1D,Write_Ascii_Array1D
+  module procedure Write_Bin_Array2D,Write_Ascii_Array2D
+  module procedure Write_Bin_Array3D,Write_Ascii_Array3D
 endinterface
-!!Read overloading.
+!> @brief Read overloading of Type_BC variable.
+!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for reading scalar variables,
+!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
+!> @code ...
+!> integer(I4P):: err,unit
+!> character(1):: format="*"
+!> type(Type_BC):: bc_scal,bc_1D(10),bc_2D(10,2),bc_3D(10,2,3)
+!> ...
+!> ! formatted reading of bc_scal, bc_1D, bc_2D and bc_3D
+!> err = read(unit,format,bc_scal)
+!> err = read(unit,format,bc_1D)
+!> err = read(unit,format,bc_2D)
+!> err = read(unit,format,bc_3D)
+!> ! binary reading of bc_scal, bc_1D, bc_2D and bc_3D
+!> err = read(unit,bc_scal)
+!> err = read(unit,bc_1D)
+!> err = read(unit,bc_2D)
+!> err = read(unit,bc_3D)
+!> ... @endcode
 interface read
-  module procedure Read_Bin_Scalar,        & ! binary scalar
-                   Read_Ascii_Scalar,      & ! ascii scalar
-                   Read_Bin_Vectorial1D,   & ! binary vectorial 1D
-                   Read_Ascii_Vectorial1D, & ! ascii vectorial 1D
-                   Read_Bin_Vectorial2D,   & ! binary vectorial 2D
-                   Read_Ascii_Vectorial2D, & ! ascii vectorial 2D
-                   Read_Bin_Vectorial3D,   & ! binary vectorial 3D
-                   Read_Ascii_Vectorial3D    ! ascii vectorial 3D
+  module procedure Read_Bin_Scalar,     Read_Ascii_Scalar
+  module procedure Read_Bin_Array1D,Read_Ascii_Array1D
+  module procedure Read_Bin_Array2D,Read_Ascii_Array2D
+  module procedure Read_Bin_Array3D,Read_Ascii_Array3D
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> Function for initializing components of Type_BC variable.
+  !> @return \b bc Type_BC variable.
   elemental function init(tp,inf,adj) result(bc)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for initializing Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),   intent(IN), optional:: tp
-  integer(I_P),   intent(IN), optional:: inf
-  type(Type_Adj), intent(IN), optional:: adj
-  type(Type_BC)::                        bc
+  integer(I_P),   intent(IN), optional:: tp  !< Type of boundary condition.
+  integer(I_P),   intent(IN), optional:: inf !< Auxiliary informations for inflow-type  boundary condition.
+  type(Type_Adj), intent(IN), optional:: adj !< Connection indexes for adjacent boundary condition.
+  type(Type_BC)::                        bc  !< Boundary conditions data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -138,17 +171,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction init
 
+  !> Subroutine for setting components of Type_BC variable.
+  !> @return \b bc Type_BC variable.
   elemental subroutine set(tp,inf,adj,bc) !result(bc)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for setting Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),   intent(IN), optional:: tp
-  integer(I_P),   intent(IN), optional:: inf
-  type(Type_Adj), intent(IN), optional:: adj
-  type(Type_BC),  intent(INOUT)::        bc
+  integer(I_P),   intent(IN), optional:: tp  !< Type of boundary condition.
+  integer(I_P),   intent(IN), optional:: inf !< Auxiliary informations for inflow-type  boundary condition.
+  type(Type_Adj), intent(IN), optional:: adj !< Connection indexes for adjacent boundary condition.
+  type(Type_BC),  intent(INOUT)::        bc  !< Boundary conditions data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -163,19 +194,18 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine set
 
-  elemental subroutine get(inf,adj,bc)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for extraction Type_BC attributes.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> Subroutine for extracting Type_BC variable components.
+  elemental subroutine get(tp,inf,adj,bc)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),   intent(OUT), optional:: inf
-  type(Type_Adj), intent(OUT), optional:: adj
-  type(Type_BC),  intent(IN)::            bc
+  integer(I_P),   intent(OUT), optional:: tp  !< Type of boundary condition.
+  integer(I_P),   intent(OUT), optional:: inf !< Auxiliary informations for inflow-type  boundary condition.
+  type(Type_Adj), intent(OUT), optional:: adj !< Connection indexes for adjacent boundary condition.
+  type(Type_BC),  intent(IN)::            bc  !< Boundary conditions data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
+  if (present(tp )) tp  = bc%tp
   if (present(inf)) inf = bc%inf
   if (present(adj)) adj = bc%adj
   return
@@ -183,15 +213,13 @@ contains
   endsubroutine get
 
   ! free dynamic memory
+  !>Function for freeing the memory of Type_BC \em dynamic components (scalar).
+  !> @return \b err integer(I4P) variable.
   function Free_Scalar(bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_BC (scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_BC), intent(INOUT):: bc
-  integer(I4P)::                 err  ! Error traping flag: 0 no errors, >0 error occours.
+  type(Type_BC), intent(INOUT):: bc  !< Boundary conditions data.
+  integer(I4P)::                 err !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -202,16 +230,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Free_Scalar
 
+  !>Function for freeing the memory of Type_BC \em dynamic components (array 1D).
+  !> @return \b err integer(I4P) variable.
   function Free_Array1D(bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_BC (array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_BC), intent(INOUT):: bc(:)
-  integer(I4P)::                 err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I4P)::                 i
+  type(Type_BC), intent(INOUT):: bc(:) !< Boundary conditions data.
+  integer(I4P)::                 err   !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I4P)::                 i     !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -224,16 +250,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Free_Array1D
 
+  !>Function for freeing the memory of Type_BC \em dynamic components (array 2D).
+  !> @return \b err integer(I4P) variable.
   function Free_Array2D(bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_BC (array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_BC), intent(INOUT):: bc(:,:)
-  integer(I4P)::                 err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I4P)::                 i,j
+  type(Type_BC), intent(INOUT):: bc(:,:) !< Boundary conditions data.
+  integer(I4P)::                 err     !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I4P)::                 i,j     !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -248,16 +272,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Free_Array2D
 
+  !>Function for freeing the memory of Type_BC \em dynamic components (array 3D).
+  !> @return \b err integer(I4P) variable.
   function Free_Array3D(bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_BC (array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_BC), intent(INOUT):: bc(:,:,:)
-  integer(I4P)::                 err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I4P)::                 i,j,k
+  type(Type_BC), intent(INOUT):: bc(:,:,:) !< Boundary conditions data.
+  integer(I4P)::                 err       !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I4P)::                 i,j,k     !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -275,16 +297,14 @@ contains
   endfunction Free_Array3D
 
   ! write
+  !>Function for writing (binary, scalar) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
   function Write_Bin_Scalar(unit,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (binary, scalar) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN):: unit  ! logic unit
-  type(Type_bc), intent(IN):: bc
-  integer(I_P)::              err   ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P),  intent(IN):: unit  !< Logic unit.
+  type(Type_bc), intent(IN):: bc    !< Boundary conditions data.
+  integer(I_P)::              err   !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -299,17 +319,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Write_Bin_Scalar
 
+  !>Function for writing (ascii, scalar) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
   function Write_Ascii_Scalar(unit,format,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (ascii, scalar) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN):: unit   ! logic unit
-  character(*),  intent(IN):: format ! format specifier
-  type(Type_bc), intent(IN):: bc
-  integer(I_P)::              err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P),  intent(IN):: unit   !< Logic unit.
+  character(*),  intent(IN):: format !< Format specifier.
+  type(Type_bc), intent(IN):: bc     !< Boundary conditions data.
+  integer(I_P)::              err    !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -335,17 +353,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Write_Ascii_Scalar
 
-  function Write_Bin_Vectorial1D(unit,bc) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (binary, vectorial 1D) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !>Function for writing (binary, array 1D) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
+  function Write_Bin_Array1D(unit,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN):: unit  ! logic unit
-  type(Type_bc), intent(IN):: bc(:)
-  integer(I_P)::              err   ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::              n
+  integer(I_P),  intent(IN):: unit  !< Logic unit.
+  type(Type_bc), intent(IN):: bc(:) !< Boundary conditions data.
+  integer(I_P)::              err   !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::              n     !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -360,20 +376,18 @@ contains
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Vectorial1D
+  endfunction Write_Bin_Array1D
 
-  function Write_Ascii_Vectorial1D(unit,format,bc) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (ascii, vectorial 1D) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !>Function for writing (ascii, array 1D) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
+  function Write_Ascii_Array1D(unit,format,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN):: unit   ! logic unit
-  character(*),  intent(IN):: format ! format specifier
-  type(Type_bc), intent(IN):: bc(:)
-  integer(I_P)::              err    ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::              n
+  integer(I_P),  intent(IN):: unit   !< Logic unit.
+  character(*),  intent(IN):: format !< Format specifier.
+  type(Type_bc), intent(IN):: bc(:)  !< Boundary conditions data.
+  integer(I_P)::              err    !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::              n      !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -401,19 +415,17 @@ contains
   endselect
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Vectorial1D
+  endfunction Write_Ascii_Array1D
 
-  function Write_Bin_Vectorial2D(unit,bc) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (binary, vectorial 2D) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !>Function for writing (binary, array 2D) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
+  function Write_Bin_Array2D(unit,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN):: unit    ! logic unit
-  type(Type_bc), intent(IN):: bc(:,:)
-  integer(I_P)::              err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::              n1,n2
+  integer(I_P),  intent(IN):: unit    !< Logic unit.
+  type(Type_bc), intent(IN):: bc(:,:) !< Boundary conditions data.
+  integer(I_P)::              err     !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::              n1,n2   !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -430,20 +442,18 @@ contains
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Vectorial2D
+  endfunction Write_Bin_Array2D
 
-  function Write_Ascii_Vectorial2D(unit,format,bc) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (ascii, vectorial 2D) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !>Function for writing (ascii, array 2D) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
+  function Write_Ascii_Array2D(unit,format,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN):: unit    ! logic unit
-  character(*),  intent(IN):: format  ! format specifier
-  type(Type_bc), intent(IN):: bc(:,:)
-  integer(I_P)::              err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::              n1,n2
+  integer(I_P),  intent(IN):: unit    !< Logic unit.
+  character(*),  intent(IN):: format  !< Format specifier.
+  type(Type_bc), intent(IN):: bc(:,:) !< Boundary conditions data.
+  integer(I_P)::              err     !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::              n1,n2   !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -475,19 +485,17 @@ contains
   endselect
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Vectorial2D
+  endfunction Write_Ascii_Array2D
 
-  function Write_Bin_Vectorial3D(unit,bc) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (binary, vectorial 3D) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !>Function for writing (binary, array 3D) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
+  function Write_Bin_Array3D(unit,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN):: unit      ! logic unit
-  type(Type_bc), intent(IN):: bc(:,:,:)
-  integer(I_P)::              err       ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::              n1,n2,n3
+  integer(I_P),  intent(IN):: unit      !< Logic unit.
+  type(Type_bc), intent(IN):: bc(:,:,:) !< Boundary conditions data.
+  integer(I_P)::              err       !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::              n1,n2,n3  !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -506,20 +514,18 @@ contains
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Vectorial3D
+  endfunction Write_Bin_Array3D
 
-  function Write_Ascii_Vectorial3D(unit,format,bc) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (ascii, vectorial 3D) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !>Function for writing (ascii, array 3D) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
+  function Write_Ascii_Array3D(unit,format,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN):: unit      ! logic unit
-  character(*),  intent(IN):: format    ! format specifier
-  type(Type_bc), intent(IN):: bc(:,:,:)
-  integer(I_P)::              err       ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::              n1,n2,n3
+  integer(I_P),  intent(IN):: unit      !< Logic unit.
+  character(*),  intent(IN):: format    !< Format specifier.
+  type(Type_bc), intent(IN):: bc(:,:,:) !< Boundary conditions data.
+  integer(I_P)::              err       !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::              n1,n2,n3  !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -555,19 +561,17 @@ contains
   endselect
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Vectorial3D
+  endfunction Write_Ascii_Array3D
 
   ! read
+  !>Function for reading (binary, scalar) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
   function Read_Bin_Scalar(unit,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (binary, scalar) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN)::    unit  ! logic unit
-  type(Type_bc), intent(INOUT):: bc
-  integer(I_P)::                 err   ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P),  intent(IN)::    unit  !< Logic unit.
+  type(Type_bc), intent(INOUT):: bc    !< Boundary conditions data.
+  integer(I_P)::                 err   !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -582,17 +586,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Read_Bin_Scalar
 
+  !>Function for reading (ascii, scalar) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
   function Read_Ascii_Scalar(unit,format,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (ascii, scalar) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN)::    unit   ! logic unit
-  character(*),  intent(IN)::    format ! format specifier
-  type(Type_bc), intent(INOUT):: bc
-  integer(I_P)::                 err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P),  intent(IN)::    unit   !< Logic unit.
+  character(*),  intent(IN)::    format !< Format specifier.
+  type(Type_bc), intent(INOUT):: bc     !< Boundary conditions data.
+  integer(I_P)::                 err    !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -618,17 +620,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Read_Ascii_Scalar
 
-  function Read_Bin_Vectorial1D(unit,bc) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (binary, vectorial 1D) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !>Function for reading (binary, array 1D) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
+  function Read_Bin_Array1D(unit,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN)::    unit  ! logic unit
-  type(Type_bc), intent(INOUT):: bc(:)
-  integer(I_P)::                 err   ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                 n
+  integer(I_P),  intent(IN)::    unit  !< Logic unit.
+  type(Type_bc), intent(INOUT):: bc(:) !< Boundary conditions data.
+  integer(I_P)::                 err   !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                 n     !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -643,20 +643,18 @@ contains
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Vectorial1D
+  endfunction Read_Bin_Array1D
 
-  function Read_Ascii_Vectorial1D(unit,format,bc) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (ascii, vectorial 1D) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !>Function for reading (ascii, array 1D) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
+  function Read_Ascii_Array1D(unit,format,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN)::    unit   ! logic unit
-  character(*),  intent(IN)::    format ! format specifier
-  type(Type_bc), intent(INOUT):: bc(:)
-  integer(I_P)::                 err    ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                 n
+  integer(I_P),  intent(IN)::    unit   !< Logic unit.
+  character(*),  intent(IN)::    format !< Format specifier.
+  type(Type_bc), intent(INOUT):: bc(:)  !< Boundary conditions data.
+  integer(I_P)::                 err    !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                 n      !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -686,19 +684,17 @@ contains
   endselect
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Vectorial1D
+  endfunction Read_Ascii_Array1D
 
-  function Read_Bin_Vectorial2D(unit,bc) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (binary, vectorial 2D) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !>Function for reading (binary, array 2D) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
+  function Read_Bin_Array2D(unit,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN)::    unit    ! logic unit
-  type(Type_bc), intent(INOUT):: bc(:,:)
-  integer(I_P)::                 err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                 n1,n2
+  integer(I_P),  intent(IN)::    unit    !< logic unit.
+  type(Type_bc), intent(INOUT):: bc(:,:) !< boundary conditions data.
+  integer(I_P)::                 err     !< error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                 n1,n2   !< counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -717,20 +713,18 @@ contains
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Vectorial2D
+  endfunction Read_Bin_Array2D
 
-  function Read_Ascii_Vectorial2D(unit,format,bc) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (ascii, vectorial 2D) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !>Function for reading (ascii, array 2D) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
+  function Read_Ascii_Array2D(unit,format,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN)::    unit    ! logic unit
-  character(*),  intent(IN)::    format  ! format specifier
-  type(Type_bc), intent(INOUT):: bc(:,:)
-  integer(I_P)::                 err     ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                 n1,n2
+  integer(I_P),  intent(IN)::    unit    !< Logic unit.
+  character(*),  intent(IN)::    format  !< Format specifier.
+  type(Type_bc), intent(INOUT):: bc(:,:) !< Boundary conditions data.
+  integer(I_P)::                 err     !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                 n1,n2   !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -766,19 +760,17 @@ contains
   endselect
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Vectorial2D
+  endfunction Read_Ascii_Array2D
 
-  function Read_Bin_Vectorial3D(unit,bc) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (binary, vectorial 3D) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !>Function for reading (binary, array 3D) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
+  function Read_Bin_Array3D(unit,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN)::    unit      ! logic unit
-  type(Type_bc), intent(INOUT):: bc(:,:,:)
-  integer(I_P)::                 err       ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                 n1,n2,n3
+  integer(I_P),  intent(IN)::    unit      !< logic unit.
+  type(Type_bc), intent(INOUT):: bc(:,:,:) !< boundary conditions data.
+  integer(I_P)::                 err       !< error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                 n1,n2,n3  !< counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -799,20 +791,18 @@ contains
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Vectorial3D
+  endfunction Read_Bin_Array3D
 
-  function Read_Ascii_Vectorial3D(unit,format,bc) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (ascii, vectorial 3D) Type_BC.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !>Function for reading (ascii, array 3D) Type_BC variable.
+  !> @return \b err integer(I4P) variable.
+  function Read_Ascii_Array3D(unit,format,bc) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),  intent(IN)::    unit      ! logic unit
-  character(*),  intent(IN)::    format    ! format specifier
-  type(Type_bc), intent(INOUT):: bc(:,:,:)
-  integer(I_P)::                 err       ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                 n1,n2,n3
+  integer(I_P),  intent(IN)::    unit      !< Logic unit.
+  character(*),  intent(IN)::    format    !< Format specifier.
+  type(Type_bc), intent(INOUT):: bc(:,:,:) !< Boundary conditions data.
+  integer(I_P)::                 err       !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                 n1,n2,n3  !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -852,22 +842,20 @@ contains
   endselect
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Vectorial3D
+  endfunction Read_Ascii_Array3D
 
   ! get_bc
+  !> Function for getting integer id of a boundary condition from the corresponding boundary condition string.
+  !> @return \b bc_id integer(I_P) variable.
   function get_bc_id(myrank,bc_str) result(bc_id)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for getting integer id of a bc type from the corresponding bc string.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN):: myrank ! Actual rank process.
-  character(*), intent(IN):: bc_str ! String of bc.
-  integer(I_P)::             bc_id  ! Id of bc.
-  integer(I_P)::             b      ! Boundary conditions counter.
+  integer(I_P), intent(IN):: myrank !< Actual rank process.
+  character(*), intent(IN):: bc_str !< String id of boundary condition.
+  integer(I_P)::             bc_id  !< Integer id of boundary condition.
+  integer(I_P)::             b      !< Boundary conditions counter.
 #ifdef MPI2
-  integer(I_P)::             err    ! Error for MPI comunications.
+  integer(I_P)::             err    !< Error for MPI communications.
 #endif
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -892,19 +880,17 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction get_bc_id
 
+  !> Function for getting string id of a boundary condition from the corresponding boundary condition integer id.
+  !> @return \b bc_str character(3) variable.
   function get_bc_str(myrank,bc_id) result(bc_str)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for getting string id of a bc type from the corresponding bc integer id.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN):: myrank ! Actual rank process.
-  integer(I_P), intent(IN):: bc_id  ! Id of bc.
-  character(3)::             bc_str ! String of bc.
-  integer(I_P)::             b      ! Boundary conditions counter.
+  integer(I_P), intent(IN):: myrank !< Actual rank process.
+  integer(I_P), intent(IN):: bc_id  !< Integer id of boundary condition.
+  character(3)::             bc_str !< String of boundary condition.
+  integer(I_P)::             b      !< Boundary conditions counter.
 #ifdef MPI2
-  integer(I_P)::             err    ! Error for MPI comunications.
+  integer(I_P)::             err    !< Error for MPI communications.
 #endif
   !---------------------------------------------------------------------------------------------------------------------------------
 

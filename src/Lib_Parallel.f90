@@ -1,10 +1,9 @@
+!> This module contains the definition of procedures for send/receive data among processes for parallel (MPI) operations.
+!> It is based on MPI library.
+!> @note The communications have a tag-shift (for make them unique) that assumes a maximum number of processes of 10000.
+!> Increment this parameter if using more processes than 10000.
+!> @todo \b DocComplete: Complete the documentation of internal procedures
 module Lib_Parallel
-!-----------------------------------------------------------------------------------------------------------------------------------
-! The module Lib_Parallel contains the definition of functions and subroutines for send/recive data among processes for parallel
-! operations. It is based on MPI library. The comunications have a tagshift for make them unique that assume a maximum number of
-! processes: the default maximum is 10000; imcrement this parameter if using more processes.
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision        ! Integers and reals precision definition.
 USE Data_Type_BC        ! Definition of Type_BC.
@@ -31,22 +30,22 @@ public:: procmap_save
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-integer(I_P)::              Nthreads = 1_I_P ! Number of OpenMP threads.
-integer(I_P)::              Nproc    = 1_I_P ! Number of processes (for MPI parallelization).
-integer(I_P), allocatable:: procmap(:)       ! Processes/blocks map    [1:Nb_tot].
-integer(I_P), allocatable:: blockmap(:)      ! Local/global blocks map [1:Nb].
-integer(I_P), parameter::   maxproc = 10000  ! Maximum number of processes used for comunications tag shift.
-integer(I_P)             :: gNcR             ! Global number of recive cells (sum(NcR)).
-integer(I_P)             :: gNcS             ! Global number of send   cells (sum(NcS)).
-integer(I_P), allocatable:: NcR(:,:)         ! Number of recive cells from each process [    0:Nproc-1,1:Nl].
-integer(I_P), allocatable:: NcS(:,:)         ! Number of send   cells for  each process [    0:Nproc-1,1:Nl].
-integer(I_P), allocatable:: bbR(:,:,:)       ! Processes bounds of recive cells         [1:2,0:Nproc-1,1:Nl].
-integer(I_P), allocatable:: bbS(:,:,:)       ! Processes bounds of send   cells         [1:2,0:Nproc-1,1:Nl].
-integer(I_P), allocatable:: recvmap(:,:)     ! Reciving cells map of   myrank from other processes [1:4,1:gNcR].
-integer(I_P), allocatable:: reqsmap(:,:)     ! Quering  cells map of   myrank for  other processes [1:4,1:gNcR].
-integer(I_P), allocatable:: sendmap(:,:)     ! Sending  cells map from myrank to   other processes [1:4,1:gNcS].
-real(R_P),    allocatable:: Precv(:,:)       ! Reciving buffer of primitive variable of myrank from other processes [1:Np,1:gNcR].
-real(R_P),    allocatable:: Psend(:,:)       ! Sending  buffer of primitive variable of myrank for other  processes [1:Np,1:gNcS].
+integer(I_P)::              Nthreads = 1_I_P !< Number of OpenMP threads.
+integer(I_P)::              Nproc    = 1_I_P !< Number of processes (for MPI parallelization).
+integer(I_P), allocatable:: procmap(:)       !< Processes/blocks map    [1:Nb_tot].
+integer(I_P), allocatable:: blockmap(:)      !< Local/global blocks map [1:Nb].
+integer(I_P), parameter::   maxproc = 10000  !< Maximum number of processes used for communications tag shift.
+integer(I_P)             :: gNcR             !< Global number of receive cells (sum(NcR)).
+integer(I_P)             :: gNcS             !< Global number of send   cells (sum(NcS)).
+integer(I_P), allocatable:: NcR(:,:)         !< Number of receive cells from each process [    0:Nproc-1,1:Nl].
+integer(I_P), allocatable:: NcS(:,:)         !< Number of send   cells for  each process  [    0:Nproc-1,1:Nl].
+integer(I_P), allocatable:: bbR(:,:,:)       !< Processes bounds of receive cells         [1:2,0:Nproc-1,1:Nl].
+integer(I_P), allocatable:: bbS(:,:,:)       !< Processes bounds of send   cells          [1:2,0:Nproc-1,1:Nl].
+integer(I_P), allocatable:: recvmap(:,:)     !< Receiving cells map of   myrank from other processes [1:4,1:gNcR].
+integer(I_P), allocatable:: reqsmap(:,:)     !< Querying  cells map of   myrank for  other processes [1:4,1:gNcR].
+integer(I_P), allocatable:: sendmap(:,:)     !< Sending  cells map from myrank to   other processes [1:4,1:gNcS].
+real(R_P),    allocatable:: Precv(:,:)       !< Receiving buffer of primitive variable of myrank from other processes [1:Np,1:gNcR].
+real(R_P),    allocatable:: Psend(:,:)       !< Sending  buffer of primitive variable of myrank for other  processes [1:Np,1:gNcS].
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   subroutine alloc_SR(global)
@@ -70,7 +69,7 @@ contains
 
   subroutine compute_NcR(myrank,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for computing the number of cells that must be recived from other processes than myrank.
+  ! Function for computing the number of cells that must be received from other processes than myrank.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -86,8 +85,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! computing the number of recive cells of myrank for other processes; checking the equivalence of proc and myrank:
-  !  if proc=myrank => NcR=0 => myrank dosen't comunicate with itself
+  ! computing the number of receive cells of myrank for other processes; checking the equivalence of proc and myrank:
+  !  if proc=myrank => NcR=0 => myrank doesn't communicate with itself
   do l=1,global%mesh%Nl
     do b=1,global%mesh%Nb
       ! i interfaces
@@ -172,7 +171,7 @@ contains
 
   subroutine NcRsendrecv(myrank,global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for comunicate the number of cells that myrank must recive from other processes.
+  ! Function for communicate the number of cells that myrank must receive from other processes.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -183,16 +182,16 @@ contains
   integer(I_P)::                  proc                       ! Processes counters.
 #ifdef MPI2
   integer(I_P)::                  ierr,stat(MPI_STATUS_SIZE) ! MPI error flags.
-  integer(I_P), parameter::       tagshift=0*maxproc         ! Shift for tags (to isolate these kind of comunications).
+  integer(I_P), parameter::       tagshift=0*maxproc         ! Shift for tags (to isolate these kind of communications).
 #endif
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  do l=1,global%mesh%Nl ! loop pver grid levels
-    do proc=0,Nproc-1 ! the comunications is organized by processes sequence
+  do l=1,global%mesh%Nl ! loop over grid levels
+    do proc=0,Nproc-1 ! the communications is organized by processes sequence
 #ifdef MPI2
-      ! sending quering (reciving) cells number of myrank to proc and
-      ! using the quering number cells of proc for building the sending number of cells of myrank
+      ! sending querying (receiving) cells number of myrank to proc and
+      ! using the querying number cells of proc for building the sending number of cells of myrank
       call MPI_SENDRECV(NcR(proc,l),1,MPI_INTEGER,proc,tagshift+Nproc*(myrank+1), &
                         NcS(proc,l),1,MPI_INTEGER,proc,tagshift+Nproc*(proc  +1), &
                         MPI_COMM_WORLD,stat,ierr)
@@ -234,7 +233,7 @@ contains
 
   subroutine alloc_sendrecv(global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for safety allocation of send/recive variables.
+  ! Subroutine for safety allocation of send/receive variables.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -254,7 +253,7 @@ contains
 
   subroutine compute_recv_maps(myrank,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for computing quering and reciving maps of actual process.
+  ! Subroutine for computing querying and receiving maps of actual process.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -268,9 +267,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   do l=1,global%mesh%Nl ! loop pver grid levels
-    do proc=0,Nproc-1 ! the comunications is organized by processes sequence
-      if (proc==myrank) cycle ! myrank doesn't comunicate with itself
-      if (NcR(proc,l)==0) cycle ! there are no data to comunicate to process proc
+    do proc=0,Nproc-1 ! the communications is organized by processes sequence
+      if (proc==myrank) cycle ! myrank doesn't communicate with itself
+      if (NcR(proc,l)==0) cycle ! there are no data to communicate to process proc
       call scan_proc(NcR     = NcR(proc,l),                              &
                      proc    = proc,                                     &
                      global  = global,                                   &
@@ -284,17 +283,17 @@ contains
   contains
     subroutine scan_proc(NcR,proc,global,block,reqsmap,recvmap)
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! Subroutine for searching reciving cells of myrank from process proc.
+    ! Subroutine for searching receiving cells of myrank from process proc.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),      intent(IN)::  NcR                     ! Number of send/recive cells.
-    integer(I_P),      intent(IN)::  proc                    ! Other process than myrank to send/recive cells.
+    integer(I_P),      intent(IN)::  NcR                     ! Number of send/receive cells.
+    integer(I_P),      intent(IN)::  proc                    ! Other process than myrank to send/receive cells.
     type(Type_Global), intent(IN)::  global                  ! Global-level data.
     type(Type_Block),  intent(IN)::  block(1:global%mesh%Nb) ! Block-level data.
-    integer(I_P),      intent(OUT):: reqsmap(1:4,1:NcR)      ! Quering cells map.
-    integer(I_P),      intent(OUT):: recvmap(1:4,1:NcR)      ! Reciving cells map.
+    integer(I_P),      intent(OUT):: reqsmap(1:4,1:NcR)      ! Querying cells map.
+    integer(I_P),      intent(OUT):: recvmap(1:4,1:NcR)      ! Receiving cells map.
     integer(I_P)::                   c                       ! Cells counter.
     integer(I_P)::                   b                       ! Blocks counter.
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -316,18 +315,18 @@ contains
 
     subroutine scan_block(NcR,block,proc,b,c,reqsmap,recvmap)
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! Subroutine for searching reciving cells of myrank from process proc into the actual block "b".
+    ! Subroutine for searching receiving cells of myrank from process proc into the actual block "b".
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),      intent(IN)::    NcR                ! Number of send/recive cells.
+    integer(I_P),      intent(IN)::    NcR                ! Number of send/receive cells.
     type(Type_Block),  intent(IN)::    block              ! Block-level data.
     integer(I_P),      intent(IN)::    proc               ! Other process than myrank to s/r cells.
     integer(I_P),      intent(IN)::    b                  ! Actual block number.
     integer(I_P),      intent(INOUT):: c                  ! Actual cell counter.
-    integer(I_P),      intent(OUT)::   reqsmap(1:4,1:NcR) ! Quering cells map.
-    integer(I_P),      intent(OUT)::   recvmap(1:4,1:NcR) ! Reciving cells map.
+    integer(I_P),      intent(OUT)::   reqsmap(1:4,1:NcR) ! Querying cells map.
+    integer(I_P),      intent(OUT)::   recvmap(1:4,1:NcR) ! Receiving cells map.
     integer(I_P)::                     Ni,Nj,Nk,gc(1:6)   ! Temp var for storing block dimensions.
     integer(I_P)::                     i,j,k              ! Spaces counters.
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -428,8 +427,8 @@ contains
 
   subroutine mapsendrecv(myrank,global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for comunicate the quering cells map of myrank to other processes and for building the sending cells maps of myrank
-  ! for other processes (the building is done by reciving the quering cells map of other processes).
+  ! Subroutine for communicate the querying cells map of myrank to other processes and for building the sending cells maps of myrank
+  ! for other processes (the building is done by receiving the querying cells map of other processes).
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -440,17 +439,17 @@ contains
   integer(I_P)::                  proc                       ! Processes counter.
 #ifdef MPI2
   integer(I_P)::                  ierr,stat(MPI_STATUS_SIZE) ! MPI error flags.
-  integer(I_P), parameter::       tagshift=1*maxproc         ! Shift for tags (to isolate these kind of comunications).
+  integer(I_P), parameter::       tagshift=1*maxproc         ! Shift for tags (to isolate these kind of communications).
 #endif
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  do l=1,global%mesh%Nl ! loop pver grid levels
-    do proc=0,Nproc-1 ! the comunications is organized by processes sequence
-      if ((NcR(proc,l)==0).AND.(NcS(proc,l)==0)) cycle ! there are no data to comunicate to process proc
+  do l=1,global%mesh%Nl ! loop over grid levels
+    do proc=0,Nproc-1 ! the communications is organized by processes sequence
+      if ((NcR(proc,l)==0).AND.(NcS(proc,l)==0)) cycle ! there are no data to communicate to process proc
 #ifdef MPI2
-      ! sending quering (reqsmap) cells map of myrank to proc and
-      ! using the quering cells map of proc for building the sending (sendmap) cells map of myrank
+      ! sending querying (reqsmap) cells map of myrank to proc and
+      ! using the querying cells map of proc for building the sending (sendmap) cells map of myrank
       call MPI_SENDRECV(reqsmap(1,bbR(1,proc,l)),4*NcR(proc,l),MPI_INTEGER,proc,tagshift+Nproc*(myrank+1), &
                         sendmap(1,bbS(1,proc,l)),4*NcS(proc,l),MPI_INTEGER,proc,tagshift+Nproc*(proc  +1), &
                         MPI_COMM_WORLD,stat,ierr)
@@ -461,17 +460,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine mapsendrecv
 
+  !> Subroutine for initializing the send/receive communications data.
   subroutine Init_sendrecv(myrank,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Suroutine for initialize the send/recive comunications.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN):: myrank                                   ! Actual rank process.
-  type(Type_Global), intent(IN):: global                                   ! Global-level data.
-  type(Type_Block),  intent(IN):: block(1:global%mesh%Nb,1:global%mesh%Nl) ! Block-level data.
-  integer(I_P)::                  err                                      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P),      intent(IN):: myrank                                   !< Actual rank process.
+  type(Type_Global), intent(IN):: global                                   !< Global-level data.
+  type(Type_Block),  intent(IN):: block(1:global%mesh%Nb,1:global%mesh%Nl) !< Block-level data.
+  integer(I_P)::                  err                                      !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -487,29 +483,26 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Init_sendrecv
 
+  !> Subroutine for performing send/receive of primitive variables of myrank to other processes.
   subroutine Psendrecv(myrank,l,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for send/recive primitive variables of myrank to other processes.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank                     ! Actual rank process.
-  integer(I_P),      intent(IN)::    l                          ! Grid level.
-  type(Type_Global), intent(IN)::    global                     ! Global-level data.
-  type(Type_Block),  intent(INOUT):: block(1:global%mesh%Nb)    ! Block-level data.
-  integer(I_P)::                     proc                       ! Processes counter.
-  integer(I_P)::                     c                          ! Cells counter.
-  integer(I_P)::                     b                          ! Blocks counter.
+  integer(I_P),      intent(IN)::    myrank                     !< Actual rank process.
+  integer(I_P),      intent(IN)::    l                          !< Grid level.
+  type(Type_Global), intent(IN)::    global                     !< Global-level data.
+  type(Type_Block),  intent(INOUT):: block(1:global%mesh%Nb)    !< Block-level data.
+  integer(I_P)::                     proc                       !< Processes counter.
+  integer(I_P)::                     c                          !< Cells counter.
+  integer(I_P)::                     b                          !< Blocks counter.
 #ifdef MPI2
-  integer(I_P)::                     ierr,stat(MPI_STATUS_SIZE) ! MPI error flags.
-  integer(I_P), parameter::          tagshift=2*maxproc         ! Shift for tags (to isolate these comunications).
+  integer(I_P)::                     ierr,stat(MPI_STATUS_SIZE) !< MPI error flags.
+  integer(I_P), parameter::          tagshift=2*maxproc         !< Shift for tags (to isolate these communications).
 #endif
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  do proc=0,Nproc-1 ! the comunications is organized by processes sequence
-    if ((NcR(proc,l)==0).AND.(NcR(proc,l)==0)) cycle ! there are no data to comunicate to process proc
+  do proc=0,Nproc-1 ! the communications is organized by processes sequence
+    if ((NcR(proc,l)==0).AND.(NcR(proc,l)==0)) cycle ! there are no data to communicate to process proc
     ! building the send buffer (Psend) of myrank for proc using local var P
     do c=bbS(1,proc,l),bbS(2,proc,l)
       b = minloc(array=blockmap,dim=1,mask=blockmap==sendmap(1,c))
@@ -521,7 +514,7 @@ contains
                       Precv(1,bbR(1,proc,l)),global%fluid%Np*NcR(proc,l),MPI_REAL8,proc,tagshift+Nproc*(proc  +1), &
                       MPI_COMM_WORLD,stat,ierr)
 #endif
-    ! coping the recive buffer (Precv) of myrank from proc in the local var P
+    ! coping the receive buffer (Precv) of myrank from proc in the local var P
     do c=bbR(1,proc,l),bbR(2,proc,l)
        block(recvmap(1,c))%fluid%P(recvmap(2,c),recvmap(3,c),recvmap(4,c)) = array2prim(Precv(:,c))
     enddo
@@ -532,24 +525,24 @@ contains
 
   function Printsendrecvmaps(myrank) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for send/recive primitive variables of myrank to other processes.
+  ! Subroutine for send/receive primitive variables of myrank to other processes.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I_P), intent(IN):: myrank ! Actual rank process.
-  integer(I_P)::             err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::             err    ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I_P)::             proc   ! Processes counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   write(stdout,'(A)',iostat=err)'rank'//trim(str(.true.,myrank))//&
                                 '----------------------------------------------------------------------'
-  do proc=0,Nproc-1 ! the comunications is organized by processes sequence
-    if (proc==myrank) cycle ! myrank doesn't comunicate with itself
+  do proc=0,Nproc-1 ! the communications is organized by processes sequence
+    if (proc==myrank) cycle ! myrank doesn't communicate with itself
     write(stdout,'(A)',IOSTAT=err) 'rank'//trim(str(.true.,myrank))//' Process '//trim(str(.true.,myrank))// &
                                    ' must send '//trim(str(.true.,NcS(proc,1)))//  &
-                                   ' and recive '//trim(str(.true.,NcR(proc,1)))// &
+                                   ' and receive '//trim(str(.true.,NcR(proc,1)))// &
                                    ' finite voluems with process '//trim(str(.true.,proc))
   enddo
   write(stdout,'(A)',iostat=err)'rank'//trim(str(.true.,myrank))//&
@@ -559,20 +552,18 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Printsendrecvmaps
 
+  !> Function for loading the processes/blocks map and local/global blocks map.
+  !> @return \b err integer(I4P) variable.
   function procmap_load(myrank,filename,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for loading the processes/blocks map and local/global blocks map.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank   ! Actual rank process.
-  character(*),      intent(IN)::    filename ! File name processes/blocks map.
-  type(Type_Global), intent(INOUT):: global   ! Global-level data.
-  integer(I_P)::                     err      ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                     UnitFree ! Free logic unit.
-  logical::                          is_file  ! Flag for inquiring the presence of procmap file.
-  integer(I_P)::                     b,bb     ! Blocks counter.
+  integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
+  character(*),      intent(IN)::    filename !< File name processes/blocks map.
+  type(Type_Global), intent(INOUT):: global   !< Global-level data.
+  integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                     UnitFree !< Free logic unit.
+  logical::                          is_file  !< Flag for inquiring the presence of procmap file.
+  integer(I_P)::                     b,bb     !< Blocks counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -588,7 +579,7 @@ contains
   close(UnitFree)
   ! computing the local/global blocks map
   if (Nproc==1_I_P) then
-    ! there is no MPI enviroment thus all blocks are loaded by process 0
+    ! there is no MPI environment thus all blocks are loaded by process 0
     global%mesh%Nb = global%mesh%Nb_tot
     if (allocated(blockmap)) deallocate(blockmap) ; allocate(blockmap(1:global%mesh%Nb)) ; blockmap = 0_I_P
     do b=1,global%mesh%Nb_tot
@@ -613,18 +604,16 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction procmap_load
 
+  !> Function for saving the processes/blocks map.
+  !> @return \b err integer(I4P) variable.
   function procmap_save(filename,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for saving the processes/blocks map.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  character(*),      intent(IN):: filename ! File name processes/blocks map.
-  type(Type_Global), intent(IN):: global   ! Global-level data.
-  integer(I_P)::                  err      ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                  UnitFree ! Free logic unit.
-  integer(I_P)::                  b        ! Block counter.
+  character(*),      intent(IN):: filename !< File name processes/blocks map.
+  type(Type_Global), intent(IN):: global   !< Global-level data.
+  integer(I_P)::                  err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                  UnitFree !< Free logic unit.
+  integer(I_P)::                  b        !< Block counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

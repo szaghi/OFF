@@ -1,15 +1,13 @@
+!> The module Lib_Multigrid contains the definition of multigrid functions and subroutines.
+!> @todo \b DocComplete: Complete the documentation of internal procedures
 module Lib_Multigrid
 !-----------------------------------------------------------------------------------------------------------------------------------
-!! The module Lib_Multigrid contains the definition of multigrid functions and subroutines.
-!-----------------------------------------------------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                       ! Integers and reals precision definition.
-USE Data_Type_BC, init_bc => init, set_bc => set       ! Definition of Type_BC.
-USE Data_Type_Vector, init_vec => init, set_vec => set ! Definition of Type_Vector.
-USE Lib_Fluidynamic, only: conservative2primitive, &   ! Function for converting conservative variables to primitive ones.
-                           residuals,              &   ! Subroutine for computing conservative variables residuals.
-                           boundary_conditions         ! Subroutine for setting boundary conditions.
+USE IR_Precision                                     ! Integers and reals precision definition.
+USE Data_Type_BC, init_bc => init, set_bc => set     ! Definition of Type_BC.
+USE Data_Type_Vector, set_vec => set                 ! Definition of Type_Vector.
+USE Lib_Fluidynamic, only: conservative2primitive, & ! Function for converting conservative variables to primitive ones.
+                           residuals,              & ! Subroutine for computing conservative variables residuals.
+                           boundary_conditions       ! Subroutine for setting boundary conditions.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -25,8 +23,8 @@ public:: correct
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! Multigrid variables
-real(R_P), allocatable:: UR(:,:) ! Restriction of conservative variables      [1:Nc,bb1:bb2].
-real(R_P), allocatable:: TE(:,:) ! Truncation error of conservative variables [1:Nc,bb1:bb2].
+real(R_P), allocatable:: UR(:,:) !< Restriction of conservative variables      [1:Nc,bb1:bb2].
+real(R_P), allocatable:: TE(:,:) !< Truncation error of conservative variables [1:Nc,bb1:bb2].
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   subroutine alloc_multigrid(Nc,bb1,bb2)

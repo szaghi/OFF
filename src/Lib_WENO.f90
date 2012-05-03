@@ -1,9 +1,6 @@
+!> This module contains the definition of procedures for computing WENO reconstruction with a user-defined \f$P^{th}\f$ order.
+!> @todo \b DocComplete: Complete the documentation of internal procedures
 module Lib_WENO
-!-----------------------------------------------------------------------------------------------------------------------------------
-! The module Lib_WENO contains the definition of functions and subroutines for computing WENO reconstruction with a user-defined
-! Sth order.
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision      ! Integers and reals precision definition.
 USE Data_Type_Globals ! Definition of Type_Global and Type_Block.
@@ -23,25 +20,22 @@ public:: weno
 ! WENO coefficients (S = number of stencils used)
 real(R_P), allocatable:: weno_c(:,:)       ! Central difference coefficients    [1:2,1:2*S].
 real(R_P), allocatable:: weno_a(:,:)       ! Optimal weights                    [1:2,0:S-1].
-real(R_P), allocatable:: weno_p(:,:,:)     ! Polinomials coefficients           [1:2,0:S-1,0:S-1].
+real(R_P), allocatable:: weno_p(:,:,:)     ! Polynomials coefficients           [1:2,0:S-1,0:S-1].
 real(R_P), allocatable:: weno_d(:,:,:)     ! Smoothness indicators coefficients [0:S-1,0:S-1,0:S-1].
 real(R_P)::              weno_eps          ! Parameter for avoiding divided by zero when computing smoothness indicators.
 integer(I_P)::           weno_odd          ! Constant for distinguishing between odd and even number of stencils (mod(S,2)).
 integer(I_P)::           weno_exp          ! Exponent for growing the diffusive part of weights.
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> Subroutine for initialization of WENO coefficients.
   subroutine weno_init(myrank,global,block,S)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for initialization of WENO coefficients.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN):: myrank                  ! Actual rank process.
-  type(Type_Global), intent(IN):: global                  ! Global-level data.
-  type(Type_Block),  intent(IN):: block(1:global%mesh%Nb) ! Block-level data.
-  integer(I1P),      intent(IN):: S                       ! Number of stencils used.
-  integer(I_P)::                  b                       ! Blocks counter.
+  integer(I_P),      intent(IN):: myrank                  !< Actual rank process.
+  type(Type_Global), intent(IN):: global                  !< Global-level data.
+  type(Type_Block),  intent(IN):: block(1:global%mesh%Nb) !< Block-level data.
+  integer(I1P),      intent(IN):: S                       !< Number of stencils used.
+  integer(I_P)::                  b                       !< Blocks counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -280,17 +274,14 @@ contains
     endsubroutine get_min_sstep
   endsubroutine weno_init
 
+  !> Function for computing central difference reconstruction of \f$2S^{th}\f$ order instead of WENO \f$2S^{th}-1\f$ one.
   pure function noweno_central(S,V) result(VR)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for computing central difference reconstruction of 2S order instead of WENO 2S-1 one.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN):: S             ! Number of stencils used.
-  real(R_P),    intent(IN):: V (1:2,0:2*S) ! Variable to be reconstructed.
-  real(R_P)::                VR(1:2      ) ! Left and right (1,2) interface value of reconstructed V.
-  integer(I_P)::             k,f           ! Counters.
+  integer(I_P), intent(IN):: S             !< Number of stencils used.
+  real(R_P),    intent(IN):: V (1:2,0:2*S) !< Variable to be reconstructed.
+  real(R_P)::                VR(1:2      ) !< Left and right (1,2) interface value of reconstructed V.
+  integer(I_P)::             k,f           !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -305,18 +296,16 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction noweno_central
 
+  !> Function for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of
+  !> \f$2S^{th}-1\f$ order.
   pure function weno_optimal(S,V) result(VR)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for computing WENO reconstruction with optimal weigths (without smoothness indicators computations) of 2S-1 order.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN):: S                ! Number of stencils used.
-  real(R_P),    intent(IN):: V (1:2,1-S:-1+S) ! Variable to be reconstructed.
-  real(R_P)::                VR(1:2         ) ! Left and right (1,2) interface value of reconstructed V.
-  real(R_P)::                VP(1:2,0:S-1   ) ! Polynomial reconstructions.
-  real(R_P)::                w (1:2,0:S-1   ) ! Weights of the stencils.
+  integer(I_P), intent(IN):: S                !< Number of stencils used.
+  real(R_P),    intent(IN):: V (1:2,1-S:-1+S) !< Variable to be reconstructed.
+  real(R_P)::                VR(1:2         ) !< Left and right (1,2) interface value of reconstructed V.
+  real(R_P)::                VP(1:2,0:S-1   ) !< Polynomial reconstructions.
+  real(R_P)::                w (1:2,0:S-1   ) !< Weights of the stencils.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -330,18 +319,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction weno_optimal
 
+  !> Function for computing WENO reconstruction of \f$2S^{th}-1\f$ order.
   pure function weno(S,V) result(VR)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for computing WENO reconstruction of 2S-1 order.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN):: S                ! Number of stencils used.
-  real(R_P),    intent(IN):: V (1:2,1-S:-1+S) ! Variable to be reconstructed.
-  real(R_P)::                VR(1:2         ) ! Left and right (1,2) interface value of reconstructed V.
-  real(R_P)::                VP(1:2,0:S-1   ) ! Polynomial reconstructions.
-  real(R_P)::                w (1:2,0:S-1   ) ! Weights of the stencils.
+  integer(I_P), intent(IN):: S                !< Number of stencils used.
+  real(R_P),    intent(IN):: V (1:2,1-S:-1+S) !< Variable to be reconstructed.
+  real(R_P)::                VR(1:2         ) !< Left and right (1,2) interface value of reconstructed V.
+  real(R_P)::                VP(1:2,0:S-1   ) !< Polynomial reconstructions.
+  real(R_P)::                w (1:2,0:S-1   ) !< Weights of the stencils.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

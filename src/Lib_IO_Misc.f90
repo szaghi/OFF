@@ -1,8 +1,7 @@
+!> This module contains miscellanea procedures for input/output and string operations.
+!> This is a library module.
+!> @todo \b DocComplete: Complete the documentation of internal procedures
 module Lib_IO_Misc
-!-----------------------------------------------------------------------------------------------------------------------------------
-!!The module Lib_IO_Misc contains miscellanea functions and subroutines for input/output and string operations.
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision ! Integers and reals precision definition.
 USE Data_Type_OS ! Definition of Type_OS.
@@ -28,7 +27,7 @@ public:: File_Not_Found
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-type(Type_OS):: OS ! OS definition.
+type(Type_OS):: OS !< OS definition.
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @brief The GetUnit function is used for getting a free logic unit.

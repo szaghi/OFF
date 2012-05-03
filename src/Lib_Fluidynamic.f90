@@ -1,8 +1,7 @@
+!> This module contains the definition of fluid dynamic procedures.
+!> This is a library module.
+!> @todo \b DocComplete: Complete the documentation of internal procedures
 module Lib_Fluidynamic
-!-----------------------------------------------------------------------------------------------------------------------------------
-! The module Lib_Fluidynamic contains the definition of fluidynamic functions and subroutines.
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                                                 ! Integers and reals precision definition.
 USE Data_Type_BC, &                                                              ! Definition of Type_BC.
@@ -14,7 +13,7 @@ USE Data_Type_Primitive, &                                                      
                                         init_prim=>init, set_prim=>set           ! Function for initializing Type_Primitive.
 USE Data_Type_Time                                                               ! Definition of Type_Time.
 USE Data_Type_Vector, &                                                          ! Definition of Type_Vector.
-                                        init_vec=>init, set_vec=>set             ! Function for initializing Type_Vector.
+                                        set_vec=>set                             ! Function for initializing Type_Vector.
 USE Lib_IO_Misc                                                                  ! Procedures for IO and strings operations.
 USE Lib_Math,                     only: interpolate1                             ! Function for computing linear interpolation.
 USE Lib_Parallel,                 only: blockmap, &                              ! Local/global blocks map.
@@ -77,10 +76,10 @@ public:: rk_init
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! Runge-Kutta coefficients
-real(R_P), allocatable:: rk_c1(:)   ! c1 coefficients of Runge-Kutta's integration [1:rk_ord]
-real(R_P), allocatable:: rk_c2(:,:) ! c2 coefficients of Runge-Kutta's integration [1:rk_ord,1:rk_ord]
+real(R_P), allocatable:: rk_c1(:)   !< c1 coefficients of Runge-Kutta's integration [1:rk_ord]
+real(R_P), allocatable:: rk_c2(:,:) !< c2 coefficients of Runge-Kutta's integration [1:rk_ord,1:rk_ord]
 
-integer(I1P):: flip = 0_I_P ! Flip-Flop flag for restart solution file.
+integer(I1P):: flip = 0_I_P !< Flip-Flop flag for restart solution file.
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   pure subroutine prim2cons(prim,cons)

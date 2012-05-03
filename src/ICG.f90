@@ -1,6 +1,6 @@
 program ICG
 !-----------------------------------------------------------------------------------------------------------------------------------
-!(doc)CNAME{ICG, Initial Condiftion Genrator for OFF (Open Finite volume Fluidynamics code)}
+!(doc)CNAME{ICG, Initial Conditions Generator for OFF (Open Finite volume Fluid dynamics code)}
 !(doc)AUTHORS{Stefano Zaghi}
 !(doc)VERSION{v0.0.5}
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -13,7 +13,6 @@ USE Data_Type_Conservative, init_cons=>init, set_cons=>set ! Definition of Type_
 USE Data_Type_Globals                                      ! Definition of Type_Global and Type_Block.
 USE Data_Type_OS, init_OS=>init, set_OS=>set               ! Definition of Type_OS.
 USE Data_Type_Primitive, init_prim=>init, set_prim=>set    ! Definition of Type_Primitive.
-USE Data_Type_Vector, init_vec=>init, set_vec=>set         ! Definition of Type_Vector.
 USE Data_Type_Time, only: Get_Date_String                  ! Function for getting actual date.
 USE Data_Type_Vector, set_Vector=>set                      ! Definition of Type_Vector.
 USE Lib_IO_Misc                                            ! Procedures for IO and strings operations.
@@ -23,18 +22,24 @@ USE Lib_IO_Misc                                            ! Procedures for IO a
 implicit none
 type(Type_Global)::             global         ! Global-level data.
 type(Type_Block), allocatable:: block(:,:)     ! Block-level data [1:Nb,1:Nl].
-! Derived type for containing block data.
+!> Derived type containing blocks informations.
 type:: Type_Blocks
-  integer(I1P)::         gc(1:6)        ! ghost cells
-  integer(I_P)::         Ni,Nj,Nk       ! block dimensions
-  real(R_P)::            xmin,ymin,zmin !
-  real(R_P)::            xmax,ymax,zmax ! block extenesions
-  type(Type_BC)::        bc(1:6)        ! block faces boundary conditions
-  type(Type_Primitive):: P              ! blocks primitive variables
+  integer(I1P)::         gc(1:6) !< Ghost cells.
+  integer(I_P)::         Ni      !< Number of cells in i direction.
+  integer(I_P)::         Nj      !< Number of cells in j direction.
+  integer(I_P)::         Nk      !< Number of cells in k direction.
+  real(R_P)::            xmin    !< Minimum value of x abscissa.
+  real(R_P)::            ymin    !< Minimum value of y abscissa.
+  real(R_P)::            zmin    !< Minimum value of z abscissa.
+  real(R_P)::            xmax    !< Maximum value of x abscissa.
+  real(R_P)::            ymax    !< Maximum value of y abscissa.
+  real(R_P)::            zmax    !< Maximum value of z abscissa.
+  type(Type_BC)::        bc(1:6) !< Block faces boundary conditions.
+  type(Type_Primitive):: P       !< Blocks primitive variables.
 endtype Type_Blocks
 type(Type_Blocks), allocatable:: blocks(:)           ! Blocks data [1:Nb].
 character(7)::                   In_type = 'ICEMCFD' ! Input type: 'BLOCKS' use direct blocks description, 'ICEMCFD' geo/topo files.
-integer(I_P)::                   err                 ! Error traping flag: 0 no errors, >0 error occours.
+integer(I_P)::                   err                 ! Error trapping flag: 0 no errors, >0 error occurs.
 character(20)::                  date                ! Actual date.
 integer(I_P),      allocatable:: UnitScratch(:,:,:)  ! Free logic units for scratch files [1:3,1:Nb,1:Nl].
 character(60)::                  File_Blocks         ! Blocks option file name.
@@ -190,7 +195,7 @@ contains
 
   subroutine icg_init(global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! The subroutine icg_init initialize the initial conditions according to the input options.
+  ! Subroutine for initializing the initial conditions according to the input options.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -246,7 +251,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   character(*), intent(IN):: filename ! Name of file where initial species are saved.
-  integer(I_P)::             err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::             err      ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I_P)::             UnitFree ! Free logic unit.
   logical::                  is_file  ! Flag for inquiring the presence of option file.
   character(3)::             os_type  ! Type operating system.
@@ -303,7 +308,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   character(*), intent(IN):: filename ! Name of file where blocks informations are saved.
-  integer(I_P)::             err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::             err      ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I_P)::             UnitFree ! Free logic unit.
   logical::                  is_file  ! Flag for inquiring the presence of blocks file.
   character(3)::             bc_str   ! Type of boundary condition.
@@ -369,7 +374,7 @@ contains
   enddo
   close(UnitFree)
   ! for memory efficiency each block is generated alone and then stored in scratch file
-  ! opening the scratch file where the current block is temporanely stored
+  ! opening the scratch file where the current block is temporarily stored
   do l=1,global%mesh%Nl
     do b=1,global%mesh%Nb_tot
       UnitScratch(1,b,l)=Get_Unit() ; open(unit=UnitScratch(1,b,l),form='UNFORMATTED',status='SCRATCH',iostat=err) ! geo file
@@ -697,7 +702,7 @@ contains
       block(1,l)%fluid%P = blocks(b)%P
     enddo
 
-    ! storing the mesh, boundary and intial conditions in the scratch files
+    ! storing the mesh, boundary and initial conditions in the scratch files
     do l=1,global%mesh%Nl
       ! mesh data
       err = write(UnitScratch(1,b,l),block(1,l)%mesh%node)
@@ -728,8 +733,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I_P), intent(IN):: Nf               ! Number of input files.
-  character(*), intent(IN):: filenames(1:Nf)  ! Basename of icemcfd files.
-  integer(I_P)::             err              ! Error traping flag: 0 no errors, >0 error occours.
+  character(*), intent(IN):: filenames(1:Nf)  ! Base name of icemcfd files.
+  integer(I_P)::             err              ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I_P)::             UnitFree         ! Free logic unit.
   integer(I_P)::             Unit_itc         ! Free logic unit for initial conditions files.
   integer(I_P)::             Unit_gc          ! Free logic unit for ghost cells definition.
@@ -759,7 +764,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! verifing the presence of input files
+  ! verifying the presence of input files
   do f=1,Nf
     inquire(file=adjustl(trim(filenames(f)))//'.geo',exist=is_file,iostat=err)
     if (.NOT.is_file) call File_Not_Found(myrank,adjustl(trim(filenames(f)))//'.geo','load_icemcfd')
@@ -820,7 +825,7 @@ contains
     close(UnitFree)                                      ! close file
   enddo
   ! for efficiency each block is generated alone and then stored in scratch file
-  ! opening the scratch file where the current block is temporanely stored
+  ! opening the scratch file where the current block is temporarily stored
   do l=1,global%mesh%Nl
     do b=1,global%mesh%Nb_tot
       if (l==1) then
@@ -928,7 +933,7 @@ contains
     close(UnitFree)                                      ! close file
   enddo
   write(stdout,'(A)')'  Reading boundary and initial conditions from icemcfd files'
-  ! the topological files are pre-processed and arranged one for block in the scratchfiles
+  ! the topological files are pre-processed and arranged one for block in the scratch files
   b = 0
   do f=1,Nf
     Nb_l = 0 ; if (f>1) Nb_l = sum(blk_map(1:f-1))

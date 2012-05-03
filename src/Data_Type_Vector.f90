@@ -1,10 +1,13 @@
+!>This module contains the definition of Type_Vector and its procedures.
+!>This derived type is useful for manipulating vectors in 3D space. The components of the vectors are real with
+!>R_P kind as defined by the IR_Precision module. The components are defined in a three-dimensional cartesian frame of reference.
+!>All the vectorial math procedures (cross, dot products, parallel...) assume a three-dimensional cartesian frame of reference.
+!> @note The operators of assignment (=), multiplication (*), division (/), sum (+) and subtraction (-) have been overloaded.
+!> Furthermore the \em dot and \em cross products have been defined.
+!> Therefore this module provides a far-complete algebra based on Type_Vector derived type. This algebra simplifies the
+!> vectorial operations of Partial Differential Equations (PDE) systems.
+!> @todo \b DocComplete: Complete the documentation of internal procedures
 module Data_Type_Vector
-!-----------------------------------------------------------------------------------------------------------------------------------
-!!This module contains Data_Type_Vector, a "class" for manipulating vectors in 3D space. The components of the vectors are real with
-!!R_P kind as defined by the IR_Precision module. The components are defined in a three-dimensional cartesian frame of reference.
-!!All the vectorial math procedures (cross, dot products, parallel...) assume a three-dimensional cartesian frame of reference.
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision ! Integers and reals precision definition.
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -12,9 +15,8 @@ USE IR_Precision ! Integers and reals precision definition.
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 private
-public:: Type_Vector
 public:: ex,ey,ez
-public:: init,set,get
+public:: set,get
 public:: pprint
 public:: write,read
 public:: assignment (=)
@@ -39,297 +41,339 @@ public:: face_normal3,face_normal4
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!!Type_Vector definition:
-type:: Type_Vector
+!> Derived type defining vectors.
+type, public:: Type_Vector
   sequence
-  real(R_P):: x = 0._R_P ! Cartesian component in x direction.
-  real(R_P):: y = 0._R_P ! Cartesian component in y direction.
-  real(R_P):: z = 0._R_P ! Cartesian component in z direction.
+  real(R_P):: x = 0._R_P !< Cartesian component in x direction.
+  real(R_P):: y = 0._R_P !< Cartesian component in y direction.
+  real(R_P):: z = 0._R_P !< Cartesian component in z direction.
 endtype Type_Vector
-type(Type_Vector), parameter:: ex = Type_Vector(1._R_P,0._R_P,0._R_P) ! x versor.
-type(Type_Vector), parameter:: ey = Type_Vector(0._R_P,1._R_P,0._R_P) ! x versor.
-type(Type_Vector), parameter:: ez = Type_Vector(0._R_P,0._R_P,1._R_P) ! x versor.
+type(Type_Vector), parameter:: ex = Type_Vector(1._R_P,0._R_P,0._R_P) !< X direction versor.
+type(Type_Vector), parameter:: ey = Type_Vector(0._R_P,1._R_P,0._R_P) !< Y direction versor.
+type(Type_Vector), parameter:: ez = Type_Vector(0._R_P,0._R_P,1._R_P) !< Z direction versor.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!!Write overloading.
+!> @brief Write overloading of Type_Vector variable.
+!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for writing scalar variables,
+!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
+!> @code ...
+!> integer(I4P):: err,unit
+!> character(1):: format="*"
+!> type(Type_Vector):: vec_scal,vec_1D(10),vec_2D(10,2),vec_3D(10,2,3)
+!> ...
+!> ! formatted writing of vec_scal, vec_1D, vec_2D and vec_3D
+!> err = write(unit,format,vec_scal)
+!> err = write(unit,format,vec_1D)
+!> err = write(unit,format,vec_2D)
+!> err = write(unit,format,vec_3D)
+!> ! binary writing of vec_scal, vec_1D, vec_2D and vec_3D
+!> err = write(unit,vec_scal)
+!> err = write(unit,vec_1D)
+!> err = write(unit,vec_2D)
+!> err = write(unit,vec_3D)
+!> ... @endcode
 interface write
-  module procedure Write_Bin_Scalar,    & ! binary scalar
-                   Write_Ascii_Scalar,  & ! ascii scalar
-                   Write_Bin_Array1D,   & ! binary array 1D
-                   Write_Ascii_Array1D, & ! ascii array 1D
-                   Write_Bin_Array2D,   & ! binary array 2D
-                   Write_Ascii_Array2D, & ! ascii array 2D
-                   Write_Bin_Array3D,   & ! binary array 3D
-                   Write_Ascii_Array3D    ! ascii array 3D
+  module procedure Write_Bin_Scalar, Write_Ascii_Scalar
+  module procedure Write_Bin_Array1D,Write_Ascii_Array1D
+  module procedure Write_Bin_Array2D,Write_Ascii_Array2D
+  module procedure Write_Bin_Array3D,Write_Ascii_Array3D
 endinterface
-!!Read overloading.
+!> @brief Read overloading of Type_Vector variable.
+!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for reading scalar variables,
+!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
+!> @code ...
+!> integer(I4P):: err,unit
+!> character(1):: format="*"
+!> type(Type_Vector):: vec_scal,vec_1D(10),vec_2D(10,2),vec_3D(10,2,3)
+!> ...
+!> ! formatted reading of vec_scal, vec_1D, vec_2D and vec_3D
+!> err = read(unit,format,vec_scal)
+!> err = read(unit,format,vec_1D)
+!> err = read(unit,format,vec_2D)
+!> err = read(unit,format,vec_3D)
+!> ! binary reading of vec_scal, vec_1D, vec_2D and vec_3D
+!> err = read(unit,vec_scal)
+!> err = read(unit,vec_1D)
+!> err = read(unit,vec_2D)
+!> err = read(unit,vec_3D)
+!> ... @endcode
 interface read
-  module procedure Read_Bin_Scalar,    & ! binary scalar
-                   Read_Ascii_Scalar,  & ! ascii scalar
-                   Read_Bin_Array1D,   & ! binary array 1D
-                   Read_Ascii_Array1D, & ! ascii array 1D
-                   Read_Bin_Array2D,   & ! binary array 2D
-                   Read_Ascii_Array2D, & ! ascii array 2D
-                   Read_Bin_Array3D,   & ! binary array 3D
-                   Read_Ascii_Array3D    ! ascii array 3D
+  module procedure Read_Bin_Scalar, Read_Ascii_Scalar
+  module procedure Read_Bin_Array1D,Read_Ascii_Array1D
+  module procedure Read_Bin_Array2D,Read_Ascii_Array2D
+  module procedure Read_Bin_Array3D,Read_Ascii_Array3D
 endinterface
-!!Assigment (=) overloading.
+!> @brief Assignment operator (=) overloading.
 interface assignment (=)
- module procedure                  &
 #ifdef r16p
-                  assign_ScalR16P, &
+  module procedure assign_ScalR16P
 #endif
-                  assign_ScalR8P,  &
-                  assign_ScalR4P,  &
-                  assign_ScalI8P,  &
-                  assign_ScalI4P,  &
-                  assign_ScalI2P,  &
-                  assign_ScalI1P
+  module procedure assign_ScalR8P
+  module procedure assign_ScalR4P
+  module procedure assign_ScalI8P
+  module procedure assign_ScalI4P
+  module procedure assign_ScalI2P
+  module procedure assign_ScalI1P
 end interface
-!!Multiplication (*) overloading.
+!> @brief Multiplication operator (*) overloading.
+!> @note The admissible multiplications are:
+!>       - Type_Vector * Type_Vector: each component of first vector variable (vec1) is multiplied for the
+!>         corresponding component of the second one (vec2), i.e. \n
+!>         \f$ {\rm result\%x = vec1\%x*vec2\%x} \f$ \n
+!>         \f$ {\rm result\%y = vec1\%y*vec2\%y} \f$ \n
+!>         \f$ {\rm result\%z = vec1\%z*vec2\%z} \f$ \n
+!>       - scalar number (real or integer of any kinds defined in IR_Precision module) * Type_Vector: each component of
+!>         Type_Vector is multiplied for the scalar, i.e. \n
+!>         \f$ {\rm result\%x = vec\%x*scalar} \f$ \n
+!>         \f$ {\rm result\%y = vec\%y*scalar} \f$ \n
+!>         \f$ {\rm result\%z = vec\%z*scalar} \f$ \n
+!>       - Type_Vector * scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>         Type_Vector is multiplied for the scalar, i.e. \n
+!>         \f$ {\rm result\%x = vec\%x*scalar} \f$ \n
+!>         \f$ {\rm result\%y = vec\%y*scalar} \f$ \n
+!>         \f$ {\rm result\%z = vec\%z*scalar} \f$ \n
 interface operator (*)
-  module procedure vec_mul_vec,      &
+  module procedure vec_mul_vec
 #ifdef r16p
-                   ScalR16P_mul_vec, &
+  module procedure ScalR16P_mul_vec
 #endif
-                   ScalR8P_mul_vec,  &
-                   ScalR4P_mul_vec,  &
-                   ScalI8P_mul_vec,  &
-                   ScalI4P_mul_vec,  &
-                   ScalI2P_mul_vec,  &
-                   ScalI1P_mul_vec,  &
+  module procedure ScalR8P_mul_vec
+  module procedure ScalR4P_mul_vec
+  module procedure ScalI8P_mul_vec
+  module procedure ScalI4P_mul_vec
+  module procedure ScalI2P_mul_vec
+  module procedure ScalI1P_mul_vec
 #ifdef r16p
-                   vec_mul_ScalR16P, &
+  module procedure vec_mul_ScalR16P
 #endif
-                   vec_mul_ScalR8P,  &
-                   vec_mul_ScalR4P,  &
-                   vec_mul_ScalI8P,  &
-                   vec_mul_ScalI4P,  &
-                   vec_mul_ScalI2P,  &
-                   vec_mul_ScalI1P
+  module procedure vec_mul_ScalR8P
+  module procedure vec_mul_ScalR4P
+  module procedure vec_mul_ScalI8P
+  module procedure vec_mul_ScalI4P
+  module procedure vec_mul_ScalI2P
+  module procedure vec_mul_ScalI1P
 endinterface
-!!Division (/) overloading.
+!> @brief Division operator (/) overloading.
+!> @note The admissible divisions are:
+!>       - Type_Vector / Type_Vector: each component of first vector variable (vec1) is divided for the
+!>         corresponding component of the second one (vec2), i.e. \n
+!>         \f$ {\rm result\%x = \frac{vec1\%x}{vec2\%x}} \f$ \n
+!>         \f$ {\rm result\%y = \frac{vec1\%y}{vec2\%y}} \f$ \n
+!>         \f$ {\rm result\%z = \frac{vec1\%z}{vec2\%z}} \f$ \n
+!>       - Type_Vector / scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>         Type_Vector is divided for the scalar, i.e. \n
+!>         \f$ {\rm result\%x = \frac{vec\%x}{scalar}} \f$ \n
+!>         \f$ {\rm result\%y = \frac{vec\%y}{scalar}} \f$ \n
+!>         \f$ {\rm result\%z = \frac{vec\%z}{scalar}} \f$ \n
 interface operator (/)
-  module procedure vec_div_vec,      &
+  module procedure vec_div_vec
 #ifdef r16p
-                   vec_div_ScalR16P, &
+  module procedure vec_div_ScalR16P
 #endif
-                   vec_div_ScalR8P,  &
-                   vec_div_ScalR4P,  &
-                   vec_div_ScalI8P,  &
-                   vec_div_ScalI4P,  &
-                   vec_div_ScalI2P,  &
-                   vec_div_ScalI1P
+  module procedure vec_div_ScalR8P
+  module procedure vec_div_ScalR4P
+  module procedure vec_div_ScalI8P
+  module procedure vec_div_ScalI4P
+  module procedure vec_div_ScalI2P
+  module procedure vec_div_ScalI1P
 endinterface
-!!Sum (+) overloading.
+!> @brief Sum operator (+) overloading.
+!> @note The admissible summations are:
+!>       - Type_Vector + Type_Vector: each component of first Vector variable (vec1) is summed with the
+!>         corresponding component of the second one (vec2), i.e. \n
+!>         \f$ {\rm result\%x = vec1\%x+vec2\%x} \f$ \n
+!>         \f$ {\rm result\%y = vec1\%y+vec2\%y} \f$ \n
+!>         \f$ {\rm result\%z = vec1\%z+vec2\%z} \f$ \n
+!>       - scalar number (real or integer of any kinds defined in IR_Precision module) + Type_Vector: each component of
+!>         Type_Vector is summed with the scalar, i.e. \n
+!>         \f$ {\rm result\%x = vec\%x+scalar} \f$ \n
+!>         \f$ {\rm result\%y = vec\%y+scalar} \f$ \n
+!>         \f$ {\rm result\%z = vec\%z+scalar} \f$ \n
+!>       - Type_Vector + scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>         Type_Vector is summed with the scalar, i.e. \n
+!>         \f$ {\rm result\%x = vec\%x+scalar} \f$ \n
+!>         \f$ {\rm result\%y = vec\%y+scalar} \f$ \n
+!>         \f$ {\rm result\%z = vec\%z+scalar} \f$ \n
 interface operator (+)
-  module procedure positive_vec,     &
-                   vec_sum_vec,      &
+  module procedure positive_vec
+  module procedure vec_sum_vec
 #ifdef r16p
-                   ScalR16P_sum_vec, &
+  module procedure ScalR16P_sum_vec
 #endif
-                   ScalR8P_sum_vec,  &
-                   ScalR4P_sum_vec,  &
-                   ScalI8P_sum_vec,  &
-                   ScalI4P_sum_vec,  &
-                   ScalI2P_sum_vec,  &
-                   ScalI1P_sum_vec,  &
+  module procedure ScalR8P_sum_vec
+  module procedure ScalR4P_sum_vec
+  module procedure ScalI8P_sum_vec
+  module procedure ScalI4P_sum_vec
+  module procedure ScalI2P_sum_vec
+  module procedure ScalI1P_sum_vec
 #ifdef r16p
-                   vec_sum_ScalR16P, &
+  module procedure vec_sum_ScalR16P
 #endif
-                   vec_sum_ScalR8P,  &
-                   vec_sum_ScalR4P,  &
-                   vec_sum_ScalI8P,  &
-                   vec_sum_ScalI4P,  &
-                   vec_sum_ScalI2P,  &
-                   vec_sum_ScalI1P
+  module procedure vec_sum_ScalR8P
+  module procedure vec_sum_ScalR4P
+  module procedure vec_sum_ScalI8P
+  module procedure vec_sum_ScalI4P
+  module procedure vec_sum_ScalI2P
+  module procedure vec_sum_ScalI1P
 endinterface
-!!Subtraction (-) overloading.
+!> @brief Subtraction operator (-) overloading.
+!> @note The admissible subtractions are:
+!>       - Type_Vector - Type_Vector: each component of first vector variable (vec1) is subtracted with the
+!>         corresponding component of the second one (vec2), i.e. \n
+!>         \f$ {\rm result\%x = vec1\%x-vec2\%x} \f$ \n
+!>         \f$ {\rm result\%y = vec1\%y-vec2\%y} \f$ \n
+!>         \f$ {\rm result\%z = vec1\%z-vec2\%z} \f$ \n
+!>       - scalar number (real or integer of any kinds defined in IR_Precision module) - Type_Vector: each component of
+!>         Type_Vector is subtracted with the scalar, i.e. \n
+!>         \f$ {\rm result\%x = scalar-vec\%x} \f$ \n
+!>         \f$ {\rm result\%y = scalar-vec\%y} \f$ \n
+!>         \f$ {\rm result\%z = scalar-vec\%z} \f$ \n
+!>       - Type_Vector - scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>         Type_Vector is subtracted with the scalar, i.e. \n
+!>         \f$ {\rm result\%x = vec\%x-scalar} \f$ \n
+!>         \f$ {\rm result\%y = vec\%y-scalar} \f$ \n
+!>         \f$ {\rm result\%z = vec\%z-scalar} \f$ \n
 interface operator (-)
-  module procedure negative_vec,     &
-                   vec_sub_vec,      &
+  module procedure negative_vec
+  module procedure vec_sub_vec
 #ifdef r16p
-                   ScalR16P_sub_vec, &
+  module procedure ScalR16P_sub_vec
 #endif
-                   ScalR8P_sub_vec,  &
-                   ScalR4P_sub_vec,  &
-                   ScalI8P_sub_vec,  &
-                   ScalI4P_sub_vec,  &
-                   ScalI2P_sub_vec,  &
-                   ScalI1P_sub_vec,  &
+  module procedure ScalR8P_sub_vec
+  module procedure ScalR4P_sub_vec
+  module procedure ScalI8P_sub_vec
+  module procedure ScalI4P_sub_vec
+  module procedure ScalI2P_sub_vec
+  module procedure ScalI1P_sub_vec
 #ifdef r16p
-                   vec_sub_ScalR16P, &
+  module procedure vec_sub_ScalR16P
 #endif
-                   vec_sub_ScalR8P,  &
-                   vec_sub_ScalR4P,  &
-                   vec_sub_ScalI8P,  &
-                   vec_sub_ScalI4P,  &
-                   vec_sub_ScalI2P,  &
-                   vec_sub_ScalI1P
+  module procedure vec_sub_ScalR8P
+  module procedure vec_sub_ScalR4P
+  module procedure vec_sub_ScalI8P
+  module procedure vec_sub_ScalI4P
+  module procedure vec_sub_ScalI2P
+  module procedure vec_sub_ScalI1P
 endinterface
-!!Conditional operators overloading.
+!> @brief Not-equal-to boolean operator (/=) overloading.
+!> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
+!> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
 interface operator (/=)
-  module procedure vec_not_eq_vec,  &
+  module procedure vec_not_eq_vec
 #ifdef r16p
-                   R16P_not_eq_vec, &
-                   vec_not_eq_R16P, &
+  module procedure R16P_not_eq_vec,vec_not_eq_R16P
 #endif
-                   R8P_not_eq_vec,  &
-                   vec_not_eq_R8P,  &
-                   R4P_not_eq_vec,  &
-                   vec_not_eq_R4P,  &
-                   I8P_not_eq_vec,  &
-                   vec_not_eq_I8P,  &
-                   I4P_not_eq_vec,  &
-                   vec_not_eq_I4P,  &
-                   I2P_not_eq_vec,  &
-                   vec_not_eq_I2P,  &
-                   I1P_not_eq_vec,  &
-                   vec_not_eq_I1P
+  module procedure R8P_not_eq_vec,vec_not_eq_R8P
+  module procedure R4P_not_eq_vec,vec_not_eq_R4P
+  module procedure I8P_not_eq_vec,vec_not_eq_I8P
+  module procedure I4P_not_eq_vec,vec_not_eq_I4P
+  module procedure I2P_not_eq_vec,vec_not_eq_I2P
+  module procedure I1P_not_eq_vec,vec_not_eq_I1P
 endinterface
+!> @brief Lower-than boolean operator (<) overloading.
+!> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
+!> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
 interface operator (<)
-  module procedure vec_low_vec,  &
+  module procedure vec_low_vec
 #ifdef r16p
-                   R16P_low_vec, &
-                   vec_low_R16P, &
+  module procedure R16P_low_vec,vec_low_R16P
 #endif
-                   R8P_low_vec,  &
-                   vec_low_R8P,  &
-                   R4P_low_vec,  &
-                   vec_low_R4P,  &
-                   I8P_low_vec,  &
-                   vec_low_I8P,  &
-                   I4P_low_vec,  &
-                   vec_low_I4P,  &
-                   I2P_low_vec,  &
-                   vec_low_I2P,  &
-                   I1P_low_vec,  &
-                   vec_low_I1P
+  module procedure R8P_low_vec,vec_low_R8P
+  module procedure R4P_low_vec,vec_low_R4P
+  module procedure I8P_low_vec,vec_low_I8P
+  module procedure I4P_low_vec,vec_low_I4P
+  module procedure I2P_low_vec,vec_low_I2P
+  module procedure I1P_low_vec,vec_low_I1P
 endinterface
+!> @brief Lower-equal-than boolean operator (<=) overloading.
+!> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
+!> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
 interface operator (<=)
-  module procedure vec_low_eq_vec,  &
+  module procedure vec_low_eq_vec
 #ifdef r16p
-                   R16P_low_eq_vec, &
-                   vec_low_eq_R16P, &
+  module procedure R16P_low_eq_vec,vec_low_eq_R16P
 #endif
-                   R8P_low_eq_vec,  &
-                   vec_low_eq_R8P,  &
-                   R4P_low_eq_vec,  &
-                   vec_low_eq_R4P,  &
-                   I8P_low_eq_vec,  &
-                   vec_low_eq_I8P,  &
-                   I4P_low_eq_vec,  &
-                   vec_low_eq_I4P,  &
-                   I2P_low_eq_vec,  &
-                   vec_low_eq_I2P,  &
-                   I1P_low_eq_vec,  &
-                   vec_low_eq_I1P
+  module procedure R8P_low_eq_vec,vec_low_eq_R8P
+  module procedure R4P_low_eq_vec,vec_low_eq_R4P
+  module procedure I8P_low_eq_vec,vec_low_eq_I8P
+  module procedure I4P_low_eq_vec,vec_low_eq_I4P
+  module procedure I2P_low_eq_vec,vec_low_eq_I2P
+  module procedure I1P_low_eq_vec,vec_low_eq_I1P
 endinterface
+!> @brief Equal-to boolean operator (==) overloading.
+!> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
+!> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
 interface operator (==)
-  module procedure vec_eq_vec,  &
+  module procedure vec_eq_vec
 #ifdef r16p
-                   R16P_eq_vec, &
-                   vec_eq_R16P, &
+  module procedure R16P_eq_vec,vec_eq_R16P
 #endif
-                   R8P_eq_vec,  &
-                   vec_eq_R8P,  &
-                   R4P_eq_vec,  &
-                   vec_eq_R4P,  &
-                   I8P_eq_vec,  &
-                   vec_eq_I8P,  &
-                   I4P_eq_vec,  &
-                   vec_eq_I4P,  &
-                   I2P_eq_vec,  &
-                   vec_eq_I2P,  &
-                   I1P_eq_vec,  &
-                   vec_eq_I1P
+  module procedure R8P_eq_vec,vec_eq_R8P
+  module procedure R4P_eq_vec,vec_eq_R4P
+  module procedure I8P_eq_vec,vec_eq_I8P
+  module procedure I4P_eq_vec,vec_eq_I4P
+  module procedure I2P_eq_vec,vec_eq_I2P
+  module procedure I1P_eq_vec,vec_eq_I1P
 endinterface
+!> @brief Higher-equal-than boolean operator (>=) overloading.
+!> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
+!> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
 interface operator (>=)
-  module procedure vec_great_eq_vec,  &
+  module procedure vec_great_eq_vec
 #ifdef r16p
-                   R16P_great_eq_vec, &
-                   vec_great_eq_R16P, &
+  module procedure R16P_great_eq_vec,vec_great_eq_R16P
 #endif
-                   R8P_great_eq_vec,  &
-                   vec_great_eq_R8P,  &
-                   R4P_great_eq_vec,  &
-                   vec_great_eq_R4P,  &
-                   I8P_great_eq_vec,  &
-                   vec_great_eq_I8P,  &
-                   I4P_great_eq_vec,  &
-                   vec_great_eq_I4P,  &
-                   I2P_great_eq_vec,  &
-                   vec_great_eq_I2P,  &
-                   I1P_great_eq_vec,  &
-                   vec_great_eq_I1P
+  module procedure R8P_great_eq_vec,vec_great_eq_R8P
+  module procedure R4P_great_eq_vec,vec_great_eq_R4P
+  module procedure I8P_great_eq_vec,vec_great_eq_I8P
+  module procedure I4P_great_eq_vec,vec_great_eq_I4P
+  module procedure I2P_great_eq_vec,vec_great_eq_I2P
+  module procedure I1P_great_eq_vec,vec_great_eq_I1P
 endinterface
+!> @brief Higher-than boolean operator (>) overloading.
+!> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
+!> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
 interface operator (>)
-  module procedure vec_great_vec,  &
+  module procedure vec_great_vec
 #ifdef r16p
-                   R16P_great_vec, &
-                   vec_great_R16P, &
+  module procedure R16P_great_vec,vec_great_R16P
 #endif
-                   R8P_great_vec,  &
-                   vec_great_R8P,  &
-                   R4P_great_vec,  &
-                   vec_great_R4P,  &
-                   I8P_great_vec,  &
-                   vec_great_I8P,  &
-                   I4P_great_vec,  &
-                   vec_great_I4P,  &
-                   I2P_great_vec,  &
-                   vec_great_I2P,  &
-                   I1P_great_vec,  &
-                   vec_great_I1P
+  module procedure R8P_great_vec,vec_great_R8P
+  module procedure R4P_great_vec,vec_great_R4P
+  module procedure I8P_great_vec,vec_great_I8P
+  module procedure I4P_great_vec,vec_great_I4P
+  module procedure I2P_great_vec,vec_great_I2P
+  module procedure I1P_great_vec,vec_great_I1P
 endinterface
-!!Cross product operator definition.
+!> @brief Cross product operator (.cross.) definition.
 interface operator (.cross.)
   module procedure crossproduct
 endinterface
-!!Dot product operator definition.
+!> @brief Dot product operator (.dot.) definition.
 interface operator (.dot.)
   module procedure dotproduct
 endinterface
-!!Parallel operator definition.
+!> @brief Parallel product operator (.paral.) definition.
+!> @note This operator produces a vector with the normL2 of first vector and parallel to the second vector.
 interface operator (.paral.)
   module procedure parallel
 endinterface
-!!Orthogonal operator definition.
+!> @brief Orthogonal product operator (.ortho.) definition.
+!> @note This operator produces a vector with the normL2 of first vector and orthogonal to the second vector.
 interface operator (.ortho.)
   module procedure orthogonal
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  elemental function init(x,y,z) result(vec)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for initializing Type_Vector: all components are initialized to zero and if there is a dummy argument the corresponding
-  !!component is set to dummy value passed.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P), intent(IN), optional:: x,y,z ! Vector's components.
-  type(Type_Vector)::               vec   ! Vector.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(x)) vec%x = x
-  if (present(y)) vec%y = y
-  if (present(z)) vec%z = z
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction init
-
+  !> Subroutine for setting components of Type_Vector variable.
   elemental subroutine set(x,y,z,vec)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!subroutine for assignment Type_Vector: if there is a dummy argument the corresponding component is set to dummy value passed.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),         intent(IN), optional:: x,y,z ! Vector's components.
-  type(Type_Vector), intent(INOUT)::        vec   ! Vector.
+  real(R_P),         intent(IN), optional:: x   !< Cartesian component in x direction.
+  real(R_P),         intent(IN), optional:: y   !< Cartesian component in y direction.
+  real(R_P),         intent(IN), optional:: z   !< Cartesian component in z direction.
+  type(Type_Vector), intent(INOUT)::        vec !< Vector.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -340,15 +384,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine set
 
+  !> Subroutine for extracting Type_Vector variable components.
   elemental subroutine get(x,y,z,vec)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for extraction Type_Vector components: if there is a dummy argument it is set to the corresponding component value.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),         intent(OUT), optional:: x,y,z ! Vector's components.
-  type(Type_Vector), intent(IN)::            vec   ! Vector.
+  real(R_P),         intent(OUT), optional:: x   !< Cartesian component in x direction.
+  real(R_P),         intent(OUT), optional:: y   !< Cartesian component in y direction.
+  real(R_P),         intent(OUT), optional:: z   !< Cartesian component in z direction.
+  type(Type_Vector), intent(IN)::            vec !< Vector.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

@@ -1,26 +1,21 @@
+!> @brief Module Data_Type_Globals contains the definition of global types variables and useful procedures for their handling.
+!> Two main derived type are defined: \n
+!> - Type_Global: derived type containing global-level data.
+!> - Type_Block: derived type containing block-level data.
 module Data_Type_Globals
 !-----------------------------------------------------------------------------------------------------------------------------------
-! The module Data_Globals contains the definition of globals variables.
-!-----------------------------------------------------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                            ! Integers and reals precision definition.
-USE Data_Type_BC, init_bc=>init, set_bc=>set                ! Definition of Type_BC.
-USE Data_Type_Cell, init_cell=>init, set_cell=>set          ! Definition of Type_Cell.
-USE Data_Type_Conservative, init_cons=>init, set_cons=>set  ! Definition of Type_Conservative.
-USE Data_Type_Primitive, init_prim=>init, set_prim=>set     ! Definition of Type_Primitive.
-USE Data_Type_Vector, init_vec=>init, set_vec=>set          ! Definition of Type_Vector.
-USE Lib_IO_Misc                                             ! Procedures for IO and strings operations.
+USE IR_Precision                                            !< Integers and reals precision definition.
+USE Data_Type_BC, init_bc=>init, set_bc=>set                !< Definition of Type_BC.
+USE Data_Type_Cell, init_cell=>init, set_cell=>set          !< Definition of Type_Cell.
+USE Data_Type_Conservative, init_cons=>init, set_cons=>set  !< Definition of Type_Conservative.
+USE Data_Type_Primitive, init_prim=>init, set_prim=>set     !< Definition of Type_Primitive.
+USE Data_Type_Vector, set_vec=>set                          !< Definition of Type_Vector.
+USE Lib_IO_Misc                                             !< Procedures for IO and strings operations.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 private
-public:: Type_File_Global
-public:: Type_Mesh_Global, Type_Mesh_Block
-public:: Type_BC_Global,   Type_BC_Block
-public:: Type_Fluid_Global,Type_Fluid_Block
-public:: Type_Global,      Type_Block
 public:: file_name
 public:: alloc_global_bc,alloc_global_fluid
 public:: free_block,alloc_block
@@ -30,136 +25,148 @@ public:: load_gfluid_soption,load_gfluid_Ns,load_gfluid_0species,load_bfluid,sav
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-! Derived type containing the global-level file data.
-type:: Type_File_Global
-  character(60)::  Path_InPut           ! Path of input files.
-  character(60)::  Path_OutPut          ! Path of output files.
-  character(60)::  File_BC     ='unset' ! Basename of boundary conditions file.
-  character(60)::  File_Init   ='unset' ! Basename of initial conditions file.
-  character(60)::  File_Mesh   ='unset' ! Basename of mesh file.
-  character(60)::  File_Spec   ='unset' ! Name of initial species file.
-  character(60)::  File_Sol    ='unset' ! Basename of solution file.
-  character(60)::  File_Solver ='unset' ! Name of solver options file.
-  character(60)::  File_Pout   ='unset' ! Post-processed output file name.
-  character(500):: varform_res          ! Gnuplot residuals writing format.
-  integer(I8P)::   screen_out  = 1      ! Console refresh frequency.
-  integer(I8P)::   sol_out     = 0      ! Actual solution writing frequency (if 0 only restart solution is saved).
-  integer(I8P)::   restart_out = 1      ! Restart Solution writing frequency.
-  integer(I8P)::   probe_out   = 1      ! Probes writing frequency.
-  integer(I_P)::   unit_res             ! Logical unit of gnuplot log file of residuals.
+!> @brief Derived type containing the global-level file data.
+!> Global-level file data are referred to those informations concerning with files of global interest.
+type, public:: Type_File_Global
+  character(60)::  Path_InPut           !< Path of input files.
+  character(60)::  Path_OutPut          !< Path of output files.
+  character(60)::  File_BC     ='unset' !< Base name of boundary conditions file.
+  character(60)::  File_Init   ='unset' !< Base name of initial conditions file.
+  character(60)::  File_Mesh   ='unset' !< Base name of mesh file.
+  character(60)::  File_Spec   ='unset' !< Name of initial species file.
+  character(60)::  File_Sol    ='unset' !< Base name of solution file.
+  character(60)::  File_Solver ='unset' !< Name of solver options file.
+  character(60)::  File_Pout   ='unset' !< Post-processed output file name.
+  character(500):: varform_res          !< Gnuplot residuals writing format.
+  integer(I8P)::   screen_out  = 1      !< Console refresh frequency.
+  integer(I8P)::   sol_out     = 0      !< Actual solution writing frequency (if 0 only restart solution is saved).
+  integer(I8P)::   restart_out = 1      !< Restart Solution writing frequency.
+  integer(I8P)::   probe_out   = 1      !< Probes writing frequency.
+  integer(I_P)::   unit_res             !< Logical unit of gnuplot log file of residuals.
 endtype Type_File_Global
 
-! Mesh data type:
-! Derived type containing the global-level mesh data:
-type:: Type_Mesh_Global
-  integer(I_P):: Nl     = 1_I_P ! Number of grid levels.
-  integer(I_P):: Nb     = 0_I_P ! Number of blocks.
-  integer(I_P):: Nb_tot = 0_I_P ! Number of total blocks (sum over each process).
-  integer(I1P):: gco    = 1_I_P ! Number of ghost cells necessary to achieve the space reconstruction order.
+!> @brief Derived type containing the global-level mesh data.
+!> Global-level mesh data are referred to those informations concerning with mesh's details of global interest.
+type, public:: Type_Mesh_Global
+  integer(I_P):: Nl     = 1_I_P !< Number of grid levels.
+  integer(I_P):: Nb     = 0_I_P !< Number of blocks.
+  integer(I_P):: Nb_tot = 0_I_P !< Number of total blocks (sum over each process).
+  integer(I1P):: gco    = 1_I_P !< Number of ghost cells necessary to achieve the space reconstruction order.
 endtype Type_Mesh_Global
-! Derived type containing the block-level mesh data:
-type:: Type_Mesh_Block
-  integer(I_P)::                   Ni     = 0_I_P    ! Number of cells in i direction.
-  integer(I_P)::                   Nj     = 0_I_P    ! Number of cells in j direction.
-  integer(I_P)::                   Nk     = 0_I_P    ! Number of cells in k direction.
-  integer(I1P)::                   gc(1:6)=&         ! Number of ghost cells for the 6 faces of the block:
-                                           [1_I1P, & ! gc(1) => left  i.
+!> @brief Derived type containing the block-level mesh data.
+!> Block-level mesh data are referred to those informations concerning with mesh's details of blocks interest.
+type, public:: Type_Mesh_Block
+  integer(I_P)::                   Ni     = 0_I_P    !< Number of cells in i direction.
+  integer(I_P)::                   Nj     = 0_I_P    !< Number of cells in j direction.
+  integer(I_P)::                   Nk     = 0_I_P    !< Number of cells in k direction.
+  integer(I1P)::                   gc(1:6)=&
+                                          (/1_I1P, & ! gc(1) => left  i.
                                             1_I1P, & ! gc(2) => right i.
                                             1_I1P, & ! gc(3) => left  j.
                                             1_I1P, & ! gc(4) => right j.
                                             1_I1P, & ! gc(5) => left  k.
-                                            1_I1P]   ! gc(6) => right k.
-  type(Type_Vector), allocatable:: node(:,:,:)       ! Cell nodes coordinates  [0-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
-  type(Type_Vector), allocatable:: NFi(:,:,:)        ! Face i normals (versor) [0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  type(Type_Vector), allocatable:: NFj(:,:,:)        ! Face j normals (versor) [1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  type(Type_Vector), allocatable:: NFk(:,:,:)        ! Face k normals (versor) [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
-  real(R_P),         allocatable:: Si(:,:,:)         ! Face i area             [0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  real(R_P),         allocatable:: Sj(:,:,:)         ! Face j area             [1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  real(R_P),         allocatable:: Sk(:,:,:)         ! Face k area             [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
-  real(R_P),         allocatable:: V(:,:,:)          ! Cell volume             [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  type(Type_Cell),   allocatable:: cell(:,:,:)       ! Cell data informations  [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  type(Type_Vector), allocatable:: cent(:,:,:)       ! Cell center coordinates [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+                                            1_I1P  & ! gc(6) => right k.
+                                            /)       !< Number of ghost cells for the 6 faces of the block.
+  type(Type_Vector), allocatable:: node(:,:,:)       !< Cell nodes coordinates [0-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
+  type(Type_Vector), allocatable:: NFi(:,:,:)        !< Face i normals, versor [0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+  type(Type_Vector), allocatable:: NFj(:,:,:)        !< Face j normals, versor [1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+  type(Type_Vector), allocatable:: NFk(:,:,:)        !< Face k normals, versor [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
+  real(R_P),         allocatable:: Si(:,:,:)         !< Face i area            [0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+  real(R_P),         allocatable:: Sj(:,:,:)         !< Face j area            [1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+  real(R_P),         allocatable:: Sk(:,:,:)         !< Face k area            [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
+  real(R_P),         allocatable:: V(:,:,:)          !< Cell volume            [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+  type(Type_Cell),   allocatable:: cell(:,:,:)       !< Cell data informations [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+  type(Type_Vector), allocatable:: cent(:,:,:)       !< Cell center coordinates[1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
   ! Adaptive Mesh Refinement
-  integer(I1P)::                   octree = 0_I_P    ! Octree refinemnt level.
-  type(Type_Mesh_Block), pointer:: amr(:,:,:)=>null()! Mesh data of refined cells.
+  integer(I1P)::                   octree = 0_I_P    !< Octree refinement level.
+  type(Type_Mesh_Block), pointer:: amr(:,:,:)=>null()!< Mesh data of refined cells.
 endtype Type_Mesh_Block
 
-! Boundary conditions data type:
-! Derived type containing the global-level boundary conditions data:
-type:: Type_BC_Global
-  integer(I_P)::                      Nin1 = 0_I_P ! Number of inflow 1 boundary conditions.
-  type(Type_Primitive), allocatable:: in1(:)       ! Inflow 1 boundary conditions primitive variables [1:Nin1].
+!> @brief Derived type containing the global-level boundary conditions data.
+!> Global-level boundary conditions data are referred to those informations concerning with bc's details of global interest.
+type, public:: Type_BC_Global
+  integer(I_P)::                      Nin1 = 0_I_P !< Number of inflow 1 boundary conditions.
+  type(Type_Primitive), allocatable:: in1(:)       !< Inflow 1 boundary conditions primitive variables [1:Nin1].
 endtype Type_BC_Global
-! Derived type containing the block-level boundary conditions data:
-type:: Type_BC_Block
-  type(Type_BC), allocatable:: BCi(:,:,:) ! Boundary conditions of i faces [0-gc(1):1+gc(2),1-gc(3):1+gc(4),1-gc(5):1+gc(6)].
-  type(Type_BC), allocatable:: BCj(:,:,:) ! Boundary conditions of j faces [1-gc(1):1+gc(2),0-gc(3):1+gc(4),1-gc(5):1+gc(6)].
-  type(Type_BC), allocatable:: BCk(:,:,:) ! Boundary conditions of k faces [1-gc(1):1+gc(2),1-gc(3):1+gc(4),0-gc(5):1+gc(6)].
+!> @brief Derived type containing the block-level boundary conditions data.
+!> Block-level boundary conditions data are referred to those informations concerning with bc's details of blocks interest.
+type, public:: Type_BC_Block
+  type(Type_BC), allocatable:: BCi(:,:,:) !< Boundary conditions of i faces [0-gc(1):1+gc(2),1-gc(3):1+gc(4),1-gc(5):1+gc(6)].
+  type(Type_BC), allocatable:: BCj(:,:,:) !< Boundary conditions of j faces [1-gc(1):1+gc(2),0-gc(3):1+gc(4),1-gc(5):1+gc(6)].
+  type(Type_BC), allocatable:: BCk(:,:,:) !< Boundary conditions of k faces [1-gc(1):1+gc(2),1-gc(3):1+gc(4),0-gc(5):1+gc(6)].
 endtype Type_BC_Block
 
-! Fluidynamic data type:
-! Derived type containing the global-level fludynamic data:
-type:: Type_Fluid_Global
-  integer(I8P)::           n             = 0_I8P    ! Time steps counter.
-  real(R_P)::              t             = 0._R_P   ! Time.
-  integer(I_P)::           Ns            = 1_I_P    ! Number of species.
-  integer(I_P)::           Np            = 7_I_P    ! Number of primitive variables    (Np = Ns + 6).
-  integer(I_P)::           Nc            = 5_I_P    ! Number of conservative variables (Nc = Ns + 4).
-  logical::                unsteady      = .true.   ! Type of simulation: unsteady or not.
-  integer(I8P)::           Nmax          = 0_I8P    ! Max number of iterations.
-  real(R_P)::              Tmax          = 0._R_P   ! Max time, ignored if Nmax>0.
-  integer(I1P)::           sp_ord        = 1_I_P    ! Order of space convergence (number of ghost cells).
-  integer(I1P)::           rk_ord        = 1_I_P    ! Order of time convergence (number of Runge-Kutta stages).
-  real(R_P)::              CFL           = 0.3_R_P  ! Value of stability coefficient.
-  real(R_P)::              residual_toll = 0.01_R_P ! Tollerance for residuals vanishing evaluation.
-  logical::                residual_stop = .false.  ! Sentinel for stopping steady simulation when residuals vanish.
-  real(R_P), allocatable:: cp0(:)                   ! Initial specific heat cp for each specie [1:Ns].
-  real(R_P), allocatable:: cv0(:)                   ! Initial specific heat cv for each specie [1:Ns].
+!> Derived type containing the global-level fluid dynamic data.
+!> Global-level fluid dynamic data are referred to those informations concerning with fluids details of global interest.
+type, public:: Type_Fluid_Global
+  integer(I8P)::           n             = 0_I8P    !< Time steps counter.
+  real(R_P)::              t             = 0._R_P   !< Time.
+  integer(I_P)::           Ns            = 1_I_P    !< Number of species.
+  integer(I_P)::           Np            = 7_I_P    !< Number of primitive variables    (Np = Ns + 6).
+  integer(I_P)::           Nc            = 5_I_P    !< Number of conservative variables (Nc = Ns + 4).
+  logical::                unsteady      = .true.   !< Type of simulation: unsteady or not.
+  integer(I8P)::           Nmax          = 0_I8P    !< Max number of iterations.
+  real(R_P)::              Tmax          = 0._R_P   !< Max time, ignored if Nmax>0.
+  integer(I1P)::           sp_ord        = 1_I_P    !< Order of space convergence (number of ghost cells).
+  integer(I1P)::           rk_ord        = 1_I_P    !< Order of time convergence (number of Runge-Kutta stages).
+  real(R_P)::              CFL           = 0.3_R_P  !< Value of stability coefficient.
+  real(R_P)::              residual_toll = 0.01_R_P !< Tolerance for residuals vanishing evaluation.
+  logical::                residual_stop = .false.  !< Sentinel for stopping steady simulation when residuals vanish.
+  real(R_P), allocatable:: cp0(:)                   !< Initial specific heat cp for each specie [1:Ns].
+  real(R_P), allocatable:: cv0(:)                   !< Initial specific heat cv for each specie [1:Ns].
 endtype Type_Fluid_Global
-! Derived type containing the block-level fludynamic data.
-type:: Type_Fluid_Block
-  ! Dimensions of 3D array [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  real(R_P),               allocatable:: Dt(:,:,:)   ! Local time step.
-  type(Type_Primitive),    allocatable:: P (:,:,:)   ! Primitive variables.
-  type(Type_Conservative), allocatable:: U (:,:,:)   ! Conservative variables.
-  type(Type_Conservative), allocatable:: KS(:,:,:,:) ! Runge-Kutta stages of conservative variables [1:rk_ord].
+!> Derived type containing the block-level fluid dynamic data.
+!> Block-level fluid dynamic data are referred to those informations concerning with fluids details of blocks interest.
+!> @note Dimensions of 3D array are [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+type, public:: Type_Fluid_Block
+  real(R_P),               allocatable:: Dt(:,:,:)   !< Local time step.
+  type(Type_Primitive),    allocatable:: P (:,:,:)   !< Primitive variables.
+  type(Type_Conservative), allocatable:: U (:,:,:)   !< Conservative variables.
+  type(Type_Conservative), allocatable:: KS(:,:,:,:) !< Runge-Kutta stages of conservative variables [1:rk_ord].
 endtype Type_Fluid_Block
 
-! Derived type containing the global-level data:
-type:: Type_Global
-  type(Type_File_Global)::  file  ! File data.
-  type(Type_Mesh_Global)::  mesh  ! Mesh data.
-  type(Type_BC_Global)::    bc    ! Boundary conditions data.
-  type(Type_Fluid_Global):: fluid ! Fluidynamic data.
+!> @brief Derived type containing the global-level data.
+type, public:: Type_Global
+  type(Type_File_Global)::  file  !< File data.
+  type(Type_Mesh_Global)::  mesh  !< Mesh data.
+  type(Type_BC_Global)::    bc    !< Boundary conditions data.
+  type(Type_Fluid_Global):: fluid !< Fluid dynamic data.
 endtype Type_Global
-! Derived type containing the block-level data:
-type:: Type_Block
-  type(Type_Mesh_Block)::  mesh  ! Mesh data.
-  type(Type_BC_Block)::    bc    ! Boundary conditions data.
-  type(Type_Fluid_Block):: fluid ! Fluidynamic data.
+!> Derived type containing the block-level data.
+type, public:: Type_Block
+  type(Type_Mesh_Block)::  mesh  !< Mesh data.
+  type(Type_BC_Block)::    bc    !< Boundary conditions data.
+  type(Type_Fluid_Block):: fluid !< Fluid dynamic data.
 endtype Type_Block
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!!File name building procedures overloading.
+!> @brief Generic procedure for building file names.
+!> Three different types of output file name can be build by means of this generic interface: \n
+!> - File name of \b block-clean data; this type of file name is referred to those files containing block-level data; calling
+!>   signature is of the type:
+!>   @code fname = file_name(basename,suffix,blk,grl) @endcode
+!> - File name of \b block-time_step data; this type of file name is referred to those files containing block-level data that
+!>   varying with time; calling signature is of the type:
+!>   @code fname = file_name(basename,suffix,blk,grl,n) @endcode
+!> - File name of \b block-flip_flop data; this type of file name is referred to those files containing block-level data stored as
+!>   backup flip/flop file; calling signature is of the type:
+!>   @code fname = file_name(basename,suffix,blk,grl,flip) @endcode
 interface file_name
   module procedure Block_File_Name,Block_Step_File_Name,Block_Flip_File_Name
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  ! procedures for building file names
+  !> Function for building block-clean file name.
+  !> @return \b filename character(len_trim(basename)+4+5+len_trim(suffix)) variable.
   function Block_File_Name(basename,suffix,blk,grl) result(filename)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for building block-level file name.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  character(*), intent(IN)::                           basename ! Basename of file name.
-  character(*), intent(IN)::                           suffix   ! Suffix   of file name.
-  integer(I_P), intent(IN)::                           blk      ! Block number.
-  integer(I_P), intent(IN)::                           grl      ! Grid refinement level.
-  character(len_trim(basename)+4+5+len_trim(suffix)):: filename ! Output file name.
+  character(*), intent(IN)::                           basename !< Base name of file name.
+  character(*), intent(IN)::                           suffix   !< Suffix   of file name.
+  integer(I_P), intent(IN)::                           blk      !< Block number.
+  integer(I_P), intent(IN)::                           grl      !< Grid refinement level.
+  character(len_trim(basename)+4+5+len_trim(suffix)):: filename !< Output file name.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -168,19 +175,17 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Block_File_Name
 
+  !> Function for building block-time_step file name.
+  !> @return \b filename character(len_trim(basename)+4+5+13+len_trim(suffix)) variable.
   function Block_Step_File_Name(basename,suffix,blk,grl,n) result(filename)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for building block-level time step varing file name.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  character(*), intent(IN)::                              basename ! Basename of file name.
-  character(*), intent(IN)::                              suffix   ! Suffix   of file name.
-  integer(I_P), intent(IN)::                              blk      ! Block number.
-  integer(I_P), intent(IN)::                              grl      ! Grid refinement level.
-  integer(I8P), intent(IN)::                              n        ! Time step number.
-  character(len_trim(basename)+4+5+13+len_trim(suffix)):: filename ! Output file name.
+  character(*), intent(IN)::                              basename !< Base name of file name.
+  character(*), intent(IN)::                              suffix   !< Suffix   of file name.
+  integer(I_P), intent(IN)::                              blk      !< Block number.
+  integer(I_P), intent(IN)::                              grl      !< Grid refinement level.
+  integer(I8P), intent(IN)::                              n        !< Time step number.
+  character(len_trim(basename)+4+5+13+len_trim(suffix)):: filename !< Output file name.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -189,19 +194,17 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Block_Step_File_Name
 
+  !> Function for building block-flip_flop file name.
+  !> @return \b filename character(len_trim(basename)+3+4+5+len_trim(suffix)) variable.
   function Block_Flip_File_Name(basename,suffix,blk,grl,flip) result(filename)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for building block-level flip-flop varing file name.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  character(*), intent(IN)::                              basename ! Basename of file name.
-  character(*), intent(IN)::                              suffix   ! Suffix   of file name.
-  integer(I_P), intent(IN)::                              blk      ! Block number.
-  integer(I_P), intent(IN)::                              grl      ! Grid refinement level.
-  integer(I1P), intent(IN)::                              flip     ! Flip-flop number.
-  character(len_trim(basename)+3+4+5+len_trim(suffix)):: filename ! Output file name.
+  character(*), intent(IN)::                             basename !< Base name of file name.
+  character(*), intent(IN)::                             suffix   !< Suffix   of file name.
+  integer(I_P), intent(IN)::                             blk      !< Block number.
+  integer(I_P), intent(IN)::                             grl      !< Grid refinement level.
+  integer(I1P), intent(IN)::                             flip     !< Flip-flop number.
+  character(len_trim(basename)+3+4+5+len_trim(suffix)):: filename !< Output file name.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -210,15 +213,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Block_Flip_File_Name
 
-  ! procedures for free and allocating dynamic memory of global variables
+  !> Subroutine for allocating dynamic data of Type_Global boundary conditions variables.
   subroutine alloc_global_bc(global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for allocating dynamic data of Type_Global boundary conditions variables.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global), intent(INOUT):: global ! Global data.
+  type(Type_Global), intent(INOUT):: global !< Global data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -227,14 +226,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine alloc_global_bc
 
+  !> Subroutine for allocating dynamic data of Type_Global fluid dynamic variables.
   subroutine alloc_global_fluid(global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for allocating dynamic data of Type_Global fluidynamic variables.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global), intent(INOUT):: global ! Global data.
+  type(Type_Global), intent(INOUT):: global !< Global data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -244,15 +240,12 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine alloc_global_fluid
 
+  !> Subroutine for free dynamic data of Type_Block variables.
   subroutine free_block(block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for free dynamic data of Type_Block variables.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_block), intent(INOUT):: block ! Block data.
-  integer(I_P)::                    err   ! Error traping flag: 0 no errors, >0 error occours.
+  type(Type_block), intent(INOUT):: block !< Block data.
+  integer(I_P)::                    err   !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -280,7 +273,7 @@ contains
     err = free(block%bc%BCk) ! free the dynamic memory of Type_BC data
     deallocate(block%bc%BCk) ! free the block dynamic data
   endif
-  ! Fluidynamic data
+  ! Fluid dynamic data
   if (allocated(block%fluid%Dt)) deallocate(block%fluid%Dt)
   if (allocated(block%fluid%P)) then
     err = free(block%fluid%P) ! free the dynamic memory of Type_Primitive data
@@ -298,19 +291,16 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine free_block
 
+  !> Subroutine for allocating dynamic data of Type_Block variables.
   subroutine alloc_block(global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for allocating dynamic data of Type_Block variables.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global), intent(IN)::    global   ! Global data.
-  type(Type_block),  intent(INOUT):: block    ! Block data.
-  integer(I_P)::                     Ni,Nj,Nk ! Temporary variables for storing blocks dimensions.
-  integer(I_P)::                     gc(1:6)  ! Temporary variable  for storing blocks ghost cells number.
-  integer(I_P)::                     Ns       ! Temporary variable  for storing number of species.
-  integer(I_P)::                     rk_ord   ! Temporary variable  for storing rk_ord.
+  type(Type_Global), intent(IN)::    global   !< Global data.
+  type(Type_block),  intent(INOUT):: block    !< Block data.
+  integer(I_P)::                     Ni,Nj,Nk !< Temporary variables for storing blocks dimensions.
+  integer(I_P)::                     gc(1:6)  !< Temporary variable  for storing blocks ghost cells number.
+  integer(I_P)::                     Ns       !< Temporary variable  for storing number of species.
+  integer(I_P)::                     rk_ord   !< Temporary variable  for storing rk_ord.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -324,21 +314,21 @@ contains
   Ns      = global%fluid%Ns
   rk_ord  = global%fluid%rk_ord
   ! Mesh data
-  allocate(block%mesh%node(0-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6))) ; block%mesh%node=init_vec()
-  allocate(block%mesh%NFi (0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%NFi =init_vec()
-  allocate(block%mesh%NFj (1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%NFj =init_vec()
-  allocate(block%mesh%NFk (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6))) ; block%mesh%NFk =init_vec()
+  allocate(block%mesh%node(0-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6))) ; block%mesh%node=0._R_P
+  allocate(block%mesh%NFi (0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%NFi =0._R_P
+  allocate(block%mesh%NFj (1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%NFj =0._R_P
+  allocate(block%mesh%NFk (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6))) ; block%mesh%NFk =0._R_P
   allocate(block%mesh%Si  (0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%Si  =0._R_P
   allocate(block%mesh%Sj  (1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%Sj  =0._R_P
   allocate(block%mesh%Sk  (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6))) ; block%mesh%Sk  =0._R_P
   allocate(block%mesh%V   (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%V   =0._R_P
   allocate(block%mesh%cell(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%cell=init_cell()
-  allocate(block%mesh%cent(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%cent=init_vec()
+  allocate(block%mesh%cent(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%cent=0._R_P
   ! Boundary conditions data
   allocate(block%bc%BCi(0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%bc%BCi=init_bc()
   allocate(block%bc%BCj(1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%bc%BCj=init_bc()
   allocate(block%bc%BCk(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6))) ; block%bc%BCk=init_bc()
-  ! Fluidynamic data
+  ! Fluid dynamic data
   allocate(block%fluid%Dt(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))          ; block%fluid%Dt = 0._R_P
   allocate(block%fluid%P (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))          ; call init_prim(Ns=Ns,prim=block%fluid%P)
   allocate(block%fluid%U (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))          ; call init_cons(Ns=Ns,cons=block%fluid%U)
@@ -347,21 +337,18 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine alloc_block
 
-  ! mesh procedures
+  !> Function for loading the mesh data dimensions of block from the mesh file "filename".
+  !> @return \b err integer(I4P) variable.
   function load_bmesh_dims(ascii,myrank,filename,block) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for loading the mesh data dimensions of block from the mesh file "filename".
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  logical, optional, intent(IN)::    ascii    ! Flag for ascii file.
-  integer(I_P),      intent(IN)::    myrank   ! Actual rank process.
-  character(*),      intent(IN)::    filename ! Name of file where mesh variables are saved.
-  type(Type_Block),  intent(INOUT):: block    ! Block level data.
-  integer(I_P)::                     UnitFree ! Free logic unit.
-  logical::                          is_file  ! Flag for inquiring the presence of mesh file.
-  integer(I_P)::                     err      ! Error traping flag: 0 no errors, >0 error occours.
+  logical, optional, intent(IN)::    ascii    !< Flag for ascii file.
+  integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
+  character(*),      intent(IN)::    filename !< Name of file where mesh variables are saved.
+  type(Type_Block),  intent(INOUT):: block    !< Block level data.
+  integer(I_P)::                     UnitFree !< Free logic unit.
+  logical::                          is_file  !< Flag for inquiring the presence of mesh file.
+  integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -384,20 +371,18 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction load_bmesh_dims
 
+  !> Function for loading block mesh file.
+  !> @return \b err integer(I4P) variable.
   function load_bmesh(ascii,myrank,filename,block) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for loading block mesh file.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  logical, optional, intent(IN)::    ascii    ! Flag for ascii file.
-  integer(I_P),      intent(IN)::    myrank   ! Actual rank process.
-  character(*),      intent(IN)::    filename ! Name of file where mesh variables are saved.
-  type(Type_Block),  intent(INOUT):: block    ! Block level data.
-  integer(I_P)::                     err      ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                     UnitFree ! Free logic unit.
-  logical::                          is_file  ! Flag for inquiring the presence of mesh file.
+  logical, optional, intent(IN)::    ascii    !< Flag for ascii file.
+  integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
+  character(*),      intent(IN)::    filename !< Name of file where mesh variables are saved.
+  type(Type_Block),  intent(INOUT):: block    !< Block level data.
+  integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                     UnitFree !< Free logic unit.
+  logical::                          is_file  !< Flag for inquiring the presence of mesh file.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -424,18 +409,16 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction load_bmesh
 
+  !> Function for saving block mesh file.
+  !> @return \b err integer(I4P) variable.
   function save_bmesh(ascii,filename,block) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for saving block mesh file.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  logical, optional, intent(IN):: ascii    ! Flag for ascii file.
-  character(*),      intent(IN):: filename ! Name of file where mesh variables are saved.
-  type(Type_Block),  intent(IN):: block    ! Block level data.
-  integer(I_P)::                  err      ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                  UnitFree ! Free logic unit.
+  logical, optional, intent(IN):: ascii    !< Flag for ascii file.
+  character(*),      intent(IN):: filename !< Name of file where mesh variables are saved.
+  type(Type_Block),  intent(IN):: block    !< Block level data.
+  integer(I_P)::                  err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                  UnitFree !< Free logic unit.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -460,30 +443,28 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction save_bmesh
 
+  !> Function for printing to standard output info of block mesh data.
+  !> @return \b err integer(I4P) variable.
   function print_info_bmesh(myrank,blk,grl,global,block) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for printing to standard output info of block mesh data.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::  myrank       ! Rank process identification for MPI comunications.
-  integer(I_P),      intent(IN)::  blk          ! Actual block number.
-  integer(I_P),      intent(IN)::  grl          ! Actual grid level number.
-  type(Type_Global), intent(IN)::  global       ! Global level data.
-  type(Type_Block),  intent(IN)::  block        ! Block level data.
-  integer(I_P)::                   err          ! Error traping flag: 0 no errors, >0 error occours.
-  character(DR_P)::                vmax,vmin    ! String for printing max and min of variables.
-  character(DR_P)::                xmm,ymm,zmm  ! String for printing max and min of variables.
-  type(Type_Vector), allocatable:: NFi(:,:,:)   ! |
-  type(Type_Vector), allocatable:: NFj(:,:,:)   ! |
-  type(Type_Vector), allocatable:: NFk(:,:,:)   ! |
-  real(R_P),         allocatable:: Si (:,:,:)   ! | Dummy variables for printing only internal cells info.
-  real(R_P),         allocatable:: Sj (:,:,:)   ! |
-  real(R_P),         allocatable:: Sk (:,:,:)   ! |
-  real(R_P),         allocatable:: V  (:,:,:)   ! |
-  integer(I_P)::                   Ni,Nj,Nk     ! Temporary varables for storing block dimensions.
-  character(DI_P)::                rks          ! String containing myrank.
+  integer(I_P),      intent(IN)::  myrank       !< Rank process identification for MPI communications.
+  integer(I_P),      intent(IN)::  blk          !< Actual block number.
+  integer(I_P),      intent(IN)::  grl          !< Actual grid level number.
+  type(Type_Global), intent(IN)::  global       !< Global level data.
+  type(Type_Block),  intent(IN)::  block        !< Block level data.
+  integer(I_P)::                   err          !< Error trapping flag: 0 no errors, >0 error occurs.
+  character(DR_P)::                vmax,vmin    !< String for printing max and min of variables.
+  character(DR_P)::                xmm,ymm,zmm  !< String for printing max and min of variables.
+  type(Type_Vector), allocatable:: NFi(:,:,:)   !< |
+  type(Type_Vector), allocatable:: NFj(:,:,:)   !< |
+  type(Type_Vector), allocatable:: NFk(:,:,:)   !< |
+  real(R_P),         allocatable:: Si (:,:,:)   !< | Dummy variables for printing only internal cells info.
+  real(R_P),         allocatable:: Sj (:,:,:)   !< |
+  real(R_P),         allocatable:: Sk (:,:,:)   !< |
+  real(R_P),         allocatable:: V  (:,:,:)   !< |
+  integer(I_P)::                   Ni,Nj,Nk     !< Temporary variables for storing block dimensions.
+  character(DI_P)::                rks          !< String containing myrank.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -538,20 +519,17 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction print_info_bmesh
 
-  ! boundary conditions procedures
+  !> Function for loading inflow 1 boundary conditions.
+  !> @return \b err integer(I4P) variable.
   function load_gbc_in1(myrank,filename,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for loading inflow 1 boundary conditions.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank   ! Actual rank process.
-  character(*),      intent(IN)::    filename ! Name of file where boundary conditions variables are saved.
-  type(Type_Global), intent(INOUT):: global   ! Global level data.
-  integer(I_P)::                     err      ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                     UnitFree ! Free logic unit.
-  logical::                          is_file  ! Flag for inquiring the presence of boundary conditions file.
+  integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
+  character(*),      intent(IN)::    filename !< Name of file where boundary conditions variables are saved.
+  type(Type_Global), intent(INOUT):: global   !< Global level data.
+  integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                     UnitFree !< Free logic unit.
+  logical::                          is_file  !< Flag for inquiring the presence of boundary conditions file.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -565,19 +543,17 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction load_gbc_in1
 
+  !> Function for loading block boundary conditions file.
+  !> @return \b err integer(I4P) variable.
   function load_bbc(myrank,filename,block) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for loading block boundary conditions file.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),     intent(IN)::    myrank   ! Actual rank process.
-  character(*),     intent(IN)::    filename ! Name of file where mesh variables are saved.
-  type(Type_Block), intent(INOUT):: block    ! Block level data.
-  integer(I_P)::                    err      ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                    UnitFree ! Free logic unit.
-  logical::                         is_file  ! Flag for inquiring the presence of boundary conditions file.
+  integer(I_P),     intent(IN)::    myrank   !< Actual rank process.
+  character(*),     intent(IN)::    filename !< Name of file where mesh variables are saved.
+  type(Type_Block), intent(INOUT):: block    !< Block level data.
+  integer(I_P)::                    err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                    UnitFree !< Free logic unit.
+  logical::                         is_file  !< Flag for inquiring the presence of boundary conditions file.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -593,17 +569,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction load_bbc
 
+  !> Function for saving block boundary conditions file.
+  !> @return \b err integer(I4P) variable.
   function save_bbc(filename,block) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for saving block boundary conditions file.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  character(*),     intent(IN):: filename ! Name of file where mesh variables are saved.
-  type(Type_Block), intent(IN):: block    ! Block level data.
-  integer(I_P)::                 err      ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                 UnitFree ! Free logic unit.
+  character(*),     intent(IN):: filename !< Name of file where mesh variables are saved.
+  type(Type_Block), intent(IN):: block    !< Block level data.
+  integer(I_P)::                 err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                 UnitFree !< Free logic unit.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -617,21 +591,18 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction save_bbc
 
-  ! fluidynamic procedures
+  !> Function for loading solver option variables.
+  !> @return \b err integer(I4P) variable.
   function load_gfluid_soption(myrank,filename,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for loading solver option variables.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank   ! Rank process identification for MPI comunications.
-  character(*),      intent(IN)::    filename ! Name of file where option variables are saved.
-  type(Type_Global), intent(INOUT):: global   ! Global level data.
-  integer(I_P)::                     err      ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                     UnitFree ! Free logic unit.
-  logical::                          is_file  ! Flag for inquiring the presence of option file.
-  character(8)::                     timing   ! timing = 'unsteady' simulation otherwise steady one.
+  integer(I_P),      intent(IN)::    myrank   !< Rank process identification for MPI communications.
+  character(*),      intent(IN)::    filename !< Name of file where option variables are saved.
+  type(Type_Global), intent(INOUT):: global   !< Global level data.
+  integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                     UnitFree !< Free logic unit.
+  logical::                          is_file  !< Flag for inquiring the presence of option file.
+  character(8)::                     timing   !< timing = 'unsteady' simulation otherwise steady one.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -661,20 +632,18 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction load_gfluid_soption
 
+  !> Function for loading the number of species from fluid dynamic file "filename".
+  !> @return \b err integer(I4P) variable.
   function load_gfluid_Ns(binary,myrank,filename,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for loading the number of species from fluidynamic file "filename".
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  logical,           intent(IN), optional:: binary   ! Flag for binary of ascii input file.
-  integer(I_P),      intent(IN)::           myrank   ! Actual rank process.
-  character(*),      intent(IN)::           filename ! Name of file where mesh variables are saved.
-  type(Type_Global), intent(INOUT)::        global   ! Global level data.
-  integer(I_P)::                            err      ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                            UnitFree ! Free logic unit.
-  logical::                                 is_file  ! Flag for inquiring the presence of fluidynamic file.
+  logical,           intent(IN), optional:: binary   !< Flag for binary of ascii input file.
+  integer(I_P),      intent(IN)::           myrank   !< Actual rank process.
+  character(*),      intent(IN)::           filename !< Name of file where mesh variables are saved.
+  type(Type_Global), intent(INOUT)::        global   !< Global level data.
+  integer(I_P)::                            err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                            UnitFree !< Free logic unit.
+  logical::                                 is_file  !< Flag for inquiring the presence of fluid dynamic file.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -697,22 +666,20 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction load_gfluid_Ns
 
+  !> Function for loading initial species from ascii file.
+  !> @return \b err integer(I4P) variable.
   function load_gfluid_0species(myrank,filename,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for loading initial species from ascii file.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank   ! Actual rank process.
-  character(*),      intent(IN)::    filename ! Name of file where initial species are saved.
-  type(Type_Global), intent(INOUT):: global   ! Global level data.
-  integer(I_P)::                     err      ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                     UnitFree ! Free logic unit.
-  logical::                          is_file  ! Flag for inquiring the presence of initial species file.
-  integer(I_P)::                     s        ! Species counter.
-  real(R_P)::                        g        ! Specific heats ratio (cp/cv).
-  real(R_P)::                        R        ! Specific heats difference (cp-cv).
+  integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
+  character(*),      intent(IN)::    filename !< Name of file where initial species are saved.
+  type(Type_Global), intent(INOUT):: global   !< Global level data.
+  integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                     UnitFree !< Free logic unit.
+  logical::                          is_file  !< Flag for inquiring the presence of initial species file.
+  integer(I_P)::                     s        !< Species counter.
+  real(R_P)::                        g        !< Specific heats ratio (cp/cv).
+  real(R_P)::                        R        !< Specific heats difference (cp-cv).
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -747,20 +714,18 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction load_gfluid_0species
 
+  !> Function for loading fluid dynamic file.
+  !> @return \b err integer(I4P) variable.
   function load_bfluid(myrank,filename,global,block) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for loading fluidynamic file.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank   ! Actual rank process.
-  character(*),      intent(IN)::    filename ! Name of file where mesh variables are saved.
-  type(Type_Global), intent(INOUT):: global   ! Global level data.
-  type(Type_Block),  intent(INOUT):: block    ! Block level data.
-  integer(I_P)::                     err      ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                     UnitFree ! Free logic unit.
-  logical::                          is_file  ! Flag for inquiring the presence of fluidynamic file.
+  integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
+  character(*),      intent(IN)::    filename !< Name of file where mesh variables are saved.
+  type(Type_Global), intent(INOUT):: global   !< Global level data.
+  type(Type_Block),  intent(INOUT):: block    !< Block level data.
+  integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                     UnitFree !< Free logic unit.
+  logical::                          is_file  !< Flag for inquiring the presence of fluid dynamic file.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -779,18 +744,16 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction load_bfluid
 
+  !> Function for saving fluid dynamic file.
+  !> @return \b err integer(I4P) variable.
   function save_bfluid(filename,global,block) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for saving fluidynamic file.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  character(*),      intent(IN):: filename ! Name of file where mesh variables are saved.
-  type(Type_Global), intent(IN):: global   ! Global level data.
-  type(Type_Block),  intent(IN):: block    ! Block level data.
-  integer(I_P)::                  err      ! Error traping flag: 0 no errors, >0 error occours.
-  integer(I_P)::                  UnitFree ! Free logic unit.
+  character(*),      intent(IN):: filename !< Name of file where mesh variables are saved.
+  type(Type_Global), intent(IN):: global   !< Global level data.
+  type(Type_Block),  intent(IN):: block    !< Block level data.
+  integer(I_P)::                  err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                  UnitFree !< Free logic unit.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -807,24 +770,22 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction save_bfluid
 
+  !> Function for printing to standard output info of block fluid data.
+  !> @return \b err integer(I4P) variable.
   function print_info_bfluid(myrank,blk,grl,global,block) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for printing to standard output info of block fluid data.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN):: myrank         ! Rank process identification for MPI comunications.
-  integer(I_P),      intent(IN):: blk            ! Actual block number.
-  integer(I_P),      intent(IN):: grl            ! Actual grid level number.
-  type(Type_Global), intent(IN):: global         ! Global level data.
-  type(Type_Block),  intent(IN):: block          ! Block level data.
-  integer(I_P)::                  err            ! Error traping flag: 0 no errors, >0 error occours.
-  character(DR_P)::               vmax,vmin      ! String for printing max and min of variables.
-  real(R_P), allocatable::        dummy(:,:,:,:) !  Dummy variables for printing only internal cells info.
-  integer(I_P)::                  Ni,Nj,Nk,Np,Nc ! Temporary varables for storing block dimensions.
-  character(DI_P)::               rks            ! String containing myrank.
-  integer(I_P)::                  i,j,k,s        ! Counters.
+  integer(I_P),      intent(IN):: myrank         !< Rank process identification for MPI communications.
+  integer(I_P),      intent(IN):: blk            !< Actual block number.
+  integer(I_P),      intent(IN):: grl            !< Actual grid level number.
+  type(Type_Global), intent(IN):: global         !< Global level data.
+  type(Type_Block),  intent(IN):: block          !< Block level data.
+  integer(I_P)::                  err            !< Error trapping flag: 0 no errors, >0 error occurs.
+  character(DR_P)::               vmax,vmin      !< String for printing max and min of variables.
+  real(R_P), allocatable::        dummy(:,:,:,:) !<  Dummy variables for printing only internal cells info.
+  integer(I_P)::                  Ni,Nj,Nk,Np,Nc !< Temporary variables for storing block dimensions.
+  character(DI_P)::               rks            !< String containing myrank.
+  integer(I_P)::                  i,j,k,s        !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

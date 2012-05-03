@@ -1,21 +1,21 @@
 program POG
 !-----------------------------------------------------------------------------------------------------------------------------------
-!(doc)CNAME{POG, Post-processor Outout Genrator for OFF (Open Finite volume Fluidynamics code)}
+!(doc)CNAME{POG, Post-processor Output Generator for OFF (Open Finite volume Fluid dynamics code)}
 !(doc)AUTHORS{Stefano Zaghi}
 !(doc)VERSION{v0.0.5}
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                   ! Integers and reals precision definition.
-USE Data_Type_Globals                              ! Definition of Type_Global and Type_Block.
-USE Data_Type_OS, init_os=>init                    ! Definition of Type_OS.
-USE Data_Type_Time                                 ! Definition of Type_Time.
-USE Data_Type_Vector, init_vec=>init, set_vec=>set ! Definition of Type_Vector.
-USE Lib_IO_Misc                                    ! Procedures for IO and strings operations.
-USE Lib_Mesh,           only: node2center          ! Subroutine for computing cell center cell nodes ones.
-USE Lib_PostProcessing, only: pp_format,  &        ! Post-processing data format.
-                              tec_output, &        ! Function for writing Tecplot file.
-                              vtk_output           ! Function for writing VTK file.
+USE IR_Precision                            ! Integers and reals precision definition.
+USE Data_Type_Globals                       ! Definition of Type_Global and Type_Block.
+USE Data_Type_OS, init_os=>init             ! Definition of Type_OS.
+USE Data_Type_Time                          ! Definition of Type_Time.
+USE Data_Type_Vector, set_vec=>set          ! Definition of Type_Vector.
+USE Lib_IO_Misc                             ! Procedures for IO and strings operations.
+USE Lib_Mesh,           only: node2center   ! Subroutine for computing cell center cell nodes ones.
+USE Lib_PostProcessing, only: pp_format,  & ! Post-processing data format.
+                              tec_output, & ! Function for writing Tecplot file.
+                              vtk_output    ! Function for writing VTK file.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -23,8 +23,8 @@ implicit none
 type(Type_Global)::             global            ! Global-level data.
 type(Type_Block), allocatable:: block(:)          ! Block-level data.
 logical::                       meshonly = .true. ! Flag for post-process only mesh.
-integer(I_P)::                  b,l               ! counters.
-integer(I_P)::                  err               ! Error traping flag: 0 no errors, >0 error occours.
+integer(I_P)::                  b,l               ! Counters.
+integer(I_P)::                  err               ! Error trapping flag: 0 no errors, >0 error occurs.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ err = load_bmesh(myrank = 0, filename = global%file%File_Mesh, block = block(1))
 if (.not.meshonly) then
   write(stdout,'(A)',IOSTAT=err)' Loading '//trim(global%file%File_Sol)
   err = load_gfluid_Ns(binary = .true., myrank = 0, filename = global%file%File_Sol, global = global)
-  ! allocating global fluidynamic data
+  ! allocating global fluid dynamic data
   call alloc_global_fluid(global=global)
   err = load_bfluid(myrank = 0, filename = global%file%File_Sol, global = global, block = block(1))
 endif

@@ -1,8 +1,6 @@
+!> This module contains mathematical procedures.
+!> @todo \b DocComplete: Complete the documentation of internal procedures
 module Lib_Math
-!-----------------------------------------------------------------------------------------------------------------------------------
-!!The module Lib\_Math contains mathematical functions and subroutines.
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                        ! Integers and reals precision definition.
 USE Data_Type_Vector, only: Type_Vector ! Definition of Type_Vector.
@@ -36,107 +34,90 @@ public:: laplacian
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! Pi greek definitions with parametric kind precision.
 #ifdef r16p
-real(R16P), parameter:: pi_R16 = 2._R16P*asin(1._R16P) ! Pi greek with R16P precision.
+real(R16P), parameter:: pi_R16 = 2._R16P*asin(1._R16P) !< Pi greek with R16P precision.
 #endif
-real(R8P),  parameter:: pi_R8  = 2._R8P* asin(1._R8P)  ! Pi greek with R8P  precision.
-real(R4P),  parameter:: pi_R4  = 2._R4P* asin(1._R4P)  ! Pi greek with R4P  precision.
-real(R_P),  parameter:: pi     = 2._R_P* asin(1._R_P)  ! Pi greek with R_P  precision.
+real(R8P),  parameter:: pi_R8  = 2._R8P* asin(1._R8P)  !< Pi greek with R8P  precision.
+real(R4P),  parameter:: pi_R4  = 2._R4P* asin(1._R4P)  !< Pi greek with R4P  precision.
+real(R_P),  parameter:: pi     = 2._R_P* asin(1._R_P)  !< Pi greek with R_P  precision.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!!Average overloading
+!>Average overloading
 interface average
-  module procedure                                                                          &
 #ifdef r16p
-                   average_Vectorial1D_R16,average_Vectorial2D_R16,average_Vectorial3D_R16, &
+  module procedure average_Vectorial1D_R16,average_Vectorial2D_R16,average_Vectorial3D_R16
 #endif
-                   average_Vectorial1D_R8,average_Vectorial2D_R8,average_Vectorial3D_R8,    &
-                   average_Vectorial1D_R4,average_Vectorial2D_R4,average_Vectorial3D_R4
+  module procedure average_Vectorial1D_R8,average_Vectorial2D_R8,average_Vectorial3D_R8
+  module procedure average_Vectorial1D_R4,average_Vectorial2D_R4,average_Vectorial3D_R4
 endinterface
-!!Digit overloading
+!>Digit overloading
 interface digit
   module procedure digit_I8,digit_I4,digit_I2,digit_I1
 endinterface
-!!Linear interpolate overloading
+!>Linear interpolate overloading
 interface interpolate1
-  module procedure                   &
 #ifdef r16p
-                   interpolate1_R16, &
+  module procedure interpolate1_R16
 #endif
-                   interpolate1_R8,  &
-                   interpolate1_R4
+  module procedure interpolate1_R8,interpolate1_R4
 endinterface
-!!Bi-linear interpolate overloading
+!>Bi-linear interpolate overloading
 interface interpolate2
-  module procedure                   &
 #ifdef r16p
-                   interpolate2_R16, &
+  module procedure interpolate2_R16
 #endif
-                   interpolate2_R8,  &
-                   interpolate2_R4
+  module procedure interpolate2_R8,interpolate2_R4
 endinterface
-!!Tri-linear interpolate overloading
+!>Tri-linear interpolate overloading
 interface interpolate3
-  module procedure                   &
 #ifdef r16p
-                   interpolate3_R16, &
+  module procedure interpolate3_R16
 #endif
-                   interpolate3_R8,  &
-                   interpolate3_R4
+  module procedure interpolate3_R8,interpolate3_R4
 endinterface
-!!Degree overloading
+!>Degree overloading
 interface degree
-  module procedure                                                                                         &
 #ifdef r16p
-                   degree_Scalar_R16,degree_Vectorial1D_R16,degree_Vectorial2D_R16,degree_Vectorial3D_R16, &
+  module procedure degree_Scalar_R16,degree_Vectorial1D_R16,degree_Vectorial2D_R16,degree_Vectorial3D_R16
 #endif
-                   degree_Scalar_R8,degree_Vectorial1D_R8,degree_Vectorial2D_R8,degree_Vectorial3D_R8,     &
-                   degree_Scalar_R4,degree_Vectorial1D_R4,degree_Vectorial2D_R4,degree_Vectorial3D_R4
+  module procedure degree_Scalar_R8,degree_Vectorial1D_R8,degree_Vectorial2D_R8,degree_Vectorial3D_R8
+  module procedure degree_Scalar_R4,degree_Vectorial1D_R4,degree_Vectorial2D_R4,degree_Vectorial3D_R4
 endinterface
-!!Radiant overloading
+!>Radiant overloading
 interface radiant
-  module procedure                                                                                             &
 #ifdef r16p
-                   radiant_Scalar_R16,radiant_Vectorial1D_R16,radiant_Vectorial2D_R16,radiant_Vectorial3D_R16, &
+  module procedure radiant_Scalar_R16,radiant_Vectorial1D_R16,radiant_Vectorial2D_R16,radiant_Vectorial3D_R16
 #endif
-                   radiant_Scalar_R8,radiant_Vectorial1D_R8,radiant_Vectorial2D_R8,radiant_Vectorial3D_R8,     &
-                   radiant_Scalar_R4,radiant_Vectorial1D_R4,radiant_Vectorial2D_R4,radiant_Vectorial3D_R4
+  module procedure radiant_Scalar_R8,radiant_Vectorial1D_R8,radiant_Vectorial2D_R8,radiant_Vectorial3D_R8
+  module procedure radiant_Scalar_R4,radiant_Vectorial1D_R4,radiant_Vectorial2D_R4,radiant_Vectorial3D_R4
 endinterface
-!!delta1_2o overloading
+!>delta1_2o overloading
 interface delta1_2o
-  module procedure                &
 #ifdef r16p
-                   delta1_2o_R16, &
+  module procedure delta1_2o_R16
 #endif
-                   delta1_2o_R8,  &
-                   delta1_2o_R4
+  module procedure delta1_2o_R8,delta1_2o_R4
 endinterface
-!!delta2_2o overloading
+!>delta2_2o overloading
 interface delta2_2o
-  module procedure                &
 #ifdef r16p
-                   delta2_2o_R16, &
+  module procedure delta2_2o_R16
 #endif
-                   delta2_2o_R8,  &
-                   delta2_2o_R4
+  module procedure delta2_2o_R8,delta2_2o_R4
 endinterface
-!!abs_grad overloading
+!>abs_grad overloading
 interface abs_grad
-  module procedure               &
 #ifdef r16p
-                   abs_grad_R16, &
+  module procedure abs_grad_R16
 #endif
-                   abs_grad_R8,  &
-                   abs_grad_R4
+  module procedure abs_grad_R8,abs_grad_R4
 endinterface
-!!laplacian overloading
+!>laplacian overloading
 interface laplacian
-  module procedure                &
 #ifdef r16p
-                   laplacian_R16, &
+  module procedure laplacian_R16
 #endif
-                   laplacian_R8,  &
-                   laplacian_R4
+  module procedure laplacian_R8,laplacian_R4
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains

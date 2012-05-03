@@ -1,8 +1,6 @@
+!>This module contains the definition of Type_Probe and its procedures.
+!> @todo \b DocComplete: Complete the documentation of internal procedures
 module Data_Type_Probe
-!-----------------------------------------------------------------------------------------------------------------------------------
-!!This module contains the definition of Type_Probe and its functions and subroutines.
-!-----------------------------------------------------------------------------------------------------------------------------------
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision ! Integers and reals precision definition.
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -10,60 +8,66 @@ USE IR_Precision ! Integers and reals precision definition.
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 private
-public:: Type_Probe
-public:: init,set
+public:: set
 public:: write,read
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-! Type_Probe definition:
-type:: Type_Probe
+!> Derived type containing probe informations.
+type, public:: Type_Probe
   sequence
-  integer(I_P):: b = 1_I_P                       ! Block (global map) index.
-  integer(I_P):: i = 0_I_P, j = 0_I_P, k = 0_I_P ! Space indexes.
+  integer(I_P):: b = 1_I_P !< Block (global map) index.
+  integer(I_P):: i = 0_I_P !< I direction index.
+  integer(I_P):: j = 0_I_P !< J direction index.
+  integer(I_P):: k = 0_I_P !< K direction index.
 endtype Type_Probe
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!!Write overloading.
+!> @brief Write overloading of Type_Probe variable.
+!> This is a generic interface to 2 functions (one binary and another ascii) for writing scalar variables.
+!> The functions return an error integer code. The calling signatures are:
+!> @code ...
+!> integer(I4P):: err,unit
+!> character(1):: format="*"
+!> type(Type_Probe):: probe
+!> ...
+!> ! formatted writing
+!> err = write(unit,format,probe)
+!> ! binary writing
+!> err = write(unit,probe)
+!> ... @endcode
 interface write
-  module procedure Write_Bin, Write_Ascii
+  module procedure Write_Bin,Write_Ascii
 endinterface
-!!Read overloading.
+!> @brief Read overloading of Type_Probe variable.
+!> This is a generic interface to 2 functions (one binary and another ascii) for reading scalar variables.
+!> The functions return an error integer code. The calling signatures are:
+!> @code ...
+!> integer(I4P):: err,unit
+!> character(1):: format="*"
+!> type(Type_Probe):: probe
+!> ...
+!> ! formatted reading
+!> err = read(unit,format,probe)
+!> ! binary reading
+!> err = read(unit,probe)
+!> ... @endcode
 interface read
-  module procedure Read_Bin, Read_Ascii
+  module procedure Read_Bin,Read_Ascii
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  elemental function init(b,i,j,k) result(probe)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for initializing Type_Probe.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P), intent(IN), optional:: b,i,j,k
-  type(Type_Probe)::                   probe
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(b)) probe%b = b
-  if (present(i)) probe%i = i
-  if (present(j)) probe%j = j
-  if (present(k)) probe%k = k
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction init
-
+  !>Function for setting components of Type_Probe variable.
+  !> @return \b probe type(Type_Probe) variable.
   elemental subroutine set(b,i,j,k,probe)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for assignment Type_Probe.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),     intent(IN), optional:: b,i,j,k
-  type(Type_Probe), intent(INOUT)::        probe
+  integer(I_P),     intent(IN), optional:: b     !< Block (global map) index.
+  integer(I_P),     intent(IN), optional:: i     !< I direction index.
+  integer(I_P),     intent(IN), optional:: j     !< J direction index.
+  integer(I_P),     intent(IN), optional:: k     !< K direction index.
+  type(Type_Probe), intent(INOUT)::        probe !< Probe data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

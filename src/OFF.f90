@@ -41,6 +41,7 @@
 !>   - Fine, local parallelism by means of OpenMP paradigm providing the ability to use shared-memory cluster facilities;
 !>   - Fine, local parallelism by means of GPU programming (e.g. CUDA framework) providing the ability to use GPUs cluster
 !>     facilities (to be developed in future);
+!> @author    Stefano Zaghi
 !> @version   0.0.5
 !> @date      2012-04-24
 !> @copyright GNU Public License version 3.

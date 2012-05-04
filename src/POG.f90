@@ -1,10 +1,6 @@
-program POG
-!-----------------------------------------------------------------------------------------------------------------------------------
 !(doc)CNAME{POG, Post-processor Output Generator for OFF (Open Finite volume Fluid dynamics code)}
-!(doc)AUTHORS{Stefano Zaghi}
-!(doc)VERSION{v0.0.5}
-!-----------------------------------------------------------------------------------------------------------------------------------
-
+!> @todo \b DocImprove: Improve the documentation
+program POG
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                            ! Integers and reals precision definition.
 USE Data_Type_Globals                       ! Definition of Type_Global and Type_Block.

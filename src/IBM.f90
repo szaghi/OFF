@@ -1,10 +1,13 @@
-program ICG
-!-----------------------------------------------------------------------------------------------------------------------------------
-!(doc)CNAME{ICG, Initial Conditions Generator for OFF (Open Finite volume Fluid dynamics code)}
-!(doc)AUTHORS{Stefano Zaghi}
-!(doc)VERSION{v0.0.5}
-!-----------------------------------------------------------------------------------------------------------------------------------
-
+!> @brief IBM, Initial and Boundary conditions, Mesh generator for @off (Open Finite volume Fluid dynamics code).
+!> This is an auxiliary tool useful for building proper inputs for @off code. ICG can build Initial Conditions files, Mesh files and
+!> Boundary Conditions files. It accepts two kinds of inputs: \n
+!> - Direct Blocks Description: this is the simplest available input. The initial and boundary descriptions as well as the geometry
+!>   are directly described by means of simple ascii files. This kind of inputs can describe only simple Cartesian grids.
+!> - Ansys IcemCFD Multiblock INFO importer: this is a more complex (but more flexible) input. The initial conditions are described
+!>   by means of simple ascii files similar to the Direct Block Description input, but the boundary conditions and the geometry are
+!>   loaded by Ansys IcemCFD Multiblock INFO files. These files can describe more complex scenario with general curvilinear grids.
+!> @todo \b DocImprove: Improve the documentation
+program IBM
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                           ! Integers and reals precision definition.
 USE Data_Type_BC, init_bc=>init, set_bc=>set               ! Definition of Type_BC.
@@ -1678,4 +1681,4 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction load_icemcfd
-endprogram ICG
+endprogram IBM

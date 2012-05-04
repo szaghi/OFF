@@ -1,4 +1,5 @@
 !> This module contains procedures for computing the solution of a Riemann Problem.
+!> This is a library module.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
 module Lib_Riemann
 !-----------------------------------------------------------------------------------------------------------------------------------

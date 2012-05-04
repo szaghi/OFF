@@ -1,4 +1,16 @@
-!(doc)CNAME{POG, Post-processor Output Generator for OFF (Open Finite volume Fluid dynamics code)}
+!> @brief POG, Post-processor Output Generator for @off (Open Finite volume Fluid dynamics code).
+!> This is an auxiliary tool useful for post-processing @off simulations outputs. It can manipulate @off outputs and it can produce
+!> files ready to be visualized. Two different visualization standards are supported:
+!> - Tecplot, Inc.: Tecplot is a wide-used visualization tool (http://www.tecplot.com/). POG can produce both ascii and binary files
+!>   in Tecplot standard.
+!> - VTK: The Visualization Toolkit (VTK) is an open-source, freely available software system for 3D computer graphics, image
+!>   processing and visualization (http://www.vtk.org/). A lot of visualization tools support VTK standard. Among those tools
+!>   Paraview (http://www.paraview.org/) seems to be one of the most complete. POG can produce both ascii and binary files in VTK
+!>   standard. To this aim the Lib_VTK_IO is used.
+!> @note In order to produce binary Tecplot file the Tecplot, Inc.'s library tecio.a (or tecio64.a) must be available during the
+!>       compilation of POG. If you are using the makefile shipped with @off code there is a dedicated option: TECIO=yes/no. If
+!>       during the compilation this option is set to yes (e.g. make POG TECIO=yes) the make search the correct library into ./lib/.
+!>       Edit the makefile to point to the correct path where tecio.a (or tecio64.a) is placed.
 !> @todo \b DocImprove: Improve the documentation
 program POG
 !-----------------------------------------------------------------------------------------------------------------------------------

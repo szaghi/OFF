@@ -3,9 +3,10 @@
 !> Boundary Conditions files. It accepts two kinds of inputs: \n
 !> - Direct Blocks Description: this is the simplest available input. The initial and boundary descriptions as well as the geometry
 !>   are directly described by means of simple ascii files. This kind of inputs can describe only simple Cartesian grids.
-!> - Ansys IcemCFD Multiblock INFO importer: this is a more complex (but more flexible) input. The initial conditions are described
-!>   by means of simple ascii files similar to the Direct Block Description input, but the boundary conditions and the geometry are
-!>   loaded by Ansys IcemCFD Multiblock INFO files. These files can describe more complex scenario with general curvilinear grids.
+!> - Ansys (http://www.ansys.com) IcemCFD Multiblock INFO importer: this is a more complex (but more flexible) input. The initial
+!>   conditions are described by means of simple ascii files similar to the Direct Block Description input, but the boundary
+!>   conditions and the geometry are loaded by Ansys IcemCFD Multiblock INFO files. These files can describe more complex scenario
+!>   with general curvilinear grids.
 !> @todo \b DocImprove: Improve the documentation
 program IBM
 !-----------------------------------------------------------------------------------------------------------------------------------

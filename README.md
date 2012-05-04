@@ -8,7 +8,7 @@ It is written in in standard (compliant) Fortran 2003 with highly modularity as 
 
 The aim of _OFF_ is to solve, numerically, the Navier-Stokes equations of fluid dynamics by means of Finite Volume technique.
 
-The main features of @off code are the following:
+The main features of _OFF_ code are the following:
 * Finite Volume, Godunov-like scheme based on Euler conservation Laws written in fully conservative formulation:
     - the extension to viscous Navier-Stokes equations is under developing;
 * Underling Riemann Problem solver for convective fluxes:
@@ -27,12 +27,12 @@ The main features of @off code are the following:
 * Multi-Phases fluids models:
     - Fully-coupled Lagrangian particles transport model (under developing);
 * Space numerical integration models:
-    - 1^st^ order piece-wise constant reconstruction;
-    - 2^nd^ order TVD linear-wise reconstruction;
-    - 3^rd^,5^th^,7^th^ orders WENO non-linear reconstruction;
+    - 1-st order piece-wise constant reconstruction;
+    - 2-nd order TVD linear-wise reconstruction;
+    - 3-rd,5-th,7-th orders WENO non-linear reconstruction;
 * Time approximation models:
-    - 1^st^ order forward Euler integration;
-    - 2^nd^,3^rd^,4^th^ orders Strong-Stability-Preserving explicit Runge-Kutta integration;
+    - 1-st order forward Euler integration;
+    - 2-nd,3-rd,4-th orders Strong-Stability-Preserving explicit Runge-Kutta integration;
 * Local pseudo-time convergence acceleration for steady simulations;
 * Multi-grid time convergence acceleration:
     - Multi-grid model has been already developed, but it is affected by some not still recognized bugs. Testing and bugs fixing

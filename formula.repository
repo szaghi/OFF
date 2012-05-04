@@ -1,0 +1,170 @@
+\form#0:$ {\rm result\%rs = cons1\%rs*cons2\%rs} $
+\form#1:$ {\rm result\%rv = cons1\%rv*cons2\%rv} $
+\form#2:$ {\rm result\%re = cons1\%re*cons2\%re} $
+\form#3:$ {\rm result\%rs = cons\%rs*scalar} $
+\form#4:$ {\rm result\%rv = cons\%rv*scalar} $
+\form#5:$ {\rm result\%re = cons\%re*scalar} $
+\form#6:$ {\rm result\%rs = \frac{cons1\%rs}{cons2\%rs}} $
+\form#7:$ {\rm result\%rv = \frac{cons1\%rv}{cons2\%rv}} $
+\form#8:$ {\rm result\%re = \frac{cons1\%re}{cons2\%re}} $
+\form#9:$ {\rm result\%rs = \frac{cons\%rs}{scalar}} $
+\form#10:$ {\rm result\%rv = \frac{cons\%rv}{scalar}} $
+\form#11:$ {\rm result\%re = \frac{cons\%re}{scalar}} $
+\form#12:$ {\rm result\%rs = cons1\%rs+cons2\%rs} $
+\form#13:$ {\rm result\%rv = cons1\%rv+cons2\%rv} $
+\form#14:$ {\rm result\%re = cons1\%re+cons2\%re} $
+\form#15:$ {\rm result\%rs = cons\%rs+scalar} $
+\form#16:$ {\rm result\%rv = cons\%rv+scalar} $
+\form#17:$ {\rm result\%re = cons\%re+scalar} $
+\form#18:$ {\rm result\%rs = cons1\%rs-cons2\%rs} $
+\form#19:$ {\rm result\%rv = cons1\%rv-cons2\%rv} $
+\form#20:$ {\rm result\%re = cons1\%re-cons2\%re} $
+\form#21:$ {\rm result\%rs = scalar-cons\%rs} $
+\form#22:$ {\rm result\%rv = scalar-cons\%rv} $
+\form#23:$ {\rm result\%re = scalar-cons\%re} $
+\form#24:$ {\rm result\%rs = cons\%rs-scalar} $
+\form#25:$ {\rm result\%rv = cons\%rv-scalar} $
+\form#26:$ {\rm result\%re = cons\%re-scalar} $
+\form#27:$ \gamma = \frac{c_p}{c_v} $
+\form#28:$ {\rm result\%r = prim1\%r*prim2\%r} $
+\form#29:$ {\rm result\%v = prim1\%v*prim2\%v} $
+\form#30:$ {\rm result\%p = prim1\%p*prim2\%p} $
+\form#31:$ {\rm result\%d = prim1\%d*prim2\%d} $
+\form#32:$ {\rm result\%g = prim1\%g*prim2\%g} $
+\form#33:$ {\rm result\%r = prim\%r*scalar} $
+\form#34:$ {\rm result\%v = prim\%v*scalar} $
+\form#35:$ {\rm result\%p = prim\%p*scalar} $
+\form#36:$ {\rm result\%d = prim\%d*scalar} $
+\form#37:$ {\rm result\%g = prim\%g*scalar} $
+\form#38:$ {\rm result\%r = \frac{prim1\%r}{prim2\%r}} $
+\form#39:$ {\rm result\%v = \frac{prim1\%v}{prim2\%v}} $
+\form#40:$ {\rm result\%p = \frac{prim1\%p}{prim2\%p}} $
+\form#41:$ {\rm result\%d = \frac{prim1\%d}{prim2\%d}} $
+\form#42:$ {\rm result\%g = \frac{prim1\%g}{prim2\%g}} $
+\form#43:$ {\rm result\%r = \frac{prim\%r}{scalar}} $
+\form#44:$ {\rm result\%v = \frac{prim\%v}{scalar}} $
+\form#45:$ {\rm result\%p = \frac{prim\%p}{scalar}} $
+\form#46:$ {\rm result\%d = \frac{prim\%d}{scalar}} $
+\form#47:$ {\rm result\%g = \frac{prim\%g}{scalar}} $
+\form#48:$ {\rm result\%r = prim1\%r+prim2\%r} $
+\form#49:$ {\rm result\%v = prim1\%v+prim2\%v} $
+\form#50:$ {\rm result\%p = prim1\%p+prim2\%p} $
+\form#51:$ {\rm result\%d = prim1\%d+prim2\%d} $
+\form#52:$ {\rm result\%g = prim1\%g+prim2\%g} $
+\form#53:$ {\rm result\%r = prim\%r+scalar} $
+\form#54:$ {\rm result\%v = prim\%v+scalar} $
+\form#55:$ {\rm result\%p = prim\%p+scalar} $
+\form#56:$ {\rm result\%d = prim\%d+scalar} $
+\form#57:$ {\rm result\%g = prim\%g+scalar} $
+\form#58:$ {\rm result\%r = prim1\%r-prim2\%r} $
+\form#59:$ {\rm result\%v = prim1\%v-prim2\%v} $
+\form#60:$ {\rm result\%p = prim1\%p-prim2\%p} $
+\form#61:$ {\rm result\%d = prim1\%d-prim2\%d} $
+\form#62:$ {\rm result\%g = prim1\%g-prim2\%g} $
+\form#63:$ {\rm result\%r = scalar-prim\%r} $
+\form#64:$ {\rm result\%v = scalar-prim\%v} $
+\form#65:$ {\rm result\%p = scalar-prim\%p} $
+\form#66:$ {\rm result\%d = scalar-prim\%d} $
+\form#67:$ {\rm result\%g = scalar-prim\%g} $
+\form#68:$ {\rm result\%r = prim\%r-scalar} $
+\form#69:$ {\rm result\%v = prim\%v-scalar} $
+\form#70:$ {\rm result\%p = prim\%p-scalar} $
+\form#71:$ {\rm result\%d = prim\%d-scalar} $
+\form#72:$ {\rm result\%g = prim\%g-scalar} $
+\form#73:$ T_{ij}=\left[{\begin{array}{*{20}{c}}t_{11}&t_{12}&t_{13}\\ t_{21}&t_{22}&t_{23}\\ t_{31}&t_{32}&t_{33}\end{array}}\right] =\left[{\begin{array}{*{20}{c}} {x\% x}&{x\% y}&{x\% z}\\ {y\% x}&{y\% y}&{y\% z}\\ {z\% x}&{z\% y}&{z\% z}\end{array}}\right]$
+\form#74:$ {\rm result\%x = ten1\%x*ten2\%x} $
+\form#75:$ {\rm result\%y = ten1\%y*ten2\%y} $
+\form#76:$ {\rm result\%z = ten1\%z*ten2\%z} $
+\form#77:$ {\rm result\%x = ten\%x*scalar} $
+\form#78:$ {\rm result\%y = ten\%y*scalar} $
+\form#79:$ {\rm result\%z = ten\%z*scalar} $
+\form#80:$ {\rm result\%x = \frac{ten1\%x}{ten2\%x}} $
+\form#81:$ {\rm result\%y = \frac{ten1\%y}{ten2\%y}} $
+\form#82:$ {\rm result\%z = \frac{ten1\%z}{ten2\%z}} $
+\form#83:$ {\rm result\%x = \frac{ten\%x}{scalar}} $
+\form#84:$ {\rm result\%y = \frac{ten\%y}{scalar}} $
+\form#85:$ {\rm result\%z = \frac{ten\%z}{scalar}} $
+\form#86:$ {\rm result\%x = ten1\%x+ten2\%x} $
+\form#87:$ {\rm result\%y = ten1\%y+ten2\%y} $
+\form#88:$ {\rm result\%z = ten1\%z+ten2\%z} $
+\form#89:$ {\rm result\%x = ten\%x+scalar} $
+\form#90:$ {\rm result\%y = ten\%y+scalar} $
+\form#91:$ {\rm result\%z = ten\%z+scalar} $
+\form#92:$ {\rm result\%x = ten1\%x-ten2\%x} $
+\form#93:$ {\rm result\%y = ten1\%y-ten2\%y} $
+\form#94:$ {\rm result\%z = ten1\%z-ten2\%z} $
+\form#95:$ {\rm result\%x = scalar-ten\%x} $
+\form#96:$ {\rm result\%y = scalar-ten\%y} $
+\form#97:$ {\rm result\%z = scalar-ten\%z} $
+\form#98:$ {\rm result\%x = ten\%x-scalar} $
+\form#99:$ {\rm result\%y = ten\%y-scalar} $
+\form#100:$ {\rm result\%z = ten\%z-scalar} $
+\form#101:$ \det = \left| {\begin{array}{*{20}{c}} {x\% x}&{x\% y}&{x\% z}\\ {y\% x}&{y\% y}&{y\% z}\\ {z\% x}&{z\% y}&{z\% z} \end{array}} \right| = $
+\form#102:$=x\%x(z\%z\cdot y\%y-z\%y\cdot y\%z)-$
+\form#103:$ y\%x(z\%z\cdot x\%y-z\%y\cdot x\%z)+$
+\form#104:$ z\%x(y\%z\cdot x\%y-y\%y\cdot x\%z) $
+\form#105:$ T_{ij}^{ - 1} = \frac{1}{{\det (T)}}\left[ {\begin{array}{*{20}{c}} {z\%z\cdot y\%y-z\%y\cdot y\%z}&{-(z\%z\cdot x\%y-z\%y\cdot x\%z)}&{y\%z\cdot x\%y-y\%y\cdot x\%z}\\{-(z\%z\cdot y\%x- z\%x\cdot y\%z)}&{z\%z\cdot x\%x-z\%x\cdot x\%z}&{-(y\%z\cdot x\%x-y\%x\cdot x\%z)}\\{z\%y\cdot y\%x-z\%x\cdot y\%y}&{-(z\%y \cdot x\%x-z\%x\cdot x\%y)}&{y\%y\cdot x\%x-y\%x\cdot x\%y} \end{array}} \right]$
+\form#106:$ {\rm result\%x = vec1\%x*vec2\%x} $
+\form#107:$ {\rm result\%y = vec1\%y*vec2\%y} $
+\form#108:$ {\rm result\%z = vec1\%z*vec2\%z} $
+\form#109:$ {\rm result\%x = vec\%x*scalar} $
+\form#110:$ {\rm result\%y = vec\%y*scalar} $
+\form#111:$ {\rm result\%z = vec\%z*scalar} $
+\form#112:$ {\rm result\%x = \frac{vec1\%x}{vec2\%x}} $
+\form#113:$ {\rm result\%y = \frac{vec1\%y}{vec2\%y}} $
+\form#114:$ {\rm result\%z = \frac{vec1\%z}{vec2\%z}} $
+\form#115:$ {\rm result\%x = \frac{vec\%x}{scalar}} $
+\form#116:$ {\rm result\%y = \frac{vec\%y}{scalar}} $
+\form#117:$ {\rm result\%z = \frac{vec\%z}{scalar}} $
+\form#118:$ {\rm result\%x = vec1\%x+vec2\%x} $
+\form#119:$ {\rm result\%y = vec1\%y+vec2\%y} $
+\form#120:$ {\rm result\%z = vec1\%z+vec2\%z} $
+\form#121:$ {\rm result\%x = vec\%x+scalar} $
+\form#122:$ {\rm result\%y = vec\%y+scalar} $
+\form#123:$ {\rm result\%z = vec\%z+scalar} $
+\form#124:$ {\rm result\%x = vec1\%x-vec2\%x} $
+\form#125:$ {\rm result\%y = vec1\%y-vec2\%y} $
+\form#126:$ {\rm result\%z = vec1\%z-vec2\%z} $
+\form#127:$ {\rm result\%x = scalar-vec\%x} $
+\form#128:$ {\rm result\%y = scalar-vec\%y} $
+\form#129:$ {\rm result\%z = scalar-vec\%z} $
+\form#130:$ {\rm result\%x = vec\%x-scalar} $
+\form#131:$ {\rm result\%y = vec\%y-scalar} $
+\form#132:$ {\rm result\%z = vec\%z-scalar} $
+\form#133:$[10^{-307} , 10^{+307} - 1]$
+\form#134:$[10^{-37} , 10^{+37} - 1]$
+\form#135:$[-2^{63},+2^{63} - 1]$
+\form#136:$[-2^{31},+2^{31} - 1]$
+\form#137:$[-2^{15},+2^{15} - 1]$
+\form#138:$[-2^{7} ,+2^{7} - 1]$
+\form#139:$\rho$
+\form#140:$\gamma=\frac{{c_p}}{{c_v}}$
+\form#141:$ E = \frac{p}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
+\form#142:$ H = \frac{{\gamma p}}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
+\form#143:$dc = NC + \sum\limits_{i = 1}^{NC} {nvertex_i }$
+\form#144:$dc$
+\form#145:$nvertex_i$
+\form#146:$i^{th}$
+\form#147:$dc=2+8+5=15$
+\form#148:$1^\circ$
+\form#149:$2^\circ$
+\form#150:$3^\circ$
+\form#151:$4^\circ$
+\form#152:$5^\circ$
+\form#153:$6^\circ$
+\form#154:$7^\circ$
+\form#155:$8^\circ$
+\form#156:$2^\circ $
+\form#157:$dc = dc = \sum\limits_{i = 1}^{NC} {nvertex_i }$
+\form#158:$dc=8+5=13$
+\form#159:$offset_c=\sum\limits_{i=1}^{c}{nvertex_i}$
+\form#160:$offset_c$
+\form#161:$c^{th}$
+\form#162:$P^{th}$
+\form#163:$2S^{th}$
+\form#164:$2S^{th}-1$
+\form#165:$\gamma,\eta,\chi$
+\form#166:$1^{st}$
+\form#167:$2^{nd}$
+\form#168:$3^{rd},5^{th},7^{th}$
+\form#169:$2^{nd},3^{rd},4^{th}$

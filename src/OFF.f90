@@ -26,7 +26,7 @@
 !>   - \f$3^{rd},5^{th},7^{th}\f$ orders WENO non-linear reconstruction;
 !> - Time approximation models:
 !>   - \f$1^{st}\f$ order forward Euler integration;
-!>   -  \f$2^{nd},3^{rd},4^{th}\f$ orders Strong-Stability-Preserving explicit Runge-Kutta integration;
+!>   - \f$2^{nd},3^{rd},4^{th}\f$ orders Strong-Stability-Preserving explicit Runge-Kutta integration;
 !> - Local pseudo-time convergence acceleration for steady simulations;
 !> - Multi-grid time convergence acceleration:
 !>   - Multi-grid model has been already developed, but it is affected by some not still recognized bugs. Testing and bugs fixing
@@ -40,7 +40,7 @@
 !>     cluster facilities;
 !>   - Fine, local parallelism by means of OpenMP paradigm providing the ability to use shared-memory cluster facilities;
 !>   - Fine, local parallelism by means of GPU programming (e.g. CUDA framework) providing the ability to use GPUs cluster
-!>     facilities (to be developed in future);
+!>     facilities (to be developed in future).
 !> @author    Stefano Zaghi
 !> @version   0.0.5
 !> @date      2012-04-24

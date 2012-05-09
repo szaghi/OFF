@@ -1,3 +1,21 @@
+!> @defgroup Program Programs
+!> List of excutable programs.
+!> @defgroup DerivedType Derived Types
+!> List of derived data types.
+!> @defgroup GlobalVarPar Global Variables and Parameters
+!> List of global variables and parameters.
+!> @defgroup Interface Interfaces
+!> List of explicitly defined interface.
+!> @defgroup Library Modules Libraries
+!> List of modules containing libraries of procedures.
+!> @defgroup PrivateProcedure Private Procedures
+!> List of private procedures.
+
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup OFFPrivateProcedure OFF
+!> @}
+
 !> @brief @off is an Open source Finite volume Fluid dynamics code.
 !> It is written in in standard (compliant) Fortran 2003 with highly modularity as design target. \n
 !>
@@ -55,6 +73,7 @@
 !> @todo \b GPU: Introducing fine, local parallelism by means of GPU programming (e.g. CUDA framework)
 !> @todo \b DocImprove: Improve the documentation
 !> @todo \b DocMakeFile: Create the documentation of makefile
+!> @ingroup Program
 program OFF
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                        ! Integers and reals precision definition.
@@ -165,6 +184,7 @@ stop
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @brief Subroutine for initializing the simulation according to the input options.
+  !> @ingroup OFFPrivateProcedure
   subroutine off_init()
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -260,7 +280,7 @@ contains
   endif
 
   ! loading input options
-  err = load_option_file(myrank = myrank, filename = File_Option, global = global)
+  err = load_off_option_file(myrank = myrank, filename = File_Option, global = global)
   if (myrank==0) then
     write(stdout,'(A)',iostat=err)'  Loading '//trim(global%file%Path_InPut)//trim(global%file%File_Solver)
   endif
@@ -464,13 +484,14 @@ contains
   endsubroutine off_init
 
   !> @brief Function for loading global file options.
-  function load_option_file(myrank,filename,global) result(err)
+  !> @ingroup OFFPrivateProcedure
+  function load_off_option_file(myrank,filename,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
   character(*),      intent(IN)::    filename !< Name of file where option variables are saved.
   type(Type_Global), intent(INOUT):: global   !< Global-level data.
-  integer(I_P)::                     err      !< Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
   integer(I_P)::                     UnitFree !< Free logic unit.
   logical::                          is_file  !< Flag for inquiring the presence of file.
   character(3)::                     os_type  !< Type operating system.
@@ -479,7 +500,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
   if (.NOT.is_file) then
-      call File_Not_Found(myrank,filename,'load_option_file')
+      call File_Not_Found(myrank,filename,'load_off_option_file')
   endif
   UnitFree = Get_Unit()
   open(unit = UnitFree, file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
@@ -512,5 +533,5 @@ contains
   global%file%File_Sol   =string_OS_sep(global%file%File_Sol   ) ; global%file%File_Sol    = adjustl(trim(global%file%File_Sol   ))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction load_option_file
+  endfunction load_off_option_file
 endprogram OFF

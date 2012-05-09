@@ -1,5 +1,6 @@
-!> The module Lib_Multigrid contains the definition of multigrid functions and subroutines.
+!> This module contains the definition of multigrid procedures.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
+!> @ingroup Library
 module Lib_Multigrid
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                     ! Integers and reals precision definition.

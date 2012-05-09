@@ -1,6 +1,7 @@
 !> This module contains the definition of fluid dynamic procedures.
 !> This is a library module.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
+!> @ingroup Library
 module Lib_Fluidynamic
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                                                 ! Integers and reals precision definition.
@@ -1426,7 +1427,7 @@ contains
   real(R_P)::                        RU  (1:global%fluid%Nc,1:global%mesh%Nb) ! NormL2 of conservartive residuals.
   real(R_P)::                        mRU (1:global%fluid%Nc)                  ! Maximum of RU of actual process.
   real(R_P)::                        gmRU(1:global%fluid%Nc)                  ! Global (all processes) maximum of RU.
-  integer(I_P)::                     err                                      ! Error traping flag: 0 no errors, >0 errors.
+  integer(I_P)::                     err                                      ! Error trapping flag: 0 no errors, >0 errors.
   integer(I_P)::                     b                                        ! Blocks counter.
   integer(I_P)::                     s1                                       ! Runge-Kutta stages counters.
   real(R_P)::                        sec_elp                                  ! Seconds elapsed from the simulation start.

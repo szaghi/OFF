@@ -1,5 +1,11 @@
+!> @ingroup GlobalVarPar
+!> @{
+!> @defgroup Lib_Math Lib_Math
+!> @}
+
 !> This module contains mathematical procedures.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
+!> @ingroup Library
 module Lib_Math
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                        ! Integers and reals precision definition.
@@ -33,16 +39,20 @@ public:: laplacian
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! Pi greek definitions with parametric kind precision.
+!> @ingroup Lib_Math
+!> @{
 #ifdef r16p
-real(R16P), parameter:: pi_R16 = 2._R16P*asin(1._R16P) !< Pi greek with R16P precision.
+real(R16P), parameter:: pi_R16 = 2._R16P*asin(1._R16P) !< \f$\pi \f$ with R16P precision.
 #endif
-real(R8P),  parameter:: pi_R8  = 2._R8P* asin(1._R8P)  !< Pi greek with R8P  precision.
-real(R4P),  parameter:: pi_R4  = 2._R4P* asin(1._R4P)  !< Pi greek with R4P  precision.
-real(R_P),  parameter:: pi     = 2._R_P* asin(1._R_P)  !< Pi greek with R_P  precision.
+real(R8P),  parameter:: pi_R8  = 2._R8P* asin(1._R8P)  !< \f$\pi \f$ with R8P  precision.
+real(R4P),  parameter:: pi_R4  = 2._R4P* asin(1._R4P)  !< \f$\pi \f$ with R4P  precision.
+real(R_P),  parameter:: pi     = 2._R_P* asin(1._R_P)  !< \f$\pi \f$ with R_P  precision.
+!> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !>Average overloading
+!> @ingroup Interface
 interface average
 #ifdef r16p
   module procedure average_Vectorial1D_R16,average_Vectorial2D_R16,average_Vectorial3D_R16
@@ -51,10 +61,12 @@ interface average
   module procedure average_Vectorial1D_R4,average_Vectorial2D_R4,average_Vectorial3D_R4
 endinterface
 !>Digit overloading
+!> @ingroup Interface
 interface digit
   module procedure digit_I8,digit_I4,digit_I2,digit_I1
 endinterface
 !>Linear interpolate overloading
+!> @ingroup Interface
 interface interpolate1
 #ifdef r16p
   module procedure interpolate1_R16
@@ -62,6 +74,7 @@ interface interpolate1
   module procedure interpolate1_R8,interpolate1_R4
 endinterface
 !>Bi-linear interpolate overloading
+!> @ingroup Interface
 interface interpolate2
 #ifdef r16p
   module procedure interpolate2_R16
@@ -69,6 +82,7 @@ interface interpolate2
   module procedure interpolate2_R8,interpolate2_R4
 endinterface
 !>Tri-linear interpolate overloading
+!> @ingroup Interface
 interface interpolate3
 #ifdef r16p
   module procedure interpolate3_R16
@@ -76,6 +90,7 @@ interface interpolate3
   module procedure interpolate3_R8,interpolate3_R4
 endinterface
 !>Degree overloading
+!> @ingroup Interface
 interface degree
 #ifdef r16p
   module procedure degree_Scalar_R16,degree_Vectorial1D_R16,degree_Vectorial2D_R16,degree_Vectorial3D_R16
@@ -84,6 +99,7 @@ interface degree
   module procedure degree_Scalar_R4,degree_Vectorial1D_R4,degree_Vectorial2D_R4,degree_Vectorial3D_R4
 endinterface
 !>Radiant overloading
+!> @ingroup Interface
 interface radiant
 #ifdef r16p
   module procedure radiant_Scalar_R16,radiant_Vectorial1D_R16,radiant_Vectorial2D_R16,radiant_Vectorial3D_R16
@@ -92,6 +108,7 @@ interface radiant
   module procedure radiant_Scalar_R4,radiant_Vectorial1D_R4,radiant_Vectorial2D_R4,radiant_Vectorial3D_R4
 endinterface
 !>delta1_2o overloading
+!> @ingroup Interface
 interface delta1_2o
 #ifdef r16p
   module procedure delta1_2o_R16
@@ -99,6 +116,7 @@ interface delta1_2o
   module procedure delta1_2o_R8,delta1_2o_R4
 endinterface
 !>delta2_2o overloading
+!> @ingroup Interface
 interface delta2_2o
 #ifdef r16p
   module procedure delta2_2o_R16
@@ -106,6 +124,7 @@ interface delta2_2o
   module procedure delta2_2o_R8,delta2_2o_R4
 endinterface
 !>abs_grad overloading
+!> @ingroup Interface
 interface abs_grad
 #ifdef r16p
   module procedure abs_grad_R16
@@ -113,6 +132,7 @@ interface abs_grad
   module procedure abs_grad_R8,abs_grad_R4
 endinterface
 !>laplacian overloading
+!> @ingroup Interface
 interface laplacian
 #ifdef r16p
   module procedure laplacian_R16

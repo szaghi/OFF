@@ -1,3 +1,13 @@
+!> @ingroup GlobalVarPar
+!> @{
+!> @defgroup Data_Type_Cell Data_Type_Cell
+!> @}
+
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Data_Type_CellPrivateProcedure Data_Type_Cell
+!> @}
+
 !> This module contains the definition of Type_Cell and its procedures.
 !> @todo \b DocWriteRead: Complete the documentation of write and read functions
 module Data_Type_Cell
@@ -22,9 +32,8 @@ public:: get_cell_id_str,get_cell_id
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-! To handle the conditions of cell there are integers and characters parameters. Each integer parameter has a
-! corresponding character parameter.
-! Id parameters:
+!> @ingroup Data_Type_Cell
+!> @{
 character(3), parameter:: cell_unset_str   = 'UNS'  !< String corresponding to unset cell identifier.
 integer(I1P), parameter:: cell_unset       = -1_I1P !< Unset cell identifier.
 character(3), parameter:: cell_active_str  = 'ACT'  !< String corresponding to active cell identifier.
@@ -50,7 +59,9 @@ integer(I1P), parameter:: cell_list(1:Nid) = &
                                               cell_probe,   &
                                               cell_isoss    &
                                             /)      !< Cell identifiers list.
+!> @}
 !> Derived type containing cell informations.
+!> @ingroup DerivedType
 type, public:: Type_Cell
   sequence
   integer(I1P):: id = cell_active !< Id identifier.
@@ -78,6 +89,7 @@ endtype Type_Cell
 !> err = write(unit,cell_2D)
 !> err = write(unit,cell_3D)
 !> ... @endcode
+!> @ingroup Interface
 interface write
   module procedure Write_Bin_Scalar, Write_Ascii_Scalar
   module procedure Write_Bin_Array1D,Write_Ascii_Array1D
@@ -103,6 +115,7 @@ endinterface
 !> err = read(unit,cell_2D)
 !> err = read(unit,cell_3D)
 !> ... @endcode
+!> @ingroup Interface
 interface read
   module procedure Read_Bin_Scalar, Read_Ascii_Scalar
   module procedure Read_Bin_Array1D,Read_Ascii_Array1D
@@ -161,6 +174,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine get
 
+  !> @ingroup Data_Type_CellPrivateProcedure
+  !> @{
   ! write
   function Write_Bin_Scalar(unit,cell) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -171,7 +186,7 @@ contains
   implicit none
   integer(I_P),    intent(IN):: unit  ! logic unit
   type(Type_Cell), intent(IN):: cell
-  integer(I_P)::                err   ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                err   ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -190,7 +205,7 @@ contains
   integer(I_P),    intent(IN):: unit   ! logic unit
   character(*),    intent(IN):: format ! format specifier
   type(Type_Cell), intent(IN):: cell
-  integer(I_P)::                err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -213,7 +228,7 @@ contains
   implicit none
   integer(I_P),    intent(IN):: unit     ! logic unit
   type(Type_Cell), intent(IN):: cell(:)
-  integer(I_P)::                err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -232,7 +247,7 @@ contains
   integer(I_P),    intent(IN):: unit    ! logic unit
   character(*),    intent(IN):: format  ! format specifier
   type(Type_Cell), intent(IN):: cell(:)
-  integer(I_P)::                err     ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                err     ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -255,7 +270,7 @@ contains
   implicit none
   integer(I_P),    intent(IN):: unit     ! logic unit
   type(Type_Cell), intent(IN):: cell(:,:)
-  integer(I_P)::                err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -274,7 +289,7 @@ contains
   integer(I_P),    intent(IN):: unit    ! logic unit
   character(*),    intent(IN):: format  ! format specifier
   type(Type_Cell), intent(IN):: cell(:,:)
-  integer(I_P)::                err     ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                err     ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -297,7 +312,7 @@ contains
   implicit none
   integer(I_P),    intent(IN):: unit     ! logic unit
   type(Type_Cell), intent(IN):: cell(:,:,:)
-  integer(I_P)::                err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -316,7 +331,7 @@ contains
   integer(I_P),    intent(IN):: unit    ! logic unit
   character(*),    intent(IN):: format  ! format specifier
   type(Type_Cell), intent(IN):: cell(:,:,:)
-  integer(I_P)::                err     ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                err     ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -340,7 +355,7 @@ contains
   implicit none
   integer(I_P),    intent(IN)::    unit  ! logic unit
   type(Type_Cell), intent(INOUT):: cell
-  integer(I_P)::                   err   ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                   err   ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -359,7 +374,7 @@ contains
   integer(I_P),    intent(IN)::    unit   ! logic unit
   character(*),    intent(IN)::    format ! format specifier
   type(Type_Cell), intent(INOUT):: cell
-  integer(I_P)::                   err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                   err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -382,7 +397,7 @@ contains
   implicit none
   integer(I_P),    intent(IN)::    unit  ! logic unit
   type(Type_Cell), intent(INOUT):: cell(:)
-  integer(I_P)::                   err   ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                   err   ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -401,7 +416,7 @@ contains
   integer(I_P),    intent(IN)::    unit     ! logic unit
   character(*),    intent(IN)::    format   ! format specifier
   type(Type_Cell), intent(INOUT):: cell(:)
-  integer(I_P)::                   err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                   err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -424,7 +439,7 @@ contains
   implicit none
   integer(I_P),    intent(IN)::    unit  ! logic unit
   type(Type_Cell), intent(INOUT):: cell(:,:)
-  integer(I_P)::                   err   ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                   err   ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -443,7 +458,7 @@ contains
   integer(I_P),    intent(IN)::    unit     ! logic unit
   character(*),    intent(IN)::    format   ! format specifier
   type(Type_Cell), intent(INOUT):: cell(:,:)
-  integer(I_P)::                   err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                   err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -466,7 +481,7 @@ contains
   implicit none
   integer(I_P),    intent(IN)::    unit  ! logic unit
   type(Type_Cell), intent(INOUT):: cell(:,:,:)
-  integer(I_P)::                   err   ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                   err   ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -485,7 +500,7 @@ contains
   integer(I_P),    intent(IN)::    unit     ! logic unit
   character(*),    intent(IN)::    format   ! format specifier
   type(Type_Cell), intent(INOUT):: cell(:,:,:)
-  integer(I_P)::                   err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                   err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -498,6 +513,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Read_Ascii_Array3D
+  !> @}
 
   !> Function for getting integer id from the corresponding string id.
   !> @return \b id integer(I1P) variable.

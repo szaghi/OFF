@@ -12,6 +12,7 @@
 !>       during the compilation this option is set to yes (e.g. make POG TECIO=yes) the make search the correct library into ./lib/.
 !>       Edit the makefile to point to the correct path where tecio.a (or tecio64.a) is placed.
 !> @todo \b DocImprove: Improve the documentation
+!> @ingroup Program
 program POG
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                            ! Integers and reals precision definition.

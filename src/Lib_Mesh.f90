@@ -1,4 +1,5 @@
 !> This module contains mesh procedures.
+!> @ingroup Library
 module Lib_Mesh
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision      ! Integers and reals precision definition.

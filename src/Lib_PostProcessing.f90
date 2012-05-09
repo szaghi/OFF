@@ -1,4 +1,10 @@
+!> @ingroup GlobalVarPar
+!> @{
+!> @defgroup Lib_PostProcessing Lib_PostProcessing
+!> @}
+
 !> This module contains the definition of procedures and variables useful for post-process the OFF data.
+!> @ingroup Library
 module Lib_PostProcessing
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision        ! Integers and reals precision definition.
@@ -19,6 +25,7 @@ public:: vtk_output
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> Derived type containing the post-processing options.
+!> @ingroup DerivedType
 type, public:: Type_PP_Format
   logical:: binary = .true.  !< Binary or ascii post-process file.
   logical:: node   = .true.  !< Node or cell data location.
@@ -26,7 +33,10 @@ type, public:: Type_PP_Format
   logical:: tec    = .true.  !< Tecplot file.
   logical:: vtk    = .false. !< VTK file.
 endtype Type_PP_Format
-type(Type_PP_Format):: pp_format !< Post-processing format options.
+!> @ingroup Lib_PostProcessing
+!> @{
+type(Type_PP_Format):: pp_format !< Post-processing format options (see \ref Lib_PostProcessing::Type_PP_Format "definition").
+!> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   subroutine interpolate_primitive(global,block,P)

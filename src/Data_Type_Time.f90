@@ -1,3 +1,8 @@
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Data_Type_TimePrivateProcedure Data_Type_Time
+!> @}
+
 !> This module contains the definition of Type_Time and its procedures.
 !> This derived type is useful for handling time and date
 !> @todo \b DocComplete: Complete the documentation of internal procedures
@@ -23,6 +28,7 @@ public:: Crono
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> Derived type containing time variables.
+!> @ingroup DerivedType
 type, public:: Type_Time
   integer(I_P) Days    !< Number of days.
   integer(I_P) Hours   !< Number of hours.
@@ -34,31 +40,39 @@ real:: instant0 = 0.0 !< The Crono starting instant (used for timing the code).
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @brief Not-equal-to boolean operator (/=) overloading.
+!> @ingroup Interface
 interface operator (/=)
   module procedure not_eq
 endinterface
 !> @brief Lower-than boolean operator (<) overloading.
+!> @ingroup Interface
 interface operator (<)
   module procedure low
 endinterface
 !> @brief Lower-equal-than boolean operator (<=) overloading.
+!> @ingroup Interface
 interface operator (<=)
   module procedure low_eq
 endinterface
 !> @brief Equal-to boolean operator (==) overloading.
+!> @ingroup Interface
 interface operator (==)
   module procedure eq
 endinterface
 !> @brief Higher-equal-than boolean operator (>=) overloading.
+!> @ingroup Interface
 interface operator (>=)
   module procedure great_eq
 endinterface
 !> @brief Higher-than boolean operator (>) overloading.
+!> @ingroup Interface
 interface operator (>)
   module procedure great
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @ingroup Data_Type_TimePrivateProcedure
+  !> @{
   function not_eq(time1,time2) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function returns .true. if the the time time1 is /= with respect the time time2, .false. otherwise.
@@ -248,6 +262,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction great
+  !> @}
 
   !> Function for getting actual date and returning it into a string.
   !> @return \b Date_String character(20) variable.

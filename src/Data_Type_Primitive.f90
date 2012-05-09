@@ -1,3 +1,8 @@
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Data_Type_PrimitivePrivateProcedure Data_Type_Primitive
+!> @}
+
 !> This module contains the definition of Type_Primitive and its procedures.
 !> Type_Primitive is a derived type that handles primitive fluid dynamic variables.
 !> @note The operators of assignment (=), multiplication (*), division (/), sum (+) and subtraction (-) have been overloaded.
@@ -33,6 +38,7 @@ public:: prim2array,array2prim
 !> as an allocatable 1D array. \b r is allocated at runtime with the number of initial species that constitute the initial fluid
 !> mixture. Due to the presence of a dynamic component a freeing memory "method" for this component is necessary. Before deallocate
 !> a variable defined as Type_Primitive the free function must be invoked to free the memory of the dynamic component.
+!> @ingroup DerivedType
 type, public:: Type_Primitive
   sequence
   real(R_P), allocatable:: r(:)       !< Density of single species [1:Ns].
@@ -61,6 +67,7 @@ endtype Type_Primitive
 !> call init(r,v,p,d,g,Ns,prim_3D)
 !> ... @endcode
 !> @note r,v,p,d,g,Ns are optional.
+!> @ingroup Interface
 interface init
   module procedure Init_Scalar,Init_Array1D,Init_Array2D,Init_Array3D
 endinterface
@@ -81,6 +88,7 @@ endinterface
 !> call set(r,v,p,d,g,Ns,prim_3D)
 !> ... @endcode
 !> @note r,v,p,d,g,Ns are optional.
+!> @ingroup Interface
 interface set
   module procedure Set_Scalar,Set_Array1D,Set_Array2D,Set_Array3D
 endinterface
@@ -97,6 +105,7 @@ endinterface
 !> err = free(prim_2D)
 !> err = free(prim_3D)
 !> ... @endcode
+!> @ingroup Interface
 interface free
   module procedure Free_Scalar,Free_Array1D,Free_Array2D,Free_Array3D
 endinterface
@@ -119,6 +128,7 @@ endinterface
 !> err = write(unit,prim_2D)
 !> err = write(unit,prim_3D)
 !> ... @endcode
+!> @ingroup Interface
 interface write
   module procedure Write_Bin_Scalar, Write_Ascii_Scalar
   module procedure Write_Bin_Array1D,Write_Ascii_Array1D
@@ -144,6 +154,7 @@ endinterface
 !> err = read(unit,prim_2D)
 !> err = read(unit,prim_3D)
 !> ... @endcode
+!> @ingroup Interface
 interface read
   module procedure Read_Bin_Scalar, Read_Ascii_Scalar
   module procedure Read_Bin_Array1D,Read_Ascii_Array1D
@@ -151,6 +162,7 @@ interface read
   module procedure Read_Bin_Array3D,Read_Ascii_Array3D
 endinterface
 !> @brief Assignment operator (=) overloading.
+!> @ingroup Interface
 interface assignment (=)
   module procedure assign_prim
 #ifdef r16p
@@ -186,6 +198,7 @@ end interface
 !>         \f$ {\rm result\%p = prim\%p*scalar} \f$ \n
 !>         \f$ {\rm result\%d = prim\%d*scalar} \f$ \n
 !>         \f$ {\rm result\%g = prim\%g*scalar} \f$ \n
+!> @ingroup Interface
 interface operator (*)
   module procedure prim_mul_prim
 #ifdef r16p
@@ -223,6 +236,7 @@ endinterface
 !>         \f$ {\rm result\%p = \frac{prim\%p}{scalar}} \f$ \n
 !>         \f$ {\rm result\%d = \frac{prim\%d}{scalar}} \f$ \n
 !>         \f$ {\rm result\%g = \frac{prim\%g}{scalar}} \f$ \n
+!> @ingroup Interface
 interface operator (/)
   module procedure prim_div_prim
 #ifdef r16p
@@ -258,6 +272,7 @@ endinterface
 !>         \f$ {\rm result\%p = prim\%p+scalar} \f$ \n
 !>         \f$ {\rm result\%d = prim\%d+scalar} \f$ \n
 !>         \f$ {\rm result\%g = prim\%g+scalar} \f$ \n
+!> @ingroup Interface
 interface operator (+)
   module procedure positive_prim
   module procedure prim_sum_prim
@@ -303,6 +318,7 @@ endinterface
 !>         \f$ {\rm result\%p = prim\%p-scalar} \f$ \n
 !>         \f$ {\rm result\%d = prim\%d-scalar} \f$ \n
 !>         \f$ {\rm result\%g = prim\%g-scalar} \f$ \n
+!> @ingroup Interface
 interface operator (-)
   module procedure negative_prim
   module procedure prim_sub_prim
@@ -327,6 +343,8 @@ interface operator (-)
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @ingroup Data_Type_PrimitivePrivateProcedure
+  !> @{
   !>Subroutine for initializing components of Type_Primitive (scalar) variable.
   pure subroutine Init_Scalar(r,v,p,d,g,Ns,prim)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2606,6 +2624,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sub_ScalI1P
+  !> @}
 
   !>Function for converting derived type Type_Primitive to 1D array.
   !> @return \b array real(R_P), dimension(1:size(prim\%r)+6) variable.

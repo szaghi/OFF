@@ -1,3 +1,13 @@
+!> @ingroup GlobalVarPar
+!> @{
+!> @defgroup Data_Type_Vector Data_Type_Vector
+!> @}
+
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Data_Type_VectorPrivateProcedure Data_Type_Vector
+!> @}
+
 !>This module contains the definition of Type_Vector and its procedures.
 !>This derived type is useful for manipulating vectors in 3D space. The components of the vectors are real with
 !>R_P kind as defined by the IR_Precision module. The components are defined in a three-dimensional cartesian frame of reference.
@@ -42,15 +52,22 @@ public:: face_normal3,face_normal4
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> Derived type defining vectors.
+!> @ingroup DerivedType
 type, public:: Type_Vector
   sequence
   real(R_P):: x = 0._R_P !< Cartesian component in x direction.
   real(R_P):: y = 0._R_P !< Cartesian component in y direction.
   real(R_P):: z = 0._R_P !< Cartesian component in z direction.
 endtype Type_Vector
-type(Type_Vector), parameter:: ex = Type_Vector(1._R_P,0._R_P,0._R_P) !< X direction versor.
-type(Type_Vector), parameter:: ey = Type_Vector(0._R_P,1._R_P,0._R_P) !< Y direction versor.
-type(Type_Vector), parameter:: ez = Type_Vector(0._R_P,0._R_P,1._R_P) !< Z direction versor.
+!> @ingroup Data_Type_Vector
+!> @{
+type(Type_Vector), parameter:: ex = Type_Vector(1._R_P,0._R_P,0._R_P) !< X direction versor
+                                                                      !< (see \ref Data_Type_Vector::Type_Vector "definition").
+type(Type_Vector), parameter:: ey = Type_Vector(0._R_P,1._R_P,0._R_P) !< Y direction versor
+                                                                      !< (see \ref Data_Type_Vector::Type_Vector "definition").
+type(Type_Vector), parameter:: ez = Type_Vector(0._R_P,0._R_P,1._R_P) !< Z direction versor
+                                                                      !< (see \ref Data_Type_Vector::Type_Vector "definition").
+!> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -73,6 +90,7 @@ type(Type_Vector), parameter:: ez = Type_Vector(0._R_P,0._R_P,1._R_P) !< Z direc
 !> err = write(unit,vec_2D)
 !> err = write(unit,vec_3D)
 !> ... @endcode
+!> @ingroup Interface
 interface write
   module procedure Write_Bin_Scalar, Write_Ascii_Scalar
   module procedure Write_Bin_Array1D,Write_Ascii_Array1D
@@ -98,6 +116,7 @@ endinterface
 !> err = read(unit,vec_2D)
 !> err = read(unit,vec_3D)
 !> ... @endcode
+!> @ingroup Interface
 interface read
   module procedure Read_Bin_Scalar, Read_Ascii_Scalar
   module procedure Read_Bin_Array1D,Read_Ascii_Array1D
@@ -105,6 +124,7 @@ interface read
   module procedure Read_Bin_Array3D,Read_Ascii_Array3D
 endinterface
 !> @brief Assignment operator (=) overloading.
+!> @ingroup Interface
 interface assignment (=)
 #ifdef r16p
   module procedure assign_ScalR16P
@@ -133,6 +153,7 @@ end interface
 !>         \f$ {\rm result\%x = vec\%x*scalar} \f$ \n
 !>         \f$ {\rm result\%y = vec\%y*scalar} \f$ \n
 !>         \f$ {\rm result\%z = vec\%z*scalar} \f$ \n
+!> @ingroup Interface
 interface operator (*)
   module procedure vec_mul_vec
 #ifdef r16p
@@ -166,6 +187,7 @@ endinterface
 !>         \f$ {\rm result\%x = \frac{vec\%x}{scalar}} \f$ \n
 !>         \f$ {\rm result\%y = \frac{vec\%y}{scalar}} \f$ \n
 !>         \f$ {\rm result\%z = \frac{vec\%z}{scalar}} \f$ \n
+!> @ingroup Interface
 interface operator (/)
   module procedure vec_div_vec
 #ifdef r16p
@@ -195,6 +217,7 @@ endinterface
 !>         \f$ {\rm result\%x = vec\%x+scalar} \f$ \n
 !>         \f$ {\rm result\%y = vec\%y+scalar} \f$ \n
 !>         \f$ {\rm result\%z = vec\%z+scalar} \f$ \n
+!> @ingroup Interface
 interface operator (+)
   module procedure positive_vec
   module procedure vec_sum_vec
@@ -234,6 +257,7 @@ endinterface
 !>         \f$ {\rm result\%x = vec\%x-scalar} \f$ \n
 !>         \f$ {\rm result\%y = vec\%y-scalar} \f$ \n
 !>         \f$ {\rm result\%z = vec\%z-scalar} \f$ \n
+!> @ingroup Interface
 interface operator (-)
   module procedure negative_vec
   module procedure vec_sub_vec
@@ -259,6 +283,7 @@ endinterface
 !> @brief Not-equal-to boolean operator (/=) overloading.
 !> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
 !> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
+!> @ingroup Interface
 interface operator (/=)
   module procedure vec_not_eq_vec
 #ifdef r16p
@@ -274,6 +299,7 @@ endinterface
 !> @brief Lower-than boolean operator (<) overloading.
 !> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
 !> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
+!> @ingroup Interface
 interface operator (<)
   module procedure vec_low_vec
 #ifdef r16p
@@ -289,6 +315,7 @@ endinterface
 !> @brief Lower-equal-than boolean operator (<=) overloading.
 !> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
 !> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
+!> @ingroup Interface
 interface operator (<=)
   module procedure vec_low_eq_vec
 #ifdef r16p
@@ -304,6 +331,7 @@ endinterface
 !> @brief Equal-to boolean operator (==) overloading.
 !> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
 !> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
+!> @ingroup Interface
 interface operator (==)
   module procedure vec_eq_vec
 #ifdef r16p
@@ -319,6 +347,7 @@ endinterface
 !> @brief Higher-equal-than boolean operator (>=) overloading.
 !> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
 !> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
+!> @ingroup Interface
 interface operator (>=)
   module procedure vec_great_eq_vec
 #ifdef r16p
@@ -334,6 +363,7 @@ endinterface
 !> @brief Higher-than boolean operator (>) overloading.
 !> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
 !> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
+!> @ingroup Interface
 interface operator (>)
   module procedure vec_great_vec
 #ifdef r16p
@@ -347,20 +377,24 @@ interface operator (>)
   module procedure I1P_great_vec,vec_great_I1P
 endinterface
 !> @brief Cross product operator (.cross.) definition.
+!> @ingroup Interface
 interface operator (.cross.)
   module procedure crossproduct
 endinterface
 !> @brief Dot product operator (.dot.) definition.
+!> @ingroup Interface
 interface operator (.dot.)
   module procedure dotproduct
 endinterface
 !> @brief Parallel product operator (.paral.) definition.
 !> @note This operator produces a vector with the normL2 of first vector and parallel to the second vector.
+!> @ingroup Interface
 interface operator (.paral.)
   module procedure parallel
 endinterface
 !> @brief Orthogonal product operator (.ortho.) definition.
 !> @note This operator produces a vector with the normL2 of first vector and orthogonal to the second vector.
+!> @ingroup Interface
 interface operator (.ortho.)
   module procedure orthogonal
 endinterface
@@ -412,7 +446,7 @@ contains
   implicit none
   type(Type_Vector), intent(IN):: vec  ! Vector.
   integer(I_P),      intent(IN):: unit ! Logic unit.
-  integer(I_P)::                  err  ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err  ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -423,16 +457,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction pprint
 
+  !> @ingroup Data_Type_VectorPrivateProcedure
+  !> @{
+  !> Function for writing Type_Vector (binary, scalar).
   function Write_Bin_Scalar(unit,vec) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Vector (binary, scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P),      intent(IN):: unit ! Logic unit.
-  type(Type_Vector), intent(IN):: vec  ! Vector.
-  integer(I_P)::                  err  ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P),      intent(IN):: unit !< Logic unit.
+  type(Type_Vector), intent(IN):: vec  !< Vector.
+  integer(I_P)::                  err  !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -451,7 +484,7 @@ contains
   integer(I4P),      intent(IN):: unit   ! Logic unit.
   character(*),      intent(IN):: format ! Format specifier.
   type(Type_Vector), intent(IN):: vec    ! Vector.
-  integer(I_P)::                  err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -474,7 +507,7 @@ contains
   implicit none
   integer(I4P),      intent(IN):: unit   ! Logic unit.
   type(Type_Vector), intent(IN):: vec(:) ! Vector.
-  integer(I_P)::                  err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -493,7 +526,7 @@ contains
   integer(I4P),      intent(IN):: unit   ! Logic unit.
   character(*),      intent(IN):: format ! Format specifier.
   type(Type_Vector), intent(IN):: vec(:) ! Vector.
-  integer(I_P)::                  err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -516,7 +549,7 @@ contains
   implicit none
   integer(I4P),      intent(IN):: unit     ! Logic unit.
   type(Type_Vector), intent(IN):: vec(:,:) ! Vector.
-  integer(I_P)::                  err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -535,7 +568,7 @@ contains
   integer(I4P),      intent(IN):: unit     ! Logic unit.
   character(*),      intent(IN):: format   ! Format specifier.
   type(Type_Vector), intent(IN):: vec(:,:) ! Vector.
-  integer(I_P)::                  err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -558,7 +591,7 @@ contains
   implicit none
   integer(I4P),      intent(IN):: unit       ! Logic unit.
   type(Type_Vector), intent(IN):: vec(:,:,:) ! Vector.
-  integer(I_P)::                  err        ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err        ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -577,7 +610,7 @@ contains
   integer(I4P),      intent(IN):: unit       ! Logic unit
   character(*),      intent(IN):: format     ! Format specifier.
   type(Type_Vector), intent(IN):: vec(:,:,:) ! Vector.
-  integer(I_P)::                  err        ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err        ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -601,7 +634,7 @@ contains
   implicit none
   integer(I4P),      intent(IN)::    unit  ! Logic unit.
   type(Type_Vector), intent(INOUT):: vec   ! Vector.
-  integer(I_P)::                     err   ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err   ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -620,7 +653,7 @@ contains
   integer(I4P),      intent(IN)::    unit   ! Logic unit.
   character(*),      intent(IN)::    format ! Format specifier.
   type(Type_Vector), intent(INOUT):: vec    ! Vector.
-  integer(I_P)::                     err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -643,7 +676,7 @@ contains
   implicit none
   integer(I4P),      intent(IN)::    unit   ! Logic unit.
   type(Type_Vector), intent(INOUT):: vec(:) ! Vector.
-  integer(I_P)::                     err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -662,7 +695,7 @@ contains
   integer(I4P),      intent(IN)::    unit   ! logic unit
   character(*),      intent(IN)::    format ! format specifier
   type(Type_Vector), intent(INOUT):: vec(:) ! Vector.
-  integer(I_P)::                     err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -685,7 +718,7 @@ contains
   implicit none
   integer(I4P),      intent(IN)::    unit     ! Logic unit.
   type(Type_Vector), intent(INOUT):: vec(:,:) ! Vector.
-  integer(I_P)::                     err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -704,7 +737,7 @@ contains
   integer(I4P),      intent(IN)::    unit     ! Logic unit.
   character(*),      intent(IN)::    format   ! Format specifier.
   type(Type_Vector), intent(INOUT):: vec(:,:) ! Vector.
-  integer(I_P)::                     err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -727,7 +760,7 @@ contains
   implicit none
   integer(I4P),      intent(IN)::    unit       ! Logic unit.
   type(Type_Vector), intent(INOUT):: vec(:,:,:) ! Vector.
-  integer(I_P)::                     err        ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err        ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -746,7 +779,7 @@ contains
   integer(I4P),      intent(IN)::    unit       ! Logic unit.
   character(*),      intent(IN)::    format     ! Format specifier.
   type(Type_Vector), intent(INOUT):: vec(:,:,:) ! Vector.
-  integer(I_P)::                     err        ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err        ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3706,6 +3739,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction dotproduct
+  !> @}
 
   ! sq_norm
   elemental function sq_norm(vec) result(sq)

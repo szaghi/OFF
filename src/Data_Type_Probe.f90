@@ -1,3 +1,8 @@
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Data_Type_ProbePrivateProcedure Data_Type_Probe
+!> @}
+
 !>This module contains the definition of Type_Probe and its procedures.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
 module Data_Type_Probe
@@ -14,6 +19,7 @@ public:: write,read
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> Derived type containing probe informations.
+!> @ingroup DerivedType
 type, public:: Type_Probe
   sequence
   integer(I_P):: b = 1_I_P !< Block (global map) index.
@@ -37,6 +43,7 @@ endtype Type_Probe
 !> ! binary writing
 !> err = write(unit,probe)
 !> ... @endcode
+!> @ingroup Interface
 interface write
   module procedure Write_Bin,Write_Ascii
 endinterface
@@ -53,6 +60,7 @@ endinterface
 !> ! binary reading
 !> err = read(unit,probe)
 !> ... @endcode
+!> @ingroup Interface
 interface read
   module procedure Read_Bin,Read_Ascii
 endinterface
@@ -79,6 +87,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine set
 
+  !> @ingroup Data_Type_ProbePrivateProcedure
+  !> @{
   ! write
   function Write_Bin(unit,probe) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -89,7 +99,7 @@ contains
   implicit none
   integer(I_P),     intent(IN):: unit  ! logic unit
   type(Type_Probe), intent(IN):: probe
-  integer(I_P)::                 err   ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                 err   ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -108,7 +118,7 @@ contains
   integer(I_P),     intent(IN):: unit   ! logic unit
   character(*),     intent(IN):: format ! format specifier
   type(Type_probe), intent(IN):: probe
-  integer(I_P)::                 err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                 err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -132,7 +142,7 @@ contains
   implicit none
   integer(I_P),     intent(IN)::    unit  ! logic unit
   type(Type_Probe), intent(INOUT):: probe
-  integer(I_P)::                    err   ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                    err   ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -151,7 +161,7 @@ contains
   integer(I_P),     intent(IN)::    unit   ! logic unit
   character(*),     intent(IN)::    format ! format specifier
   type(Type_Probe), intent(INOUT):: probe
-  integer(I_P)::                    err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                    err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -164,4 +174,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Read_Ascii
+  !> @}
 endmodule Data_Type_Probe

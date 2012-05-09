@@ -1,3 +1,8 @@
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Data_Type_GlobalsPrivateProcedure Data_Type_Globals
+!> @}
+
 !> @brief Module Data_Type_Globals contains the definition of global types variables and useful procedures for their handling.
 !> Two main derived type are defined: \n
 !> - Type_Global: derived type containing global-level data.
@@ -27,6 +32,7 @@ public:: load_gfluid_soption,load_gfluid_Ns,load_gfluid_0species,load_bfluid,sav
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @brief Derived type containing the global-level file data.
 !> Global-level file data are referred to those informations concerning with files of global interest.
+!> @ingroup DerivedType
 type, public:: Type_File_Global
   character(60)::  Path_InPut           !< Path of input files.
   character(60)::  Path_OutPut          !< Path of output files.
@@ -47,6 +53,7 @@ endtype Type_File_Global
 
 !> @brief Derived type containing the global-level mesh data.
 !> Global-level mesh data are referred to those informations concerning with mesh's details of global interest.
+!> @ingroup DerivedType
 type, public:: Type_Mesh_Global
   integer(I_P):: Nl     = 1_I_P !< Number of grid levels.
   integer(I_P):: Nb     = 0_I_P !< Number of blocks.
@@ -84,12 +91,14 @@ endtype Type_Mesh_Block
 
 !> @brief Derived type containing the global-level boundary conditions data.
 !> Global-level boundary conditions data are referred to those informations concerning with bc's details of global interest.
+!> @ingroup DerivedType
 type, public:: Type_BC_Global
   integer(I_P)::                      Nin1 = 0_I_P !< Number of inflow 1 boundary conditions.
   type(Type_Primitive), allocatable:: in1(:)       !< Inflow 1 boundary conditions primitive variables [1:Nin1].
 endtype Type_BC_Global
 !> @brief Derived type containing the block-level boundary conditions data.
 !> Block-level boundary conditions data are referred to those informations concerning with bc's details of blocks interest.
+!> @ingroup DerivedType
 type, public:: Type_BC_Block
   type(Type_BC), allocatable:: BCi(:,:,:) !< Boundary conditions of i faces [0-gc(1):1+gc(2),1-gc(3):1+gc(4),1-gc(5):1+gc(6)].
   type(Type_BC), allocatable:: BCj(:,:,:) !< Boundary conditions of j faces [1-gc(1):1+gc(2),0-gc(3):1+gc(4),1-gc(5):1+gc(6)].
@@ -98,6 +107,7 @@ endtype Type_BC_Block
 
 !> Derived type containing the global-level fluid dynamic data.
 !> Global-level fluid dynamic data are referred to those informations concerning with fluids details of global interest.
+!> @ingroup DerivedType
 type, public:: Type_Fluid_Global
   integer(I8P)::           n             = 0_I8P    !< Time steps counter.
   real(R_P)::              t             = 0._R_P   !< Time.
@@ -118,6 +128,7 @@ endtype Type_Fluid_Global
 !> Derived type containing the block-level fluid dynamic data.
 !> Block-level fluid dynamic data are referred to those informations concerning with fluids details of blocks interest.
 !> @note Dimensions of 3D array are [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+!> @ingroup DerivedType
 type, public:: Type_Fluid_Block
   real(R_P),               allocatable:: Dt(:,:,:)   !< Local time step.
   type(Type_Primitive),    allocatable:: P (:,:,:)   !< Primitive variables.
@@ -126,6 +137,7 @@ type, public:: Type_Fluid_Block
 endtype Type_Fluid_Block
 
 !> @brief Derived type containing the global-level data.
+!> @ingroup DerivedType
 type, public:: Type_Global
   type(Type_File_Global)::  file  !< File data.
   type(Type_Mesh_Global)::  mesh  !< Mesh data.
@@ -133,6 +145,7 @@ type, public:: Type_Global
   type(Type_Fluid_Global):: fluid !< Fluid dynamic data.
 endtype Type_Global
 !> Derived type containing the block-level data.
+!> @ingroup DerivedType
 type, public:: Type_Block
   type(Type_Mesh_Block)::  mesh  !< Mesh data.
   type(Type_BC_Block)::    bc    !< Boundary conditions data.
@@ -152,11 +165,14 @@ endtype Type_Block
 !> - File name of \b block-flip_flop data; this type of file name is referred to those files containing block-level data stored as
 !>   backup flip/flop file; calling signature is of the type:
 !>   @code fname = file_name(basename,suffix,blk,grl,flip) @endcode
+!> @ingroup Interface
 interface file_name
   module procedure Block_File_Name,Block_Step_File_Name,Block_Flip_File_Name
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @ingroup Data_Type_GlobalsPrivateProcedure
+  !> @{
   !> Function for building block-clean file name.
   !> @return \b filename character(len_trim(basename)+4+5+len_trim(suffix)) variable.
   function Block_File_Name(basename,suffix,blk,grl) result(filename)
@@ -212,6 +228,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Block_Flip_File_Name
+  !> @}
 
   !> Subroutine for allocating dynamic data of Type_Global boundary conditions variables.
   subroutine alloc_global_bc(global)

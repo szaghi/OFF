@@ -1,4 +1,5 @@
 !> This module contains the definition of Thermodynamic Laws for ideal calorically perfect gas.
+!> @ingroup Library
 module Lib_Thermodynamic_Laws_Ideal
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision ! Definition of integers and reals precision.

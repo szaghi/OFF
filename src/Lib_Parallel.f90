@@ -1,8 +1,14 @@
+!> @ingroup GlobalVarPar
+!> @{
+!> @defgroup Lib_Parallel Lib_Parallel
+!> @}
+
 !> This module contains the definition of procedures for send/receive data among processes for parallel (MPI) operations.
 !> It is based on MPI library.
 !> @note The communications have a tag-shift (for make them unique) that assumes a maximum number of processes of 10000.
 !> Increment this parameter if using more processes than 10000.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
+!> @ingroup Library
 module Lib_Parallel
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision        ! Integers and reals precision definition.
@@ -30,10 +36,13 @@ public:: procmap_save
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
+!> @ingroup Lib_Parallel
+!> @{
 integer(I_P)::              Nthreads = 1_I_P !< Number of OpenMP threads.
 integer(I_P)::              Nproc    = 1_I_P !< Number of processes (for MPI parallelization).
 integer(I_P), allocatable:: procmap(:)       !< Processes/blocks map    [1:Nb_tot].
 integer(I_P), allocatable:: blockmap(:)      !< Local/global blocks map [1:Nb].
+!> @}
 integer(I_P), parameter::   maxproc = 10000  !< Maximum number of processes used for communications tag shift.
 integer(I_P)             :: gNcR             !< Global number of receive cells (sum(NcR)).
 integer(I_P)             :: gNcS             !< Global number of send   cells (sum(NcS)).

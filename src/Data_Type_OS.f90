@@ -1,3 +1,8 @@
+!> @ingroup GlobalVarPar
+!> @{
+!> @defgroup Data_Type_OS Data_Type_OS
+!> @}
+
 !> This module contains the definition of Type_OS and its procedures.
 !> This derived type has useful parameters for performing system calls.
 !> @bug <b>MS Windows directory separator's documentation</b>: \n The documentation of variable "win_sep" containing MS Windows
@@ -18,6 +23,8 @@ public:: init,set
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
+!> @ingroup Data_Type_OS
+!> @{
 character(3), parameter:: c_uix_id   = "UIX"   !< Unix/Linux string identifier.
 integer(I1P), parameter:: uix_id     = 1_I1P   !< Unix/Linux identifier.
 character(1), parameter:: uix_sep    = "/"     !< Unix/Linux directories separator.
@@ -32,7 +39,9 @@ character(1), parameter:: win_sep    = "\"     !< MS Windows directories separat
 character(3), parameter:: win_remove = "del"   !< MS Windows remove command.
 character(4), parameter:: win_copy   = "copy"  !< MS Windows copy command.
 character(5), parameter:: win_mkdir  = "mkdir" !< MS Windows make dir command.
-!> Type_OS derived type contains useful parameters for performing portable system calls.
+!> @}
+!> Derived type contains useful parameters for performing portable system calls.
+!> @ingroup DerivedType
 type, public:: Type_OS
  sequence
  integer(I1P):: id     = uix_id     !< OS id.

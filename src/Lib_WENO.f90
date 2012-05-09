@@ -1,5 +1,6 @@
 !> This module contains the definition of procedures for computing WENO reconstruction with a user-defined \f$P^{th}\f$ order.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
+!> @ingroup Library
 module Lib_WENO
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision      ! Integers and reals precision definition.

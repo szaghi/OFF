@@ -1,6 +1,12 @@
+!> @ingroup GlobalVarPar
+!> @{
+!> @defgroup Lib_IO_Misc Lib_IO_Misc
+!> @}
+
 !> This module contains miscellanea procedures for input/output and string operations.
 !> This is a library module.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
+!> @ingroup Library
 module Lib_IO_Misc
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision ! Integers and reals precision definition.
@@ -27,7 +33,8 @@ public:: File_Not_Found
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-type(Type_OS):: OS !< OS definition.
+!> @ingroup Lib_IO_Misc
+type(Type_OS):: OS !< OS definition (see \ref Data_Type_OS::Type_OS "definition").
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @brief The GetUnit function is used for getting a free logic unit.
@@ -69,7 +76,7 @@ contains
   implicit none
   integer(I_P),  intent(IN), optional:: myrank    ! Actual rank process necessary for concurrent multi-processes calls.
   character(*),  intent(IN)::           directory ! Name of the directory that must be created.
-  integer(I4P)::                        err       ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::                        err       ! Error trapping flag: 0 no errors, >0 error occurs.
   integer(I_P)::                        UnitFree  ! Free logic unit.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -104,7 +111,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   character(*),  intent(IN):: filename ! Name of file that must be copied.
-  integer(I4P)::              err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::              err      ! Error trapping flag: 0 no errors, >0 error occurs.
   logical(4)::                exist    ! Inquiring flag.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -134,7 +141,7 @@ contains
   implicit none
   character(*),  intent(IN):: source_file ! Name of file that must be copied.
   character(*),  intent(IN):: target_file ! Destination path.
-  integer(I4P)::              err         ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P)::              err         ! Error trapping flag: 0 no errors, >0 error occurs.
   logical(4)::                exist       ! Inquiring flag.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -337,7 +344,7 @@ contains
   integer(I_P), intent(IN)::  myrank   ! Actual rank process.
   character(*), intent(IN)::  filename ! Name of file where option variables are saved.
   character(*), intent(IN)::  cpn      ! Calling procedure name.
-  integer(I_P)::              err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::              err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

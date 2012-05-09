@@ -8,6 +8,7 @@
 !>   conditions and the geometry are loaded by Ansys IcemCFD Multiblock INFO files. These files can describe more complex scenario
 !>   with general curvilinear grids.
 !> @todo \b DocImprove: Improve the documentation
+!> @ingroup Program
 program IBM
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                           ! Integers and reals precision definition.

@@ -1,4 +1,4 @@
-!> @brief   @libvtk is a library of functions for Input and Output pure Fortran data in VTK format.
+!> @brief   This is a library of functions for Input and Output pure Fortran data in VTK format.
 !> @details It is useful for Paraview visualization tool. Even though there are many wrappers/porting of the VTK source
 !>          code (C++ code), there is not a Fortran one. This library is not a porting or a wrapper of the VTK code,
 !>          but it only an exporter/importer of the VTK data format written in pure Fortran language (standard Fortran 2003)
@@ -103,22 +103,7 @@
 !>                             the final XML file. Only when all XML formatting data have been written the scratch file is rewind
 !>                             and the binary data is saved in the final tag of XML file as \b raw data. This approach is not
 !>                             efficient.
-!> @param[out] VTK_INI
-!> @param[out] VTK_GEO
-!> @param[out] VTK_CON
-!> @param[out] VTK_DAT
-!> @param[out] VTK_VAR
-!> @param[out] VTK_END
-!> @param[out] VTK_INI_XML
-!> @param[out] VTK_GEO_XML
-!> @param[out] VTK_CON_XML
-!> @param[out] VTK_DAT_XML
-!> @param[out] VTK_VAR_XML
-!> @param[out] VTK_END_XML
-!> @param[out] VTM_INI_XML
-!> @param[out] VTM_BLK_XML
-!> @param[out] VTM_WRF_XML
-!> @param[out] VTM_END_XML
+!> @ingroup Library
 module Lib_VTK_IO
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                                                ! Integers and reals precision definition.
@@ -185,6 +170,7 @@ public:: VTM_END_XML
 !> ...
 !> E_IO=VTK_GEO(NN,X,Y,Z)
 !> ... @endcode
+!> @ingroup Interface
 interface VTK_GEO
   module procedure VTK_GEO_UNST_R8, & ! real(R8P) UNSTRUCTURED_GRID
                    VTK_GEO_UNST_R4, & ! real(R4P) UNSTRUCTURED_GRID
@@ -217,6 +203,7 @@ endinterface
 !> ...
 !> E_IO=VTK_VAR('vect',NN,'Vec',varX,varY,varZ)
 !> ... @endcode
+!> @ingroup Interface
 interface VTK_VAR
   module procedure VTK_VAR_SCAL_R8, & ! real(R8P)    scalar
                    VTK_VAR_SCAL_R4, & ! real(R4P)    scalar
@@ -262,6 +249,7 @@ endinterface
 !> @code ...
 !> E_IO=VTK_GEO_XML()
 !> ... @endcode
+!> @ingroup Interface
 interface VTK_GEO_XML
   module procedure VTK_GEO_XML_STRG_R4, & ! real(R4P) StructuredGrid
                    VTK_GEO_XML_STRG_R8, & ! real(R8P) StructuredGrid
@@ -291,6 +279,7 @@ endinterface
 !> ...
 !> E_IO=VTK_VAR_XML(NN,'Vec',varX,varY,varZ)
 !> ... @endcode
+!> @ingroup Interface
 interface VTK_VAR_XML
   module procedure VTK_VAR_XML_SCAL_R8, & ! real(R8P)    scalar
                    VTK_VAR_XML_SCAL_R4, & ! real(R4P)    scalar

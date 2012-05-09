@@ -1,3 +1,13 @@
+!> @ingroup GlobalVarPar
+!> @{
+!> @defgroup Data_Type_Tensor Data_Type_Tensor
+!> @}
+
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Data_Type_TensorPrivateProcedure Data_Type_Tensor
+!> @}
+
 !>This module contains the definition of Type_Tensor and its procedures.
 !>This derived type is useful for manipulating second order tensors in 3D space. The components of the tensors
 !>are derived type of Type_Vector. The components are defined in a three-dimensional cartesian frame of reference.
@@ -37,16 +47,21 @@ public:: invert,invertible
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> Derived type defining tensors.
-!> @note The components the tensor are 3 vectors arranged as following: \n
+!> @note The components of the tensor are 3 vectors arranged as following: \n
 !> \f$ T_{ij}=\left[{\begin{array}{*{20}{c}}t_{11}&t_{12}&t_{13}\\ t_{21}&t_{22}&t_{23}\\ t_{31}&t_{32}&t_{33}\end{array}}\right]
 !> =\left[{\begin{array}{*{20}{c}} {x\% x}&{x\% y}&{x\% z}\\ {y\% x}&{y\% y}&{y\% z}\\ {z\% x}&{z\% y}&{z\% z}\end{array}}\right]\f$
+!> @ingroup DerivedType
 type, public:: Type_Tensor
   sequence
   type(Type_Vector):: x !< Cartesian vector component in x direction.
   type(Type_Vector):: y !< Cartesian vector component in y direction.
   type(Type_Vector):: z !< Cartesian vector component in z direction.
 endtype Type_Tensor
-type(Type_Tensor), parameter:: unity = Type_Tensor(ex,ey,ez) !< Unity (identity) tensor.
+!> @ingroup Data_Type_Tensor
+!> @{
+type(Type_Tensor), parameter:: unity = Type_Tensor(ex,ey,ez) !< Unity (identity) tensor
+                                                             !< (see \ref Data_Type_Tensor::Type_Tensor "definition").
+!> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -69,6 +84,7 @@ type(Type_Tensor), parameter:: unity = Type_Tensor(ex,ey,ez) !< Unity (identity)
 !> err = write(unit,ten_2D)
 !> err = write(unit,ten_3D)
 !> ... @endcode
+!> @ingroup Interface
 interface write
   module procedure Write_Bin_Scalar, Write_Ascii_Scalar
   module procedure Write_Bin_Array1D,Write_Ascii_Array1D
@@ -94,6 +110,7 @@ endinterface
 !> err = read(unit,ten_2D)
 !> err = read(unit,ten_3D)
 !> ... @endcode
+!> @ingroup Interface
 interface read
   module procedure Read_Bin_Scalar, Read_Ascii_Scalar
   module procedure Read_Bin_Array1D,Read_Ascii_Array1D
@@ -101,6 +118,7 @@ interface read
   module procedure Read_Bin_Array3D,Read_Ascii_Array3D
 endinterface
 !> @brief Assignment operator (=) overloading.
+!> @ingroup Interface
 interface assignment (=)
   module procedure assign_Vec
 #ifdef r16p
@@ -130,6 +148,7 @@ end interface
 !>         \f$ {\rm result\%x = ten\%x*scalar} \f$ \n
 !>         \f$ {\rm result\%y = ten\%y*scalar} \f$ \n
 !>         \f$ {\rm result\%z = ten\%z*scalar} \f$ \n
+!> @ingroup Interface
 interface operator (*)
   module procedure ten_mul_ten
 #ifdef r16p
@@ -163,6 +182,7 @@ endinterface
 !>         \f$ {\rm result\%x = \frac{ten\%x}{scalar}} \f$ \n
 !>         \f$ {\rm result\%y = \frac{ten\%y}{scalar}} \f$ \n
 !>         \f$ {\rm result\%z = \frac{ten\%z}{scalar}} \f$ \n
+!> @ingroup Interface
 interface operator (/)
   module procedure ten_div_ten
 #ifdef r16p
@@ -192,6 +212,7 @@ endinterface
 !>         \f$ {\rm result\%x = ten\%x+scalar} \f$ \n
 !>         \f$ {\rm result\%y = ten\%y+scalar} \f$ \n
 !>         \f$ {\rm result\%z = ten\%z+scalar} \f$ \n
+!> @ingroup Interface
 interface operator (+)
   module procedure positive_ten
   module procedure ten_sum_ten
@@ -231,6 +252,7 @@ endinterface
 !>         \f$ {\rm result\%x = ten\%x-scalar} \f$ \n
 !>         \f$ {\rm result\%y = ten\%y-scalar} \f$ \n
 !>         \f$ {\rm result\%z = ten\%z-scalar} \f$ \n
+!> @ingroup Interface
 interface operator (-)
   module procedure negative_ten
   module procedure ten_sub_ten
@@ -254,34 +276,41 @@ interface operator (-)
   module procedure ten_sub_ScalI1P
 endinterface
 !> @brief Double dot product operator (.ddot.) definition.
+!> @ingroup Interface
 interface operator (.ddot.)
   module procedure ddotproduct
 endinterface
 !> @brief Dot product operator (.dot.) definition.
+!> @ingroup Interface
 interface operator (.dot.)
   module procedure ten_dot_vec,vec_dot_ten
 endinterface
 !> @brief Diadic product operator (.diad.) definition.
+!> @ingroup Interface
 interface operator (.diad.)
   module procedure diadicproduct
 endinterface
 !> @brief Square norm function \em sq_norm overloading.
 !> The function \em sq_norm defined for Type_Vector is overloaded for handling also Type_Tensor.
+!> @ingroup Interface
 interface sq_norm
   module procedure sq_norm,sq_norm_ten
 endinterface
 !> @brief L2 norm function \em normL2 overloading.
 !> The function \em normL2 defined for Type_Vector is overloaded for handling also Type_Tensor.
+!> @ingroup Interface
 interface normL2
   module procedure normL2,normL2_ten
 endinterface
 !> @brief Normalize function \em normalize overloading.
 !> The function \em normalize defined for Type_Vector is overloaded for handling also Type_Tensor.
+!> @ingroup Interface
 interface normalize
   module procedure normalize,normalize_ten
 endinterface
 !> @brief Transpose function \em transpose overloading.
 !> The built in function \em transpose defined for rank 2 arrays is overloaded for handling also Type_Tensor.
+!> @ingroup Interface
 interface transpose
   module procedure transpose_ten
 endinterface
@@ -323,17 +352,16 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine get
 
+  !> @ingroup Data_Type_TensorPrivateProcedure
+  !> @{
   ! write
+  !!Function for writing Type_Tensor (binary, scalar).
   function Write_Bin_Scalar(unit,ten) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Tensor (binary, scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P),      intent(IN):: unit ! Logic unit.
-  type(Type_Tensor), intent(IN):: ten  ! Tensor.
-  integer(I_P)::                  err  ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I4P),      intent(IN):: unit !< Logic unit.
+  type(Type_Tensor), intent(IN):: ten  !< Tensor.
+  integer(I_P)::                  err  !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -352,7 +380,7 @@ contains
   integer(I4P),      intent(IN):: unit   ! Logic unit.
   character(*),      intent(IN):: format ! Format specifier.
   type(Type_Tensor), intent(IN):: ten    ! Tensor.
-  integer(I_P)::                  err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -375,7 +403,7 @@ contains
   implicit none
   integer(I4P),      intent(IN):: unit   ! Logic unit.
   type(Type_Tensor), intent(IN):: ten(:) ! Tensor.
-  integer(I_P)::                  err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -394,7 +422,7 @@ contains
   integer(I4P),      intent(IN):: unit   ! Logic unit.
   character(*),      intent(IN):: format ! Format specifier.
   type(Type_Tensor), intent(IN):: ten(:) ! Tensor.
-  integer(I_P)::                  err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -417,7 +445,7 @@ contains
   implicit none
   integer(I4P),      intent(IN):: unit     ! Logic unit.
   type(Type_Tensor), intent(IN):: ten(:,:) ! Tensor.
-  integer(I_P)::                  err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -436,7 +464,7 @@ contains
   integer(I4P),      intent(IN):: unit     ! Logic unit.
   character(*),      intent(IN):: format   ! Format specifier.
   type(Type_Tensor), intent(IN):: ten(:,:) ! Tensor.
-  integer(I_P)::                  err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -459,7 +487,7 @@ contains
   implicit none
   integer(I4P),      intent(IN):: unit       ! Logic unit.
   type(Type_Tensor), intent(IN):: ten(:,:,:) ! Tensor.
-  integer(I_P)::                  err        ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err        ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -478,7 +506,7 @@ contains
   integer(I4P),      intent(IN):: unit       ! Logic unit
   character(*),      intent(IN):: format     ! Format specifier.
   type(Type_Tensor), intent(IN):: ten(:,:,:) ! Tensor.
-  integer(I_P)::                  err        ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                  err        ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -502,7 +530,7 @@ contains
   implicit none
   integer(I4P),      intent(IN)::    unit  ! Logic unit.
   type(Type_Tensor), intent(INOUT):: ten   ! Tensor.
-  integer(I_P)::                     err   ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err   ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -521,7 +549,7 @@ contains
   integer(I4P),      intent(IN)::    unit   ! Logic unit.
   character(*),      intent(IN)::    format ! Format specifier.
   type(Type_Tensor), intent(INOUT):: ten    ! Tensor.
-  integer(I_P)::                     err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -544,7 +572,7 @@ contains
   implicit none
   integer(I4P),      intent(IN)::    unit   ! Logic unit.
   type(Type_Tensor), intent(INOUT):: ten(:) ! Tensor.
-  integer(I_P)::                     err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -563,7 +591,7 @@ contains
   integer(I4P),      intent(IN)::    unit   ! logic unit
   character(*),      intent(IN)::    format ! format specifier
   type(Type_Tensor), intent(INOUT):: ten(:) ! Tensor.
-  integer(I_P)::                     err    ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -586,7 +614,7 @@ contains
   implicit none
   integer(I4P),      intent(IN)::    unit     ! Logic unit.
   type(Type_Tensor), intent(INOUT):: ten(:,:) ! Tensor.
-  integer(I_P)::                     err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -605,7 +633,7 @@ contains
   integer(I4P),      intent(IN)::    unit     ! Logic unit.
   character(*),      intent(IN)::    format   ! Format specifier.
   type(Type_Tensor), intent(INOUT):: ten(:,:) ! Tensor.
-  integer(I_P)::                     err      ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err      ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -628,7 +656,7 @@ contains
   implicit none
   integer(I4P),      intent(IN)::    unit       ! Logic unit.
   type(Type_Tensor), intent(INOUT):: ten(:,:,:) ! Tensor.
-  integer(I_P)::                     err        ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err        ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -647,7 +675,7 @@ contains
   integer(I4P),      intent(IN)::    unit       ! Logic unit.
   character(*),      intent(IN)::    format     ! Format specifier.
   type(Type_Tensor), intent(INOUT):: ten(:,:,:) ! Tensor.
-  integer(I_P)::                     err        ! Error traping flag: 0 no errors, >0 error occours.
+  integer(I_P)::                     err        ! Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2063,6 +2091,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction normalize_ten
+  !> @}
 
   ! transpose
   elemental function transpose_ten(ten) result(tran)

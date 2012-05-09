@@ -1,3 +1,13 @@
+!> @ingroup GlobalVarPar
+!> @{
+!> @defgroup Data_Type_BC Data_Type_BC
+!> @}
+
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Data_Type_BCPrivateProcedure Data_Type_BC
+!> @}
+
 !> @brief This module contains the definition of Type_BC and its procedures.
 !> Type_BC is a derived type containing all boundary conditions informations.
 module Data_Type_BC
@@ -27,7 +37,8 @@ public:: get_bc_id,get_bc_str
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-! Type id parameters
+!> @ingroup Data_Type_BC
+!> @{
 character(3), parameter:: bc_nan_str = 'NAN' !< Definition of non-assigned boundary condition parameter string.
 integer(I_P), parameter:: bc_nan     =-1_I_P !< Definition of non-assigned boundary condition parameter id.
 character(3), parameter:: bc_ref_str = 'REF' !< Definition of reflective boundary condition parameter string.
@@ -61,7 +72,9 @@ integer(I_P), parameter:: bc_list    (1:Nbc) = &
                                                 bc_in1, &
                                                 bc_in2  &
                                               /) !< Boundary conditions list.
+!> @}
 !> Derived type containing adjacent boundary condition.
+!> @ingroup DerivedType
 type, public:: Type_Adj
   sequence
   integer(I_P):: b = 0_I_P !< b index of adjacent block.
@@ -70,12 +83,16 @@ type, public:: Type_Adj
   integer(I_P):: k = 0_I_P !< k index of adjacent block.
 endtype Type_Adj
 !> Derived type containing boundary conditions informations.
-!> @note \b bc_in1 type conditions: supersonic inflow steady conditions \n
-!>   the component \b inf is the index array of inflow boundary conditions; inflow 1 conditions (primitive variables) are stored in
-!>   array "in1" so the boundary conditions can be accessed by: @code in1(1:Np,inf) @endcode
-!> @note \b bc_in2 type conditions: supersonic inflow unsteady conditions \n
-!>   the component \b inf is the index array of inflow boundary conditions; inflow 2 conditions (primitive variables) are stored in
-!>   array "in2" so the boundary conditions can be accessed by: @code in2(1:Np,n,inf) @endcode where n is the time step counter.
+!> @note
+!>   meaning of \b inf component \n
+!>   - \b bc_in1 type condition: supersonic inflow steady conditions \n
+!>     the component \b inf is the index array of inflow boundary conditions; inflow 1 conditions (primitive variables) are stored
+!>     in array "in1" so the boundary conditions can be accessed by: @code in1(1:Np,inf) @endcode
+!>   - \b bc_in2 type condition: supersonic inflow unsteady conditions \n
+!>     the component \b inf is the index array of inflow boundary conditions; inflow 2 conditions (primitive variables) are stored
+!>     in array "in2" so the boundary conditions can be accessed by: @code in2(1:Np,n,inf) @endcode
+!>     where n is the time step counter.
+!> @ingroup DerivedType
 type, public:: Type_BC
   integer(I_P)::                tp = bc_ext !< Type of boundary condition (bc_nan,bc_ref,bc_ext...).
   integer(I_P),   allocatable:: inf         !< Auxiliary informations for inflow-type  boundary condition.
@@ -97,6 +114,7 @@ endtype Type_BC
 !> err = free(bc_2D)
 !> err = free(bc_3D)
 !> ... @endcode
+!> @ingroup Interface
 interface free
   module procedure Free_Scalar,Free_Array1D,Free_Array2D,Free_Array3D
 endinterface
@@ -119,6 +137,7 @@ endinterface
 !> err = write(unit,bc_2D)
 !> err = write(unit,bc_3D)
 !> ... @endcode
+!> @ingroup Interface
 interface write
   module procedure Write_Bin_Scalar,     Write_Ascii_Scalar
   module procedure Write_Bin_Array1D,Write_Ascii_Array1D
@@ -144,6 +163,7 @@ endinterface
 !> err = read(unit,bc_2D)
 !> err = read(unit,bc_3D)
 !> ... @endcode
+!> @ingroup Interface
 interface read
   module procedure Read_Bin_Scalar,     Read_Ascii_Scalar
   module procedure Read_Bin_Array1D,Read_Ascii_Array1D
@@ -212,6 +232,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine get
 
+  !> @ingroup Data_Type_BCPrivateProcedure
+  !> @{
   ! free dynamic memory
   !>Function for freeing the memory of Type_BC \em dynamic components (scalar).
   !> @return \b err integer(I4P) variable.
@@ -843,6 +865,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Read_Ascii_Array3D
+  !> @}
 
   ! get_bc
   !> Function for getting integer id of a boundary condition from the corresponding boundary condition string.

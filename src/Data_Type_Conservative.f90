@@ -1,3 +1,8 @@
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Data_Type_ConservativePrivateProcedure Data_Type_Conservative
+!> @}
+
 !> This module contains the definition of Type_Conservative and its procedures.
 !> Type_Conservative is a derived type that handles conservative fluid dynamic variables.
 !> @note The operators of assignment (=), multiplication (*), division (/), sum (+) and subtraction (-) have been overloaded.
@@ -32,11 +37,12 @@ public:: cons2array,array2cons
 !> as an allocatable 1D array. \b rs is allocated at runtime with the number of initial species that constitute the initial fluid
 !> mixture. Due to the presence of a dynamic component a freeing memory "method" for this component is necessary. Before deallocate
 !> a variable defined as Type_Conservative the free function must be invoked to free the memory of the dynamic component.
+!> @ingroup DerivedType
 type, public:: Type_Conservative
   sequence
   real(R_P), allocatable:: rs(:)       !< Density of single species [1:Ns].
   type(Type_Vector)::      rv          !< Momentum vector.
-  real(R_P)::              re = 0._R_P !< Product of density for total internal energy (sum(r)*E).
+  real(R_P)::              re = 0._R_P !< Product of density for specific total internal energy (sum(r)*E).
 endtype Type_Conservative
 !-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -59,6 +65,7 @@ endtype Type_Conservative
 !> call init(rs,rv,re,Ns,cons_4D)
 !> ... @endcode
 !> @note rs,rv,re,Ns are optional.
+!> @ingroup Interface
 interface init
   module procedure Init_Scalar,Init_Array1D,Init_Array2D,Init_Array3D,Init_Array4D
 endinterface
@@ -80,6 +87,7 @@ endinterface
 !> call set(rs,rv,re,Ns,cons_4D)
 !> ... @endcode
 !> @note rs,rv,re,Ns are optional.
+!> @ingroup Interface
 interface set
   module procedure Set_Scalar,Set_Array1D,Set_Array2D,Set_Array3D,Set_Array4D
 endinterface
@@ -97,10 +105,12 @@ endinterface
 !> err = free(cons_3D)
 !> err = free(cons_4D)
 !> ... @endcode
+!> @ingroup Interface
 interface free
   module procedure Free_Scalar,Free_Array1D,Free_Array2D,Free_Array3D,Free_Array4D
 endinterface
 !> @brief Assignment operator (=) overloading.
+!> @ingroup Interface
 interface assignment (=)
   module procedure assign_cons
 #ifdef r16p
@@ -130,6 +140,7 @@ end interface
 !>         \f$ {\rm result\%rs = cons\%rs*scalar} \f$ \n
 !>         \f$ {\rm result\%rv = cons\%rv*scalar} \f$ \n
 !>         \f$ {\rm result\%re = cons\%re*scalar} \f$ \n
+!> @ingroup Interface
 interface operator (*)
   module procedure cons_mul_cons
 #ifdef r16p
@@ -163,6 +174,7 @@ endinterface
 !>         \f$ {\rm result\%rs = \frac{cons\%rs}{scalar}} \f$ \n
 !>         \f$ {\rm result\%rv = \frac{cons\%rv}{scalar}} \f$ \n
 !>         \f$ {\rm result\%re = \frac{cons\%re}{scalar}} \f$ \n
+!> @ingroup Interface
 interface operator (/)
   module procedure cons_div_cons
 #ifdef r16p
@@ -192,6 +204,7 @@ endinterface
 !>         \f$ {\rm result\%rs = cons\%rs+scalar} \f$ \n
 !>         \f$ {\rm result\%rv = cons\%rv+scalar} \f$ \n
 !>         \f$ {\rm result\%re = cons\%re+scalar} \f$ \n
+!> @ingroup Interface
 interface operator (+)
   module procedure positive_cons
   module procedure cons_sum_cons
@@ -231,6 +244,7 @@ endinterface
 !>         \f$ {\rm result\%rs = cons\%rs-scalar} \f$ \n
 !>         \f$ {\rm result\%rv = cons\%rv-scalar} \f$ \n
 !>         \f$ {\rm result\%re = cons\%re-scalar} \f$ \n
+!> @ingroup Interface
 interface operator (-)
   module procedure negative_cons
   module procedure cons_sub_cons
@@ -255,6 +269,8 @@ interface operator (-)
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @ingroup Data_Type_ConservativePrivateProcedure
+  !> @{
   !>Subroutine for initializing components of Type_Conservative (scalar) variable.
   pure subroutine Init_Scalar(rs,rv,re,Ns,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1928,6 +1944,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sub_ScalI1P
+  !> @}
 
   !>Function for converting derived type Type_Conservative to 1D array.
   !> @return \b array real(R_P), dimension(1:size(cons\%rs)+4) variable.

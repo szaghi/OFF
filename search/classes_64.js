@@ -10,8 +10,8 @@ var searchData=
   ['data_5ftype_5ftensor',['Data_Type_Tensor',['../d9/d2f/classData__Type__Tensor.html',1,'']]],
   ['data_5ftype_5ftime',['Data_Type_Time',['../dd/d0e/classData__Type__Time.html',1,'']]],
   ['data_5ftype_5fvector',['Data_Type_Vector',['../da/def/classData__Type__Vector.html',1,'']]],
-  ['degree',['degree',['../d7/d03/interfaceLib__Math_1_1degree.html',1,'Lib_Math']]],
-  ['delta1_5f2o',['delta1_2o',['../dc/dfc/interfaceLib__Math_1_1delta1__2o.html',1,'Lib_Math']]],
-  ['delta2_5f2o',['delta2_2o',['../dd/d3d/interfaceLib__Math_1_1delta2__2o.html',1,'Lib_Math']]],
-  ['digit',['digit',['../d6/d8b/interfaceLib__Math_1_1digit.html',1,'Lib_Math']]]
+  ['degree',['degree',['../dd/d55/group__Interface.html#d7/d03/interfaceLib__Math_1_1degree',1,'Lib_Math']]],
+  ['delta1_5f2o',['delta1_2o',['../dd/d55/group__Interface.html#dc/dfc/interfaceLib__Math_1_1delta1__2o',1,'Lib_Math']]],
+  ['delta2_5f2o',['delta2_2o',['../dd/d55/group__Interface.html#dd/d3d/interfaceLib__Math_1_1delta2__2o',1,'Lib_Math']]],
+  ['digit',['digit',['../dd/d55/group__Interface.html#d6/d8b/interfaceLib__Math_1_1digit',1,'Lib_Math']]]
 ];

@@ -35,7 +35,7 @@
    <div id="projectname">OFF
    
    </div>
-   
+   <div id="projectbrief">an Open source Finite volume Fluid dynamics code</div>
   </td>
   
   
@@ -53,10 +53,10 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="../../index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="../../pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="../../annotated.html"><span>Data&#160;Types&#160;List</span></a></li>
-      <li class="current"><a href="../../files.html"><span>Files</span></a></li>
+      <li><a href="../../modules.html"><span>API</span></a></li>
+      <li class="current"><a href="../../files.html"><span>Source&#160;Files</span></a></li>
       <li><a href="../../dirs.html"><span>Directories</span></a></li>
+      <li><a href="../../pages.html"><span>Todos&#160;and&#160;Bugs</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -78,7 +78,6 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="../../files.html"><span>File&#160;List</span></a></li>
-      <li><a href="../../globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
 </div>
@@ -112,8 +111,8 @@ Data Types</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived type containing blocks informations.  <a href="../../d3/dc5/IBM_8f90.html#d6/d27/structType__Blocks">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions/Subroutines</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">program&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc5/IBM_8f90.html#ab26dc33da06d747e4982826462b7d43a">IBM</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">IBM, Initial and Boundary conditions, Mesh generator for <em>OFF</em> (Open Finite volume Fluid dynamics code).  <a href="#ab26dc33da06d747e4982826462b7d43a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">program&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db0/group__Program.html#gab26dc33da06d747e4982826462b7d43a">IBM</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">IBM, Initial and Boundary conditions, Mesh generator for <em>OFF</em> (Open Finite volume Fluid dynamics code).  <a href="../../db/db0/group__Program.html#gab26dc33da06d747e4982826462b7d43a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc5/IBM_8f90.html#a280ae0605335cfa04ebdd73a1f5fff58">print_usage</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc5/IBM_8f90.html#a0d5dfeb25576596de486561ace2977e4">icg_init</a> (global)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">integer(I_P) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc5/IBM_8f90.html#acee70b226888901a5411193dbeddbdf8">load_option_file</a> (filename)</td></tr>
@@ -133,7 +132,7 @@ Functions/Subroutines</h2></td></tr>
 <div class="memdoc">
 <div class="textblock"><p>Derived type containing blocks informations. </p>
 
-<p>Definition at line <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00034">34</a> of file <a class="el" href="../../d3/dc5/IBM_8f90_source.html">IBM.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00035">35</a> of file <a class="el" href="../../d3/dc5/IBM_8f90_source.html">IBM.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -213,33 +212,6 @@ Blocks primitive variables. </td></tr>
 </div>
 </div>
 <!-- doxytag: class="Type_Blocks" --><hr/><h2>Function/Subroutine Documentation</h2>
-<a class="anchor" id="ab26dc33da06d747e4982826462b7d43a"></a><!-- doxytag: member="IBM.f90::IBM" ref="ab26dc33da06d747e4982826462b7d43a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">program <a class="el" href="../../d3/dc5/IBM_8f90.html#ab26dc33da06d747e4982826462b7d43a">IBM</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>IBM, Initial and Boundary conditions, Mesh generator for <em>OFF</em> (Open Finite volume Fluid dynamics code). </p>
-<p>This is an auxiliary tool useful for building proper inputs for <em>OFF</em> code. ICG can build Initial Conditions files, Mesh files and Boundary Conditions files. It accepts two kinds of inputs: <br/>
-</p>
-<ul>
-<li>Direct Blocks Description: this is the simplest available input. The initial and boundary descriptions as well as the geometry are directly described by means of simple ascii files. This kind of inputs can describe only simple Cartesian grids.</li>
-<li>Ansys (<a href="http://www.ansys.com">http://www.ansys.com</a>) IcemCFD Multiblock INFO importer: this is a more complex (but more flexible) input. The initial conditions are described by means of simple ascii files similar to the Direct Block Description input, but the boundary conditions and the geometry are loaded by Ansys IcemCFD Multiblock INFO files. These files can describe more complex scenario with general curvilinear grids. <dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000008">Todo:</a></b></dt><dd><b>DocImprove:</b> Improve the documentation </dd></dl>
-</li>
-</ul>
-
-<p>Definition at line <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00015">15</a> of file <a class="el" href="../../d3/dc5/IBM_8f90_source.html">IBM.f90</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="a280ae0605335cfa04ebdd73a1f5fff58"></a><!-- doxytag: member="IBM.f90::print_usage" ref="a280ae0605335cfa04ebdd73a1f5fff58" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -254,9 +226,9 @@ Blocks primitive variables. </td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00185">185</a> of file <a class="el" href="../../d3/dc5/IBM_8f90_source.html">IBM.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00186">186</a> of file <a class="el" href="../../d3/dc5/IBM_8f90_source.html">IBM.f90</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00204">icg_init()</a>, and <a class="el" href="../../d9/de8/POG_8f90_source.html#l00140">parsing_command_line()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00205">icg_init()</a>, and <a class="el" href="../../d9/de8/POG_8f90_source.html#l00141">parsing_command_line()</a>.</p>
 
 <p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="../../closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -265,7 +237,7 @@ Blocks primitive variables. </td></tr>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d3/dc5/IBM_8f90_a280ae0605335cfa04ebdd73a1f5fff58_icgraph.png" border="0" usemap="#d3/dc5/IBM_8f90_a280ae0605335cfa04ebdd73a1f5fff58_icgraph" alt=""/></div>
 <map name="d3/dc5/IBM_8f90_a280ae0605335cfa04ebdd73a1f5fff58_icgraph" id="d3/dc5/IBM_8f90_a280ae0605335cfa04ebdd73a1f5fff58_icgraph">
-<area shape="rect" id="node3" href="../../d3/dc5/IBM_8f90.html#a0d5dfeb25576596de486561ace2977e4" title="icg_init" alt="" coords="191,5,252,35"/><area shape="rect" id="node5" href="../../d9/de8/POG_8f90.html#a7ebd416423870c5644b7bab1fc18fdc6" title="parsing_command_line" alt="" coords="144,59,299,88"/><area shape="rect" id="node7" href="../../d9/de8/POG_8f90.html#a5025084443394bb3b6df20e67d964d9a" title="POG, Post&#45;processor Output Generator for OFF (Open Finite volume Fluid dynamics code)." alt="" coords="347,59,397,88"/></map>
+<area shape="rect" id="node3" href="../../d3/dc5/IBM_8f90.html#a0d5dfeb25576596de486561ace2977e4" title="icg_init" alt="" coords="191,5,252,35"/><area shape="rect" id="node5" href="../../d9/de8/POG_8f90.html#a7ebd416423870c5644b7bab1fc18fdc6" title="parsing_command_line" alt="" coords="144,59,299,88"/><area shape="rect" id="node7" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a" title="POG, Post&#45;processor Output Generator for OFF (Open Finite volume Fluid dynamics code)." alt="" coords="347,59,397,88"/></map>
 </div>
 </p>
 
@@ -286,9 +258,9 @@ Blocks primitive variables. </td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00204">204</a> of file <a class="el" href="../../d3/dc5/IBM_8f90_source.html">IBM.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00205">205</a> of file <a class="el" href="../../d3/dc5/IBM_8f90_source.html">IBM.f90</a>.</p>
 
-<p>References <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00254">load_option_file()</a>, and <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00185">print_usage()</a>.</p>
+<p>References <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00255">load_option_file()</a>, and <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00186">print_usage()</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -308,7 +280,7 @@ Blocks primitive variables. </td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">integer(I_P) function <a class="el" href="../../da/da9/OFF_8f90.html#a3daf36aed92a0d6e27be28c9efa9d91a">IBM::load_option_file</a> </td>
+          <td class="memname">integer(I_P) function <a class="el" href="../../d3/dc5/IBM_8f90.html#acee70b226888901a5411193dbeddbdf8">IBM::load_option_file</a> </td>
           <td>(</td>
           <td class="paramtype">character(*), intent(in)&#160;</td>
           <td class="paramname"><em>filename</em></td><td>)</td>
@@ -318,9 +290,9 @@ Blocks primitive variables. </td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00254">254</a> of file <a class="el" href="../../d3/dc5/IBM_8f90_source.html">IBM.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00255">255</a> of file <a class="el" href="../../d3/dc5/IBM_8f90_source.html">IBM.f90</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00204">icg_init()</a>, and <a class="el" href="../../da/da9/OFF_8f90_source.html#l00172">off_init()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00205">icg_init()</a>.</p>
 
 <p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-2-trigger" src="../../closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -329,7 +301,7 @@ Blocks primitive variables. </td></tr>
 <div id="dynsection-2-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d3/dc5/IBM_8f90_acee70b226888901a5411193dbeddbdf8_icgraph.png" border="0" usemap="#d3/dc5/IBM_8f90_acee70b226888901a5411193dbeddbdf8_icgraph" alt=""/></div>
 <map name="d3/dc5/IBM_8f90_acee70b226888901a5411193dbeddbdf8_icgraph" id="d3/dc5/IBM_8f90_acee70b226888901a5411193dbeddbdf8_icgraph">
-<area shape="rect" id="node3" href="../../d3/dc5/IBM_8f90.html#a0d5dfeb25576596de486561ace2977e4" title="icg_init" alt="" coords="167,5,228,35"/><area shape="rect" id="node5" href="../../da/da9/OFF_8f90.html#a5aad3b5da532f1f31fb623516f150605" title="Subroutine for initializing the simulation according to the input options." alt="" coords="167,59,228,88"/><area shape="rect" id="node7" href="../../da/da9/OFF_8f90.html#a2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volume Fluid dynamics code." alt="" coords="277,59,325,88"/></map>
+<area shape="rect" id="node3" href="../../d3/dc5/IBM_8f90.html#a0d5dfeb25576596de486561ace2977e4" title="icg_init" alt="" coords="167,5,228,35"/></map>
 </div>
 </p>
 
@@ -350,7 +322,7 @@ Blocks primitive variables. </td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00311">311</a> of file <a class="el" href="../../d3/dc5/IBM_8f90_source.html">IBM.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00312">312</a> of file <a class="el" href="../../d3/dc5/IBM_8f90_source.html">IBM.f90</a>.</p>
 
 </div>
 </div>
@@ -379,7 +351,7 @@ Blocks primitive variables. </td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00736">736</a> of file <a class="el" href="../../d3/dc5/IBM_8f90_source.html">IBM.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dc5/IBM_8f90_source.html#l00737">737</a> of file <a class="el" href="../../d3/dc5/IBM_8f90_source.html">IBM.f90</a>.</p>
 
 </div>
 </div>
@@ -403,7 +375,7 @@ Blocks primitive variables. </td></tr>
     <ul>
       <li class="navelem"><a class="el" href="../../d3/dc5/IBM_8f90.html">IBM.f90</a>      </li>
 
-    <li class="footer">Generated on Fri May 4 2012 15:29:28 for OFF by
+    <li class="footer">Generated on Wed May 9 2012 13:19:23 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

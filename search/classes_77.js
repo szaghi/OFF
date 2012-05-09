@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['write',['write',['../dd/d85/interfaceData__Type__BC_1_1write.html',1,'Data_Type_BC']]],
+  ['write',['write',['../dd/d55/group__Interface.html#dd/d85/interfaceData__Type__BC_1_1write',1,'Data_Type_BC']]],
   ['write',['write',['../d7/d47/interfaceData__Type__Vector_1_1write.html',1,'Data_Type_Vector']]],
   ['write',['write',['../d5/d4d/interfaceData__Type__Tensor_1_1write.html',1,'Data_Type_Tensor']]],
   ['write',['write',['../dd/db2/interfaceData__Type__Probe_1_1write.html',1,'Data_Type_Probe']]],

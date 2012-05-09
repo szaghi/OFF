@@ -1,5 +1,3 @@
 <map id="G" name="G">
 <area shape="rect" id="node3" href="$d3/dc5/IBM_8f90.html#a0d5dfeb25576596de486561ace2977e4" title="icg_init" alt="" coords="167,5,228,35"/>
-<area shape="rect" id="node5" href="$da/da9/OFF_8f90.html#a5aad3b5da532f1f31fb623516f150605" title="Subroutine for initializing the simulation according to the input options." alt="" coords="167,59,228,88"/>
-<area shape="rect" id="node7" href="$da/da9/OFF_8f90.html#a2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volume Fluid dynamics code." alt="" coords="277,59,325,88"/>
 </map>

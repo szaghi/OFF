@@ -35,7 +35,7 @@
    <div id="projectname">OFF
    
    </div>
-   
+   <div id="projectbrief">an Open source Finite volume Fluid dynamics code</div>
   </td>
   
   
@@ -54,8 +54,8 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
     <ul class="tablist">
       <li><a href="../../index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="../../pages.html"><span>Related&#160;Pages</span></a></li>
-      <li class="current"><a href="../../annotated.html"><span>Data&#160;Types&#160;List</span></a></li>
-      <li><a href="../../files.html"><span>Files</span></a></li>
+      <li><a href="../../modules.html"><span>API</span></a></li>
+      <li><a href="../../files.html"><span>Source&#160;Files</span></a></li>
       <li><a href="../../dirs.html"><span>Directories</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -121,12 +121,12 @@ Private Member Functions</h2></td></tr>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Division operator (/) overloading. </p>
 <dl class="note"><dt><b>Note:</b></dt><dd>The admissible divisions are:<ul>
-<li><a class="el" href="../../d7/d2e/classData__Type__Conservative.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative" title="Derived type containing conservative variables.">Type_Conservative</a> / <a class="el" href="../../d7/d2e/classData__Type__Conservative.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative" title="Derived type containing conservative variables.">Type_Conservative</a>: each component of first conservative variable (cons1) is divided for the corresponding component of the second one (cons2): i.e. <br/>
+<li><a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative" title="Derived type containing conservative variables.">Type_Conservative</a> / <a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative" title="Derived type containing conservative variables.">Type_Conservative</a>: each component of first conservative variable (cons1) is divided for the corresponding component of the second one (cons2): i.e. <br/>
  <img class="formulaInl" alt="$ {\rm result\%rs = \frac{cons1\%rs}{cons2\%rs}} $" src="../../form_6.png"/> <br/>
  <img class="formulaInl" alt="$ {\rm result\%rv = \frac{cons1\%rv}{cons2\%rv}} $" src="../../form_7.png"/> <br/>
  <img class="formulaInl" alt="$ {\rm result\%re = \frac{cons1\%re}{cons2\%re}} $" src="../../form_8.png"/> <br/>
 </li>
-<li><a class="el" href="../../d7/d2e/classData__Type__Conservative.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative" title="Derived type containing conservative variables.">Type_Conservative</a> / scalar number (real or integer of any kinds defined in <a class="el" href="../../d7/dc8/classIR__Precision.html" title="Module IR_Precision makes available some portable kind-parameters and some useful procedures to deal ...">IR_Precision</a> module): each component of <a class="el" href="../../d7/d2e/classData__Type__Conservative.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative" title="Derived type containing conservative variables.">Type_Conservative</a> is divided for the scalar, i.e. <br/>
+<li><a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative" title="Derived type containing conservative variables.">Type_Conservative</a> / scalar number (real or integer of any kinds defined in <a class="el" href="../../d7/dc8/classIR__Precision.html" title="Module IR_Precision makes available some portable kind-parameters and some useful procedures to deal ...">IR_Precision</a> module): each component of <a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative" title="Derived type containing conservative variables.">Type_Conservative</a> is divided for the scalar, i.e. <br/>
  <img class="formulaInl" alt="$ {\rm result\%rs = \frac{cons\%rs}{scalar}} $" src="../../form_9.png"/> <br/>
  <img class="formulaInl" alt="$ {\rm result\%rv = \frac{cons\%rv}{scalar}} $" src="../../form_10.png"/> <br/>
  <img class="formulaInl" alt="$ {\rm result\%re = \frac{cons\%re}{scalar}} $" src="../../form_11.png"/> <br/>
@@ -134,7 +134,7 @@ Private Member Functions</h2></td></tr>
 </ul>
 </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l00170">170</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l00171">171</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
 </div><hr/><h2>Member Function/Subroutine Documentation</h2>
 <a class="anchor" id="ae2feb8f4027715f2975f2371b788c401"></a><!-- doxytag: member="Data_Type_Conservative::operator(/)::cons_div_cons" ref="ae2feb8f4027715f2975f2371b788c401" args="(cons1, cons2)" -->
 <div class="memitem">
@@ -143,13 +143,13 @@ Private Member Functions</h2></td></tr>
         <tr>
           <td class="memname">elemental function Data_Type_Conservative::operator(/)::<a class="el" href="../../d9/dd6/interfaceData__Type__Conservative_1_1operator_07_2_08.html#ae2feb8f4027715f2975f2371b788c401">cons_div_cons</a> </td>
           <td>(</td>
-          <td class="paramtype">type(<a class="el" href="../../d7/d2e/classData__Type__Conservative.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
           <td class="paramname"><em>cons1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">type(<a class="el" href="../../d7/d2e/classData__Type__Conservative.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
           <td class="paramname"><em>cons2</em>&#160;</td>
         </tr>
         <tr>
@@ -161,7 +161,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01029">1029</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01030">1030</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
 
 </div>
 </div>
@@ -172,7 +172,7 @@ Private Member Functions</h2></td></tr>
         <tr>
           <td class="memname">elemental function Data_Type_Conservative::operator(/)::<a class="el" href="../../d9/dd6/interfaceData__Type__Conservative_1_1operator_07_2_08.html#abbfd5d9af67192c65b38c94203285db6">cons_div_ScalR8P</a> </td>
           <td>(</td>
-          <td class="paramtype">type(<a class="el" href="../../d7/d2e/classData__Type__Conservative.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
           <td class="paramname"><em>cons</em>, </td>
         </tr>
         <tr>
@@ -190,7 +190,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01052">1052</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01053">1053</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
 
 </div>
 </div>
@@ -201,7 +201,7 @@ Private Member Functions</h2></td></tr>
         <tr>
           <td class="memname">elemental function Data_Type_Conservative::operator(/)::<a class="el" href="../../d9/dd6/interfaceData__Type__Conservative_1_1operator_07_2_08.html#adcca6e740398f8b145c956265241dd1e">cons_div_ScalR4P</a> </td>
           <td>(</td>
-          <td class="paramtype">type(<a class="el" href="../../d7/d2e/classData__Type__Conservative.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
           <td class="paramname"><em>cons</em>, </td>
         </tr>
         <tr>
@@ -219,7 +219,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01073">1073</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01074">1074</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
 
 </div>
 </div>
@@ -230,7 +230,7 @@ Private Member Functions</h2></td></tr>
         <tr>
           <td class="memname">elemental function Data_Type_Conservative::operator(/)::<a class="el" href="../../d9/dd6/interfaceData__Type__Conservative_1_1operator_07_2_08.html#a3bda026d6c5a886e01ca40c935343a2e">cons_div_ScalI8P</a> </td>
           <td>(</td>
-          <td class="paramtype">type(<a class="el" href="../../d7/d2e/classData__Type__Conservative.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
           <td class="paramname"><em>cons</em>, </td>
         </tr>
         <tr>
@@ -248,7 +248,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01094">1094</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01095">1095</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
 
 </div>
 </div>
@@ -259,7 +259,7 @@ Private Member Functions</h2></td></tr>
         <tr>
           <td class="memname">elemental function Data_Type_Conservative::operator(/)::<a class="el" href="../../d9/dd6/interfaceData__Type__Conservative_1_1operator_07_2_08.html#a4da3127ffb5719fb1985a8846bb6c9cd">cons_div_ScalI4P</a> </td>
           <td>(</td>
-          <td class="paramtype">type(<a class="el" href="../../d7/d2e/classData__Type__Conservative.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
           <td class="paramname"><em>cons</em>, </td>
         </tr>
         <tr>
@@ -277,7 +277,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01115">1115</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01116">1116</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
 
 </div>
 </div>
@@ -288,7 +288,7 @@ Private Member Functions</h2></td></tr>
         <tr>
           <td class="memname">elemental function Data_Type_Conservative::operator(/)::<a class="el" href="../../d9/dd6/interfaceData__Type__Conservative_1_1operator_07_2_08.html#a9437d8446d7c4c80c65281c72bc34d90">cons_div_ScalI2P</a> </td>
           <td>(</td>
-          <td class="paramtype">type(<a class="el" href="../../d7/d2e/classData__Type__Conservative.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
           <td class="paramname"><em>cons</em>, </td>
         </tr>
         <tr>
@@ -306,7 +306,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01136">1136</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01137">1137</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
 
 </div>
 </div>
@@ -317,7 +317,7 @@ Private Member Functions</h2></td></tr>
         <tr>
           <td class="memname">elemental function Data_Type_Conservative::operator(/)::<a class="el" href="../../d9/dd6/interfaceData__Type__Conservative_1_1operator_07_2_08.html#a6bac8c10d81e4066c39c7c204afe138d">cons_div_ScalI1P</a> </td>
           <td>(</td>
-          <td class="paramtype">type(<a class="el" href="../../d7/d2e/classData__Type__Conservative.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a>), intent(in)&#160;</td>
           <td class="paramname"><em>cons</em>, </td>
         </tr>
         <tr>
@@ -335,7 +335,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01157">1157</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l01158">1158</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
 
 </div>
 </div>
@@ -363,7 +363,7 @@ Private Member Functions</h2></td></tr>
       <li class="navelem"><a class="el" href="../../d7/d2e/classData__Type__Conservative.html">Data_Type_Conservative</a>      </li>
       <li class="navelem"><a class="el" href="../../d9/dd6/interfaceData__Type__Conservative_1_1operator_07_2_08.html">operator(/)</a>      </li>
 
-    <li class="footer">Generated on Fri May 4 2012 15:29:28 for OFF by
+    <li class="footer">Generated on Wed May 9 2012 10:50:28 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

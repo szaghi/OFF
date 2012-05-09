@@ -1,7 +1,13 @@
 var classData__Type__Time =
 [
-    [ "Days", "dd/d0e/classData__Type__Time.html#a11f29ce1213efdf8a31e621862ecdedd", null ],
-    [ "Hours", "dd/d0e/classData__Type__Time.html#a131a404e733d2d03ffb9743c7c9cf797", null ],
-    [ "Minutes", "dd/d0e/classData__Type__Time.html#a15c727954e41ef14b8cf891b9b10f207", null ],
-    [ "Seconds", "dd/d0e/classData__Type__Time.html#a28b84a68e96e2ced667616adf5410bf2", null ]
+    [ "not_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga51d7e6aef45d1a6e74ce8275ca627ca7", null ],
+    [ "low", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga2d830605f98a77388e43487bd971342f", null ],
+    [ "low_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga37d2ca06f8b73bc0548a9dea6e9c52c9", null ],
+    [ "eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga624e63b0a5ace21dc86841c191e8913e", null ],
+    [ "great_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga56e9ee3f31a2288cb6b0bf7b762ba37b", null ],
+    [ "great", "db/d28/group__Data__Type__TimePrivateProcedure.html#gaebf1eaf93fd962f05e934eb90bcff8eb", null ],
+    [ "Get_Date_String", "dd/d0e/classData__Type__Time.html#a9519e07de1e824a495921ecc964542ca", null ],
+    [ "Seconds_To_Time", "dd/d0e/classData__Type__Time.html#ae610e70e666992cae88feb4ebe2ed674", null ],
+    [ "Crono", "dd/d0e/classData__Type__Time.html#a6dbd2fe5a735781736860fbdfdab1f60", null ],
+    [ "instant0", "dd/d0e/classData__Type__Time.html#a8ea936238de43caee769675cf3f79717", null ]
 ];

@@ -1,7 +1,8 @@
 var classData__Type__Probe =
 [
-    [ "b", "df/d77/classData__Type__Probe.html#ab2808cce4b998ad76168bebd24fc82a9", null ],
-    [ "i", "df/d77/classData__Type__Probe.html#a4e4ea992f0d86cbfd7df302395fc5a5a", null ],
-    [ "j", "df/d77/classData__Type__Probe.html#ac93b3d96cfb0de5f26c06d7c4bb9b775", null ],
-    [ "k", "df/d77/classData__Type__Probe.html#a20ecb56c4ae32c696a67e9661034d715", null ]
+    [ "set", "df/d77/classData__Type__Probe.html#a3a92d2410554a056ea30bfae28ec6f1c", null ],
+    [ "Write_Bin", "d5/d9b/group__Data__Type__ProbePrivateProcedure.html#ga28b1d99cfa4b4787632946341a9fa61a", null ],
+    [ "Write_Ascii", "d5/d9b/group__Data__Type__ProbePrivateProcedure.html#ga5aba14398777f26eac82fc0624402c80", null ],
+    [ "Read_Bin", "d5/d9b/group__Data__Type__ProbePrivateProcedure.html#ga348c9a4f60ef4112b2f8ff72f315a884", null ],
+    [ "Read_Ascii", "d5/d9b/group__Data__Type__ProbePrivateProcedure.html#ga8b8973e8a3a827575c3b077ba8659b19", null ]
 ];

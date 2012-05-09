@@ -1,3 +1,8 @@
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Data_Type_ConservativePublicProcedure Data_Type_Conservative
+!> @}
+
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup Data_Type_ConservativePrivateProcedure Data_Type_Conservative
@@ -65,7 +70,7 @@ endtype Type_Conservative
 !> call init(rs,rv,re,Ns,cons_4D)
 !> ... @endcode
 !> @note rs,rv,re,Ns are optional.
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_ConservativePublicProcedure
 interface init
   module procedure Init_Scalar,Init_Array1D,Init_Array2D,Init_Array3D,Init_Array4D
 endinterface
@@ -87,7 +92,7 @@ endinterface
 !> call set(rs,rv,re,Ns,cons_4D)
 !> ... @endcode
 !> @note rs,rv,re,Ns are optional.
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_ConservativePublicProcedure
 interface set
   module procedure Set_Scalar,Set_Array1D,Set_Array2D,Set_Array3D,Set_Array4D
 endinterface
@@ -105,7 +110,7 @@ endinterface
 !> err = free(cons_3D)
 !> err = free(cons_4D)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_ConservativePublicProcedure
 interface free
   module procedure Free_Scalar,Free_Array1D,Free_Array2D,Free_Array3D,Free_Array4D
 endinterface
@@ -1946,6 +1951,8 @@ contains
   endfunction cons_sub_ScalI1P
   !> @}
 
+  !> @ingroup Data_Type_ConservativePublicProcedure
+  !> @{
   !>Function for converting derived type Type_Conservative to 1D array.
   !> @return \b array real(R_P), dimension(1:size(cons\%rs)+4) variable.
   pure function cons2array(cons) result(array)
@@ -1988,4 +1995,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction array2cons
+  !> @}
 endmodule Data_Type_Conservative

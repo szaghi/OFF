@@ -3,6 +3,11 @@
 !> @defgroup Data_Type_Cell Data_Type_Cell
 !> @}
 
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Data_Type_CellPublicProcedure Data_Type_Cell
+!> @}
+
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup Data_Type_CellPrivateProcedure Data_Type_Cell
@@ -89,7 +94,7 @@ endtype Type_Cell
 !> err = write(unit,cell_2D)
 !> err = write(unit,cell_3D)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_CellPublicProcedure
 interface write
   module procedure Write_Bin_Scalar, Write_Ascii_Scalar
   module procedure Write_Bin_Array1D,Write_Ascii_Array1D
@@ -115,7 +120,7 @@ endinterface
 !> err = read(unit,cell_2D)
 !> err = read(unit,cell_3D)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_CellPublicProcedure
 interface read
   module procedure Read_Bin_Scalar, Read_Ascii_Scalar
   module procedure Read_Bin_Array1D,Read_Ascii_Array1D
@@ -124,6 +129,8 @@ interface read
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @ingroup Data_Type_CellPublicProcedure
+  !> @{
   !>Function for initializing Type_Cell variable.
   !> @return \b cell Type_Cell variable.
   elemental function init(id,oc) result(cell)
@@ -173,6 +180,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine get
+  !> @}
 
   !> @ingroup Data_Type_CellPrivateProcedure
   !> @{
@@ -515,6 +523,8 @@ contains
   endfunction Read_Ascii_Array3D
   !> @}
 
+  !> @ingroup Data_Type_CellPublicProcedure
+  !> @{
   !> Function for getting integer id from the corresponding string id.
   !> @return \b id integer(I1P) variable.
   function get_cell_id(id_str) result(id)
@@ -568,4 +578,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction get_cell_id_str
+  !> @}
 endmodule Data_Type_Cell

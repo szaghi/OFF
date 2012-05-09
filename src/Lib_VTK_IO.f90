@@ -1,3 +1,31 @@
+!> @addtogroup GlobalVarPar Global Variables and Parameters
+!> List of global variables and parameters.
+!> @addtogroup PrivateVarPar Private Variables and Parameters
+!> List of private variables and parameters.
+!> @addtogroup Interface Interfaces
+!> List of explicitly defined interface.
+!> @addtogroup Library Modules Libraries
+!> List of modules containing libraries of procedures.
+!> @addtogroup PublicProcedure Public Procedures
+!> List of public procedures.
+!> @addtogroup PrivateProcedure Private Procedures
+!> List of private procedures.
+
+!> @ingroup PrivateVarPar
+!> @{
+!> @defgroup Lib_VTK_IOPrivateVarPar Lib_VTK_IO
+!> @}
+
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Lib_VTK_IOPublicProcedure Lib_VTK_IO
+!> @}
+
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Lib_VTK_IOPrivateProcedure Lib_VTK_IO
+!> @}
+
 !> @brief   This is a library of functions for Input and Output pure Fortran data in VTK format.
 !> @details It is useful for Paraview visualization tool. Even though there are many wrappers/porting of the VTK source
 !>          code (C++ code), there is not a Fortran one. This library is not a porting or a wrapper of the VTK code,
@@ -170,7 +198,7 @@ public:: VTM_END_XML
 !> ...
 !> E_IO=VTK_GEO(NN,X,Y,Z)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Lib_VTK_IOPublicProcedure
 interface VTK_GEO
   module procedure VTK_GEO_UNST_R8, & ! real(R8P) UNSTRUCTURED_GRID
                    VTK_GEO_UNST_R4, & ! real(R4P) UNSTRUCTURED_GRID
@@ -203,7 +231,7 @@ endinterface
 !> ...
 !> E_IO=VTK_VAR('vect',NN,'Vec',varX,varY,varZ)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Lib_VTK_IOPublicProcedure
 interface VTK_VAR
   module procedure VTK_VAR_SCAL_R8, & ! real(R8P)    scalar
                    VTK_VAR_SCAL_R4, & ! real(R4P)    scalar
@@ -249,7 +277,7 @@ endinterface
 !> @code ...
 !> E_IO=VTK_GEO_XML()
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Lib_VTK_IOPublicProcedure
 interface VTK_GEO_XML
   module procedure VTK_GEO_XML_STRG_R4, & ! real(R4P) StructuredGrid
                    VTK_GEO_XML_STRG_R8, & ! real(R8P) StructuredGrid
@@ -279,7 +307,7 @@ endinterface
 !> ...
 !> E_IO=VTK_VAR_XML(NN,'Vec',varX,varY,varZ)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Lib_VTK_IOPublicProcedure
 interface VTK_VAR_XML
   module procedure VTK_VAR_XML_SCAL_R8, & ! real(R8P)    scalar
                    VTK_VAR_XML_SCAL_R4, & ! real(R4P)    scalar
@@ -303,8 +331,10 @@ endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-! @libvtk uses a small set of internal variables that are private (not accessible from the outside). The following are
+! The library uses a small set of internal variables that are private (not accessible from the outside). The following are
 ! private variables:
+!> @ingroup Lib_VTK_IOPrivateVarPar
+!> @{
 integer(I4P), parameter:: maxlen       = 500         !< Max number of characters of static string.
 character(1), parameter:: end_rec      = char(10)    !< End-character for binary-record finalize.
 integer(I4P), parameter:: f_out_ascii  = 0           !< Ascii-output-format parameter identifier.
@@ -325,11 +355,14 @@ integer(I4P)::            indent                     !< Indent pointer.
 integer(I4P)::            Unit_VTM                   !< Internal logical unit.
 integer(I4P)::            blk                        !< Block index.
 integer(I4P)::            vtm_indent                 !< Indent pointer.
+!> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  ! @libvtk uses two auxiliary functions that are not connected with the VTK standard. These functions are private and so they
+  ! The library uses two auxiliary functions that are not connected with the VTK standard. These functions are private and so they
   ! cannot be called outside the library.
 
+  !> @ingroup Lib_VTK_IOPrivateProcedure
+  !> @{
   !> @brief Function for getting a free logic unit. The users of @libvtk does not know which is the logical
   !>        unit: @libvtk uses this information without boring the users. The logical unit used is safe-free: if the program
   !>        calling @libvtk has others logical units used @libvtk will never use these units, but will choice one that is free.
@@ -387,6 +420,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Upper_Case
+  !> @}
 
   !> @brief Function for initializing VTK-legacy file.
   !> @remark This function must be the first to be called.
@@ -395,6 +429,7 @@ contains
   !> E_IO=VTK_INI('Binary','example.vtk','VTK legacy file','UNSTRUCTURED_GRID')
   !> ... @endcode
   !> @return E_IO: integer(I4P) error flag
+  !> @ingroup Lib_VTK_IOPublicProcedure
   function VTK_INI(output_format,filename,title,mesh_topology) result(E_IO)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -440,6 +475,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction VTK_INI
 
+  !> @ingroup Lib_VTK_IOPrivateProcedure
+  !> @{
   !> Function for saving mesh with \b STRUCTURED_POINTS topology (R8P).
   !> @return E_IO: integer(I4P) error flag
   function VTK_GEO_STRP_R8(Nx,Ny,Nz,X0,Y0,Z0,Dx,Dy,Dz) result(E_IO)
@@ -731,6 +768,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction VTK_GEO_UNST_R4
+  !> @}
 
   !> Function that \b must be used when unstructured grid is used, it saves the connectivity of the unstructured gird.
   !> @note The vector \b connect must follow the VTK-legacy standard. It is passed as \em assumed-shape array
@@ -770,6 +808,7 @@ contains
   !> second cell \n
   !> cell_type(2) = 14 pyramid type of \f$2^\circ\f$ cell \n
   !> @return E_IO: integer(I4P) error flag
+  !> @ingroup Lib_VTK_IOPublicProcedure
   function VTK_CON(NC,connect,cell_type) result(E_IO)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -817,6 +856,7 @@ contains
   !> E_IO=VTK_DAT(50,'cell')
   !> ... @endcode
   !> @return E_IO: integer(I4P) error flag
+  !> @ingroup Lib_VTK_IOPublicProcedure
   function VTK_DAT(NC_NN,var_location) result(E_IO)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -849,6 +889,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction VTK_DAT
 
+  !> @ingroup Lib_VTK_IOPrivateProcedure
+  !> @{
   !> Function for saving field of scalar variable (R8P).
   !> @return E_IO: integer(I4P) error flag
   function VTK_VAR_SCAL_R8(NC_NN,varname,var) result(E_IO)
@@ -1101,6 +1143,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction VTK_VAR_TEXT_R4
+  !> @}
 
   !>Function for finalizing open file,  it has not inputs, @libvtk manages the file unit without the
   !>user's action.
@@ -1109,6 +1152,7 @@ contains
   !> E_IO=VTK_END()
   !> ... @endcode
   !> @return E_IO: integer(I4P) error flag
+  !> @ingroup Lib_VTK_IOPublicProcedure
   function VTK_END() result(E_IO)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -1137,6 +1181,7 @@ contains
   !> Note that the file extension is necessary in the file name. The XML standard has different extensions for each
   !> different topologies (e.g. \em vtr for rectilinear topology). See the VTK-standard file for more information.
   !> @return E_IO: integer(I4P) error flag
+  !> @ingroup Lib_VTK_IOPublicProcedure
   function VTK_INI_XML(output_format,filename,mesh_topology,nx1,nx2,ny1,ny2,nz1,nz2) result(E_IO)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -1230,6 +1275,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction VTK_INI_XML
 
+  !> @ingroup Lib_VTK_IOPrivateProcedure
+  !> @{
   !> Function for saving mesh with \b StructuredGrid topology (R8P).
   !> @return E_IO: integer(I4P) error flag
   function VTK_GEO_XML_STRG_R8(nx1,nx2,ny1,ny2,nz1,nz2,NN,X,Y,Z) result(E_IO)
@@ -1643,6 +1690,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction VTK_GEO_XML_CLOSEP
+  !> @}
 
   !> Function that \b must be used when unstructured grid is used, it saves the connectivity of the unstructured gird.
   !> @note The vector \b connect must follow the VTK-legacy standard. It is passed as \em assumed-shape array
@@ -1686,6 +1734,7 @@ contains
   !> second cell \n
   !> cell_type(2) = 14 pyramid type of \f$2^\circ\f$ cell \n
   !> @return E_IO: integer(I4P) error flag
+  !> @ingroup Lib_VTK_IOPublicProcedure
   function VTK_CON_XML(NC,connect,offset,cell_type) result(E_IO)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -1767,6 +1816,7 @@ contains
   !> E_IO=VTK_DAT_XML('node','CLOSE')
   !> ... @endcode
   !> @return E_IO: integer(I4P) error flag
+  !> @ingroup Lib_VTK_IOPublicProcedure
   function VTK_DAT_XML(var_location,var_block_action) result(E_IO)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -1824,6 +1874,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction VTK_DAT_XML
 
+  !> @ingroup Lib_VTK_IOPrivateProcedure
+  !> @{
   !> Function for saving field of scalar variable (R8P).
   !> @return E_IO: integer(I4P) error flag
   function VTK_VAR_XML_SCAL_R8(NC_NN,varname,var) result(E_IO)
@@ -2585,6 +2637,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction VTK_VAR_XML_LIST_I1
+  !> @}
 
   !> This function is used to finalize the file opened and it has not inputs, @libvtk manages the file unit without the
   !> user's action.
@@ -2593,6 +2646,7 @@ contains
   !> E_IO=VTK_END_XML()
   !> ... @endcode
   !> @return E_IO: integer(I4P) error flag
+  !> @ingroup Lib_VTK_IOPublicProcedure
   function VTK_END_XML() result(E_IO)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -2676,6 +2730,7 @@ contains
 
   !> The VTK_VTM_XML function is used for initializing a VTM (VTK Multiblocks) XML file that is a wrapper to a set of VTK-XML files.
   !> @return E_IO: integer(I4P) error flag
+  !> @ingroup Lib_VTK_IOPublicProcedure
   function VTM_INI_XML(filename) result(E_IO)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -2705,6 +2760,7 @@ contains
 
   !> The VTM_BLK_XML function is used for opening or closing a block level of a VTM file.
   !> @return E_IO: integer(I4P) error flag
+  !> @ingroup Lib_VTK_IOPublicProcedure
   function VTM_BLK_XML(block_action) result(E_IO)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -2728,6 +2784,7 @@ contains
 
   !> The VTM_WRF_XML function is used for saving the list of VTK-XML wrapped files by the actual block of the mutliblock VTM file.
   !> @return E_IO: integer(I4P) error flag
+  !> @ingroup Lib_VTK_IOPublicProcedure
   function VTM_WRF_XML(wrf_dir,vtk_xml_file_list) result(E_IO)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -2760,6 +2817,7 @@ contains
   !> Function for finalizing open file, it has not inputs, @libvtk manages the file unit without the
   !> user's action.
   !> @return E_IO: integer(I4P) error flag
+  !> @ingroup Lib_VTK_IOPublicProcedure
   function VTM_END_XML() result(E_IO)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none

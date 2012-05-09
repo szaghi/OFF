@@ -3,6 +3,11 @@
 !> @defgroup Data_Type_Vector Data_Type_Vector
 !> @}
 
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Data_Type_VectorPublicProcedure Data_Type_Vector
+!> @}
+
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup Data_Type_VectorPrivateProcedure Data_Type_Vector
@@ -90,7 +95,7 @@ type(Type_Vector), parameter:: ez = Type_Vector(0._R_P,0._R_P,1._R_P) !< Z direc
 !> err = write(unit,vec_2D)
 !> err = write(unit,vec_3D)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_VectorPublicProcedure
 interface write
   module procedure Write_Bin_Scalar, Write_Ascii_Scalar
   module procedure Write_Bin_Array1D,Write_Ascii_Array1D
@@ -116,7 +121,7 @@ endinterface
 !> err = read(unit,vec_2D)
 !> err = read(unit,vec_3D)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_VectorPublicProcedure
 interface read
   module procedure Read_Bin_Scalar, Read_Ascii_Scalar
   module procedure Read_Bin_Array1D,Read_Ascii_Array1D
@@ -400,6 +405,8 @@ interface operator (.ortho.)
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @ingroup Data_Type_VectorPublicProcedure
+  !> @{
   !> Subroutine for setting components of Type_Vector variable.
   elemental subroutine set(x,y,z,vec)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -436,17 +443,13 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine get
 
-  ! write
+  !> Function that write to unit the components of vec with a "pretty" format.
   function pprint(vec,unit) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function that write to unit the components of vec with a "pretty" format.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec  ! Vector.
-  integer(I_P),      intent(IN):: unit ! Logic unit.
-  integer(I_P)::                  err  ! Error trapping flag: 0 no errors, >0 error occurs.
+  type(Type_Vector), intent(IN):: vec  !< Vector.
+  integer(I_P),      intent(IN):: unit !< Logic unit.
+  integer(I_P)::                  err  !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -456,6 +459,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction pprint
+  !> @}
 
   !> @ingroup Data_Type_VectorPrivateProcedure
   !> @{
@@ -3739,76 +3743,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction dotproduct
-  !> @}
-
-  ! sq_norm
-  elemental function sq_norm(vec) result(sq)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!This function computes the square of the norm of a 3D vector.
-  !!\begin{equation}
-  !!N = x^2  + y^2  + z^2
-  !!\end{equation}
-  !!\noindent where $x$, $y$ and $z$ are the components of the vector.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Vector), intent(IN):: vec ! Vector.
-  real(R_P)::                     sq  ! Square of the Norm.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  sq = (vec%x*vec%x) + (vec%y*vec%y) + (vec%z*vec%z)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction sq_norm
-
-  ! normL2
-  elemental function normL2(vec) result(norm)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!This function computes the norm L2 of a 3D vector.
-  !!\begin{equation}
-  !!N = \sqrt {x^2  + y^2  + z^2 }
-  !!\end{equation}
-  !!\noindent where $x$, $y$ and $z$ are the components of the vector.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Vector), intent(IN):: vec  ! Vector.
-  real(R_P)::                     norm ! Norm L2.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  norm = sqrt((vec%x*vec%x) + (vec%y*vec%y) + (vec%z*vec%z))
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction normL2
-
-  ! normalize
-  elemental function normalize(vec) result(norm)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!This function normalize a 3D vector.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Vector), intent(IN):: vec  ! Vector to be normalized.
-  type(Type_Vector)::             norm ! Vector normalized.
-  real(R_P)::                     nm   ! Norm L2 of 3D vector.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  nm = normL2(vec)
-  if (nm < smallR_P) then
-    nm = nm + smallR_P
-  endif
-  norm%x = vec%x/nm
-  norm%y = vec%y/nm
-  norm%z = vec%z/nm
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction normalize
 
   ! othogonal & parallel
   elemental function parallel(vec1,vec2) result(paral)
@@ -3846,26 +3780,89 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction orthogonal
+  !> @}
 
-  ! face normal
-  elemental function face_normal4(norm,pt1,pt2,pt3,pt4) result(fnormal)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!This function calculates the normal of the face defined by the 4 points pt1, pt2, pt3 and pt4. The convention for the points
-  !!numeration is the following:
-  !!                                     1.----------.2  The normal is calculated by the cross product of the diagonal d13 for
-  !!                                      |          |   the diagonal d24: d13 x d24.
-  !!                                      |          |   The normal is normalized if the variable 'norm' is passed.
-  !!                                      |          |
-  !!                                      |          |
-  !!                                     4.----------.3
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @ingroup Data_Type_VectorPublicProcedure
+  !> @{
+  !> Function for computing the square of the norm of a 3D vector.
+  !> The square norm if defined as \f$ N = x^2  + y^2  + z^2\f$.
+  !> @return \b sq square norm
+  elemental function sq_norm(vec) result(sq)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  character(1),      intent(IN), optional:: norm            ! If 'norm' is passed as argument the normal is normalized.
-  type(Type_Vector), intent(IN)::           pt1,pt2,pt3,pt4 ! Face points.
-  type(Type_Vector)::                       fnormal         ! Face normal.
-  type(Type_Vector)::                       d13,d24         ! Face diagonals.
+  type(Type_Vector), intent(IN):: vec !< Vector.
+  real(R_P)::                     sq  !< Square of the Norm.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  sq = (vec%x*vec%x) + (vec%y*vec%y) + (vec%z*vec%z)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction sq_norm
+
+  !> Function for computing the norm L2 of a 3D vector.
+  !> The norm L2 if defined as \f$N = \sqrt {x^2  + y^2  + z^2 }\f$.
+  !> @return \b norm norm L2
+  elemental function normL2(vec) result(norm)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Vector), intent(IN):: vec  !< Vector.
+  real(R_P)::                     norm !< Norm L2.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  norm = sqrt((vec%x*vec%x) + (vec%y*vec%y) + (vec%z*vec%z))
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction normL2
+
+  !> Function for normalizing a 3D vector.
+  !> The normalization is made by means of norm L2. If the norm L2 of the vector is less than the parameter smallR_P the
+  !> normalization value is set to normL2(vec)+smallR_P.
+  !> @return \b norm normalized vector
+  elemental function normalize(vec) result(norm)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Vector), intent(IN):: vec  !< Vector to be normalized.
+  type(Type_Vector)::             norm !< Vector normalized.
+  real(R_P)::                     nm   !< Norm L2 of 3D vector.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  nm = normL2(vec)
+  if (nm < smallR_P) then
+    nm = nm + smallR_P
+  endif
+  norm%x = vec%x/nm
+  norm%y = vec%y/nm
+  norm%z = vec%z/nm
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction normalize
+
+  !> Function for calculating the normal of the face defined by 4 points vector pt1, pt2, pt3 and pt4.
+  !> The convention for the points numeration is the following:
+  !> @code
+  !> 1.----------.2
+  !>  |          |
+  !>  |          |
+  !>  |          |
+  !>  |          |
+  !> 4.----------.3
+  !> @endcode
+  !> The normal is calculated by the cross product of the diagonal d13 for the diagonal d24: d13 x d24.
+  !> The normal is normalized if the variable 'norm' is passed (with any value).
+  !> @return \b fnormal face normal
+  elemental function face_normal4(norm,pt1,pt2,pt3,pt4) result(fnormal)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(1),      intent(IN), optional:: norm    !< If 'norm' is passed as argument the normal is normalized.
+  type(Type_Vector), intent(IN)::           pt1     !< First face point.
+  type(Type_Vector), intent(IN)::           pt2     !< Second face point.
+  type(Type_Vector), intent(IN)::           pt3     !< Third face point.
+  type(Type_Vector), intent(IN)::           pt4     !< Fourth face point.
+  type(Type_Vector)::                       fnormal !< Face normal.
+  type(Type_Vector)::                       d13,d24 !< Face diagonals.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3880,24 +3877,28 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction face_normal4
 
+  !> Function for calculating the normal of the face defined by the 3 points vector pt1, pt2 and pt3.
+  ! The convention for the points numeration is the following:
+  !> @code
+  !> 1.----.2
+  !>   \   |
+  !>    \  |
+  !>     \ |
+  !>      \|
+  !>       .3
+  !> @endcode
+  !> The normal is calculated by the cross product of the side s12 for the side s13: s12 x s13.
+  !> The normal is normalized if the variable 'norm' is passed (with any value).
+  !> @return \b fnormal face normal
   elemental function face_normal3(norm,pt1,pt2,pt3) result(fnormal)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!This function calculates the normal of the face defined by the 3 points pt1, pt2 and pt3. The convention for the points
-  !!numeration is the following:
-  !!                                     1.----.2  The normal is calculated by the cross product of the side s12 for the side s13:
-  !!                                       \   |   s12 x s13.
-  !!                                        \  |   The normal is normalized if the variable 'norm' is passed.
-  !!                                         \ |
-  !!                                          \|
-  !!                                           .3
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  character(1),      intent(IN), optional:: norm        ! If 'norm' is passed as argument the normal is normalized.
-  type(Type_Vector), intent(IN)::           pt1,pt2,pt3 ! Face points.
-  type(Type_Vector)::                       fnormal     ! Face normal.
-  type(Type_Vector)::                       s12,s13     ! Face diagonals.
+  character(1),      intent(IN), optional:: norm    !< If 'norm' is passed as argument the normal is normalized.
+  type(Type_Vector), intent(IN)::           pt1     !< First face point.
+  type(Type_Vector), intent(IN)::           pt2     !< Second face point.
+  type(Type_Vector), intent(IN)::           pt3     !< Third face point.
+  type(Type_Vector)::                       fnormal !< Face normal.
+  type(Type_Vector)::                       s12,s13 !< Face diagonals.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3911,4 +3912,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction face_normal3
+  !> @}
 endmodule Data_Type_Vector

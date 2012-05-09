@@ -1,3 +1,8 @@
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Data_Type_TimePublicProcedure Data_Type_Time
+!> @}
+
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup Data_Type_TimePrivateProcedure Data_Type_Time
@@ -264,6 +269,8 @@ contains
   endfunction great
   !> @}
 
+  !> @ingroup Data_Type_TimePublicProcedure
+  !> @{
   !> Function for getting actual date and returning it into a string.
   !> @return \b Date_String character(20) variable.
   function Get_Date_String() result(Date_String)
@@ -331,4 +338,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Crono
+  !> @}
 endmodule Data_Type_Time

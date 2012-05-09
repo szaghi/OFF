@@ -3,6 +3,11 @@
 !> @defgroup Data_Type_Tensor Data_Type_Tensor
 !> @}
 
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Data_Type_TensorPublicProcedure Data_Type_Tensor
+!> @}
+
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup Data_Type_TensorPrivateProcedure Data_Type_Tensor
@@ -84,7 +89,7 @@ type(Type_Tensor), parameter:: unity = Type_Tensor(ex,ey,ez) !< Unity (identity)
 !> err = write(unit,ten_2D)
 !> err = write(unit,ten_3D)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_TensorPublicProcedure
 interface write
   module procedure Write_Bin_Scalar, Write_Ascii_Scalar
   module procedure Write_Bin_Array1D,Write_Ascii_Array1D
@@ -110,7 +115,7 @@ endinterface
 !> err = read(unit,ten_2D)
 !> err = read(unit,ten_3D)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_TensorPublicProcedure
 interface read
   module procedure Read_Bin_Scalar, Read_Ascii_Scalar
   module procedure Read_Bin_Array1D,Read_Ascii_Array1D
@@ -316,6 +321,8 @@ interface transpose
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @ingroup Data_Type_TensorPublicProcedure
+  !> @{
   !> Subroutine for setting components of Type_Tensor variable.
   elemental subroutine set(x,y,z,ten)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -351,6 +358,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine get
+  !> @}
 
   !> @ingroup Data_Type_TensorPrivateProcedure
   !> @{
@@ -2093,6 +2101,8 @@ contains
   endfunction normalize_ten
   !> @}
 
+  !> @ingroup Data_Type_TensorPublicProcedure
+  !> @{
   ! transpose
   elemental function transpose_ten(ten) result(tran)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2185,4 +2195,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction invertible
+  !> @}
 endmodule Data_Type_Tensor

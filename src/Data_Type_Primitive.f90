@@ -1,3 +1,8 @@
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Data_Type_PrimitivePublicProcedure Data_Type_Primitive
+!> @}
+
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup Data_Type_PrimitivePrivateProcedure Data_Type_Primitive
@@ -67,7 +72,7 @@ endtype Type_Primitive
 !> call init(r,v,p,d,g,Ns,prim_3D)
 !> ... @endcode
 !> @note r,v,p,d,g,Ns are optional.
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_PrimitivePublicProcedure
 interface init
   module procedure Init_Scalar,Init_Array1D,Init_Array2D,Init_Array3D
 endinterface
@@ -88,7 +93,7 @@ endinterface
 !> call set(r,v,p,d,g,Ns,prim_3D)
 !> ... @endcode
 !> @note r,v,p,d,g,Ns are optional.
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_PrimitivePublicProcedure
 interface set
   module procedure Set_Scalar,Set_Array1D,Set_Array2D,Set_Array3D
 endinterface
@@ -105,7 +110,7 @@ endinterface
 !> err = free(prim_2D)
 !> err = free(prim_3D)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_PrimitivePublicProcedure
 interface free
   module procedure Free_Scalar,Free_Array1D,Free_Array2D,Free_Array3D
 endinterface
@@ -128,7 +133,7 @@ endinterface
 !> err = write(unit,prim_2D)
 !> err = write(unit,prim_3D)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_PrimitivePublicProcedure
 interface write
   module procedure Write_Bin_Scalar, Write_Ascii_Scalar
   module procedure Write_Bin_Array1D,Write_Ascii_Array1D
@@ -154,7 +159,7 @@ endinterface
 !> err = read(unit,prim_2D)
 !> err = read(unit,prim_3D)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_PrimitivePublicProcedure
 interface read
   module procedure Read_Bin_Scalar, Read_Ascii_Scalar
   module procedure Read_Bin_Array1D,Read_Ascii_Array1D
@@ -2626,6 +2631,8 @@ contains
   endfunction prim_sub_ScalI1P
   !> @}
 
+  !> @ingroup Data_Type_PrimitivePublicProcedure
+  !> @{
   !>Function for converting derived type Type_Primitive to 1D array.
   !> @return \b array real(R_P), dimension(1:size(prim\%r)+6) variable.
   pure function prim2array(prim) result(array)
@@ -2676,4 +2683,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction array2prim
+  !> @}
 endmodule Data_Type_Primitive

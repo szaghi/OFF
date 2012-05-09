@@ -1,3 +1,8 @@
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Data_Type_GlobalsPublicProcedure Data_Type_Globals
+!> @}
+
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup Data_Type_GlobalsPrivateProcedure Data_Type_Globals
@@ -165,7 +170,7 @@ endtype Type_Block
 !> - File name of \b block-flip_flop data; this type of file name is referred to those files containing block-level data stored as
 !>   backup flip/flop file; calling signature is of the type:
 !>   @code fname = file_name(basename,suffix,blk,grl,flip) @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_GlobalsPublicProcedure
 interface file_name
   module procedure Block_File_Name,Block_Step_File_Name,Block_Flip_File_Name
 endinterface
@@ -230,6 +235,8 @@ contains
   endfunction Block_Flip_File_Name
   !> @}
 
+  !> @ingroup Data_Type_GlobalsPublicProcedure
+  !> @{
   !> Subroutine for allocating dynamic data of Type_Global boundary conditions variables.
   subroutine alloc_global_bc(global)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -859,4 +866,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction print_info_bfluid
+  !> @}
 endmodule Data_Type_Globals

@@ -3,6 +3,11 @@
 !> @defgroup Data_Type_BC Data_Type_BC
 !> @}
 
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Data_Type_BCPublicProcedure Data_Type_BC
+!> @}
+
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup Data_Type_BCPrivateProcedure Data_Type_BC
@@ -114,7 +119,7 @@ endtype Type_BC
 !> err = free(bc_2D)
 !> err = free(bc_3D)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_BCPublicProcedure
 interface free
   module procedure Free_Scalar,Free_Array1D,Free_Array2D,Free_Array3D
 endinterface
@@ -137,7 +142,7 @@ endinterface
 !> err = write(unit,bc_2D)
 !> err = write(unit,bc_3D)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_BCPublicProcedure
 interface write
   module procedure Write_Bin_Scalar,     Write_Ascii_Scalar
   module procedure Write_Bin_Array1D,Write_Ascii_Array1D
@@ -163,7 +168,7 @@ endinterface
 !> err = read(unit,bc_2D)
 !> err = read(unit,bc_3D)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_BCPublicProcedure
 interface read
   module procedure Read_Bin_Scalar,     Read_Ascii_Scalar
   module procedure Read_Bin_Array1D,Read_Ascii_Array1D
@@ -172,6 +177,8 @@ interface read
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @ingroup Data_Type_BCPublicProcedure
+  !> @{
   !> Function for initializing components of Type_BC variable.
   !> @return \b bc Type_BC variable.
   elemental function init(tp,inf,adj) result(bc)
@@ -231,6 +238,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine get
+  !> @}
 
   !> @ingroup Data_Type_BCPrivateProcedure
   !> @{
@@ -867,7 +875,8 @@ contains
   endfunction Read_Ascii_Array3D
   !> @}
 
-  ! get_bc
+  !> @ingroup Data_Type_BCPublicProcedure
+  !> @{
   !> Function for getting integer id of a boundary condition from the corresponding boundary condition string.
   !> @return \b bc_id integer(I_P) variable.
   function get_bc_id(myrank,bc_str) result(bc_id)
@@ -937,4 +946,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction get_bc_str
+  !> @}
 endmodule Data_Type_BC

@@ -1,3 +1,8 @@
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Data_Type_ProbePublicProcedure Data_Type_Probe
+!> @}
+
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup Data_Type_ProbePrivateProcedure Data_Type_Probe
@@ -43,7 +48,7 @@ endtype Type_Probe
 !> ! binary writing
 !> err = write(unit,probe)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_ProbePublicProcedure
 interface write
   module procedure Write_Bin,Write_Ascii
 endinterface
@@ -60,7 +65,7 @@ endinterface
 !> ! binary reading
 !> err = read(unit,probe)
 !> ... @endcode
-!> @ingroup Interface
+!> @ingroup Interface,Data_Type_ProbePublicProcedure
 interface read
   module procedure Read_Bin,Read_Ascii
 endinterface
@@ -68,6 +73,7 @@ endinterface
 contains
   !>Function for setting components of Type_Probe variable.
   !> @return \b probe type(Type_Probe) variable.
+  !> @ingroup Data_Type_ProbePublicProcedure
   elemental subroutine set(b,i,j,k,probe)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none

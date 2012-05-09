@@ -4,12 +4,21 @@
 !> List of derived data types.
 !> @defgroup GlobalVarPar Global Variables and Parameters
 !> List of global variables and parameters.
+!> @defgroup PrivateVarPar Private Variables and Parameters
+!> List of private variables and parameters.
 !> @defgroup Interface Interfaces
 !> List of explicitly defined interface.
 !> @defgroup Library Modules Libraries
 !> List of modules containing libraries of procedures.
+!> @defgroup PublicProcedure Public Procedures
+!> List of public procedures.
 !> @defgroup PrivateProcedure Private Procedures
 !> List of private procedures.
+
+!> @ingroup PrivateVarPar
+!> @{
+!> @defgroup OFFPrivateVarPar OFF
+!> @}
 
 !> @ingroup PrivateProcedure
 !> @{
@@ -109,18 +118,21 @@ USE Lib_Parallel,    only: Init_sendrecv                ! Subroutine for initial
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
-type(Type_Global)::             global         !< Global-level data.
-type(Type_Block), allocatable:: block(:,:)     !< Block-level data [1:Nb,1:Nl].
-integer(I_P)::                  b              !< Blocks counter.
-integer(I_P)::                  l              !< Grid levels counter.
-integer(I_P)::                  err            !< Error trapping flag: 0 no errors, >0 error occurs.
-integer(I_P)::                  lockfile       !< Locking unit file.
-real::                          partial(1:10)  !< Partial time counters for code profiling
-character(20)::                 date           !< Actual date.
-integer(I_P)::                  myrank         !< Actual rank process.
-integer(I_P)::                  Nprb = 0_I_P   !< Number of probes.
-type(Type_Probe), allocatable:: probes(:)      !< Probes [1:Nprb].
-integer(I_P)::                  unitprobe      !< Probes unit file.
+!> @ingroup OFFPrivateVarPar
+!> @{
+type(Type_Global)::             global        !< Global-level data.
+type(Type_Block), allocatable:: block(:,:)    !< Block-level data [1:Nb,1:Nl].
+integer(I_P)::                  b             !< Blocks counter.
+integer(I_P)::                  l             !< Grid levels counter.
+integer(I_P)::                  err           !< Error trapping flag: 0 no errors, >0 error occurs.
+integer(I_P)::                  lockfile      !< Locking unit file.
+real::                          partial(1:10) !< Partial time counters for code profiling
+character(20)::                 date          !< Actual date.
+integer(I_P)::                  myrank        !< Actual rank process.
+integer(I_P)::                  Nprb = 0_I_P  !< Number of probes.
+type(Type_Probe), allocatable:: probes(:)     !< Probes [1:Nprb].
+integer(I_P)::                  unitprobe     !< Probes unit file.
+!> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------

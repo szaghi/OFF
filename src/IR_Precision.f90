@@ -1,6 +1,27 @@
+!> @addtogroup GlobalVarPar Global Variables and Parameters
+!> List of global variables and parameters.
+!> @addtogroup Interface Interfaces
+!> List of explicitly defined interface.
+!> @addtogroup Library Modules Libraries
+!> List of modules containing libraries of procedures.
+!> @addtogroup PublicProcedure Public Procedures
+!> List of public procedures.
+!> @addtogroup PrivateProcedure Private Procedures
+!> List of private procedures.
+
 !> @ingroup GlobalVarPar
 !> @{
 !> @defgroup IR_Precision IR_Precision
+!> @}
+
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup IR_PrecisionPublicProcedure IR_Precision
+!> @}
+
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup IR_PrecisionPrivateProcedure IR_Precision
 !> @}
 
 !> @brief     Module IR_Precision makes available some portable kind-parameters and some useful procedures to deal with them.
@@ -17,6 +38,7 @@
 !> @date      2012-04-24
 !> @copyright GNU Public License version 3.
 !> @todo \b g95_test: Test g95 compiler
+!> @ingroup Library
 module IR_Precision
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE, intrinsic:: ISO_FORTRAN_ENV, only: stdout => OUTPUT_UNIT, stderr => ERROR_UNIT ! Standard output/error logical units.
@@ -143,7 +165,7 @@ real(R_P),  parameter:: Zero    = ZeroR8                  !< Smallest representa
 !> logical, intent(\b IN), optional:: <b>\em no_sign</b> flag for do not write sign;
 !> number,  intent(\b IN)::           <b>\em n</b> input number;
 !> string,  intent(\b OUT)::          <b>\em str</b> output string.
-!> @ingroup Interface
+!> @ingroup Interface,IR_PrecisionPublicProcedure
 interface str
   module procedure           &
 #ifdef r16p
@@ -161,7 +183,7 @@ endinterface
 !> number,  intent(\b IN), optional:: <b>\em no_zpad</b> number of padding zeros;
 !> number,  intent(\b IN)::           <b>\em n  </b> input number;
 !> string,  intent(\b OUT)::          <b>\em str</b> output string.
-!> @ingroup Interface
+!> @ingroup Interface,IR_PrecisionPublicProcedure
 interface strz
   module procedure strz_I8P,  &
                    strz_I4P,  &
@@ -171,7 +193,7 @@ endinterface
 !> @brief Function for converting string to number, real or initeger, (string to number type casting);
 !> string,  intent(\b IN)::  <b>\em str</b> input string;
 !> number,  intent(\b OUT):: <b>\em n  </b> output number.
-!> @ingroup Interface
+!> @ingroup Interface,IR_PrecisionPublicProcedure
 interface cton
   module procedure            &
 #ifdef r16p
@@ -189,6 +211,7 @@ contains
   !>Subroutine for checking the type of bit ordering (big or little endian) of the running architecture; the result is
   !>stored into the "endian" global variable.
   !>@return endian
+  !> @ingroup IR_PrecisionPublicProcedure
   subroutine check_endian()
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -206,6 +229,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine check_endian
 
+  !> @ingroup IR_PrecisionPrivateProcedure
+  !> @{
 #ifdef r16p
   elemental function str_R16P(no_sign,n) result(str)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -605,8 +630,10 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ctoi_I1P
+  !> @}
 
   !>Subroutine for printing to the standard output the kind definition of reals and integers and the utility variables.
+  !> @ingroup IR_PrecisionPublicProcedure
   subroutine IR_Print()
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none

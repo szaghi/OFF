@@ -38,7 +38,7 @@ var searchData=
   ['tr_5fu23',['TR_u23',['../d6/dec/group__Library.html#add4746779e9df9f55a15b90c5ba2a895',1,'Lib_Riemann']]],
   ['tr_5fup23',['TR_up23',['../d6/dec/group__Library.html#a7fad524b9814fe41e30a5f7395503367',1,'Lib_Riemann']]],
   ['tr_5fwavesspeed14',['TR_WavesSpeed14',['../d6/dec/group__Library.html#a7896b37ae0ec596b69674a1827f4cbd2',1,'Lib_Riemann']]],
-  ['transpose_5ften',['transpose_ten',['../dd/d55/group__Interface.html#a57269f9cb9eaebe26cb78928827a6dd0',1,'Data_Type_Tensor::transpose::transpose_ten()'],['../d9/d2f/classData__Type__Tensor.html#abe6f085fcf076b2927f979fa4490d60c',1,'Data_Type_Tensor::transpose_ten()']]],
+  ['transpose_5ften',['transpose_ten',['../dd/d55/group__Interface.html#a57269f9cb9eaebe26cb78928827a6dd0',1,'Data_Type_Tensor::transpose::transpose_ten()'],['../d9/d0c/group__Data__Type__TensorPublicProcedure.html#gabe6f085fcf076b2927f979fa4490d60c',1,'Data_Type_Tensor::transpose_ten()']]],
   ['ts_5fstates',['TS_States',['../d6/dec/group__Library.html#a7b1bb5327010246af6c7f43795d5dd10',1,'Lib_Riemann']]],
   ['ts_5fup23',['TS_up23',['../d6/dec/group__Library.html#a210ae027625a6f6c96427ef4e9b6cff5',1,'Lib_Riemann']]],
   ['ts_5fwavesspeed14',['TS_WavesSpeed14',['../d6/dec/group__Library.html#a26812487dbe9ffc46a268757bd7d3b56',1,'Lib_Riemann']]]

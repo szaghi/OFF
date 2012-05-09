@@ -9,5 +9,8 @@ var group__PrivateProcedure =
     [ "Data_Type_Tensor", "d1/dff/group__Data__Type__TensorPrivateProcedure.html", "d1/dff/group__Data__Type__TensorPrivateProcedure" ],
     [ "Data_Type_Time", "db/d28/group__Data__Type__TimePrivateProcedure.html", "db/d28/group__Data__Type__TimePrivateProcedure" ],
     [ "Data_Type_Vector", "d1/dc3/group__Data__Type__VectorPrivateProcedure.html", "d1/dc3/group__Data__Type__VectorPrivateProcedure" ],
+    [ "IR_Precision", "d1/de2/group__IR__PrecisionPrivateProcedure.html", "d1/de2/group__IR__PrecisionPrivateProcedure" ],
+    [ "Lib_VTK_IO", "df/d7f/group__Lib__VTK__IOPrivateProcedure.html", "df/d7f/group__Lib__VTK__IOPrivateProcedure" ],
+    [ "Lib_WENO", "de/de2/group__Lib__WENOPrivateProcedure.html", "de/de2/group__Lib__WENOPrivateProcedure" ],
     [ "OFF", "d7/d45/group__OFFPrivateProcedure.html", "d7/d45/group__OFFPrivateProcedure" ]
 ];

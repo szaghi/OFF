@@ -1,8 +1,8 @@
 var classData__Type__BC =
 [
-    [ "init", "d3/d18/classData__Type__BC.html#af7b025b04c4ba85da6f3bd21cd8276f4", null ],
-    [ "set", "d3/d18/classData__Type__BC.html#a1d324c97e209dc1442ecad2ce626d220", null ],
-    [ "get", "d3/d18/classData__Type__BC.html#a87864bd245ce532e94ae8900f7012880", null ],
+    [ "init", "db/daa/group__Data__Type__BCPublicProcedure.html#gaf7b025b04c4ba85da6f3bd21cd8276f4", null ],
+    [ "set", "db/daa/group__Data__Type__BCPublicProcedure.html#ga1d324c97e209dc1442ecad2ce626d220", null ],
+    [ "get", "db/daa/group__Data__Type__BCPublicProcedure.html#ga87864bd245ce532e94ae8900f7012880", null ],
     [ "Free_Scalar", "d7/d01/group__Data__Type__BCPrivateProcedure.html#ga7ec49d46c40fcee0653948078cbacc8c", null ],
     [ "Free_Array1D", "d7/d01/group__Data__Type__BCPrivateProcedure.html#gae91585aa55bf0882123320c74cb0bad3", null ],
     [ "Free_Array2D", "d7/d01/group__Data__Type__BCPrivateProcedure.html#ga2c079a6b1c131d0293590831ec7aa6b4", null ],
@@ -23,8 +23,8 @@ var classData__Type__BC =
     [ "Read_Ascii_Array2D", "d7/d01/group__Data__Type__BCPrivateProcedure.html#ga01185d1f803dceb3bd1d0c81c967adba", null ],
     [ "Read_Bin_Array3D", "d7/d01/group__Data__Type__BCPrivateProcedure.html#ga96a364cd72182d9bbd2c6f935d201ec5", null ],
     [ "Read_Ascii_Array3D", "d7/d01/group__Data__Type__BCPrivateProcedure.html#gaff65c3d4f52aaa4479cbb7abbb671779", null ],
-    [ "get_bc_id", "d3/d18/classData__Type__BC.html#ad7028f1deaa7f37353990f21614f74ae", null ],
-    [ "get_bc_str", "d3/d18/classData__Type__BC.html#ae5694120c71715f06df47cbdb83f2e17", null ],
+    [ "get_bc_id", "db/daa/group__Data__Type__BCPublicProcedure.html#gad7028f1deaa7f37353990f21614f74ae", null ],
+    [ "get_bc_str", "db/daa/group__Data__Type__BCPublicProcedure.html#gae5694120c71715f06df47cbdb83f2e17", null ],
     [ "bc_nan_str", "d1/dd7/group__Data__Type__BC.html#gaba3d6c105c63b750f747ee2895ce5827", null ],
     [ "bc_nan", "d1/dd7/group__Data__Type__BC.html#ga12705f5267b03a588216122f28a447ee", null ],
     [ "bc_ref_str", "d1/dd7/group__Data__Type__BC.html#ga45f56899faf88976562f3cf270109df3", null ],

@@ -98,7 +98,6 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Data Types</a> &#124;
-<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">Data_Type_Time Module Reference</div>  </div>
@@ -128,13 +127,14 @@ Data Types</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived type containing time variables.  <a href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">character(20) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d0e/classData__Type__Time.html#a9519e07de1e824a495921ecc964542ca">Get_Date_String</a> ()</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for getting actual date and returning it into a string.  <a href="#a9519e07de1e824a495921ecc964542ca"></a><br/></td></tr>
+<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">character(20) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d7b/group__Data__Type__TimePublicProcedure.html#ga9519e07de1e824a495921ecc964542ca">Get_Date_String</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for getting actual date and returning it into a string.  <a href="../../d1/d7b/group__Data__Type__TimePublicProcedure.html#ga9519e07de1e824a495921ecc964542ca"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time">Type_Time</a>) type(<a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time">Type_Time</a>) <br class="typebreak"/>
-function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d0e/classData__Type__Time.html#ae610e70e666992cae88feb4ebe2ed674">Seconds_To_Time</a> (seconds)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for converting seconds to <a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time" title="Derived type containing time variables.">Type_Time</a> (days,hours,minutes,seconds) derived type.  <a href="#ae610e70e666992cae88feb4ebe2ed674"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">real real function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d0e/classData__Type__Time.html#a6dbd2fe5a735781736860fbdfdab1f60">Crono</a> (start, instant1)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple stop/watch function.  <a href="#a6dbd2fe5a735781736860fbdfdab1f60"></a><br/></td></tr>
+function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d7b/group__Data__Type__TimePublicProcedure.html#gae610e70e666992cae88feb4ebe2ed674">Seconds_To_Time</a> (seconds)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for converting seconds to <a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time" title="Derived type containing time variables.">Type_Time</a> (days,hours,minutes,seconds) derived type.  <a href="../../d1/d7b/group__Data__Type__TimePublicProcedure.html#gae610e70e666992cae88feb4ebe2ed674"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">real real function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d7b/group__Data__Type__TimePublicProcedure.html#ga6dbd2fe5a735781736860fbdfdab1f60">Crono</a> (start, instant1)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple stop/watch function.  <a href="../../d1/d7b/group__Data__Type__TimePublicProcedure.html#ga6dbd2fe5a735781736860fbdfdab1f60"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">real&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d0e/classData__Type__Time.html#a8ea936238de43caee769675cf3f79717">instant0</a> = 0.0</td></tr>
@@ -154,97 +154,8 @@ Private Member Functions</h2></td></tr>
 <p>This derived type is useful for handling time and date </p>
 <dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000006">Todo:</a></b></dt><dd><b>DocComplete:</b> Complete the documentation of internal procedures </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00013">13</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
-</div><hr/><h2>Member Function/Subroutine Documentation</h2>
-<a class="anchor" id="a9519e07de1e824a495921ecc964542ca"></a><!-- doxytag: member="Data_Type_Time::Get_Date_String" ref="a9519e07de1e824a495921ecc964542ca" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">character(20) function, public <a class="el" href="../../dd/d0e/classData__Type__Time.html#a9519e07de1e824a495921ecc964542ca">Data_Type_Time::Get_Date_String</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Function for getting actual date and returning it into a string. </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd><b>Date_String</b> character(20) variable. </dd></dl>
-
-<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00273">273</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ae610e70e666992cae88feb4ebe2ed674"></a><!-- doxytag: member="Data_Type_Time::Seconds_To_Time" ref="ae610e70e666992cae88feb4ebe2ed674" args="(seconds)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time">Type_Time</a>) type(<a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time">Type_Time</a>) function, public <a class="el" href="../../dd/d0e/classData__Type__Time.html#ae610e70e666992cae88feb4ebe2ed674">Data_Type_Time::Seconds_To_Time</a> </td>
-          <td>(</td>
-          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time">Type_Time</a>), intent(in)&#160;</td>
-          <td class="paramname"><em>seconds</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Function for converting seconds to <a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time" title="Derived type containing time variables.">Type_Time</a> (days,hours,minutes,seconds) derived type. </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd><b>Time</b> type(Type_Time) variable. </dd></dl>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">seconds</td><td>Number of seconds. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00300">300</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a6dbd2fe5a735781736860fbdfdab1f60"></a><!-- doxytag: member="Data_Type_Time::Crono" ref="a6dbd2fe5a735781736860fbdfdab1f60" args="(start, instant1)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">real real function, public <a class="el" href="../../dd/d0e/classData__Type__Time.html#a6dbd2fe5a735781736860fbdfdab1f60">Data_Type_Time::Crono</a> </td>
-          <td>(</td>
-          <td class="paramtype">logical, intent(in), optional&#160;</td>
-          <td class="paramname"><em>start</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real, intent(in), optional&#160;</td>
-          <td class="paramname"><em>instant1</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>A simple stop/watch function. </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd><b>seconds</b> real variable. </dd></dl>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">start</td><td>Flag for starting time measurament. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">instant1</td><td>Starting instant1 (external supplied) different from instant0. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00318">318</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
-
-</div>
-</div>
-<hr/><h2>Member Data Documentation</h2>
+<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00018">18</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
+</div><hr/><h2>Member Data Documentation</h2>
 <a class="anchor" id="a8ea936238de43caee769675cf3f79717"></a><!-- doxytag: member="Data_Type_Time::instant0" ref="a8ea936238de43caee769675cf3f79717" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -258,7 +169,7 @@ Private Member Functions</h2></td></tr>
 
 <p>The Crono starting instant (used for timing the code). </p>
 
-<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00042">42</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00047">47</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
 
 </div>
 </div>
@@ -285,7 +196,7 @@ Private Member Functions</h2></td></tr>
     <ul>
       <li class="navelem"><a class="el" href="../../dd/d0e/classData__Type__Time.html">Data_Type_Time</a>      </li>
 
-    <li class="footer">Generated on Wed May 9 2012 13:19:24 for OFF by
+    <li class="footer">Generated on Wed May 9 2012 16:04:46 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

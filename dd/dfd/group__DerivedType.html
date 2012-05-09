@@ -156,7 +156,7 @@ Data Types</h2></td></tr>
 <div class="memdoc">
 <div class="textblock"><p>Derived type containing adjacent boundary condition. </p>
 
-<p>Definition at line <a class="el" href="../../d3/dac/Data__Type__BC_8f90_source.html#l00082">82</a> of file <a class="el" href="../../d3/dac/Data__Type__BC_8f90_source.html">Data_Type_BC.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dac/Data__Type__BC_8f90_source.html#l00087">87</a> of file <a class="el" href="../../d3/dac/Data__Type__BC_8f90_source.html">Data_Type_BC.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -209,7 +209,7 @@ k index of adjacent block. </td></tr>
 </ul>
 </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dac/Data__Type__BC_8f90_source.html#l00100">100</a> of file <a class="el" href="../../d3/dac/Data__Type__BC_8f90_source.html">Data_Type_BC.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dac/Data__Type__BC_8f90_source.html#l00105">105</a> of file <a class="el" href="../../d3/dac/Data__Type__BC_8f90_source.html">Data_Type_BC.f90</a>.</p>
 </div><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="../../closed.png" alt="+"/> Collaboration diagram for Data_Type_BC::Type_BC:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -255,7 +255,7 @@ Connection indexes for adjacent boundary condition. </td></tr>
 <div class="memdoc">
 <div class="textblock"><p>Derived type containing cell informations. </p>
 
-<p>Definition at line <a class="el" href="../../d9/d94/Data__Type__Cell_8f90_source.html#l00069">69</a> of file <a class="el" href="../../d9/d94/Data__Type__Cell_8f90_source.html">Data_Type_Cell.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d94/Data__Type__Cell_8f90_source.html#l00074">74</a> of file <a class="el" href="../../d9/d94/Data__Type__Cell_8f90_source.html">Data_Type_Cell.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -287,7 +287,7 @@ Octree refinement: oc&gt;0 cell is refined oc-times. </td></tr>
 <div class="textblock"><p>Derived type containing conservative variables. </p>
 <dl class="note"><dt><b>Note:</b></dt><dd>This derived type can represent multi species fluids. The density component, <b>rs</b>, is a dynamic memory component defined as an allocatable 1D array. <b>rs</b> is allocated at runtime with the number of initial species that constitute the initial fluid mixture. Due to the presence of a dynamic component a freeing memory "method" for this component is necessary. Before deallocate a variable defined as <a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative" title="Derived type containing conservative variables.">Type_Conservative</a> the free function must be invoked to free the memory of the dynamic component. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l00045">45</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html#l00050">50</a> of file <a class="el" href="../../d8/da4/Data__Type__Conservative_8f90_source.html">Data_Type_Conservative.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -326,7 +326,7 @@ Product of density for specific total internal energy (sum(r)*E). </td></tr>
 <div class="textblock"><p>Derived type containing the global-level file data. </p>
 <p>Global-level file data are referred to those informations concerning with files of global interest. </p>
 
-<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00040">40</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00045">45</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -436,7 +436,7 @@ Logical unit of gnuplot log file of residuals. </td></tr>
 <div class="textblock"><p>Derived type containing the global-level mesh data. </p>
 <p>Global-level mesh data are referred to those informations concerning with mesh's details of global interest. </p>
 
-<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00061">61</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00066">66</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -480,7 +480,7 @@ Number of ghost cells necessary to achieve the space reconstruction order. </td>
 <div class="textblock"><p>Derived type containing the global-level boundary conditions data. </p>
 <p>Global-level boundary conditions data are referred to those informations concerning with bc's details of global interest. </p>
 
-<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00099">99</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00104">104</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -513,7 +513,7 @@ Inflow 1 boundary conditions primitive variables [1:Nin1]. </td></tr>
 <div class="textblock"><p>Derived type containing the block-level boundary conditions data. </p>
 <p>Block-level boundary conditions data are referred to those informations concerning with bc's details of blocks interest. </p>
 
-<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00106">106</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00111">111</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -551,7 +551,7 @@ Boundary conditions of k faces [1-gc(1):1+gc(2),1-gc(3):1+gc(4),0-gc(5):1+gc(6)]
 <div class="textblock"><p>Derived type containing the global-level fluid dynamic data. </p>
 <p>Global-level fluid dynamic data are referred to those informations concerning with fluids details of global interest. </p>
 
-<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00115">115</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00120">120</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -664,7 +664,7 @@ Initial specific heat cv for each specie [1:Ns]. </td></tr>
 <p>Block-level fluid dynamic data are referred to those informations concerning with fluids details of blocks interest. </p>
 <dl class="note"><dt><b>Note:</b></dt><dd>Dimensions of 3D array are [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)]. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00136">136</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00141">141</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -709,7 +709,7 @@ Runge-Kutta stages of conservative variables [1:rk_ord]. </td></tr>
 <div class="memdoc">
 <div class="textblock"><p>Derived type containing the global-level data. </p>
 
-<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00145">145</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00150">150</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
 </div><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="../../closed.png" alt="+"/> Collaboration diagram for Data_Type_Globals::Type_Global:</div>
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
@@ -761,7 +761,7 @@ Fluid dynamic data. </td></tr>
 <div class="memdoc">
 <div class="textblock"><p>Derived type containing the block-level data. </p>
 
-<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00153">153</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html#l00158">158</a> of file <a class="el" href="../../d6/dfe/Data__Type__Globals_8f90_source.html">Data_Type_Globals.f90</a>.</p>
 </div><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-2-trigger" src="../../closed.png" alt="+"/> Collaboration diagram for Data_Type_Globals::Type_Block:</div>
 <div id="dynsection-2-summary" class="dynsummary" style="display:block;">
@@ -857,7 +857,7 @@ OS make dir command. </td></tr>
 <div class="textblock"><p>Derived type containing primitive variables. </p>
 <dl class="note"><dt><b>Note:</b></dt><dd>This derived type can represent multi species fluids. The density component, <b>r</b>, is a dynamic memory component defined as an allocatable 1D array. <b>r</b> is allocated at runtime with the number of initial species that constitute the initial fluid mixture. Due to the presence of a dynamic component a freeing memory "method" for this component is necessary. Before deallocate a variable defined as <a class="el" href="../../dd/dfd/group__DerivedType.html#d2/d5e/structData__Type__Primitive_1_1Type__Primitive" title="Derived type containing primitive variables.">Type_Primitive</a> the free function must be invoked to free the memory of the dynamic component. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../dd/d83/Data__Type__Primitive_8f90_source.html#l00046">46</a> of file <a class="el" href="../../dd/d83/Data__Type__Primitive_8f90_source.html">Data_Type_Primitive.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../dd/d83/Data__Type__Primitive_8f90_source.html#l00051">51</a> of file <a class="el" href="../../dd/d83/Data__Type__Primitive_8f90_source.html">Data_Type_Primitive.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -907,7 +907,7 @@ Specific heats ratio <img class="formulaInl" alt="$ \gamma = \frac{c_p}{c_v} $" 
 <div class="memdoc">
 <div class="textblock"><p>Derived type containing probe informations. </p>
 
-<p>Definition at line <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html#l00027">27</a> of file <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html">Data_Type_Probe.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html#l00032">32</a> of file <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html">Data_Type_Probe.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -952,7 +952,7 @@ K direction index. </td></tr>
 <dl class="note"><dt><b>Note:</b></dt><dd>The components of the tensor are 3 vectors arranged as following: <br/>
  <img class="formulaInl" alt="$ T_{ij}=\left[{\begin{array}{*{20}{c}}t_{11}&amp;t_{12}&amp;t_{13}\\ t_{21}&amp;t_{22}&amp;t_{23}\\ t_{31}&amp;t_{32}&amp;t_{33}\end{array}}\right] =\left[{\begin{array}{*{20}{c}} {x\% x}&amp;{x\% y}&amp;{x\% z}\\ {y\% x}&amp;{y\% y}&amp;{y\% z}\\ {z\% x}&amp;{z\% y}&amp;{z\% z}\end{array}}\right]$" src="../../form_73.png"/> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d9c/Data__Type__Tensor_8f90_source.html#l00058">58</a> of file <a class="el" href="../../d1/d9c/Data__Type__Tensor_8f90_source.html">Data_Type_Tensor.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d9c/Data__Type__Tensor_8f90_source.html#l00063">63</a> of file <a class="el" href="../../d1/d9c/Data__Type__Tensor_8f90_source.html">Data_Type_Tensor.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -989,7 +989,7 @@ Cartesian vector component in z direction. </td></tr>
 <div class="memdoc">
 <div class="textblock"><p>Derived type containing time variables. </p>
 
-<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00036">36</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00041">41</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -1032,7 +1032,7 @@ Number of seconds. </td></tr>
 <div class="memdoc">
 <div class="textblock"><p>Derived type defining vectors. </p>
 
-<p>Definition at line <a class="el" href="../../d9/d50/Data__Type__Vector_8f90_source.html#l00060">60</a> of file <a class="el" href="../../d9/d50/Data__Type__Vector_8f90_source.html">Data_Type_Vector.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d50/Data__Type__Vector_8f90_source.html#l00065">65</a> of file <a class="el" href="../../d9/d50/Data__Type__Vector_8f90_source.html">Data_Type_Vector.f90</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
@@ -1125,7 +1125,7 @@ VTK file. </td></tr>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Wed May 9 2012 13:19:23 for OFF by
+    <li class="footer">Generated on Wed May 9 2012 16:04:45 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

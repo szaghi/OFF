@@ -1,7 +1,7 @@
 var classData__Type__Tensor =
 [
-    [ "set", "d9/d2f/classData__Type__Tensor.html#ade71e4afe6d453c109b33d29ff2de492", null ],
-    [ "get", "d9/d2f/classData__Type__Tensor.html#ae2784143dd0e1e6995231a421651709d", null ],
+    [ "set", "d9/d0c/group__Data__Type__TensorPublicProcedure.html#gade71e4afe6d453c109b33d29ff2de492", null ],
+    [ "get", "d9/d0c/group__Data__Type__TensorPublicProcedure.html#gae2784143dd0e1e6995231a421651709d", null ],
     [ "Write_Bin_Scalar", "d1/dff/group__Data__Type__TensorPrivateProcedure.html#gac7d90fecbec49d4caf9f2c481c9ed1a8", null ],
     [ "Write_Ascii_Scalar", "d1/dff/group__Data__Type__TensorPrivateProcedure.html#gaa69a4771b9fa54d9ada162bef79547b6", null ],
     [ "Write_Bin_Array1D", "d1/dff/group__Data__Type__TensorPrivateProcedure.html#gab65375e916e951bd8cee0c048a86260d", null ],
@@ -80,7 +80,7 @@ var classData__Type__Tensor =
     [ "sq_norm_ten", "d1/dff/group__Data__Type__TensorPrivateProcedure.html#ga573fa3851280ed0106a4574930b3e6a9", null ],
     [ "normL2_ten", "d1/dff/group__Data__Type__TensorPrivateProcedure.html#ga27a5c246fc16012ccc4389f4c4fa2428", null ],
     [ "normalize_ten", "d1/dff/group__Data__Type__TensorPrivateProcedure.html#ga73dd29c625bc5423c72bbbeff1fb1e2e", null ],
-    [ "transpose_ten", "d9/d2f/classData__Type__Tensor.html#abe6f085fcf076b2927f979fa4490d60c", null ],
+    [ "transpose_ten", "d9/d0c/group__Data__Type__TensorPublicProcedure.html#gabe6f085fcf076b2927f979fa4490d60c", null ],
     [ "determinant", "d9/d2f/classData__Type__Tensor.html#a635b777e6fdc506f23ea0a0ebd87e11a", null ],
     [ "invert", "d9/d2f/classData__Type__Tensor.html#ae028d9cade88dc323c6e2b43a4b7d603", null ],
     [ "invertible", "d9/d2f/classData__Type__Tensor.html#a5861e136980a2deb328998e5ece7df22", null ],

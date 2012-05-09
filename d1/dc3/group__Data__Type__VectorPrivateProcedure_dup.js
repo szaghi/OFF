@@ -149,5 +149,7 @@ var group__Data__Type__VectorPrivateProcedure_dup =
     [ "I1P_great_vec", "d1/dc3/group__Data__Type__VectorPrivateProcedure.html#ga927535145983c9fc24103c275e3699b4", null ],
     [ "vec_great_I1P", "d1/dc3/group__Data__Type__VectorPrivateProcedure.html#gae8b3eb239bd6ab961ad2f66fef45a83f", null ],
     [ "crossproduct", "d1/dc3/group__Data__Type__VectorPrivateProcedure.html#gaad7dbd7b60b7639370b911cd5dd557d8", null ],
-    [ "dotproduct", "d1/dc3/group__Data__Type__VectorPrivateProcedure.html#ga86bda267edb6b778eab9079bb6bec585", null ]
+    [ "dotproduct", "d1/dc3/group__Data__Type__VectorPrivateProcedure.html#ga86bda267edb6b778eab9079bb6bec585", null ],
+    [ "parallel", "d1/dc3/group__Data__Type__VectorPrivateProcedure.html#gaa6c003d7d5c3d8a8120377ae59d5f001", null ],
+    [ "orthogonal", "d1/dc3/group__Data__Type__VectorPrivateProcedure.html#ga79cd0fc2664de02247743ca04bdbebdd", null ]
 ];

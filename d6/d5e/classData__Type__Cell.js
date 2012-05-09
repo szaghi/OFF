@@ -1,8 +1,8 @@
 var classData__Type__Cell =
 [
-    [ "init", "d6/d5e/classData__Type__Cell.html#af01e1f9c66d1bdacf8a68bc1287385aa", null ],
-    [ "set", "d6/d5e/classData__Type__Cell.html#ad26b02dc7c0a4662d26b529e3eaffadb", null ],
-    [ "get", "d6/d5e/classData__Type__Cell.html#abb84331d4ba5761a9056212b08b154d3", null ],
+    [ "init", "d6/de6/group__Data__Type__CellPublicProcedure.html#gaf01e1f9c66d1bdacf8a68bc1287385aa", null ],
+    [ "set", "d6/de6/group__Data__Type__CellPublicProcedure.html#gad26b02dc7c0a4662d26b529e3eaffadb", null ],
+    [ "get", "d6/de6/group__Data__Type__CellPublicProcedure.html#gabb84331d4ba5761a9056212b08b154d3", null ],
     [ "Write_Bin_Scalar", "d4/dcf/group__Data__Type__CellPrivateProcedure.html#ga5bf318762b0eab53303997d7e392b720", null ],
     [ "Write_Ascii_Scalar", "d4/dcf/group__Data__Type__CellPrivateProcedure.html#gaf88b440de8828ec63958eef72a611a1b", null ],
     [ "Write_Bin_Array1D", "d4/dcf/group__Data__Type__CellPrivateProcedure.html#gad73a0f0b599a2d6873ac4706ce8ba585", null ],
@@ -19,8 +19,8 @@ var classData__Type__Cell =
     [ "Read_Ascii_Array2D", "d4/dcf/group__Data__Type__CellPrivateProcedure.html#ga822cc27fc1b3fcf0dab4501f7ecec8d6", null ],
     [ "Read_Bin_Array3D", "d4/dcf/group__Data__Type__CellPrivateProcedure.html#gaff25da867b3e1784bf92891ca63bc652", null ],
     [ "Read_Ascii_Array3D", "d4/dcf/group__Data__Type__CellPrivateProcedure.html#gad4fdf5079331d456a5155ce8ce3cc108", null ],
-    [ "get_cell_id", "d6/d5e/classData__Type__Cell.html#a904430ad7b15977156aca01dcd74fa9d", null ],
-    [ "get_cell_id_str", "d6/d5e/classData__Type__Cell.html#ad30f27fc44aafbec99c1a7218226ae02", null ],
+    [ "get_cell_id", "d6/de6/group__Data__Type__CellPublicProcedure.html#ga904430ad7b15977156aca01dcd74fa9d", null ],
+    [ "get_cell_id_str", "d6/de6/group__Data__Type__CellPublicProcedure.html#gad30f27fc44aafbec99c1a7218226ae02", null ],
     [ "cell_unset_str", "d7/da6/group__Data__Type__Cell.html#gadd401e6c2cd27ca2ab1a3e2ff2bd6473", null ],
     [ "cell_unset", "d7/da6/group__Data__Type__Cell.html#gae221144f05126ac63dcf3866a82cc0f0", null ],
     [ "cell_active_str", "d7/da6/group__Data__Type__Cell.html#gab0d3f7dbdb45cb6b0098ebbe30f8e831", null ],

@@ -40,6 +40,6 @@ var searchData=
   ['operator_28_3e_29',['operator(>)',['../dd/ddb/interfaceData__Type__Vector_1_1operator_07_4_08.html',1,'Data_Type_Vector']]],
   ['operator_28_3e_3d_29',['operator(>=)',['../dd/d55/group__Interface.html#dc/d71/interfaceData__Type__Time_1_1operator_07_4_0A_08',1,'Data_Type_Time']]],
   ['operator_28_3e_3d_29',['operator(>=)',['../da/d64/interfaceData__Type__Vector_1_1operator_07_4_0A_08.html',1,'Data_Type_Vector']]],
-  ['orthogonal',['orthogonal',['../dd/d55/group__Interface.html#a1551a6fd406749b0b8e3f55d4f0fb11a',1,'Data_Type_Vector::operator(.ortho.)::orthogonal()'],['../da/def/classData__Type__Vector.html#a79cd0fc2664de02247743ca04bdbebdd',1,'Data_Type_Vector::orthogonal()']]],
+  ['orthogonal',['orthogonal',['../dd/d55/group__Interface.html#a1551a6fd406749b0b8e3f55d4f0fb11a',1,'Data_Type_Vector::operator(.ortho.)::orthogonal()'],['../d1/dc3/group__Data__Type__VectorPrivateProcedure.html#ga79cd0fc2664de02247743ca04bdbebdd',1,'Data_Type_Vector::orthogonal()']]],
   ['os',['OS',['../de/d60/group__Lib__IO__Misc.html#ga998ffa59c09ac3be7681b46047fc75d9',1,'Lib_IO_Misc']]]
 ];

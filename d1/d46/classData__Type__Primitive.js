@@ -84,6 +84,6 @@ var classData__Type__Primitive =
     [ "prim_sub_ScalI2P", "d0/d0e/group__Data__Type__PrimitivePrivateProcedure.html#gaab721f42fd174607315c53c7eb277618", null ],
     [ "ScalI1P_sub_prim", "d0/d0e/group__Data__Type__PrimitivePrivateProcedure.html#gade98c44b0bf242d5cc3d53ccfaaaeb24", null ],
     [ "prim_sub_ScalI1P", "d0/d0e/group__Data__Type__PrimitivePrivateProcedure.html#ga15237cef4bc9efdf8a3baaff9ac48f74", null ],
-    [ "prim2array", "d1/d46/classData__Type__Primitive.html#ae8c9fad0fd78585512e53003e92954b8", null ],
-    [ "array2prim", "d1/d46/classData__Type__Primitive.html#aad03179150b6b89a56b56ee2b026561b", null ]
+    [ "prim2array", "d2/d15/group__Data__Type__PrimitivePublicProcedure.html#gae8c9fad0fd78585512e53003e92954b8", null ],
+    [ "array2prim", "d2/d15/group__Data__Type__PrimitivePublicProcedure.html#gaad03179150b6b89a56b56ee2b026561b", null ]
 ];

@@ -70,6 +70,6 @@ var classData__Type__Conservative =
     [ "cons_sub_ScalI2P", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga51bd9c8b7910ec1d98825cb01b4596c3", null ],
     [ "ScalI1P_sub_cons", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaf4d1ed6a541f50f5032d44dee2baebdd", null ],
     [ "cons_sub_ScalI1P", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaef9f595a7098ea6b1386f79f86e15a22", null ],
-    [ "cons2array", "d7/d2e/classData__Type__Conservative.html#a7f10a37b44b2cd13ce782aa8534e58a5", null ],
-    [ "array2cons", "d7/d2e/classData__Type__Conservative.html#a08c651699b0af0c98ab45fb932fd6d78", null ]
+    [ "cons2array", "dd/d22/group__Data__Type__ConservativePublicProcedure.html#ga7f10a37b44b2cd13ce782aa8534e58a5", null ],
+    [ "array2cons", "dd/d22/group__Data__Type__ConservativePublicProcedure.html#ga08c651699b0af0c98ab45fb932fd6d78", null ]
 ];

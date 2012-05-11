@@ -35,7 +35,7 @@
    <div id="projectname">OFF
    
    </div>
-   <div id="projectbrief">an Open source Finite volume Fluid dynamics code</div>
+   <div id="projectbrief">an Open source Finite volumes Fluid dynamics code</div>
   </td>
   
   
@@ -53,10 +53,10 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="../../index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="../../pages.html"><span>Compiling,&#160;Examples,&#160;Todos&#160;and&#160;Bugs</span></a></li>
       <li><a href="../../modules.html"><span>API</span></a></li>
       <li class="current"><a href="../../files.html"><span>Source&#160;Files</span></a></li>
       <li><a href="../../dirs.html"><span>Directories</span></a></li>
-      <li><a href="../../pages.html"><span>Todos&#160;and&#160;Bugs</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -100,226 +100,226 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <a href="../../d9/de8/POG_8f90.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 
-<a name="l00016"></a>00016 <span class="keyword">program</span> <a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a">POG</a>
-<a name="l00017"></a>00017 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00018"></a>00018 USE <span class="keywordflow">IR_Precision</span>                            <span class="comment">! Integers and reals precision definition.</span>
-<a name="l00019"></a>00019 USE <span class="keywordflow">Data_Type_Globals</span>                       <span class="comment">! Definition of Type_Global and Type_Block.</span>
-<a name="l00020"></a><a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a">00020</a> USE <span class="keywordflow">Data_Type_OS</span>, <span class="keywordflow">init_os</span>=&gt;<span class="keywordflow">init</span>             <span class="comment">! Definition of Type_OS.</span>
-<a name="l00021"></a>00021 USE <span class="keywordflow">Data_Type_Time</span>                          <span class="comment">! Definition of Type_Time.</span>
-<a name="l00022"></a>00022 USE <span class="keywordflow">Data_Type_Vector</span>, <span class="keywordflow">set_vec</span>=&gt;<span class="keywordflow">set</span>          <span class="comment">! Definition of Type_Vector.</span>
-<a name="l00023"></a>00023 USE <span class="keywordflow">Lib_IO_Misc</span>                             <span class="comment">! Procedures for IO and strings operations.</span>
-<a name="l00024"></a>00024 USE <span class="keywordflow">Lib_Mesh</span>,           only: node2center   <span class="comment">! Subroutine for computing cell center cell nodes ones.</span>
-<a name="l00025"></a>00025 USE <span class="keywordflow">Lib_PostProcessing</span>, only: pp_format,  &amp; <span class="comment">! Post-processing data format.</span>
-<a name="l00026"></a>00026                               tec_output, &amp; <span class="comment">! Function for writing Tecplot file.</span>
-<a name="l00027"></a>00027                               vtk_output    <span class="comment">! Function for writing VTK file.</span>
-<a name="l00028"></a>00028 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00029"></a>00029 
-<a name="l00030"></a>00030 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00031"></a>00031 <span class="keyword">implicit none</span>
-<a name="l00032"></a>00032 <span class="keywordtype">type(Type_Global)</span>::             global            <span class="comment">! Global-level data.</span>
-<a name="l00033"></a>00033 <span class="keywordtype">type(Type_Block)</span>, <span class="keywordtype">allocatable</span>:: block(:)          <span class="comment">! Block-level data.</span>
-<a name="l00034"></a>00034 <span class="keywordtype">logical</span>::                       meshonly = .true. <span class="comment">! Flag for post-process only mesh.</span>
-<a name="l00035"></a>00035 <span class="keywordtype">integer(I_P)</span>::                  b,l               <span class="comment">! Counters.</span>
-<a name="l00036"></a>00036 <span class="keywordtype">integer(I_P)</span>::                  err               <span class="comment">! Error trapping flag: 0 no errors, &gt;0 error occurs.</span>
-<a name="l00037"></a>00037 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00038"></a>00038 
-<a name="l00039"></a>00039 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00040"></a>00040 <span class="comment">! parsing command line for getting options</span>
-<a name="l00041"></a>00041 call <a class="code" href="../../d9/de8/POG_8f90.html#a7ebd416423870c5644b7bab1fc18fdc6">parsing_command_line</a>
-<a name="l00042"></a>00042 
-<a name="l00043"></a>00043 <span class="comment">! the number of grid levels/blocks are artificially set to 1: the post processor convert one level/block at time</span>
-<a name="l00044"></a>00044 global%mesh%Nl = 1 ; global%mesh%Nb = 1
-<a name="l00045"></a>00045 <span class="comment">! allocating block-level data</span>
-<a name="l00046"></a>00046 <span class="keyword">if</span> (<span class="keyword">allocated</span>(block)) <span class="keyword">then</span>
-<a name="l00047"></a>00047   call free_block(block=block(1))
-<a name="l00048"></a>00048   <span class="keyword">deallocate</span>(block)
-<a name="l00049"></a>00049 <span class="keyword">endif</span>
-<a name="l00050"></a>00050 <span class="keyword">allocate</span>(block(1))
-<a name="l00051"></a>00051 <span class="comment">! getting dimensions of block</span>
-<a name="l00052"></a>00052 err = load_bmesh_dims(myrank = 0, filename = global%file%File_Mesh, block = block(1))
-<a name="l00053"></a>00053 <span class="comment">! allocating block</span>
-<a name="l00054"></a>00054 call alloc_block(global=global,block=block(1))
-<a name="l00055"></a>00055 
-<a name="l00056"></a>00056 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
-<a name="l00057"></a>00057 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39; Loading &#39;</span>//trim(global%file%File_Mesh)
-<a name="l00058"></a>00058 
-<a name="l00059"></a>00059 err = load_bmesh(myrank = 0, filename = global%file%File_Mesh, block = block(1))
-<a name="l00060"></a>00060 <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
-<a name="l00061"></a>00061   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39; Loading &#39;</span>//trim(global%file%File_Sol)
-<a name="l00062"></a>00062   err = load_gfluid_Ns(binary = .true., myrank = 0, filename = global%file%File_Sol, global = global)
-<a name="l00063"></a>00063   <span class="comment">! allocating global fluid dynamic data</span>
-<a name="l00064"></a>00064   call alloc_global_fluid(global=global)
-<a name="l00065"></a>00065   err = load_bfluid(myrank = 0, filename = global%file%File_Sol, global = global, block = block(1))
-<a name="l00066"></a>00066 <span class="keyword">endif</span>
-<a name="l00067"></a>00067 <span class="keyword">write</span>(stdout,*)
-<a name="l00068"></a>00068 
-<a name="l00069"></a>00069 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39; Computing the mesh variables that are not loaded from input files&#39;</span>
-<a name="l00070"></a>00070 <span class="comment">! computing the cell-center coordinates</span>
-<a name="l00071"></a>00071 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39;   Computing cells centers coordinates&#39;</span>
-<a name="l00072"></a>00072 call node2center(block = block(1))
-<a name="l00073"></a>00073 
-<a name="l00074"></a>00074 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
-<a name="l00075"></a>00075 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39; Processing data&#39;</span>
-<a name="l00076"></a>00076 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39;  Writing Tecplot and/or VTK output data&#39;</span>
-<a name="l00077"></a>00077 <span class="comment">! writing output</span>
-<a name="l00078"></a>00078 <span class="keyword">if</span> (pp_format%tec) err = tec_output(meshonly=meshonly, global=global, block=block(1), filename=trim(global%file%File_Pout))
-<a name="l00079"></a>00079 <span class="keyword">if</span> (pp_format%vtk) err = vtk_output(meshonly=meshonly, global=global, block=block(1), filename=trim(global%file%File_Pout))
-<a name="l00080"></a>00080 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39; Processing data Complete&#39;</span>
-<a name="l00081"></a>00081 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
-<a name="l00082"></a>00082 <span class="keyword">write</span>(stdout,*)
-<a name="l00083"></a>00083 stop
-<a name="l00084"></a>00084 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00085"></a>00085 <span class="keyword">contains</span>
-<a name="l00086"></a>00086   <span class="keyword">subroutine </span><a class="code" href="../../d3/dc5/IBM_8f90.html#a280ae0605335cfa04ebdd73a1f5fff58">print_usage</a>()
-<a name="l00087"></a>00087   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00088"></a>00088   <span class="comment">! Subroutine for printing the correct use of the program.</span>
-<a name="l00089"></a>00089   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00090"></a><a class="code" href="../../d9/de8/POG_8f90.html#a6c8ab23f90da6b88355c31607334cf0e">00090</a> 
-<a name="l00091"></a>00091   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00092"></a>00092   <span class="keyword">implicit none</span>
-<a name="l00093"></a>00093   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00094"></a>00094 
-<a name="l00095"></a>00095   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00096"></a>00096   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39; POG&#39;</span>
-<a name="l00097"></a>00097   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39; Post processing code for OFF code&#39;</span>
-<a name="l00098"></a>00098   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39; Usage:&#39;</span>
-<a name="l00099"></a>00099   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;   POG -m mesh_file_name&#39;</span>
-<a name="l00100"></a>00100   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;     [-o output_file_name&#39;</span>
-<a name="l00101"></a>00101   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -s solution_file_name&#39;</span>
-<a name="l00102"></a>00102   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -bc&#39;</span>
-<a name="l00103"></a>00103   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -cell&#39;</span>
-<a name="l00104"></a>00104   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -ascii&#39;</span>
-<a name="l00105"></a>00105   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -tec yes/no&#39;</span>
-<a name="l00106"></a>00106   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -vtk yes/no&#39;</span>
-<a name="l00107"></a>00107   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -os UIX/WIN]&#39;</span>
-<a name="l00108"></a>00108   <span class="keyword">write</span>(stdout,*)
-<a name="l00109"></a>00109   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39; Optional arguments and default values:&#39;</span>
-<a name="l00110"></a>00110   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -o output_file_name   =&gt; output file name; default is basename of mesh file with the proper extension&#39;</span>
-<a name="l00111"></a>00111   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -s solution_file_name =&gt; solution file name; if passed the solution variables are saved&#39;</span>
-<a name="l00112"></a>00112   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -bc                   =&gt; saving boundary conditions ghost cells (default no)&#39;</span>
-<a name="l00113"></a>00113   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -cell                 =&gt; all vars other than nodes coord. are cell centered (default no, node centered)&#39;</span>
-<a name="l00114"></a>00114   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -ascii                =&gt; write ascii output file (default no, write binary one)&#39;</span>
-<a name="l00115"></a>00115   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -tec yes/no           =&gt; write (or not) Tecplot file format (default yes)&#39;</span>
-<a name="l00116"></a>00116   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -vtk yes/no           =&gt; write (or not) VTK file format (default no)&#39;</span>
-<a name="l00117"></a>00117   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -os UIX/WIN           =&gt; type of Operating System write (default *UIX OS type)&#39;</span>
-<a name="l00118"></a>00118   <span class="keyword">write</span>(stdout,*)
-<a name="l00119"></a>00119   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39; Examples: &#39;</span>
-<a name="l00120"></a>00120   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;  Solution file&#39;</span>
-<a name="l00121"></a>00121   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;    Teplot) POG -m example.geo -s example.sol -o example&#39;</span>
-<a name="l00122"></a>00122   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;    VTK)    POG -m example.geo -s example.sol -o example&#39;</span>
-<a name="l00123"></a>00123   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;  Only mesh file&#39;</span>
-<a name="l00124"></a>00124   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;    Teplot) POG -m example.geo                -o example&#39;</span>
-<a name="l00125"></a>00125   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;    VTK)    POG -m example.geo                -o example&#39;</span>
-<a name="l00126"></a>00126   <span class="keyword">write</span>(stdout,*)
-<a name="l00127"></a>00127   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39; Notes:&#39;</span>
-<a name="l00128"></a>00128   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;   1) the output file name extension is not necessary because it assigned according to the type of output:&#39;</span>
-<a name="l00129"></a>00129   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      binary       Tecplot =&gt; .plt&#39;</span>
-<a name="l00130"></a>00130   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      ascii        Tecplot =&gt; .dat&#39;</span>
-<a name="l00131"></a>00131   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      binary/ascii VTK     =&gt; .vtm&#39;</span>
-<a name="l00132"></a>00132   <span class="keyword">write</span>(stdout,*)
-<a name="l00133"></a>00133   return
-<a name="l00134"></a>00134   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00135"></a>00135 <span class="keyword">  endsubroutine print_usage</span>
-<a name="l00136"></a>00136 
-<a name="l00137"></a>00137   <span class="keyword">subroutine </span><a class="code" href="../../d9/de8/POG_8f90.html#a7ebd416423870c5644b7bab1fc18fdc6">parsing_command_line</a>()
-<a name="l00138"></a>00138   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00139"></a>00139   <span class="comment">! Subroutine for printing the correct use of the program.</span>
-<a name="l00140"></a>00140   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00141"></a><a class="code" href="../../d9/de8/POG_8f90.html#a7ebd416423870c5644b7bab1fc18fdc6">00141</a> 
-<a name="l00142"></a>00142   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00143"></a>00143   <span class="keyword">implicit none</span>
-<a name="l00144"></a>00144   <span class="keywordtype">integer(I_P)</span>:: Nca = 0         <span class="comment">! Number of command line arguments.</span>
-<a name="l00145"></a>00145   <span class="keywordtype">integer(I_P)</span>:: c               <span class="comment">! Counter for command line arguments.</span>
-<a name="l00146"></a>00146   <span class="keywordtype">character(6)</span>:: ca_switch       <span class="comment">! Switch identifier.</span>
-<a name="l00147"></a>00147   <span class="keywordtype">character(3)</span>:: yes             <span class="comment">! Yes (no) flag.</span>
-<a name="l00148"></a>00148   <span class="keywordtype">character(3)</span>:: os_type = <span class="stringliteral">&#39;UIX&#39;</span> <span class="comment">! OS type &#39;UIX&#39; or &#39;WIN&#39;.</span>
-<a name="l00149"></a>00149   <span class="keywordtype">character(20)</span>:: date           <span class="comment">! Actual date.</span>
-<a name="l00150"></a>00150   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00151"></a>00151 
-<a name="l00152"></a>00152   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00153"></a>00153   <span class="comment">! initializing solution file name to &quot;undefined&quot; in order to capture when only mesh is to be post-processed</span>
-<a name="l00154"></a>00154   global%file%File_Sol = <span class="stringliteral">&quot;undefined&quot;</span>
-<a name="l00155"></a>00155   Nca = command_argument_count()
-<a name="l00156"></a>00156   <span class="keyword">if</span> (Nca==0) <span class="keyword">then</span>
-<a name="l00157"></a>00157     <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39; Error: no argument has been passed to command line&#39;</span>
-<a name="l00158"></a>00158     call <a class="code" href="../../d3/dc5/IBM_8f90.html#a280ae0605335cfa04ebdd73a1f5fff58">print_usage</a>
-<a name="l00159"></a>00159     stop
-<a name="l00160"></a>00160   <span class="keyword">else</span>
-<a name="l00161"></a>00161     <span class="comment">! processing switch</span>
-<a name="l00162"></a>00162     c = 0
-<a name="l00163"></a>00163     <span class="keyword">do</span> <span class="keyword">while</span> (c&lt;Nca)
-<a name="l00164"></a>00164       c = c + 1
-<a name="l00165"></a>00165       call get_command_argument(c, ca_switch)
-<a name="l00166"></a>00166       <span class="keyword">select</span> <span class="keyword">case</span>(adjustl(trim(ca_switch)))
-<a name="l00167"></a>00167       <span class="keyword">case</span>(<span class="stringliteral">&#39;-m&#39;</span>) <span class="comment">! file name of mesh file</span>
-<a name="l00168"></a>00168         call get_command_argument(c+1, global%file%File_Mesh) ; c = c + 1
-<a name="l00169"></a>00169       <span class="keyword">case</span>(<span class="stringliteral">&#39;-o&#39;</span>) <span class="comment">! file name of output file</span>
-<a name="l00170"></a>00170         call get_command_argument(c+1, global%file%File_Pout) ; c = c + 1
-<a name="l00171"></a>00171       <span class="keyword">case</span>(<span class="stringliteral">&#39;-s&#39;</span>) <span class="comment">! file name of solution file</span>
-<a name="l00172"></a>00172         call get_command_argument(c+1, global%file%File_Sol) ; c = c + 1
-<a name="l00173"></a>00173       <span class="keyword">case</span>(<span class="stringliteral">&#39;-bc&#39;</span>) <span class="comment">! saving boundary conditions ghost cells</span>
-<a name="l00174"></a>00174         pp_format%bc = .true.
-<a name="l00175"></a>00175       <span class="keyword">case</span>(<span class="stringliteral">&#39;-cell&#39;</span>) <span class="comment">! dependent variables are saved cell centered instead of interpolated at nodes</span>
-<a name="l00176"></a>00176         pp_format%node = .false.
-<a name="l00177"></a>00177       <span class="keyword">case</span>(<span class="stringliteral">&#39;-ascii&#39;</span>) <span class="comment">! ascii output</span>
-<a name="l00178"></a>00178         pp_format%binary = .false.
-<a name="l00179"></a>00179       <span class="keyword">case</span>(<span class="stringliteral">&#39;-tec&#39;</span>) <span class="comment">! Tecplot file format</span>
-<a name="l00180"></a>00180         call get_command_argument(c+1,yes) ; c = c + 1 ; yes = Upper_Case(adjustl(trim(yes)))
-<a name="l00181"></a>00181         pp_format%tec = (adjustl(trim(yes))==<span class="stringliteral">&#39;YES&#39;</span>)
-<a name="l00182"></a>00182       <span class="keyword">case</span>(<span class="stringliteral">&#39;-vtk&#39;</span>) <span class="comment">! VKT file format</span>
-<a name="l00183"></a>00183         call get_command_argument(c+1,yes) ; c = c + 1 ; yes = Upper_Case(adjustl(trim(yes)))
-<a name="l00184"></a>00184         pp_format%vtk = (adjustl(trim(yes))==<span class="stringliteral">&#39;YES&#39;</span>)
-<a name="l00185"></a>00185       <span class="keyword">case</span>(<span class="stringliteral">&#39;-os&#39;</span>) <span class="comment">! OS type</span>
-<a name="l00186"></a>00186         call get_command_argument(c+1,os_type) ; c = c + 1 ; os_type = Upper_Case(os_type)
-<a name="l00187"></a>00187       <span class="keyword">case</span> default
-<a name="l00188"></a>00188         <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39; Error: switch &quot;&#39;</span>//adjustl(trim(ca_switch))//<span class="stringliteral">&#39;&quot; is unknown&#39;</span>
-<a name="l00189"></a>00189         call <a class="code" href="../../d3/dc5/IBM_8f90.html#a280ae0605335cfa04ebdd73a1f5fff58">print_usage</a>
-<a name="l00190"></a>00190         stop
-<a name="l00191"></a>00191       endselect
-<a name="l00192"></a>00192     <span class="keyword">enddo</span>
-<a name="l00193"></a>00193   <span class="keyword">endif</span>
-<a name="l00194"></a>00194   <span class="keyword">if</span> (pp_format%node.and.pp_format%bc) <span class="keyword">then</span>
-<a name="l00195"></a>00195     <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39; It is not possible to save bc ghost cells and node-centered interpolated variables!&#39;</span>
-<a name="l00196"></a>00196     <span class="keyword">write</span>(stderr,*)
-<a name="l00197"></a>00197     stop
-<a name="l00198"></a>00198   <span class="keyword">endif</span>
-<a name="l00199"></a>00199   <span class="comment">! set OS type</span>
-<a name="l00200"></a>00200   OS=init_os(c_id=os_type)
-<a name="l00201"></a>00201   <span class="keyword">if</span> (adjustl(trim(global%file%File_Mesh))==<span class="stringliteral">&#39;unset&#39;</span>) <span class="keyword">then</span>
-<a name="l00202"></a>00202     <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39; File name of mesh file must be provided!&#39;</span>
-<a name="l00203"></a>00203     <span class="keyword">write</span>(stderr,*)
-<a name="l00204"></a>00204     call <a class="code" href="../../d3/dc5/IBM_8f90.html#a280ae0605335cfa04ebdd73a1f5fff58">print_usage</a>
-<a name="l00205"></a>00205     stop
-<a name="l00206"></a>00206   <span class="keyword">endif</span>
-<a name="l00207"></a>00207   <span class="keyword">if</span> (adjustl(trim(global%file%File_Pout))==<span class="stringliteral">&#39;unset&#39;</span>) <span class="keyword">then</span>
-<a name="l00208"></a>00208     <span class="comment">! the name of mesh file is used as output file base name</span>
-<a name="l00209"></a>00209     global%file%File_Pout = adjustl(trim(global%file%File_Mesh))
-<a name="l00210"></a>00210   <span class="keyword">endif</span>
-<a name="l00211"></a>00211   global%file%File_Mesh = adjustl(trim(global%file%File_Mesh)) ; global%file%File_Mesh = string_OS_sep(global%file%File_Mesh)
-<a name="l00212"></a>00212   global%file%File_Sol  = adjustl(trim(global%file%File_Sol )) ; global%file%File_Sol  = string_OS_sep(global%file%File_Sol )
-<a name="l00213"></a>00213   global%file%File_Pout = adjustl(trim(global%file%File_Pout)) ; global%file%File_Pout = string_OS_sep(global%file%File_Pout)
-<a name="l00214"></a>00214   date = Get_Date_String()
-<a name="l00215"></a>00215   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
-<a name="l00216"></a>00216   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39; POG started on&#39;</span>
-<a name="l00217"></a>00217   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39; &#39;</span>//date
-<a name="l00218"></a>00218   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39; Input Files&#39;</span>
-<a name="l00219"></a>00219   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39;  Mesh file:                &#39;</span>//trim(global%file%File_Mesh)
-<a name="l00220"></a>00220   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39;  Boundary conditions file: &#39;</span>//trim(global%file%File_BC)
-<a name="l00221"></a>00221   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39;  Solution file:            &#39;</span>//trim(global%file%File_Sol)
-<a name="l00222"></a>00222   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39;  Output file:              &#39;</span>//trim(global%file%File_Pout)
-<a name="l00223"></a>00223   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
-<a name="l00224"></a>00224   <span class="keyword">write</span>(stdout,*)
-<a name="l00225"></a>00225   <span class="keyword">if</span> (trim(global%file%File_Sol)/=<span class="stringliteral">&quot;unset&quot;</span>) <span class="keyword">then</span>
-<a name="l00226"></a>00226     <span class="comment">! a solution file name has been passed</span>
-<a name="l00227"></a>00227     meshonly = .false.
-<a name="l00228"></a>00228   <span class="keyword">else</span>
-<a name="l00229"></a>00229     <span class="comment">! no solution file name has been passed: post-processing of only mesh is assumed</span>
-<a name="l00230"></a>00230     meshonly = .true.
-<a name="l00231"></a>00231   <span class="keyword">endif</span>
-<a name="l00232"></a>00232   return
-<a name="l00233"></a>00233   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00234"></a>00234 <span class="keyword">  endsubroutine parsing_command_line</span>
-<a name="l00235"></a>00235 <span class="keyword">endprogram POG</span>
+<a name="l00017"></a>00017 <span class="keyword">program</span> <a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a">POG</a>
+<a name="l00018"></a>00018 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00019"></a>00019 USE <span class="keywordflow">IR_Precision</span>                            <span class="comment">! Integers and reals precision definition.</span>
+<a name="l00020"></a>00020 USE <span class="keywordflow">Data_Type_Globals</span>                       <span class="comment">! Definition of Type_Global and Type_Block.</span>
+<a name="l00021"></a><a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a">00021</a> USE <span class="keywordflow">Data_Type_OS</span>, <span class="keywordflow">init_os</span>=&gt;<span class="keywordflow">init</span>             <span class="comment">! Definition of Type_OS.</span>
+<a name="l00022"></a>00022 USE <span class="keywordflow">Data_Type_Time</span>                          <span class="comment">! Definition of Type_Time.</span>
+<a name="l00023"></a>00023 USE <span class="keywordflow">Data_Type_Vector</span>, <span class="keywordflow">set_vec</span>=&gt;<span class="keywordflow">set</span>          <span class="comment">! Definition of Type_Vector.</span>
+<a name="l00024"></a>00024 USE <span class="keywordflow">Lib_IO_Misc</span>                             <span class="comment">! Procedures for IO and strings operations.</span>
+<a name="l00025"></a>00025 USE <span class="keywordflow">Lib_Mesh</span>,           only: node2center   <span class="comment">! Subroutine for computing cell center cell nodes ones.</span>
+<a name="l00026"></a>00026 USE <span class="keywordflow">Lib_PostProcessing</span>, only: pp_format,  &amp; <span class="comment">! Post-processing data format.</span>
+<a name="l00027"></a>00027                               tec_output, &amp; <span class="comment">! Function for writing Tecplot file.</span>
+<a name="l00028"></a>00028                               vtk_output    <span class="comment">! Function for writing VTK file.</span>
+<a name="l00029"></a>00029 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00030"></a>00030 
+<a name="l00031"></a>00031 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00032"></a>00032 <span class="keyword">implicit none</span>
+<a name="l00033"></a>00033 <span class="keywordtype">type(Type_Global)</span>::             global            <span class="comment">! Global-level data.</span>
+<a name="l00034"></a>00034 <span class="keywordtype">type(Type_Block)</span>, <span class="keywordtype">allocatable</span>:: block(:)          <span class="comment">! Block-level data.</span>
+<a name="l00035"></a>00035 <span class="keywordtype">logical</span>::                       meshonly = .true. <span class="comment">! Flag for post-process only mesh.</span>
+<a name="l00036"></a>00036 <span class="keywordtype">integer(I_P)</span>::                  b,l               <span class="comment">! Counters.</span>
+<a name="l00037"></a>00037 <span class="keywordtype">integer(I_P)</span>::                  err               <span class="comment">! Error trapping flag: 0 no errors, &gt;0 error occurs.</span>
+<a name="l00038"></a>00038 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00039"></a>00039 
+<a name="l00040"></a>00040 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00041"></a>00041 <span class="comment">! parsing command line for getting options</span>
+<a name="l00042"></a>00042 call <a class="code" href="../../d9/de8/POG_8f90.html#a7ebd416423870c5644b7bab1fc18fdc6">parsing_command_line</a>
+<a name="l00043"></a>00043 
+<a name="l00044"></a>00044 <span class="comment">! the number of grid levels/blocks are artificially set to 1: the post processor convert one level/block at time</span>
+<a name="l00045"></a>00045 global%mesh%Nl = 1 ; global%mesh%Nb = 1
+<a name="l00046"></a>00046 <span class="comment">! allocating block-level data</span>
+<a name="l00047"></a>00047 <span class="keyword">if</span> (<span class="keyword">allocated</span>(block)) <span class="keyword">then</span>
+<a name="l00048"></a>00048   call free_block(block=block(1))
+<a name="l00049"></a>00049   <span class="keyword">deallocate</span>(block)
+<a name="l00050"></a>00050 <span class="keyword">endif</span>
+<a name="l00051"></a>00051 <span class="keyword">allocate</span>(block(1))
+<a name="l00052"></a>00052 <span class="comment">! getting dimensions of block</span>
+<a name="l00053"></a>00053 err = load_bmesh_dims(myrank = 0, filename = global%file%File_Mesh, block = block(1))
+<a name="l00054"></a>00054 <span class="comment">! allocating block</span>
+<a name="l00055"></a>00055 call alloc_block(global=global,block=block(1))
+<a name="l00056"></a>00056 
+<a name="l00057"></a>00057 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
+<a name="l00058"></a>00058 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39; Loading &#39;</span>//trim(global%file%File_Mesh)
+<a name="l00059"></a>00059 
+<a name="l00060"></a>00060 err = load_bmesh(myrank = 0, filename = global%file%File_Mesh, block = block(1))
+<a name="l00061"></a>00061 <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
+<a name="l00062"></a>00062   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39; Loading &#39;</span>//trim(global%file%File_Sol)
+<a name="l00063"></a>00063   err = load_gfluid_Ns(binary = .true., myrank = 0, filename = global%file%File_Sol, global = global)
+<a name="l00064"></a>00064   <span class="comment">! allocating global fluid dynamic data</span>
+<a name="l00065"></a>00065   call alloc_global_fluid(global=global)
+<a name="l00066"></a>00066   err = load_bfluid(myrank = 0, filename = global%file%File_Sol, global = global, block = block(1))
+<a name="l00067"></a>00067 <span class="keyword">endif</span>
+<a name="l00068"></a>00068 <span class="keyword">write</span>(stdout,*)
+<a name="l00069"></a>00069 
+<a name="l00070"></a>00070 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39; Computing the mesh variables that are not loaded from input files&#39;</span>
+<a name="l00071"></a>00071 <span class="comment">! computing the cell-center coordinates</span>
+<a name="l00072"></a>00072 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39;   Computing cells centers coordinates&#39;</span>
+<a name="l00073"></a>00073 call node2center(block = block(1))
+<a name="l00074"></a>00074 
+<a name="l00075"></a>00075 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
+<a name="l00076"></a>00076 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39; Processing data&#39;</span>
+<a name="l00077"></a>00077 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39;  Writing Tecplot and/or VTK output data&#39;</span>
+<a name="l00078"></a>00078 <span class="comment">! writing output</span>
+<a name="l00079"></a>00079 <span class="keyword">if</span> (pp_format%tec) err = tec_output(meshonly=meshonly, global=global, block=block(1), filename=trim(global%file%File_Pout))
+<a name="l00080"></a>00080 <span class="keyword">if</span> (pp_format%vtk) err = vtk_output(meshonly=meshonly, global=global, block=block(1), filename=trim(global%file%File_Pout))
+<a name="l00081"></a>00081 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39; Processing data Complete&#39;</span>
+<a name="l00082"></a>00082 <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,IOSTAT=err)<span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
+<a name="l00083"></a>00083 <span class="keyword">write</span>(stdout,*)
+<a name="l00084"></a>00084 stop
+<a name="l00085"></a>00085 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00086"></a>00086 <span class="keyword">contains</span>
+<a name="l00087"></a>00087   <span class="keyword">subroutine </span><a class="code" href="../../d3/dc5/IBM_8f90.html#a280ae0605335cfa04ebdd73a1f5fff58">print_usage</a>()
+<a name="l00088"></a>00088   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00089"></a>00089   <span class="comment">! Subroutine for printing the correct use of the program.</span>
+<a name="l00090"></a>00090   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00091"></a><a class="code" href="../../d9/de8/POG_8f90.html#a6c8ab23f90da6b88355c31607334cf0e">00091</a> 
+<a name="l00092"></a>00092   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00093"></a>00093   <span class="keyword">implicit none</span>
+<a name="l00094"></a>00094   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00095"></a>00095 
+<a name="l00096"></a>00096   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00097"></a>00097   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39; POG&#39;</span>
+<a name="l00098"></a>00098   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39; Post processing code for OFF code&#39;</span>
+<a name="l00099"></a>00099   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39; Usage:&#39;</span>
+<a name="l00100"></a>00100   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;   POG -m mesh_file_name&#39;</span>
+<a name="l00101"></a>00101   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;     [-o output_file_name&#39;</span>
+<a name="l00102"></a>00102   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -s solution_file_name&#39;</span>
+<a name="l00103"></a>00103   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -bc&#39;</span>
+<a name="l00104"></a>00104   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -cell&#39;</span>
+<a name="l00105"></a>00105   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -ascii&#39;</span>
+<a name="l00106"></a>00106   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -tec yes/no&#39;</span>
+<a name="l00107"></a>00107   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -vtk yes/no&#39;</span>
+<a name="l00108"></a>00108   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      -os UIX/WIN]&#39;</span>
+<a name="l00109"></a>00109   <span class="keyword">write</span>(stdout,*)
+<a name="l00110"></a>00110   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39; Optional arguments and default values:&#39;</span>
+<a name="l00111"></a>00111   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -o output_file_name   =&gt; output file name; default is basename of mesh file with the proper extension&#39;</span>
+<a name="l00112"></a>00112   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -s solution_file_name =&gt; solution file name; if passed the solution variables are saved&#39;</span>
+<a name="l00113"></a>00113   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -bc                   =&gt; saving boundary conditions ghost cells (default no)&#39;</span>
+<a name="l00114"></a>00114   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -cell                 =&gt; all vars other than nodes coord. are cell centered (default no, node centered)&#39;</span>
+<a name="l00115"></a>00115   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -ascii                =&gt; write ascii output file (default no, write binary one)&#39;</span>
+<a name="l00116"></a>00116   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -tec yes/no           =&gt; write (or not) Tecplot file format (default yes)&#39;</span>
+<a name="l00117"></a>00117   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -vtk yes/no           =&gt; write (or not) VTK file format (default no)&#39;</span>
+<a name="l00118"></a>00118   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;  -os UIX/WIN           =&gt; type of Operating System write (default *UIX OS type)&#39;</span>
+<a name="l00119"></a>00119   <span class="keyword">write</span>(stdout,*)
+<a name="l00120"></a>00120   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39; Examples: &#39;</span>
+<a name="l00121"></a>00121   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;  Solution file&#39;</span>
+<a name="l00122"></a>00122   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;    Teplot) POG -m example.geo -s example.sol -o example&#39;</span>
+<a name="l00123"></a>00123   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;    VTK)    POG -m example.geo -s example.sol -o example&#39;</span>
+<a name="l00124"></a>00124   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;  Only mesh file&#39;</span>
+<a name="l00125"></a>00125   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;    Teplot) POG -m example.geo                -o example&#39;</span>
+<a name="l00126"></a>00126   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;    VTK)    POG -m example.geo                -o example&#39;</span>
+<a name="l00127"></a>00127   <span class="keyword">write</span>(stdout,*)
+<a name="l00128"></a>00128   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39; Notes:&#39;</span>
+<a name="l00129"></a>00129   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;   1) the output file name extension is not necessary because it assigned according to the type of output:&#39;</span>
+<a name="l00130"></a>00130   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      binary       Tecplot =&gt; .plt&#39;</span>
+<a name="l00131"></a>00131   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      ascii        Tecplot =&gt; .dat&#39;</span>
+<a name="l00132"></a>00132   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;      binary/ascii VTK     =&gt; .vtm&#39;</span>
+<a name="l00133"></a>00133   <span class="keyword">write</span>(stdout,*)
+<a name="l00134"></a>00134   return
+<a name="l00135"></a>00135   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00136"></a>00136 <span class="keyword">  endsubroutine print_usage</span>
+<a name="l00137"></a>00137 
+<a name="l00138"></a>00138   <span class="keyword">subroutine </span><a class="code" href="../../d9/de8/POG_8f90.html#a7ebd416423870c5644b7bab1fc18fdc6">parsing_command_line</a>()
+<a name="l00139"></a>00139   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00140"></a>00140   <span class="comment">! Subroutine for printing the correct use of the program.</span>
+<a name="l00141"></a>00141   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00142"></a><a class="code" href="../../d9/de8/POG_8f90.html#a7ebd416423870c5644b7bab1fc18fdc6">00142</a> 
+<a name="l00143"></a>00143   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00144"></a>00144   <span class="keyword">implicit none</span>
+<a name="l00145"></a>00145   <span class="keywordtype">integer(I_P)</span>:: Nca = 0         <span class="comment">! Number of command line arguments.</span>
+<a name="l00146"></a>00146   <span class="keywordtype">integer(I_P)</span>:: c               <span class="comment">! Counter for command line arguments.</span>
+<a name="l00147"></a>00147   <span class="keywordtype">character(6)</span>:: ca_switch       <span class="comment">! Switch identifier.</span>
+<a name="l00148"></a>00148   <span class="keywordtype">character(3)</span>:: yes             <span class="comment">! Yes (no) flag.</span>
+<a name="l00149"></a>00149   <span class="keywordtype">character(3)</span>:: os_type = <span class="stringliteral">&#39;UIX&#39;</span> <span class="comment">! OS type &#39;UIX&#39; or &#39;WIN&#39;.</span>
+<a name="l00150"></a>00150   <span class="keywordtype">character(20)</span>:: date           <span class="comment">! Actual date.</span>
+<a name="l00151"></a>00151   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00152"></a>00152 
+<a name="l00153"></a>00153   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00154"></a>00154   <span class="comment">! initializing solution file name to &quot;undefined&quot; in order to capture when only mesh is to be post-processed</span>
+<a name="l00155"></a>00155   global%file%File_Sol = <span class="stringliteral">&quot;undefined&quot;</span>
+<a name="l00156"></a>00156   Nca = command_argument_count()
+<a name="l00157"></a>00157   <span class="keyword">if</span> (Nca==0) <span class="keyword">then</span>
+<a name="l00158"></a>00158     <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39; Error: no argument has been passed to command line&#39;</span>
+<a name="l00159"></a>00159     call <a class="code" href="../../d3/dc5/IBM_8f90.html#a280ae0605335cfa04ebdd73a1f5fff58">print_usage</a>
+<a name="l00160"></a>00160     stop
+<a name="l00161"></a>00161   <span class="keyword">else</span>
+<a name="l00162"></a>00162     <span class="comment">! processing switch</span>
+<a name="l00163"></a>00163     c = 0
+<a name="l00164"></a>00164     <span class="keyword">do</span> <span class="keyword">while</span> (c&lt;Nca)
+<a name="l00165"></a>00165       c = c + 1
+<a name="l00166"></a>00166       call get_command_argument(c, ca_switch)
+<a name="l00167"></a>00167       <span class="keyword">select</span> <span class="keyword">case</span>(adjustl(trim(ca_switch)))
+<a name="l00168"></a>00168       <span class="keyword">case</span>(<span class="stringliteral">&#39;-m&#39;</span>) <span class="comment">! file name of mesh file</span>
+<a name="l00169"></a>00169         call get_command_argument(c+1, global%file%File_Mesh) ; c = c + 1
+<a name="l00170"></a>00170       <span class="keyword">case</span>(<span class="stringliteral">&#39;-o&#39;</span>) <span class="comment">! file name of output file</span>
+<a name="l00171"></a>00171         call get_command_argument(c+1, global%file%File_Pout) ; c = c + 1
+<a name="l00172"></a>00172       <span class="keyword">case</span>(<span class="stringliteral">&#39;-s&#39;</span>) <span class="comment">! file name of solution file</span>
+<a name="l00173"></a>00173         call get_command_argument(c+1, global%file%File_Sol) ; c = c + 1
+<a name="l00174"></a>00174       <span class="keyword">case</span>(<span class="stringliteral">&#39;-bc&#39;</span>) <span class="comment">! saving boundary conditions ghost cells</span>
+<a name="l00175"></a>00175         pp_format%bc = .true.
+<a name="l00176"></a>00176       <span class="keyword">case</span>(<span class="stringliteral">&#39;-cell&#39;</span>) <span class="comment">! dependent variables are saved cell centered instead of interpolated at nodes</span>
+<a name="l00177"></a>00177         pp_format%node = .false.
+<a name="l00178"></a>00178       <span class="keyword">case</span>(<span class="stringliteral">&#39;-ascii&#39;</span>) <span class="comment">! ascii output</span>
+<a name="l00179"></a>00179         pp_format%binary = .false.
+<a name="l00180"></a>00180       <span class="keyword">case</span>(<span class="stringliteral">&#39;-tec&#39;</span>) <span class="comment">! Tecplot file format</span>
+<a name="l00181"></a>00181         call get_command_argument(c+1,yes) ; c = c + 1 ; yes = Upper_Case(adjustl(trim(yes)))
+<a name="l00182"></a>00182         pp_format%tec = (adjustl(trim(yes))==<span class="stringliteral">&#39;YES&#39;</span>)
+<a name="l00183"></a>00183       <span class="keyword">case</span>(<span class="stringliteral">&#39;-vtk&#39;</span>) <span class="comment">! VKT file format</span>
+<a name="l00184"></a>00184         call get_command_argument(c+1,yes) ; c = c + 1 ; yes = Upper_Case(adjustl(trim(yes)))
+<a name="l00185"></a>00185         pp_format%vtk = (adjustl(trim(yes))==<span class="stringliteral">&#39;YES&#39;</span>)
+<a name="l00186"></a>00186       <span class="keyword">case</span>(<span class="stringliteral">&#39;-os&#39;</span>) <span class="comment">! OS type</span>
+<a name="l00187"></a>00187         call get_command_argument(c+1,os_type) ; c = c + 1 ; os_type = Upper_Case(os_type)
+<a name="l00188"></a>00188       <span class="keyword">case</span> default
+<a name="l00189"></a>00189         <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39; Error: switch &quot;&#39;</span>//adjustl(trim(ca_switch))//<span class="stringliteral">&#39;&quot; is unknown&#39;</span>
+<a name="l00190"></a>00190         call <a class="code" href="../../d3/dc5/IBM_8f90.html#a280ae0605335cfa04ebdd73a1f5fff58">print_usage</a>
+<a name="l00191"></a>00191         stop
+<a name="l00192"></a>00192       endselect
+<a name="l00193"></a>00193     <span class="keyword">enddo</span>
+<a name="l00194"></a>00194   <span class="keyword">endif</span>
+<a name="l00195"></a>00195   <span class="keyword">if</span> (pp_format%node.and.pp_format%bc) <span class="keyword">then</span>
+<a name="l00196"></a>00196     <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39; It is not possible to save bc ghost cells and node-centered interpolated variables!&#39;</span>
+<a name="l00197"></a>00197     <span class="keyword">write</span>(stderr,*)
+<a name="l00198"></a>00198     stop
+<a name="l00199"></a>00199   <span class="keyword">endif</span>
+<a name="l00200"></a>00200   <span class="comment">! set OS type</span>
+<a name="l00201"></a>00201   OS=init_os(c_id=os_type)
+<a name="l00202"></a>00202   <span class="keyword">if</span> (adjustl(trim(global%file%File_Mesh))==<span class="stringliteral">&#39;unset&#39;</span>) <span class="keyword">then</span>
+<a name="l00203"></a>00203     <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39; File name of mesh file must be provided!&#39;</span>
+<a name="l00204"></a>00204     <span class="keyword">write</span>(stderr,*)
+<a name="l00205"></a>00205     call <a class="code" href="../../d3/dc5/IBM_8f90.html#a280ae0605335cfa04ebdd73a1f5fff58">print_usage</a>
+<a name="l00206"></a>00206     stop
+<a name="l00207"></a>00207   <span class="keyword">endif</span>
+<a name="l00208"></a>00208   <span class="keyword">if</span> (adjustl(trim(global%file%File_Pout))==<span class="stringliteral">&#39;unset&#39;</span>) <span class="keyword">then</span>
+<a name="l00209"></a>00209     <span class="comment">! the name of mesh file is used as output file base name</span>
+<a name="l00210"></a>00210     global%file%File_Pout = adjustl(trim(global%file%File_Mesh))
+<a name="l00211"></a>00211   <span class="keyword">endif</span>
+<a name="l00212"></a>00212   global%file%File_Mesh = adjustl(trim(global%file%File_Mesh)) ; global%file%File_Mesh = string_OS_sep(global%file%File_Mesh)
+<a name="l00213"></a>00213   global%file%File_Sol  = adjustl(trim(global%file%File_Sol )) ; global%file%File_Sol  = string_OS_sep(global%file%File_Sol )
+<a name="l00214"></a>00214   global%file%File_Pout = adjustl(trim(global%file%File_Pout)) ; global%file%File_Pout = string_OS_sep(global%file%File_Pout)
+<a name="l00215"></a>00215   date = Get_Date_String()
+<a name="l00216"></a>00216   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
+<a name="l00217"></a>00217   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39; POG started on&#39;</span>
+<a name="l00218"></a>00218   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39; &#39;</span>//date
+<a name="l00219"></a>00219   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39; Input Files&#39;</span>
+<a name="l00220"></a>00220   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39;  Mesh file:                &#39;</span>//trim(global%file%File_Mesh)
+<a name="l00221"></a>00221   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39;  Boundary conditions file: &#39;</span>//trim(global%file%File_BC)
+<a name="l00222"></a>00222   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39;  Solution file:            &#39;</span>//trim(global%file%File_Sol)
+<a name="l00223"></a>00223   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39;  Output file:              &#39;</span>//trim(global%file%File_Pout)
+<a name="l00224"></a>00224   <span class="keyword">write</span>(stdout,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)<span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
+<a name="l00225"></a>00225   <span class="keyword">write</span>(stdout,*)
+<a name="l00226"></a>00226   <span class="keyword">if</span> (trim(global%file%File_Sol)/=<span class="stringliteral">&quot;unset&quot;</span>) <span class="keyword">then</span>
+<a name="l00227"></a>00227     <span class="comment">! a solution file name has been passed</span>
+<a name="l00228"></a>00228     meshonly = .false.
+<a name="l00229"></a>00229   <span class="keyword">else</span>
+<a name="l00230"></a>00230     <span class="comment">! no solution file name has been passed: post-processing of only mesh is assumed</span>
+<a name="l00231"></a>00231     meshonly = .true.
+<a name="l00232"></a>00232   <span class="keyword">endif</span>
+<a name="l00233"></a>00233   return
+<a name="l00234"></a>00234   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00235"></a>00235 <span class="keyword">  endsubroutine parsing_command_line</span>
+<a name="l00236"></a>00236 <span class="keyword">endprogram POG</span>
 </pre></div></div><!-- contents -->
 </div>
 <!-- window showing the filter options -->
@@ -340,7 +340,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
     <ul>
       <li class="navelem"><a class="el" href="../../d9/de8/POG_8f90.html">POG.f90</a>      </li>
 
-    <li class="footer">Generated on Wed May 9 2012 16:04:44 for OFF by
+    <li class="footer">Generated on Fri May 11 2012 12:38:45 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

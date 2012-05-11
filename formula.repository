@@ -131,43 +131,52 @@
 \form#130:$ {\rm result\%x = vec\%x-scalar} $
 \form#131:$ {\rm result\%y = vec\%y-scalar} $
 \form#132:$ {\rm result\%z = vec\%z-scalar} $
-\form#133:$[10^{-307} , 10^{+307} - 1]$
-\form#134:$[10^{-37} , 10^{+37} - 1]$
-\form#135:$[-2^{63},+2^{63} - 1]$
-\form#136:$[-2^{31},+2^{31} - 1]$
-\form#137:$[-2^{15},+2^{15} - 1]$
-\form#138:$[-2^{7} ,+2^{7} - 1]$
-\form#139:$\rho$
-\form#140:$\gamma=\frac{{c_p}}{{c_v}}$
-\form#141:$ E = \frac{p}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
-\form#142:$ H = \frac{{\gamma p}}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
-\form#143:$dc = NC + \sum\limits_{i = 1}^{NC} {nvertex_i }$
-\form#144:$dc$
-\form#145:$nvertex_i$
-\form#146:$i^{th}$
-\form#147:$dc=2+8+5=15$
-\form#148:$1^\circ$
-\form#149:$2^\circ$
-\form#150:$3^\circ$
-\form#151:$4^\circ$
-\form#152:$5^\circ$
-\form#153:$6^\circ$
-\form#154:$7^\circ$
-\form#155:$8^\circ$
-\form#156:$2^\circ $
-\form#157:$dc = dc = \sum\limits_{i = 1}^{NC} {nvertex_i }$
-\form#158:$dc=8+5=13$
-\form#159:$offset_c=\sum\limits_{i=1}^{c}{nvertex_i}$
-\form#160:$offset_c$
-\form#161:$c^{th}$
-\form#162:$P^{th}$
-\form#163:$2S^{th}$
-\form#164:$2S^{th}-1$
-\form#165:$\gamma,\eta,\chi$
-\form#166:$1^{st}$
-\form#167:$2^{nd}$
-\form#168:$3^{rd},5^{th},7^{th}$
-\form#169:$2^{nd},3^{rd},4^{th}$
-\form#170:$\pi $
-\form#171:$ N = x^2 + y^2 + z^2$
-\form#172:$N = \sqrt {x^2 + y^2 + z^2 }$
+\form#133:$ N = x^2 + y^2 + z^2$
+\form#134:$N = \sqrt {x^2 + y^2 + z^2 }$
+\form#135:$[10^{-307} , 10^{+307} - 1]$
+\form#136:$[10^{-37} , 10^{+37} - 1]$
+\form#137:$[-2^{63},+2^{63} - 1]$
+\form#138:$[-2^{31},+2^{31} - 1]$
+\form#139:$[-2^{15},+2^{15} - 1]$
+\form#140:$[-2^{7} ,+2^{7} - 1]$
+\form#141:$|_{conservative} =\left| \rho_s\right|_{primitive}$
+\form#142:$|_{conservative} = \left| \rho \vec V \right|_{primitive}$
+\form#143:$|_{conservative}=\left|\frac{p}{\gamma-1}+\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right|_{primitive}$
+\form#144:$|_{primitive} =\left| \rho_s\right|_{conservative}$
+\form#145:$|_{primitive} =\left|\sum_{s=1}^{Ns}\rho_s\right|_{conservative}$
+\form#146:$|_{primitive}=\left|\frac{\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cp_s^0}} {\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cv_s^0}}\right|_{conservative}$
+\form#147:$|_{primitive} =\left|\frac{\vec momentum}{\rho}\right|_{conservative}$
+\form#148:$|_{primitive}=\left|(\gamma-1)\left[energy-\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right]\right|_{conservative}$
+\form#149:$cp_s^0,cv_s^0$
+\form#150:$\pi $
+\form#151:$\rho$
+\form#152:$\gamma=\frac{{c_p}}{{c_v}}$
+\form#153:$ E = \frac{p}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
+\form#154:$ H = \frac{{\gamma p}}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
+\form#155:$dc = dc = \sum\limits_{i = 1}^{NC} {nvertex_i }$
+\form#156:$dc=8+5=13$
+\form#157:$1^\circ$
+\form#158:$2^\circ$
+\form#159:$3^\circ$
+\form#160:$4^\circ$
+\form#161:$5^\circ$
+\form#162:$6^\circ$
+\form#163:$7^\circ$
+\form#164:$8^\circ$
+\form#165:$offset_c=\sum\limits_{i=1}^{c}{nvertex_i}$
+\form#166:$offset_c$
+\form#167:$c^{th}$
+\form#168:$nvertex_i$
+\form#169:$i^{th}$
+\form#170:$dc = NC + \sum\limits_{i = 1}^{NC} {nvertex_i }$
+\form#171:$dc$
+\form#172:$dc=2+8+5=15$
+\form#173:$2^\circ $
+\form#174:$P^{th}$
+\form#175:$2S^{th}$
+\form#176:$2S^{th}-1$
+\form#177:$\gamma,\eta,\chi$
+\form#178:$1^{st}$
+\form#179:$2^{nd}$
+\form#180:$3^{rd},5^{th},7^{th}$
+\form#181:$2^{nd},3^{rd},4^{th}$

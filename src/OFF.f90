@@ -25,10 +25,11 @@
 !> @defgroup OFFPrivateProcedure OFF
 !> @}
 
-!> @brief @off is an Open source Finite volume Fluid dynamics code.
+!> @brief @off is an Open source Finite volumes Fluid dynamics code.
 !> It is written in in standard (compliant) Fortran 2003 with highly modularity as design target. \n
 !>
-!> The aim of @off is to solve, numerically, the Navier-Stokes equations of fluid dynamics by means of Finite Volume technique.
+!> The aim of @off is to solve, numerically, the compressible Navier-Stokes equations of fluid dynamics by means of Finite Volumes
+!> techniques.
 !> The main features of @off code are the following:
 !> - Finite Volume, Godunov-like scheme based on Euler conservation Laws written in fully conservative formulation:
 !>   - the extension to viscous Navier-Stokes equations is under developing;
@@ -81,7 +82,10 @@
 !> @todo \b Chimera: Introducing blocks overlapping, overset (Chimera) model
 !> @todo \b GPU: Introducing fine, local parallelism by means of GPU programming (e.g. CUDA framework)
 !> @todo \b DocImprove: Improve the documentation
-!> @todo \b DocMakeFile: Create the documentation of makefile
+!> @note
+!> <b>Compiling Instructions</b> \n
+!> @off is shipped with a makefile for compiling the codes on Unix/GNU Linux architectures. Other OS are not supported.
+!> For more details see \ref Compiling "Compiling Instructions".
 !> @ingroup Program
 program OFF
 !-----------------------------------------------------------------------------------------------------------------------------------

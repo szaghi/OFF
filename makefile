@@ -97,6 +97,21 @@ help:
 	@echo -e '\033[1;31m External libraries\033[0m'
 	@echo -e '\033[1;31m  TECIO=yes(no)\033[0m\033[1m => on(off) Tecplot IO library linking (default $(TECIO))\033[0m'
 	@echo
+	@echo -e '\033[1;31m Provided Rules\033[0m'
+	@echo -e '\033[1;31m  Defualt rule =>\033[0m\033[1m OFF\033[0m'
+	@echo -e '\033[1;31m  help         =>\033[0m\033[1m printing this help message\033[0m'
+	@echo -e '\033[1;31m  OFF          =>\033[0m\033[1m building OFF code\033[0m'
+	@echo -e '\033[1;31m  IBM          =>\033[0m\033[1m building IBM code\033[0m'
+	@echo -e '\033[1;31m  POG          =>\033[0m\033[1m building POG code\033[0m'
+	@echo -e '\033[1;31m  cleanobj     =>\033[0m\033[1m cleaning compiled object\033[0m'
+	@echo -e '\033[1;31m  cleanmod     =>\033[0m\033[1m cleaning .mod files\033[0m'
+	@echo -e '\033[1;31m  cleanmsg     =>\033[0m\033[1m cleaning make-log massage files\033[0m'
+	@echo -e '\033[1;31m  cleanexe     =>\033[0m\033[1m cleaning executable files\033[0m'
+	@echo -e '\033[1;31m  clean        =>\033[0m\033[1m running cleanobj, cleanmod and cleanmsg\033[0m'
+	@echo -e '\033[1;31m  cleanall     =>\033[0m\033[1m running clean and cleanexe\033[0m'
+	@echo -e '\033[1;31m  tar          =>\033[0m\033[1m creating a tar archive of the project\033[0m'
+	@echo -e '\033[1;31m  doc          =>\033[0m\033[1m building the documentation\033[0m'
+	@echo
 #----------------------------------------------------------------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------------------------------------------------------------

@@ -1,3 +1,8 @@
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Lib_FluidynamicPublicProcedure Lib_Fluidynamic
+!> @}
+
 !> This module contains the definition of fluid dynamic procedures.
 !> This is a library module.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
@@ -83,15 +88,21 @@ real(R_P), allocatable:: rk_c2(:,:) !< c2 coefficients of Runge-Kutta's integrat
 integer(I1P):: flip = 0_I_P !< Flip-Flop flag for restart solution file.
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @ingroup Lib_FluidynamicPublicProcedure
+  !> @{
+  !> Subroutine for converting primitive variables to conservative variables.
+  !> The conversion laws are: \n
+  !> - Partial densities\f$|_{conservative} =\left| \rho_s\right|_{primitive}\f$
+  !> - Momentum\f$|_{conservative} = \left| \rho \vec V \right|_{primitive}\f$
+  !> - Energy\f$|_{conservative}=\left|\frac{p}{\gamma-1}+\frac{1}{2}\rho
+  !>   \left(V_x^2+V_y^2+V_z^2\right)\right|_{primitive}\f$
   pure subroutine prim2cons(prim,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for converting primitive variables to conservative variables.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Primitive),    intent(IN)::    prim ! Primitive variables.
-  type(Type_Conservative), intent(INOUT):: cons ! Conservative variables.
+  type(Type_Primitive),    intent(IN)::    prim !< Primitive variables (see \ref Data_Type_Primitive::Type_Primitive
+                                                !< "Type_Primitive" definition).
+  type(Type_Conservative), intent(INOUT):: cons !< Conservative variables (see \ref Data_Type_Conservative::Type_Conservative
+                                                !< "Type_Conservative" definition).
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -102,18 +113,28 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine prim2cons
 
+  !> Subroutine for converting conservative variables to primitive variables.
+  !> The conversion laws are: \n
+  !> - Partial densities\f$|_{primitive} =\left| \rho_s\right|_{conservative}\f$
+  !> - Density\f$|_{primitive} =\left|\sum_{s=1}^{Ns}\rho_s\right|_{conservative}\f$
+  !> - Specific heats ratio\f$|_{primitive}=\left|\frac{\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cp_s^0}}
+  !>   {\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cv_s^0}}\right|_{conservative}\f$
+  !> - Velocity\f$|_{primitive} =\left|\frac{\vec momentum}{\rho}\right|_{conservative}\f$
+  !> - Pressure\f$|_{primitive}=\left|(\gamma-1)\left[energy-\frac{1}{2}\rho
+  !>   \left(V_x^2+V_y^2+V_z^2\right)\right]\right|_{conservative}\f$ \n
+  !> where Ns is the number of initial species and \f$cp_s^0,cv_s^0\f$ are the initial specific heats.
   pure subroutine cons2prim(cp0,cv0,cons,prim)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for converting conservative variables to primitive variables.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),               intent(IN)::    cp0(:)                  ! Specific heat at constant p of initial species.
-  real(R_P),               intent(IN)::    cv0(:)                  ! Specific heat at constant v of initial species.
-  type(Type_Conservative), intent(IN)::    cons                    ! Conservative variables.
-  type(Type_Primitive),    intent(INOUT):: prim                    ! Primitive variables.
-  real(R_P)::                              c(1:size(cp0(:),dim=1)) ! Species concentration.
+  real(R_P),               intent(IN)::    cp0(:)                  !< Specific heat at constant p of initial species.
+  real(R_P),               intent(IN)::    cv0(:)                  !< Specific heat at constant v of initial species.
+  type(Type_Conservative), intent(IN)::    cons                    !< Conservative variables (see
+                                                                   !< \ref Data_Type_Conservative::Type_Conservative
+                                                                   !< "Type_Conservative" definition).
+  type(Type_Primitive),    intent(INOUT):: prim                    !< Primitive variables (see
+                                                                   !< \ref Data_Type_Primitive::Type_Primitive "Type_Primitive"
+                                                                   !< definition).
+  real(R_P)::                              c(1:size(cp0(:),dim=1)) !< Species concentration.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -127,15 +148,12 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine cons2prim
 
-  subroutine primitive2conservative(block)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for converting primitive variables to conservative variables.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> Subroutine for converting primitive variables to conservative variables of all cells of a block.
+  pure subroutine primitive2conservative(block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Block),  intent(INOUT):: block  ! Block-level data.
-  integer(I_P)::                     i,j,k  ! Space counters.
+  type(Type_Block), intent(INOUT):: block !< Block-level data (see \ref Data_Type_Globals::Type_Block "Type_Block" definition).
+  integer(I_P)::                    i,j,k !< Space counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -156,16 +174,13 @@ contains
 
   endsubroutine primitive2conservative
 
+  !> Subroutine for converting conservative variables to primitive variables of all cells of a block.
   subroutine conservative2primitive(global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for converting conservative variables to primitive variables.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global), intent(IN)::    global ! Global-level data.
-  type(Type_Block),  intent(INOUT):: block  ! Block-level data.
-  integer(I_P)::                     i,j,k  ! Space counters.
+  type(Type_Global), intent(IN)::    global !< Global-level data (see \ref Data_Type_Globals::Type_Global "Type_Global" definition).
+  type(Type_Block),  intent(INOUT):: block  !< Block-level data (see \ref Data_Type_Globals::Type_Block "Type_Block" definition).
+  integer(I_P)::                     i,j,k  !< Space counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -184,6 +199,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine conservative2primitive
+  !> @}
 
   subroutine compute_time(global,block,Dtmin)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -993,13 +1009,13 @@ contains
 
   subroutine boundary_conditions(myrank,l,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! The subroutine boundary_conditions imposes the boundary conditions of blocks of grid level "l" updating the ghost cells.
+  ! Subroutine for imposing the boundary conditions of blocks of grid level "l" updating the ghost cells.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank                  ! Actual rank process.
-  integer(I_P),      intent(IN)::    l                       ! Actual grid level.
+  integer(I_P),      intent(IN)::    myrank                  ! Current rank process.
+  integer(I_P),      intent(IN)::    l                       ! Current grid level.
   type(Type_Global), intent(IN)::    global                  ! Global-level data.
   type(Type_Block),  intent(INOUT):: block(1:global%mesh%Nb) ! Block-level data.
   integer(I_P)::                     Ni,Nj,Nk,gc(1:6)        ! Temp var for storing block dimensions.
@@ -1410,31 +1426,31 @@ contains
    !endsubroutine set_in2
   endsubroutine boundary_conditions
 
+  !> @ingroup Lib_FluidynamicPublicProcedure
+  !> Subroutine for solving (performing 1 time step integration) the conservation equations for a given grid level.
   subroutine solve_grl(myrank,l,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for solving the conservation equations for a given grid level
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank                                   ! Actual rank process.
-  integer(I_P),      intent(IN)::    l                                        ! Actual grid level.
-  type(Type_Global), intent(INOUT):: global                                   ! Global-level data.
-  type(Type_Block),  intent(INOUT):: block(1:global%mesh%Nb)                  ! Block-level data.
-  real(R_P)::                        Dtmin(1:global%mesh%Nb)                  ! Min t step of actual process for each blk.
-  real(R_P)::                        DtminL                                   ! Min t step of actual process over all blks.
-  real(R_P)::                        gDtmin                                   ! Global (all processes/all blks) min t step.
-  real(R_P)::                        RU  (1:global%fluid%Nc,1:global%mesh%Nb) ! NormL2 of conservartive residuals.
-  real(R_P)::                        mRU (1:global%fluid%Nc)                  ! Maximum of RU of actual process.
-  real(R_P)::                        gmRU(1:global%fluid%Nc)                  ! Global (all processes) maximum of RU.
-  integer(I_P)::                     err                                      ! Error trapping flag: 0 no errors, >0 errors.
-  integer(I_P)::                     b                                        ! Blocks counter.
-  integer(I_P)::                     s1                                       ! Runge-Kutta stages counters.
-  real(R_P)::                        sec_elp                                  ! Seconds elapsed from the simulation start.
-  real(R_P)::                        sec_res                                  ! Seconds residual from the simulation end.
-  type(Type_Time)::                  time_elp                                 ! Time elapsed (in days,hours,min... format).
-  type(Type_Time)::                  time_res                                 ! Time residual (in days,hours,min... format).
-  real(R_P)::                        progress                                 ! Status (%) of simulation progress.
+  integer(I_P),      intent(IN)::    myrank                  !< Current rank process.
+  integer(I_P),      intent(IN)::    l                       !< Current grid level.
+  type(Type_Global), intent(INOUT):: global                  !< Global-level data (see \ref Data_Type_Globals::Type_Global
+                                                             !< "Type_Global" definition).
+  type(Type_Block),  intent(INOUT):: block(1:global%mesh%Nb) !< Block-level data (see \ref Data_Type_Globals::Type_Block
+                                                             !< "Type_Block" definition).
+  real(R_P)::       Dtmin(1:global%mesh%Nb)                  !< Min t step of actual process for each blk.
+  real(R_P)::       DtminL                                   !< Min t step of actual process over all blks.
+  real(R_P)::       gDtmin                                   !< Global (all processes/all blks) min t step.
+  real(R_P)::       RU  (1:global%fluid%Nc,1:global%mesh%Nb) !< NormL2 of conservartive residuals.
+  real(R_P)::       mRU (1:global%fluid%Nc)                  !< Maximum of RU of actual process.
+  real(R_P)::       gmRU(1:global%fluid%Nc)                  !< Global (all processes) maximum of RU.
+  integer(I_P)::    err                                      !< Error trapping flag: 0 no errors, >0 errors.
+  integer(I_P)::    b                                        !< Blocks counter.
+  integer(I_P)::    s1                                       !< Runge-Kutta stages counters.
+  real(R_P)::       sec_elp                                  !< Seconds elapsed from the simulation start.
+  real(R_P)::       sec_res                                  !< Seconds residual from the simulation end.
+  type(Type_Time):: time_elp                                 !< Time elapsed (in days,hours,min... format).
+  type(Type_Time):: time_res                                 !< Time residual (in days,hours,min... format).
+  real(R_P)::       progress                                 !< Status (%) of simulation progress.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1519,11 +1535,11 @@ contains
       time_elp = Seconds_To_Time(sec_elp)
       time_res = Seconds_To_Time(sec_res)
       write(stdout,'(A)',                      iostat=err)'----------------------------------------------------------------------'
-      write(stdout,'(A39,I30)',                iostat=err)' Actual grid level                  l: ',l
+      write(stdout,'(A39,I30)',                iostat=err)' Current grid level                 l: ',l
       write(stdout,'(A39,23X,F6.2,A)',         iostat=err)' Simulation progress                p: ',progress,'%'
-      write(stdout,'(A39,I30)',                iostat=err)' Actual step number                 n: ',global%fluid%n
-      write(stdout,'(A39,ES30.12)',            iostat=err)' Actual simulation time             t: ',global%fluid%t
-      write(stdout,'(A39,ES30.12)',            iostat=err)' Actual time step value           gDt: ',gDtmin
+      write(stdout,'(A39,I30)',                iostat=err)' Current step number                n: ',global%fluid%n
+      write(stdout,'(A39,ES30.12)',            iostat=err)' Current simulation time            t: ',global%fluid%t
+      write(stdout,'(A39,ES30.12)',            iostat=err)' Current time step value          gDt: ',gDtmin
       write(stdout,*)
       write(stdout,'(10X,A15,20X,A15)',        iostat=err)' Elapsed Time','Residual Time'
       write(stdout,'(10X,A9,I6,20X,A9,I6)',    iostat=err)' Days    =',time_elp%Days,   'Days    =',time_res%Days
@@ -1538,7 +1554,7 @@ contains
   ! evaluating the Runge-Kutta stages
   ! Runge-Kutta stages initialization
   do b=1,global%mesh%Nb
-    call init_cons(Ns=global%fluid%Ns,cons=block(b)%fluid%KS)
+    block(b)%fluid%KS = 0._R_P
   enddo
   do s1=1,global%fluid%rk_ord
     if (s1>1) then

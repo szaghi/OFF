@@ -10,7 +10,8 @@
 !> @note In order to produce binary Tecplot file the Tecplot, Inc.'s library tecio.a (or tecio64.a) must be available during the
 !>       compilation of POG. If you are using the makefile shipped with @off code there is a dedicated option: TECIO=yes/no. If
 !>       during the compilation this option is set to yes (e.g. make POG TECIO=yes) the make search the correct library into ./lib/.
-!>       Edit the makefile to point to the correct path where tecio.a (or tecio64.a) is placed.
+!>       Edit the makefile to point to the correct path where tecio.a (or tecio64.a) is placed. For more details see \ref Compiling
+!>       "Compiling Instructions".
 !> @todo \b DocImprove: Improve the documentation
 !> @ingroup Program
 program POG

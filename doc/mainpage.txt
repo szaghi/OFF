@@ -8,11 +8,12 @@
 
 @section Introduction
 
-@off is an Open source Finite volume Fluid dynamics code.
+@off is an Open source Finite volumes Fluid dynamics code.
 
 It is written in in standard (compliant) Fortran 2003 with highly modularity as design target.
 
-The aim of @off is to solve, numerically, the Navier-Stokes equations of fluid dynamics by means of Finite Volume technique.
+The aim of @off is to solve, numerically, the compressible Navier-Stokes equations of fluid dynamics by means of
+Finite Volumes techniques.
 The main features of @off code are the following:
 - Finite Volume, Godunov-like scheme based on Euler conservation Laws written in fully conservative formulation:
   - the extension to viscous Navier-Stokes equations is under developing;
@@ -40,7 +41,7 @@ The main features of @off code are the following:
   - \f$2^{nd},3^{rd},4^{th}\f$ orders Strong-Stability-Preserving explicit Runge-Kutta integration;
 - Local pseudo-time convergence acceleration for steady simulations;
 - Multi-grid time convergence acceleration:
-  - Multi-grid model has been already developed, but it is affected by some not still recognized bugs. Testing and bugs fixing
+  - Multi-grid model has been already developed, but it is affected by some not yet recognized bugs. Testing and bugs fixing
     are in progress.
 - Underling numerical grid models:
   - 3D, general curvilinear, body-fitted, structured multi-blocks mesh;
@@ -53,6 +54,11 @@ The main features of @off code are the following:
   - Fine, local parallelism by means of GPU programming (e.g. CUDA framework) providing the ability to use GPUs cluster
     facilities (to be developed in future).
 
+@note
+<b>Compiling Instructions</b> \n
+@off is shipped with a makefile for compiling the codes on Unix/GNU Linux architectures. Other OS are not supported.
+For more details see \ref Compiling "Compiling Instructions".
+
 @bug <b>Multi-grid Models</b>: \n Multi-grid time convergence acceleration has been developed, but it is affected by some bugs
                                that <em>blow up</em> steady simulations.
 @todo \b NavierStokesEq: Extension to viscous Navier-Stokes equations
@@ -62,7 +68,6 @@ The main features of @off code are the following:
 @todo \b Chimera: Introducing blocks overlapping, overset (Chimera) model
 @todo \b GPU: Introducing fine, local parallelism by means of GPU programming (e.g. CUDA framework)
 @todo \b DocImprove: Improve the documentation
-@todo \b DocMakeFile: Create the documentation of makefile
 
 @subsection Auxiliary_Codes
 
@@ -105,5 +110,243 @@ files ready to be visualized. Two different visualization standards are supporte
 @section Source-Code
 
 It can be found at: https://github.com/szaghi/OFF
+
+
+@page Compiling Compiling Instruction
+@off has been developed on GNU/Linux architectures. Other OS are not supported (and in general there is no best alternative to
+GNU/Linux :-).
+
+The codes provided (@off, IBM and POG) have been successfully compiled with the following compilers:
+
+- GNU gfortran (from version 4.6.3)
+- Intel Fortran Compiler ifort (from version 11.0)
+
+Other compilers are not supported. For the Portland Group Compiler pgf it is known the presence of problems (and lack of performance
+due to the dynamic data nested into derived types).
+
+@off can run over High Performance Computing facilities. It is parallelizated by
+means MPI paradigm for running over large distributed memory clusters and by means OpenMP paradigm for shared memory architectures.
+Both the supported compilers provides OpenMP paradigm support. For MPI support a MPI implementation is necessary. @off has been
+successfully compiled by means OpenMPI and MPCH2 implementations. In particular the supported implementations are:
+
+- OpenMPI (from version 1.4.5)  compiled against GNU gfortran;
+- OpenMPI (from version 1.4.5)  compiled against Intel Fortran Compiler ifort;
+- MPICH2 (from version 1.4.1)  compiled against GNU gfortran;
+- MPICH2 (from version 1.4.1)  compiled against Intel Fortran Compiler ifort.
+
+The codes are constituted by several modules. Therefore there are many dependences. The most easy way to compile the code is to
+start with the provided makefile thus it is necessary that the system has "Make" program (preferably GNU make http://www.gnu.org/software/make/).
+
+Examples of compiling are:
+- @off code with default options:
+  @code
+  make
+  @endcode
+- parallel and performance-optimized @off:
+  @code
+  make DEBUG=no OPTIMIZE=yes OPENMP=yes MPI=yes
+  @endcode
+- auxiliaries codes:
+  - IBM code with default options:
+    @code
+    make IBM
+    @endcode
+  - POG code with Tecplot binary library:
+    @code
+    make POG TECIO=yes
+    @endcode
+- building documentation:
+  @code
+  make doc
+  @endcode
+- cleaning the project directory:
+  @code
+  make cleanall
+  @endcode
+
+In the following subsections there are more details of each option and rule of the provided makefile.
+
+@section Makefile
+
+The provided makefile has several options. It has one rule that prints all options available and the default settings.
+Typing in the shell prompt: @code make help @endcode the following output will be printed:
+
+@code
+ Make options of OFF codes
+
+ Compiler choice
+  COMPILER=gnu   => GNU gfortran
+  COMPILER=intel => Intel Fortran
+  COMPILER=pgi   => Portland Group Fortran
+  COMPILER=g95   => free g95
+  COMPILER=gnu   => default
+
+ Compiling options
+  DEBUG=yes(no)    => on(off) debug                  (default yes)
+  F03STD=yes(no)   => on(off) check standard fortran (default yes)
+  OPTIMIZE=yes(no) => on(off) optimization           (default no)
+  OPENMP=yes(no)   => on(off) OpenMP directives      (default no)
+  MPI=yes(no)      => on(off) MPI    directives      (default no)
+
+ Preprocessing options
+  R16P=yes(no) => on(off) definition of real with "128 bit" (default no)
+  NULi=yes(no) => on(off) nullify i direction (1D or 2D)    (default no)
+  NULj=yes(no) => on(off) nullify j direction (1D or 2D)    (default no)
+  NULk=yes(no) => on(off) nullify k direction (1D or 2D)    (default no)
+  PPL=yes(no)  => on(off) Positivity Preserving Limiter     (default no)
+  WENO=WENO/WENOZ/WENOM WENO algorithm (default WENO)
+   WENO  => Original Jiang-Shu
+   WENOZ => Improved Borges-Carmona-Costa-Don
+   WENOM => Improved Henrick-Aslam-Powers
+  RECV=RECVC/RECVP reconstruction variables type (default RECVC)
+   RECVC => reconstruction in (local) characteristic variables
+   RECVP => reconstruction in primitive variables
+  RSU=HLLCb/HLLCc/HLLCp/HLLCt/HLLCz/EXA/PVL/TR/TS/APRS/ALFR/LF/LFz/ROE Riemann solver algorithm (default HLLCp)
+   HLLCb => Approximate HLLC solver using BCLC waves speed estimation
+   HLLCc => Approximate HLLC solver using CVL  waves speed estimation
+   HLLCp => Approximate HLLC solver using PVL  waves speed estimation
+   HLLCt => Approximate HLLC solver using TR   waves speed estimation
+   HLLCz => Approximate HLLC solver using Z    waves speed estimation
+   EXA   => Exact solver
+   PVL   => Approximate PVL solver
+   TR    => Approximate TR solver
+   TS    => Approximate TS solver
+   APRS  => Approximate APRS solver
+   ALFR  => Approximate ALFR solver
+   LFp   => Approximate Lax-Friedrichs solver using PVL waves speed estimation
+   LFz   => Approximate Lax-Friedrichs solver using Z   waves speed estimation
+   ROE   => Approximate Roe solver
+  WS=WSu/WSup Waves Speed estimation algorithm (default WSup)
+   WSu  => WavesSpeed14u  or WavesSpeed1234u  algorithm
+   WSup => WavesSpeed14up or WavesSpeed1234up algorithm
+  SMSW=SMSWz/SMSWliu/SMSWvanleer/SMSWvanalbada/SMSWharten smoothness switchg algorithm (default SMSWz)
+   SMSWz         => Riemann-solver-like algorithm
+   SMSWliu       => Liu algorithm
+   SMSWvanleer   => van Leer slope limiter algorithm
+   SMSWvanAlbada => van Albada slope limiter  algorithm
+   SMSWharten    => Harten slope limiter algorithm
+  HYBRID=NOHYBRID/HYBRID/HYBRIDC hybrid scheme (default NOHYBRID)
+   NOHYBRID => no hybrid scheme
+   HYBRID   => hybrid weno/weno_optimal scheme
+   HYBRIDC  => hybrid weno/noweno_central scheme
+
+ External libraries
+  TECIO=yes(no) => on(off) Tecplot IO library linking (default no)
+
+ Provided Rules
+  Defualt rule => OFF
+  help         => printing this help message
+  OFF          => building OFF code
+  IBM          => building IBM code
+  POG          => building POG code
+  cleanobj     => cleaning compiled object
+  cleanmod     => cleaning .mod files
+  cleanmsg     => cleaning make-log massage files
+  cleanexe     => cleaning executable files
+  clean        => running cleanobj, cleanmod and cleanmsg
+  cleanall     => running clean and cleanexe
+  tar          => creating a tar archive of the project
+  doc          => building the documentation
+@endcode
+
+@subsection Options
+
+The makefiles provides several options. These can be divided in make options (compiler choice and compiling options) and in
+pre-processing options. For the pre-processing options the C pre-process paradigm has been used.
+
+The meaning of the options are:
+
+- <b>Compiler choice:</b>
+  - <b>COMPILER=gnu  </b> the codes is compiled using GNU gfortran compiler;
+  - <b>COMPILER=intel</b> the codes is compiled using Intel Fortran compiler;
+  - <b>COMPILER=pgi  </b> the codes is compiled using Portland Group Fortran compiler (<em>not yet supported</em>);
+  - <b>COMPILER=g95  </b> the codes is compiled using free g95 compiler (<em>not yet supported</em>).
+- <b>Compiling options:</b>
+  - <b>DEBUG=yes(no)   </b> compilation with (or not) debug symbols;
+  - <b>F03STD=yes(no)  </b> checking (or not) the compliance to Fortran standard 2003;
+  - <b>OPTIMIZE=yes(no)</b> performance-optimized compilation (or not);
+  - <b>OPENMP=yes(no)  </b> compilation with (or not) OpenMP directives;
+  - <b>MPI=yes(no)     </b> compilation with (or not) MPI directives.
+- <b>Preprocessing options:</b>
+  - <b>R16P=yes(no)</b> activation (or not) support for real with "128 bit" (quadruple precision) representation;
+  - <b>NULi=yes(no)</b> nullify i direction integration for 1D or 2D simulation;
+  - <b>NULj=yes(no)</b> nullify j direction integration for 1D or 2D simulation;
+  - <b>NULk=yes(no)</b> nullify k direction integration for 1D or 2D simulation;
+  - <b>PPL=yes(no) </b> activation (or not) the Positivity Preserving Limiter for high order WENO scheme.
+  - <b>WENO=WENO/WENOZ/WENOM WENO</b> WENO algorithm:
+    - <b>WENO </b> original Jiang-Shu sheme;
+    - <b>WENOZ</b> improved Borges-Carmona-Costa-Don scheme;
+    - <b>WENOM</b> improved Henrick-Aslam-Powers scheme.
+  - <b>RECV=RECVC/RECVP</b> high order WENO scheme reconstruction variables type:
+    - <b>RECVC</b> reconstruction in (local) characteristic variables;
+    - <b>RECVP</b> reconstruction in primitive variables.
+  - <b>RSU=HLLCb/HLLCc/HLLCp/HLLCt/HLLCz/EXA/PVL/TR/TS/APRS/ALFR/LF/LFz/ROE</b> Riemann solver algorithm:
+    - <b>HLLCb</b> approximate HLLC solver using BCLC waves speed estimation;
+    - <b>HLLCc</b> approximate HLLC solver using CVL  waves speed estimation;
+    - <b>HLLCp</b> approximate HLLC solver using PVL  waves speed estimation;
+    - <b>HLLCt</b> approximate HLLC solver using TR   waves speed estimation;
+    - <b>HLLCz</b> approximate HLLC solver using Z    waves speed estimation;
+    - <b>EXA  </b> exact solver based on u-function iterative solution;
+    - <b>PVL  </b> approximate PVL (Primitive Variables Linearization) solver;
+    - <b>TR   </b> approximate TR (Two Rarefaction) solver;
+    - <b>TS   </b> approximate TS (Two Shock) solver;
+    - <b>APRS </b> approximate APRS (Adaptive PVL-TR-TS) solver;
+    - <b>ALFR </b> approximate ALFR (Adaptive HLL-TR-TS) solver;
+    - <b>LFp  </b> approximate local Lax-Friedrichs solver using PVL waves speed estimation;
+    - <b>LFz  </b> approximate local Lax-Friedrichs solver using Z   waves speed estimation;
+    - <b>ROE  </b> approximate Roe solver.
+  - <b>WS=WSu/WSup</b> waves speed estimation algorithm:
+    - <b>WSu </b> WavesSpeed14u  or WavesSpeed1234u  algorithm;
+    - <b>WSup</b> WavesSpeed14up or WavesSpeed1234up algorithm;
+  - <b>SMSW=SMSWz/SMSWliu/SMSWvanleer/SMSWvanalbada/SMSWharten</b> smoothness switchg algorithm:
+    - <b>SMSWz        </b> Riemann-solver-like algorithm;
+    - <b>SMSWliu      </b> Liu algorithm;
+    - <b>SMSWvanleer  </b> van Leer slope limiter algorithm;
+    - <b>SMSWvanAlbada</b> van Albada slope limiter  algorithm;
+    - <b>SMSWharten   </b> Harten slope limiter algorithm.
+  - <b>HYBRID=NOHYBRID/HYBRID/HYBRIDC</b>: hybrid (WENO/Central) scheme:
+    - <b>NOHYBRID</b> no hybrid scheme;
+    - <b>HYBRID  </b> hybrid weno/weno_optimal scheme;
+    - <b>HYBRIDC </b> hybrid weno/noweno_central scheme.
+@subsection Rules
+
+The makefiles provides several rules. Their meanings are:
+
+- <b>help    </b>: print help message in the shell prompt providing informations about the options and the rules available;
+- <b>OFF     </b>: build OFF code according to the options chosen; the parallel options OPENMPI and MPI can be used;
+- <b>IBM     </b>: build IBM code according to the options chosen; IBM has no parallel symbols thus activating the
+                   parallel options OPENMPI and MPI has no sense;
+- <b>POG     </b>: build POG code according to the options chosen; POG has only OPENMPI symbols thus activating the
+                   parallel option MPI has no sense;
+- <b>cleanobj</b>: clean compiled object file .o that are saved in obj directory by default;
+- <b>cleanmod</b>: clean modules files .mod that are saved in obj directory by default;
+- <b>cleanmsg</b>: clean log massage files of the make compilation that are "error_message" and "diagnostic_messages";
+- <b>cleanexe</b>: clean executable files OFF, IBM and POG that are stored in ./ by default;
+- <b>clean   </b>: execute cleanobj, cleanmod and cleanmsgr;
+- <b>cleanall</b>: execute clean and cleanexe;
+- <b>tar     </b>: create a tar archive containing input lib util and src directories and makefile;
+- <b>doc     </b>: build the documentation (by means doxygen) in the directory doc/html.
+
+@note
+In order to build the documentation the following dependences must be satisfied:
+- .doxigenconfig file must be in project main directory;
+- doc directory with doc/fpp.sh, doc/mainpage.txt and doc/off-layout.xml files must be in project main directory;
+- doxygen program must be installed (http://www.stack.nl/~dimitri/doxygen/).
+@note
+All of the above pre-requisites are satisfied if the GitHub repository (https://github.com/szaghi/OFF) is cloned. \n
+\n
+@note
+POG code can produce Tecplot binary files. To this aim the proprietary library tecio.a (or tecio64.a) from Tecplot Inc. company
+must be available (these libraries are shipped within Tecplot installer or they can be freely downloaded
+from http://download.tecplot.com/tecio/). By default the provided makefile search this libraries in ./lib/. The makefile try to
+recognized the type of OS (32 or 64 bit) by means of the <em>getconf LONG_BIT</em> shell command. According to the result of this
+command the library lib/32bit/tecio.a or lib/64bit/tecio64.a is passed to the linker. Note that for complete the building with
+these libraries the standard c++ library stdc++5 must be explicitly passed to the linker. The author prefers to put this last
+system library into the directories lib/32bit/ and lib/64bit/ to facilitate the makefile searching. The user must provide the
+necessary libraries and he must update the makefile with the correct paths.
+
+@page Examples Examples of usage
+
+Working in progress.
 
 */

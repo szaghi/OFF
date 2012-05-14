@@ -128,7 +128,7 @@ LBITS := $(shell getconf LONG_BIT)
 ifeq "$(TECIO)" "yes"
   PREPROC = -DTECIO
 	ifeq ($(LBITS),64)
-		LIBS = $(DLIB)64bit/tecio64.a $(DLIB)64bit/libstdc++64.5.0.7.so
+  LIBS = $(DLIB)64bit/tecio64.a $(DLIB)64bit/libstdc++64.5.0.7.so
 	else
 		LIBS = $(DLIB)32bit/tecio.a $(DLIB)32bit/libstdc++.5.0.7.so
 	endif
@@ -146,9 +146,8 @@ ifeq "$(COMPILER)" "gnu"
   # debug
   ifeq "$(DEBUG)" "yes"
     PREPROC := $(PREPROC) -DDEBUG
-    OPTSC := $(OPTSC) -O0 -Wall -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow,precision,denormal
-    OPTSL := $(OPTSL) -O0 -Wall -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow,precision,denormal
-#-Warray-temporaries
+    OPTSC := $(OPTSC) -O0 -Wall -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow,precision,denormal -Warray-temporaries
+    OPTSL := $(OPTSL) -O0 -Wall -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow,precision,denormal -Warray-temporaries
   endif
   # standard
   ifeq "$(F03STD)" "yes"
@@ -532,12 +531,12 @@ LCEXES  = $(shell echo $(EXES) | tr '[:upper:]' '[:lower:]')
 EXESPO  = $(addsuffix .o,$(LCEXES))
 EXESOBJ = $(addprefix $(DOBJ),$(EXESPO))
 
-$(DEXE)ICG : PRINTINFO $(MKDIRS) $(DOBJ)icg.o
-	@rm -f $(filter-out $(DOBJ)icg.o,$(EXESOBJ))
+$(DEXE)IBM : PRINTINFO $(MKDIRS) $(DOBJ)ibm.o
+	@rm -f $(filter-out $(DOBJ)ibm.o,$(EXESOBJ))
 	@echo | tee -a make.log
 	@echo $(LITEXT) | tee -a make.log
 	@$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1>> diagnostic_messages 2>> error_messages
-EXES := $(EXES) ICG
+EXES := $(EXES) IBM
 
 $(DEXE)OFF : PRINTINFO $(MKDIRS) $(DOBJ)off.o
 	@rm -f $(filter-out $(DOBJ)off.o,$(EXESOBJ))
@@ -612,7 +611,7 @@ $(DOBJ)data_type_vector.o : Data_Type_Vector.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-$(DOBJ)icg.o : ICG.f90 \
+$(DOBJ)ibm.o : IBM.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_bc.o \
 	$(DOBJ)data_type_cell.o \
@@ -620,7 +619,6 @@ $(DOBJ)icg.o : ICG.f90 \
 	$(DOBJ)data_type_globals.o \
 	$(DOBJ)data_type_os.o \
 	$(DOBJ)data_type_primitive.o \
-	$(DOBJ)data_type_vector.o \
 	$(DOBJ)data_type_time.o \
 	$(DOBJ)data_type_vector.o \
 	$(DOBJ)lib_io_misc.o
@@ -643,6 +641,7 @@ $(DOBJ)lib_fluidynamic.o : Lib_Fluidynamic.f90 \
 	$(DOBJ)lib_math.o \
 	$(DOBJ)lib_parallel.o \
 	$(DOBJ)lib_riemann.o \
+	$(DOBJ)lib_runge_kutta.o \
 	$(DOBJ)lib_thermodynamic_laws_ideal.o \
 	$(DOBJ)lib_weno.o \
 	$(DOBJ)lib_parallel.o
@@ -701,6 +700,11 @@ $(DOBJ)lib_riemann.o : Lib_Riemann.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
+$(DOBJ)lib_runge_kutta.o : Lib_Runge_Kutta.f90 \
+	$(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
 $(DOBJ)lib_thermodynamic_laws_ideal.o : Lib_Thermodynamic_Laws_Ideal.f90 \
 	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
@@ -727,6 +731,7 @@ $(DOBJ)off.o : OFF.f90 \
 	$(DOBJ)data_type_tensor.o \
 	$(DOBJ)data_type_time.o \
 	$(DOBJ)lib_fluidynamic.o \
+	$(DOBJ)lib_runge_kutta.o \
 	$(DOBJ)lib_math.o \
 	$(DOBJ)lib_mesh.o \
 	$(DOBJ)lib_io_misc.o \

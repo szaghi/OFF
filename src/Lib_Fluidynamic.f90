@@ -3,6 +3,11 @@
 !> @defgroup Lib_FluidynamicPublicProcedure Lib_Fluidynamic
 !> @}
 
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Lib_FluidynamicPrivateProcedure Lib_Fluidynamic
+!> @}
+
 !> This module contains the definition of fluid dynamic procedures.
 !> This is a library module.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
@@ -23,7 +28,7 @@ USE Data_Type_Vector, &                                                         
 USE Lib_IO_Misc                                                                  ! Procedures for IO and strings operations.
 USE Lib_Math,                     only: interpolate1                             ! Function for computing linear interpolation.
 USE Lib_Parallel,                 only: blockmap, &                              ! Local/global blocks map.
-                                        Psendrecv                                ! Subroutine for send/recive Primitive variables.
+                                        Psendrecv                                ! Subroutine for send/receive Primitive variables.
 USE Lib_Riemann,                  only: &
 #ifdef SMSWliu
                                         chk_smooth_liu,        &                 ! Liu's smoothness function.
@@ -53,14 +58,15 @@ USE Lib_Riemann,                  only: &
 #else
                                         Riem_Solver=>Riem_Solver_HLLC            ! HLLC Riemann solver.
 #endif
+USE Lib_Runge_Kutta                                                              ! Runge-Kutta time integration library.
 USE Lib_Thermodynamic_Laws_Ideal, only: a                                        ! Function for computing speed of sound.
 USE Lib_WENO,                     only: &
 #ifdef HYBRIDC
-                                        noweno_central, &                        ! Function for comp. central diff. reconctruction.
+                                        noweno_central, &                        ! Function for comp. central diff. reconstruction.
 #elif HYBRID
-                                        weno_optimal,   &                        ! Function for comp. optimal WENO reconctruction.
+                                        weno_optimal,   &                        ! Function for comp. optimal WENO reconstruction.
 #endif
-                                        weno                                     ! Function for computing WENO reconctruction.
+                                        weno                                     ! Function for computing WENO reconstruction.
 #ifdef MPI2
 USE Lib_Parallel,                 only: procmap, &                               ! Proc/blocks map.
                                         blockmap                                 ! Local/global blocks map.
@@ -72,30 +78,22 @@ USE MPI                                                                         
 implicit none
 save
 private
-public:: primitive2conservative
-public:: conservative2primitive
-public:: residuals
+public:: prim2cons,primitive2conservative,cons2prim,conservative2primitive
 public:: boundary_conditions
 public:: solve_grl
-public:: rk_init
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-! Runge-Kutta coefficients
-real(R_P), allocatable:: rk_c1(:)   !< c1 coefficients of Runge-Kutta's integration [1:rk_ord]
-real(R_P), allocatable:: rk_c2(:,:) !< c2 coefficients of Runge-Kutta's integration [1:rk_ord,1:rk_ord]
-
 integer(I1P):: flip = 0_I_P !< Flip-Flop flag for restart solution file.
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  !> @ingroup Lib_FluidynamicPublicProcedure
-  !> @{
   !> Subroutine for converting primitive variables to conservative variables.
   !> The conversion laws are: \n
   !> - Partial densities\f$|_{conservative} =\left| \rho_s\right|_{primitive}\f$
   !> - Momentum\f$|_{conservative} = \left| \rho \vec V \right|_{primitive}\f$
   !> - Energy\f$|_{conservative}=\left|\frac{p}{\gamma-1}+\frac{1}{2}\rho
   !>   \left(V_x^2+V_y^2+V_z^2\right)\right|_{primitive}\f$
+  !> @ingroup Lib_FluidynamicPublicProcedure
   pure subroutine prim2cons(prim,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -123,6 +121,7 @@ contains
   !> - Pressure\f$|_{primitive}=\left|(\gamma-1)\left[energy-\frac{1}{2}\rho
   !>   \left(V_x^2+V_y^2+V_z^2\right)\right]\right|_{conservative}\f$ \n
   !> where Ns is the number of initial species and \f$cp_s^0,cv_s^0\f$ are the initial specific heats.
+  !> @ingroup Lib_FluidynamicPublicProcedure
   pure subroutine cons2prim(cp0,cv0,cons,prim)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -149,74 +148,112 @@ contains
   endsubroutine cons2prim
 
   !> Subroutine for converting primitive variables to conservative variables of all cells of a block.
+  !> @note Only the inner cells of the block are converted.
+  !> @ingroup Lib_FluidynamicPublicProcedure
   pure subroutine primitive2conservative(block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Block), intent(INOUT):: block !< Block-level data (see \ref Data_Type_Globals::Type_Block "Type_Block" definition).
-  integer(I_P)::                    i,j,k !< Space counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  !$OMP PARALLEL DEFAULT(NONE) &
-  !$OMP PRIVATE(i,j,k)         &
-  !$OMP SHARED(block)
-  !$OMP DO
-  do k=1,block%mesh%Nk
-    do j=1,block%mesh%Nj
-      do i=1,block%mesh%Ni
-        call prim2cons(prim = block%fluid%P(i,j,k), cons = block%fluid%U(i,j,k))
-      enddo
-    enddo
-  enddo
-  !$OMP END PARALLEL
+  call p2c_reshape1D(N = int(block%mesh%Ni*block%mesh%Nj*block%mesh%Nk,I8P),             &
+                     P = block%fluid%P(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk), &
+                     U = block%fluid%U(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency.
+    !> The computation of the parent procedure is performed in 1D re-shaped arrays in order to augment the computational efficiency
+    !> when using OpenMP shared parallel paradigm. As a matter of facts the scalability of OpenMP parallelism is exploited only when
+    !> the parallelized loop is the largest one. In the case of multi-dimensional arrays the first index is not always the largest
+    !> one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping
+    !> there is only one index.
+    !> @ingroup Lib_FluidynamicPrivateProcedure
+    pure subroutine p2c_reshape1D(N,P,U)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I8P),            intent(IN)::    N      !< Number of finite volumes.
+    type(Type_Primitive),    intent(IN)::    P(1:N) !< Primitive variables.
+    type(Type_Conservative), intent(INOUT):: U(1:N) !< Conservative variables.
+    integer(I8P)::                           i      !< Cell counter.
+    !-------------------------------------------------------------------------------------------------------------------------------
 
+    !-------------------------------------------------------------------------------------------------------------------------------
+    !$OMP PARALLEL DEFAULT(NONE)   &
+    !$OMP PRIVATE(i)               &
+    !$OMP SHARED(N,P,U)
+    !$OMP DO
+    do i=1,N
+      call prim2cons(prim = P(i), cons = U(i))
+    enddo
+    !$OMP END PARALLEL
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine p2c_reshape1D
   endsubroutine primitive2conservative
 
   !> Subroutine for converting conservative variables to primitive variables of all cells of a block.
+  !> @note Only the inner cells of the block are converted.
+  !> @ingroup Lib_FluidynamicPublicProcedure
   subroutine conservative2primitive(global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Global), intent(IN)::    global !< Global-level data (see \ref Data_Type_Globals::Type_Global "Type_Global" definition).
   type(Type_Block),  intent(INOUT):: block  !< Block-level data (see \ref Data_Type_Globals::Type_Block "Type_Block" definition).
-  integer(I_P)::                     i,j,k  !< Space counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  !$OMP PARALLEL DEFAULT(NONE) &
-  !$OMP PRIVATE(i,j,k)         &
-  !$OMP SHARED(global,block)
-  !$OMP DO
-  do k=1,block%mesh%Nk
-    do j=1,block%mesh%Nj
-      do i=1,block%mesh%Ni
-        call cons2prim(cp0 = global%fluid%cp0, cv0 = global%fluid%cv0, cons = block%fluid%U(i,j,k), prim = block%fluid%P(i,j,k))
-      enddo
-    enddo
-  enddo
-  !$OMP END PARALLEL
+  call c2p_reshape1D(N = int(block%mesh%Ni*block%mesh%Nj*block%mesh%Nk,I8P),             &
+                     U = block%fluid%U(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk), &
+                     P = block%fluid%P(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine conservative2primitive
-  !> @}
+  contains
+    !> Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency.
+    !> The computation of the parent procedure is performed in 1D re-shaped arrays in order to augment the computational efficiency
+    !> when using OpenMP shared parallel paradigm. As a matter of facts the scalability of OpenMP parallelism is exploited only when
+    !> the parallelized loop is the largest one. In the case of multi-dimensional arrays the first index is not always the largest
+    !> one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping
+    !> there is only one index.
+    !> @ingroup Lib_FluidynamicPrivateProcedure
+    pure subroutine c2p_reshape1D(N,U,P)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I8P),            intent(IN)::    N      !< Number of finite volumes.
+    type(Type_Conservative), intent(IN)::    U(1:N) !< Conservative variables.
+    type(Type_Primitive),    intent(INOUT):: P(1:N) !< Primitive variables.
+    integer(I8P)::                           i      !< Cell counter.
+    !-------------------------------------------------------------------------------------------------------------------------------
 
+    !-------------------------------------------------------------------------------------------------------------------------------
+    !$OMP PARALLEL DEFAULT(NONE)   &
+    !$OMP PRIVATE(i)               &
+    !$OMP SHARED(global,N,P,U)
+    !$OMP DO
+    do i=1,N
+      call cons2prim(cp0 = global%fluid%cp0, cv0 = global%fluid%cv0, cons = U(i), prim = P(i))
+    enddo
+    !$OMP END PARALLEL
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine c2p_reshape1D
+  endsubroutine conservative2primitive
+
+  !> Function for evaluating the local and global time step value by CFL condition.
+  !> @ingroup Lib_FluidynamicPrivateProcedure
   subroutine compute_time(global,block,Dtmin)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for evaluating the local and global time step value by CFL conditions.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global), intent(IN)::    global                        ! Global-level data.
-  type(Type_Block),  intent(INOUT):: block                         ! Block-level data.
-  real(R_P),         intent(OUT)::   Dtmin                         ! Minimum Dt.
-  real(R_P)::                        vmax                          ! Maximum speed of waves.
-  real(R_P)::                        a                             ! Speed of sound.
-  real(R_P)::                        vmiL,vmiR,vmjL,vmjR,vmkL,vmkR ! Dummy velocities.
-  type(Type_Vector)::                vm                            ! Dummy vectorial velocities.
-  integer(I_P)::                     Ni,Nj,Nk,gc(1:6)              ! Temp var for storing block dimensions.
-  integer(I_P)::                     i,j,k                         ! Space counters.
+  type(Type_Global), intent(IN)::    global !< Global-level data.
+  type(Type_Block),  intent(INOUT):: block  !< Block-level data.
+  real(R_P),         intent(OUT)::   Dtmin  !< Minimum Dt.
+  real(R_P)::         vmax                          !< Maximum speed of waves.
+  real(R_P)::         a                             !< Speed of sound.
+  real(R_P)::         vmiL,vmiR,vmjL,vmjR,vmkL,vmkR !< Dummy velocities.
+  type(Type_Vector):: vm                            !< Dummy vectorial velocities.
+  integer(I_P)::      Ni,Nj,Nk,gc(1:6)              !< Temp var for storing block dimensions.
+  integer(I_P)::      i,j,k                         !< Space counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -331,23 +368,21 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine compute_time
 
+  !> Subroutine for computing the residuals. This the space operator.
+  !> @ingroup Lib_FluidynamicPrivateProcedure
   subroutine residuals(s1,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for computing the residuals. This the space operator.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    s1                                                  ! Current Runge-kutta stage.
-  type(Type_Global), intent(IN)::    global                                              ! Global-level data.
-  type(Type_Block),  intent(INOUT):: block                                               ! Block-level data.
-  type(Type_Conservative)::          Fi(0:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk) ! I fluxes.
-  type(Type_Conservative)::          Fj(1:block%mesh%Ni,0:block%mesh%Nj,1:block%mesh%Nk) ! J fluxes.
-  type(Type_Conservative)::          Fk(1:block%mesh%Ni,1:block%mesh%Nj,0:block%mesh%Nk) ! K fluxes.
-  integer(I1P)::                     gcu                                                 ! Number of ghost cells used.
-  integer(I_P)::                     Ni,Nj,Nk,Ns                                         ! Temp var for storing block dims.
-  integer(I1P)::                     gc(1:6)                                             ! Temp var for storing ghost cells num.
-  integer(I_P)::                     i,j,k                                               ! Counters.
+  integer(I_P),      intent(IN)::    s1     ! Current Runge-kutta stage.
+  type(Type_Global), intent(IN)::    global ! Global-level data.
+  type(Type_Block),  intent(INOUT):: block  ! Block-level data.
+  type(Type_Conservative):: Fi(0:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk) ! I fluxes.
+  type(Type_Conservative):: Fj(1:block%mesh%Ni,0:block%mesh%Nj,1:block%mesh%Nk) ! J fluxes.
+  type(Type_Conservative):: Fk(1:block%mesh%Ni,1:block%mesh%Nj,0:block%mesh%Nk) ! K fluxes.
+  integer(I1P)::            gcu                                                 ! Number of ghost cells used.
+  integer(I_P)::            Ni,Nj,Nk,Ns                                         ! Temp var for storing block dims.
+  integer(I1P)::            gc(1:6)                                             ! Temp var for storing ghost cells num.
+  integer(I_P)::            i,j,k                                               ! Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1007,24 +1042,32 @@ contains
     endsubroutine positivity_preserving_limiter
   endsubroutine residuals
 
+  !> Subroutine for imposing the boundary conditions of blocks of grid level "l" updating the ghost cells.
+  !> @note Considering the ghost cell \f$ c^0 \f$ and the inner one \f$ c^1 \f$ (being \f$ c^N \f$ the other bound)
+  !> the available boundary conditions are:
+  !> - \b REF: reflective boundary condition \f$ \begin{array}{*{20}{c}} P^0 = P^1 \\ P_{\vec v\cdot \vec n}^0 =
+  !>           - P_{\vec v\cdot \vec n}^1\end{array} \f$;
+  !> - \b EXT: extrapolation boundary condition \f$ P^0 = P^1 \f$;
+  !> - \b PER: periodic boundary condition \f$ P^0 = P^N \f$;
+  !> - \b ADJ: adjacent (cell) boundary condition \f$ P^0 = P^a \f$ where "a" is the adjacent cell (b,i,j,k indexes must be
+  !>           specified);
+  !> - \b IN1: supersonic inflow steady boundary condition \f$ P^0 = P^{in1} \f$. \n
+  !> where \f$P\f$ are the primitive variables.
+  !> @ingroup Lib_FluidynamicPublicProcedure
   subroutine boundary_conditions(myrank,l,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for imposing the boundary conditions of blocks of grid level "l" updating the ghost cells.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank                  ! Current rank process.
-  integer(I_P),      intent(IN)::    l                       ! Current grid level.
-  type(Type_Global), intent(IN)::    global                  ! Global-level data.
-  type(Type_Block),  intent(INOUT):: block(1:global%mesh%Nb) ! Block-level data.
-  integer(I_P)::                     Ni,Nj,Nk,gc(1:6)        ! Temp var for storing block dimensions.
-  integer(I_P)::                     b,i,j,k                 ! Counters.
+  integer(I_P),      intent(IN)::    myrank                  !< Current rank process.
+  integer(I_P),      intent(IN)::    l                       !< Current grid level.
+  type(Type_Global), intent(IN)::    global                  !< Global-level data.
+  type(Type_Block),  intent(INOUT):: block(1:global%mesh%Nb) !< Block-level data.
+  integer(I_P)::                     Ni,Nj,Nk,gc(1:6)        !< Temporary var for storing block dimensions.
+  integer(I_P)::                     b,i,j,k                 !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
 #ifdef MPI2
-  ! doing the multi-processes comunications if necessary
+  ! doing the multi-processes communications if necessary
   call Psendrecv(myrank=myrank,l=l,global=global,block=block)
 #endif
   !$OMP PARALLEL DEFAULT(NONE)       &
@@ -1050,8 +1093,6 @@ contains
           call set_adj(gc=gc(1),bc=block(b)%bc%BCi(1-gc(1):0,j,k),P=block(b)%fluid%P(1-gc(1):0,j,k))
         case(bc_in1)
           call set_in1(gc=gc(1),bc=block(b)%bc%BCi(1-gc(1):0,j,k),P=block(b)%fluid%P(1-gc(1):0,j,k))
-        case(bc_in2)
-          !call set_in2(gc=gc(1),Np=Np,bc=block(b)%bc%BCi(1-gc(1):0,j,k),t=global%fluid%t,P=block(b)%fluid%P(1-gc(1):0,j,k))
         endselect
         ! right i
         select case(block(b)%bc%BCi(Ni,j,k)%tp)
@@ -1065,8 +1106,6 @@ contains
           call set_adj(gc=gc(2),bc=block(b)%bc%BCi(Ni:Ni+gc(2)-1,j,k),P=block(b)%fluid%P(Ni+1:Ni+gc(2),j,k))
         case(bc_in1)
           call set_in1(gc=gc(2),bc=block(b)%bc%BCi(Ni:Ni+gc(2)-1,j,k),P=block(b)%fluid%P(Ni+1:Ni+gc(2),j,k))
-        case(bc_in2)
-          !call set_in2(gc=gc(2),Np=Np,bc=block(b)%bc%BCi(Ni:Ni+gc(2)-1,j,k),t=global%fluid%t,P=block(b)%fluid%P(Ni+1:Ni+gc(2),j,k))
         endselect
       enddo
     enddo
@@ -1084,8 +1123,6 @@ contains
           call set_adj(gc=gc(3),bc=block(b)%bc%BCj(i,1-gc(3):0,k),P=block(b)%fluid%P(i,1-gc(3):0,k))
         case(bc_in1)
           call set_in1(gc=gc(3),bc=block(b)%bc%BCj(i,1-gc(3):0,k),P=block(b)%fluid%P(i,1-gc(3):0,k))
-        case(bc_in2)
-          !call set_in2(gc=gc(3),Np=Np,bc=block(b)%bc%BCj(i,1-gc(3):0,k),t=global%fluid%t,P=block(b)%fluid%P(i,1-gc(3):0,k))
         endselect
         ! right j
         select case(block(b)%bc%BCj(i,Nj,k)%tp)
@@ -1099,8 +1136,6 @@ contains
           call set_adj(gc=gc(4),bc=block(b)%bc%BCj(i,Nj:Nj+gc(4)-1,k),P=block(b)%fluid%P(i,Nj+1:Nj+gc(4),k))
         case(bc_in1)
           call set_in1(gc=gc(4),bc=block(b)%bc%BCj(i,Nj:Nj+gc(4)-1,k),P=block(b)%fluid%P(i,Nj+1:Nj+gc(4),k))
-        case(bc_in2)
-          !call set_in2(gc=gc(4),Np=Np,bc=block(b)%bc%BCj(i,Nj:Nj+gc(4)-1,k),t=global%fluid%t,P=block(b)%fluid%P(i,Nj+1:Nj+gc(4),k))
         endselect
       enddo
     enddo
@@ -1118,8 +1153,6 @@ contains
           call set_adj(gc=gc(5),bc=block(b)%bc%BCk(i,j,1-gc(5):0),P=block(b)%fluid%P(i,j,1-gc(5):0))
         case(bc_in1)
           call set_in1(gc=gc(5),bc=block(b)%bc%BCk(i,j,1-gc(5):0),P=block(b)%fluid%P(i,j,1-gc(5):0))
-        case(bc_in2)
-          !call set_in2(gc=gc(5),Np=Np,bc=block(b)%bc%BCk(i,j,1-gc(5):0),t=global%fluid%t,P=block(b)%fluid%P(i,j,1-gc(5):0))
         endselect
         ! right k
         select case(block(b)%bc%BCk(i,j,Nk)%tp)
@@ -1133,8 +1166,6 @@ contains
           call set_adj(gc=gc(6),bc=block(b)%bc%BCk(i,j,Nk:Nk+gc(6)-1),P=block(b)%fluid%P(i,j,Nk+1:Nk+gc(6)))
         case(bc_in1)
           call set_in1(gc=gc(6),bc=block(b)%bc%BCk(i,j,Nk:Nk+gc(6)-1),P=block(b)%fluid%P(i,j,Nk+1:Nk+gc(6)))
-        case(bc_in2)
-          !call set_in2(gc=gc(6),Np=Np,bc=block(b)%bc%BCk(i,j,Nk:Nk+gc(6)-1),t=global%fluid%t,P=block(b)%fluid%P(i,j,Nk+1:Nk+gc(6)))
         endselect
       enddo
     enddo
@@ -1390,44 +1421,10 @@ contains
     return
     !-------------------------------------------------------------------------------------------------------------------------------
     endsubroutine set_in1
-
-   !subroutine set_in2(gc,bc,t,P)
-   !!-------------------------------------------------------------------------------------------------------------------------------
-   !! Subroutine for imposing inflow 2 boundary conditions.
-   !! Note that when this subroutine is called for a 'right' (Ni,Nj,Nk) boundary the section of arrays BC(i,j,k) and P must be
-   !! properly remapped: in the section [1-gc:0] must be passed the actual section [N:N+gc-1].
-   !!-------------------------------------------------------------------------------------------------------------------------------
-   !
-   !!-------------------------------------------------------------------------------------------------------------------------------
-   !implicit none
-   !integer(I_P),  intent(IN)::  gc         ! Number of ghost cells.
-   !type(Type_BC), intent(IN)::  bc(1-gc:0) ! Boundary conditions.
-   !real(R_P),     intent(IN)::  t          ! Time.
-   !real(R_P),     intent(OUT):: P (1-gc:0) ! Left section of primitive variables.
-   !integer(I_P)::               i          ! Cell counter.
-   !integer(I_P)::               n          ! Time counter.
-   !integer(I_P)::               v          ! Variable counter.
-   !!-------------------------------------------------------------------------------------------------------------------------------
-   !
-   !!-------------------------------------------------------------------------------------------------------------------------------
-   !do i=1-gc,0
-   !  time_search: do n=bc_global%bb_in2(1,bc(i)%inf)+1,bc_global%bb_in2(2,bc(i)%inf)
-   !    if (t<bc_global%in2(Np+1,n))          exit time_search
-   !    if (n==bc_global%bb_in2(2,bc(i)%inf)) exit time_search
-   !  enddo time_search
-   !  do v=1,size()
-   !    P(i)%r(v) = interpolate1(x1 = bc_global%in2(Np+1,n-1),x2 = bc_global%in2(Np+1,n), &
-   !                             V1 = bc_global%in2(v   ,n-1),V2 = bc_global%in2(v   ,n), &
-   !                             x  = t)
-   !  enddo
-   !enddo
-   !return
-   !!-------------------------------------------------------------------------------------------------------------------------------
-   !endsubroutine set_in2
   endsubroutine boundary_conditions
 
   !> @ingroup Lib_FluidynamicPublicProcedure
-  !> Subroutine for solving (performing 1 time step integration) the conservation equations for a given grid level.
+  !> Subroutine for solving (performing one time step integration) the conservation equations for grid level "l".
   subroutine solve_grl(myrank,l,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -1565,7 +1562,7 @@ contains
       ! imposing the boundary conditions
       call boundary_conditions(myrank = myrank, l = l, global = global, block = block)
     endif
-    ! computing the s1-th Runge-Kutta stage: K_s1=R(Un+sum_s2=1-s1-1(Dt*rk_c2(s1,s2)*K_s2))
+    ! computing the s1-th Runge-Kutta stage: K_s1=R(Un+sum_s2=1^s1-1(Dt*rk_c2(s1,s2)*K_s2))
     do b=1,global%mesh%Nb
       call residuals(s1=s1,global=global,block=block(b))
     enddo
@@ -1597,151 +1594,142 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine solve_grl
 
-  subroutine rk_init(S)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for initializing Runge-Kutta coefficients.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I1P), intent(IN):: S ! Number of stages used.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  ! allocating variables
-  if (allocated(rk_c1)) deallocate(rk_c1) ; allocate(rk_c1(    1:S)) ; rk_c1 = 0._R_P
-  if (allocated(rk_c2)) deallocate(rk_c2) ; allocate(rk_c2(1:S,1:S)) ; rk_c2 = 0._R_P
-  ! inizializing the coefficients
-  select case(S)
-  case(1_I1P)
-    ! RK(1,1) Forward-Euler
-    rk_c1(1) = 1._R_P
-  case(2_I1P)
-    ! SSPRK(2,2)
-    rk_c1(1) = 0.5_R_P
-    rk_c1(2) = 0.5_R_P
-
-    rk_c2(2,1) = 1._R_P
-  case(3_I1P)
-    ! SSPRK(3,3)
-    rk_c1(1) = 1._R_P/6._R_P
-    rk_c1(2) = 1._R_P/6._R_P
-    rk_c1(3) = 2._R_P/3._R_P
-
-    rk_c2(2,1) = 1._R_P
-    rk_c2(3,1) = 0.25_R_P ; rk_c2(3,2) = 0.25_R_P
-  case(4_I1P)
-    ! NSSPRK(4,4)
-    rk_c1(1) = 55._R_P/108._R_P
-    rk_c1(2) = 1._R_P/3._R_P
-    rk_c1(3) = 1._R_P/3._R_P
-    rk_c1(4) = 1._R_P/6._R_P
-
-    rk_c2(2,1) = 1._R_P
-    rk_c2(3,1) = 0.25_R_P       ; rk_c2(3,2) = 0.5_R_P
-    rk_c2(4,1) = 5._R_P/18._R_P ; rk_c2(4,2) = 0._R_P  ; rk_c2(4,3) = 1._R_P
-  case(5_I1P)
-    ! SSPRK(5,4)
-    rk_c1(1) = 0.14681187618661_R_P
-    rk_c1(2) = 0.24848290924556_R_P
-    rk_c1(3) = 0.10425883036650_R_P
-    rk_c1(4) = 0.27443890091960_R_P
-    rk_c1(5) = 0.22600748319395_R_P
-
-    rk_c2(2,1)=0.39175222700392_R_P
-    rk_c2(3,1)=0.21766909633821_R_P;rk_c2(3,2)=0.36841059262959_R_P
-    rk_c2(4,1)=0.08269208670950_R_P;rk_c2(4,2)=0.13995850206999_R_P;rk_c2(4,3)=0.25189177424738_R_P
-    rk_c2(5,1)=0.06796628370320_R_P;rk_c2(5,2)=0.11503469844438_R_P;rk_c2(5,3)=0.20703489864929_R_P;rk_c2(5,4)=0.54497475021237_R_P
-
-    ! NSSPRK(5,3)
-    !rk_c1(1) = 0.25_R_P
-    !rk_c1(5) = 0.75_R_P
-
-    !rk_c2(2,1)=1._R_P/7._R_P
-    !rk_c2(3,1)=0._R_P        ; rk_c2(3,2)=3._R_P/16._R_P
-    !rk_c2(4,1)=0._R_P        ; rk_c2(4,2)=0._R_P         ; rk_c2(4,3)=1._R_P/3._R_P
-    !rk_c2(5,1)=0._R_P        ; rk_c2(5,2)=0._R_P         ; rk_c2(5,3)=0._R_P        ; rk_c2(5,4)=2._R_P/3._R_P
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine rk_init
-
+  !> Subroutine for summing Runge-Kutta stages for updating primitive variables (block\%fluid\%P).
+  !> @ingroup Lib_FluidynamicPrivateProcedure
   subroutine rk_stages_sum(s1,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for summing Runge-Kutta stages for updating primitive variables (block%fluid%P).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    s1      ! Current Runge-kutta stage.
-  type(Type_Global), intent(IN)::    global  ! Global-level data.
-  type(Type_Block),  intent(INOUT):: block   ! Block-level data.
-  type(Type_Conservative)::          U,rksum ! Dummy conservative varibales.
-  integer(I_P)::                     i,j,k,s ! Counters.
+  integer(I_P),      intent(IN)::    s1      !< Current Runge-Kutta stage.
+  type(Type_Global), intent(IN)::    global  !< Global-level data.
+  type(Type_Block),  intent(INOUT):: block   !< Block-level data.
+  type(Type_Conservative)::          U,rksum !< Dummy conservative varibales.
+  integer(I_P)::                     i,j,k,s !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  !$OMP PARALLEL DEFAULT(NONE)   &
-  !$OMP PRIVATE(i,j,k,s,rksum,U) &
-  !$OMP SHARED(s1,global,block,rk_c2)
-  call init_cons(Ns = global%fluid%Ns, cons = rksum)
-  call init_cons(Ns = global%fluid%Ns, cons = U    )
-  !$OMP DO
-  do k=1,block%mesh%Nk
-    do j=1,block%mesh%Nj
-      do i=1,block%mesh%Ni
-        rksum = 0._R_P
-        do s=1,s1-1
-          rksum = rksum + rk_c2(s1,s)*block%fluid%KS(i,j,k,s)
-        enddo
-        U = block%fluid%U(i,j,k) + block%fluid%Dt(i,j,k)*rksum
-        call cons2prim(cp0 = global%fluid%cp0, cv0 = global%fluid%cv0, cons = U, prim = block%fluid%P(i,j,k))
-      enddo
-    enddo
-  enddo
-  !$OMP END PARALLEL
+  call rk_stg_reshape1D(N  = int(block%mesh%Ni*block%mesh%Nj*block%mesh%Nk,I8P),                     &
+                        Dt = block%fluid%Dt(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk       ), &
+                        U  = block%fluid%U (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk       ), &
+                        KS = block%fluid%KS(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk,1:s1-1), &
+                        P  = block%fluid%P (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk       ))
+  return
   !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency.
+    !> The computation of the parent procedure is performed in 1D re-shaped arrays in order to augment the computational efficiency
+    !> when using OpenMP shared parallel paradigm. As a matter of facts the scalability of OpenMP parallelism is exploited only when
+    !> the parallelized loop is the largest one. In the case of multi-dimensional arrays the first index is not always the largest
+    !> one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping
+    !> there is only one index.
+    !> @ingroup Lib_FluidynamicPrivateProcedure
+    subroutine rk_stg_reshape1D(N,Dt,U,KS,P)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I8P),            intent(IN)::    N              !< Number of finite volumes.
+    real(R_P),               intent(IN)::    Dt(1:N)        !< Time steps.
+    type(Type_Conservative), intent(IN)::    U( 1:N)        !< Current conservative variables.
+    type(Type_Conservative), intent(IN)::    KS(1:N,1:s1-1) !< Runge-Kutta stages.
+    type(Type_Primitive),    intent(INOUT):: P( 1:N)        !< Updated primitive variables.
+    type(Type_Conservative):: Ud                            !< Dummy conservative variablew.
+    real(R_P)::               KSd(1:global%fluid%Nc,1:s1-1) !< Dummy Runge-Kutta stages.
+    integer(I8P)::            i                             !< Cell counter.
+    integer(I_P)::            s                             !< Counter.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    !$OMP PARALLEL DEFAULT(NONE) &
+    !$OMP PRIVATE(i,s,Ud,KSd)    &
+    !$OMP SHARED(s1,global,N,Dt,U,KS,P)
+    call init_cons(Ns = global%fluid%Ns, cons = Ud)
+    !$OMP DO
+    do i=1,N
+      do s=1,s1-1
+        KSd(1:global%fluid%Nc,s) = cons2array(KS(i,s))
+      enddo
+      do s=1,global%fluid%Ns
+       Ud%rs(s) = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%rs(s),KS=KSd(s,1:s1-1))
+      enddo
+      Ud%rv%x = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%rv%x,KS=KS(i,1:s1-1)%rv%x)
+      Ud%rv%y = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%rv%y,KS=KS(i,1:s1-1)%rv%y)
+      Ud%rv%z = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%rv%z,KS=KS(i,1:s1-1)%rv%z)
+      Ud%re   = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%re  ,KS=KS(i,1:s1-1)%re  )
+      call cons2prim(cp0 = global%fluid%cp0, cv0 = global%fluid%cv0, cons = Ud, prim = P(i))
+    enddo
+    !$OMP END PARALLEL
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine rk_stg_reshape1D
   endsubroutine rk_stages_sum
 
+  !> Subroutine for computing Runge-Kutta one time step integration.
+  !> @ingroup Lib_FluidynamicPrivateProcedure
   subroutine rk_time_integration(global,block,RU)
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! Subroutine for computing Runge-Kutta integration.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global), intent(IN)::    global                ! Global-level data.
-  type(Type_Block),  intent(INOUT):: block                 ! Block-level data.
-  real(R_P),         intent(OUT)::   RU(1:global%fluid%Nc) ! NormL2 of residuals of conservative variables.
-  type(Type_Conservative)::          rksum                 ! Dummy conservative varibale.
-  integer(I_P)::                     i,j,k,s               ! Counters.
+  type(Type_Global), intent(IN)::    global                !< Global-level data.
+  type(Type_Block),  intent(INOUT):: block                 !< Block-level data.
+  real(R_P),         intent(OUT)::   RU(1:global%fluid%Nc) !< NormL2 of residuals of conservative variables.
+  type(Type_Conservative)::          rksum                 !< Dummy conservative varibale.
+  integer(I_P)::                     i,j,k,s               !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  RU = 0._R_P
-  !$OMP PARALLEL DEFAULT(NONE)     &
-  !$OMP PRIVATE(i,j,k,s,rksum)     &
-  !$OMP SHARED(global,block,rk_c1) &
-  !$OMP REDUCTION(+: RU)
-  call init_cons(Ns = global%fluid%Ns, cons = rksum)
-  !$OMP DO
-  do k=1,block%mesh%Nk
-    do j=1,block%mesh%Nj
-      do i=1,block%mesh%Ni
-        rksum = 0._R_P
-        do s=1,global%fluid%rk_ord
-          rksum = rksum + rk_c1(s)*block%fluid%KS(i,j,k,s)
-        enddo
-        block%fluid%U(i,j,k) = block%fluid%U(i,j,k) + block%fluid%Dt(i,j,k)*rksum
-        RU = RU + cons2array(rksum*rksum)
-      enddo
-    enddo
-  enddo
-  !$OMP DO
-  do s=1,global%fluid%Nc
-    RU(s) = sqrt(RU(s))
-  enddo
-  !$OMP END PARALLEL
+  call rk_t_int_reshape1D(N  = int(block%mesh%Ni*block%mesh%Nj*block%mesh%Nk,I8P),                                    &
+                          Dt = block%fluid%Dt(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk                      ), &
+                          KS = block%fluid%KS(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk,1:global%fluid%rk_ord), &
+                          U  = block%fluid%U (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk                      ))
+  return
   !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency.
+    !> The computation of the parent procedure is performed in 1D re-shaped arrays in order to augment the computational efficiency
+    !> when using OpenMP shared parallel paradigm. As a matter of facts the scalability of OpenMP parallelism is exploited only when
+    !> the parallelized loop is the largest one. In the case of multi-dimensional arrays the first index is not always the largest
+    !> one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping
+    !> there is only one index.
+    !> @ingroup Lib_FluidynamicPrivateProcedure
+    subroutine rk_t_int_reshape1D(N,Dt,KS,U)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I8P),            intent(IN)::    N                             !< Number of finite volumes.
+    real(R_P),               intent(IN)::    Dt(1:N)                       !< Time steps.
+    type(Type_Conservative), intent(IN)::    KS(1:N,1:global%fluid%rk_ord) !< Runge-Kutta stages.
+    type(Type_Conservative), intent(INOUT):: U( 1:N)                       !< Current conservative variables.
+    type(Type_Conservative):: Ud,R                                         !< Dummy conservative variables.
+    real(R_P)::               KSd(1:global%fluid%Nc,1:global%fluid%rk_ord) !< Dummy Runge-Kutta stages.
+    integer(I8P)::            i                                            !< Cell counter.
+    integer(I_P)::            s                                            !< Counter.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    RU = 0._R_P
+    !$OMP PARALLEL DEFAULT(NONE)   &
+    !$OMP PRIVATE(i,s,Ud,R,KSd)    &
+    !$OMP SHARED(global,N,Dt,KS,U) &
+    !$OMP REDUCTION(+: RU)
+    call init_cons(Ns = global%fluid%Ns, cons = Ud)
+    !$OMP DO
+    do i=1,N
+      do s=1,global%fluid%rk_ord
+        KSd(1:global%fluid%Nc,s) = cons2array(KS(i,s))
+      enddo
+      do s=1,global%fluid%Ns
+        Ud%rs(s) = rk_time_integ(Dt=Dt(i),un=U(i)%rs(s),KS=KSd(s,1:global%fluid%rk_ord))
+      enddo
+      Ud%rv%x = rk_time_integ(Dt=Dt(i),un=U(i)%rv%x,KS=KS(i,1:global%fluid%rk_ord)%rv%x)
+      Ud%rv%y = rk_time_integ(Dt=Dt(i),un=U(i)%rv%y,KS=KS(i,1:global%fluid%rk_ord)%rv%y)
+      Ud%rv%z = rk_time_integ(Dt=Dt(i),un=U(i)%rv%z,KS=KS(i,1:global%fluid%rk_ord)%rv%z)
+      Ud%re   = rk_time_integ(Dt=Dt(i),un=U(i)%re,  KS=KS(i,1:global%fluid%rk_ord)%re  )
+      R = (Ud-U(i))/Dt(i) ; R = R*R ; RU = RU + cons2array(R)
+      U(i) = Ud
+    enddo
+    !$OMP DO
+    do s=1,global%fluid%Nc
+     RU(s) = sqrt(RU(s))
+    enddo
+    !$OMP END PARALLEL
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine rk_t_int_reshape1D
   endsubroutine rk_time_integration
 endmodule Lib_Fluidynamic

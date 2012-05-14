@@ -35,10 +35,10 @@ The main features of @off code are the following:
 - Space numerical integration models:
   - \f$1^{st}\f$ order piece-wise constant reconstruction;
   - \f$2^{nd}\f$ order TVD linear-wise reconstruction;
-  - \f$3^{rd},5^{th},7^{th}\f$ orders WENO non-linear reconstruction;
+  - \f$3^{rd}\f$,\f$5^{th}\f$,\f$7^{th}\f$ order WENO non-linear reconstruction;
 - Time approximation models:
   - \f$1^{st}\f$ order forward Euler integration;
-  - \f$2^{nd},3^{rd},4^{th}\f$ orders Strong-Stability-Preserving explicit Runge-Kutta integration;
+  - \f$2^{nd}\f$,\f$3^{rd}\f$,\f$4^{th}\f$ order Strong-Stability-Preserving explicit Runge-Kutta integration;
 - Local pseudo-time convergence acceleration for steady simulations;
 - Multi-grid time convergence acceleration:
   - Multi-grid model has been already developed, but it is affected by some not yet recognized bugs. Testing and bugs fixing

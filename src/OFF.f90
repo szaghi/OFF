@@ -51,10 +51,10 @@
 !> - Space numerical integration models:
 !>   - \f$1^{st}\f$ order piece-wise constant reconstruction;
 !>   - \f$2^{nd}\f$ order TVD linear-wise reconstruction;
-!>   - \f$3^{rd},5^{th},7^{th}\f$ orders WENO non-linear reconstruction;
+!>   - \f$3^{rd}\f$,\f$5^{th}\f$,\f$7^{th}\f$ order WENO non-linear reconstruction;
 !> - Time approximation models:
 !>   - \f$1^{st}\f$ order forward Euler integration;
-!>   - \f$2^{nd},3^{rd},4^{th}\f$ orders Strong-Stability-Preserving explicit Runge-Kutta integration;
+!>   - \f$2^{nd}\f$,\f$3^{rd}\f$,\f$4^{th}\f$ order Strong-Stability-Preserving explicit Runge-Kutta integration;
 !> - Local pseudo-time convergence acceleration for steady simulations;
 !> - Multi-grid time convergence acceleration:
 !>   - Multi-grid model has been already developed, but it is affected by some not still recognized bugs. Testing and bugs fixing
@@ -100,8 +100,8 @@ USE Data_Type_Time                                      ! Definition of Type_Tim
 USE Lib_Fluidynamic, only: primitive2conservative, &    ! Function for converting primitive variables to conservative ones.
                            conservative2primitive, &    ! Function for converting conservative variables to primitive ones.
                            boundary_conditions,    &    ! Subroutine for imposing the boundary conditions.
-                           solve_grl,              &    ! Subroutine for solving conservation eq. for a given grid level.
-                           rk_init                      ! Subroutine for initializing Runge-Kutta coefficients.
+                           solve_grl                    ! Subroutine for solving conservation eq. for a given grid level.
+USE Lib_Runge_Kutta, only: rk_init                      ! Subroutine for initializing Runge-Kutta coefficients.
 USE Lib_Math,        only: digit                        ! Function for computing the number of digits of an integer.
 USE Lib_Mesh,        only: mesh_metrics, &              ! Subroutine for computing metrics of the mesh.
                            mesh_metrics_correction      ! Subroutine for correcting metrics of the mesh according to bc.

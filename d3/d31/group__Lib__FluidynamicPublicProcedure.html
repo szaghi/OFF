@@ -109,24 +109,26 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions/Subroutines</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gab0878159386863d9df80b862dec04118">Lib_Fluidynamic::solve_grl</a> (myrank, l, global, block)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for solving (performing 1 time step integration) the conservation equations for a given grid level.  <a href="#gab0878159386863d9df80b862dec04118"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga28f8521a7e547730159d07e84fdeda81">Lib_Fluidynamic::prim2cons</a> (prim, cons)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for converting primitive variables to conservative variables.  <a href="#ga28f8521a7e547730159d07e84fdeda81"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gac05b8eff2e1fe3b801989feb1d0e8d49">Lib_Fluidynamic::cons2prim</a> (cp0, cv0, cons, prim)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for converting conservative variables to primitive variables.  <a href="#gac05b8eff2e1fe3b801989feb1d0e8d49"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga310fb23a716b289920d9ca30cf4b48fb">Lib_Fluidynamic::prim2cons</a> (prim, cons)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for converting primitive variables to conservative variables.  <a href="#ga310fb23a716b289920d9ca30cf4b48fb"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga58d0148e6861fd77dc79610e62ed272c">Lib_Fluidynamic::cons2prim</a> (cp0, cv0, cons, prim)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for converting conservative variables to primitive variables.  <a href="#ga58d0148e6861fd77dc79610e62ed272c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga69edfc54725c92f88b104ed8f21bcb6f">Lib_Fluidynamic::primitive2conservative</a> (block)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for converting primitive variables to conservative variables of all cells of a block.  <a href="#ga69edfc54725c92f88b104ed8f21bcb6f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gaaec639e0cd32cd1cd756eae90b2fd55d">Lib_Fluidynamic::conservative2primitive</a> (global, block)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for converting conservative variables to primitive variables of all cells of a block.  <a href="#gaaec639e0cd32cd1cd756eae90b2fd55d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga3cc6f55a99802e9ba522253542e7199b">Lib_Fluidynamic::boundary_conditions</a> (myrank, l, global, block)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for imposing the boundary conditions of blocks of grid level "l" updating the ghost cells.  <a href="#ga3cc6f55a99802e9ba522253542e7199b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gab0878159386863d9df80b862dec04118">Lib_Fluidynamic::solve_grl</a> (myrank, l, global, block)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for solving (performing one time step integration) the conservation equations for grid level "l".  <a href="#gab0878159386863d9df80b862dec04118"></a><br/></td></tr>
 </table>
 <hr/><h2>Function/Subroutine Documentation</h2>
-<a class="anchor" id="ga28f8521a7e547730159d07e84fdeda81"></a><!-- doxytag: member="Lib_Fluidynamic::prim2cons" ref="ga28f8521a7e547730159d07e84fdeda81" args="(prim, cons)" -->
+<a class="anchor" id="ga310fb23a716b289920d9ca30cf4b48fb"></a><!-- doxytag: member="Lib_Fluidynamic::prim2cons" ref="ga310fb23a716b289920d9ca30cf4b48fb" args="(prim, cons)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pure subroutine <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga28f8521a7e547730159d07e84fdeda81">Lib_Fluidynamic::prim2cons</a> </td>
+          <td class="memname">pure subroutine, public <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga310fb23a716b289920d9ca30cf4b48fb">Lib_Fluidynamic::prim2cons</a> </td>
           <td>(</td>
           <td class="paramtype">type(Type_Primitive), intent(in)&#160;</td>
           <td class="paramname"><em>prim</em>, </td>
@@ -140,7 +142,7 @@ Functions/Subroutines</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td><code> [private]</code></td>
+          <td></td><td></td>
         </tr>
       </table>
 </div>
@@ -152,7 +154,7 @@ Functions/Subroutines</h2></td></tr>
 <ul>
 <li>Partial densities <img class="formulaInl" alt="$|_{conservative} =\left| \rho_s\right|_{primitive}$" src="../../form_141.png"/></li>
 <li>Momentum <img class="formulaInl" alt="$|_{conservative} = \left| \rho \vec V \right|_{primitive}$" src="../../form_142.png"/></li>
-<li>Energy <img class="formulaInl" alt="$|_{conservative}=\left|\frac{p}{\gamma-1}+\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right|_{primitive}$" src="../../form_143.png"/> <dl class="params"><dt><b>Parameters:</b></dt><dd>
+<li>Energy <img class="formulaInl" alt="$|_{conservative}=\left|\frac{p}{\gamma-1}+\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right|_{primitive}$" src="../../form_143.png"/><dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">prim</td><td>Primitive variables (see <a class="el" href="../../dd/dfd/group__DerivedType.html#d2/d5e/structData__Type__Primitive_1_1Type__Primitive">Type_Primitive</a> definition). </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">cons</td><td>Conservative variables (see <a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a> definition). </td></tr>
@@ -162,7 +164,210 @@ Functions/Subroutines</h2></td></tr>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00084">84</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00082">82</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ga58d0148e6861fd77dc79610e62ed272c"></a><!-- doxytag: member="Lib_Fluidynamic::cons2prim" ref="ga58d0148e6861fd77dc79610e62ed272c" args="(cp0, cv0, cons, prim)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">pure subroutine, public <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga58d0148e6861fd77dc79610e62ed272c">Lib_Fluidynamic::cons2prim</a> </td>
+          <td>(</td>
+          <td class="paramtype">real(R_P), dimension(:), intent(in)&#160;</td>
+          <td class="paramname"><em>cp0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(R_P), dimension(:), intent(in)&#160;</td>
+          <td class="paramname"><em>cv0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">type(Type_Conservative), intent(in)&#160;</td>
+          <td class="paramname"><em>cons</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">type(Type_Primitive), intent(inout)&#160;</td>
+          <td class="paramname"><em>prim</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Subroutine for converting conservative variables to primitive variables. </p>
+<p>The conversion laws are: <br/>
+</p>
+<ul>
+<li>Partial densities <img class="formulaInl" alt="$|_{primitive} =\left| \rho_s\right|_{conservative}$" src="../../form_144.png"/></li>
+<li>Density <img class="formulaInl" alt="$|_{primitive} =\left|\sum_{s=1}^{Ns}\rho_s\right|_{conservative}$" src="../../form_145.png"/></li>
+<li>Specific heats ratio <img class="formulaInl" alt="$|_{primitive}=\left|\frac{\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cp_s^0}} {\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cv_s^0}}\right|_{conservative}$" src="../../form_146.png"/></li>
+<li>Velocity <img class="formulaInl" alt="$|_{primitive} =\left|\frac{\vec momentum}{\rho}\right|_{conservative}$" src="../../form_147.png"/></li>
+<li>Pressure <img class="formulaInl" alt="$|_{primitive}=\left|(\gamma-1)\left[energy-\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right]\right|_{conservative}$" src="../../form_148.png"/> <br/>
+ where Ns is the number of initial species and <img class="formulaInl" alt="$cp_s^0,cv_s^0$" src="../../form_149.png"/> are the initial specific heats.<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">cp0</td><td>Specific heat at constant p of initial species. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cv0</td><td>Specific heat at constant v of initial species. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cons</td><td>Conservative variables (see <a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a> definition). </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">prim</td><td>Primitive variables (see <a class="el" href="../../dd/dfd/group__DerivedType.html#d2/d5e/structData__Type__Primitive_1_1Type__Primitive">Type_Primitive</a> definition). </td></tr>
+  </table>
+  </dd>
+</dl>
+</li>
+</ul>
+
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00110">110</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ga69edfc54725c92f88b104ed8f21bcb6f"></a><!-- doxytag: member="Lib_Fluidynamic::primitive2conservative" ref="ga69edfc54725c92f88b104ed8f21bcb6f" args="(block)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">pure subroutine, public <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga69edfc54725c92f88b104ed8f21bcb6f">Lib_Fluidynamic::primitive2conservative</a> </td>
+          <td>(</td>
+          <td class="paramtype">type(Type_Block), intent(inout)&#160;</td>
+          <td class="paramname"><em>block</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Subroutine for converting primitive variables to conservative variables of all cells of a block. </p>
+<dl class="note"><dt><b>Note:</b></dt><dd>Only the inner cells of the block are converted.</dd></dl>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">block</td><td>Block-level data (see <a class="el" href="../../dd/dfd/group__DerivedType.html#d3/dce/structData__Type__Globals_1_1Type__Block">Type_Block</a> definition). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00138">138</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="gaaec639e0cd32cd1cd756eae90b2fd55d"></a><!-- doxytag: member="Lib_Fluidynamic::conservative2primitive" ref="gaaec639e0cd32cd1cd756eae90b2fd55d" args="(global, block)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">subroutine, public <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gaaec639e0cd32cd1cd756eae90b2fd55d">Lib_Fluidynamic::conservative2primitive</a> </td>
+          <td>(</td>
+          <td class="paramtype">type(Type_Global), intent(in)&#160;</td>
+          <td class="paramname"><em>global</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">type(Type_Block), intent(inout)&#160;</td>
+          <td class="paramname"><em>block</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Subroutine for converting conservative variables to primitive variables of all cells of a block. </p>
+<dl class="note"><dt><b>Note:</b></dt><dd>Only the inner cells of the block are converted.</dd></dl>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">global</td><td>Global-level data (see <a class="el" href="../../dd/dfd/group__DerivedType.html#dd/d0c/structData__Type__Globals_1_1Type__Global">Type_Global</a> definition). </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">block</td><td>Block-level data (see <a class="el" href="../../dd/dfd/group__DerivedType.html#d3/dce/structData__Type__Globals_1_1Type__Block">Type_Block</a> definition). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00184">184</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ga3cc6f55a99802e9ba522253542e7199b"></a><!-- doxytag: member="Lib_Fluidynamic::boundary_conditions" ref="ga3cc6f55a99802e9ba522253542e7199b" args="(myrank, l, global, block)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">subroutine, public <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga3cc6f55a99802e9ba522253542e7199b">Lib_Fluidynamic::boundary_conditions</a> </td>
+          <td>(</td>
+          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
+          <td class="paramname"><em>myrank</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
+          <td class="paramname"><em>l</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">type(Type_Global), intent(in)&#160;</td>
+          <td class="paramname"><em>global</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(I_P), dimension(1:global%mesh%nb), intent(inout)&#160;</td>
+          <td class="paramname"><em>block</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Subroutine for imposing the boundary conditions of blocks of grid level "l" updating the ghost cells. </p>
+<dl class="note"><dt><b>Note:</b></dt><dd>Considering the ghost cell <img class="formulaInl" alt="$ c^0 $" src="../../form_213.png"/> and the inner one <img class="formulaInl" alt="$ c^1 $" src="../../form_214.png"/> (being <img class="formulaInl" alt="$ c^N $" src="../../form_218.png"/> the other bound) the available boundary conditions are:<ul>
+<li><b>REF:</b> reflective boundary condition <img class="formulaInl" alt="$ \begin{array}{*{20}{c}} P^0 = P^1 \\ P_{\vec v\cdot \vec n}^0 = - P_{\vec v\cdot \vec n}^1\end{array} $" src="../../form_215.png"/>;</li>
+<li><b>EXT:</b> extrapolation boundary condition <img class="formulaInl" alt="$ P^0 = P^1 $" src="../../form_219.png"/>;</li>
+<li><b>PER:</b> periodic boundary condition <img class="formulaInl" alt="$ P^0 = P^N $" src="../../form_220.png"/>;</li>
+<li><b>ADJ:</b> adjacent (cell) boundary condition <img class="formulaInl" alt="$ P^0 = P^a $" src="../../form_221.png"/> where "a" is the adjacent cell (b,i,j,k indexes must be specified);</li>
+<li><b>IN1:</b> supersonic inflow steady boundary condition <img class="formulaInl" alt="$ P^0 = P^{in1} $" src="../../form_222.png"/>. <br/>
+ where <img class="formulaInl" alt="$P$" src="../../form_217.png"/> are the primitive variables.</li>
+</ul>
+</dd></dl>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">myrank</td><td>Current rank process. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">l</td><td>Current grid level. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">global</td><td>Global-level data. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">block</td><td>Block-level data. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00810">810</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+
+<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00767">positivity_preserving_limiter()</a>.</p>
+
+<p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-1-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-1-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="../../d3/d31/group__Lib__FluidynamicPublicProcedure_ga3cc6f55a99802e9ba522253542e7199b_cgraph.png" border="0" usemap="#d3/d31/group__Lib__FluidynamicPublicProcedure_ga3cc6f55a99802e9ba522253542e7199b_cgraph" alt=""/></div>
+<map name="d3/d31/group__Lib__FluidynamicPublicProcedure_ga3cc6f55a99802e9ba522253542e7199b_cgraph" id="d3/d31/group__Lib__FluidynamicPublicProcedure_ga3cc6f55a99802e9ba522253542e7199b_cgraph">
+<area shape="rect" id="node3" href="../../d7/d68/Lib__Fluidynamic_8f90.html#a3852dacbfc21ca234846327fabd01cf6" title="positivity_preserving_limiter" alt="" coords="297,5,479,35"/></map>
+</div>
+</p>
 
 </div>
 </div>
@@ -203,7 +408,7 @@ Functions/Subroutines</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Subroutine for solving (performing 1 time step integration) the conservation equations for a given grid level. </p>
+<p>Subroutine for solving (performing one time step integration) the conservation equations for grid level "l". </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">myrank</td><td>Current rank process. </td></tr>
@@ -214,134 +419,7 @@ Functions/Subroutines</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l01184">1184</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="gac05b8eff2e1fe3b801989feb1d0e8d49"></a><!-- doxytag: member="Lib_Fluidynamic::cons2prim" ref="gac05b8eff2e1fe3b801989feb1d0e8d49" args="(cp0, cv0, cons, prim)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">pure subroutine <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gac05b8eff2e1fe3b801989feb1d0e8d49">Lib_Fluidynamic::cons2prim</a> </td>
-          <td>(</td>
-          <td class="paramtype">real(R_P), dimension(:), intent(in)&#160;</td>
-          <td class="paramname"><em>cp0</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(R_P), dimension(:), intent(in)&#160;</td>
-          <td class="paramname"><em>cv0</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Conservative), intent(in)&#160;</td>
-          <td class="paramname"><em>cons</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Primitive), intent(inout)&#160;</td>
-          <td class="paramname"><em>prim</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Subroutine for converting conservative variables to primitive variables. </p>
-<p>The conversion laws are: <br/>
-</p>
-<ul>
-<li>Partial densities <img class="formulaInl" alt="$|_{primitive} =\left| \rho_s\right|_{conservative}$" src="../../form_144.png"/></li>
-<li>Density <img class="formulaInl" alt="$|_{primitive} =\left|\sum_{s=1}^{Ns}\rho_s\right|_{conservative}$" src="../../form_145.png"/></li>
-<li>Specific heats ratio <img class="formulaInl" alt="$|_{primitive}=\left|\frac{\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cp_s^0}} {\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cv_s^0}}\right|_{conservative}$" src="../../form_146.png"/></li>
-<li>Velocity <img class="formulaInl" alt="$|_{primitive} =\left|\frac{\vec momentum}{\rho}\right|_{conservative}$" src="../../form_147.png"/></li>
-<li>Pressure <img class="formulaInl" alt="$|_{primitive}=\left|(\gamma-1)\left[energy-\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right]\right|_{conservative}$" src="../../form_148.png"/> <br/>
- where Ns is the number of initial species and <img class="formulaInl" alt="$cp_s^0,cv_s^0$" src="../../form_149.png"/> are the initial specific heats. <dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">cp0</td><td>Specific heat at constant p of initial species. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cv0</td><td>Specific heat at constant v of initial species. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cons</td><td>Conservative variables (see <a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative">Type_Conservative</a> definition). </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">prim</td><td>Primitive variables (see <a class="el" href="../../dd/dfd/group__DerivedType.html#d2/d5e/structData__Type__Primitive_1_1Type__Primitive">Type_Primitive</a> definition). </td></tr>
-  </table>
-  </dd>
-</dl>
-</li>
-</ul>
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00111">111</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ga69edfc54725c92f88b104ed8f21bcb6f"></a><!-- doxytag: member="Lib_Fluidynamic::primitive2conservative" ref="ga69edfc54725c92f88b104ed8f21bcb6f" args="(block)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">pure subroutine, public <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga69edfc54725c92f88b104ed8f21bcb6f">Lib_Fluidynamic::primitive2conservative</a> </td>
-          <td>(</td>
-          <td class="paramtype">type(Type_Block), intent(inout)&#160;</td>
-          <td class="paramname"><em>block</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Subroutine for converting primitive variables to conservative variables of all cells of a block. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">block</td><td>Block-level data (see <a class="el" href="../../dd/dfd/group__DerivedType.html#d3/dce/structData__Type__Globals_1_1Type__Block">Type_Block</a> definition). </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00137">137</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="gaaec639e0cd32cd1cd756eae90b2fd55d"></a><!-- doxytag: member="Lib_Fluidynamic::conservative2primitive" ref="gaaec639e0cd32cd1cd756eae90b2fd55d" args="(global, block)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine, public <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gaaec639e0cd32cd1cd756eae90b2fd55d">Lib_Fluidynamic::conservative2primitive</a> </td>
-          <td>(</td>
-          <td class="paramtype">type(Type_Global), intent(in)&#160;</td>
-          <td class="paramname"><em>global</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Block), intent(inout)&#160;</td>
-          <td class="paramname"><em>block</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Subroutine for converting conservative variables to primitive variables of all cells of a block. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">global</td><td>Global-level data (see <a class="el" href="../../dd/dfd/group__DerivedType.html#dd/d0c/structData__Type__Globals_1_1Type__Global">Type_Global</a> definition). </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">block</td><td>Block-level data (see <a class="el" href="../../dd/dfd/group__DerivedType.html#d3/dce/structData__Type__Globals_1_1Type__Block">Type_Block</a> definition). </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00163">163</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l01181">1181</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
 
 </div>
 </div>
@@ -364,7 +442,7 @@ Functions/Subroutines</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri May 11 2012 12:38:46 for OFF by
+    <li class="footer">Generated on Mon May 14 2012 17:45:56 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d6/dec/group__Library.html#aedc2b726a30de179e7fb04673fc216a4" title="Lib_Fluidynamic::residuals" alt="" coords="151,5,327,35"/>
+<area shape="rect" id="node3" href="$dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gabc9e93106542597ca7c9f624e849e93f" title="Subroutine for computing the residuals." alt="" coords="151,5,327,35"/>
 <area shape="rect" id="node5" href="$d6/dec/group__Library.html#a0f74f26511b1784ab74d10cfff281bd5" title="Approximate Riemann solver based on Adaptive (non iterative) PVL&#45;TR&#45;TS algorithm." alt="" coords="127,59,351,88"/>
 <area shape="rect" id="node7" href="$d6/dec/group__Library.html#a486558b503e2b46780895fdd5ec8814c" title="Exact Riemann solver based on iterative solution of u&#45;function." alt="" coords="120,112,357,141"/>
 <area shape="rect" id="node9" href="$d6/dec/group__Library.html#a8a96ea1f260aa987f7b83ad3f9358b09" title="Approximate Riemann solver based on Primitive Variables Linearization algorithm." alt="" coords="132,165,345,195"/>

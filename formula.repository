@@ -149,34 +149,78 @@
 \form#148:$|_{primitive}=\left|(\gamma-1)\left[energy-\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right]\right|_{conservative}$
 \form#149:$cp_s^0,cv_s^0$
 \form#150:$\pi $
-\form#151:$\rho$
-\form#152:$\gamma=\frac{{c_p}}{{c_v}}$
-\form#153:$ E = \frac{p}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
-\form#154:$ H = \frac{{\gamma p}}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
-\form#155:$dc = dc = \sum\limits_{i = 1}^{NC} {nvertex_i }$
-\form#156:$dc=8+5=13$
-\form#157:$1^\circ$
-\form#158:$2^\circ$
-\form#159:$3^\circ$
-\form#160:$4^\circ$
-\form#161:$5^\circ$
-\form#162:$6^\circ$
-\form#163:$7^\circ$
-\form#164:$8^\circ$
-\form#165:$offset_c=\sum\limits_{i=1}^{c}{nvertex_i}$
-\form#166:$offset_c$
-\form#167:$c^{th}$
-\form#168:$nvertex_i$
-\form#169:$i^{th}$
-\form#170:$dc = NC + \sum\limits_{i = 1}^{NC} {nvertex_i }$
-\form#171:$dc$
-\form#172:$dc=2+8+5=15$
-\form#173:$2^\circ $
-\form#174:$P^{th}$
-\form#175:$2S^{th}$
-\form#176:$2S^{th}-1$
-\form#177:$\gamma,\eta,\chi$
-\form#178:$1^{st}$
-\form#179:$2^{nd}$
-\form#180:$3^{rd},5^{th},7^{th}$
-\form#181:$2^{nd},3^{rd},4^{th}$
+\form#151:$ u_t = R(t,u) $
+\form#152:$ u^{n+1} = u^n +\Delta t \sum_{s=1}^{Ns}c_1^s K^s $
+\form#153:$K^s$
+\form#154:$s^{th}$
+\form#155:$ K^s = R\left( t^n+c_3^s \Delta t, u^n +\Delta t \sum_{i=1}^{s-1}c_2^{s,i} K^i \right) $
+\form#156:$s-1$
+\form#157:$c_1$
+\form#158:$c_2$
+\form#159:$c_3$
+\form#160:$\begin{array}{l} \begin{array}{*{20}{c}} {c_3^1}\\ {c_3^2}\\ \vdots \\ {c_3^{Ns}} \end{array}\left| \!{\underline {\, {\begin{array}{*{20}{c}} {c_2^{1,1}}&{c_2^{1,2}}& \cdots &{c_2^{1,Ns}}\\ {c_2^{2,1}}&{c_2^{2,2}}& \cdots &{c_2^{1,Ns}}\\ \vdots & \vdots & \ddots & \vdots \\ {c_2^{Ns,1}}&{c_2^{Ns,2}}& \ldots &{c_2^{Ns,Ns}} \end{array}} \,}} \right. \\ \begin{array}{*{20}{c}} {\;\;\;\;\;\;\;}&{c_1^1}&{\;\;\;\;\;c_1^2}&{\;\;\;\;\; \cdots }&{c_1^{Ns}} \end{array} \end{array}$
+\form#161:$\begin{array}{l} \begin{array}{*{20}{c}} {c_3^1}\\ {c_3^1}\\ \vdots \\ {c_3^{Ns}} \end{array}\left| \!{\underline {\, {\begin{array}{*{20}{c}} 0&0& \cdots &0\\ {c_2^{2,1}}&0& \cdots &0\\ \vdots & \vdots & \ddots & \vdots \\ {c_2^{Ns,1}}&{c_2^{Ns,2}}& \ldots &0 \end{array}} \,}} \right. \\ \begin{array}{*{20}{c}} {\;\;\;\;\;\;\;}&{c_1^1}&{\;\;\;\;\;c_1^2}&{\;\;\;\;\; \cdots }&{c_1^{Ns}} \end{array} \end{array}$
+\form#162:$ c_3^s = \sum_{i=1}^{Ns}c_2^{s,i} $
+\form#163:$1^{st}$
+\form#164:$ c_1 = \left[1\right]$
+\form#165:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0 \end{array}} \right] $
+\form#166:$ c_3 = \left[0\right]$
+\form#167:$2^{nd}$
+\form#168:$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{1}{2}&\frac{1}{2} \end{array}} \right] $
+\form#169:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0\\ 1&0 \end{array}} \right] $
+\form#170:$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \end{array}} \right] $
+\form#171:$3^{rd}$
+\form#172:$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{1}{6}&\frac{1}{6}&\frac{1}{3} \end{array}} \right] $
+\form#173:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0&0\\ 1&0&0\\ \frac{1}{4}&\frac{1}{4}&0 \end{array}} \right] $
+\form#174:$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \\ \frac{1}{2} \end{array}} \right] $
+\form#175:$4^{rd}$
+\form#176:$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{55}{108}&\frac{1}{3}&\frac{1}{3}&\frac{1}{6} \end{array}} \right] $
+\form#177:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0&0&0\\ 1&0&0&0\\ \frac{1}{4}&\frac{1}{2}&0&0\\ \frac{5}{18}&0&1&0 \end{array}} \right] $
+\form#178:$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \\ \frac{3}{4} \\ \frac{23}{18} \end{array}} \right] $
+\form#179:$ c_1 = \left[ {\begin{array}{*{20}{c}} 0.14681187618661&0.24848290924556&0.10425883036650&0.27443890091960& 0.22600748319395 \end{array}} \right] $
+\form#180:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0&0&0&0 \\ 0.39175222700392&0&0&0&0 \\ 0.21766909633821&0.36841059262959&0&0&0 \\ 0.08269208670950& 0.13995850206999&0.25189177424738&0&0 \\ 0.06796628370320&0.11503469844438&0.20703489864929&0.54497475021237&0 \end{array}} \right] $
+\form#181:$ c_3 = \left[ {\begin{array}{*{20}{c}} 0\\0.39175222700392\\0.58607968896780\\0.47454236302687\\0.93501063100924 \end{array}} \right] $
+\form#182:$s1^{th}$
+\form#183:$u^{n+1}$
+\form#184:$\rho$
+\form#185:$\gamma=\frac{{c_p}}{{c_v}}$
+\form#186:$ E = \frac{p}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
+\form#187:$ H = \frac{{\gamma p}}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
+\form#188:$dc = dc = \sum\limits_{i = 1}^{NC} {nvertex_i }$
+\form#189:$dc=8+5=13$
+\form#190:$1^\circ$
+\form#191:$2^\circ$
+\form#192:$3^\circ$
+\form#193:$4^\circ$
+\form#194:$5^\circ$
+\form#195:$6^\circ$
+\form#196:$7^\circ$
+\form#197:$8^\circ$
+\form#198:$offset_c=\sum\limits_{i=1}^{c}{nvertex_i}$
+\form#199:$offset_c$
+\form#200:$c^{th}$
+\form#201:$nvertex_i$
+\form#202:$i^{th}$
+\form#203:$dc = NC + \sum\limits_{i = 1}^{NC} {nvertex_i }$
+\form#204:$dc$
+\form#205:$dc=2+8+5=15$
+\form#206:$2^\circ $
+\form#207:$P^{th}$
+\form#208:$2S^{th}$
+\form#209:$2S^{th}-1$
+\form#210:$\gamma,\eta,\chi$
+\form#211:$3^{rd},5^{th},7^{th}$
+\form#212:$2^{nd},3^{rd},4^{th}$
+\form#213:$ c^0 $
+\form#214:$ c^1 $
+\form#215:$ \begin{array}{*{20}{c}} P^0 = P^1 \\ P_{\vec v\cdot \vec n}^0 = - P_{\vec v\cdot \vec n}^1\end{array} $
+\form#216:$ P_0 = P_1 $
+\form#217:$P$
+\form#218:$ c^N $
+\form#219:$ P^0 = P^1 $
+\form#220:$ P^0 = P^N $
+\form#221:$ P^0 = P^a $
+\form#222:$ P^0 = P^{in1} $
+\form#223:$5^{th}$
+\form#224:$7^{th}$
+\form#225:$4^{th}$

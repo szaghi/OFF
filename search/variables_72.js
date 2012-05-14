@@ -11,8 +11,6 @@ var searchData=
   ['residual_5fstop',['residual_stop',['../dd/dfd/group__DerivedType.html#a45ac18a73371566730a7bf3ba8257c3b',1,'Data_Type_Globals::Type_Fluid_Global']]],
   ['residual_5ftoll',['residual_toll',['../dd/dfd/group__DerivedType.html#a3517da651ec82f5795b2702f7a1fe63a',1,'Data_Type_Globals::Type_Fluid_Global']]],
   ['restart_5fout',['restart_out',['../dd/dfd/group__DerivedType.html#aa4d749f8e586e2c01fa40da199dd895d',1,'Data_Type_Globals::Type_File_Global']]],
-  ['rk_5fc1',['rk_c1',['../d6/dec/group__Library.html#a283b5b9c376b8e88748f76560b24b83e',1,'Lib_Fluidynamic']]],
-  ['rk_5fc2',['rk_c2',['../d6/dec/group__Library.html#ac6ecd29e4f13177a66e439b45a51331c',1,'Lib_Fluidynamic']]],
   ['rk_5ford',['rk_ord',['../dd/dfd/group__DerivedType.html#ab6872234e5ff4821dfd8727313618e00',1,'Data_Type_Globals::Type_Fluid_Global']]],
   ['rs',['rs',['../dd/dfd/group__DerivedType.html#a23b81d4bf84ad80f28fca83156c04017',1,'Data_Type_Conservative::Type_Conservative']]],
   ['rv',['rv',['../dd/dfd/group__DerivedType.html#a491b7d412d8000ca5a4eaf4ebd6cc905',1,'Data_Type_Conservative::Type_Conservative']]]

@@ -11,6 +11,7 @@ var group__PublicProcedure =
     [ "Data_Type_Vector", "db/daf/group__Data__Type__VectorPublicProcedure.html", "db/daf/group__Data__Type__VectorPublicProcedure" ],
     [ "IR_Precision", "d7/d79/group__IR__PrecisionPublicProcedure.html", "d7/d79/group__IR__PrecisionPublicProcedure" ],
     [ "Lib_Fluidynamic", "d3/d31/group__Lib__FluidynamicPublicProcedure.html", "d3/d31/group__Lib__FluidynamicPublicProcedure" ],
+    [ "Lib_Runge_Kutta", "d5/d23/group__Lib__Runge__KuttaPublicProcedure.html", "d5/d23/group__Lib__Runge__KuttaPublicProcedure" ],
     [ "Lib_VTK_IO", "d5/d47/group__Lib__VTK__IOPublicProcedure.html", "d5/d47/group__Lib__VTK__IOPublicProcedure" ],
     [ "Lib_WENO", "db/d22/group__Lib__WENOPublicProcedure.html", "db/d22/group__Lib__WENOPublicProcedure" ]
 ];

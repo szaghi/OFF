@@ -120,12 +120,14 @@ Data Types</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This module contains the definition of procedures and variables useful for post-process the OFF data.  <a href="../../d6/dec/group__Library.html#d1/dce/classLib__PostProcessing">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">module &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#d8/d76/classLib__Riemann">Lib_Riemann</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This module contains procedures for computing the solution of a Riemann Problem.  <a href="../../d6/dec/group__Library.html#d8/d76/classLib__Riemann">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">module &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#d6/dc1/classLib__Runge__Kutta">Lib_Runge_Kutta</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This module contains the definition of Runge-Kutta procedures for time integration.  <a href="../../d6/dec/group__Library.html#d6/dc1/classLib__Runge__Kutta">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">module &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#d0/d11/classLib__Thermodynamic__Laws__Ideal">Lib_Thermodynamic_Laws_Ideal</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This module contains the definition of Thermodynamic Laws for ideal calorically perfect gas.  <a href="../../d6/dec/group__Library.html#d0/d11/classLib__Thermodynamic__Laws__Ideal">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">module &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#d6/d5b/classLib__VTK__IO">Lib_VTK_IO</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This is a library of functions for Input and Output pure Fortran data in VTK format.  <a href="../../d6/dec/group__Library.html#d6/d5b/classLib__VTK__IO">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">module &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#d7/d0a/classLib__WENO">Lib_WENO</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This module contains the definition of procedures for computing WENO reconstruction with a user-defined <img class="formulaInl" alt="$P^{th}$" src="../../form_174.png"/> order.  <a href="../../d6/dec/group__Library.html#d7/d0a/classLib__WENO">More...</a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This module contains the definition of procedures for computing WENO reconstruction with a user-defined <img class="formulaInl" alt="$P^{th}$" src="../../form_207.png"/> order.  <a href="../../d6/dec/group__Library.html#d7/d0a/classLib__WENO">More...</a><br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>List of modules containing libraries of procedures. </p>
@@ -293,298 +295,35 @@ Data Types</h2></td></tr>
 <p>This is a library module. </p>
 <dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000010">Todo:</a></b></dt><dd><b>DocComplete:</b> Complete the documentation of internal procedures </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00014">14</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00019">19</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
 </div><table class="memberdecls">
 <tr><td colspan="2"><h3>Public Member Functions</h3></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#aedc2b726a30de179e7fb04673fc216a4">residuals</a> (s1, global, block)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#a3cc6f55a99802e9ba522253542e7199b">boundary_conditions</a> (myrank, l, global, block)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gab0878159386863d9df80b862dec04118">solve_grl</a> (myrank, l, global, block)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for solving (performing 1 time step integration) the conservation equations for a given grid level.  <a href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gab0878159386863d9df80b862dec04118"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#a72cf5b7e97f59178d0b6f0895aaccb51">rk_init</a> (S)</td></tr>
-<tr><td colspan="2"><h3>Private Member Functions</h3></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#abb7369c20e4ef78216b6756d163cb469">compute_time</a> (global, block, Dtmin)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#afcd52f4802d17f33ededcaf21feffd2f">rk_stages_sum</a> (s1, global, block)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#ae27a81762853e919a50a580cf5626590">rk_time_integration</a> (global, block, RU)</td></tr>
-<tr><td colspan="2"><h3>Private Attributes</h3></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">real(R_P), dimension(:), <br class="typebreak"/>
-allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#a283b5b9c376b8e88748f76560b24b83e">rk_c1</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">c1 coefficients of Runge-Kutta's integration [1:rk_ord]  <a href="#a283b5b9c376b8e88748f76560b24b83e"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">real(R_P), dimension(:,:), <br class="typebreak"/>
-allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#ac6ecd29e4f13177a66e439b45a51331c">rk_c2</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">c2 coefficients of Runge-Kutta's integration [1:rk_ord,1:rk_ord]  <a href="#ac6ecd29e4f13177a66e439b45a51331c"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I1P)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#aa1b75b605f84e93dd22ba68f8e15eeca">flip</a> = 0_I_P</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Flip-Flop flag for restart solution file.  <a href="#aa1b75b605f84e93dd22ba68f8e15eeca"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga28f8521a7e547730159d07e84fdeda81">prim2cons</a> (prim, cons)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for converting primitive variables to conservative variables.  <a href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga28f8521a7e547730159d07e84fdeda81"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gac05b8eff2e1fe3b801989feb1d0e8d49">cons2prim</a> (cp0, cv0, cons, prim)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for converting conservative variables to primitive variables.  <a href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gac05b8eff2e1fe3b801989feb1d0e8d49"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga310fb23a716b289920d9ca30cf4b48fb">prim2cons</a> (prim, cons)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for converting primitive variables to conservative variables.  <a href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga310fb23a716b289920d9ca30cf4b48fb"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga58d0148e6861fd77dc79610e62ed272c">cons2prim</a> (cp0, cv0, cons, prim)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for converting conservative variables to primitive variables.  <a href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga58d0148e6861fd77dc79610e62ed272c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga69edfc54725c92f88b104ed8f21bcb6f">primitive2conservative</a> (block)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for converting primitive variables to conservative variables of all cells of a block.  <a href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga69edfc54725c92f88b104ed8f21bcb6f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gaaec639e0cd32cd1cd756eae90b2fd55d">conservative2primitive</a> (global, block)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for converting conservative variables to primitive variables of all cells of a block.  <a href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gaaec639e0cd32cd1cd756eae90b2fd55d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga3cc6f55a99802e9ba522253542e7199b">boundary_conditions</a> (myrank, l, global, block)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for imposing the boundary conditions of blocks of grid level "l" updating the ghost cells.  <a href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga3cc6f55a99802e9ba522253542e7199b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gab0878159386863d9df80b862dec04118">solve_grl</a> (myrank, l, global, block)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for solving (performing one time step integration) the conservation equations for grid level "l".  <a href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gab0878159386863d9df80b862dec04118"></a><br/></td></tr>
+<tr><td colspan="2"><h3>Private Member Functions</h3></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gabb7369c20e4ef78216b6756d163cb469">compute_time</a> (global, block, Dtmin)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for evaluating the local and global time step value by CFL condition.  <a href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gabb7369c20e4ef78216b6756d163cb469"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gabc9e93106542597ca7c9f624e849e93f">residuals</a> (s1, global, block)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing the residuals.  <a href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gabc9e93106542597ca7c9f624e849e93f"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gafcd52f4802d17f33ededcaf21feffd2f">rk_stages_sum</a> (s1, global, block)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for summing Runge-Kutta stages for updating primitive variables (block%fluid%P).  <a href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gafcd52f4802d17f33ededcaf21feffd2f"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gae27a81762853e919a50a580cf5626590">rk_time_integration</a> (global, block, RU)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing Runge-Kutta one time step integration.  <a href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gae27a81762853e919a50a580cf5626590"></a><br/></td></tr>
+<tr><td colspan="2"><h3>Private Attributes</h3></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">integer(I1P)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#aa1b75b605f84e93dd22ba68f8e15eeca">flip</a> = 0_I_P</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Flip-Flop flag for restart solution file.  <a href="#aa1b75b605f84e93dd22ba68f8e15eeca"></a><br/></td></tr>
 </table>
-<hr/><h4>Member Function/Subroutine Documentation</h4>
-<a class="anchor" id="abb7369c20e4ef78216b6756d163cb469"></a><!-- doxytag: member="Lib_Fluidynamic::compute_time" ref="abb7369c20e4ef78216b6756d163cb469" args="(global, block, Dtmin)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine <a class="el" href="../../d6/dec/group__Library.html#abb7369c20e4ef78216b6756d163cb469">Lib_Fluidynamic::compute_time</a> </td>
-          <td>(</td>
-          <td class="paramtype">type(Type_Global), intent(in)&#160;</td>
-          <td class="paramname"><em>global</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Block), intent(inout)&#160;</td>
-          <td class="paramname"><em>block</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(R_P), intent(out)&#160;</td>
-          <td class="paramname"><em>Dtmin</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00189">189</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aedc2b726a30de179e7fb04673fc216a4"></a><!-- doxytag: member="Lib_Fluidynamic::residuals" ref="aedc2b726a30de179e7fb04673fc216a4" args="(s1, global, block)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine, public <a class="el" href="../../d6/dec/group__Library.html#aedc2b726a30de179e7fb04673fc216a4">Lib_Fluidynamic::residuals</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>s1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Global), intent(in)&#160;</td>
-          <td class="paramname"><em>global</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Block), intent(inout)&#160;</td>
-          <td class="paramname"><em>block</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00319">319</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00420">fluxes()</a>.</p>
-
-<p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-0-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="../../d6/dec/group__Library_aedc2b726a30de179e7fb04673fc216a4_cgraph.png" border="0" usemap="#d6/dec/group__Library_aedc2b726a30de179e7fb04673fc216a4_cgraph" alt=""/></div>
-<map name="d6/dec/group__Library_aedc2b726a30de179e7fb04673fc216a4_cgraph" id="d6/dec/group__Library_aedc2b726a30de179e7fb04673fc216a4_cgraph">
-<area shape="rect" id="node3" href="../../d7/d68/Lib__Fluidynamic_8f90.html#ac27b512e170e1fd2ea188f68b54fe8ec" title="fluxes" alt="" coords="231,5,287,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a3cc6f55a99802e9ba522253542e7199b"></a><!-- doxytag: member="Lib_Fluidynamic::boundary_conditions" ref="a3cc6f55a99802e9ba522253542e7199b" args="(myrank, l, global, block)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine, public <a class="el" href="../../d6/dec/group__Library.html#a3cc6f55a99802e9ba522253542e7199b">Lib_Fluidynamic::boundary_conditions</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>myrank</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>l</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Global), intent(in)&#160;</td>
-          <td class="paramname"><em>global</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Block), dimension(1:global%mesh%nb), intent(inout)&#160;</td>
-          <td class="paramname"><em>block</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00763">763</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00732">positivity_preserving_limiter()</a>.</p>
-
-<p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-1-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="../../d6/dec/group__Library_a3cc6f55a99802e9ba522253542e7199b_cgraph.png" border="0" usemap="#d6/dec/group__Library_a3cc6f55a99802e9ba522253542e7199b_cgraph" alt=""/></div>
-<map name="d6/dec/group__Library_a3cc6f55a99802e9ba522253542e7199b_cgraph" id="d6/dec/group__Library_a3cc6f55a99802e9ba522253542e7199b_cgraph">
-<area shape="rect" id="node3" href="../../d7/d68/Lib__Fluidynamic_8f90.html#a3852dacbfc21ca234846327fabd01cf6" title="positivity_preserving_limiter" alt="" coords="297,5,479,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a72cf5b7e97f59178d0b6f0895aaccb51"></a><!-- doxytag: member="Lib_Fluidynamic::rk_init" ref="a72cf5b7e97f59178d0b6f0895aaccb51" args="(S)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine, public <a class="el" href="../../d6/dec/group__Library.html#a72cf5b7e97f59178d0b6f0895aaccb51">Lib_Fluidynamic::rk_init</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I1P), intent(in)&#160;</td>
-          <td class="paramname"><em>S</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l01353">1353</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="afcd52f4802d17f33ededcaf21feffd2f"></a><!-- doxytag: member="Lib_Fluidynamic::rk_stages_sum" ref="afcd52f4802d17f33ededcaf21feffd2f" args="(s1, global, block)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine <a class="el" href="../../d6/dec/group__Library.html#afcd52f4802d17f33ededcaf21feffd2f">Lib_Fluidynamic::rk_stages_sum</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>s1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Global), intent(in)&#160;</td>
-          <td class="paramname"><em>global</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Block), intent(inout)&#160;</td>
-          <td class="paramname"><em>block</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l01422">1422</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ae27a81762853e919a50a580cf5626590"></a><!-- doxytag: member="Lib_Fluidynamic::rk_time_integration" ref="ae27a81762853e919a50a580cf5626590" args="(global, block, RU)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine <a class="el" href="../../d6/dec/group__Library.html#ae27a81762853e919a50a580cf5626590">Lib_Fluidynamic::rk_time_integration</a> </td>
-          <td>(</td>
-          <td class="paramtype">type(Type_Global), intent(in)&#160;</td>
-          <td class="paramname"><em>global</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Block), intent(inout)&#160;</td>
-          <td class="paramname"><em>block</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(R_P), dimension(1:global%fluid%nc), intent(out)&#160;</td>
-          <td class="paramname"><em>RU</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l01459">1459</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-</div>
-</div>
 <hr/><h4>Member Data Documentation</h4>
-<a class="anchor" id="a283b5b9c376b8e88748f76560b24b83e"></a><!-- doxytag: member="Lib_Fluidynamic::rk_c1" ref="a283b5b9c376b8e88748f76560b24b83e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">real(R_P), dimension(:), allocatable <a class="el" href="../../d6/dec/group__Library.html#a283b5b9c376b8e88748f76560b24b83e">Lib_Fluidynamic::rk_c1</a><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>c1 coefficients of Runge-Kutta's integration [1:rk_ord] </p>
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00070">70</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ac6ecd29e4f13177a66e439b45a51331c"></a><!-- doxytag: member="Lib_Fluidynamic::rk_c2" ref="ac6ecd29e4f13177a66e439b45a51331c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">real(R_P), dimension(:,:), allocatable <a class="el" href="../../d6/dec/group__Library.html#ac6ecd29e4f13177a66e439b45a51331c">Lib_Fluidynamic::rk_c2</a><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>c2 coefficients of Runge-Kutta's integration [1:rk_ord,1:rk_ord] </p>
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00071">71</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="aa1b75b605f84e93dd22ba68f8e15eeca"></a><!-- doxytag: member="Lib_Fluidynamic::flip" ref="aa1b75b605f84e93dd22ba68f8e15eeca" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -598,7 +337,7 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p>Flip-Flop flag for restart solution file. </p>
 
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00073">73</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00072">72</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
 
 </div>
 </div>
@@ -2987,11 +2726,11 @@ function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 
 <p>References <a class="el" href="../../dc/dba/Lib__Multigrid_8f90_source.html#l00246">fine2coarse_R()</a>, <a class="el" href="../../dc/dba/Lib__Multigrid_8f90_source.html#l00207">fine2coarse_U()</a>, and <a class="el" href="../../dc/dba/Lib__Multigrid_8f90_source.html#l00284">te_estimation()</a>.</p>
 
-<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-2-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-0-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-2-content" class="dyncontent" style="display:none;">
+<div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d6/dec/group__Library_a5ecdee8975f2cde4d710bd4d8f16d0f4_cgraph.png" border="0" usemap="#d6/dec/group__Library_a5ecdee8975f2cde4d710bd4d8f16d0f4_cgraph" alt=""/></div>
 <map name="d6/dec/group__Library_a5ecdee8975f2cde4d710bd4d8f16d0f4_cgraph" id="d6/dec/group__Library_a5ecdee8975f2cde4d710bd4d8f16d0f4_cgraph">
 <area shape="rect" id="node3" href="../../dc/dba/Lib__Multigrid_8f90.html#a158e6e50026281e9a0606c15e8c3bab0" title="fine2coarse_R" alt="" coords="197,5,304,35"/><area shape="rect" id="node5" href="../../dc/dba/Lib__Multigrid_8f90.html#a7cd0338a18b7ded0ab421fbb7067796d" title="fine2coarse_U" alt="" coords="197,59,304,88"/><area shape="rect" id="node7" href="../../dc/dba/Lib__Multigrid_8f90.html#a5c87d959c7e2825b1009ef1ba8cb51ae" title="te_estimation" alt="" coords="201,112,300,141"/></map>
@@ -3251,11 +2990,11 @@ function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 
 <p>References <a class="el" href="../../dc/dba/Lib__Multigrid_8f90_source.html#l00504">coarse2fine_U()</a>, <a class="el" href="../../dc/dba/Lib__Multigrid_8f90_source.html#l00468">get_correction()</a>, and <a class="el" href="../../dc/dba/Lib__Multigrid_8f90_source.html#l00565">update_fine()</a>.</p>
 
-<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-3-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-1-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-3-content" class="dyncontent" style="display:none;">
+<div id="dynsection-1-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d6/dec/group__Library_a73330ac4d88df3d6f52f0ef18b695e42_cgraph.png" border="0" usemap="#d6/dec/group__Library_a73330ac4d88df3d6f52f0ef18b695e42_cgraph" alt=""/></div>
 <map name="d6/dec/group__Library_a73330ac4d88df3d6f52f0ef18b695e42_cgraph" id="d6/dec/group__Library_a73330ac4d88df3d6f52f0ef18b695e42_cgraph">
 <area shape="rect" id="node3" href="../../dc/dba/Lib__Multigrid_8f90.html#aeb666358151e2940c6057e4305dd4801" title="coarse2fine_U" alt="" coords="197,5,304,35"/><area shape="rect" id="node5" href="../../dc/dba/Lib__Multigrid_8f90.html#a3d1b7c94ef0761749cc7da8a85d3060e" title="get_correction" alt="" coords="199,59,303,88"/><area shape="rect" id="node7" href="../../dc/dba/Lib__Multigrid_8f90.html#adb8e56cece73681546844cbf1169d4d5" title="update_fine" alt="" coords="207,112,295,141"/></map>
@@ -3535,11 +3274,11 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p>References <a class="el" href="../../dd/d1a/Lib__Parallel_8f90_source.html#l00297">scan_proc()</a>.</p>
 
-<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-4-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-2-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-4-content" class="dyncontent" style="display:none;">
+<div id="dynsection-2-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d6/dec/group__Library_abcc44b45fee083dcecf76b01b90318a5_cgraph.png" border="0" usemap="#d6/dec/group__Library_abcc44b45fee083dcecf76b01b90318a5_cgraph" alt=""/></div>
 <map name="d6/dec/group__Library_abcc44b45fee083dcecf76b01b90318a5_cgraph" id="d6/dec/group__Library_abcc44b45fee083dcecf76b01b90318a5_cgraph">
 <area shape="rect" id="node3" href="../../dd/d1a/Lib__Parallel_8f90.html#a5bbe49df7f8d9b21931033c36e6db7f9" title="scan_proc" alt="" coords="272,5,355,35"/><area shape="rect" id="node5" href="../../dd/d1a/Lib__Parallel_8f90.html#a15b10d921326106ca809890636f24e52" title="scan_block" alt="" coords="403,5,491,35"/></map>
@@ -3999,11 +3738,11 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div class="textblock"><p>This module contains the definition of procedures and variables useful for post-process the OFF data. </p>
 
 <p>Definition at line <a class="el" href="../../da/df8/Lib__PostProcessing_8f90_source.html#l00012">12</a> of file <a class="el" href="../../da/df8/Lib__PostProcessing_8f90_source.html">Lib_PostProcessing.f90</a>.</p>
-</div><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-5-trigger" src="../../closed.png" alt="+"/> Collaboration diagram for Lib_PostProcessing:</div>
-<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
+</div><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-3-trigger" src="../../closed.png" alt="+"/> Collaboration diagram for Lib_PostProcessing:</div>
+<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-5-content" class="dyncontent" style="display:none;">
+<div id="dynsection-3-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../dc/d94/classLib__PostProcessing__coll__graph.png" border="0" usemap="#Lib__PostProcessing_coll__map" alt="Collaboration graph"/></div>
 <map name="Lib__PostProcessing_coll__map" id="Lib__PostProcessing_coll__map">
 <area shape="rect" id="node2" href="../../dd/dfd/group__DerivedType.html#d0/d09/structLib__PostProcessing_1_1Type__PP__Format" title="Derived type containing the post&#45;processing options." alt="" coords="5,5,253,35"/></map>
@@ -4257,11 +3996,11 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p>References <a class="el" href="../../da/df8/Lib__PostProcessing_8f90_source.html#l00388">tec_dat()</a>.</p>
 
-<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-6-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-4-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-6-content" class="dyncontent" style="display:none;">
+<div id="dynsection-4-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d6/dec/group__Library_a08b1780647e6818045dd75e4d1310534_cgraph.png" border="0" usemap="#d6/dec/group__Library_a08b1780647e6818045dd75e4d1310534_cgraph" alt=""/></div>
 <map name="d6/dec/group__Library_a08b1780647e6818045dd75e4d1310534_cgraph" id="d6/dec/group__Library_a08b1780647e6818045dd75e4d1310534_cgraph">
 <area shape="rect" id="node3" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c" title="tec_dat" alt="" coords="263,5,327,35"/></map>
@@ -5401,13 +5140,13 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p>Definition at line <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html#l00493">493</a> of file <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html">Lib_Riemann.f90</a>.</p>
 
-<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00420">fluxes()</a>.</p>
+<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00455">fluxes()</a>.</p>
 
-<p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-7-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-7-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-5-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-7-content" class="dyncontent" style="display:none;">
+<div id="dynsection-5-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d6/dec/group__Library_a15031c97727c91635d174d005dcc54df_cgraph.png" border="0" usemap="#d6/dec/group__Library_a15031c97727c91635d174d005dcc54df_cgraph" alt=""/></div>
 <map name="d6/dec/group__Library_a15031c97727c91635d174d005dcc54df_cgraph" id="d6/dec/group__Library_a15031c97727c91635d174d005dcc54df_cgraph">
 <area shape="rect" id="node3" href="../../d7/d68/Lib__Fluidynamic_8f90.html#ac27b512e170e1fd2ea188f68b54fe8ec" title="fluxes" alt="" coords="255,5,311,35"/></map>
@@ -5581,13 +5320,13 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p>Definition at line <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html#l00555">555</a> of file <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html">Lib_Riemann.f90</a>.</p>
 
-<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00420">fluxes()</a>.</p>
+<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00455">fluxes()</a>.</p>
 
-<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-8-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-6-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-8-content" class="dyncontent" style="display:none;">
+<div id="dynsection-6-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d6/dec/group__Library_a8a4a337227f0dba571865ab597799161_cgraph.png" border="0" usemap="#d6/dec/group__Library_a8a4a337227f0dba571865ab597799161_cgraph" alt=""/></div>
 <map name="d6/dec/group__Library_a8a4a337227f0dba571865ab597799161_cgraph" id="d6/dec/group__Library_a8a4a337227f0dba571865ab597799161_cgraph">
 <area shape="rect" id="node3" href="../../d7/d68/Lib__Fluidynamic_8f90.html#ac27b512e170e1fd2ea188f68b54fe8ec" title="fluxes" alt="" coords="279,5,335,35"/></map>
@@ -5737,13 +5476,13 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p>Definition at line <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html#l00641">641</a> of file <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html">Lib_Riemann.f90</a>.</p>
 
-<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00420">fluxes()</a>.</p>
+<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00455">fluxes()</a>.</p>
 
-<p><div id="dynsection-9" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-9-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-9-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-7-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-7-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-9-content" class="dyncontent" style="display:none;">
+<div id="dynsection-7-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d6/dec/group__Library_a197ffaaf0a956294c472dbaff73bbd21_cgraph.png" border="0" usemap="#d6/dec/group__Library_a197ffaaf0a956294c472dbaff73bbd21_cgraph" alt=""/></div>
 <map name="d6/dec/group__Library_a197ffaaf0a956294c472dbaff73bbd21_cgraph" id="d6/dec/group__Library_a197ffaaf0a956294c472dbaff73bbd21_cgraph">
 <area shape="rect" id="node3" href="../../d7/d68/Lib__Fluidynamic_8f90.html#ac27b512e170e1fd2ea188f68b54fe8ec" title="fluxes" alt="" coords="308,5,364,35"/></map>
@@ -8559,13 +8298,13 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p>Definition at line <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html#l01809">1809</a> of file <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html">Lib_Riemann.f90</a>.</p>
 
-<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00420">fluxes()</a>.</p>
+<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00455">fluxes()</a>.</p>
 
-<p><div id="dynsection-10" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-10-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-10-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-8-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-10-content" class="dyncontent" style="display:none;">
+<div id="dynsection-8-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d6/dec/group__Library_a8a96ea1f260aa987f7b83ad3f9358b09_cgraph.png" border="0" usemap="#d6/dec/group__Library_a8a96ea1f260aa987f7b83ad3f9358b09_cgraph" alt=""/></div>
 <map name="d6/dec/group__Library_a8a96ea1f260aa987f7b83ad3f9358b09_cgraph" id="d6/dec/group__Library_a8a96ea1f260aa987f7b83ad3f9358b09_cgraph">
 <area shape="rect" id="node3" href="../../d7/d68/Lib__Fluidynamic_8f90.html#ac27b512e170e1fd2ea188f68b54fe8ec" title="fluxes" alt="" coords="268,5,324,35"/></map>
@@ -8875,13 +8614,13 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p>Definition at line <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html#l01941">1941</a> of file <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html">Lib_Riemann.f90</a>.</p>
 
-<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00420">fluxes()</a>.</p>
+<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00455">fluxes()</a>.</p>
 
-<p><div id="dynsection-11" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-11-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-11-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-9" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-9-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-9-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-11-content" class="dyncontent" style="display:none;">
+<div id="dynsection-9-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d6/dec/group__Library_a0f74f26511b1784ab74d10cfff281bd5_cgraph.png" border="0" usemap="#d6/dec/group__Library_a0f74f26511b1784ab74d10cfff281bd5_cgraph" alt=""/></div>
 <map name="d6/dec/group__Library_a0f74f26511b1784ab74d10cfff281bd5_cgraph" id="d6/dec/group__Library_a0f74f26511b1784ab74d10cfff281bd5_cgraph">
 <area shape="rect" id="node3" href="../../d7/d68/Lib__Fluidynamic_8f90.html#ac27b512e170e1fd2ea188f68b54fe8ec" title="fluxes" alt="" coords="281,5,337,35"/></map>
@@ -9172,13 +8911,13 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p>Definition at line <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html#l02180">2180</a> of file <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html">Lib_Riemann.f90</a>.</p>
 
-<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00420">fluxes()</a>.</p>
+<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00455">fluxes()</a>.</p>
 
-<p><div id="dynsection-12" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-12-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-12-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-10" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-10-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-10-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-12-content" class="dyncontent" style="display:none;">
+<div id="dynsection-10-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d6/dec/group__Library_a48672e75faf94cd0e36d6a23138d2f26_cgraph.png" border="0" usemap="#d6/dec/group__Library_a48672e75faf94cd0e36d6a23138d2f26_cgraph" alt=""/></div>
 <map name="d6/dec/group__Library_a48672e75faf94cd0e36d6a23138d2f26_cgraph" id="d6/dec/group__Library_a48672e75faf94cd0e36d6a23138d2f26_cgraph">
 <area shape="rect" id="node3" href="../../d7/d68/Lib__Fluidynamic_8f90.html#ac27b512e170e1fd2ea188f68b54fe8ec" title="fluxes" alt="" coords="268,5,324,35"/></map>
@@ -9286,13 +9025,13 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p>Definition at line <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html#l02280">2280</a> of file <a class="el" href="../../d2/d43/Lib__Riemann_8f90_source.html">Lib_Riemann.f90</a>.</p>
 
-<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00420">fluxes()</a>.</p>
+<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00455">fluxes()</a>.</p>
 
-<p><div id="dynsection-13" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-13-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-13-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-11" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-11-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-11-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-13-content" class="dyncontent" style="display:none;">
+<div id="dynsection-11-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d6/dec/group__Library_a486558b503e2b46780895fdd5ec8814c_cgraph.png" border="0" usemap="#d6/dec/group__Library_a486558b503e2b46780895fdd5ec8814c_cgraph" alt=""/></div>
 <map name="d6/dec/group__Library_a486558b503e2b46780895fdd5ec8814c_cgraph" id="d6/dec/group__Library_a486558b503e2b46780895fdd5ec8814c_cgraph">
 <area shape="rect" id="node3" href="../../d7/d68/Lib__Fluidynamic_8f90.html#ac27b512e170e1fd2ea188f68b54fe8ec" title="fluxes" alt="" coords="295,5,351,35"/></map>
@@ -9320,7 +9059,58 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 </div>
 </div>
-<!-- doxytag: class="Lib_Riemann" --><a name="d0/d11/classLib__Thermodynamic__Laws__Ideal" id="d0/d11/classLib__Thermodynamic__Laws__Ideal"></a>
+<!-- doxytag: class="Lib_Riemann" --><a name="d6/dc1/classLib__Runge__Kutta" id="d6/dc1/classLib__Runge__Kutta"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">module Lib_Runge_Kutta</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<div class="textblock"><p>This module contains the definition of Runge-Kutta procedures for time integration. </p>
+<dl class="note"><dt><b>Note:</b></dt><dd>This is a library module. This module provides procedure for performing ODE time integration by means numerical scheme belongs to the explicit, Strong Stability Preserving Runge-Kutta family. The implementation is explicit without low-storage form. The scheme is written using the Butcher table (see Butcher, J.C., "Coefficients for the study of Runge-Kutta integration
+ processes", J. Austral. Math. Soc., Vol. 3, pages: 185--201, 1963). Considering the following ODE (Ordinary Differential Equation): <br/>
+ <img class="formulaInl" alt="$ u_t = R(t,u) $" src="../../form_151.png"/> <br/>
+ where R is the residual function. The scheme adopted can written in the form: <br/>
+ <img class="formulaInl" alt="$ u^{n+1} = u^n +\Delta t \sum_{s=1}^{Ns}c_1^s K^s $" src="../../form_152.png"/> <br/>
+ where Ns is the number of stages used and <img class="formulaInl" alt="$K^s$" src="../../form_153.png"/> is the <img class="formulaInl" alt="$s^{th}$" src="../../form_154.png"/> stage computed as: <br/>
+ <img class="formulaInl" alt="$ K^s = R\left( t^n+c_3^s \Delta t, u^n +\Delta t \sum_{i=1}^{s-1}c_2^{s,i} K^i \right) $" src="../../form_155.png"/> <br/>
+ The scheme is explicit thus the above summation is up to <img class="formulaInl" alt="$s-1$" src="../../form_156.png"/>. The coefficients <img class="formulaInl" alt="$c_1$" src="../../form_157.png"/>, <img class="formulaInl" alt="$c_2$" src="../../form_158.png"/> and <img class="formulaInl" alt="$c_3$" src="../../form_159.png"/> are given in the Butcher table form: <br/>
+ <img class="formulaInl" alt="$\begin{array}{l} \begin{array}{*{20}{c}} {c_3^1}\\ {c_3^2}\\ \vdots \\ {c_3^{Ns}} \end{array}\left| \!{\underline {\, {\begin{array}{*{20}{c}} {c_2^{1,1}}&amp;{c_2^{1,2}}&amp; \cdots &amp;{c_2^{1,Ns}}\\ {c_2^{2,1}}&amp;{c_2^{2,2}}&amp; \cdots &amp;{c_2^{1,Ns}}\\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ {c_2^{Ns,1}}&amp;{c_2^{Ns,2}}&amp; \ldots &amp;{c_2^{Ns,Ns}} \end{array}} \,}} \right. \\ \begin{array}{*{20}{c}} {\;\;\;\;\;\;\;}&amp;{c_1^1}&amp;{\;\;\;\;\;c_1^2}&amp;{\;\;\;\;\; \cdots }&amp;{c_1^{Ns}} \end{array} \end{array}$" src="../../form_160.png"/> <br/>
+ Because only explicit scheme is considered the Butcher table reduces to diagonal matrix: <br/>
+ <img class="formulaInl" alt="$\begin{array}{l} \begin{array}{*{20}{c}} {c_3^1}\\ {c_3^1}\\ \vdots \\ {c_3^{Ns}} \end{array}\left| \!{\underline {\, {\begin{array}{*{20}{c}} 0&amp;0&amp; \cdots &amp;0\\ {c_2^{2,1}}&amp;0&amp; \cdots &amp;0\\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ {c_2^{Ns,1}}&amp;{c_2^{Ns,2}}&amp; \ldots &amp;0 \end{array}} \,}} \right. \\ \begin{array}{*{20}{c}} {\;\;\;\;\;\;\;}&amp;{c_1^1}&amp;{\;\;\;\;\;c_1^2}&amp;{\;\;\;\;\; \cdots }&amp;{c_1^{Ns}} \end{array} \end{array}$" src="../../form_161.png"/> <br/>
+ Moreover the following relation always holds: <img class="formulaInl" alt="$ c_3^s = \sum_{i=1}^{Ns}c_2^{s,i} $" src="../../form_162.png"/> <br/>
+ According to the number of stages used different schemes are available. See the <a class="el" href="../../d5/d23/group__Lib__Runge__KuttaPublicProcedure.html#ga448bfdc6c9a7ebde2191ad6fd1ac393c">procedure rk_init</a> for more details.</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000016">Todo:</a></b></dt><dd><b>RK-implicit</b>: Implement (semi)-implicit schemes. </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html#l00045">45</a> of file <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html">Lib_Runge_Kutta.f90</a>.</p>
+</div><table class="memberdecls">
+<tr><td colspan="2"><h3>Public Member Functions</h3></td></tr>
+<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d23/group__Lib__Runge__KuttaPublicProcedure.html#ga448bfdc6c9a7ebde2191ad6fd1ac393c">rk_init</a> (S)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for initializing Runge-Kutta coefficients.  <a href="../../d5/d23/group__Lib__Runge__KuttaPublicProcedure.html#ga448bfdc6c9a7ebde2191ad6fd1ac393c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d23/group__Lib__Runge__KuttaPublicProcedure.html#ga4c15bab89de8aad3cbe3e9615131c744">rk_stage</a> (s1, Dt, un, KS)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing <img class="formulaInl" alt="$s1^{th}$" src="../../form_182.png"/> Runge-Kutta stage.  <a href="../../d5/d23/group__Lib__Runge__KuttaPublicProcedure.html#ga4c15bab89de8aad3cbe3e9615131c744"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d23/group__Lib__Runge__KuttaPublicProcedure.html#ga1e15c197f2d6fbef313f856b02414dd7">rk_time_integ</a> (Dt, un, KS)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing Runge-Kutta one time step integration <img class="formulaInl" alt="$u^{n+1}$" src="../../form_183.png"/>.  <a href="../../d5/d23/group__Lib__Runge__KuttaPublicProcedure.html#ga1e15c197f2d6fbef313f856b02414dd7"></a><br/></td></tr>
+<tr><td colspan="2"><h3>Private Attributes</h3></td></tr>
+<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">real(R_P), dimension(:), <br class="typebreak"/>
+allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d8b/group__GvarLib__Runge__Kutta.html#ga59182d1971ab70076973c7a0ff247a84">c1</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">c1 coefficients of Runge-Kutta integration [1:S]  <a href="../../d7/d8b/group__GvarLib__Runge__Kutta.html#ga59182d1971ab70076973c7a0ff247a84"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">real(R_P), dimension(:,:), <br class="typebreak"/>
+allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d8b/group__GvarLib__Runge__Kutta.html#ga543f5e1c1048421c5d43640981f756e1">c2</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">c2 coefficients of Runge-Kutta integration [1:S,1:S]  <a href="../../d7/d8b/group__GvarLib__Runge__Kutta.html#ga543f5e1c1048421c5d43640981f756e1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">real(R_P), dimension(:), <br class="typebreak"/>
+allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d8b/group__GvarLib__Runge__Kutta.html#ga0a4c13dc6a084c1e9e972ad930985ebe">c3</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">c3 coefficients of Runge-Kutta integration [ 1:S]  <a href="../../d7/d8b/group__GvarLib__Runge__Kutta.html#ga0a4c13dc6a084c1e9e972ad930985ebe"></a><br/></td></tr>
+</table>
+
+</div>
+</div>
+<!-- doxytag: class="Lib_Runge_Kutta" --><a name="d0/d11/classLib__Thermodynamic__Laws__Ideal" id="d0/d11/classLib__Thermodynamic__Laws__Ideal"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -9381,9 +9171,9 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <p>Function for computing the pressure for an ideal calorically perfect gas. </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>Density ( <img class="formulaInl" alt="$\rho$" src="../../form_151.png"/>). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>Density ( <img class="formulaInl" alt="$\rho$" src="../../form_184.png"/>). </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>Speed of sound. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">g</td><td>Specific heats ratio <img class="formulaInl" alt="$\gamma=\frac{{c_p}}{{c_v}}$" src="../../form_152.png"/>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">g</td><td>Specific heats ratio <img class="formulaInl" alt="$\gamma=\frac{{c_p}}{{c_v}}$" src="../../form_185.png"/>. </td></tr>
   </table>
   </dd>
 </dl>
@@ -9428,7 +9218,7 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">p</td><td>Pressure. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>Speed of sound. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">g</td><td>Specific heats ratio <img class="formulaInl" alt="$\gamma=\frac{{c_p}}{{c_v}}$" src="../../form_152.png"/>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">g</td><td>Specific heats ratio <img class="formulaInl" alt="$\gamma=\frac{{c_p}}{{c_v}}$" src="../../form_185.png"/>. </td></tr>
   </table>
   </dd>
 </dl>
@@ -9472,8 +9262,8 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">p</td><td>Pressure. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>Density ( <img class="formulaInl" alt="$\rho$" src="../../form_151.png"/>). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">g</td><td>Specific heats ratio <img class="formulaInl" alt="$\gamma=\frac{{c_p}}{{c_v}}$" src="../../form_152.png"/>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>Density ( <img class="formulaInl" alt="$\rho$" src="../../form_184.png"/>). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">g</td><td>Specific heats ratio <img class="formulaInl" alt="$\gamma=\frac{{c_p}}{{c_v}}$" src="../../form_185.png"/>. </td></tr>
   </table>
   </dd>
 </dl>
@@ -9521,13 +9311,13 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p>Function for computing the total specific energy (per unit of mass) for an ideal calorically perfect gas. </p>
 <dl class="note"><dt><b>Note:</b></dt><dd>This law is defined as: <br/>
- <img class="formulaInl" alt="$ E = \frac{p}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $" src="../../form_153.png"/> </dd></dl>
+ <img class="formulaInl" alt="$ E = \frac{p}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $" src="../../form_186.png"/> </dd></dl>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">p</td><td>Pressure. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>Density ( <img class="formulaInl" alt="$\rho$" src="../../form_151.png"/>). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>Density ( <img class="formulaInl" alt="$\rho$" src="../../form_184.png"/>). </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Module of velocity vector. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">g</td><td>Specific heats ratio <img class="formulaInl" alt="$\gamma=\frac{{c_p}}{{c_v}}$" src="../../form_152.png"/>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">g</td><td>Specific heats ratio <img class="formulaInl" alt="$\gamma=\frac{{c_p}}{{c_v}}$" src="../../form_185.png"/>. </td></tr>
   </table>
   </dd>
 </dl>
@@ -9575,13 +9365,13 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p>Function for computing the total specific entalpy (per unit of mass) for an ideal calorically perfect gas. </p>
 <dl class="note"><dt><b>Note:</b></dt><dd>This law is defined as: <br/>
- <img class="formulaInl" alt="$ H = \frac{{\gamma p}}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $" src="../../form_154.png"/> </dd></dl>
+ <img class="formulaInl" alt="$ H = \frac{{\gamma p}}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $" src="../../form_187.png"/> </dd></dl>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">p</td><td>Pressure. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>Density ( <img class="formulaInl" alt="$\rho$" src="../../form_151.png"/>). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>Density ( <img class="formulaInl" alt="$\rho$" src="../../form_184.png"/>). </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">u</td><td>Module of velocity vector. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">g</td><td>Specific heats ratio <img class="formulaInl" alt="$\gamma=\frac{{c_p}}{{c_v}}$" src="../../form_152.png"/>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">g</td><td>Specific heats ratio <img class="formulaInl" alt="$\gamma=\frac{{c_p}}{{c_v}}$" src="../../form_185.png"/>. </td></tr>
   </table>
   </dd>
 </dl>
@@ -9652,7 +9442,7 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <dl class="version"><dt><b>Version:</b></dt><dd>1.0 </dd></dl>
 <dl class="date"><dt><b>Date:</b></dt><dd>2012-04-24 </dd></dl>
 <dl class="copyright"><dt><b>Copyright:</b></dt><dd>GNU Public License version 3. </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000016">Todo:</a></b></dt><dd><p class="startdd"><b>CompleteExporter:</b> Complete the exporters </p>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000017">Todo:</a></b></dt><dd><p class="startdd"><b>CompleteExporter:</b> Complete the exporters </p>
 <p><b>CompleteImporter:</b> Complete the importers </p>
 <p><b>DocExamples:</b> Improve the documentation by means of examples </p>
 <p><b>DocMakeFile:</b> Create the documentation of makefile </p>
@@ -9896,8 +9686,8 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
       </table>
 </div>
 <div class="memdoc">
-<div class="textblock"><p>This module contains the definition of procedures for computing WENO reconstruction with a user-defined <img class="formulaInl" alt="$P^{th}$" src="../../form_174.png"/> order. </p>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000017">Todo:</a></b></dt><dd><b>DocComplete:</b> Complete the documentation of internal procedures </dd></dl>
+<div class="textblock"><p>This module contains the definition of procedures for computing WENO reconstruction with a user-defined <img class="formulaInl" alt="$P^{th}$" src="../../form_207.png"/> order. </p>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000018">Todo:</a></b></dt><dd><b>DocComplete:</b> Complete the documentation of internal procedures </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00023">23</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
 </div><table class="memberdecls">
@@ -9906,11 +9696,11 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga12ddef5212e444aa9d2d9060f4ab1662">weno_init</a> (myrank, global, block, S)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for initialization of WENO coefficients.  <a href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga12ddef5212e444aa9d2d9060f4ab1662"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">pure function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga9329e093c7635e22e7884d4631848878">noweno_central</a> (S, V)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing central difference reconstruction of <img class="formulaInl" alt="$2S^{th}$" src="../../form_175.png"/> order instead of WENO <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_176.png"/> one.  <a href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga9329e093c7635e22e7884d4631848878"></a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing central difference reconstruction of <img class="formulaInl" alt="$2S^{th}$" src="../../form_208.png"/> order instead of WENO <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_209.png"/> one.  <a href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga9329e093c7635e22e7884d4631848878"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">pure function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga47430fff09742d9963802b0dd1cf9bc2">weno_optimal</a> (S, V)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_176.png"/> order.  <a href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga47430fff09742d9963802b0dd1cf9bc2"></a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_209.png"/> order.  <a href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga47430fff09742d9963802b0dd1cf9bc2"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">pure function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#gaf043f24262940e4e499aa9fdedba75df">weno</a> (S, V)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing WENO reconstruction of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_176.png"/> order.  <a href="../../db/d22/group__Lib__WENOPublicProcedure.html#gaf043f24262940e4e499aa9fdedba75df"></a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing WENO reconstruction of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_209.png"/> order.  <a href="../../db/d22/group__Lib__WENOPublicProcedure.html#gaf043f24262940e4e499aa9fdedba75df"></a><br/></td></tr>
 <tr><td colspan="2"><h3>Private Member Functions</h3></td></tr>
 <tr><td colspan="2"><div class="groupHeader"></div></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#gab2c63052d096b9e9628b5068dfd1b62d">weno_polynomials</a> (S, V)</td></tr>
@@ -9960,7 +9750,7 @@ allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri May 11 2012 12:38:46 for OFF by
+    <li class="footer">Generated on Mon May 14 2012 17:45:57 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

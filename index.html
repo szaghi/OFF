@@ -122,7 +122,7 @@ Introduction</h2>
 </li>
 <li>Multi-Species fluids models:<ul>
 <li>Partial Densities species conservation (Standard Thermodynamic Model);</li>
-<li>New multi-dimensional <img class="formulaInl" alt="$\gamma,\eta,\chi$" src="form_177.png"/> conservation models of Favini, B. et al (under developing);</li>
+<li>New multi-dimensional <img class="formulaInl" alt="$\gamma,\eta,\chi$" src="form_210.png"/> conservation models of Favini, B. et al (under developing);</li>
 </ul>
 </li>
 <li>Multi-Phases fluids models:<ul>
@@ -130,14 +130,14 @@ Introduction</h2>
 </ul>
 </li>
 <li>Space numerical integration models:<ul>
-<li><img class="formulaInl" alt="$1^{st}$" src="form_178.png"/> order piece-wise constant reconstruction;</li>
-<li><img class="formulaInl" alt="$2^{nd}$" src="form_179.png"/> order TVD linear-wise reconstruction;</li>
-<li><img class="formulaInl" alt="$3^{rd},5^{th},7^{th}$" src="form_180.png"/> orders WENO non-linear reconstruction;</li>
+<li><img class="formulaInl" alt="$1^{st}$" src="form_163.png"/> order piece-wise constant reconstruction;</li>
+<li><img class="formulaInl" alt="$2^{nd}$" src="form_167.png"/> order TVD linear-wise reconstruction;</li>
+<li><img class="formulaInl" alt="$3^{rd}$" src="form_171.png"/>, <img class="formulaInl" alt="$5^{th}$" src="form_223.png"/>, <img class="formulaInl" alt="$7^{th}$" src="form_224.png"/> order WENO non-linear reconstruction;</li>
 </ul>
 </li>
 <li>Time approximation models:<ul>
-<li><img class="formulaInl" alt="$1^{st}$" src="form_178.png"/> order forward Euler integration;</li>
-<li><img class="formulaInl" alt="$2^{nd},3^{rd},4^{th}$" src="form_181.png"/> orders Strong-Stability-Preserving explicit Runge-Kutta integration;</li>
+<li><img class="formulaInl" alt="$1^{st}$" src="form_163.png"/> order forward Euler integration;</li>
+<li><img class="formulaInl" alt="$2^{nd}$" src="form_167.png"/>, <img class="formulaInl" alt="$3^{rd}$" src="form_171.png"/>, <img class="formulaInl" alt="$4^{th}$" src="form_225.png"/> order Strong-Stability-Preserving explicit Runge-Kutta integration;</li>
 </ul>
 </li>
 <li>Local pseudo-time convergence acceleration for steady simulations;</li>
@@ -162,8 +162,8 @@ Introduction</h2>
  <em>OFF</em> is shipped with a makefile for compiling the codes on Unix/GNU Linux architectures. Other OS are not supported. For more details see <a class="el" href="d9/d26/Compiling.html">Compiling Instructions</a>.</dd></dl>
 <dl class="bug"><dt><b><a class="el" href="de/da5/bug.html#_bug000004">Bug:</a></b></dt><dd><b>Multi-grid Models</b>: <br/>
  Multi-grid time convergence acceleration has been developed, but it is affected by some bugs that <em>blow up</em> steady simulations. </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="dd/da0/todo.html#_todo000020">Todo:</a></b></dt><dd><p class="startdd"><b>NavierStokesEq:</b> Extension to viscous Navier-Stokes equations </p>
-<p><b>MultiSpeciesModel:</b> Introducing new multi-dimensional <img class="formulaInl" alt="$\gamma,\eta,\chi$" src="form_177.png"/> conservation models of Favini, B. et al </p>
+<dl class="todo"><dt><b><a class="el" href="dd/da0/todo.html#_todo000021">Todo:</a></b></dt><dd><p class="startdd"><b>NavierStokesEq:</b> Extension to viscous Navier-Stokes equations </p>
+<p><b>MultiSpeciesModel:</b> Introducing new multi-dimensional <img class="formulaInl" alt="$\gamma,\eta,\chi$" src="form_210.png"/> conservation models of Favini, B. et al </p>
 <p><b>MultiPhaseModel:</b> Introducing fully-coupled Lagrangian particles transport model </p>
 <p><b>AMR:</b> Introducing AMR (Adaptive Mesh Refinement) model </p>
 <p><b>Chimera:</b> Introducing blocks overlapping, overset (Chimera) model </p>
@@ -219,7 +219,7 @@ Source-Code</h2>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri May 11 2012 12:38:47 for OFF by
+    <li class="footer">Generated on Mon May 14 2012 17:45:57 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

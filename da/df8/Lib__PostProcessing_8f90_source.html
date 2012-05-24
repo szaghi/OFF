@@ -53,7 +53,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="../../index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="../../pages.html"><span>Compiling,&#160;Examples,&#160;Todos&#160;and&#160;Bugs</span></a></li>
+      <li><a href="../../pages.html"><span>README</span></a></li>
       <li><a href="../../modules.html"><span>API</span></a></li>
       <li class="current"><a href="../../files.html"><span>Source&#160;Files</span></a></li>
       <li><a href="../../dirs.html"><span>Directories</span></a></li>
@@ -280,10 +280,10 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a name="l00190"></a>00190                                      tecauxstr112,                     <span class="comment">! |</span>
 <a name="l00191"></a>00191                                      teczne112,                        <span class="comment">! | Tecplot external functions.</span>
 <a name="l00192"></a>00192                                      tecdat112,                        <span class="comment">! |</span>
-<a name="l00193"></a><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a91d1c4626521c345bd7dbdc99b371870">00193</a>                                      tecend112                          <span class="comment">! |</span>
+<a name="l00193"></a>00193                                      tecend112                          <span class="comment">! |</span>
 <a name="l00194"></a>00194 <span class="preprocessor">#endif</span>
 <a name="l00195"></a>00195   <span class="keywordtype">character(1)</span>, <span class="keywordtype">parameter</span>::          tecendrec = char(0)                <span class="comment">!&lt; End-character for binary-record end.</span>
-<a name="l00196"></a>00196   <span class="keywordtype">character(500)</span>::                   tecvarname                         <span class="comment">!&lt; Variables name for tecplot header file.</span>
+<a name="l00196"></a><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a91d1c4626521c345bd7dbdc99b371870">00196</a>   <span class="keywordtype">character(500)</span>::                   tecvarname                         <span class="comment">!&lt; Variables name for tecplot header file.</span>
 <a name="l00197"></a>00197   <span class="keywordtype">character(500)</span>::                   teczoneheader                      <span class="comment">!&lt; Tecplot string of zone header.</span>
 <a name="l00198"></a>00198   <span class="keywordtype">character(500)</span>::                   tecvarform                         <span class="comment">!&lt; Format for variables for tecplot file.</span>
 <a name="l00199"></a>00199   <span class="keywordtype">integer(I_P)</span>::                     tecvarloc(1:3+global%fluid%Np)     <span class="comment">!&lt; Tecplot array of variables location.</span>
@@ -300,416 +300,423 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a name="l00210"></a>00210   <span class="comment">! initializing tecplot file</span>
 <a name="l00211"></a>00211   <span class="keyword">if</span> (pp_format%binary) <span class="keyword">then</span>
 <a name="l00212"></a>00212 <span class="preprocessor">#ifdef TECIO</span>
-<a name="l00213"></a>00213     err = tecini112(tecendrec,trim(tecvarname)//tecendrec,trim(filename)//tecendrec,<span class="stringliteral">&#39;.&#39;</span>//tecendrec,0,0,1)
-<a name="l00214"></a>00214     err = tecauxstr112(<span class="stringliteral">&quot;Time&quot;</span>//tecendrec,trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(n=global%fluid%t))//tecendrec)
-<a name="l00215"></a>00215 <span class="preprocessor">#else</span>
-<a name="l00216"></a>00216     <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;Error: your are trying to save binary tecplot file without compiling against the Tecplot library.&#39;</span>
-<a name="l00217"></a>00217     stop
-<a name="l00218"></a>00218 <span class="preprocessor">#endif</span>
-<a name="l00219"></a>00219   <span class="keyword">else</span>
-<a name="l00220"></a>00220     <span class="keyword">write</span>(tecunit,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)trim(tecvarname)
-<a name="l00221"></a>00221   <span class="keyword">endif</span>
-<a name="l00222"></a>00222   <span class="comment">! writing data blocks</span>
-<a name="l00223"></a>00223   <span class="keyword">do</span> b=1,global%mesh%Nb
-<a name="l00224"></a>00224     err = <a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#ad1cb4a1c53437411c9d0e54e0fa98139">tec_blk_data</a>(b = b, global = global, block = block(b))
-<a name="l00225"></a>00225   <span class="keyword">enddo</span>
-<a name="l00226"></a>00226   <span class="comment">! finalizing tecplot file</span>
-<a name="l00227"></a>00227   <span class="keyword">if</span> (pp_format%binary) <span class="keyword">then</span>
-<a name="l00228"></a>00228 <span class="preprocessor">#ifdef TECIO</span>
-<a name="l00229"></a>00229     err = tecend112()
-<a name="l00230"></a>00230 <span class="preprocessor">#else</span>
-<a name="l00231"></a>00231     <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;Error: your are trying to save binary tecplot file without compiling against the Tecplot library.&#39;</span>
-<a name="l00232"></a>00232     stop
-<a name="l00233"></a>00233 <span class="preprocessor">#endif</span>
-<a name="l00234"></a>00234   <span class="keyword">else</span>
-<a name="l00235"></a>00235     <span class="keyword">close</span>(tecunit)
-<a name="l00236"></a>00236   <span class="keyword">endif</span>
-<a name="l00237"></a>00237   return
-<a name="l00238"></a>00238   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00239"></a>00239   <span class="keyword">contains</span>
-<a name="l00240"></a>00240     <span class="keyword">subroutine </span><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a91d1c4626521c345bd7dbdc99b371870">tec_init</a>()
-<a name="l00241"></a>00241     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00242"></a>00242     <span class="comment">! Function for initializing Tecplot specific variables.</span>
-<a name="l00243"></a>00243     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00244"></a>00244 
-<a name="l00245"></a>00245     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00246"></a>00246     <span class="keyword">implicit none</span>
-<a name="l00247"></a>00247     <span class="keywordtype">integer(I_P)</span>:: s <span class="comment">! Counter.</span>
-<a name="l00248"></a>00248     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00249"></a>00249 
-<a name="l00250"></a>00250     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00251"></a>00251     <span class="keyword">if</span> (pp_format%binary) <span class="keyword">then</span>
-<a name="l00252"></a>00252       <span class="comment">! header variables names</span>
-<a name="l00253"></a>00253       tecvarname = <span class="stringliteral">&#39;x y z&#39;</span>
-<a name="l00254"></a>00254       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
-<a name="l00255"></a>00255         <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l00256"></a>00256           tecvarname = trim(tecvarname)//<span class="stringliteral">&#39; r_&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(.true.,s))
-<a name="l00257"></a>00257         <span class="keyword">enddo</span>
-<a name="l00258"></a>00258         tecvarname = trim(tecvarname)//<span class="stringliteral">&#39; r u v w p g&#39;</span>
-<a name="l00259"></a><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#ad1cb4a1c53437411c9d0e54e0fa98139">00259</a>       <span class="keyword">endif</span>
-<a name="l00260"></a>00260       <span class="comment">! variables location</span>
-<a name="l00261"></a>00261       <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
-<a name="l00262"></a>00262         tecvarloc = 1
-<a name="l00263"></a>00263       <span class="keyword">else</span>
-<a name="l00264"></a>00264         tecvarloc(1:3) = 1 ; tecvarloc(4:3+global%fluid%Np)= 0
-<a name="l00265"></a>00265       <span class="keyword">endif</span>
-<a name="l00266"></a>00266       <span class="comment">! null array</span>
-<a name="l00267"></a>00267       tecnull = 0
-<a name="l00268"></a>00268       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
-<a name="l00269"></a>00269         nvar = 3 + global%fluid%Np
-<a name="l00270"></a>00270       <span class="keyword">else</span>
-<a name="l00271"></a>00271         nvar = 3
-<a name="l00272"></a>00272       <span class="keyword">endif</span>
-<a name="l00273"></a>00273     <span class="keyword">else</span>
-<a name="l00274"></a>00274       <span class="comment">! header variables names</span>
-<a name="l00275"></a>00275       tecvarname = <span class="stringliteral">&#39; VARIABLES =&quot;x&quot; &quot;y&quot; &quot;z&quot;&#39;</span>
-<a name="l00276"></a>00276       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
-<a name="l00277"></a>00277         <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l00278"></a>00278           tecvarname = trim(tecvarname)//<span class="stringliteral">&#39; &quot;r_&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(.true.,s))//<span class="stringliteral">&#39;&quot;&#39;</span>
-<a name="l00279"></a>00279         <span class="keyword">enddo</span>
-<a name="l00280"></a>00280         tecvarname = trim(tecvarname)//<span class="stringliteral">&#39; &quot;r&quot; &quot;u&quot; &quot;v&quot; &quot;w&quot; &quot;p&quot; &quot;g&quot;&#39;</span>
-<a name="l00281"></a>00281       <span class="keyword">endif</span>
-<a name="l00282"></a>00282       <span class="comment">! variables output format</span>
-<a name="l00283"></a>00283       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
-<a name="l00284"></a>00284         <span class="keyword">write</span>(tecvarform,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;(&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(no_sign=.true.,n=global%fluid%Np))//<span class="stringliteral">&#39;(&#39;</span>//FR_P//<span class="stringliteral">&#39;,1X))&#39;</span>
-<a name="l00285"></a>00285       <span class="keyword">else</span>
-<a name="l00286"></a>00286         <span class="keyword">write</span>(tecvarform,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;(&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(no_sign=.true.,n=3))//<span class="stringliteral">&#39;(&#39;</span>//FR_P//<span class="stringliteral">&#39;,1X))&#39;</span>
-<a name="l00287"></a>00287       <span class="keyword">endif</span>
-<a name="l00288"></a>00288       <span class="comment">! output logical unit</span>
-<a name="l00289"></a>00289       tecunit = Get_Unit()
-<a name="l00290"></a>00290       <span class="keyword">open</span>(unit=tecunit,file=trim(filename),iostat=err)
-<a name="l00291"></a>00291       <span class="comment">! variables location</span>
-<a name="l00292"></a>00292       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
-<a name="l00293"></a>00293         <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
-<a name="l00294"></a>00294           tecvarlocstr = <span class="stringliteral">&#39;, VARLOCATION=([1-&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(.true.,global%fluid%Np))//<span class="stringliteral">&#39;]=NODAL)&#39;</span>
-<a name="l00295"></a>00295         <span class="keyword">else</span>
-<a name="l00296"></a>00296           tecvarlocstr = <span class="stringliteral">&#39;, VARLOCATION=([1-3]=NODAL,[4-&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(.true.,global%fluid%Np))//<span class="stringliteral">&#39;]=CELLCENTERED)&#39;</span>
-<a name="l00297"></a>00297         <span class="keyword">endif</span>
-<a name="l00298"></a>00298       <span class="keyword">else</span>
-<a name="l00299"></a>00299         tecvarlocstr = <span class="stringliteral">&#39;, VARLOCATION=([1-3]=NODAL)&#39;</span>
-<a name="l00300"></a>00300       <span class="keyword">endif</span>
-<a name="l00301"></a>00301     <span class="keyword">endif</span>
-<a name="l00302"></a>00302     return
-<a name="l00303"></a>00303     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00304"></a>00304 <span class="keyword">    endsubroutine tec_init</span>
-<a name="l00305"></a>00305 
-<a name="l00306"></a>00306     <span class="keyword">function </span><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#ad1cb4a1c53437411c9d0e54e0fa98139">tec_blk_data</a>(b,global,block) result(err)
-<a name="l00307"></a>00307     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00308"></a>00308     <span class="comment">! Function for writing block data.</span>
-<a name="l00309"></a>00309     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00310"></a>00310 
-<a name="l00311"></a>00311     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00312"></a>00312     <span class="keyword">implicit none</span>
-<a name="l00313"></a>00313     <span class="keywordtype">integer(I_P)</span>,      <span class="keywordtype">intent(IN)</span>::    b                       <span class="comment">! Block number.</span>
-<a name="l00314"></a>00314     <span class="keywordtype">type(Type_Global)</span>, <span class="keywordtype">intent(IN)</span>::    global                  <span class="comment">! Global-level data.</span>
-<a name="l00315"></a>00315     <span class="keywordtype">type(Type_Block)</span>,  <span class="keywordtype">intent(INOUT)</span>:: block                   <span class="comment">! Block-level data.</span>
-<a name="l00316"></a>00316     <span class="keywordtype">integer(I_P)</span>::                     err                     <span class="comment">! Error trapping flag: 0 no errors, &gt;0 error occurs.</span>
-<a name="l00317"></a>00317     <span class="keywordtype">type(Type_Primitive)</span>::             P(0:block%mesh%Ni,     <span class="comment">! |</span>
-<a name="l00318"></a>00318                                          0:block%mesh%Nj,     <span class="comment">! | Primitive variables intepolated at nodes.</span>
-<a name="l00319"></a>00319                                          0:block%mesh%Nk)      <span class="comment">! |</span>
-<a name="l00320"></a>00320     <span class="keywordtype">real(R_P)</span>::                        r(1:global%fluid%Ns,   <span class="comment">! |</span>
-<a name="l00321"></a>00321                                          0:block%mesh%Ni,     <span class="comment">! | Array containing species densities.</span>
-<a name="l00322"></a>00322                                          0:block%mesh%Nj,     <span class="comment">! |</span>
-<a name="l00323"></a>00323                                          0:block%mesh%Nk)      <span class="comment">! |</span>
-<a name="l00324"></a>00324     <span class="keywordtype">integer(I_P)</span>::                     ni1,ni2,nj1,nj2,nk1,nk2 <span class="comment">! Bounds of dimensions of node-centered data.</span>
-<a name="l00325"></a>00325     <span class="keywordtype">integer(I_P)</span>::                     ci1,ci2,cj1,cj2,ck1,ck2 <span class="comment">! Bounds of dimensions of cell-centered data.</span>
-<a name="l00326"></a>00326     <span class="keywordtype">integer(I_P)</span>::                     nnode,ncell             <span class="comment">! Number of nodes and cells.</span>
-<a name="l00327"></a>00327     <span class="keywordtype">integer(I_P)</span>::                     i,j,k,s                 <span class="comment">! Counters.</span>
-<a name="l00328"></a>00328     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00329"></a>00329 
-<a name="l00330"></a>00330     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00331"></a>00331     <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
-<a name="l00332"></a>00332       <span class="comment">! tri-linear interpolation of cell-centered values at nodes</span>
-<a name="l00333"></a>00333       call interpolate_primitive(global=global,block=block,P=P)
-<a name="l00334"></a>00334     <span class="keyword">endif</span>
-<a name="l00335"></a>00335     <span class="comment">! initialize the zone dimensions</span>
-<a name="l00336"></a>00336     call compute_dimensions(block=block,                                     &amp;
-<a name="l00337"></a>00337                             ni1=ni1,ni2=ni2,nj1=nj1,nj2=nj2,nk1=nk1,nk2=nk2, &amp;
-<a name="l00338"></a>00338                             ci1=ci1,ci2=ci2,cj1=cj1,cj2=cj2,ck1=ck1,ck2=ck2)
-<a name="l00339"></a>00339     nnode = (ni2-ni1+1)*(nj2-nj1+1)*(nk2-nk1+1)
-<a name="l00340"></a>00340     ncell = (ci2-ci1+1)*(cj2-cj1+1)*(ck2-ck1+1)
-<a name="l00341"></a>00341     <span class="comment">! storing species densities into an array for avoiding problems with nonzero rank pointer</span>
-<a name="l00342"></a>00342     <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
-<a name="l00343"></a>00343       <span class="keyword">do</span> k=0,block%mesh%Nk
-<a name="l00344"></a>00344         <span class="keyword">do</span> j=0,block%mesh%Nj
-<a name="l00345"></a>00345           <span class="keyword">do</span> i=0,block%mesh%Ni
-<a name="l00346"></a>00346             <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l00347"></a>00347               r(s,i,j,k) = P(i,j,k)%r(s)
-<a name="l00348"></a>00348             <span class="keyword">enddo</span>
-<a name="l00349"></a>00349           <span class="keyword">enddo</span>
-<a name="l00350"></a>00350         <span class="keyword">enddo</span>
-<a name="l00351"></a>00351       <span class="keyword">enddo</span>
-<a name="l00352"></a>00352     <span class="keyword">else</span>
-<a name="l00353"></a>00353       <span class="keyword">do</span> k=1,block%mesh%Nk
-<a name="l00354"></a>00354         <span class="keyword">do</span> j=1,block%mesh%Nj
-<a name="l00355"></a>00355           <span class="keyword">do</span> i=1,block%mesh%Ni
-<a name="l00356"></a>00356             <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l00357"></a>00357               r(s,i,j,k) = block%fluid%P(i,j,k)%r(s)
-<a name="l00358"></a>00358             <span class="keyword">enddo</span>
-<a name="l00359"></a>00359           <span class="keyword">enddo</span>
-<a name="l00360"></a>00360         <span class="keyword">enddo</span>
-<a name="l00361"></a>00361       <span class="keyword">enddo</span>
-<a name="l00362"></a>00362     <span class="keyword">endif</span>
-<a name="l00363"></a>00363     <span class="comment">! writing the block data</span>
-<a name="l00364"></a>00364     <span class="keyword">if</span> (pp_format%binary) <span class="keyword">then</span>
-<a name="l00365"></a>00365 <span class="preprocessor">#ifdef TECIO</span>
-<a name="l00366"></a>00366       err = teczne112(<span class="stringliteral">&#39;n_&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d0/d4a/interfaceIR__Precision_1_1strz">strz</a>(nz_pad=10,n=global%fluid%n))//<span class="stringliteral">&#39;-b_&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d0/d4a/interfaceIR__Precision_1_1strz">strz</a>(nz_pad=4,n=b))//tecendrec, &amp;
-<a name="l00367"></a>00367                       0,                                                                                        &amp;
-<a name="l00368"></a>00368                       ni2-ni1+1,                                                                                &amp;
-<a name="l00369"></a>00369                       nj2-nj1+1,                                                                                &amp;
-<a name="l00370"></a>00370                       nk2-nk1+1,                                                                                &amp;
-<a name="l00371"></a>00371                       0,                                                                                        &amp;
-<a name="l00372"></a>00372                       0,                                                                                        &amp;
-<a name="l00373"></a>00373                       0,                                                                                        &amp;
-<a name="l00374"></a>00374                       global%fluid%t,                                                                           &amp;
-<a name="l00375"></a>00375                       0,                                                                                        &amp;
-<a name="l00376"></a>00376                       0,                                                                                        &amp;
-<a name="l00377"></a>00377                       1,                                                                                        &amp; <span class="comment">!1=&gt;block,0=&gt;point</span>
+<a name="l00213"></a>00213     <span class="keyword">if</span> (filename(len_trim(filename)-4:len_trim(filename))/=<span class="stringliteral">&quot;.plt&quot;</span>) <span class="keyword">then</span>
+<a name="l00214"></a>00214       err = tecini112(tecendrec,trim(tecvarname)//tecendrec,trim(filename)//<span class="stringliteral">&quot;.plt&quot;</span>//tecendrec,<span class="stringliteral">&#39;.&#39;</span>//tecendrec,0,0,1)
+<a name="l00215"></a>00215     <span class="keyword">else</span>
+<a name="l00216"></a>00216       err = tecini112(tecendrec,trim(tecvarname)//tecendrec,trim(filename)//tecendrec,<span class="stringliteral">&#39;.&#39;</span>//tecendrec,0,0,1)
+<a name="l00217"></a>00217     <span class="keyword">endif</span>
+<a name="l00218"></a>00218     err = tecauxstr112(<span class="stringliteral">&quot;Time&quot;</span>//tecendrec,trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(n=global%fluid%t))//tecendrec)
+<a name="l00219"></a>00219 <span class="preprocessor">#else</span>
+<a name="l00220"></a>00220     <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;Error: your are trying to save binary tecplot file without compiling against the Tecplot library.&#39;</span>
+<a name="l00221"></a>00221     stop
+<a name="l00222"></a>00222 <span class="preprocessor">#endif</span>
+<a name="l00223"></a>00223   <span class="keyword">else</span>
+<a name="l00224"></a>00224     tecunit = Get_Unit()
+<a name="l00225"></a>00225     <span class="keyword">if</span> (filename(len_trim(filename)-4:len_trim(filename))/=<span class="stringliteral">&quot;.dat&quot;</span>) <span class="keyword">then</span>
+<a name="l00226"></a>00226       <span class="keyword">open</span>(unit=tecunit,file=trim(filename)//<span class="stringliteral">&quot;.dat&quot;</span>)
+<a name="l00227"></a>00227     <span class="keyword">else</span>
+<a name="l00228"></a>00228       <span class="keyword">open</span>(unit=tecunit,file=trim(filename))
+<a name="l00229"></a>00229     <span class="keyword">endif</span>
+<a name="l00230"></a>00230     <span class="keyword">write</span>(tecunit,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)trim(tecvarname)
+<a name="l00231"></a>00231   <span class="keyword">endif</span>
+<a name="l00232"></a>00232   <span class="comment">! writing data blocks</span>
+<a name="l00233"></a>00233   <span class="keyword">do</span> b=1,global%mesh%Nb
+<a name="l00234"></a>00234     err = <a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#ad1cb4a1c53437411c9d0e54e0fa98139">tec_blk_data</a>(b = b, global = global, block = block(b))
+<a name="l00235"></a>00235   <span class="keyword">enddo</span>
+<a name="l00236"></a>00236   <span class="comment">! finalizing tecplot file</span>
+<a name="l00237"></a>00237   <span class="keyword">if</span> (pp_format%binary) <span class="keyword">then</span>
+<a name="l00238"></a>00238 <span class="preprocessor">#ifdef TECIO</span>
+<a name="l00239"></a>00239     err = tecend112()
+<a name="l00240"></a>00240 <span class="preprocessor">#else</span>
+<a name="l00241"></a>00241     <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;Error: your are trying to save binary tecplot file without compiling against the Tecplot library.&#39;</span>
+<a name="l00242"></a>00242     stop
+<a name="l00243"></a>00243 <span class="preprocessor">#endif</span>
+<a name="l00244"></a>00244   <span class="keyword">else</span>
+<a name="l00245"></a>00245     <span class="keyword">close</span>(tecunit)
+<a name="l00246"></a>00246   <span class="keyword">endif</span>
+<a name="l00247"></a>00247   return
+<a name="l00248"></a>00248   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00249"></a>00249   <span class="keyword">contains</span>
+<a name="l00250"></a>00250     <span class="keyword">subroutine </span><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a91d1c4626521c345bd7dbdc99b371870">tec_init</a>()
+<a name="l00251"></a>00251     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00252"></a>00252     <span class="comment">! Function for initializing Tecplot specific variables.</span>
+<a name="l00253"></a>00253     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00254"></a>00254 
+<a name="l00255"></a>00255     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00256"></a>00256     <span class="keyword">implicit none</span>
+<a name="l00257"></a>00257     <span class="keywordtype">integer(I_P)</span>:: s <span class="comment">! Counter.</span>
+<a name="l00258"></a>00258     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00259"></a><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#ad1cb4a1c53437411c9d0e54e0fa98139">00259</a> 
+<a name="l00260"></a>00260     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00261"></a>00261     <span class="keyword">if</span> (pp_format%binary) <span class="keyword">then</span>
+<a name="l00262"></a>00262       <span class="comment">! header variables names</span>
+<a name="l00263"></a>00263       tecvarname = <span class="stringliteral">&#39;x y z&#39;</span>
+<a name="l00264"></a>00264       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
+<a name="l00265"></a>00265         <span class="keyword">do</span> s=1,global%fluid%Ns
+<a name="l00266"></a>00266           tecvarname = trim(tecvarname)//<span class="stringliteral">&#39; r_&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(.true.,s))
+<a name="l00267"></a>00267         <span class="keyword">enddo</span>
+<a name="l00268"></a>00268         tecvarname = trim(tecvarname)//<span class="stringliteral">&#39; r u v w p g&#39;</span>
+<a name="l00269"></a>00269       <span class="keyword">endif</span>
+<a name="l00270"></a>00270       <span class="comment">! variables location</span>
+<a name="l00271"></a>00271       <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
+<a name="l00272"></a>00272         tecvarloc = 1
+<a name="l00273"></a>00273       <span class="keyword">else</span>
+<a name="l00274"></a>00274         tecvarloc(1:3) = 1 ; tecvarloc(4:3+global%fluid%Np)= 0
+<a name="l00275"></a>00275       <span class="keyword">endif</span>
+<a name="l00276"></a>00276       <span class="comment">! null array</span>
+<a name="l00277"></a>00277       tecnull = 0
+<a name="l00278"></a>00278       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
+<a name="l00279"></a>00279         nvar = 3 + global%fluid%Np
+<a name="l00280"></a>00280       <span class="keyword">else</span>
+<a name="l00281"></a>00281         nvar = 3
+<a name="l00282"></a>00282       <span class="keyword">endif</span>
+<a name="l00283"></a>00283     <span class="keyword">else</span>
+<a name="l00284"></a>00284       <span class="comment">! header variables names</span>
+<a name="l00285"></a>00285       tecvarname = <span class="stringliteral">&#39; VARIABLES =&quot;x&quot; &quot;y&quot; &quot;z&quot;&#39;</span>
+<a name="l00286"></a>00286       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
+<a name="l00287"></a>00287         <span class="keyword">do</span> s=1,global%fluid%Ns
+<a name="l00288"></a>00288           tecvarname = trim(tecvarname)//<span class="stringliteral">&#39; &quot;r_&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(.true.,s))//<span class="stringliteral">&#39;&quot;&#39;</span>
+<a name="l00289"></a>00289         <span class="keyword">enddo</span>
+<a name="l00290"></a>00290         tecvarname = trim(tecvarname)//<span class="stringliteral">&#39; &quot;r&quot; &quot;u&quot; &quot;v&quot; &quot;w&quot; &quot;p&quot; &quot;g&quot;&#39;</span>
+<a name="l00291"></a>00291       <span class="keyword">endif</span>
+<a name="l00292"></a>00292       <span class="comment">! variables output format</span>
+<a name="l00293"></a>00293       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
+<a name="l00294"></a>00294         <span class="keyword">write</span>(tecvarform,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;(&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(no_sign=.true.,n=global%fluid%Np))//<span class="stringliteral">&#39;(&#39;</span>//FR_P//<span class="stringliteral">&#39;,1X))&#39;</span>
+<a name="l00295"></a>00295       <span class="keyword">else</span>
+<a name="l00296"></a>00296         <span class="keyword">write</span>(tecvarform,<span class="stringliteral">&#39;(A)&#39;</span>)<span class="stringliteral">&#39;(&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(no_sign=.true.,n=3))//<span class="stringliteral">&#39;(&#39;</span>//FR_P//<span class="stringliteral">&#39;,1X))&#39;</span>
+<a name="l00297"></a>00297       <span class="keyword">endif</span>
+<a name="l00298"></a>00298       <span class="comment">! variables location</span>
+<a name="l00299"></a>00299       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
+<a name="l00300"></a>00300         <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
+<a name="l00301"></a>00301           tecvarlocstr = <span class="stringliteral">&#39;, VARLOCATION=([1-&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(.true.,global%fluid%Np))//<span class="stringliteral">&#39;]=NODAL)&#39;</span>
+<a name="l00302"></a>00302         <span class="keyword">else</span>
+<a name="l00303"></a>00303           tecvarlocstr = <span class="stringliteral">&#39;, VARLOCATION=([1-3]=NODAL,[4-&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(.true.,global%fluid%Np))//<span class="stringliteral">&#39;]=CELLCENTERED)&#39;</span>
+<a name="l00304"></a>00304         <span class="keyword">endif</span>
+<a name="l00305"></a>00305       <span class="keyword">else</span>
+<a name="l00306"></a>00306         tecvarlocstr = <span class="stringliteral">&#39;, VARLOCATION=([1-3]=NODAL)&#39;</span>
+<a name="l00307"></a>00307       <span class="keyword">endif</span>
+<a name="l00308"></a>00308     <span class="keyword">endif</span>
+<a name="l00309"></a>00309     return
+<a name="l00310"></a>00310     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00311"></a>00311 <span class="keyword">    endsubroutine tec_init</span>
+<a name="l00312"></a>00312 
+<a name="l00313"></a>00313     <span class="keyword">function </span><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#ad1cb4a1c53437411c9d0e54e0fa98139">tec_blk_data</a>(b,global,block) result(err)
+<a name="l00314"></a>00314     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00315"></a>00315     <span class="comment">! Function for writing block data.</span>
+<a name="l00316"></a>00316     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00317"></a>00317 
+<a name="l00318"></a>00318     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00319"></a>00319     <span class="keyword">implicit none</span>
+<a name="l00320"></a>00320     <span class="keywordtype">integer(I_P)</span>,      <span class="keywordtype">intent(IN)</span>::    b                       <span class="comment">! Block number.</span>
+<a name="l00321"></a>00321     <span class="keywordtype">type(Type_Global)</span>, <span class="keywordtype">intent(IN)</span>::    global                  <span class="comment">! Global-level data.</span>
+<a name="l00322"></a>00322     <span class="keywordtype">type(Type_Block)</span>,  <span class="keywordtype">intent(INOUT)</span>:: block                   <span class="comment">! Block-level data.</span>
+<a name="l00323"></a>00323     <span class="keywordtype">integer(I_P)</span>::                     err                     <span class="comment">! Error trapping flag: 0 no errors, &gt;0 error occurs.</span>
+<a name="l00324"></a>00324     <span class="keywordtype">type(Type_Primitive)</span>::             P(0:block%mesh%Ni,     <span class="comment">! |</span>
+<a name="l00325"></a>00325                                          0:block%mesh%Nj,     <span class="comment">! | Primitive variables intepolated at nodes.</span>
+<a name="l00326"></a>00326                                          0:block%mesh%Nk)      <span class="comment">! |</span>
+<a name="l00327"></a>00327     <span class="keywordtype">real(R_P)</span>::                        r(1:global%fluid%Ns,   <span class="comment">! |</span>
+<a name="l00328"></a>00328                                          0:block%mesh%Ni,     <span class="comment">! | Array containing species densities.</span>
+<a name="l00329"></a>00329                                          0:block%mesh%Nj,     <span class="comment">! |</span>
+<a name="l00330"></a>00330                                          0:block%mesh%Nk)      <span class="comment">! |</span>
+<a name="l00331"></a>00331     <span class="keywordtype">integer(I_P)</span>::                     ni1,ni2,nj1,nj2,nk1,nk2 <span class="comment">! Bounds of dimensions of node-centered data.</span>
+<a name="l00332"></a>00332     <span class="keywordtype">integer(I_P)</span>::                     ci1,ci2,cj1,cj2,ck1,ck2 <span class="comment">! Bounds of dimensions of cell-centered data.</span>
+<a name="l00333"></a>00333     <span class="keywordtype">integer(I_P)</span>::                     nnode,ncell             <span class="comment">! Number of nodes and cells.</span>
+<a name="l00334"></a>00334     <span class="keywordtype">integer(I_P)</span>::                     i,j,k,s                 <span class="comment">! Counters.</span>
+<a name="l00335"></a>00335     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00336"></a>00336 
+<a name="l00337"></a>00337     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00338"></a>00338     <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
+<a name="l00339"></a>00339       <span class="comment">! tri-linear interpolation of cell-centered values at nodes</span>
+<a name="l00340"></a>00340       call interpolate_primitive(global=global,block=block,P=P)
+<a name="l00341"></a>00341     <span class="keyword">endif</span>
+<a name="l00342"></a>00342     <span class="comment">! initialize the zone dimensions</span>
+<a name="l00343"></a>00343     call compute_dimensions(block=block,                                     &amp;
+<a name="l00344"></a>00344                             ni1=ni1,ni2=ni2,nj1=nj1,nj2=nj2,nk1=nk1,nk2=nk2, &amp;
+<a name="l00345"></a>00345                             ci1=ci1,ci2=ci2,cj1=cj1,cj2=cj2,ck1=ck1,ck2=ck2)
+<a name="l00346"></a>00346     nnode = (ni2-ni1+1)*(nj2-nj1+1)*(nk2-nk1+1)
+<a name="l00347"></a>00347     ncell = (ci2-ci1+1)*(cj2-cj1+1)*(ck2-ck1+1)
+<a name="l00348"></a>00348     <span class="comment">! storing species densities into an array for avoiding problems with nonzero rank pointer</span>
+<a name="l00349"></a>00349     <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
+<a name="l00350"></a>00350       <span class="keyword">do</span> k=0,block%mesh%Nk
+<a name="l00351"></a>00351         <span class="keyword">do</span> j=0,block%mesh%Nj
+<a name="l00352"></a>00352           <span class="keyword">do</span> i=0,block%mesh%Ni
+<a name="l00353"></a>00353             <span class="keyword">do</span> s=1,global%fluid%Ns
+<a name="l00354"></a>00354               r(s,i,j,k) = P(i,j,k)%r(s)
+<a name="l00355"></a>00355             <span class="keyword">enddo</span>
+<a name="l00356"></a>00356           <span class="keyword">enddo</span>
+<a name="l00357"></a>00357         <span class="keyword">enddo</span>
+<a name="l00358"></a>00358       <span class="keyword">enddo</span>
+<a name="l00359"></a>00359     <span class="keyword">else</span>
+<a name="l00360"></a>00360       <span class="keyword">do</span> k=1,block%mesh%Nk
+<a name="l00361"></a>00361         <span class="keyword">do</span> j=1,block%mesh%Nj
+<a name="l00362"></a>00362           <span class="keyword">do</span> i=1,block%mesh%Ni
+<a name="l00363"></a>00363             <span class="keyword">do</span> s=1,global%fluid%Ns
+<a name="l00364"></a>00364               r(s,i,j,k) = block%fluid%P(i,j,k)%r(s)
+<a name="l00365"></a>00365             <span class="keyword">enddo</span>
+<a name="l00366"></a>00366           <span class="keyword">enddo</span>
+<a name="l00367"></a>00367         <span class="keyword">enddo</span>
+<a name="l00368"></a>00368       <span class="keyword">enddo</span>
+<a name="l00369"></a>00369     <span class="keyword">endif</span>
+<a name="l00370"></a>00370     <span class="comment">! writing the block data</span>
+<a name="l00371"></a>00371     <span class="keyword">if</span> (pp_format%binary) <span class="keyword">then</span>
+<a name="l00372"></a>00372 <span class="preprocessor">#ifdef TECIO</span>
+<a name="l00373"></a>00373       err = teczne112(<span class="stringliteral">&#39;n_&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d0/d4a/interfaceIR__Precision_1_1strz">strz</a>(nz_pad=10,n=global%fluid%n))//<span class="stringliteral">&#39;-b_&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d0/d4a/interfaceIR__Precision_1_1strz">strz</a>(nz_pad=4,n=b))//tecendrec, &amp;
+<a name="l00374"></a>00374                       0,                                                                                        &amp;
+<a name="l00375"></a>00375                       ni2-ni1+1,                                                                                &amp;
+<a name="l00376"></a>00376                       nj2-nj1+1,                                                                                &amp;
+<a name="l00377"></a>00377                       nk2-nk1+1,                                                                                &amp;
 <a name="l00378"></a>00378                       0,                                                                                        &amp;
 <a name="l00379"></a>00379                       0,                                                                                        &amp;
 <a name="l00380"></a>00380                       0,                                                                                        &amp;
-<a name="l00381"></a>00381                       0,                                                                                        &amp;
+<a name="l00381"></a>00381                       global%fluid%t,                                                                           &amp;
 <a name="l00382"></a>00382                       0,                                                                                        &amp;
-<a name="l00383"></a>00383                       tecnull(1:nvar),                                                                          &amp;
-<a name="l00384"></a>00384                       tecvarloc(1:nvar),                                                                        &amp;
-<a name="l00385"></a>00385                       tecnull(1:nvar),                                                                          &amp;
-<a name="l00386"></a>00386                       0)
-<a name="l00387"></a>00387 <span class="preprocessor">#else</span>
-<a name="l00388"></a><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">00388</a>       <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;Error: your are trying to save binary tecplot file without compiling against the Tecplot library.&#39;</span>
-<a name="l00389"></a>00389       stop
-<a name="l00390"></a>00390 <span class="preprocessor">#endif</span>
-<a name="l00391"></a>00391       err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%x)
-<a name="l00392"></a>00392       err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%y)
-<a name="l00393"></a>00393       err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%z)
-<a name="l00394"></a>00394       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
-<a name="l00395"></a>00395         <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
-<a name="l00396"></a>00396           <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l00397"></a>00397             err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=r(s,ni1:ni2,nj1:nj2,nk1:nk2))
-<a name="l00398"></a>00398           <span class="keyword">enddo</span>
-<a name="l00399"></a>00399           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=P(ni1:ni2,nj1:nj2,nk1:nk2)%d  )
-<a name="l00400"></a>00400           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=P(ni1:ni2,nj1:nj2,nk1:nk2)%v%x)
-<a name="l00401"></a>00401           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=P(ni1:ni2,nj1:nj2,nk1:nk2)%v%y)
-<a name="l00402"></a>00402           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=P(ni1:ni2,nj1:nj2,nk1:nk2)%v%z)
-<a name="l00403"></a>00403           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=P(ni1:ni2,nj1:nj2,nk1:nk2)%p  )
-<a name="l00404"></a>00404           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=P(ni1:ni2,nj1:nj2,nk1:nk2)%g  )
-<a name="l00405"></a>00405         <span class="keyword">else</span>
-<a name="l00406"></a>00406           <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l00407"></a>00407             err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=r(s,ci1:ci2,cj1:cj2,ck1:ck2))
-<a name="l00408"></a>00408           <span class="keyword">enddo</span>
-<a name="l00409"></a>00409           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%d  )
-<a name="l00410"></a>00410           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%x)
-<a name="l00411"></a>00411           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%y)
-<a name="l00412"></a>00412           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%z)
-<a name="l00413"></a><a class="code" href="../../d6/dec/group__Library.html#a08b1780647e6818045dd75e4d1310534">00413</a>           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%p  )
-<a name="l00414"></a>00414           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%g  )
-<a name="l00415"></a>00415         <span class="keyword">endif</span>
-<a name="l00416"></a>00416       <span class="keyword">endif</span>
-<a name="l00417"></a>00417     <span class="keyword">else</span>
-<a name="l00418"></a>00418       <span class="comment">! tecplot zone header</span>
-<a name="l00419"></a>00419       teczoneheader = <span class="stringliteral">&#39; ZONE  T = &quot;n_&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d0/d4a/interfaceIR__Precision_1_1strz">strz</a>(nz_pad=10,n=global%fluid%n))// &amp;
-<a name="l00420"></a>00420                                  <span class="stringliteral">&#39;-b_&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d0/d4a/interfaceIR__Precision_1_1strz">strz</a>(nz_pad=4,n=b))//<span class="stringliteral">&#39;&quot;&#39;</span>//          &amp;
-<a name="l00421"></a>00421                       <span class="stringliteral">&#39;, I=&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(no_sign=.true.,n=ni2-ni1+1))//            &amp;
-<a name="l00422"></a>00422                       <span class="stringliteral">&#39;, J=&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(no_sign=.true.,n=nj2-nj1+1))//            &amp;
-<a name="l00423"></a>00423                       <span class="stringliteral">&#39;, K=&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(no_sign=.true.,n=nk2-nk1+1))//            &amp;
-<a name="l00424"></a>00424                       <span class="stringliteral">&#39;, DATAPACKING=BLOCK&#39;</span>//adjustl(trim(tecvarlocstr))
-<a name="l00425"></a>00425       <span class="keyword">write</span>(tecunit,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)trim(teczoneheader)
-<a name="l00426"></a>00426       <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%mesh%node(i,j,k)%x,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
-<a name="l00427"></a>00427       <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%mesh%node(i,j,k)%y,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
-<a name="l00428"></a>00428       <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%mesh%node(i,j,k)%z,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
-<a name="l00429"></a>00429       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
-<a name="l00430"></a>00430         <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
-<a name="l00431"></a>00431           <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l00432"></a>00432             <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%r(s),i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
-<a name="l00433"></a>00433           <span class="keyword">enddo</span>
-<a name="l00434"></a>00434           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%d  ,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
-<a name="l00435"></a>00435           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%v%x,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
-<a name="l00436"></a>00436           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%v%y,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
-<a name="l00437"></a>00437           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%v%z,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
-<a name="l00438"></a><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#aa8959036d89645a609a72ae558414408">00438</a>           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%p  ,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
-<a name="l00439"></a>00439           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%g  ,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
-<a name="l00440"></a>00440         <span class="keyword">else</span>
-<a name="l00441"></a>00441           <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l00442"></a>00442             <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%r(s),i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
-<a name="l00443"></a>00443           <span class="keyword">enddo</span>
-<a name="l00444"></a>00444           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%d  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
-<a name="l00445"></a>00445           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%v%x,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
-<a name="l00446"></a>00446           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%v%y,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
-<a name="l00447"></a>00447           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%v%z,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
-<a name="l00448"></a>00448           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%p  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
-<a name="l00449"></a>00449           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%g  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
-<a name="l00450"></a>00450         <span class="keyword">endif</span>
-<a name="l00451"></a>00451       <span class="keyword">endif</span>
-<a name="l00452"></a>00452     <span class="keyword">endif</span>
-<a name="l00453"></a>00453     return
-<a name="l00454"></a>00454     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00455"></a>00455 <span class="keyword">    endfunction tec_blk_data</span>
-<a name="l00456"></a>00456 
-<a name="l00457"></a>00457     <span class="keyword">function </span><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N,dat) result(err)
-<a name="l00458"></a>00458     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00459"></a>00459     <span class="comment">! Function interface for using &quot;tecdat&quot; function.</span>
-<a name="l00460"></a>00460     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00461"></a>00461 
-<a name="l00462"></a>00462     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00463"></a>00463     <span class="keyword">implicit none</span>
-<a name="l00464"></a>00464     <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>:: N        <span class="comment">! Number of data to save.</span>
-<a name="l00465"></a>00465     <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>:: dat(1:N) <span class="comment">! Data to save.</span>
-<a name="l00466"></a>00466     <span class="keywordtype">integer(I_P)</span>::             err      <span class="comment">! Error trapping flag: 0 no errors, &gt;0 error occurs.</span>
+<a name="l00383"></a>00383                       0,                                                                                        &amp;
+<a name="l00384"></a>00384                       1,                                                                                        &amp; <span class="comment">!1=&gt;block,0=&gt;point</span>
+<a name="l00385"></a>00385                       0,                                                                                        &amp;
+<a name="l00386"></a>00386                       0,                                                                                        &amp;
+<a name="l00387"></a>00387                       0,                                                                                        &amp;
+<a name="l00388"></a><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">00388</a>                       0,                                                                                        &amp;
+<a name="l00389"></a>00389                       0,                                                                                        &amp;
+<a name="l00390"></a>00390                       tecnull(1:nvar),                                                                          &amp;
+<a name="l00391"></a>00391                       tecvarloc(1:nvar),                                                                        &amp;
+<a name="l00392"></a>00392                       tecnull(1:nvar),                                                                          &amp;
+<a name="l00393"></a>00393                       0)
+<a name="l00394"></a>00394 <span class="preprocessor">#else</span>
+<a name="l00395"></a>00395       <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;Error: your are trying to save binary tecplot file without compiling against the Tecplot library.&#39;</span>
+<a name="l00396"></a>00396       stop
+<a name="l00397"></a>00397 <span class="preprocessor">#endif</span>
+<a name="l00398"></a>00398       err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%x)
+<a name="l00399"></a>00399       err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%y)
+<a name="l00400"></a>00400       err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%z)
+<a name="l00401"></a>00401       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
+<a name="l00402"></a>00402         <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
+<a name="l00403"></a>00403           <span class="keyword">do</span> s=1,global%fluid%Ns
+<a name="l00404"></a>00404             err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=r(s,ni1:ni2,nj1:nj2,nk1:nk2))
+<a name="l00405"></a>00405           <span class="keyword">enddo</span>
+<a name="l00406"></a>00406           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=P(ni1:ni2,nj1:nj2,nk1:nk2)%d  )
+<a name="l00407"></a>00407           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=P(ni1:ni2,nj1:nj2,nk1:nk2)%v%x)
+<a name="l00408"></a>00408           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=P(ni1:ni2,nj1:nj2,nk1:nk2)%v%y)
+<a name="l00409"></a>00409           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=P(ni1:ni2,nj1:nj2,nk1:nk2)%v%z)
+<a name="l00410"></a>00410           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=P(ni1:ni2,nj1:nj2,nk1:nk2)%p  )
+<a name="l00411"></a>00411           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=nnode,dat=P(ni1:ni2,nj1:nj2,nk1:nk2)%g  )
+<a name="l00412"></a>00412         <span class="keyword">else</span>
+<a name="l00413"></a><a class="code" href="../../d6/dec/group__Library.html#a08b1780647e6818045dd75e4d1310534">00413</a>           <span class="keyword">do</span> s=1,global%fluid%Ns
+<a name="l00414"></a>00414             err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=r(s,ci1:ci2,cj1:cj2,ck1:ck2))
+<a name="l00415"></a>00415           <span class="keyword">enddo</span>
+<a name="l00416"></a>00416           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%d  )
+<a name="l00417"></a>00417           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%x)
+<a name="l00418"></a>00418           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%y)
+<a name="l00419"></a>00419           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%z)
+<a name="l00420"></a>00420           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%p  )
+<a name="l00421"></a>00421           err=<a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N=ncell,dat=block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%g  )
+<a name="l00422"></a>00422         <span class="keyword">endif</span>
+<a name="l00423"></a>00423       <span class="keyword">endif</span>
+<a name="l00424"></a>00424     <span class="keyword">else</span>
+<a name="l00425"></a>00425       <span class="comment">! tecplot zone header</span>
+<a name="l00426"></a>00426       teczoneheader = <span class="stringliteral">&#39; ZONE  T = &quot;n_&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d0/d4a/interfaceIR__Precision_1_1strz">strz</a>(nz_pad=10,n=global%fluid%n))// &amp;
+<a name="l00427"></a>00427                                  <span class="stringliteral">&#39;-b_&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d0/d4a/interfaceIR__Precision_1_1strz">strz</a>(nz_pad=4,n=b))//<span class="stringliteral">&#39;&quot;&#39;</span>//          &amp;
+<a name="l00428"></a>00428                       <span class="stringliteral">&#39;, I=&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(no_sign=.true.,n=ni2-ni1+1))//            &amp;
+<a name="l00429"></a>00429                       <span class="stringliteral">&#39;, J=&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(no_sign=.true.,n=nj2-nj1+1))//            &amp;
+<a name="l00430"></a>00430                       <span class="stringliteral">&#39;, K=&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(no_sign=.true.,n=nk2-nk1+1))//            &amp;
+<a name="l00431"></a>00431                       <span class="stringliteral">&#39;, DATAPACKING=BLOCK&#39;</span>//adjustl(trim(tecvarlocstr))
+<a name="l00432"></a>00432       <span class="keyword">write</span>(tecunit,<span class="stringliteral">&#39;(A)&#39;</span>,iostat=err)trim(teczoneheader)
+<a name="l00433"></a>00433       <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%mesh%node(i,j,k)%x,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
+<a name="l00434"></a>00434       <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%mesh%node(i,j,k)%y,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
+<a name="l00435"></a>00435       <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%mesh%node(i,j,k)%z,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
+<a name="l00436"></a>00436       <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
+<a name="l00437"></a>00437         <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
+<a name="l00438"></a><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#aa8959036d89645a609a72ae558414408">00438</a>           <span class="keyword">do</span> s=1,global%fluid%Ns
+<a name="l00439"></a>00439             <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%r(s),i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
+<a name="l00440"></a>00440           <span class="keyword">enddo</span>
+<a name="l00441"></a>00441           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%d  ,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
+<a name="l00442"></a>00442           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%v%x,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
+<a name="l00443"></a>00443           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%v%y,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
+<a name="l00444"></a>00444           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%v%z,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
+<a name="l00445"></a>00445           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%p  ,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
+<a name="l00446"></a>00446           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((P(i,j,k)%g  ,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
+<a name="l00447"></a>00447         <span class="keyword">else</span>
+<a name="l00448"></a>00448           <span class="keyword">do</span> s=1,global%fluid%Ns
+<a name="l00449"></a>00449             <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%r(s),i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+<a name="l00450"></a>00450           <span class="keyword">enddo</span>
+<a name="l00451"></a>00451           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%d  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+<a name="l00452"></a>00452           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%v%x,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+<a name="l00453"></a>00453           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%v%y,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+<a name="l00454"></a>00454           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%v%z,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+<a name="l00455"></a>00455           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%p  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+<a name="l00456"></a>00456           <span class="keyword">write</span>(tecunit,FR_P,iostat=err)(((block%fluid%P(i,j,k)%g  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+<a name="l00457"></a>00457         <span class="keyword">endif</span>
+<a name="l00458"></a>00458       <span class="keyword">endif</span>
+<a name="l00459"></a>00459     <span class="keyword">endif</span>
+<a name="l00460"></a>00460     return
+<a name="l00461"></a>00461     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00462"></a>00462 <span class="keyword">    endfunction tec_blk_data</span>
+<a name="l00463"></a>00463 
+<a name="l00464"></a>00464     <span class="keyword">function </span><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#a3375927e414b700b8731085c03963f4c">tec_dat</a>(N,dat) result(err)
+<a name="l00465"></a>00465     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00466"></a>00466     <span class="comment">! Function interface for using &quot;tecdat&quot; function.</span>
 <a name="l00467"></a>00467     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
 <a name="l00468"></a>00468 
 <a name="l00469"></a>00469     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00470"></a>00470 <span class="preprocessor">#ifdef TECIO</span>
-<a name="l00471"></a>00471     err = tecdat112(N,dat,1)
-<a name="l00472"></a>00472 <span class="preprocessor">#else</span>
-<a name="l00473"></a>00473     <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;Error: your are trying to save binary tecplot file without compiling against the Tecplot library.&#39;</span>
-<a name="l00474"></a>00474     stop
-<a name="l00475"></a>00475 <span class="preprocessor">#endif</span>
-<a name="l00476"></a>00476     return
-<a name="l00477"></a>00477     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00478"></a>00478 <span class="keyword">    endfunction tec_dat</span>
-<a name="l00479"></a>00479 <span class="keyword">  endfunction tec_output</span>
-<a name="l00480"></a>00480 
-<a name="l00482"></a>00482   <span class="keyword">function </span>vtk_output(meshonly,global,block,filename) result(err)
-<a name="l00483"></a>00483   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00484"></a>00484   <span class="keyword">implicit none</span>
-<a name="l00485"></a>00485   <span class="keywordtype">logical</span>,           <span class="keywordtype">intent(IN)</span>::    meshonly                <span class="comment">!&lt; Flag for post-process only mesh.</span>
-<a name="l00486"></a>00486   <span class="keywordtype">type(Type_Global)</span>, <span class="keywordtype">intent(IN)</span>::    global                  <span class="comment">!&lt; Global-level data.</span>
-<a name="l00487"></a>00487   <span class="keywordtype">type(Type_Block)</span>,  <span class="keywordtype">intent(INOUT)</span>:: block(1:global%mesh%Nb) <span class="comment">!&lt; Block-level data.</span>
-<a name="l00488"></a>00488   <span class="keywordtype">character(*)</span>,      <span class="keywordtype">intent(IN)</span>::    filename                <span class="comment">!&lt; File name of the output file.</span>
-<a name="l00489"></a>00489   <span class="keywordtype">integer(I_P)</span>::                     err                     <span class="comment">!&lt; Error trapping flag: 0 no errors, &gt;0 error occurs.</span>
-<a name="l00490"></a>00490   <span class="keywordtype">integer(I_P)</span>::                     b                       <span class="comment">!&lt; Counter.</span>
-<a name="l00491"></a>00491   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00492"></a>00492 
-<a name="l00493"></a>00493   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00494"></a>00494   <span class="comment">! writing data blocks</span>
-<a name="l00495"></a>00495   <span class="keyword">do</span> b=1,global%mesh%Nb
-<a name="l00496"></a>00496     err = <a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#aa8959036d89645a609a72ae558414408">vtk_blk_data</a>( global = global, block = block(b), filename = trim(filename)//<span class="stringliteral">&#39;_b&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d0/d4a/interfaceIR__Precision_1_1strz">strz</a>(4,b))//<span class="stringliteral">&#39;.vts&#39;</span>)
-<a name="l00497"></a>00497   <span class="keyword">enddo</span>
-<a name="l00498"></a>00498   <span class="comment">!! writing the VTM wrapper for multiblock dataset</span>
-<a name="l00499"></a>00499   <span class="comment">!err = VTM_INI_XML(filename=trim(filename)//&#39;.vtm&#39;)</span>
-<a name="l00500"></a>00500   <span class="comment">!err = VTM_BLK_XML(block_action=&#39;open&#39;)</span>
-<a name="l00501"></a>00501   <span class="comment">!err = VTM_WRF_XML(vtk_xml_file_list=(/(trim(filename)//&#39;_b&#39;//trim(strz(4,b))//&#39;.vts&#39;,b=1,global%mesh%Nb)/))</span>
-<a name="l00502"></a>00502   <span class="comment">!err = VTM_BLK_XML(block_action=&#39;close&#39;)</span>
-<a name="l00503"></a>00503   <span class="comment">!err = VTM_END_XML()</span>
-<a name="l00504"></a>00504   return
-<a name="l00505"></a>00505   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00506"></a>00506   <span class="keyword">contains</span>
-<a name="l00507"></a>00507     <span class="keyword">function </span><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#aa8959036d89645a609a72ae558414408">vtk_blk_data</a>(global,block,filename) result(err)
-<a name="l00508"></a>00508     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00509"></a>00509     <span class="comment">! Function for writing block data.</span>
-<a name="l00510"></a>00510     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00511"></a>00511 
-<a name="l00512"></a>00512     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00513"></a>00513     <span class="keyword">implicit none</span>
-<a name="l00514"></a>00514     <span class="keywordtype">type(Type_Global)</span>, <span class="keywordtype">intent(IN)</span>::    global                  <span class="comment">! Global-level data.</span>
-<a name="l00515"></a>00515     <span class="keywordtype">type(Type_Block)</span>,  <span class="keywordtype">intent(INOUT)</span>:: block                   <span class="comment">! Block-level data.</span>
-<a name="l00516"></a>00516     <span class="keywordtype">character(*)</span>,      <span class="keywordtype">intent(IN)</span>::    filename                <span class="comment">! File name of the output block file.</span>
-<a name="l00517"></a>00517     <span class="keywordtype">integer(I_P)</span>::                     err                     <span class="comment">! Error trapping flag: 0 no errors, &gt;0 error occurs.</span>
-<a name="l00518"></a>00518     <span class="keywordtype">type(Type_Primitive)</span>::             P(0:block%mesh%Ni,     <span class="comment">! |</span>
-<a name="l00519"></a>00519                                          0:block%mesh%Nj,     <span class="comment">! | Primitive variables intepolated at nodes.</span>
-<a name="l00520"></a>00520                                          0:block%mesh%Nk)      <span class="comment">! |</span>
-<a name="l00521"></a>00521     <span class="keywordtype">real(R_P)</span>::                        r(1:global%fluid%Ns,   <span class="comment">! |</span>
-<a name="l00522"></a>00522                                          0:block%mesh%Ni,     <span class="comment">! | Array containing species densities.</span>
-<a name="l00523"></a>00523                                          0:block%mesh%Nj,     <span class="comment">! |</span>
-<a name="l00524"></a>00524                                          0:block%mesh%Nk)      <span class="comment">! |</span>
-<a name="l00525"></a>00525     <span class="keywordtype">integer(I_P)</span>::                     ni1,ni2,nj1,nj2,nk1,nk2 <span class="comment">! Bounds of dimensions of node-centered data.</span>
-<a name="l00526"></a>00526     <span class="keywordtype">integer(I_P)</span>::                     ci1,ci2,cj1,cj2,ck1,ck2 <span class="comment">! Bounds of dimensions of cell-centered data.</span>
-<a name="l00527"></a>00527     <span class="keywordtype">integer(I_P)</span>::                     nnode,ncell             <span class="comment">! Number of nodes and cells.</span>
-<a name="l00528"></a>00528     <span class="keywordtype">integer(I_P)</span>::                     i,j,k,s                 <span class="comment">! Counters.</span>
-<a name="l00529"></a>00529     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00530"></a>00530 
-<a name="l00531"></a>00531     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00532"></a>00532     <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
-<a name="l00533"></a>00533       <span class="comment">! tri-linear interpolation of cell-centered values at nodes</span>
-<a name="l00534"></a>00534       call interpolate_primitive(global=global,block=block,P=P)
-<a name="l00535"></a>00535     <span class="keyword">endif</span>
-<a name="l00536"></a>00536     <span class="comment">! initialize the block dimensions</span>
-<a name="l00537"></a>00537     call compute_dimensions(block=block,                                     &amp;
-<a name="l00538"></a>00538                             ni1=ni1,ni2=ni2,nj1=nj1,nj2=nj2,nk1=nk1,nk2=nk2, &amp;
-<a name="l00539"></a>00539                             ci1=ci1,ci2=ci2,cj1=cj1,cj2=cj2,ck1=ck1,ck2=ck2)
-<a name="l00540"></a>00540     nnode = (ni2-ni1+1)*(nj2-nj1+1)*(nk2-nk1+1)
-<a name="l00541"></a>00541     ncell = (ci2-ci1+1)*(cj2-cj1+1)*(ck2-ck1+1)
-<a name="l00542"></a>00542     <span class="comment">! storing species densities into an array for avoiding problems with nonzero rank pointer</span>
-<a name="l00543"></a>00543     <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
-<a name="l00544"></a>00544       <span class="keyword">do</span> k=0,block%mesh%Nk
-<a name="l00545"></a>00545         <span class="keyword">do</span> j=0,block%mesh%Nj
-<a name="l00546"></a>00546           <span class="keyword">do</span> i=0,block%mesh%Ni
-<a name="l00547"></a>00547             <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l00548"></a>00548               r(s,i,j,k) = P(i,j,k)%r(s)
-<a name="l00549"></a>00549             <span class="keyword">enddo</span>
-<a name="l00550"></a>00550           <span class="keyword">enddo</span>
-<a name="l00551"></a>00551         <span class="keyword">enddo</span>
-<a name="l00552"></a>00552       <span class="keyword">enddo</span>
-<a name="l00553"></a>00553     <span class="keyword">else</span>
-<a name="l00554"></a>00554       <span class="keyword">do</span> k=1,block%mesh%Nk
-<a name="l00555"></a>00555         <span class="keyword">do</span> j=1,block%mesh%Nj
-<a name="l00556"></a>00556           <span class="keyword">do</span> i=1,block%mesh%Ni
-<a name="l00557"></a>00557             <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l00558"></a>00558               r(s,i,j,k) = block%fluid%P(i,j,k)%r(s)
-<a name="l00559"></a>00559             <span class="keyword">enddo</span>
-<a name="l00560"></a>00560           <span class="keyword">enddo</span>
-<a name="l00561"></a>00561         <span class="keyword">enddo</span>
-<a name="l00562"></a>00562       <span class="keyword">enddo</span>
-<a name="l00563"></a>00563     <span class="keyword">endif</span>
-<a name="l00564"></a>00564     <span class="comment">! initializing VTK file</span>
-<a name="l00565"></a>00565     <span class="keyword">if</span> (pp_format%binary) <span class="keyword">then</span>
-<a name="l00566"></a>00566       err = <a class="code" href="../../dd/d55/group__Interface.html#d9/db8/interfaceLib__VTK__IO_1_1VTK__INI__XML">VTK_INI_XML</a>(output_format = <span class="stringliteral">&#39;binary&#39;</span>,         &amp;
-<a name="l00567"></a>00567                         filename      = trim(filename),   &amp;
-<a name="l00568"></a>00568                         mesh_topology = <span class="stringliteral">&#39;StructuredGrid&#39;</span>, &amp;
-<a name="l00569"></a>00569                         nx1 = ni1, nx2 = ni2,             &amp;
-<a name="l00570"></a>00570                         ny1 = nj1, ny2 = nj2,             &amp;
-<a name="l00571"></a>00571                         nz1 = nk1, nz2 = nk2)
-<a name="l00572"></a>00572     <span class="keyword">else</span>
-<a name="l00573"></a>00573       err = <a class="code" href="../../dd/d55/group__Interface.html#d9/db8/interfaceLib__VTK__IO_1_1VTK__INI__XML">VTK_INI_XML</a>(output_format = <span class="stringliteral">&#39;ascii&#39;</span>,          &amp;
+<a name="l00470"></a>00470     <span class="keyword">implicit none</span>
+<a name="l00471"></a>00471     <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>:: N        <span class="comment">! Number of data to save.</span>
+<a name="l00472"></a>00472     <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>:: dat(1:N) <span class="comment">! Data to save.</span>
+<a name="l00473"></a>00473     <span class="keywordtype">integer(I_P)</span>::             err      <span class="comment">! Error trapping flag: 0 no errors, &gt;0 error occurs.</span>
+<a name="l00474"></a>00474     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00475"></a>00475 
+<a name="l00476"></a>00476     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00477"></a>00477 <span class="preprocessor">#ifdef TECIO</span>
+<a name="l00478"></a>00478     err = tecdat112(N,dat,1)
+<a name="l00479"></a>00479 <span class="preprocessor">#else</span>
+<a name="l00480"></a>00480     <span class="keyword">write</span>(stderr,<span class="stringliteral">&#39;(A)&#39;</span>) <span class="stringliteral">&#39;Error: your are trying to save binary tecplot file without compiling against the Tecplot library.&#39;</span>
+<a name="l00481"></a>00481     stop
+<a name="l00482"></a>00482 <span class="preprocessor">#endif</span>
+<a name="l00483"></a>00483     return
+<a name="l00484"></a>00484     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00485"></a>00485 <span class="keyword">    endfunction tec_dat</span>
+<a name="l00486"></a>00486 <span class="keyword">  endfunction tec_output</span>
+<a name="l00487"></a>00487 
+<a name="l00489"></a>00489   <span class="keyword">function </span>vtk_output(meshonly,global,block,filename) result(err)
+<a name="l00490"></a>00490   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00491"></a>00491   <span class="keyword">implicit none</span>
+<a name="l00492"></a>00492   <span class="keywordtype">logical</span>,           <span class="keywordtype">intent(IN)</span>::    meshonly                <span class="comment">!&lt; Flag for post-process only mesh.</span>
+<a name="l00493"></a>00493   <span class="keywordtype">type(Type_Global)</span>, <span class="keywordtype">intent(IN)</span>::    global                  <span class="comment">!&lt; Global-level data.</span>
+<a name="l00494"></a>00494   <span class="keywordtype">type(Type_Block)</span>,  <span class="keywordtype">intent(INOUT)</span>:: block(1:global%mesh%Nb) <span class="comment">!&lt; Block-level data.</span>
+<a name="l00495"></a>00495   <span class="keywordtype">character(*)</span>,      <span class="keywordtype">intent(IN)</span>::    filename                <span class="comment">!&lt; File name of the output file.</span>
+<a name="l00496"></a>00496   <span class="keywordtype">integer(I_P)</span>::                     err                     <span class="comment">!&lt; Error trapping flag: 0 no errors, &gt;0 error occurs.</span>
+<a name="l00497"></a>00497   <span class="keywordtype">integer(I_P)</span>::                     b                       <span class="comment">!&lt; Counter.</span>
+<a name="l00498"></a>00498   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00499"></a>00499 
+<a name="l00500"></a>00500   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00501"></a>00501   <span class="comment">! writing data blocks</span>
+<a name="l00502"></a>00502   <span class="keyword">do</span> b=1,global%mesh%Nb
+<a name="l00503"></a>00503     err = <a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#aa8959036d89645a609a72ae558414408">vtk_blk_data</a>( global = global, block = block(b), filename = trim(filename)//<span class="stringliteral">&#39;_b&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d0/d4a/interfaceIR__Precision_1_1strz">strz</a>(4,b))//<span class="stringliteral">&#39;.vts&#39;</span>)
+<a name="l00504"></a>00504   <span class="keyword">enddo</span>
+<a name="l00505"></a>00505   <span class="comment">!! writing the VTM wrapper for multiblock dataset</span>
+<a name="l00506"></a>00506   <span class="comment">!err = VTM_INI_XML(filename=trim(filename)//&#39;.vtm&#39;)</span>
+<a name="l00507"></a>00507   <span class="comment">!err = VTM_BLK_XML(block_action=&#39;open&#39;)</span>
+<a name="l00508"></a>00508   <span class="comment">!err = VTM_WRF_XML(vtk_xml_file_list=(/(trim(filename)//&#39;_b&#39;//trim(strz(4,b))//&#39;.vts&#39;,b=1,global%mesh%Nb)/))</span>
+<a name="l00509"></a>00509   <span class="comment">!err = VTM_BLK_XML(block_action=&#39;close&#39;)</span>
+<a name="l00510"></a>00510   <span class="comment">!err = VTM_END_XML()</span>
+<a name="l00511"></a>00511   return
+<a name="l00512"></a>00512   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00513"></a>00513   <span class="keyword">contains</span>
+<a name="l00514"></a>00514     <span class="keyword">function </span><a class="code" href="../../da/df8/Lib__PostProcessing_8f90.html#aa8959036d89645a609a72ae558414408">vtk_blk_data</a>(global,block,filename) result(err)
+<a name="l00515"></a>00515     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00516"></a>00516     <span class="comment">! Function for writing block data.</span>
+<a name="l00517"></a>00517     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00518"></a>00518 
+<a name="l00519"></a>00519     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00520"></a>00520     <span class="keyword">implicit none</span>
+<a name="l00521"></a>00521     <span class="keywordtype">type(Type_Global)</span>, <span class="keywordtype">intent(IN)</span>::    global                  <span class="comment">! Global-level data.</span>
+<a name="l00522"></a>00522     <span class="keywordtype">type(Type_Block)</span>,  <span class="keywordtype">intent(INOUT)</span>:: block                   <span class="comment">! Block-level data.</span>
+<a name="l00523"></a>00523     <span class="keywordtype">character(*)</span>,      <span class="keywordtype">intent(IN)</span>::    filename                <span class="comment">! File name of the output block file.</span>
+<a name="l00524"></a>00524     <span class="keywordtype">integer(I_P)</span>::                     err                     <span class="comment">! Error trapping flag: 0 no errors, &gt;0 error occurs.</span>
+<a name="l00525"></a>00525     <span class="keywordtype">type(Type_Primitive)</span>::             P(0:block%mesh%Ni,     <span class="comment">! |</span>
+<a name="l00526"></a>00526                                          0:block%mesh%Nj,     <span class="comment">! | Primitive variables intepolated at nodes.</span>
+<a name="l00527"></a>00527                                          0:block%mesh%Nk)      <span class="comment">! |</span>
+<a name="l00528"></a>00528     <span class="keywordtype">real(R_P)</span>::                        r(1:global%fluid%Ns,   <span class="comment">! |</span>
+<a name="l00529"></a>00529                                          0:block%mesh%Ni,     <span class="comment">! | Array containing species densities.</span>
+<a name="l00530"></a>00530                                          0:block%mesh%Nj,     <span class="comment">! |</span>
+<a name="l00531"></a>00531                                          0:block%mesh%Nk)      <span class="comment">! |</span>
+<a name="l00532"></a>00532     <span class="keywordtype">integer(I_P)</span>::                     ni1,ni2,nj1,nj2,nk1,nk2 <span class="comment">! Bounds of dimensions of node-centered data.</span>
+<a name="l00533"></a>00533     <span class="keywordtype">integer(I_P)</span>::                     ci1,ci2,cj1,cj2,ck1,ck2 <span class="comment">! Bounds of dimensions of cell-centered data.</span>
+<a name="l00534"></a>00534     <span class="keywordtype">integer(I_P)</span>::                     nnode,ncell             <span class="comment">! Number of nodes and cells.</span>
+<a name="l00535"></a>00535     <span class="keywordtype">integer(I_P)</span>::                     i,j,k,s                 <span class="comment">! Counters.</span>
+<a name="l00536"></a>00536     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00537"></a>00537 
+<a name="l00538"></a>00538     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00539"></a>00539     <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
+<a name="l00540"></a>00540       <span class="comment">! tri-linear interpolation of cell-centered values at nodes</span>
+<a name="l00541"></a>00541       call interpolate_primitive(global=global,block=block,P=P)
+<a name="l00542"></a>00542     <span class="keyword">endif</span>
+<a name="l00543"></a>00543     <span class="comment">! initialize the block dimensions</span>
+<a name="l00544"></a>00544     call compute_dimensions(block=block,                                     &amp;
+<a name="l00545"></a>00545                             ni1=ni1,ni2=ni2,nj1=nj1,nj2=nj2,nk1=nk1,nk2=nk2, &amp;
+<a name="l00546"></a>00546                             ci1=ci1,ci2=ci2,cj1=cj1,cj2=cj2,ck1=ck1,ck2=ck2)
+<a name="l00547"></a>00547     nnode = (ni2-ni1+1)*(nj2-nj1+1)*(nk2-nk1+1)
+<a name="l00548"></a>00548     ncell = (ci2-ci1+1)*(cj2-cj1+1)*(ck2-ck1+1)
+<a name="l00549"></a>00549     <span class="comment">! storing species densities into an array for avoiding problems with nonzero rank pointer</span>
+<a name="l00550"></a>00550     <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
+<a name="l00551"></a>00551       <span class="keyword">do</span> k=0,block%mesh%Nk
+<a name="l00552"></a>00552         <span class="keyword">do</span> j=0,block%mesh%Nj
+<a name="l00553"></a>00553           <span class="keyword">do</span> i=0,block%mesh%Ni
+<a name="l00554"></a>00554             <span class="keyword">do</span> s=1,global%fluid%Ns
+<a name="l00555"></a>00555               r(s,i,j,k) = P(i,j,k)%r(s)
+<a name="l00556"></a>00556             <span class="keyword">enddo</span>
+<a name="l00557"></a>00557           <span class="keyword">enddo</span>
+<a name="l00558"></a>00558         <span class="keyword">enddo</span>
+<a name="l00559"></a>00559       <span class="keyword">enddo</span>
+<a name="l00560"></a>00560     <span class="keyword">else</span>
+<a name="l00561"></a>00561       <span class="keyword">do</span> k=1,block%mesh%Nk
+<a name="l00562"></a>00562         <span class="keyword">do</span> j=1,block%mesh%Nj
+<a name="l00563"></a>00563           <span class="keyword">do</span> i=1,block%mesh%Ni
+<a name="l00564"></a>00564             <span class="keyword">do</span> s=1,global%fluid%Ns
+<a name="l00565"></a>00565               r(s,i,j,k) = block%fluid%P(i,j,k)%r(s)
+<a name="l00566"></a>00566             <span class="keyword">enddo</span>
+<a name="l00567"></a>00567           <span class="keyword">enddo</span>
+<a name="l00568"></a>00568         <span class="keyword">enddo</span>
+<a name="l00569"></a>00569       <span class="keyword">enddo</span>
+<a name="l00570"></a>00570     <span class="keyword">endif</span>
+<a name="l00571"></a>00571     <span class="comment">! initializing VTK file</span>
+<a name="l00572"></a>00572     <span class="keyword">if</span> (pp_format%binary) <span class="keyword">then</span>
+<a name="l00573"></a>00573       err = <a class="code" href="../../dd/d55/group__Interface.html#d9/db8/interfaceLib__VTK__IO_1_1VTK__INI__XML">VTK_INI_XML</a>(output_format = <span class="stringliteral">&#39;binary&#39;</span>,         &amp;
 <a name="l00574"></a>00574                         filename      = trim(filename),   &amp;
 <a name="l00575"></a>00575                         mesh_topology = <span class="stringliteral">&#39;StructuredGrid&#39;</span>, &amp;
 <a name="l00576"></a>00576                         nx1 = ni1, nx2 = ni2,             &amp;
 <a name="l00577"></a>00577                         ny1 = nj1, ny2 = nj2,             &amp;
 <a name="l00578"></a>00578                         nz1 = nk1, nz2 = nk2)
-<a name="l00579"></a>00579     <span class="keyword">endif</span>
-<a name="l00580"></a>00580     <span class="comment">! saving the geometry</span>
-<a name="l00581"></a>00581     err = <a class="code" href="../../dd/d55/group__Interface.html#db/d38/interfaceLib__VTK__IO_1_1VTK__GEO__XML">VTK_GEO_XML</a>(nx1 = ni1, nx2 = ni2,                                            &amp;
-<a name="l00582"></a>00582                       ny1 = nj1, ny2 = nj2,                                            &amp;
-<a name="l00583"></a>00583                       nz1 = nk1, nz2 = nk2,                                            &amp;
-<a name="l00584"></a>00584                       NN = nnode,                                                      &amp;
-<a name="l00585"></a>00585                       X=reshape(block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%x,(/nnode/)), &amp;
-<a name="l00586"></a>00586                       Y=reshape(block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%y,(/nnode/)), &amp;
-<a name="l00587"></a>00587                       Z=reshape(block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%z,(/nnode/)))
-<a name="l00588"></a>00588     <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
-<a name="l00589"></a>00589       <span class="comment">! saving dependent variables</span>
-<a name="l00590"></a>00590       <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
-<a name="l00591"></a>00591         err = VTK_DAT_XML(var_location = <span class="stringliteral">&#39;node&#39;</span>, var_block_action = <span class="stringliteral">&#39;open&#39;</span>)
-<a name="l00592"></a>00592         <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l00593"></a>00593           err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;r(&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(.true.,s))//<span class="stringliteral">&#39;)&#39;</span>,var=reshape(r(s,ni1:ni2,nj1:nj2,nk1:nk2),(/nnode/)))
-<a name="l00594"></a>00594         <span class="keyword">enddo</span>
-<a name="l00595"></a>00595         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;r&#39;</span>,var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%d,  (/nnode/)))
-<a name="l00596"></a>00596         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;u&#39;</span>,var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%v%x,(/nnode/)))
-<a name="l00597"></a>00597         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;v&#39;</span>,var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%v%y,(/nnode/)))
-<a name="l00598"></a>00598         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;w&#39;</span>,var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%v%z,(/nnode/)))
-<a name="l00599"></a>00599         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;p&#39;</span>,var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%p,  (/nnode/)))
-<a name="l00600"></a>00600         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;g&#39;</span>,var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%g,  (/nnode/)))
-<a name="l00601"></a>00601         err=VTK_DAT_XML(var_location =<span class="stringliteral">&#39;node&#39;</span>,var_block_action = <span class="stringliteral">&#39;close&#39;</span>)
-<a name="l00602"></a>00602       <span class="keyword">else</span>
-<a name="l00603"></a>00603         err = VTK_DAT_XML(var_location = <span class="stringliteral">&#39;cell&#39;</span>, var_block_action = <span class="stringliteral">&#39;open&#39;</span>)
-<a name="l00604"></a>00604         <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l00605"></a>00605           err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;r(&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(.true.,s))//<span class="stringliteral">&#39;)&#39;</span>,var=reshape(r(s,ci1:ci2,cj1:cj2,ck1:ck2),(/ncell/)))
-<a name="l00606"></a>00606         <span class="keyword">enddo</span>
-<a name="l00607"></a>00607         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;r&#39;</span>,var=reshape(block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%d,  (/ncell/)))
-<a name="l00608"></a>00608         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;u&#39;</span>,var=reshape(block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%x,(/ncell/)))
-<a name="l00609"></a>00609         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;v&#39;</span>,var=reshape(block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%y,(/ncell/)))
-<a name="l00610"></a>00610         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;w&#39;</span>,var=reshape(block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%z,(/ncell/)))
-<a name="l00611"></a>00611         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;p&#39;</span>,var=reshape(block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%p,  (/ncell/)))
-<a name="l00612"></a>00612         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;g&#39;</span>,var=reshape(block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%g,  (/ncell/)))
-<a name="l00613"></a>00613         err=VTK_DAT_XML(var_location =<span class="stringliteral">&#39;cell&#39;</span>,var_block_action = <span class="stringliteral">&#39;close&#39;</span>)
-<a name="l00614"></a>00614       <span class="keyword">endif</span>
-<a name="l00615"></a>00615     <span class="keyword">endif</span>
-<a name="l00616"></a>00616     <span class="comment">! closing VTK file</span>
-<a name="l00617"></a>00617     err = <a class="code" href="../../dd/d55/group__Interface.html#db/d38/interfaceLib__VTK__IO_1_1VTK__GEO__XML">VTK_GEO_XML</a>()
-<a name="l00618"></a>00618     err = VTK_END_XML()
-<a name="l00619"></a>00619     return
-<a name="l00620"></a>00620     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00621"></a>00621 <span class="keyword">    endfunction vtk_blk_data</span>
-<a name="l00622"></a>00622 <span class="keyword">  endfunction vtk_output</span>
-<a name="l00623"></a>00623 <span class="keyword">endmodule Lib_PostProcessing</span>
+<a name="l00579"></a>00579     <span class="keyword">else</span>
+<a name="l00580"></a>00580       err = <a class="code" href="../../dd/d55/group__Interface.html#d9/db8/interfaceLib__VTK__IO_1_1VTK__INI__XML">VTK_INI_XML</a>(output_format = <span class="stringliteral">&#39;ascii&#39;</span>,          &amp;
+<a name="l00581"></a>00581                         filename      = trim(filename),   &amp;
+<a name="l00582"></a>00582                         mesh_topology = <span class="stringliteral">&#39;StructuredGrid&#39;</span>, &amp;
+<a name="l00583"></a>00583                         nx1 = ni1, nx2 = ni2,             &amp;
+<a name="l00584"></a>00584                         ny1 = nj1, ny2 = nj2,             &amp;
+<a name="l00585"></a>00585                         nz1 = nk1, nz2 = nk2)
+<a name="l00586"></a>00586     <span class="keyword">endif</span>
+<a name="l00587"></a>00587     <span class="comment">! saving the geometry</span>
+<a name="l00588"></a>00588     err = <a class="code" href="../../dd/d55/group__Interface.html#db/d38/interfaceLib__VTK__IO_1_1VTK__GEO__XML">VTK_GEO_XML</a>(nx1 = ni1, nx2 = ni2,                                            &amp;
+<a name="l00589"></a>00589                       ny1 = nj1, ny2 = nj2,                                            &amp;
+<a name="l00590"></a>00590                       nz1 = nk1, nz2 = nk2,                                            &amp;
+<a name="l00591"></a>00591                       NN = nnode,                                                      &amp;
+<a name="l00592"></a>00592                       X=reshape(block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%x,(/nnode/)), &amp;
+<a name="l00593"></a>00593                       Y=reshape(block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%y,(/nnode/)), &amp;
+<a name="l00594"></a>00594                       Z=reshape(block%mesh%node(ni1:ni2,nj1:nj2,nk1:nk2)%z,(/nnode/)))
+<a name="l00595"></a>00595     <span class="keyword">if</span> (.not.meshonly) <span class="keyword">then</span>
+<a name="l00596"></a>00596       <span class="comment">! saving dependent variables</span>
+<a name="l00597"></a>00597       <span class="keyword">if</span> (pp_format%node) <span class="keyword">then</span>
+<a name="l00598"></a>00598         err = VTK_DAT_XML(var_location = <span class="stringliteral">&#39;node&#39;</span>, var_block_action = <span class="stringliteral">&#39;open&#39;</span>)
+<a name="l00599"></a>00599         <span class="keyword">do</span> s=1,global%fluid%Ns
+<a name="l00600"></a>00600           err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;r(&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(.true.,s))//<span class="stringliteral">&#39;)&#39;</span>,var=reshape(r(s,ni1:ni2,nj1:nj2,nk1:nk2),(/nnode/)))
+<a name="l00601"></a>00601         <span class="keyword">enddo</span>
+<a name="l00602"></a>00602         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;r&#39;</span>,var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%d,  (/nnode/)))
+<a name="l00603"></a>00603         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;u&#39;</span>,var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%v%x,(/nnode/)))
+<a name="l00604"></a>00604         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;v&#39;</span>,var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%v%y,(/nnode/)))
+<a name="l00605"></a>00605         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;w&#39;</span>,var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%v%z,(/nnode/)))
+<a name="l00606"></a>00606         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;p&#39;</span>,var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%p,  (/nnode/)))
+<a name="l00607"></a>00607         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=nnode,varname=<span class="stringliteral">&#39;g&#39;</span>,var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%g,  (/nnode/)))
+<a name="l00608"></a>00608         err=VTK_DAT_XML(var_location =<span class="stringliteral">&#39;node&#39;</span>,var_block_action = <span class="stringliteral">&#39;close&#39;</span>)
+<a name="l00609"></a>00609       <span class="keyword">else</span>
+<a name="l00610"></a>00610         err = VTK_DAT_XML(var_location = <span class="stringliteral">&#39;cell&#39;</span>, var_block_action = <span class="stringliteral">&#39;open&#39;</span>)
+<a name="l00611"></a>00611         <span class="keyword">do</span> s=1,global%fluid%Ns
+<a name="l00612"></a>00612           err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;r(&#39;</span>//trim(<a class="code" href="../../dd/d55/group__Interface.html#d6/d7c/interfaceIR__Precision_1_1str">str</a>(.true.,s))//<span class="stringliteral">&#39;)&#39;</span>,var=reshape(r(s,ci1:ci2,cj1:cj2,ck1:ck2),(/ncell/)))
+<a name="l00613"></a>00613         <span class="keyword">enddo</span>
+<a name="l00614"></a>00614         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;r&#39;</span>,var=reshape(block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%d,  (/ncell/)))
+<a name="l00615"></a>00615         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;u&#39;</span>,var=reshape(block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%x,(/ncell/)))
+<a name="l00616"></a>00616         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;v&#39;</span>,var=reshape(block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%y,(/ncell/)))
+<a name="l00617"></a>00617         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;w&#39;</span>,var=reshape(block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%z,(/ncell/)))
+<a name="l00618"></a>00618         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;p&#39;</span>,var=reshape(block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%p,  (/ncell/)))
+<a name="l00619"></a>00619         err=<a class="code" href="../../dd/d55/group__Interface.html#db/d5b/interfaceLib__VTK__IO_1_1VTK__VAR__XML">VTK_VAR_XML</a>(NC_NN=ncell,varname=<span class="stringliteral">&#39;g&#39;</span>,var=reshape(block%fluid%P(ci1:ci2,cj1:cj2,ck1:ck2)%g,  (/ncell/)))
+<a name="l00620"></a>00620         err=VTK_DAT_XML(var_location =<span class="stringliteral">&#39;cell&#39;</span>,var_block_action = <span class="stringliteral">&#39;close&#39;</span>)
+<a name="l00621"></a>00621       <span class="keyword">endif</span>
+<a name="l00622"></a>00622     <span class="keyword">endif</span>
+<a name="l00623"></a>00623     <span class="comment">! closing VTK file</span>
+<a name="l00624"></a>00624     err = <a class="code" href="../../dd/d55/group__Interface.html#db/d38/interfaceLib__VTK__IO_1_1VTK__GEO__XML">VTK_GEO_XML</a>()
+<a name="l00625"></a>00625     err = VTK_END_XML()
+<a name="l00626"></a>00626     return
+<a name="l00627"></a>00627     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00628"></a>00628 <span class="keyword">    endfunction vtk_blk_data</span>
+<a name="l00629"></a>00629 <span class="keyword">  endfunction vtk_output</span>
+<a name="l00630"></a>00630 <span class="keyword">endmodule Lib_PostProcessing</span>
 </pre></div></div><!-- contents -->
 </div>
 <!-- window showing the filter options -->
@@ -730,7 +737,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
     <ul>
       <li class="navelem"><a class="el" href="../../da/df8/Lib__PostProcessing_8f90.html">Lib_PostProcessing.f90</a>      </li>
 
-    <li class="footer">Generated on Mon May 14 2012 17:45:55 for OFF by
+    <li class="footer">Generated on Thu May 24 2012 10:43:13 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

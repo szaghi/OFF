@@ -2,7 +2,7 @@ var NAVTREE =
 [
   [ "OFF", "index.html", [
     [ "OFF", "index.html", null ],
-    [ "Compiling, Examples, Todos and Bugs", "pages.html", "pages" ],
+    [ "README", "pages.html", "pages" ],
     [ "API", "modules.html", "modules" ],
     [ "Data Types List", null, [
       [ "Data Types List", "annotated.html", "annotated" ],

@@ -53,7 +53,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Compiling,&#160;Examples,&#160;Todos&#160;and&#160;Bugs</span></a></li>
+      <li><a href="pages.html"><span>README</span></a></li>
       <li><a href="modules.html"><span>API</span></a></li>
       <li><a href="files.html"><span>Source&#160;Files</span></a></li>
       <li><a href="dirs.html"><span>Directories</span></a></li>
@@ -102,7 +102,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Introduction</h2>
 <p><em>OFF</em> is an Open source Finite volumes Fluid dynamics code.</p>
 <p>It is written in in standard (compliant) Fortran 2003 with highly modularity as design target.</p>
-<p>The aim of <em>OFF</em> is to solve, numerically, the compressible Navier-Stokes equations of fluid dynamics by means of Finite Volumes techniques. The main features of <em>OFF</em> code are the following:</p>
+<p>The aim of <em>OFF</em> is to solve, numerically, the compressible Navier-Stokes equations of fluid dynamics (<a class="el" href="d4/d75/Equations.html">see governing equations</a>) by means of Finite Volumes techniques. The main features of <em>OFF</em> code are the following:</p>
 <ul>
 <li>Finite Volume, Godunov-like scheme based on Euler conservation Laws written in fully conservative formulation:<ul>
 <li>the extension to viscous Navier-Stokes equations is under developing;</li>
@@ -159,7 +159,7 @@ Introduction</h2>
 </li>
 </ul>
 <dl class="note"><dt><b>Note:</b></dt><dd><b>Compiling Instructions</b> <br/>
- <em>OFF</em> is shipped with a makefile for compiling the codes on Unix/GNU Linux architectures. Other OS are not supported. For more details see <a class="el" href="d9/d26/Compiling.html">Compiling Instructions</a>.</dd></dl>
+ <em>OFF</em> is shipped with a makefile for compiling the codes on Unix/GNU Linux architectures. Other OS are not supported. For more details see <a class="el" href="dd/dbc/SOD.html">Compiling Instructions</a>.</dd></dl>
 <dl class="bug"><dt><b><a class="el" href="de/da5/bug.html#_bug000004">Bug:</a></b></dt><dd><b>Multi-grid Models</b>: <br/>
  Multi-grid time convergence acceleration has been developed, but it is affected by some bugs that <em>blow up</em> steady simulations. </dd></dl>
 <dl class="todo"><dt><b><a class="el" href="dd/da0/todo.html#_todo000021">Todo:</a></b></dt><dd><p class="startdd"><b>NavierStokesEq:</b> Extension to viscous Navier-Stokes equations </p>
@@ -170,8 +170,8 @@ Introduction</h2>
 <p><b>GPU:</b> Introducing fine, local parallelism by means of GPU programming (e.g. CUDA framework) </p>
 <p class="enddd"><b>DocImprove:</b> Improve the documentation</p>
 </dd></dl>
-<h3><a class="anchor" id="Auxiliary_Codes"></a>
-Auxiliary_Codes</h3>
+<h3><a class="anchor" id="AuxCodes"></a>
+Auxiliary Codes</h3>
 <p>There are two useful auxiliary codes:</p>
 <ul>
 <li>IBM: Initial and Boundary conditions, Mesh generator for <em>OFF</em>;</li>
@@ -197,8 +197,8 @@ POG</h2>
 <h2><a class="anchor" id="Copyrights"></a>
 Copyrights</h2>
 <p><em>OFF</em> is an open source project, it is distributed under the GPL v3. Anyone is interest to use, to develop or contribute to <em>OFF</em> is welcome.</p>
-<h2><a class="anchor" id="Source-Code"></a>
-Source-Code</h2>
+<h2><a class="anchor" id="Source"></a>
+Source Code</h2>
 <p>It can be found at: <a href="https://github.com/szaghi/OFF">https://github.com/szaghi/OFF</a> </p>
 </div></div><!-- contents -->
 <!-- window showing the filter options -->
@@ -219,7 +219,7 @@ Source-Code</h2>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Mon May 14 2012 17:45:57 for OFF by
+    <li class="footer">Generated on Thu May 24 2012 10:43:19 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

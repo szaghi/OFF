@@ -53,7 +53,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="../../index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="../../pages.html"><span>Compiling,&#160;Examples,&#160;Todos&#160;and&#160;Bugs</span></a></li>
+      <li><a href="../../pages.html"><span>README</span></a></li>
       <li><a href="../../modules.html"><span>API</span></a></li>
       <li class="current"><a href="../../files.html"><span>Source&#160;Files</span></a></li>
       <li><a href="../../dirs.html"><span>Directories</span></a></li>
@@ -243,7 +243,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a name="l00181"></a>00181 
 <a name="l00182"></a>00182     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
 <a name="l00183"></a>00183     <span class="comment">!$OMP PARALLEL DEFAULT(NONE)   &amp;</span>
-<a name="l00184"></a><a class="code" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gaaec639e0cd32cd1cd756eae90b2fd55d">00184</a>     <span class="comment">!$OMP PRIVATE(i)               &amp;</span>
+<a name="l00184"></a><a class="code" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gaef4eafa99842055224e85638feb2d333">00184</a>     <span class="comment">!$OMP PRIVATE(i)               &amp;</span>
 <a name="l00185"></a>00185     <span class="comment">!$OMP SHARED(N,P,U)</span>
 <a name="l00186"></a>00186     <span class="comment">!$OMP DO</span>
 <a name="l00187"></a>00187     <span class="keyword">do</span> i=1,N
@@ -255,7 +255,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a name="l00193"></a>00193 <span class="keyword">    endsubroutine p2c_reshape1D</span>
 <a name="l00194"></a>00194 <span class="keyword">  endsubroutine primitive2conservative</span>
 <a name="l00195"></a>00195 
-<a name="l00199"></a>00199   <span class="keyword">subroutine </span>conservative2primitive(global,block)
+<a name="l00199"></a>00199   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>conservative2primitive(global,block)
 <a name="l00200"></a>00200   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
 <a name="l00201"></a>00201   <span class="keyword">implicit none</span>
 <a name="l00202"></a>00202   <span class="keywordtype">type(Type_Global)</span>, <span class="keywordtype">intent(IN)</span>::    global <span class="comment">!&lt; Global-level data (see \ref Data_Type_Globals::Type_Global &quot;Type_Global&quot; definition).</span>
@@ -1385,7 +1385,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a name="l01349"></a>01349     <span class="keyword">endif</span>
 <a name="l01350"></a>01350     <span class="keyword">if</span> (boundary==<span class="stringliteral">&#39;r&#39;</span>) <span class="keyword">then</span>
 <a name="l01351"></a>01351       <span class="keyword">if</span> (ic==1.OR.N&lt;gc) <span class="keyword">then</span>
-<a name="l01352"></a><a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gafcd52f4802d17f33ededcaf21feffd2f">01352</a>         <span class="comment">! extrapolation using only the cell 1</span>
+<a name="l01352"></a><a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga3d0e47fc78f153168faa8200481e3fd9">01352</a>         <span class="comment">! extrapolation using only the cell 1</span>
 <a name="l01353"></a>01353         <span class="keyword">do</span> i=N+1,N+gc
 <a name="l01354"></a>01354           P(i) = P(1)
 <a name="l01355"></a>01355         <span class="keyword">enddo</span>
@@ -1409,9 +1409,9 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a name="l01373"></a>01373 
 <a name="l01374"></a>01374     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
 <a name="l01375"></a>01375     <span class="keyword">implicit none</span>
-<a name="l01376"></a>01376     <span class="keywordtype">integer(I_P)</span>,         <span class="keywordtype">intent(IN)</span>::    gc         <span class="comment">! Number of ghost cells.</span>
+<a name="l01376"></a><a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga21c7babcd053e5e947aa3d63acbce68a">01376</a>     <span class="keywordtype">integer(I_P)</span>,         <span class="keywordtype">intent(IN)</span>::    gc         <span class="comment">! Number of ghost cells.</span>
 <a name="l01377"></a>01377     <span class="keywordtype">type(Type_BC)</span>,        <span class="keywordtype">intent(IN)</span>::    bc(1-gc:0) <span class="comment">! Boundary conditions infos.</span>
-<a name="l01378"></a><a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga201b3e7e201f97a3138c52e6ee2045b6">01378</a>     <span class="keywordtype">type(Type_Primitive)</span>, <span class="keywordtype">intent(INOUT)</span>:: P (1-gc:0) <span class="comment">! Left section of primitive variables.</span>
+<a name="l01378"></a>01378     <span class="keywordtype">type(Type_Primitive)</span>, <span class="keywordtype">intent(INOUT)</span>:: P (1-gc:0) <span class="comment">! Left section of primitive variables.</span>
 <a name="l01379"></a>01379     <span class="keywordtype">integer(I_P)</span>::                        i,b        <span class="comment">! Counters.</span>
 <a name="l01380"></a>01380     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
 <a name="l01381"></a>01381 
@@ -1439,7 +1439,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a name="l01403"></a>01403     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
 <a name="l01404"></a>01404     <span class="comment">! Subroutine for imposing inflow 1 boundary conditions.</span>
 <a name="l01405"></a>01405     <span class="comment">! Note that when this subroutine is called for a &#39;right&#39; (Ni,Nj,Nk) boundary the section of arrays BC(i,j,k) and P must be</span>
-<a name="l01406"></a>01406     <span class="comment">! properly remapped: in the section [1-gc:0] must be passed the actual section [N:N+gc-1].</span>
+<a name="l01406"></a><a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gac8d097a8966b63e76049c7a18a2c9436">01406</a>     <span class="comment">! properly remapped: in the section [1-gc:0] must be passed the actual section [N:N+gc-1].</span>
 <a name="l01407"></a>01407     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
 <a name="l01408"></a>01408 
 <a name="l01409"></a>01409     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
@@ -1452,7 +1452,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a name="l01416"></a>01416 
 <a name="l01417"></a>01417     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
 <a name="l01418"></a>01418     <span class="keyword">do</span> i=1-gc,0
-<a name="l01419"></a><a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gae27a81762853e919a50a580cf5626590">01419</a>       P(i) = global%bc%in1(bc(i)%inf)
+<a name="l01419"></a>01419       P(i) = global%bc%in1(bc(i)%inf)
 <a name="l01420"></a>01420     <span class="keyword">enddo</span>
 <a name="l01421"></a>01421     return
 <a name="l01422"></a>01422     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
@@ -1461,7 +1461,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a name="l01425"></a>01425 
 <a name="l01428"></a>01428   <span class="keyword">subroutine </span>solve_grl(myrank,l,global,block)
 <a name="l01429"></a>01429   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01430"></a>01430   <span class="keyword">implicit none</span>
+<a name="l01430"></a><a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga758b5daf711f8241c6ccce4f5ba19931">01430</a>   <span class="keyword">implicit none</span>
 <a name="l01431"></a>01431   <span class="keywordtype">integer(I_P)</span>,      <span class="keywordtype">intent(IN)</span>::    myrank                  <span class="comment">!&lt; Current rank process.</span>
 <a name="l01432"></a>01432   <span class="keywordtype">integer(I_P)</span>,      <span class="keywordtype">intent(IN)</span>::    l                       <span class="comment">!&lt; Current grid level.</span>
 <a name="l01433"></a>01433   <span class="keywordtype">type(Type_Global)</span>, <span class="keywordtype">intent(INOUT)</span>:: global                  <span class="comment">!&lt; Global-level data (see \ref Data_Type_Globals::Type_Global</span>
@@ -1475,7 +1475,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a name="l01441"></a>01441   <span class="keywordtype">real(R_P)</span>::       mRU (1:global%fluid%Nc)                  <span class="comment">!&lt; Maximum of RU of actual process.</span>
 <a name="l01442"></a>01442   <span class="keywordtype">real(R_P)</span>::       gmRU(1:global%fluid%Nc)                  <span class="comment">!&lt; Global (all processes) maximum of RU.</span>
 <a name="l01443"></a>01443   <span class="keywordtype">integer(I_P)</span>::    err                                      <span class="comment">!&lt; Error trapping flag: 0 no errors, &gt;0 errors.</span>
-<a name="l01444"></a><a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga2197c37582f664b06c85580e119b5f48">01444</a>   <span class="keywordtype">integer(I_P)</span>::    b                                        <span class="comment">!&lt; Blocks counter.</span>
+<a name="l01444"></a>01444   <span class="keywordtype">integer(I_P)</span>::    b                                        <span class="comment">!&lt; Blocks counter.</span>
 <a name="l01445"></a>01445   <span class="keywordtype">integer(I_P)</span>::    s1                                       <span class="comment">!&lt; Runge-Kutta stages counters.</span>
 <a name="l01446"></a>01446   <span class="keywordtype">real(R_P)</span>::       sec_elp                                  <span class="comment">!&lt; Seconds elapsed from the simulation start.</span>
 <a name="l01447"></a>01447   <span class="keywordtype">real(R_P)</span>::       sec_res                                  <span class="comment">!&lt; Seconds residual from the simulation end.</span>
@@ -1628,127 +1628,104 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a name="l01594"></a>01594   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
 <a name="l01595"></a>01595 <span class="keyword">  endsubroutine solve_grl</span>
 <a name="l01596"></a>01596 
-<a name="l01599"></a>01599   <span class="keyword">subroutine </span>rk_stages_sum(s1,global,block)
+<a name="l01599"></a>01599   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>rk_stages_sum(s1,global,block)
 <a name="l01600"></a>01600   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
 <a name="l01601"></a>01601   <span class="keyword">implicit none</span>
 <a name="l01602"></a>01602   <span class="keywordtype">integer(I_P)</span>,      <span class="keywordtype">intent(IN)</span>::    s1      <span class="comment">!&lt; Current Runge-Kutta stage.</span>
 <a name="l01603"></a>01603   <span class="keywordtype">type(Type_Global)</span>, <span class="keywordtype">intent(IN)</span>::    global  <span class="comment">!&lt; Global-level data.</span>
 <a name="l01604"></a>01604   <span class="keywordtype">type(Type_Block)</span>,  <span class="keywordtype">intent(INOUT)</span>:: block   <span class="comment">!&lt; Block-level data.</span>
-<a name="l01605"></a>01605   <span class="keywordtype">type(Type_Conservative)</span>::          U,rksum <span class="comment">!&lt; Dummy conservative varibales.</span>
-<a name="l01606"></a>01606   <span class="keywordtype">integer(I_P)</span>::                     i,j,k,s <span class="comment">!&lt; Counters.</span>
+<a name="l01605"></a>01605   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01606"></a>01606 
 <a name="l01607"></a>01607   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01608"></a>01608 
-<a name="l01609"></a>01609   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01610"></a>01610   call <a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga201b3e7e201f97a3138c52e6ee2045b6">rk_stg_reshape1D</a>(N  = int(block%mesh%Ni*block%mesh%Nj*block%mesh%Nk,I8P),                     &amp;
-<a name="l01611"></a>01611                         Dt = block%fluid%Dt(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk       ), &amp;
-<a name="l01612"></a>01612                         U  = block%fluid%U (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk       ), &amp;
-<a name="l01613"></a>01613                         KS = block%fluid%KS(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk,1:s1-1), &amp;
-<a name="l01614"></a>01614                         P  = block%fluid%P (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk       ))
-<a name="l01615"></a>01615   return
-<a name="l01616"></a>01616   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01617"></a>01617   <span class="keyword">contains</span>
-<a name="l01625"></a>01625     <span class="keyword">subroutine </span><a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga201b3e7e201f97a3138c52e6ee2045b6">rk_stg_reshape1D</a>(N,Dt,U,KS,P)
-<a name="l01626"></a>01626     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01627"></a>01627     <span class="keyword">implicit none</span>
-<a name="l01628"></a>01628     <span class="keywordtype">integer(I8P)</span>,            <span class="keywordtype">intent(IN)</span>::    N              <span class="comment">!&lt; Number of finite volumes.</span>
-<a name="l01629"></a>01629     <span class="keywordtype">real(R_P)</span>,               <span class="keywordtype">intent(IN)</span>::    Dt(1:N)        <span class="comment">!&lt; Time steps.</span>
-<a name="l01630"></a>01630     <span class="keywordtype">type(Type_Conservative)</span>, <span class="keywordtype">intent(IN)</span>::    U( 1:N)        <span class="comment">!&lt; Current conservative variables.</span>
-<a name="l01631"></a>01631     <span class="keywordtype">type(Type_Conservative)</span>, <span class="keywordtype">intent(IN)</span>::    KS(1:N,1:s1-1) <span class="comment">!&lt; Runge-Kutta stages.</span>
-<a name="l01632"></a>01632     <span class="keywordtype">type(Type_Primitive)</span>,    <span class="keywordtype">intent(INOUT)</span>:: P( 1:N)        <span class="comment">!&lt; Updated primitive variables.</span>
-<a name="l01633"></a>01633     <span class="keywordtype">type(Type_Conservative)</span>:: Ud                            <span class="comment">!&lt; Dummy conservative variablew.</span>
-<a name="l01634"></a>01634     <span class="keywordtype">real(R_P)</span>::               KSd(1:global%fluid%Nc,1:s1-1) <span class="comment">!&lt; Dummy Runge-Kutta stages.</span>
-<a name="l01635"></a>01635     <span class="keywordtype">integer(I8P)</span>::            i                             <span class="comment">!&lt; Cell counter.</span>
-<a name="l01636"></a>01636     <span class="keywordtype">integer(I_P)</span>::            s                             <span class="comment">!&lt; Counter.</span>
-<a name="l01637"></a>01637     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01638"></a>01638 
-<a name="l01639"></a>01639     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01640"></a>01640     <span class="comment">!$OMP PARALLEL DEFAULT(NONE) &amp;</span>
-<a name="l01641"></a>01641     <span class="comment">!$OMP PRIVATE(i,s,Ud,KSd)    &amp;</span>
-<a name="l01642"></a>01642     <span class="comment">!$OMP SHARED(s1,global,N,Dt,U,KS,P)</span>
-<a name="l01643"></a>01643     call init_cons(Ns = global%fluid%Ns, cons = Ud)
-<a name="l01644"></a>01644     <span class="comment">!$OMP DO</span>
-<a name="l01645"></a>01645     <span class="keyword">do</span> i=1,N
-<a name="l01646"></a>01646       <span class="keyword">do</span> s=1,s1-1
-<a name="l01647"></a>01647         KSd(1:global%fluid%Nc,s) = cons2array(KS(i,s))
-<a name="l01648"></a>01648       <span class="keyword">enddo</span>
-<a name="l01649"></a>01649       <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l01650"></a>01650        Ud%rs(s) = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%rs(s),KS=KSd(s,1:s1-1))
-<a name="l01651"></a>01651       <span class="keyword">enddo</span>
-<a name="l01652"></a>01652       Ud%rv%x = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%rv%x,KS=KS(i,1:s1-1)%rv%x)
-<a name="l01653"></a>01653       Ud%rv%y = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%rv%y,KS=KS(i,1:s1-1)%rv%y)
-<a name="l01654"></a>01654       Ud%rv%z = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%rv%z,KS=KS(i,1:s1-1)%rv%z)
-<a name="l01655"></a>01655       Ud%re   = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%re  ,KS=KS(i,1:s1-1)%re  )
-<a name="l01656"></a>01656       call cons2prim(cp0 = global%fluid%cp0, cv0 = global%fluid%cv0, cons = Ud, prim = P(i))
-<a name="l01657"></a>01657     <span class="keyword">enddo</span>
-<a name="l01658"></a>01658     <span class="comment">!$OMP END PARALLEL</span>
-<a name="l01659"></a>01659     return
-<a name="l01660"></a>01660     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01661"></a>01661 <span class="keyword">    endsubroutine rk_stg_reshape1D</span>
-<a name="l01662"></a>01662 <span class="keyword">  endsubroutine rk_stages_sum</span>
-<a name="l01663"></a>01663 
-<a name="l01666"></a>01666   <span class="keyword">subroutine </span>rk_time_integration(global,block,RU)
-<a name="l01667"></a>01667   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01668"></a>01668   <span class="keyword">implicit none</span>
-<a name="l01669"></a>01669   <span class="keywordtype">type(Type_Global)</span>, <span class="keywordtype">intent(IN)</span>::    global                <span class="comment">!&lt; Global-level data.</span>
-<a name="l01670"></a>01670   <span class="keywordtype">type(Type_Block)</span>,  <span class="keywordtype">intent(INOUT)</span>:: block                 <span class="comment">!&lt; Block-level data.</span>
-<a name="l01671"></a>01671   <span class="keywordtype">real(R_P)</span>,         <span class="keywordtype">intent(OUT)</span>::   RU(1:global%fluid%Nc) <span class="comment">!&lt; NormL2 of residuals of conservative variables.</span>
-<a name="l01672"></a>01672   <span class="keywordtype">type(Type_Conservative)</span>::          rksum                 <span class="comment">!&lt; Dummy conservative varibale.</span>
-<a name="l01673"></a>01673   <span class="keywordtype">integer(I_P)</span>::                     i,j,k,s               <span class="comment">!&lt; Counters.</span>
-<a name="l01674"></a>01674   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01675"></a>01675 
-<a name="l01676"></a>01676   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01677"></a>01677   call <a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga2197c37582f664b06c85580e119b5f48">rk_t_int_reshape1D</a>(N  = int(block%mesh%Ni*block%mesh%Nj*block%mesh%Nk,I8P),                                    &amp;
-<a name="l01678"></a>01678                           Dt = block%fluid%Dt(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk                      ), &amp;
-<a name="l01679"></a>01679                           KS = block%fluid%KS(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk,1:global%fluid%rk_ord), &amp;
-<a name="l01680"></a>01680                           U  = block%fluid%U (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk                      ))
-<a name="l01681"></a>01681   return
-<a name="l01682"></a>01682   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01683"></a>01683   <span class="keyword">contains</span>
-<a name="l01691"></a>01691     <span class="keyword">subroutine </span><a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga2197c37582f664b06c85580e119b5f48">rk_t_int_reshape1D</a>(N,Dt,KS,U)
-<a name="l01692"></a>01692     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01693"></a>01693     <span class="keyword">implicit none</span>
-<a name="l01694"></a>01694     <span class="keywordtype">integer(I8P)</span>,            <span class="keywordtype">intent(IN)</span>::    N                             <span class="comment">!&lt; Number of finite volumes.</span>
-<a name="l01695"></a>01695     <span class="keywordtype">real(R_P)</span>,               <span class="keywordtype">intent(IN)</span>::    Dt(1:N)                       <span class="comment">!&lt; Time steps.</span>
-<a name="l01696"></a>01696     <span class="keywordtype">type(Type_Conservative)</span>, <span class="keywordtype">intent(IN)</span>::    KS(1:N,1:global%fluid%rk_ord) <span class="comment">!&lt; Runge-Kutta stages.</span>
-<a name="l01697"></a>01697     <span class="keywordtype">type(Type_Conservative)</span>, <span class="keywordtype">intent(INOUT)</span>:: U( 1:N)                       <span class="comment">!&lt; Current conservative variables.</span>
-<a name="l01698"></a>01698     <span class="keywordtype">type(Type_Conservative)</span>:: Ud,R                                         <span class="comment">!&lt; Dummy conservative variables.</span>
-<a name="l01699"></a>01699     <span class="keywordtype">real(R_P)</span>::               KSd(1:global%fluid%Nc,1:global%fluid%rk_ord) <span class="comment">!&lt; Dummy Runge-Kutta stages.</span>
-<a name="l01700"></a>01700     <span class="keywordtype">integer(I8P)</span>::            i                                            <span class="comment">!&lt; Cell counter.</span>
-<a name="l01701"></a>01701     <span class="keywordtype">integer(I_P)</span>::            s                                            <span class="comment">!&lt; Counter.</span>
-<a name="l01702"></a>01702     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01703"></a>01703 
-<a name="l01704"></a>01704     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01705"></a>01705     RU = 0._R_P
-<a name="l01706"></a>01706     <span class="comment">!$OMP PARALLEL DEFAULT(NONE)   &amp;</span>
-<a name="l01707"></a>01707     <span class="comment">!$OMP PRIVATE(i,s,Ud,R,KSd)    &amp;</span>
-<a name="l01708"></a>01708     <span class="comment">!$OMP SHARED(global,N,Dt,KS,U) &amp;</span>
-<a name="l01709"></a>01709     <span class="comment">!$OMP REDUCTION(+: RU)</span>
-<a name="l01710"></a>01710     call init_cons(Ns = global%fluid%Ns, cons = Ud)
-<a name="l01711"></a>01711     <span class="comment">!$OMP DO</span>
-<a name="l01712"></a>01712     <span class="keyword">do</span> i=1,N
-<a name="l01713"></a>01713       <span class="keyword">do</span> s=1,global%fluid%rk_ord
-<a name="l01714"></a>01714         KSd(1:global%fluid%Nc,s) = cons2array(KS(i,s))
-<a name="l01715"></a>01715       <span class="keyword">enddo</span>
-<a name="l01716"></a>01716       <span class="keyword">do</span> s=1,global%fluid%Ns
-<a name="l01717"></a>01717         Ud%rs(s) = rk_time_integ(Dt=Dt(i),un=U(i)%rs(s),KS=KSd(s,1:global%fluid%rk_ord))
-<a name="l01718"></a>01718       <span class="keyword">enddo</span>
-<a name="l01719"></a>01719       Ud%rv%x = rk_time_integ(Dt=Dt(i),un=U(i)%rv%x,KS=KS(i,1:global%fluid%rk_ord)%rv%x)
-<a name="l01720"></a>01720       Ud%rv%y = rk_time_integ(Dt=Dt(i),un=U(i)%rv%y,KS=KS(i,1:global%fluid%rk_ord)%rv%y)
-<a name="l01721"></a>01721       Ud%rv%z = rk_time_integ(Dt=Dt(i),un=U(i)%rv%z,KS=KS(i,1:global%fluid%rk_ord)%rv%z)
-<a name="l01722"></a>01722       Ud%re   = rk_time_integ(Dt=Dt(i),un=U(i)%re,  KS=KS(i,1:global%fluid%rk_ord)%re  )
-<a name="l01723"></a>01723       R = (Ud-U(i))/Dt(i) ; R = R*R ; RU = RU + cons2array(R)
-<a name="l01724"></a>01724       U(i) = Ud
-<a name="l01725"></a>01725     <span class="keyword">enddo</span>
-<a name="l01726"></a>01726     <span class="comment">!$OMP DO</span>
-<a name="l01727"></a>01727     <span class="keyword">do</span> s=1,global%fluid%Nc
-<a name="l01728"></a>01728      RU(s) = sqrt(RU(s))
-<a name="l01729"></a>01729     <span class="keyword">enddo</span>
-<a name="l01730"></a>01730     <span class="comment">!$OMP END PARALLEL</span>
-<a name="l01731"></a>01731     return
-<a name="l01732"></a>01732     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l01733"></a>01733 <span class="keyword">    endsubroutine rk_t_int_reshape1D</span>
-<a name="l01734"></a>01734 <span class="keyword">  endsubroutine rk_time_integration</span>
-<a name="l01735"></a>01735 <span class="keyword">endmodule Lib_Fluidynamic</span>
+<a name="l01608"></a>01608   call <a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga21c7babcd053e5e947aa3d63acbce68a">rk_stg_reshape1D</a>(N  = int(block%mesh%Ni*block%mesh%Nj*block%mesh%Nk,I8P),                     &amp;
+<a name="l01609"></a>01609                         Dt = block%fluid%Dt(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk       ), &amp;
+<a name="l01610"></a>01610                         U  = block%fluid%U (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk       ), &amp;
+<a name="l01611"></a>01611                         KS = block%fluid%KS(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk,1:s1-1), &amp;
+<a name="l01612"></a>01612                         P  = block%fluid%P (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk       ))
+<a name="l01613"></a>01613   return
+<a name="l01614"></a>01614   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01615"></a>01615   <span class="keyword">contains</span>
+<a name="l01623"></a>01623     <span class="keywordtype">pure</span> <span class="keyword">subroutine </span><a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga21c7babcd053e5e947aa3d63acbce68a">rk_stg_reshape1D</a>(N,Dt,U,KS,P)
+<a name="l01624"></a>01624     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01625"></a>01625     <span class="keyword">implicit none</span>
+<a name="l01626"></a>01626     <span class="keywordtype">integer(I8P)</span>,            <span class="keywordtype">intent(IN)</span>::    N              <span class="comment">!&lt; Number of finite volumes.</span>
+<a name="l01627"></a>01627     <span class="keywordtype">real(R_P)</span>,               <span class="keywordtype">intent(IN)</span>::    Dt(1:N)        <span class="comment">!&lt; Time steps.</span>
+<a name="l01628"></a>01628     <span class="keywordtype">type(Type_Conservative)</span>, <span class="keywordtype">intent(IN)</span>::    U( 1:N)        <span class="comment">!&lt; Current conservative variables.</span>
+<a name="l01629"></a>01629     <span class="keywordtype">type(Type_Conservative)</span>, <span class="keywordtype">intent(IN)</span>::    KS(1:N,1:s1-1) <span class="comment">!&lt; Runge-Kutta stages.</span>
+<a name="l01630"></a>01630     <span class="keywordtype">type(Type_Primitive)</span>,    <span class="keywordtype">intent(INOUT)</span>:: P( 1:N)        <span class="comment">!&lt; Updated primitive variables.</span>
+<a name="l01631"></a>01631     <span class="keywordtype">type(Type_Conservative)</span>:: Ud                            <span class="comment">!&lt; Dummy conservative variablew.</span>
+<a name="l01632"></a>01632     <span class="keywordtype">integer(I8P)</span>::            i                             <span class="comment">!&lt; Cell counter.</span>
+<a name="l01633"></a>01633     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01634"></a>01634 
+<a name="l01635"></a>01635     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01636"></a>01636     <span class="comment">!$OMP PARALLEL DEFAULT(NONE) &amp;</span>
+<a name="l01637"></a>01637     <span class="comment">!$OMP PRIVATE(i,s,Ud)        &amp;</span>
+<a name="l01638"></a>01638     <span class="comment">!$OMP SHARED(global,s1,N,Dt,U,KS,P)</span>
+<a name="l01639"></a>01639     call init_cons(Ns = global%fluid%Ns, cons = Ud)
+<a name="l01640"></a>01640     <span class="comment">!$OMP DO</span>
+<a name="l01641"></a>01641     <span class="keyword">do</span> i=1,N
+<a name="l01642"></a>01642       call rk_stage(s1=s1,Dt=Dt(i),Un=U(i),KS=KS(i,1:s1-1),KS1=Ud)
+<a name="l01643"></a>01643       call cons2prim(cp0 = global%fluid%cp0, cv0 = global%fluid%cv0, cons = Ud, prim = P(i))
+<a name="l01644"></a>01644     <span class="keyword">enddo</span>
+<a name="l01645"></a>01645     <span class="comment">!$OMP END PARALLEL</span>
+<a name="l01646"></a>01646     return
+<a name="l01647"></a>01647     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01648"></a>01648 <span class="keyword">    endsubroutine rk_stg_reshape1D</span>
+<a name="l01649"></a>01649 <span class="keyword">  endsubroutine rk_stages_sum</span>
+<a name="l01650"></a>01650 
+<a name="l01653"></a>01653   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>rk_time_integration(global,block,RU)
+<a name="l01654"></a>01654   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01655"></a>01655   <span class="keyword">implicit none</span>
+<a name="l01656"></a>01656   <span class="keywordtype">type(Type_Global)</span>, <span class="keywordtype">intent(IN)</span>::    global                <span class="comment">!&lt; Global-level data.</span>
+<a name="l01657"></a>01657   <span class="keywordtype">type(Type_Block)</span>,  <span class="keywordtype">intent(INOUT)</span>:: block                 <span class="comment">!&lt; Block-level data.</span>
+<a name="l01658"></a>01658   <span class="keywordtype">real(R_P)</span>,         <span class="keywordtype">intent(OUT)</span>::   RU(1:global%fluid%Nc) <span class="comment">!&lt; NormL2 of residuals of conservative variables.</span>
+<a name="l01659"></a>01659   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01660"></a>01660 
+<a name="l01661"></a>01661   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01662"></a>01662   call <a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga758b5daf711f8241c6ccce4f5ba19931">rk_t_int_reshape1D</a>(N  = int(block%mesh%Ni*block%mesh%Nj*block%mesh%Nk,I8P),                                    &amp;
+<a name="l01663"></a>01663                           Dt = block%fluid%Dt(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk                      ), &amp;
+<a name="l01664"></a>01664                           KS = block%fluid%KS(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk,1:global%fluid%rk_ord), &amp;
+<a name="l01665"></a>01665                           U  = block%fluid%U (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk                      ), &amp;
+<a name="l01666"></a>01666                           RU = RU)
+<a name="l01667"></a>01667   return
+<a name="l01668"></a>01668   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01669"></a>01669   <span class="keyword">contains</span>
+<a name="l01677"></a>01677     <span class="keywordtype">pure</span> <span class="keyword">subroutine </span><a class="code" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga758b5daf711f8241c6ccce4f5ba19931">rk_t_int_reshape1D</a>(N,Dt,KS,U,RU)
+<a name="l01678"></a>01678     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01679"></a>01679     <span class="keyword">implicit none</span>
+<a name="l01680"></a>01680     <span class="keywordtype">integer(I8P)</span>,            <span class="keywordtype">intent(IN)</span>::    N                             <span class="comment">!&lt; Number of finite volumes.</span>
+<a name="l01681"></a>01681     <span class="keywordtype">real(R_P)</span>,               <span class="keywordtype">intent(IN)</span>::    Dt(1:N)                       <span class="comment">!&lt; Time steps.</span>
+<a name="l01682"></a>01682     <span class="keywordtype">type(Type_Conservative)</span>, <span class="keywordtype">intent(IN)</span>::    KS(1:N,1:global%fluid%rk_ord) <span class="comment">!&lt; Runge-Kutta stages.</span>
+<a name="l01683"></a>01683     <span class="keywordtype">type(Type_Conservative)</span>, <span class="keywordtype">intent(INOUT)</span>:: U( 1:N)                       <span class="comment">!&lt; Current conservative variables.</span>
+<a name="l01684"></a>01684     <span class="keywordtype">real(R_P)</span>,               <span class="keywordtype">intent(OUT)</span>::   RU(1:global%fluid%Nc)         <span class="comment">!&lt; NormL2 of residuals of conservative variables.</span>
+<a name="l01685"></a>01685     <span class="keywordtype">type(Type_Conservative)</span>:: Ud,R                                         <span class="comment">!&lt; Dummy conservative variables.</span>
+<a name="l01686"></a>01686     <span class="keywordtype">integer(I8P)</span>::            i                                            <span class="comment">!&lt; Cell counter.</span>
+<a name="l01687"></a>01687     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01688"></a>01688 
+<a name="l01689"></a>01689     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01690"></a>01690     RU = 0._R_P
+<a name="l01691"></a>01691     <span class="comment">!$OMP PARALLEL DEFAULT(NONE)   &amp;</span>
+<a name="l01692"></a>01692     <span class="comment">!$OMP PRIVATE(i,s,Ud,R)        &amp;</span>
+<a name="l01693"></a>01693     <span class="comment">!$OMP SHARED(global,N,Dt,KS,U) &amp;</span>
+<a name="l01694"></a>01694     <span class="comment">!$OMP REDUCTION(+: RU)</span>
+<a name="l01695"></a>01695     call init_cons(Ns = global%fluid%Ns, cons = Ud)
+<a name="l01696"></a>01696     call init_cons(Ns = global%fluid%Ns, cons = R)
+<a name="l01697"></a>01697     <span class="comment">!$OMP DO</span>
+<a name="l01698"></a>01698     <span class="keyword">do</span> i=1,N
+<a name="l01699"></a>01699       call rk_time_integ(Dt=Dt(i),Un=U(i),KS=KS(i,1:global%fluid%rk_ord),Unp1=Ud)
+<a name="l01700"></a>01700       R = (Ud-U(i))/Dt(i) ; R = R*R ; RU = RU + cons2array(R)
+<a name="l01701"></a>01701       U(i) = Ud
+<a name="l01702"></a>01702     <span class="keyword">enddo</span>
+<a name="l01703"></a>01703     <span class="comment">!$OMP DO</span>
+<a name="l01704"></a>01704     <span class="keyword">do</span> i=1,global%fluid%Nc
+<a name="l01705"></a>01705      RU(i) = sqrt(RU(i))
+<a name="l01706"></a>01706     <span class="keyword">enddo</span>
+<a name="l01707"></a>01707     <span class="comment">!$OMP END PARALLEL</span>
+<a name="l01708"></a>01708     return
+<a name="l01709"></a>01709     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l01710"></a>01710 <span class="keyword">    endsubroutine rk_t_int_reshape1D</span>
+<a name="l01711"></a>01711 <span class="keyword">  endsubroutine rk_time_integration</span>
+<a name="l01712"></a>01712 <span class="keyword">endmodule Lib_Fluidynamic</span>
 </pre></div></div><!-- contents -->
 </div>
 <!-- window showing the filter options -->
@@ -1769,7 +1746,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
     <ul>
       <li class="navelem"><a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90.html">Lib_Fluidynamic.f90</a>      </li>
 
-    <li class="footer">Generated on Mon May 14 2012 17:45:55 for OFF by
+    <li class="footer">Generated on Thu May 24 2012 10:43:13 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

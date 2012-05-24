@@ -53,7 +53,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="../../index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="../../pages.html"><span>Compiling,&#160;Examples,&#160;Todos&#160;and&#160;Bugs</span></a></li>
+      <li><a href="../../pages.html"><span>README</span></a></li>
       <li><a href="../../modules.html"><span>API</span></a></li>
       <li><a href="../../files.html"><span>Source&#160;Files</span></a></li>
       <li><a href="../../dirs.html"><span>Directories</span></a></li>
@@ -122,6 +122,8 @@ Data Types</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Sum operator (+) overloading.  <a href="../../dd/d55/group__Interface.html#d8/d8d/interfaceData__Type__Conservative_1_1operator_07_09_08">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d55/group__Interface.html#db/de0/interfaceData__Type__Conservative_1_1operator_07-_08">operator(-)</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subtraction operator (-) overloading.  <a href="../../dd/d55/group__Interface.html#db/de0/interfaceData__Type__Conservative_1_1operator_07-_08">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d55/group__Interface.html#d6/d79/interfaceData__Type__Conservative_1_1operator_07_8dot_8_08">operator(.dot.)</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Dot product operator (.dot.) definition.  <a href="../../dd/d55/group__Interface.html#d6/d79/interfaceData__Type__Conservative_1_1operator_07_8dot_8_08">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d55/group__Interface.html#d9/dd6/interfaceData__Type__Conservative_1_1operator_07_2_08">operator(/)</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Division operator (/) overloading.  <a href="../../dd/d55/group__Interface.html#d9/dd6/interfaceData__Type__Conservative_1_1operator_07_2_08">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d55/group__Interface.html#d5/d23/interfaceData__Type__Conservative_1_1set">set</a></td></tr>
@@ -223,6 +225,32 @@ Private Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">elemental function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga51bd9c8b7910ec1d98825cb01b4596c3">cons_sub_ScalI2P</a> (cons, scal)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">elemental function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaf4d1ed6a541f50f5032d44dee2baebdd">ScalI1P_sub_cons</a> (scal, cons)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">elemental function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaef9f595a7098ea6b1386f79f86e15a22">cons_sub_ScalI1P</a> (cons, scal)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gae2ab475e30294b3677e0846c0b4c3c27">cons_dot_cons</a> (cons1, cons2)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the dot product of 2 conservative variables arrays.  <a href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gae2ab475e30294b3677e0846c0b4c3c27"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga817bb3e9f9ed814e4203a8712058c1b0">scalR8_dot_cons</a> (scal, cons)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the dot product of a scalar (R8P) array for a conservative variables one.  <a href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga817bb3e9f9ed814e4203a8712058c1b0"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gacea29ec704fc151e050aaca49953a40c">scalR4_dot_cons</a> (scal, cons)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the dot product of a scalar (R4P) array for a conservative variables one.  <a href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gacea29ec704fc151e050aaca49953a40c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga3ef8a00fff6e6c3a3a830471d8fdd87a">scalI8_dot_cons</a> (scal, cons)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the dot product of a scalar (I8P) array for a conservative variables one.  <a href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga3ef8a00fff6e6c3a3a830471d8fdd87a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gacef2528b369c5407beaa0f2fbb90cf09">scalI4_dot_cons</a> (scal, cons)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the dot product of a scalar (I4P) array for a conservative variables one.  <a href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gacef2528b369c5407beaa0f2fbb90cf09"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gad9e8434e2b3216821f9b7ab42df54f63">scalI2_dot_cons</a> (scal, cons)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the dot product of a scalar (I2P) array for a conservative variables one.  <a href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gad9e8434e2b3216821f9b7ab42df54f63"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaf801002c975dee9fbaf9df40517ae2c4">scalI1_dot_cons</a> (scal, cons)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the dot product of a scalar (I1P) array for a conservative variables one.  <a href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaf801002c975dee9fbaf9df40517ae2c4"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaab87dd653ff21683a54a293ee36f9ee1">cons_dot_scalR8</a> (cons, scal)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the dot product of a conservative variables one for a scalar (R8P) array.  <a href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaab87dd653ff21683a54a293ee36f9ee1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga12df2500ecfa2884d2285c4248bf240c">cons_dot_scalR4</a> (cons, scal)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the dot product of a conservative variables one for a scalar (R4P) array.  <a href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga12df2500ecfa2884d2285c4248bf240c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga6a21710ac0cfc0fd90c15c6e66a14456">cons_dot_scalI8</a> (cons, scal)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the dot product of a conservative variables one for a scalar (I8P) array.  <a href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga6a21710ac0cfc0fd90c15c6e66a14456"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga9e27e350e8e281e062f72c9cef9d2686">cons_dot_scalI4</a> (cons, scal)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the dot product of a conservative variables one for a scalar (I4P) array.  <a href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga9e27e350e8e281e062f72c9cef9d2686"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gad7503492c4298c5d5793eb4a6a34a940">cons_dot_scalI2</a> (cons, scal)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the dot product of a conservative variables one for a scalar (I2P) array.  <a href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gad7503492c4298c5d5793eb4a6a34a940"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga7a1c6a8eb84837b0c2347a1cb8fa10f8">cons_dot_scalI1</a> (cons, scal)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the dot product of a conservative variables one for a scalar (I1P) array.  <a href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga7a1c6a8eb84837b0c2347a1cb8fa10f8"></a><br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>This module contains the definition of <a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d91/structData__Type__Conservative_1_1Type__Conservative" title="Derived type containing conservative variables.">Type_Conservative</a> and its procedures. </p>
@@ -256,7 +284,7 @@ Private Member Functions</h2></td></tr>
     <ul>
       <li class="navelem"><a class="el" href="../../d7/d2e/classData__Type__Conservative.html">Data_Type_Conservative</a>      </li>
 
-    <li class="footer">Generated on Mon May 14 2012 17:45:57 for OFF by
+    <li class="footer">Generated on Thu May 24 2012 10:43:19 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

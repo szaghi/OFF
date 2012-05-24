@@ -224,3 +224,102 @@
 \form#223:$5^{th}$
 \form#224:$7^{th}$
 \form#225:$4^{th}$
+\form#226:$ {\rm D}= x_1 \cdot x_2 + y_1 \cdot y_2 + z_1 \cdot z_2 $
+\form#227:$ \begin{array}{l} \frac{\partial }{{\partial t}}\int_V {\rho dV} + \oint_{S\left( V \right)} {\left( {\rho \vec u} \right) \cdot \vec ndS} = 0 \\ \frac{\partial }{{\partial t}}\int_V {\left( {\rho \vec u} \right)dV} + \oint_{S\left( V \right)} {\left[ {\rho \vec u\vec u + p\overline{\overline I} - \left( {\frac{1}{{{\mathop{\rm Re}\nolimits} }} + {\upsilon _t}} \right)\overline{\overline \sigma } } \right] \cdot \vec ndS} = 0 \\ \frac{\partial }{{\partial t}}\int_V {EdV} + \oint_{S\left( V \right)} {\left[ {\left( {E + p} \right)\vec u - \left( {\frac{1}{{{\mathop{\rm Re}\nolimits} }} + {\upsilon _t}} \right)\overline{\overline \sigma } \cdot \vec u - \left( {k + {k_t}} \right)gradT} \right] \cdot \vec ndS} = 0 \end{array} $
+\form#228:$V$
+\form#229:$S(V)$
+\form#230:$\vec n$
+\form#231:$\vec u$
+\form#232:$\vec u \vec u$
+\form#233:$\vec u\vec v = \left[ {\begin{array}{*{20}{c}} {{u_1}{v_1}} & {{u_1}{v_2}} & {{u_1}{v_3}} \\ {{u_2}{v_1}} & {{u_2}{v_2}} & {{u_2}{v_3}} \\ {{u_3}{v_1}} & {{u_3}{v_2}} & {{u_3}{v_3}} \end{array}} \right]$
+\form#234:$p$
+\form#235:$\overline{\overline I}$
+\form#236:$E$
+\form#237:$T$
+\form#238:$\overline{\overline \sigma}$
+\form#239:$\upsilon _t$
+\form#240:$\mathop{\rm Re}$
+\form#241:$k$
+\form#242:$k_t$
+\form#243:$D$
+\form#244:$N_b$
+\form#245:$D^b$
+\form#246:$N_i \times N_j \times N_k$
+\form#247:$D_{ijk}^b$
+\form#248:$\bigcup D_{ijk}^b = D^b$
+\form#249:$ \begin{array}{l} \frac{\partial }{{\partial t}}\int_{{V_{ijk}}} {\rho dV} + \sum\limits_{s = 1}^6 {\int_{S_s} {\left( {\rho \vec u} \right) \cdot \vec ndS}} = 0 \\ \frac{\partial }{{\partial t}}\int_{{V_{ijk}}} {\left( {\rho \vec u} \right)dV} + \sum\limits_{s = 1}^6 {\int_{S_s} {\left[ {\rho \vec u\vec u + p\overline{\overline I} - \left( {\frac{1}{{{\mathop{\rm Re}\nolimits} }} + {\upsilon _t}} \right)\overline{\overline \sigma } } \right] \cdot \vec ndS}} = 0 \\ \frac{\partial }{{\partial t}}\int_{{V_{ijk}}} {EdV} + \sum\limits_{s = 1}^6 {\int_{S_s} {\left[ {\left( {E + p} \right)\vec u - \left( {\frac{1}{{{\mathop{\rm Re}\nolimits} }} + {\upsilon _t}} \right)\overline{\overline \sigma } \cdot \vec u - \left( {k + {k_t}} \right)gradT} \right] \cdot \vec ndS}} = 0 \end{array} \label{eq:rans-cons-num} $
+\form#250:$S_s$
+\form#251:$D_{ijk}$
+\form#252:$V_{ijk}$
+\form#253:$\frac{\partial }{{\partial t}}\int\limits_V {\overrightarrow U dV} + \oint\limits_S {\overline{\overline F} \cdot \overrightarrow n dS} = \int\limits_V {\overrightarrow {{Q_V}} dV} + \oint\limits_S {\overline{\overline {{Q_S}}} \cdot \overrightarrow n dS} $
+\form#254:$\overrightarrow U $
+\form#255:$\overline{\overline F}$
+\form#256:$\overrightarrow Q_V$
+\form#257:$\overline{\overline Q_S}$
+\form#258:${\overrightarrow Q_V}$
+\form#259:${\overline{\overline Q_S}}$
+\form#260:$\overrightarrow{Q_V}$
+\form#261:$\overline{\overline{Q_S}}$
+\form#262:$\overrightarrow U = \left[ {\begin{array}{*{20}{c}} \rho \\ {\rho \vec v}\\ {\rho E} \end{array}} \right]$
+\form#263:$\overline{\overline F} - \overline{\overline {{Q_S}}} = \left[ {\begin{array}{*{20}{c}} {\rho \vec v}\\ {\rho \vec v\vec v - \overline{\overline \sigma } }\\ {\rho \vec vE - \overline{\overline \sigma } \cdot \vec v - k\overrightarrow \nabla T} \end{array}} \right]$
+\form#264:$\overrightarrow {{Q_V}} = \left[ {\begin{array}{*{20}{c}} 0\\ {\rho \overrightarrow {{f_e}} }\\ {\rho \overrightarrow {{f_e}} \cdot \vec v + {q_h}} \end{array}} \right]$
+\form#265:$\frac{\partial }{{\partial t}}\int\limits_V {\overrightarrow U dV} + \oint\limits_{S(V)} {\overline{\overline F} \cdot \overrightarrow n dS} = \int\limits_V {\overrightarrow {{Q_V}} dV} + \oint\limits_{S(V)} {\overline{\overline {{Q_S}}} \cdot \overrightarrow n dS} $
+\form#266:$\vec v$
+\form#267:$\vec v \vec v$
+\form#268:$\overrightarrow{{f_e}}$
+\form#269:$q_h$
+\form#270:$ \overline{\overline \sigma} = -p\overline{\overline I}+ \overline{\overline \tau}$
+\form#271:$\overline{\overline \tau}$
+\form#272:$-k\overrightarrow \nabla T$
+\form#273:${\tau _{ij}} = \mu \left( {{\partial _i}{v_j} + {\partial _j}{v_i}} \right) + \lambda \left( {\overrightarrow \nabla \cdot \vec v} \right){\delta _{ij}}$
+\form#274:$\mu$
+\form#275:$\lambda = -\frac{2}{3}\mu$
+\form#276:$\delta_{ij}$
+\form#277:${\delta _{ij}} = \left\{ {\begin{array}{*{20}{c}} {0{\rm{,}}\;{\rm{if}}\;i \ne j}\\ {{\rm{1,}}\;{\rm{if}}\;i = j} \end{array}} \right.$
+\form#278:$\overline{\overline \tau } = 2\mu \frac{1}{2}\left( {\overrightarrow \nabla \vec v + \overrightarrow \nabla {{\vec v}^T}} \right) + \lambda \left( {\overrightarrow \nabla \cdot \vec v} \right)\overline{\overline I} $
+\form#279:$ \frac{1}{2}\left( {\overrightarrow \nabla \vec v + \overrightarrow \nabla {{\vec v}^T}} \right)$
+\form#280:$ p = \rho R T$
+\form#281:$R$
+\form#282:$ \gamma = \frac{c_p}{c_v} \,\, R = c_p -c_v \,\, c_p = \frac{\gamma R}{\gamma -1} \,\, c_p = \frac{R}{\gamma -1} $
+\form#283:$ \begin{array}{*{20}{c}} \gamma = \frac{c_p}{c_v} \\ R = c_p -c_v \\ c_p = \frac{\gamma R}{\gamma -1} \\ c_p = \frac{R}{\gamma -1} \end{array}$
+\form#284:$\begin{array}{*{20}{c}}\gamma = \frac{c_p}{c_v} \\ R = c_p -c_v \\ c_p = \frac{\gamma R}{\gamma -1} \\ c_p = \frac{R}{\gamma -1} \end{array}$
+\form#285:$ E = c_v T + \frac{|vec v|^2}{2} $
+\form#286:$ a = \sqrt{\frac{\gamma p}{\rho}} $
+\form#287:$ E = c_v T + \frac{|\vec v|^2}{2} $
+\form#288:$ E = c_v T + \frac{|\vec v|^2}{2} = \frac{p}{\rho(\gamma-1)} + \frac{|\vec v|^2}{2}$
+\form#289:$ H = c_p T + \frac{|\vec v|^2}{2} = \frac{\gamma p}{\rho(\gamma-1)} + \frac{|\vec v|^2}{2}= \frac{a^2}{\gamma-1} + \frac{|\vec v|^2}{2}$
+\form#290:$ L_0 $
+\form#291:$ T_0 $
+\form#292:$ \rho_0 $
+\form#293:$ a_0 = sqrt{\gamma R T} = v_0 $
+\form#294:$ E_0 = a_0^2 $
+\form#295:$ t_0 = \frac{L_0}{a_0} $
+\form#296:$ p_0 = \rho a_0^2 $
+\form#297:$ \tau_0 = \frac{\mu_0 a_0}{L_0} $
+\form#298:$ f_0 = \frac{a_0^2}{L_0} $
+\form#299:$ q_0 = \frac{a_0^3}{L_0} $
+\form#300:$\mu_0 = \mu (T_0)$
+\form#301:$ k_0 = k(\mu(T_0)) $
+\form#302:$\begin{array}{*{20}{c}} {\frac{\partial }{{\partial t}}\int\limits_V {\rho dV} + \oint\limits_S {\rho \vec v \cdot \overrightarrow n dS} = 0}\\ {\frac{\partial }{{\partial t}}\int\limits_V {\rho \vec vdV} + \oint\limits_S {\left[ {\left( {\rho \vec v\vec v + p\overline{\overline I} } \right) - \frac{1}{{{\mathop{\rm Re}\nolimits} }}\overline{\overline \tau } } \right] \cdot \overrightarrow n dS} = \int\limits_V {\rho \overrightarrow {{f_e}} dV} }\\ {\frac{\partial }{{\partial t}}\int\limits_V {\rho EdV} + \oint\limits_S {\left[ {\left( {\rho E + p} \right)\vec v - \frac{1}{{{\mathop{\rm Re}\nolimits} }}\overline{\overline \tau } \cdot \vec v - \frac{1}{{{\mathop{\rm Re}\nolimits} \Pr \left( {\gamma - 1} \right)}}k\overrightarrow \nabla T} \right] \cdot \overrightarrow n dS} = \int\limits_V {\left( {\rho \overrightarrow {{f_e}} \cdot \vec v + {q_h}} \right)dV} } \end{array}$
+\form#303:$Re$
+\form#304:$Re=\frac{\rho_0 v_0 L_0}{\mu_0}$
+\form#305:$Pr$
+\form#306:$Pr=\frac{\mu_0 c_p}{k_0}$
+\form#307:$\overline{\overline F} - \overline{\overline {{Q_S}}} = \left[ {\begin{array}{*{20}{c}} {\rho \vec v}\\ {\rho \vec v\vec v - \overline{\overline \sigma } }\\ {\rho E\vec v - \overline{\overline \sigma } \cdot \vec v - k\overrightarrow \nabla T} \end{array}} \right]$
+\form#308:$\frac{\partial }{{\partial t}}\int\limits_{{V_{ijk}}} {\overrightarrow U d{V_{ijk}}} + \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline F} \cdot \overrightarrow {{n_s}} d{S_s}} } = \int\limits_{{V_{ijk}}} {\overrightarrow {{Q_V}} d{V_{ijk}}} + \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline {{Q_S}}} \cdot \overrightarrow {{n_s}} d{S_s}} } $
+\form#309:$\overline{\overline F} - \overline{\overline {{Q_S}}} = \left[ {\begin{array}{*{20}{c}} {\rho \vec v}\\ {\rho \vec v\vec v + \overline{\overline I } }\\ {(\rho E+p)\vec v } \end{array}} \right]$
+\form#310:$(\overline{\overline F} - \overline{\overline {{Q_S}}})_{conv} = \left[ {\begin{array}{*{20}{c}} {\rho \vec v}\\ {\rho \vec v\vec v + p\overline{\overline I } }\\ {(\rho E+p)\vec v } \end{array}} \right]$
+\form#311:$\begin{array}{l} \frac{\partial }{{\partial t}}\int\limits_{{V_{ijk}}} {\overrightarrow U d{V_{ijk}}} = R\left( {\overrightarrow U } \right)\\ R\left( {\overrightarrow U } \right) = - \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline F} \cdot \overrightarrow {{n_s}} d{S_s}} } + \int\limits_{{V_{ijk}}} {\overrightarrow {{Q_V}} d{V_{ijk}}} + \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline {{Q_S}}} \cdot \overrightarrow {{n_s}} d{S_s}} } \end{array}$
+\form#312:$R\left({\overrightarrow U }\right)$
+\form#313:$\overrightarrow P = \left[ {\begin{array}{*{20}{c}} \rho \\ {v}\\ {p} \end{array}} \right]=\left[ {\begin{array}{*{20}{c}} 1 \\ 0\\ 1 \end{array}} \right]$
+\form#314:$\overrightarrow P = \left[ {\begin{array}{*{20}{c}} \rho \\ {v}\\ {p} \end{array}} \right]=\left[ {\begin{array}{*{20}{c}} 0.125 \\ 0\\ 0.1 \end{array}} \right]$
+\form#315:$ \frac{\partial }{{\partial t}}\int\limits_{{V_{ijk}}} {\overrightarrow U d{V_{ijk}}} = R\left( {\overrightarrow U } \right) $
+\form#316:$ U\left( {x,t = 0} \right) = {U_0}\left( x \right) = \left\{ \begin{array}{l} {U_L}\,x < x_0\\ {U_R}\,x > x_0 \end{array} \right. $
+\form#317:$P_L = \left[ {\begin{array}{*{20}{c}} \rho \\ {v}\\ {p} \end{array}} \right]=\left[ {\begin{array}{*{20}{c}} 1 \\ 0\\ 1 \end{array}} \right]$
+\form#318:$P_R = \left[ {\begin{array}{*{20}{c}} \rho \\ {v}\\ {p} \end{array}} \right]=\left[ {\begin{array}{*{20}{c}} 0.125 \\ 0\\ 0.1 \end{array}} \right]$
+\form#319:$U_L$
+\form#320:$U_R$
+\form#321:$x_0$
+\form#322:$v$
+\form#323:$v \pm a$
+\form#324:$a=\sqrt{\frac{\gamma p}{\rho}}$

@@ -146,8 +146,9 @@ ifeq "$(COMPILER)" "gnu"
   # debug
   ifeq "$(DEBUG)" "yes"
     PREPROC := $(PREPROC) -DDEBUG
-    OPTSC := $(OPTSC) -O0 -Wall -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow,precision,denormal -Warray-temporaries
-    OPTSL := $(OPTSL) -O0 -Wall -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow,precision,denormal -Warray-temporaries
+    OPTSC := $(OPTSC) -O0 -Wall -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow,precision,denormal
+    OPTSL := $(OPTSL) -O0 -Wall -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow,precision,denormal
+#-Warray-temporaries
   endif
   # standard
   ifeq "$(F03STD)" "yes"
@@ -701,7 +702,8 @@ $(DOBJ)lib_riemann.o : Lib_Riemann.f90 \
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_runge_kutta.o : Lib_Runge_Kutta.f90 \
-	$(DOBJ)ir_precision.o
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_conservative.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 

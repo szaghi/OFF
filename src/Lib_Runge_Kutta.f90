@@ -40,7 +40,8 @@
 !> @ingroup Library
 module Lib_Runge_Kutta
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                                                 ! Integers and reals precision definition.
+USE IR_Precision           ! Integers and reals precision definition.
+USE Data_Type_Conservative ! Definition of Type_Conservative.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -164,37 +165,37 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine rk_init
 
-  !> Function for computing \f$s1^{th}\f$ Runge-Kutta stage.
-  pure function rk_stage(s1,Dt,un,KS) result (Ks1)
+  !> Subroutine for computing \f$s1^{th}\f$ Runge-Kutta stage.
+  pure subroutine rk_stage(s1,Dt,Un,KS,KS1)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN):: s1         !< Current Runge-Kutta stage number.
-  real(R_P),    intent(IN):: Dt         !< Current time step.
-  real(R_P),    intent(IN):: un         !< Current integrating variable.
-  real(R_P),    intent(IN):: KS(1:s1-1) !< Previous Runge-Kutta stages.
-  real(R_P)::                Ks1        !< Current Runge-Kutta stage.
+  integer(I_P),            intent(IN)::    s1         !< Current Runge-Kutta stage number.
+  real(R_P),               intent(IN)::    Dt         !< Current time step.
+  type(Type_Conservative), intent(IN)::    Un         !< Current integrating variable.
+  type(Type_Conservative), intent(IN)::    KS(1:s1-1) !< Previous Runge-Kutta stages.
+  type(Type_Conservative), intent(INOUT):: KS1        !< Current Runge-Kutta stage.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  Ks1 = un + Dt*dot_product(c2(s1,1:s1-1),KS(1:s1-1))
+  Ks1 = Un + Dt*(c2(s1,1:s1-1).dot.KS(1:s1-1))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction rk_stage
+  endsubroutine rk_stage
 
-  !> Function for computing Runge-Kutta one time step integration \f$u^{n+1}\f$.
-  pure function rk_time_integ(Dt,un,KS) result(unp1)
+  !> Subroutine for computing Runge-Kutta one time step integration \f$u^{n+1}\f$.
+  pure subroutine rk_time_integ(Dt,Un,KS,Unp1)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN):: Dt    !< Current time step.
-  real(R_P), intent(IN):: un    !< Current integrating variable.
-  real(R_P), intent(IN):: KS(:) !< Runge-Kutta stages.
-  real(R_P)::             unp1  !< Time-integrated variable.
+  real(R_P),               intent(IN)::    Dt    !< Current time step.
+  type(Type_Conservative), intent(IN)::    un    !< Current integrating variable.
+  type(Type_Conservative), intent(IN)::    KS(:) !< Runge-Kutta stages.
+  type(Type_Conservative), intent(INOUT):: Unp1  !< Time-integrated variable.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  unp1 = un + Dt*dot_product(c1,KS)
+  Unp1 = Un + Dt*(c1.dot.KS)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction rk_time_integ
+  endsubroutine rk_time_integ
   !> @}
 endmodule Lib_Runge_Kutta

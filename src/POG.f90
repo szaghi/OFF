@@ -151,8 +151,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! initializing solution file name to "undefined" in order to capture when only mesh is to be post-processed
-  global%file%File_Sol = "undefined"
+  ! initializing solution file name to "unset" in order to capture when only mesh is to be post-processed
+  global%file%File_Sol = "unset"
   Nca = command_argument_count()
   if (Nca==0) then
     write(stderr,'(A)')' Error: no argument has been passed to command line'

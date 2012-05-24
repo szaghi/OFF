@@ -210,13 +210,23 @@ contains
   ! initializing tecplot file
   if (pp_format%binary) then
 #ifdef TECIO
-    err = tecini112(tecendrec,trim(tecvarname)//tecendrec,trim(filename)//tecendrec,'.'//tecendrec,0,0,1)
+    if (filename(len_trim(filename)-4:len_trim(filename))/=".plt") then
+      err = tecini112(tecendrec,trim(tecvarname)//tecendrec,trim(filename)//".plt"//tecendrec,'.'//tecendrec,0,0,1)
+    else
+      err = tecini112(tecendrec,trim(tecvarname)//tecendrec,trim(filename)//tecendrec,'.'//tecendrec,0,0,1)
+    endif
     err = tecauxstr112("Time"//tecendrec,trim(str(n=global%fluid%t))//tecendrec)
 #else
     write(stderr,'(A)') 'Error: your are trying to save binary tecplot file without compiling against the Tecplot library.'
     stop
 #endif
   else
+    tecunit = Get_Unit()
+    if (filename(len_trim(filename)-4:len_trim(filename))/=".dat") then
+      open(unit=tecunit,file=trim(filename)//".dat")
+    else
+      open(unit=tecunit,file=trim(filename))
+    endif
     write(tecunit,'(A)',iostat=err)trim(tecvarname)
   endif
   ! writing data blocks
@@ -285,9 +295,6 @@ contains
       else
         write(tecvarform,'(A)')'('//trim(str(no_sign=.true.,n=3))//'('//FR_P//',1X))'
       endif
-      ! output logical unit
-      tecunit = Get_Unit()
-      open(unit=tecunit,file=trim(filename),iostat=err)
       ! variables location
       if (.not.meshonly) then
         if (pp_format%node) then

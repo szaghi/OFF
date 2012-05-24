@@ -196,7 +196,7 @@ contains
   !> Subroutine for converting conservative variables to primitive variables of all cells of a block.
   !> @note Only the inner cells of the block are converted.
   !> @ingroup Lib_FluidynamicPublicProcedure
-  subroutine conservative2primitive(global,block)
+  pure subroutine conservative2primitive(global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Global), intent(IN)::    global !< Global-level data (see \ref Data_Type_Globals::Type_Global "Type_Global" definition).
@@ -1596,14 +1596,12 @@ contains
 
   !> Subroutine for summing Runge-Kutta stages for updating primitive variables (block\%fluid\%P).
   !> @ingroup Lib_FluidynamicPrivateProcedure
-  subroutine rk_stages_sum(s1,global,block)
+  pure subroutine rk_stages_sum(s1,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I_P),      intent(IN)::    s1      !< Current Runge-Kutta stage.
   type(Type_Global), intent(IN)::    global  !< Global-level data.
   type(Type_Block),  intent(INOUT):: block   !< Block-level data.
-  type(Type_Conservative)::          U,rksum !< Dummy conservative varibales.
-  integer(I_P)::                     i,j,k,s !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1622,7 +1620,7 @@ contains
     !> one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping
     !> there is only one index.
     !> @ingroup Lib_FluidynamicPrivateProcedure
-    subroutine rk_stg_reshape1D(N,Dt,U,KS,P)
+    pure subroutine rk_stg_reshape1D(N,Dt,U,KS,P)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
     integer(I8P),            intent(IN)::    N              !< Number of finite volumes.
@@ -1631,28 +1629,17 @@ contains
     type(Type_Conservative), intent(IN)::    KS(1:N,1:s1-1) !< Runge-Kutta stages.
     type(Type_Primitive),    intent(INOUT):: P( 1:N)        !< Updated primitive variables.
     type(Type_Conservative):: Ud                            !< Dummy conservative variablew.
-    real(R_P)::               KSd(1:global%fluid%Nc,1:s1-1) !< Dummy Runge-Kutta stages.
     integer(I8P)::            i                             !< Cell counter.
-    integer(I_P)::            s                             !< Counter.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
     !$OMP PARALLEL DEFAULT(NONE) &
-    !$OMP PRIVATE(i,s,Ud,KSd)    &
-    !$OMP SHARED(s1,global,N,Dt,U,KS,P)
+    !$OMP PRIVATE(i,s,Ud)        &
+    !$OMP SHARED(global,s1,N,Dt,U,KS,P)
     call init_cons(Ns = global%fluid%Ns, cons = Ud)
     !$OMP DO
     do i=1,N
-      do s=1,s1-1
-        KSd(1:global%fluid%Nc,s) = cons2array(KS(i,s))
-      enddo
-      do s=1,global%fluid%Ns
-       Ud%rs(s) = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%rs(s),KS=KSd(s,1:s1-1))
-      enddo
-      Ud%rv%x = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%rv%x,KS=KS(i,1:s1-1)%rv%x)
-      Ud%rv%y = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%rv%y,KS=KS(i,1:s1-1)%rv%y)
-      Ud%rv%z = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%rv%z,KS=KS(i,1:s1-1)%rv%z)
-      Ud%re   = rk_stage(s1=s1,Dt=Dt(i),un=U(i)%re  ,KS=KS(i,1:s1-1)%re  )
+      call rk_stage(s1=s1,Dt=Dt(i),Un=U(i),KS=KS(i,1:s1-1),KS1=Ud)
       call cons2prim(cp0 = global%fluid%cp0, cv0 = global%fluid%cv0, cons = Ud, prim = P(i))
     enddo
     !$OMP END PARALLEL
@@ -1663,21 +1650,20 @@ contains
 
   !> Subroutine for computing Runge-Kutta one time step integration.
   !> @ingroup Lib_FluidynamicPrivateProcedure
-  subroutine rk_time_integration(global,block,RU)
+  pure subroutine rk_time_integration(global,block,RU)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Global), intent(IN)::    global                !< Global-level data.
   type(Type_Block),  intent(INOUT):: block                 !< Block-level data.
   real(R_P),         intent(OUT)::   RU(1:global%fluid%Nc) !< NormL2 of residuals of conservative variables.
-  type(Type_Conservative)::          rksum                 !< Dummy conservative varibale.
-  integer(I_P)::                     i,j,k,s               !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   call rk_t_int_reshape1D(N  = int(block%mesh%Ni*block%mesh%Nj*block%mesh%Nk,I8P),                                    &
                           Dt = block%fluid%Dt(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk                      ), &
                           KS = block%fluid%KS(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk,1:global%fluid%rk_ord), &
-                          U  = block%fluid%U (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk                      ))
+                          U  = block%fluid%U (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk                      ), &
+                          RU = RU)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   contains
@@ -1688,44 +1674,35 @@ contains
     !> one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping
     !> there is only one index.
     !> @ingroup Lib_FluidynamicPrivateProcedure
-    subroutine rk_t_int_reshape1D(N,Dt,KS,U)
+    pure subroutine rk_t_int_reshape1D(N,Dt,KS,U,RU)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
     integer(I8P),            intent(IN)::    N                             !< Number of finite volumes.
     real(R_P),               intent(IN)::    Dt(1:N)                       !< Time steps.
     type(Type_Conservative), intent(IN)::    KS(1:N,1:global%fluid%rk_ord) !< Runge-Kutta stages.
     type(Type_Conservative), intent(INOUT):: U( 1:N)                       !< Current conservative variables.
+    real(R_P),               intent(OUT)::   RU(1:global%fluid%Nc)         !< NormL2 of residuals of conservative variables.
     type(Type_Conservative):: Ud,R                                         !< Dummy conservative variables.
-    real(R_P)::               KSd(1:global%fluid%Nc,1:global%fluid%rk_ord) !< Dummy Runge-Kutta stages.
     integer(I8P)::            i                                            !< Cell counter.
-    integer(I_P)::            s                                            !< Counter.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
     RU = 0._R_P
     !$OMP PARALLEL DEFAULT(NONE)   &
-    !$OMP PRIVATE(i,s,Ud,R,KSd)    &
+    !$OMP PRIVATE(i,s,Ud,R)        &
     !$OMP SHARED(global,N,Dt,KS,U) &
     !$OMP REDUCTION(+: RU)
     call init_cons(Ns = global%fluid%Ns, cons = Ud)
+    call init_cons(Ns = global%fluid%Ns, cons = R)
     !$OMP DO
     do i=1,N
-      do s=1,global%fluid%rk_ord
-        KSd(1:global%fluid%Nc,s) = cons2array(KS(i,s))
-      enddo
-      do s=1,global%fluid%Ns
-        Ud%rs(s) = rk_time_integ(Dt=Dt(i),un=U(i)%rs(s),KS=KSd(s,1:global%fluid%rk_ord))
-      enddo
-      Ud%rv%x = rk_time_integ(Dt=Dt(i),un=U(i)%rv%x,KS=KS(i,1:global%fluid%rk_ord)%rv%x)
-      Ud%rv%y = rk_time_integ(Dt=Dt(i),un=U(i)%rv%y,KS=KS(i,1:global%fluid%rk_ord)%rv%y)
-      Ud%rv%z = rk_time_integ(Dt=Dt(i),un=U(i)%rv%z,KS=KS(i,1:global%fluid%rk_ord)%rv%z)
-      Ud%re   = rk_time_integ(Dt=Dt(i),un=U(i)%re,  KS=KS(i,1:global%fluid%rk_ord)%re  )
+      call rk_time_integ(Dt=Dt(i),Un=U(i),KS=KS(i,1:global%fluid%rk_ord),Unp1=Ud)
       R = (Ud-U(i))/Dt(i) ; R = R*R ; RU = RU + cons2array(R)
       U(i) = Ud
     enddo
     !$OMP DO
-    do s=1,global%fluid%Nc
-     RU(s) = sqrt(RU(s))
+    do i=1,global%fluid%Nc
+     RU(i) = sqrt(RU(i))
     enddo
     !$OMP END PARALLEL
     return

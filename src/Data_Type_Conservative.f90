@@ -33,6 +33,7 @@ public:: operator (*)
 public:: operator (/)
 public:: operator (+)
 public:: operator (-)
+public:: operator (.dot.)
 public:: cons2array,array2cons
 !-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -271,6 +272,15 @@ interface operator (-)
   module procedure cons_sub_ScalI4P
   module procedure cons_sub_ScalI2P
   module procedure cons_sub_ScalI1P
+endinterface
+!> @brief Dot product operator (.dot.) definition.
+!> This operator is defined as:
+!> \f$ {\rm D}= x_1 \cdot x_2 + y_1 \cdot y_2 + z_1 \cdot z_2 \f$
+!> @ingroup Interface
+interface operator (.dot.)
+  module procedure cons_dot_cons
+  module procedure scalR8_dot_cons,scalR4_dot_cons,scalI8_dot_cons,scalI4_dot_cons,scalI2_dot_cons,scalI1_dot_cons
+  module procedure cons_dot_scalR8,cons_dot_scalR4,cons_dot_scalI8,cons_dot_scalI4,cons_dot_scalI2,cons_dot_scalI1
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
@@ -1949,6 +1959,266 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sub_ScalI1P
+
+  !> Function for computing the dot product of 2 conservative variables arrays.
+  pure function cons_dot_cons(cons1,cons2) result(dot)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Conservative), intent(IN):: cons1(:) ! First conservative variables.
+  type(Type_Conservative), intent(IN):: cons2(:) ! Second conservative variables.
+  type(Type_Conservative)::             dot      ! Dot product.
+  integer(I4P)::                        i        ! Array elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(dot%rs(1:size(cons1(1)%rs)))
+  dot = 0._R_P
+  do i=1,min(size(cons1),size(cons2))
+    dot = dot + cons1(i)*cons2(i)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction cons_dot_cons
+
+  !> Function for computing the dot product of a scalar (R8P) array for a conservative variables one.
+  pure function scalR8_dot_cons(scal,cons) result(dot)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  real(R8P),               intent(IN):: scal(:) ! Scalar array.
+  type(Type_Conservative), intent(IN):: cons(:) ! Conservative variables.
+  type(Type_Conservative)::             dot     ! Dot product.
+  integer(I4P)::                        i       ! Array elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(dot%rs(1:size(cons(1)%rs)))
+  dot = 0._R_P
+  do i=1,min(size(scal),size(cons))
+    dot = dot + scal(i)*cons(i)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction scalR8_dot_cons
+
+  !> Function for computing the dot product of a scalar (R4P) array for a conservative variables one.
+  pure function scalR4_dot_cons(scal,cons) result(dot)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  real(R4P),               intent(IN):: scal(:) ! Scalar array.
+  type(Type_Conservative), intent(IN):: cons(:) ! Conservative variables.
+  type(Type_Conservative)::             dot     ! Dot product.
+  integer(I4P)::                        i       ! Array elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(dot%rs(1:size(cons(1)%rs)))
+  dot = 0._R_P
+  do i=1,min(size(scal),size(cons))
+    dot = dot + scal(i)*cons(i)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction scalR4_dot_cons
+
+  !> Function for computing the dot product of a scalar (I8P) array for a conservative variables one.
+  pure function scalI8_dot_cons(scal,cons) result(dot)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I8P),            intent(IN):: scal(:) ! Scalar array.
+  type(Type_Conservative), intent(IN):: cons(:) ! Conservative variables.
+  type(Type_Conservative)::             dot     ! Dot product.
+  integer(I4P)::                        i       ! Array elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(dot%rs(1:size(cons(1)%rs)))
+  dot = 0._R_P
+  do i=1,min(size(scal),size(cons))
+    dot = dot + scal(i)*cons(i)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction scalI8_dot_cons
+
+  !> Function for computing the dot product of a scalar (I4P) array for a conservative variables one.
+  pure function scalI4_dot_cons(scal,cons) result(dot)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I4P),            intent(IN):: scal(:) ! Scalar array.
+  type(Type_Conservative), intent(IN):: cons(:) ! Conservative variables.
+  type(Type_Conservative)::             dot     ! Dot product.
+  integer(I4P)::                        i       ! Array elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(dot%rs(1:size(cons(1)%rs)))
+  dot = 0._R_P
+  do i=1,min(size(scal),size(cons))
+    dot = dot + scal(i)*cons(i)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction scalI4_dot_cons
+
+  !> Function for computing the dot product of a scalar (I2P) array for a conservative variables one.
+  pure function scalI2_dot_cons(scal,cons) result(dot)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I2P),            intent(IN):: scal(:) ! Scalar array.
+  type(Type_Conservative), intent(IN):: cons(:) ! Conservative variables.
+  type(Type_Conservative)::             dot     ! Dot product.
+  integer(I4P)::                        i       ! Array elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(dot%rs(1:size(cons(1)%rs)))
+  dot = 0._R_P
+  do i=1,min(size(scal),size(cons))
+    dot = dot + scal(i)*cons(i)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction scalI2_dot_cons
+
+  !> Function for computing the dot product of a scalar (I1P) array for a conservative variables one.
+  pure function scalI1_dot_cons(scal,cons) result(dot)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I1P),            intent(IN):: scal(:) ! Scalar array.
+  type(Type_Conservative), intent(IN):: cons(:) ! Conservative variables.
+  type(Type_Conservative)::             dot     ! Dot product.
+  integer(I4P)::                        i       ! Array elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(dot%rs(1:size(cons(1)%rs)))
+  dot = 0._R_P
+  do i=1,min(size(scal),size(cons))
+    dot = dot + scal(i)*cons(i)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction scalI1_dot_cons
+
+  !> Function for computing the dot product of a conservative variables one for a scalar (R8P) array.
+  pure function cons_dot_scalR8(cons,scal) result(dot)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Conservative), intent(IN):: cons(:) ! Conservative variables.
+  real(R8P),               intent(IN):: scal(:) ! Scalar array.
+  type(Type_Conservative)::             dot     ! Dot product.
+  integer(I4P)::                        i       ! Array elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(dot%rs(1:size(cons(1)%rs)))
+  dot = 0._R_P
+  do i=1,min(size(scal),size(cons))
+    dot = dot + scal(i)*cons(i)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction cons_dot_scalR8
+
+  !> Function for computing the dot product of a conservative variables one for a scalar (R4P) array.
+  pure function cons_dot_scalR4(cons,scal) result(dot)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Conservative), intent(IN):: cons(:) ! Conservative variables.
+  real(R4P),               intent(IN):: scal(:) ! Scalar array.
+  type(Type_Conservative)::             dot     ! Dot product.
+  integer(I4P)::                        i       ! Array elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(dot%rs(1:size(cons(1)%rs)))
+  dot = 0._R_P
+  do i=1,min(size(scal),size(cons))
+    dot = dot + scal(i)*cons(i)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction cons_dot_scalR4
+
+  !> Function for computing the dot product of a conservative variables one for a scalar (I8P) array.
+  pure function cons_dot_scalI8(cons,scal) result(dot)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Conservative), intent(IN):: cons(:) ! Conservative variables.
+  integer(I8P),            intent(IN):: scal(:) ! Scalar array.
+  type(Type_Conservative)::             dot     ! Dot product.
+  integer(I4P)::                        i       ! Array elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(dot%rs(1:size(cons(1)%rs)))
+  dot = 0._R_P
+  do i=1,min(size(scal),size(cons))
+    dot = dot + scal(i)*cons(i)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction cons_dot_scalI8
+
+  !> Function for computing the dot product of a conservative variables one for a scalar (I4P) array.
+  pure function cons_dot_scalI4(cons,scal) result(dot)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Conservative), intent(IN):: cons(:) ! Conservative variables.
+  integer(I4P),            intent(IN):: scal(:) ! Scalar array.
+  type(Type_Conservative)::             dot     ! Dot product.
+  integer(I4P)::                        i       ! Array elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(dot%rs(1:size(cons(1)%rs)))
+  dot = 0._R_P
+  do i=1,min(size(scal),size(cons))
+    dot = dot + scal(i)*cons(i)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction cons_dot_scalI4
+
+  !> Function for computing the dot product of a conservative variables one for a scalar (I2P) array.
+  pure function cons_dot_scalI2(cons,scal) result(dot)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Conservative), intent(IN):: cons(:) ! Conservative variables.
+  integer(I2P),            intent(IN):: scal(:) ! Scalar array.
+  type(Type_Conservative)::             dot     ! Dot product.
+  integer(I4P)::                        i       ! Array elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(dot%rs(1:size(cons(1)%rs)))
+  dot = 0._R_P
+  do i=1,min(size(scal),size(cons))
+    dot = dot + scal(i)*cons(i)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction cons_dot_scalI2
+
+  !> Function for computing the dot product of a conservative variables one for a scalar (I1P) array.
+  pure function cons_dot_scalI1(cons,scal) result(dot)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Conservative), intent(IN):: cons(:) ! Conservative variables.
+  integer(I1P),            intent(IN):: scal(:) ! Scalar array.
+  type(Type_Conservative)::             dot     ! Dot product.
+  integer(I4P)::                        i       ! Array elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(dot%rs(1:size(cons(1)%rs)))
+  dot = 0._R_P
+  do i=1,min(size(scal),size(cons))
+    dot = dot + scal(i)*cons(i)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction cons_dot_scalI1
   !> @}
 
   !> @ingroup Data_Type_ConservativePublicProcedure

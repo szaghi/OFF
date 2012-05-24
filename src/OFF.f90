@@ -28,8 +28,8 @@
 !> @brief @off is an Open source Finite volumes Fluid dynamics code.
 !> It is written in in standard (compliant) Fortran 2003 with highly modularity as design target. \n
 !>
-!> The aim of @off is to solve, numerically, the compressible Navier-Stokes equations of fluid dynamics by means of Finite Volumes
-!> techniques.
+!> The aim of @off is to solve, numerically, the compressible Navier-Stokes equations of fluid dynamics
+!> (\ref Equations "see governing equations") by means of Finite Volumes techniques.
 !> The main features of @off code are the following:
 !> - Finite Volume, Godunov-like scheme based on Euler conservation Laws written in fully conservative formulation:
 !>   - the extension to viscous Navier-Stokes equations is under developing;
@@ -73,6 +73,10 @@
 !> @version   0.0.5
 !> @date      2012-04-24
 !> @copyright GNU Public License version 3.
+!> @note
+!> <b>Compiling Instructions</b> \n
+!> @off is shipped with a makefile for compiling the codes on Unix/GNU Linux architectures. Other OS are not supported.
+!> For more details see \ref Compiling "Compiling Instructions".
 !> @bug <b>Multi-grid Models</b>: \n Multi-grid time convergence acceleration has been developed, but it is affected by some bugs
 !>                                that <em>blow up</em> steady simulations.
 !> @todo \b NavierStokesEq: Extension to viscous Navier-Stokes equations
@@ -82,10 +86,6 @@
 !> @todo \b Chimera: Introducing blocks overlapping, overset (Chimera) model
 !> @todo \b GPU: Introducing fine, local parallelism by means of GPU programming (e.g. CUDA framework)
 !> @todo \b DocImprove: Improve the documentation
-!> @note
-!> <b>Compiling Instructions</b> \n
-!> @off is shipped with a makefile for compiling the codes on Unix/GNU Linux architectures. Other OS are not supported.
-!> For more details see \ref Compiling "Compiling Instructions".
 !> @ingroup Program
 program OFF
 !-----------------------------------------------------------------------------------------------------------------------------------

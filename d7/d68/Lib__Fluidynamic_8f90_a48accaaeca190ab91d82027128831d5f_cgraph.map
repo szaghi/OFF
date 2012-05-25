@@ -1,8 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$d7/d68/Lib__Fluidynamic_8f90.html#aef477167f825c3906129fd9265aeba87" title="set_ext_l" alt="" coords="345,5,420,35"/>
-<area shape="rect" id="node5" href="$d7/d68/Lib__Fluidynamic_8f90.html#a998c9c57c2c6c5179a166811ea9f1259" title="set_ext_r" alt="" coords="345,188,420,217"/>
-<area shape="rect" id="node7" href="$d7/d68/Lib__Fluidynamic_8f90.html#ac535f74269fbbe7145d18f56d56c1955" title="set_in1" alt="" coords="117,155,181,184"/>
-<area shape="rect" id="node10" href="$d7/d68/Lib__Fluidynamic_8f90.html#af72f6fa8ab8c25cffe5cf166ffecc950" title="set_ref_r" alt="" coords="347,85,419,115"/>
-<area shape="rect" id="node12" href="$d7/d68/Lib__Fluidynamic_8f90.html#ae5c4c82f162bd43ce5c612105ec3acbd" title="set_per" alt="" coords="231,85,295,115"/>
-<area shape="rect" id="node18" href="$d7/d68/Lib__Fluidynamic_8f90.html#ad7a3dee2ae4e8c52913831b0cc383f25" title="set_ref_l" alt="" coords="347,265,419,295"/>
-</map>

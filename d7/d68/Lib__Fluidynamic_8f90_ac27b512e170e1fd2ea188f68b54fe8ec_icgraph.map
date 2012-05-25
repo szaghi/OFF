@@ -1,0 +1,10 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gabc9e93106542597ca7c9f624e849e93f" title="Subroutine for computing the residuals." alt="" coords="151,5,327,35"/>
+<area shape="rect" id="node5" href="$d6/dec/group__Library.html#a0f74f26511b1784ab74d10cfff281bd5" title="Approximate Riemann solver based on Adaptive (non iterative) PVL&#45;TR&#45;TS algorithm." alt="" coords="127,59,351,88"/>
+<area shape="rect" id="node7" href="$d6/dec/group__Library.html#a486558b503e2b46780895fdd5ec8814c" title="Exact Riemann solver based on iterative solution of u&#45;function." alt="" coords="120,112,357,141"/>
+<area shape="rect" id="node9" href="$d6/dec/group__Library.html#a8a96ea1f260aa987f7b83ad3f9358b09" title="Approximate Riemann solver based on Primitive Variables Linearization algorithm." alt="" coords="132,165,345,195"/>
+<area shape="rect" id="node11" href="$d6/dec/group__Library.html#a48672e75faf94cd0e36d6a23138d2f26" title="Approximate Riemann solver based on Roe linearization." alt="" coords="133,219,344,248"/>
+<area shape="rect" id="node13" href="$d6/dec/group__Library.html#a15031c97727c91635d174d005dcc54df" title="Lib_Riemann::sampling_fluxes" alt="" coords="139,272,339,301"/>
+<area shape="rect" id="node15" href="$d6/dec/group__Library.html#a8a4a337227f0dba571865ab597799161" title="Lib_Riemann::sampling_fluxes_old" alt="" coords="127,325,351,355"/>
+<area shape="rect" id="node17" href="$d6/dec/group__Library.html#a197ffaaf0a956294c472dbaff73bbd21" title="Lib_Riemann::sampling_fluxes_vacuum" alt="" coords="112,379,365,408"/>
+</map>

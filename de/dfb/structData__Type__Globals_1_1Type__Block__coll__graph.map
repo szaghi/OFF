@@ -1,0 +1,5 @@
+<map id="G" name="G">
+<area shape="rect" id="node2" href="$dd/dfd/group__DerivedType.html#db/df1/structData__Type__Globals_1_1Type__Fluid__Block" title="Derived type containing the block&#45;level fluid dynamic data." alt="" coords="8,5,256,35"/>
+<area shape="rect" id="node4" href="$d4/da2/classData__Type__Globals.html#d9/ddc/structData__Type__Globals_1_1Type__Mesh__Block" title="Derived type containing the block&#45;level mesh data." alt="" coords="5,100,259,129"/>
+<area shape="rect" id="node7" href="$dd/dfd/group__DerivedType.html#d2/deb/structData__Type__Globals_1_1Type__BC__Block" title="Derived type containing the block&#45;level boundary conditions data." alt="" coords="12,153,252,183"/>
+</map>

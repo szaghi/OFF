@@ -10,5 +10,6 @@ var searchData=
   ['dr4p',['DR4P',['../da/dd4/group__IR__Precision.html#gad94596d4db4590f036a9f8dcec2169b8',1,'IR_Precision']]],
   ['dr8p',['DR8P',['../da/dd4/group__IR__Precision.html#gae87422d7f403e6fad4887d0f3d7c84f0',1,'IR_Precision']]],
   ['dr_5fp',['DR_P',['../da/dd4/group__IR__Precision.html#gadd4afb826e043512c74ac5c6f62c1eba',1,'IR_Precision']]],
-  ['dt',['Dt',['../dd/dfd/group__DerivedType.html#a892302aa6542dbed0eb2e5d1bf12079e',1,'Data_Type_Globals::Type_Fluid_Block']]]
+  ['dt',['Dt',['../dd/dfd/group__DerivedType.html#a892302aa6542dbed0eb2e5d1bf12079e',1,'Data_Type_Globals::Type_Fluid_Block']]],
+  ['dt0',['Dt0',['../dd/dfd/group__DerivedType.html#a1d2a942c06108be068274d42d2bb2b20',1,'Data_Type_Globals::Type_Adimensional_Global']]]
 ];

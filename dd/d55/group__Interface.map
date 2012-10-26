@@ -1,7 +1,5 @@
 <map id="structs" name="structs">
-<area shape="rect" id="node1" href="$d3/de1/group__Data__Type__GlobalsPublicProcedure.html" title="Data_Type_Globals" alt="" coords="332,23,468,52"/>
-<area shape="rect" id="node3" href="$d5/d47/group__Lib__VTK__IOPublicProcedure.html" title="Lib_VTK_IO" alt="" coords="353,157,447,187"/>
-<area shape="rect" id="node4" href="$d7/d79/group__IR__PrecisionPublicProcedure.html" title="IR_Precision" alt="" coords="352,240,448,269"/>
-<area shape="rect" id="node5" href="$dd/d22/group__Data__Type__ConservativePublicProcedure.html" title="Data_Type_Conservative" alt="" coords="315,305,485,335"/>
-<area shape="rect" id="node6" href="$db/daa/group__Data__Type__BCPublicProcedure.html" title="Data_Type_BC" alt="" coords="344,388,456,417"/>
+<area shape="rect" id="node1" href="$d3/de1/group__Data__Type__GlobalsPublicProcedure.html" title="Data_Type_Globals" alt="" coords="316,17,452,47"/>
+<area shape="rect" id="node3" href="$d5/d47/group__Lib__VTK__IOPublicProcedure.html" title="Lib_VTK_IO" alt="" coords="337,152,431,181"/>
+<area shape="rect" id="node4" href="$d7/d79/group__IR__PrecisionPublicProcedure.html" title="IR_Precision" alt="" coords="336,235,432,264"/>
 </map>

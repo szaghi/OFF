@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['c0',['c0',['../dd/dfd/group__DerivedType.html#a9724221623ad6952048f948bf4faf5d9',1,'Data_Type_Globals::Type_Adimensional_Global']]],
   ['c1',['c1',['../d7/d8b/group__GvarLib__Runge__Kutta.html#ga59182d1971ab70076973c7a0ff247a84',1,'Lib_Runge_Kutta']]],
   ['c2',['c2',['../d7/d8b/group__GvarLib__Runge__Kutta.html#ga543f5e1c1048421c5d43640981f756e1',1,'Lib_Runge_Kutta']]],
   ['c3',['c3',['../d7/d8b/group__GvarLib__Runge__Kutta.html#ga0a4c13dc6a084c1e9e972ad930985ebe',1,'Lib_Runge_Kutta']]],

@@ -115,11 +115,8 @@ Data Types</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived type contains useful parameters for performing portable system calls.  <a href="../../dd/dfd/group__DerivedType.html#d3/d0c/structData__Type__OS_1_1Type__OS">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#d3/d0c/structData__Type__OS_1_1Type__OS">Type_OS</a>) type(<a class="el" href="../../dd/dfd/group__DerivedType.html#d3/d0c/structData__Type__OS_1_1Type__OS">Type_OS</a>) <br class="typebreak"/>
-function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d8b/classData__Type__OS.html#a99ffafeb59747890aeae4a7401d4fbd6">init</a> (id, c_id, sep, remove, copy, mkdir)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for initializing <a class="el" href="../../dd/dfd/group__DerivedType.html#d3/d0c/structData__Type__OS_1_1Type__OS" title="Derived type contains useful parameters for performing portable system calls.">Type_OS</a>.  <a href="#a99ffafeb59747890aeae4a7401d4fbd6"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d8b/classData__Type__OS.html#a3dc77e00351c9487664eb6abcb25ed05">set</a> (id, c_id, sep, remove, copy, mkdir, OS)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for setting <a class="el" href="../../dd/dfd/group__DerivedType.html#d3/d0c/structData__Type__OS_1_1Type__OS" title="Derived type contains useful parameters for performing portable system calls.">Type_OS</a> (id).  <a href="#a3dc77e00351c9487664eb6abcb25ed05"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d8b/classData__Type__OS.html#a68f7af3ac34ab39203a30a915eb72748">init</a> (OS, myrank, id, c_id)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for initializing <a class="el" href="../../dd/dfd/group__DerivedType.html#d3/d0c/structData__Type__OS_1_1Type__OS" title="Derived type contains useful parameters for performing portable system calls.">Type_OS</a>.  <a href="#a68f7af3ac34ab39203a30a915eb72748"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr><td colspan="2"><div class="groupHeader"></div></td></tr>
@@ -154,13 +151,25 @@ Public Attributes</h2></td></tr>
 
 <p>Definition at line <a class="el" href="../../db/d6f/Data__Type__OS_8f90_source.html#l00015">15</a> of file <a class="el" href="../../db/d6f/Data__Type__OS_8f90_source.html">Data_Type_OS.f90</a>.</p>
 </div><hr/><h2>Member Function/Subroutine Documentation</h2>
-<a class="anchor" id="a99ffafeb59747890aeae4a7401d4fbd6"></a><!-- doxytag: member="Data_Type_OS::init" ref="a99ffafeb59747890aeae4a7401d4fbd6" args="(id, c_id, sep, remove, copy, mkdir)" -->
+<a class="anchor" id="a68f7af3ac34ab39203a30a915eb72748"></a><!-- doxytag: member="Data_Type_OS::init" ref="a68f7af3ac34ab39203a30a915eb72748" args="(OS, myrank, id, c_id)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#d3/d0c/structData__Type__OS_1_1Type__OS">Type_OS</a>) type(<a class="el" href="../../dd/dfd/group__DerivedType.html#d3/d0c/structData__Type__OS_1_1Type__OS">Type_OS</a>) function, public <a class="el" href="../../de/d8b/classData__Type__OS.html#a99ffafeb59747890aeae4a7401d4fbd6">Data_Type_OS::init</a> </td>
+          <td class="memname">subroutine <a class="el" href="../../de/d8b/classData__Type__OS.html#a68f7af3ac34ab39203a30a915eb72748">Data_Type_OS::init</a> </td>
           <td>(</td>
+          <td class="paramtype">class(<a class="el" href="../../dd/dfd/group__DerivedType.html#d3/d0c/structData__Type__OS_1_1Type__OS">Type_OS</a>), intent(inout)&#160;</td>
+          <td class="paramname"><em>OS</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">character(DI_P), intent(in), optional&#160;</td>
+          <td class="paramname"><em>myrank</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">integer(I1P), intent(in), optional&#160;</td>
           <td class="paramname"><em>id</em>, </td>
         </tr>
@@ -168,31 +177,7 @@ Public Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">character(*), intent(in), optional&#160;</td>
-          <td class="paramname"><em>c_id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">character(*), intent(in), optional&#160;</td>
-          <td class="paramname"><em>sep</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">character(*), intent(in), optional&#160;</td>
-          <td class="paramname"><em>remove</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">character(*), intent(in), optional&#160;</td>
-          <td class="paramname"><em>copy</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">character(*), intent(in), optional&#160;</td>
-          <td class="paramname"><em>mkdir</em>&#160;</td>
+          <td class="paramname"><em>c_id</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -203,93 +188,18 @@ Public Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Function for initializing <a class="el" href="../../dd/dfd/group__DerivedType.html#d3/d0c/structData__Type__OS_1_1Type__OS" title="Derived type contains useful parameters for performing portable system calls.">Type_OS</a>. </p>
+<p>Subroutine for initializing <a class="el" href="../../dd/dfd/group__DerivedType.html#d3/d0c/structData__Type__OS_1_1Type__OS" title="Derived type contains useful parameters for performing portable system calls.">Type_OS</a>. </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>OS id parameter (integer). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">c_id</td><td>OS id parameter (string). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">sep</td><td>Directories separator. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">remove</td><td>Remove file command. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">copy</td><td>Copy file command. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">mkdir</td><td>Make directory command. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="../../db/d6f/Data__Type__OS_8f90_source.html#l00060">60</a> of file <a class="el" href="../../db/d6f/Data__Type__OS_8f90_source.html">Data_Type_OS.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a3dc77e00351c9487664eb6abcb25ed05"></a><!-- doxytag: member="Data_Type_OS::set" ref="a3dc77e00351c9487664eb6abcb25ed05" args="(id, c_id, sep, remove, copy, mkdir, OS)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine, public <a class="el" href="../../de/d8b/classData__Type__OS.html#a3dc77e00351c9487664eb6abcb25ed05">Data_Type_OS::set</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I1P), intent(in), optional&#160;</td>
-          <td class="paramname"><em>id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">character(*), intent(in), optional&#160;</td>
-          <td class="paramname"><em>c_id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">character(*), intent(in), optional&#160;</td>
-          <td class="paramname"><em>sep</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">character(*), intent(in), optional&#160;</td>
-          <td class="paramname"><em>remove</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">character(*), intent(in), optional&#160;</td>
-          <td class="paramname"><em>copy</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">character(*), intent(in), optional&#160;</td>
-          <td class="paramname"><em>mkdir</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#d3/d0c/structData__Type__OS_1_1Type__OS">Type_OS</a>), intent(inout)&#160;</td>
-          <td class="paramname"><em>OS</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Subroutine for setting <a class="el" href="../../dd/dfd/group__DerivedType.html#d3/d0c/structData__Type__OS_1_1Type__OS" title="Derived type contains useful parameters for performing portable system calls.">Type_OS</a> (id). </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>OS id parameter (integer). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">c_id</td><td>OS id parameter (string). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">sep</td><td>Directories separator. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">remove</td><td>Remove file command. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">copy</td><td>Copy file command. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">mkdir</td><td>Make directory command. </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">OS</td><td>Output OS. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">myrank</td><td>Actual rank process. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>OS id parameter (integer). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">c_id</td><td>OS id parameter (string). </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../db/d6f/Data__Type__OS_8f90_source.html#l00090">90</a> of file <a class="el" href="../../db/d6f/Data__Type__OS_8f90_source.html">Data_Type_OS.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../db/d6f/Data__Type__OS_8f90_source.html#l00064">64</a> of file <a class="el" href="../../db/d6f/Data__Type__OS_8f90_source.html">Data_Type_OS.f90</a>.</p>
 
 </div>
 </div>
@@ -316,7 +226,7 @@ Public Attributes</h2></td></tr>
     <ul>
       <li class="navelem"><a class="el" href="../../de/d8b/classData__Type__OS.html">Data_Type_OS</a>      </li>
 
-    <li class="footer">Generated on Fri May 25 2012 09:01:25 for OFF by
+    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

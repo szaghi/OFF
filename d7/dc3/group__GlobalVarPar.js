@@ -10,5 +10,6 @@ var group__GlobalVarPar =
     [ "Lib_Math", "d9/dc8/group__Lib__Math.html", "d9/dc8/group__Lib__Math" ],
     [ "Lib_Parallel", "df/d8c/group__Lib__Parallel.html", "df/d8c/group__Lib__Parallel" ],
     [ "Lib_PostProcessing", "d3/df0/group__Lib__PostProcessing.html", "d3/df0/group__Lib__PostProcessing" ],
+    [ "Lib_Profiling", "dd/db0/group__Lib__Profiling.html", null ],
     [ "Lib_Runge_Kutta", "d7/d8b/group__GvarLib__Runge__Kutta.html", "d7/d8b/group__GvarLib__Runge__Kutta" ]
 ];

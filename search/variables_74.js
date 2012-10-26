@@ -1,6 +1,7 @@
 var searchData=
 [
   ['t',['t',['../dd/dfd/group__DerivedType.html#a4bd0f81daf68faf0051dd5f2a1e38074',1,'Data_Type_Globals::Type_Fluid_Global']]],
+  ['t0',['T0',['../dd/dfd/group__DerivedType.html#ac11c3ea3fa8b9c7279fe456a50f2ad0d',1,'Data_Type_Globals::Type_Adimensional_Global']]],
   ['te',['TE',['../d6/dec/group__Library.html#a721e78f4743ee55df41117b1430b7f71',1,'Lib_Multigrid']]],
   ['tec',['tec',['../dd/dfd/group__DerivedType.html#a17aef204c423dc53300d3628975ad214',1,'Lib_PostProcessing::Type_PP_Format']]],
   ['tipo_5fi1',['Tipo_I1',['../dc/dc7/group__Lib__VTK__IOPrivateVarPar.html#ga3498c4fdea606e9192bd5c85e94ba851',1,'Lib_VTK_IO']]],

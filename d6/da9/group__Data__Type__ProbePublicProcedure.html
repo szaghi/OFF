@@ -90,9 +90,6 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </script>
 <div id="doc-content">
 <div class="header">
-  <div class="summary">
-<a href="#nested-classes">Data Types</a> &#124;
-<a href="#func-members">Functions/Subroutines</a>  </div>
   <div class="headertitle">
 <div class="title">Data_Type_Probe</div>  </div>
 <div class="ingroups"><a class="el" href="../../d0/d28/group__PublicProcedure.html">Public Procedures</a></div></div><!--header-->
@@ -108,248 +105,51 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </td></tr></table></center>
 </div>
 <table class="memberdecls">
-<tr><td colspan="2"><h2><a name="nested-classes"></a>
-Data Types</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#dd/db2/interfaceData__Type__Probe_1_1write">Data_Type_Probe::write</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Write overloading of <a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe" title="Derived type containing probe informations.">Type_Probe</a> variable.  <a href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#dd/db2/interfaceData__Type__Probe_1_1write">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#dc/d4b/interfaceData__Type__Probe_1_1read">Data_Type_Probe::read</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Read overloading of <a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe" title="Derived type containing probe informations.">Type_Probe</a> variable.  <a href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#dc/d4b/interfaceData__Type__Probe_1_1read">More...</a><br/></td></tr>
-<tr><td colspan="2"><h2><a name="func-members"></a>
-Functions/Subroutines</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">elemental subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#ga3a92d2410554a056ea30bfae28ec6f1c">Data_Type_Probe::set</a> (b, i, j, k, probe)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for setting components of <a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe" title="Derived type containing probe informations.">Type_Probe</a> variable.  <a href="#ga3a92d2410554a056ea30bfae28ec6f1c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">integer(I_P) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#ga0d824bc6a6e913a5054bb4925e73c255">Data_Type_Probe::write_probe</a> (scalar, array1D, array2D, array3D, format, unit)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for writing <a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe" title="Derived type containing probe informations.">Type_Probe</a> data.  <a href="#ga0d824bc6a6e913a5054bb4925e73c255"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">integer(I_P) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#gaa13d3ae8e64855ec3308aa8c493c7324">Data_Type_Probe::read_probe</a> (scalar, array1D, array2D, array3D, format, unit)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for reading <a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe" title="Derived type containing probe informations.">Type_Probe</a> data.  <a href="#gaa13d3ae8e64855ec3308aa8c493c7324"></a><br/></td></tr>
 </table>
-<hr/><h2>Data Type Documentation</h2>
-<a name="dd/db2/interfaceData__Type__Probe_1_1write" id="dd/db2/interfaceData__Type__Probe_1_1write"></a>
+<hr/><h2>Function/Subroutine Documentation</h2>
+<a class="anchor" id="ga0d824bc6a6e913a5054bb4925e73c255"></a><!-- doxytag: member="Data_Type_Probe::write_probe" ref="ga0d824bc6a6e913a5054bb4925e73c255" args="(scalar, array1D, array2D, array3D, format, unit)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">interface Data_Type_Probe::write</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<div class="textblock"><p>Write overloading of <a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe" title="Derived type containing probe informations.">Type_Probe</a> variable. </p>
-<p>This is a generic interface to 2 functions (one binary and another ascii) for writing scalar variables. The functions return an error integer code. The calling signatures are: </p>
-<div class="fragment"><pre class="fragment"> ...
- <span class="keywordtype">integer(I4P)</span>:: err,unit
- <span class="keywordtype">character(1)</span>:: format=<span class="stringliteral">&quot;*&quot;</span>
- <span class="keywordtype">type(Type_Probe)</span>:: probe
- ...
- <span class="comment">! formatted writing</span>
- err = <span class="keyword">write</span>(unit,format,probe)
- <span class="comment">! binary writing</span>
- err = <span class="keyword">write</span>(unit,probe)
- ... 
-</pre></div><p> , </p>
-
-<p>Definition at line <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html#l00056">56</a> of file <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html">Data_Type_Probe.f90</a>.</p>
-</div><table class="memberdecls">
-<tr><td colspan="2"><h3>Private Member Functions</h3></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I_P) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#a336be2aa9202ae4c3a1c8fad13d11e3f">Write_Bin</a> (unit, probe)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I_P) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#af3dae5f195e648be34b98b0a23963cfe">Write_Ascii</a> (unit, format, probe)</td></tr>
-</table>
-<hr/><h4>Member Function/Subroutine Documentation</h4>
-<a class="anchor" id="a336be2aa9202ae4c3a1c8fad13d11e3f"></a><!-- doxytag: member="Data_Type_Probe::write::Write_Bin" ref="a336be2aa9202ae4c3a1c8fad13d11e3f" args="(unit, probe)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">integer(I_P) function <a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#a336be2aa9202ae4c3a1c8fad13d11e3f">Data_Type_Probe::write::Write_Bin</a> </td>
+          <td class="memname">integer(I_P) function, public <a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#ga0d824bc6a6e913a5054bb4925e73c255">Data_Type_Probe::write_probe</a> </td>
           <td>(</td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>unit</em>, </td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe">Type_Probe</a>), intent(in), optional&#160;</td>
+          <td class="paramname"><em>scalar</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe">Type_Probe</a>), intent(in)&#160;</td>
-          <td class="paramname"><em>probe</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html#l00103">103</a> of file <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html">Data_Type_Probe.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="af3dae5f195e648be34b98b0a23963cfe"></a><!-- doxytag: member="Data_Type_Probe::write::Write_Ascii" ref="af3dae5f195e648be34b98b0a23963cfe" args="(unit, format, probe)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">integer(I_P) function <a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#af3dae5f195e648be34b98b0a23963cfe">Data_Type_Probe::write::Write_Ascii</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>unit</em>, </td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe">Type_Probe</a>), dimension(:), intent(in), optional&#160;</td>
+          <td class="paramname"><em>array1D</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">character(*), intent(in)&#160;</td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe">Type_Probe</a>), dimension(:,:), intent(in), optional&#160;</td>
+          <td class="paramname"><em>array2D</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe">Type_Probe</a>), dimension(:,:,:), intent(in), optional&#160;</td>
+          <td class="paramname"><em>array3D</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">character(*), intent(in), optional&#160;</td>
           <td class="paramname"><em>format</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">type(Type_probe), intent(in)&#160;</td>
-          <td class="paramname"><em>probe</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html#l00121">121</a> of file <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html">Data_Type_Probe.f90</a>.</p>
-
-</div>
-</div>
-
-</div>
-</div>
-<!-- doxytag: class="Data_Type_Probe::write" --><a name="dc/d4b/interfaceData__Type__Probe_1_1read" id="dc/d4b/interfaceData__Type__Probe_1_1read"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">interface Data_Type_Probe::read</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<div class="textblock"><p>Read overloading of <a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe" title="Derived type containing probe informations.">Type_Probe</a> variable. </p>
-<p>This is a generic interface to 2 functions (one binary and another ascii) for reading scalar variables. The functions return an error integer code. The calling signatures are: </p>
-<div class="fragment"><pre class="fragment"> ...
- <span class="keywordtype">integer(I4P)</span>:: err,unit
- <span class="keywordtype">character(1)</span>:: format=<span class="stringliteral">&quot;*&quot;</span>
- <span class="keywordtype">type(Type_Probe)</span>:: probe
- ...
- <span class="comment">! formatted reading</span>
- err = <span class="keyword">read</span>(unit,format,probe)
- <span class="comment">! binary reading</span>
- err = <span class="keyword">read</span>(unit,probe)
- ... 
-</pre></div><p> , </p>
-
-<p>Definition at line <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html#l00073">73</a> of file <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html">Data_Type_Probe.f90</a>.</p>
-</div><table class="memberdecls">
-<tr><td colspan="2"><h3>Private Member Functions</h3></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I_P) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#a1be62bd2ccd44423024502081a9a92a8">Read_Bin</a> (unit, probe)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I_P) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#afe9b767c81854a2fd450cf4e38a6b325">Read_Ascii</a> (unit, format, probe)</td></tr>
-</table>
-<hr/><h4>Member Function/Subroutine Documentation</h4>
-<a class="anchor" id="a1be62bd2ccd44423024502081a9a92a8"></a><!-- doxytag: member="Data_Type_Probe::read::Read_Bin" ref="a1be62bd2ccd44423024502081a9a92a8" args="(unit, probe)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">integer(I_P) function <a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#a1be62bd2ccd44423024502081a9a92a8">Data_Type_Probe::read::Read_Bin</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>unit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe">Type_Probe</a>), intent(inout)&#160;</td>
-          <td class="paramname"><em>probe</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html#l00146">146</a> of file <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html">Data_Type_Probe.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="afe9b767c81854a2fd450cf4e38a6b325"></a><!-- doxytag: member="Data_Type_Probe::read::Read_Ascii" ref="afe9b767c81854a2fd450cf4e38a6b325" args="(unit, format, probe)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">integer(I_P) function <a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#afe9b767c81854a2fd450cf4e38a6b325">Data_Type_Probe::read::Read_Ascii</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>unit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">character(*), intent(in)&#160;</td>
-          <td class="paramname"><em>format</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe">Type_Probe</a>), intent(inout)&#160;</td>
-          <td class="paramname"><em>probe</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html#l00164">164</a> of file <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html">Data_Type_Probe.f90</a>.</p>
-
-</div>
-</div>
-
-</div>
-</div>
-<!-- doxytag: class="Data_Type_Probe::read" --><hr/><h2>Function/Subroutine Documentation</h2>
-<a class="anchor" id="ga3a92d2410554a056ea30bfae28ec6f1c"></a><!-- doxytag: member="Data_Type_Probe::set" ref="ga3a92d2410554a056ea30bfae28ec6f1c" args="(b, i, j, k, probe)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">elemental subroutine, public <a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#ga3a92d2410554a056ea30bfae28ec6f1c">Data_Type_Probe::set</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I_P), intent(in), optional&#160;</td>
-          <td class="paramname"><em>b</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(I_P), intent(in), optional&#160;</td>
-          <td class="paramname"><em>i</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(I_P), intent(in), optional&#160;</td>
-          <td class="paramname"><em>j</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(I_P), intent(in), optional&#160;</td>
-          <td class="paramname"><em>k</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe">Type_Probe</a>), intent(inout)&#160;</td>
-          <td class="paramname"><em>probe</em>&#160;</td>
+          <td class="paramtype">integer(I4P), intent(in)&#160;</td>
+          <td class="paramname"><em>unit</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -360,20 +160,90 @@ Functions/Subroutines</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Function for setting components of <a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe" title="Derived type containing probe informations.">Type_Probe</a> variable. </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd><b>probe</b> type(Type_Probe) variable.</dd></dl>
+<p>Function for writing <a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe" title="Derived type containing probe informations.">Type_Probe</a> data. </p>
+<p>The probe data could be scalar, one, two and three dimensional array. The format could be ascii or binary. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd><b>err</b> integer(I_P) variable for error trapping. </dd></dl>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>Block (global map) index. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">i</td><td>I direction index. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">j</td><td>J direction index. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">k</td><td>K direction index. </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">probe</td><td>Probe data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">scalar</td><td>Scalar probe data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">array1D</td><td>One dimensional array probe data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">array2D</td><td>Two dimensional array probe data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">array3D</td><td>Three dimensional array probe data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">format</td><td>Format specifier. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">unit</td><td>Logic unit. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html#l00081">81</a> of file <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html">Data_Type_Probe.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html#l00045">45</a> of file <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html">Data_Type_Probe.f90</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="gaa13d3ae8e64855ec3308aa8c493c7324"></a><!-- doxytag: member="Data_Type_Probe::read_probe" ref="gaa13d3ae8e64855ec3308aa8c493c7324" args="(scalar, array1D, array2D, array3D, format, unit)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer(I_P) function, public <a class="el" href="../../d6/da9/group__Data__Type__ProbePublicProcedure.html#gaa13d3ae8e64855ec3308aa8c493c7324">Data_Type_Probe::read_probe</a> </td>
+          <td>(</td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe">Type_Probe</a>), intent(inout), optional&#160;</td>
+          <td class="paramname"><em>scalar</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe">Type_Probe</a>), dimension(:), intent(inout), optional&#160;</td>
+          <td class="paramname"><em>array1D</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe">Type_Probe</a>), dimension(:,:), intent(inout), optional&#160;</td>
+          <td class="paramname"><em>array2D</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe">Type_Probe</a>), dimension(:,:,:), intent(inout), optional&#160;</td>
+          <td class="paramname"><em>array3D</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">character(*), intent(in), optional&#160;</td>
+          <td class="paramname"><em>format</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(I4P), intent(in)&#160;</td>
+          <td class="paramname"><em>unit</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Function for reading <a class="el" href="../../dd/dfd/group__DerivedType.html#da/db9/structData__Type__Probe_1_1Type__Probe" title="Derived type containing probe informations.">Type_Probe</a> data. </p>
+<p>The probe data could be scalar, one, two and three dimensional array. The format could be ascii or binary. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd><b>err</b> integer(I_P) variable for error trapping. </dd></dl>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">scalar</td><td>Scalar probe data. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">array1D</td><td>One dimensional array probe data. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">array2D</td><td>Two dimensional array probe data. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">array3D</td><td>Three dimensional array probe data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">format</td><td>Format specifier. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">unit</td><td>Logic unit. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html#l00099">99</a> of file <a class="el" href="../../df/d9e/Data__Type__Probe_8f90_source.html">Data_Type_Probe.f90</a>.</p>
 
 </div>
 </div>
@@ -396,7 +266,7 @@ Functions/Subroutines</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri May 25 2012 09:01:24 for OFF by
+    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

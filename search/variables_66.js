@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['f0',['f0',['../dd/dfd/group__DerivedType.html#a1c6e03bae44e224c4523532e9ca4afb6',1,'Data_Type_Globals::Type_Adimensional_Global']]],
   ['f_5fout',['f_out',['../dc/dc7/group__Lib__VTK__IOPrivateVarPar.html#ga7c82984420f6169f731e01e83aa0a38e',1,'Lib_VTK_IO']]],
   ['f_5fout_5fascii',['f_out_ascii',['../dc/dc7/group__Lib__VTK__IOPrivateVarPar.html#ga858b4aad20df38d398a96835d96d43f6',1,'Lib_VTK_IO']]],
   ['f_5fout_5fbinary',['f_out_binary',['../dc/dc7/group__Lib__VTK__IOPrivateVarPar.html#ga769ebcdfc6ca98cc5f328f54e11ebfd2',1,'Lib_VTK_IO']]],
@@ -23,6 +24,8 @@ var searchData=
   ['file_5fspec',['File_Spec',['../dd/dfd/group__DerivedType.html#a93b2253f2b497ca593c1fbbd58d2dd5e',1,'Data_Type_Globals::Type_File_Global']]],
   ['flip',['flip',['../d6/dec/group__Library.html#aa1b75b605f84e93dd22ba68f8e15eeca',1,'Lib_Fluidynamic']]],
   ['fluid',['fluid',['../dd/dfd/group__DerivedType.html#a682244a452835a0454f9d3ce84ebcdfd',1,'Data_Type_Globals::Type_Global::fluid()'],['../dd/dfd/group__DerivedType.html#af66c72d8ea60be2fecdd9f7a71100301',1,'Data_Type_Globals::Type_Block::fluid()']]],
+  ['fr',['Fr',['../dd/dfd/group__DerivedType.html#a4f18c85816eb1965743a9aa7910690c0',1,'Data_Type_Globals::Type_Adimensional_Global']]],
+  ['fr2_5finv',['Fr2_inv',['../dd/dfd/group__DerivedType.html#a20363457a9acba354aae9646816d4a51',1,'Data_Type_Globals::Type_Adimensional_Global']]],
   ['fr4p',['FR4P',['../da/dd4/group__IR__Precision.html#gacc321dd400504cd5ef2242c365cb457a',1,'IR_Precision']]],
   ['fr8p',['FR8P',['../da/dd4/group__IR__Precision.html#ga8b7a43d13a28531a213f70112b338a22',1,'IR_Precision']]],
   ['fr_5fp',['FR_P',['../da/dd4/group__IR__Precision.html#ga59568e52ccfe3e99f6546bc173484995',1,'IR_Precision']]]

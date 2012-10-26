@@ -105,18 +105,21 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </td></tr></table></center>
 </div>
 <table class="memberdecls">
-<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#gab2c63052d096b9e9628b5068dfd1b62d">Lib_WENO::weno_polynomials</a> (S, V)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#gafb1a374b01e4ff60296cb4a48a308826">Lib_WENO::weno_weights</a> (S, V)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#ga91d65b5ceb9ef37c52e5c39dc6c541e0">Lib_WENO::weno_convolution</a> (S, VP, w)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#ga9b67fb1a3403d91fc492532416a5c947">Lib_WENO::weno_polynomials</a> (S, V, VP)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing WENO polynomials.  <a href="#ga9b67fb1a3403d91fc492532416a5c947"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#ga0c0a02a5abf808e2a6152a0e05ed6799">Lib_WENO::weno_weights</a> (S, V, w)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing WENO weights of the polynomial reconstructions.  <a href="#ga0c0a02a5abf808e2a6152a0e05ed6799"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#gae11faea38bff96f933ce6d24cdeefd2c">Lib_WENO::weno_convolution</a> (S, VP, w, VR)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing the WENO convulution of the polynomial recontructions.  <a href="#gae11faea38bff96f933ce6d24cdeefd2c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">recursive pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#ga3e6f5162258156b9bfc13cf34e8fa721">Lib_WENO::udiff</a> (p, v)</td></tr>
 </table>
 <hr/><h2>Function/Subroutine Documentation</h2>
-<a class="anchor" id="gab2c63052d096b9e9628b5068dfd1b62d"></a><!-- doxytag: member="Lib_WENO::weno_polynomials" ref="gab2c63052d096b9e9628b5068dfd1b62d" args="(S, V)" -->
+<a class="anchor" id="ga9b67fb1a3403d91fc492532416a5c947"></a><!-- doxytag: member="Lib_WENO::weno_polynomials" ref="ga9b67fb1a3403d91fc492532416a5c947" args="(S, V, VP)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pure function <a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#gab2c63052d096b9e9628b5068dfd1b62d">Lib_WENO::weno_polynomials</a> </td>
+          <td class="memname">pure subroutine <a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#ga9b67fb1a3403d91fc492532416a5c947">Lib_WENO::weno_polynomials</a> </td>
           <td>(</td>
           <td class="paramtype">integer(I_P), intent(in)&#160;</td>
           <td class="paramname"><em>S</em>, </td>
@@ -124,8 +127,14 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(R_P), dimension (1:2,1-s:-1+s), intent(in)&#160;</td>
-          <td class="paramname"><em>V</em>&#160;</td>
+          <td class="paramtype">real(R_P), dimension (1:,1-s:), intent(in)&#160;</td>
+          <td class="paramname"><em>V</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(R_P), dimension(1:,0:), intent(out)&#160;</td>
+          <td class="paramname"><em>VP</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -136,16 +145,27 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00372">372</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
+<p>Subroutine for computing WENO polynomials. </p>
+<dl class="note"><dt><b>Note:</b></dt><dd>For avoiding the creation of temporary arrays (improving the efficiency) the arrays <b>V</b> and <b>VP</b> are declared as assumed-shape with only the lower bound defined. Their extentions are: V [1:2,1-S:-1+S], VP [1:2,0:S-1]. </dd></dl>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">S</td><td>Number of stencils used. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">V</td><td>Variable to be reconstructed [1:2,1-S:-1+S]. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">VP</td><td>Polynomial reconstructions [1:2, 0:S-1 ]. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00381">381</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="gafb1a374b01e4ff60296cb4a48a308826"></a><!-- doxytag: member="Lib_WENO::weno_weights" ref="gafb1a374b01e4ff60296cb4a48a308826" args="(S, V)" -->
+<a class="anchor" id="ga0c0a02a5abf808e2a6152a0e05ed6799"></a><!-- doxytag: member="Lib_WENO::weno_weights" ref="ga0c0a02a5abf808e2a6152a0e05ed6799" args="(S, V, w)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pure function <a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#gafb1a374b01e4ff60296cb4a48a308826">Lib_WENO::weno_weights</a> </td>
+          <td class="memname">pure subroutine <a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#ga0c0a02a5abf808e2a6152a0e05ed6799">Lib_WENO::weno_weights</a> </td>
           <td>(</td>
           <td class="paramtype">integer(I_P), intent(in)&#160;</td>
           <td class="paramname"><em>S</em>, </td>
@@ -153,42 +173,13 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(R_P), dimension    (1:2,1-s:-1+s), intent(in)&#160;</td>
-          <td class="paramname"><em>V</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00399">399</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ga91d65b5ceb9ef37c52e5c39dc6c541e0"></a><!-- doxytag: member="Lib_WENO::weno_convolution" ref="ga91d65b5ceb9ef37c52e5c39dc6c541e0" args="(S, VP, w)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">pure function <a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#ga91d65b5ceb9ef37c52e5c39dc6c541e0">Lib_WENO::weno_convolution</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>S</em>, </td>
+          <td class="paramtype">real(R_P), dimension    (1:,1-s:), intent(in)&#160;</td>
+          <td class="paramname"><em>V</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(R_P), dimension(1:2,0:s-1), intent(in)&#160;</td>
-          <td class="paramname"><em>VP</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(R_P), dimension (1:2,0:s-1), intent(in)&#160;</td>
+          <td class="paramtype">real(R_P), dimension    (1:,0:), intent(out)&#160;</td>
           <td class="paramname"><em>w</em>&#160;</td>
         </tr>
         <tr>
@@ -200,7 +191,71 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00457">457</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
+<p>Subroutine for computing WENO weights of the polynomial reconstructions. </p>
+<dl class="note"><dt><b>Note:</b></dt><dd>For avoiding the creation of temporary arrays (improving the efficiency) the arrays <b>V</b> and <b>w</b> are declared as assumed-shape with only the lower bound defined. Their extentions are: V [1:2,1-S:-1+S], w [1:2,0:S-1]. </dd></dl>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">S</td><td>Number of stencils used. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">V</td><td>Variable to be reconstructed [1:2,1-S:-1+S]. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">w</td><td>Weights of the stencils [1:2, 0:S-1 ]. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00407">407</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="gae11faea38bff96f933ce6d24cdeefd2c"></a><!-- doxytag: member="Lib_WENO::weno_convolution" ref="gae11faea38bff96f933ce6d24cdeefd2c" args="(S, VP, w, VR)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">pure subroutine <a class="el" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#gae11faea38bff96f933ce6d24cdeefd2c">Lib_WENO::weno_convolution</a> </td>
+          <td>(</td>
+          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
+          <td class="paramname"><em>S</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(R_P), dimension(1:,0:), intent(in)&#160;</td>
+          <td class="paramname"><em>VP</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(R_P), dimension (1:,0:), intent(in)&#160;</td>
+          <td class="paramname"><em>w</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(R_P), dimension(1:   ), intent(out)&#160;</td>
+          <td class="paramname"><em>VR</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Function for computing the WENO convulution of the polynomial recontructions. </p>
+<dl class="note"><dt><b>Note:</b></dt><dd>For avoiding the creation of temporary arrays (improving the efficiency) the arrays <b>VP</b> <b>w</b> and <b>VR</b> are declared as assumed-shape with only the lower bound defined. Their extentions are: VP [1:2,0:S-1], w [1:2,0:S-1], V [1:2]. </dd></dl>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">S</td><td>Number of stencils used. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">VP</td><td>Polynomial reconstructions [1:2,0:S-1]. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">w</td><td>Weights of the stencils [1:2,0:S-1]. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">VR</td><td>Left and right (1,2) interface value of reconstructed V [1:2 ]. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00464">464</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
 
 </div>
 </div>
@@ -229,7 +284,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00483">483</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00486">486</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
 
 </div>
 </div>
@@ -252,7 +307,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri May 25 2012 09:01:25 for OFF by
+    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

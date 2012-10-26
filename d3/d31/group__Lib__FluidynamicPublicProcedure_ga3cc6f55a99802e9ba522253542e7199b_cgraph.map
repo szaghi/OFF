@@ -1,3 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d7/d68/Lib__Fluidynamic_8f90.html#a3852dacbfc21ca234846327fabd01cf6" title="positivity_preserving_limiter" alt="" coords="297,5,479,35"/>
+<area shape="rect" id="node3" href="$d7/d68/Lib__Fluidynamic_8f90.html#a48accaaeca190ab91d82027128831d5f" title="Subroutine for imposing adjacent boundary conditions." alt="" coords="425,5,489,35"/>
+<area shape="rect" id="node5" href="$d7/d68/Lib__Fluidynamic_8f90.html#aef477167f825c3906129fd9265aeba87" title="Subroutine for imposing extrapolation of ghost cells from internal ones (left boundary)." alt="" coords="296,157,371,187"/>
+<area shape="rect" id="node8" href="$d7/d68/Lib__Fluidynamic_8f90.html#a998c9c57c2c6c5179a166811ea9f1259" title="Subroutine for imposing extrapolation of ghost cells from internal ones (right boundary)." alt="" coords="420,60,495,89"/>
+<area shape="rect" id="node10" href="$d7/d68/Lib__Fluidynamic_8f90.html#ac535f74269fbbe7145d18f56d56c1955" title="Subroutine for imposing inflow 1 boundary conditions." alt="" coords="425,116,489,145"/>
+<area shape="rect" id="node12" href="$d7/d68/Lib__Fluidynamic_8f90.html#ae5c4c82f162bd43ce5c612105ec3acbd" title="Subroutine for imposing periodic boundary conditions." alt="" coords="425,175,489,204"/>
+<area shape="rect" id="node14" href="$d7/d68/Lib__Fluidynamic_8f90.html#af72f6fa8ab8c25cffe5cf166ffecc950" title="Subroutine for imposing reflective boundary conditions (right boundary)." alt="" coords="421,239,493,268"/>
+<area shape="rect" id="node19" href="$d7/d68/Lib__Fluidynamic_8f90.html#ad7a3dee2ae4e8c52913831b0cc383f25" title="Subroutine for imposing reflective boundary conditions (left boundary)." alt="" coords="297,312,369,341"/>
 </map>

@@ -94,7 +94,9 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="title">Governing Equations </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The turbulent motion of compressible viscous fluid is described by a system of equations, that read, in integral, dimensional form:</p>
+<div class="textblock"><h2><a class="anchor" id="conseq"></a>
+Conservation Laws</h2>
+<p>The turbulent motion of compressible viscous fluid is described by a system of equations, that read, in integral, dimensional form:</p>
 <p><img class="formulaInl" alt="$\frac{\partial }{{\partial t}}\int\limits_V {\overrightarrow U dV} + \oint\limits_{S(V)} {\overline{\overline F} \cdot \overrightarrow n dS} = \int\limits_V {\overrightarrow {{Q_V}} dV} + \oint\limits_{S(V)} {\overline{\overline {{Q_S}}} \cdot \overrightarrow n dS} $" src="../../form_224.png"/> <br/>
  <img class="formulaInl" alt="$V$" src="../../form_225.png"/> being the control volume, <img class="formulaInl" alt="$S(V)$" src="../../form_226.png"/> its boundary, <img class="formulaInl" alt="$\vec n$" src="../../form_227.png"/> the outward unit normal of <img class="formulaInl" alt="$S(V)$" src="../../form_226.png"/> and where <img class="formulaInl" alt="$\overrightarrow U $" src="../../form_228.png"/> is the vector of conservative variables, <img class="formulaInl" alt="$\overline{\overline F}$" src="../../form_229.png"/> is the conservative fluxes tensor, <img class="formulaInl" alt="$\overrightarrow{Q_V}$" src="../../form_230.png"/> is vector of volume source terms and <img class="formulaInl" alt="$\overline{\overline{Q_S}}$" src="../../form_231.png"/> is the tensor of surface source terms.</p>
 <p>For fluid subjected to external forces and heat sources the above vectors and tensors could be written as:</p>
@@ -139,33 +141,69 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <ul>
 <li><img class="formulaInl" alt="$ E = c_v T + \frac{|\vec v|^2}{2} = \frac{p}{\rho(\gamma-1)} + \frac{|\vec v|^2}{2}$" src="../../form_259.png"/> is the total specific energy definition;</li>
 <li><img class="formulaInl" alt="$ a = \sqrt{\frac{\gamma p}{\rho}} $" src="../../form_260.png"/> is the speed of sound (acoustic velocity);</li>
-<li><img class="formulaInl" alt="$ H = c_p T + \frac{|\vec v|^2}{2} = \frac{\gamma p}{\rho(\gamma-1)} + \frac{|\vec v|^2}{2}= \frac{a^2}{\gamma-1} + \frac{|\vec v|^2}{2}$" src="../../form_261.png"/> is the total specific entalpy definition;</li>
+<li><img class="formulaInl" alt="$ H = c_p T + \frac{|\vec v|^2}{2} = \frac{\gamma p}{\rho(\gamma-1)} + \frac{|\vec v|^2}{2}= \frac{a^2}{\gamma-1} + \frac{|\vec v|^2}{2}$" src="../../form_261.png"/> is the total specific enthalpy definition.</li>
 </ul>
-<p>The above equations are non-dimensionalized by arbitrary reference quantities. The selected reference values are:</p>
+<h3><a class="anchor" id="adim"></a>
+Non-Dimensional Form</h3>
+<p>In order to derive the non-dimensional form let us introduce non-dimensional quantities <img class="formulaInl" alt="$x'=\frac{x}{x_0}$" src="../../form_382.png"/> being <img class="formulaInl" alt="$x$" src="../../form_383.png"/> dimensional quantity and <img class="formulaInl" alt="$x_0$" src="../../form_296.png"/> an arbitrary reference value. With this nomenclature using a dimensional analysis the above equations could be written as:</p>
+<p><img class="formulaInl" alt="$ \begin{array}{l} \frac{{{\rho _0}L_0^3}}{{{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'} + {\rho _0}{v_0}L_0^2\oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \cdot \vec ndS'} = 0\\ \frac{{{\rho _0}{v_0}L_0^3}}{{{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'} + {\rho _0}v_0^2L_0^2\oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \overrightarrow {v'} \cdot \vec ndS'} + {p_0}L_0^2\oint\limits_{S'(V')} {p'\overline{\overline I} \cdot \vec ndS'} - {\tau _0}L_0^2\oint\limits_{S'(V')} {\overline{\overline {\tau '}} \cdot \vec ndS'} = {\rho _0}{f_0}L_0^3\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ \frac{{{\rho _0}{E_0}L_0^3}}{{{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'} + {\rho _0}{E_0}{v_0}L_0^2\oint\limits_{S'(V')} {\rho 'E'\overrightarrow {v'} \cdot \vec ndS'} + {p_0}L_0^2\oint\limits_{S'(V')} {p'\overrightarrow {v'} \cdot \vec ndS'} - {\tau _0}{v_0}L_0^2\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}} \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'} + \\ -\frac{{{k_0}{T_0}L_0^2}}{{{L_0}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'} = {\rho _0}{f_0}{v_0}L_0^3\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} \cdot \overrightarrow {v'} dV'} + {\rho _0}{q_0}L_0^3\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array} $" src="../../form_384.png"/></p>
+<p>In order to make non-dimensional the above system divide for <img class="formulaInl" alt="${\rho _0}{v_0}L_0^2$" src="../../form_385.png"/>, <img class="formulaInl" alt="${\rho _0}{v_0^2}L_0^2$" src="../../form_386.png"/> and <img class="formulaInl" alt="${\rho _0}{E_0}{v_0}L_0^2$" src="../../form_387.png"/> the conservation equation of mass, momentum and energy respectively, obtaining:</p>
+<p><img class="formulaInl" alt="$ \begin{array}{l} \frac{{{L_0}}}{{{v_0}{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \cdot \vec ndS'} = 0\\ \frac{{{L_0}}}{{{v_0}{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \overrightarrow {v'} \cdot \vec ndS'} + \frac{{{p_0}}}{{{\rho _0}v_0^2}}\oint\limits_{S'(V')} {p'\overline{\overline I} \cdot \vec ndS'} - \frac{{{\tau _0}}}{{{\rho _0}v_0^2}}\oint\limits_{S'(V')} {\overline{\overline {\tau '}} \cdot \vec ndS'} = \frac{{{f_0}{L_0}}}{{v_0^2}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ \frac{{{L_0}}}{{{v_0}{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'} + \oint\limits_{S'(V')} {\rho 'E'\overrightarrow {v'} \cdot \vec ndS'} + \frac{{{p_0}}}{{{\rho _0}{E_0}{v_0}}}\oint\limits_{S'(V')} {p'\overrightarrow {v'} \cdot \vec ndS'} - \frac{{{\tau _0}}}{{{\rho _0}{E_0}}}\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}} \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'} + \\ - \frac{{{k_0}{T_0}}}{{{\rho _0}{E_0}{v_0}{L_0}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'} = \frac{{{f_0}{L_0}}}{{{E_0}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} \cdot \overrightarrow {v'} dV'} + \frac{{{q_0}{L_0}}}{{{E_0}{v_0}}}\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array}$" src="../../form_388.png"/></p>
+<p>It is possible to recognize 7 non-dimensional numbers:</p>
 <ul>
-<li><img class="formulaInl" alt="$ L_0 $" src="../../form_262.png"/> reference legnth;</li>
-<li><img class="formulaInl" alt="$ T_0 $" src="../../form_263.png"/> reference temperature;</li>
-<li><img class="formulaInl" alt="$ \rho_0 $" src="../../form_264.png"/> reference density.</li>
+<li><img class="formulaInl" alt="$ \rm{St} = \frac{L_0}{v_0 t_0}$" src="../../form_339.png"/> Strouhal number; it is the ratio between characteristic frequency and the fluid dynamic one; for non periodic flow it is set to 1;</li>
+<li><img class="formulaInl" alt="$ \rm{Ru} = \frac{\rho_0 v_0^2}{p_0}$" src="../../form_340.png"/> Ruark number; it is the ratio between inertial (convective) force and pressure one; for a Newtonian fluid it is set to 1;</li>
+<li><img class="formulaInl" alt="$ \rm{Ma} = \frac{v_0}{a_0}$" src="../../form_389.png"/> Mach number; it is the ratio between velocity and speed of sound;</li>
+<li><img class="formulaInl" alt="$ \rm{Re} = \frac{\rho_0 v_0 L_0}{\mu_0}$" src="../../form_341.png"/> Reynolds number; it is the ratio between inertial (convective) force and viscous one;</li>
+<li><img class="formulaInl" alt="$ \rm{Fr} = \sqrt{\frac{v_0^2}{f_0 L_0}}$" src="../../form_342.png"/> Froude number; it is the ratio between inertial (convective) force and volume (mass) one;</li>
+<li><img class="formulaInl" alt="$ \rm{Pr} = \frac{\mu_0 c_{p0}}{k_0}$" src="../../form_343.png"/> Prandtl number; it is the ratio between momentum diffusion and heat one;</li>
+<li><img class="formulaInl" alt="$ \rm{Ec} = \frac{v_0^2}{c_{p0}T_0}$" src="../../form_344.png"/> Eckert number; it is the ratio between kinetic energy and enthalpy one;</li>
 </ul>
-<p>These selections fix all other reference quantities:</p>
+<p>By means of the above non-dimensional numbers the conservation equations could be written as:</p>
+<p><img class="formulaInl" alt="$ \begin{array}{l} {\rm{St}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \cdot \vec ndS'} = 0\\ {\rm{St}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \overrightarrow {v'} \cdot \vec ndS'} + \frac{1}{{{\rm{Ru}}}}\oint\limits_{S'(V')} {p'\overline{\overline I} \cdot \vec ndS'} - \frac{1}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\overline{\overline {\tau '}} \cdot \vec ndS'} = \frac{1}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ {\rm{St}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'} + \oint\limits_{S'(V')} {\rho 'E'\overrightarrow {v'} \cdot \vec ndS'} + \frac{{{\rm{Ec}}}}{{{\rm{Ru}}}}\oint\limits_{S'(V')} {p'\overrightarrow {v'} \cdot \vec ndS'} - \frac{{{\rm{Ec}}}}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}} \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'} + \\ - \frac{1}{{{\rm{PrRe}}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'} = \frac{{{\rm{Ec}}}}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} \cdot \overrightarrow {v'} dV'} + \frac{{{q_0}{L_0}}}{{{E_0}{v_0}}}\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array} $" src="../../form_390.png"/></p>
+<p>We are interested in Newtonian fluid in which <img class="formulaInl" alt="$\rm{St} = 1$" src="../../form_391.png"/>, <img class="formulaInl" alt="$\rm{Ru} = 1 => \rm{Ma} = \frac{1}{\sqrt{\gamma}}$" src="../../form_392.png"/> and <img class="formulaInl" alt="$\rm{Ec} = 1$" src="../../form_354.png"/>:</p>
 <ul>
-<li><img class="formulaInl" alt="$ a_0 = sqrt{\gamma R T} = v_0 $" src="../../form_265.png"/> reference speed;</li>
-<li><img class="formulaInl" alt="$ E_0 = a_0^2 $" src="../../form_266.png"/> reference energy;</li>
-<li><img class="formulaInl" alt="$ t_0 = \frac{L_0}{a_0} $" src="../../form_267.png"/> reference time;</li>
-<li><img class="formulaInl" alt="$ p_0 = \rho a_0^2 $" src="../../form_268.png"/> reference pressure;</li>
-<li><img class="formulaInl" alt="$ \tau_0 = \frac{\mu_0 a_0}{L_0} $" src="../../form_269.png"/> reference shear stress;</li>
-<li><img class="formulaInl" alt="$ f_0 = \frac{a_0^2}{L_0} $" src="../../form_270.png"/> reference specific force;</li>
-<li><img class="formulaInl" alt="$ q_0 = \frac{a_0^3}{L_0} $" src="../../form_271.png"/> reference specific heat.</li>
+<li><img class="formulaInl" alt="$ t_0 = \frac{L_0}{v_0}$" src="../../form_393.png"/></li>
+<li><img class="formulaInl" alt="$ p_0 = \rho_0 v_0^2 => a_0 = \sqrt{\gamma}v_0$" src="../../form_394.png"/></li>
+<li><img class="formulaInl" alt="$ c_{p0}T_0 = v_0^2$" src="../../form_395.png"/></li>
 </ul>
-<p>It has been assumed that the viscosity depends only by the temperature thus <img class="formulaInl" alt="$\mu_0 = \mu (T_0)$" src="../../form_272.png"/>. Assuming a constant Prandtl number we have also <img class="formulaInl" alt="$ k_0 = k(\mu(T_0)) $" src="../../form_273.png"/>.</p>
-<p>Using the above reference values the non-dimensional form of the conservation equations is (using the same symbols of aboves for dimensionless quantities):</p>
-<p><img class="formulaInl" alt="$\begin{array}{*{20}{c}} {\frac{\partial }{{\partial t}}\int\limits_V {\rho dV} + \oint\limits_S {\rho \vec v \cdot \overrightarrow n dS} = 0}\\ {\frac{\partial }{{\partial t}}\int\limits_V {\rho \vec vdV} + \oint\limits_S {\left[ {\left( {\rho \vec v\vec v + p\overline{\overline I} } \right) - \frac{1}{{{\mathop{\rm Re}\nolimits} }}\overline{\overline \tau } } \right] \cdot \overrightarrow n dS} = \int\limits_V {\rho \overrightarrow {{f_e}} dV} }\\ {\frac{\partial }{{\partial t}}\int\limits_V {\rho EdV} + \oint\limits_S {\left[ {\left( {\rho E + p} \right)\vec v - \frac{1}{{{\mathop{\rm Re}\nolimits} }}\overline{\overline \tau } \cdot \vec v - \frac{1}{{{\mathop{\rm Re}\nolimits} \Pr \left( {\gamma - 1} \right)}}k\overrightarrow \nabla T} \right] \cdot \overrightarrow n dS} = \int\limits_V {\left( {\rho \overrightarrow {{f_e}} \cdot \vec v + {q_h}} \right)dV} } \end{array}$" src="../../form_274.png"/> <br/>
- where:</p>
+<p>As a consequence the non dimensional conservation equations are:</p>
+<p><img class="formulaInl" alt="$ \begin{array}{l} \frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \cdot \vec ndS'} = 0\\ \frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'} + \oint\limits_{S'(V')} {\left( {\rho '\overrightarrow {v'} \overrightarrow {v'} + p'\overline{\overline I} } \right) \cdot \vec ndS'} - \frac{1}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\overline{\overline {\tau '}} \cdot \vec ndS'} = \frac{1}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ \frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'} + \oint\limits_{S'(V')} {\left( {\rho 'E' + p'} \right)\overrightarrow {v'} \cdot \vec ndS'} - \frac{{\rm{1}}}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}} \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'} - \frac{1}{{{\rm{PrRe}}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'} = \\ \frac{{\rm{1}}}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} \cdot \overrightarrow {v'} dV'} + \frac{{{q_0}{L_0}}}{{{E_0}{v_0}}}\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array} $" src="../../form_396.png"/></p>
+<p>The selected non-dimensional numbers are:</p>
 <ul>
-<li><img class="formulaInl" alt="$Re$" src="../../form_275.png"/> is the Reynolds number defined as: <img class="formulaInl" alt="$Re=\frac{\rho_0 v_0 L_0}{\mu_0}$" src="../../form_276.png"/>;</li>
-<li><img class="formulaInl" alt="$Pr$" src="../../form_277.png"/> is the Prandtl number defined as: <img class="formulaInl" alt="$Pr=\frac{\mu_0 c_p}{k_0}$" src="../../form_278.png"/>.</li>
+<li><img class="formulaInl" alt="$ \rm{Re} = \frac{\rho_0 v_0 L_0}{\mu_0}$" src="../../form_341.png"/> Reynolds number;</li>
+<li><img class="formulaInl" alt="$ \rm{Fr} = \sqrt{\frac{v_0^2}{f_0 L_0}}$" src="../../form_342.png"/> Froude number;</li>
+<li><img class="formulaInl" alt="$ \rm{Pr} = \frac{\mu_0 c_{p0}}{k_0}$" src="../../form_343.png"/> Prandtl number;</li>
 </ul>
-<dl class="note"><dt><b>Note:</b></dt><dd>The viscous terms are not yet implemented (they are under developing). The system actually resolved is the Euler one (the inviscid one).</dd></dl>
+<p>The above non-dimensional numbers are dependent each other. In Reynolds and Froude numbers <img class="formulaInl" alt="$L_0$" src="../../form_397.png"/> and <img class="formulaInl" alt="$v_0$" src="../../form_398.png"/> are present. Similarly in Reynolds and Prandtl numbers <img class="formulaInl" alt="$\mu_0$" src="../../form_399.png"/> is present. Therefore fixing the above non-dimensional numbers the following reference values must be fixed:</p>
+<ul>
+<li><img class="formulaInl" alt="$ L_0 $" src="../../form_262.png"/> reference length;</li>
+<li><img class="formulaInl" alt="$ \rho_0 $" src="../../form_264.png"/> reference density;</li>
+<li><img class="formulaInl" alt="$ v_0 $" src="../../form_400.png"/> reference velocity;</li>
+<li><img class="formulaInl" alt="$ \mu_0 $" src="../../form_401.png"/> reference dynamic viscosity;</li>
+<li><img class="formulaInl" alt="$ f_0 $" src="../../form_402.png"/> reference specific force;</li>
+<li><img class="formulaInl" alt="$ c_0 $" src="../../form_403.png"/> reference specific heat;</li>
+<li><img class="formulaInl" alt="$ k_0 $" src="../../form_404.png"/> reference thermal conductivity coefficient.</li>
+</ul>
+<p>We have fixed the following reference values:</p>
+<ul>
+<li><img class="formulaInl" alt="$ L_0 $" src="../../form_262.png"/> reference length;</li>
+<li><img class="formulaInl" alt="$ \rho_0 $" src="../../form_264.png"/> reference density;</li>
+<li><img class="formulaInl" alt="$ v_0 $" src="../../form_400.png"/> reference velocity;</li>
+<li><img class="formulaInl" alt="$ c_0 $" src="../../form_403.png"/> reference specific heat.</li>
+</ul>
+<p>These selections with the above selected non-dimensional numbers fix all other reference quantities:</p>
+<ul>
+<li><img class="formulaInl" alt="$ \mu_0 = \frac{\rho_0 v_0 L_0}{\rm{Re}}$" src="../../form_405.png"/> reference dynamic viscosity;</li>
+<li><img class="formulaInl" alt="$ f_0 = \frac{v_0^2}{L_0 \rm{Fr}^2}$" src="../../form_406.png"/> reference specific force;</li>
+<li><img class="formulaInl" alt="$ k_0 = \frac{\mu_0 c_0}{\rm{Pr}}$" src="../../form_407.png"/> reference thermal conductivity coefficient.</li>
+<li><img class="formulaInl" alt="$ t_0 = \frac{L_0}{v_0}$" src="../../form_393.png"/> reference time;</li>
+<li><img class="formulaInl" alt="$ p_0 = \rho_0 v_0^2 $" src="../../form_335.png"/> reference pressure;</li>
+<li><img class="formulaInl" alt="$ a_0 = \sqrt{\gamma}v_0 $" src="../../form_408.png"/> reference speed of sound;</li>
+<li><img class="formulaInl" alt="$ T_0 = \frac{v_0^2}{c_0} $" src="../../form_409.png"/> reference temperature;</li>
+<li><img class="formulaInl" alt="$ E_0 = v_0^2 $" src="../../form_410.png"/> reference specific energy;</li>
+<li><img class="formulaInl" alt="$ q_0 = \frac{v_0^3}{L_0} $" src="../../form_411.png"/> reference specific heat.</li>
+</ul>
 <p>The above equations constitute a system of partial differential equations closed by enforcing appropriate boundary conditions and initial conditions (at physical and computational boundaries).</p>
 <h2><a class="anchor" id="NumericalModels"></a>
 Numerical Models</h2>
@@ -175,9 +213,9 @@ Numerical Models</h2>
 <p>This system could be written in terms of <em>residual</em> <em>function:</em> </p>
 <p><img class="formulaInl" alt="$\begin{array}{l} \frac{\partial }{{\partial t}}\int\limits_{{V_{ijk}}} {\overrightarrow U d{V_{ijk}}} = R\left( {\overrightarrow U } \right)\\ R\left( {\overrightarrow U } \right) = - \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline F} \cdot \overrightarrow {{n_s}} d{S_s}} } + \int\limits_{{V_{ijk}}} {\overrightarrow {{Q_V}} d{V_{ijk}}} + \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline {{Q_S}}} \cdot \overrightarrow {{n_s}} d{S_s}} } \end{array}$" src="../../form_289.png"/> <br/>
  where the residual function <img class="formulaInl" alt="$R\left({\overrightarrow U }\right)$" src="../../form_290.png"/> is the space operator. In order to compute this operator several different schemes are adopted for each different term of the operator.</p>
-<p>For computing the numerical fluxes several different solvers are used.</p>
+<p>For computing the numerical fluxes several different solvers are used. It is useful to distinguish between convective and diffusive fluxes:</p>
 <p>For the convective fluxes <img class="formulaInl" alt="$(\overline{\overline F} - \overline{\overline {{Q_S}}})_{conv} = \left[ {\begin{array}{*{20}{c}} {\rho \vec v}\\ {\rho \vec v\vec v + p\overline{\overline I } }\\ {(\rho E+p)\vec v } \end{array}} \right]$" src="../../form_291.png"/> Riemann Problem solvers are used (see <a class="el" href="../../d6/dec/group__Library.html#d8/d76/classLib__Riemann">Riemann module library</a>). High order approximation of numerical fluxes is obtained by means of WENO (Weighted Essentially Non Oscillatory) reconstruction, see <a class="el" href="../../d6/dec/group__Library.html#d7/d0a/classLib__WENO">WENO module library</a>.</p>
-<dl class="note"><dt><b>Note:</b></dt><dd>The viscous fluxes are under developing.</dd></dl>
+<p>For the diffusive fluxes <img class="formulaInl" alt="${\left( {\overline{\overline F} - \overline{\overline {{Q_S}}} } \right)_{diff}} = \left[ {\begin{array}{*{20}{c}} 0\\ { - \overline{\overline \tau } }\\ { - \overline{\overline \tau } \cdot \vec v - k\overrightarrow \nabla T} \end{array}} \right]$" src="../../form_414.png"/> a standard central second order approximation is used (based on Finite-Volume derivative approximation).</p>
 <p>The time integration of the unsteady terms is computed by means of Runge-Kutta schemes, see <a class="el" href="../../d6/dec/group__Library.html#d6/dc1/classLib__Runge__Kutta">Runge-Kutta module library</a>.</p>
 <p>For more details see the Application Program Interface (API) pages of this documentation.</p>
 <h2><a class="anchor" id="OtherModels"></a>
@@ -204,7 +242,7 @@ Multi Fluids Model</h3>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri May 25 2012 09:01:24 for OFF by
+    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

@@ -2,7 +2,6 @@ var searchData=
 [
   ['screen_5fout',['screen_out',['../dd/dfd/group__DerivedType.html#ae749cd4b9a60fd2bf77eb22cb69dc7f9',1,'Data_Type_Globals::Type_File_Global']]],
   ['seconds',['Seconds',['../dd/dfd/group__DerivedType.html#a28b84a68e96e2ced667616adf5410bf2',1,'Data_Type_Time::Type_Time']]],
-  ['sendmap',['sendmap',['../d6/dec/group__Library.html#a4545e783bd1568996741f53d7cd0c8f1',1,'Lib_Parallel']]],
   ['sep',['sep',['../dd/dfd/group__DerivedType.html#a34e0250226ce69c37785e88ae67e5eb6',1,'Data_Type_OS::Type_OS']]],
   ['shell',['SHELL',['../d8/d16/makefile.html#a79f0bac0e73874da7fb7ee23d49c929c',1,'makefile']]],
   ['si',['Si',['../d4/da2/classData__Type__Globals.html#a90b1f5a84832a18b59ad77fa60b6a3ca',1,'Data_Type_Globals::Type_Mesh_Block']]],

@@ -107,12 +107,12 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <table class="memberdecls">
 <tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga12ddef5212e444aa9d2d9060f4ab1662">Lib_WENO::weno_init</a> (myrank, global, block, S)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for initialization of WENO coefficients.  <a href="#ga12ddef5212e444aa9d2d9060f4ab1662"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga9329e093c7635e22e7884d4631848878">Lib_WENO::noweno_central</a> (S, V)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing central difference reconstruction of <img class="formulaInl" alt="$2S^{th}$" src="../../form_218.png"/> order instead of WENO <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_219.png"/> one.  <a href="#ga9329e093c7635e22e7884d4631848878"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga47430fff09742d9963802b0dd1cf9bc2">Lib_WENO::weno_optimal</a> (S, V)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_219.png"/> order.  <a href="#ga47430fff09742d9963802b0dd1cf9bc2"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#gaf043f24262940e4e499aa9fdedba75df">Lib_WENO::weno</a> (S, V)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing WENO reconstruction of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_219.png"/> order.  <a href="#gaf043f24262940e4e499aa9fdedba75df"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga423849469cf89742a6b89a4de6fe2483">Lib_WENO::noweno_central</a> (S, V, VR)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing central difference reconstruction of <img class="formulaInl" alt="$2S^{th}$" src="../../form_218.png"/> order instead of WENO <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_219.png"/> one.  <a href="#ga423849469cf89742a6b89a4de6fe2483"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#gae8561586f225901448fdf77063cbd198">Lib_WENO::weno_optimal</a> (S, V, VR)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_219.png"/> order.  <a href="#gae8561586f225901448fdf77063cbd198"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga6e6e6f50289dc3eca17b1e394a78925e">Lib_WENO::weno</a> (S, V, VR)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing WENO reconstruction of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_219.png"/> order.  <a href="#ga6e6e6f50289dc3eca17b1e394a78925e"></a><br/></td></tr>
 </table>
 <hr/><h2>Function/Subroutine Documentation</h2>
 <a class="anchor" id="ga12ddef5212e444aa9d2d9060f4ab1662"></a><!-- doxytag: member="Lib_WENO::weno_init" ref="ga12ddef5212e444aa9d2d9060f4ab1662" args="(myrank, global, block, S)" -->
@@ -180,12 +180,12 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 
 </div>
 </div>
-<a class="anchor" id="ga9329e093c7635e22e7884d4631848878"></a><!-- doxytag: member="Lib_WENO::noweno_central" ref="ga9329e093c7635e22e7884d4631848878" args="(S, V)" -->
+<a class="anchor" id="ga423849469cf89742a6b89a4de6fe2483"></a><!-- doxytag: member="Lib_WENO::noweno_central" ref="ga423849469cf89742a6b89a4de6fe2483" args="(S, V, VR)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pure function, public <a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga9329e093c7635e22e7884d4631848878">Lib_WENO::noweno_central</a> </td>
+          <td class="memname">pure subroutine, public <a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga423849469cf89742a6b89a4de6fe2483">Lib_WENO::noweno_central</a> </td>
           <td>(</td>
           <td class="paramtype">integer(I_P), intent(in)&#160;</td>
           <td class="paramname"><em>S</em>, </td>
@@ -193,8 +193,14 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(R_P), dimension (1:2,0:2*s), intent(in)&#160;</td>
-          <td class="paramname"><em>V</em>&#160;</td>
+          <td class="paramtype">real(R_P), dimension (1:,0:), intent(in)&#160;</td>
+          <td class="paramname"><em>V</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(R_P), dimension(1:), intent(out)&#160;</td>
+          <td class="paramname"><em>VR</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -205,25 +211,27 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Function for computing central difference reconstruction of <img class="formulaInl" alt="$2S^{th}$" src="../../form_218.png"/> order instead of WENO <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_219.png"/> one. </p>
+<p>Subroutine for computing central difference reconstruction of <img class="formulaInl" alt="$2S^{th}$" src="../../form_218.png"/> order instead of WENO <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_219.png"/> one. </p>
+<dl class="note"><dt><b>Note:</b></dt><dd>For avoiding the creation of temporary arrays (improving the efficiency) the arrays <b>V</b> and <b>VR</b> are declared as assumed-shape with only the lower bound defined. Their extentions are: V [1:2,0:2*S], VR [1:2]. </dd></dl>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">S</td><td>Number of stencils used. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">V</td><td>Variable to be reconstructed. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">V</td><td>Variable to be reconstructed. [1:2,0:2*S]. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">VR</td><td>Left and right (1,2) interface value of reconstructed V [1:2 ]. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00303">303</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00305">305</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ga47430fff09742d9963802b0dd1cf9bc2"></a><!-- doxytag: member="Lib_WENO::weno_optimal" ref="ga47430fff09742d9963802b0dd1cf9bc2" args="(S, V)" -->
+<a class="anchor" id="gae8561586f225901448fdf77063cbd198"></a><!-- doxytag: member="Lib_WENO::weno_optimal" ref="gae8561586f225901448fdf77063cbd198" args="(S, V, VR)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pure function, public <a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga47430fff09742d9963802b0dd1cf9bc2">Lib_WENO::weno_optimal</a> </td>
+          <td class="memname">pure subroutine, public <a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#gae8561586f225901448fdf77063cbd198">Lib_WENO::weno_optimal</a> </td>
           <td>(</td>
           <td class="paramtype">integer(I_P), intent(in)&#160;</td>
           <td class="paramname"><em>S</em>, </td>
@@ -231,8 +239,14 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(R_P), dimension (1:2,1-s:-1+s), intent(in)&#160;</td>
-          <td class="paramname"><em>V</em>&#160;</td>
+          <td class="paramtype">real(R_P), dimension (1:,1-s:), intent(in)&#160;</td>
+          <td class="paramname"><em>V</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(R_P), dimension(1:), intent(out)&#160;</td>
+          <td class="paramname"><em>VR</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -243,25 +257,27 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Function for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_219.png"/> order. </p>
+<p>Subroutine for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_219.png"/> order. </p>
+<dl class="note"><dt><b>Note:</b></dt><dd>For avoiding the creation of temporary arrays (improving the efficiency) the arrays <b>V</b> and <b>VR</b> are declared as assumed-shape with only the lower bound defined. Their extentions are: V [1:2,1-S:-1+S], VR [1:2]. </dd></dl>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">S</td><td>Number of stencils used. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">V</td><td>Variable to be reconstructed. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">V</td><td>Variable to be reconstructed [1:2,1-S:-1+S]. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">VR</td><td>Left and right (1,2) interface value of reconstructed V [1:2 ]. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00326">326</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00330">330</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="gaf043f24262940e4e499aa9fdedba75df"></a><!-- doxytag: member="Lib_WENO::weno" ref="gaf043f24262940e4e499aa9fdedba75df" args="(S, V)" -->
+<a class="anchor" id="ga6e6e6f50289dc3eca17b1e394a78925e"></a><!-- doxytag: member="Lib_WENO::weno" ref="ga6e6e6f50289dc3eca17b1e394a78925e" args="(S, V, VR)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pure function, public <a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#gaf043f24262940e4e499aa9fdedba75df">Lib_WENO::weno</a> </td>
+          <td class="memname">pure subroutine, public <a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga6e6e6f50289dc3eca17b1e394a78925e">Lib_WENO::weno</a> </td>
           <td>(</td>
           <td class="paramtype">integer(I_P), intent(in)&#160;</td>
           <td class="paramname"><em>S</em>, </td>
@@ -269,8 +285,14 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(R_P), dimension (1:2,1-s:-1+s), intent(in)&#160;</td>
-          <td class="paramname"><em>V</em>&#160;</td>
+          <td class="paramtype">real(R_P), dimension (1:,1-s:), intent(in)&#160;</td>
+          <td class="paramname"><em>V</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(R_P), dimension(1:), intent(out)&#160;</td>
+          <td class="paramname"><em>VR</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -281,16 +303,18 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Function for computing WENO reconstruction of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_219.png"/> order. </p>
+<p>Subroutine for computing WENO reconstruction of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_219.png"/> order. </p>
+<dl class="note"><dt><b>Note:</b></dt><dd>For avoiding the creation of temporary arrays (improving the efficiency) the arrays <b>V</b> and <b>VR</b> are declared as assumed-shape with only the lower bound defined. Their extentions are: V [1:2,1-S:-1+S], VR [1:2]. </dd></dl>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">S</td><td>Number of stencils used. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">V</td><td>Variable to be reconstructed. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">V</td><td>Variable to be reconstructed [1:2,1-S:-1+S]. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">VR</td><td>Left and right (1,2) interface value of reconstructed V [1:2 ]. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00348">348</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html#l00354">354</a> of file <a class="el" href="../../d3/d4e/Lib__WENO_8f90_source.html">Lib_WENO.f90</a>.</p>
 
 </div>
 </div>
@@ -313,7 +337,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri May 25 2012 09:01:25 for OFF by
+    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

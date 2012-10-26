@@ -105,20 +105,60 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </td></tr></table></center>
 </div>
 <table class="memberdecls">
-<tr><td class="memItemLeft" align="right" valign="top">logical function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga51d7e6aef45d1a6e74ce8275ca627ca7">Data_Type_Time::not_eq</a> (time1, time2)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">logical function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga2d830605f98a77388e43487bd971342f">Data_Type_Time::low</a> (time1, time2)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">logical function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga37d2ca06f8b73bc0548a9dea6e9c52c9">Data_Type_Time::low_eq</a> (time1, time2)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">logical function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga624e63b0a5ace21dc86841c191e8913e">Data_Type_Time::eq</a> (time1, time2)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">logical function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga56e9ee3f31a2288cb6b0bf7b762ba37b">Data_Type_Time::great_eq</a> (time1, time2)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">logical function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#gaebf1eaf93fd962f05e934eb90bcff8eb">Data_Type_Time::great</a> (time1, time2)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#gab03c9d788b4332245647b3169ac821dd">Data_Type_Time::sec2time</a> (Time, seconds)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for converting seconds to <a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time" title="Derived type containing time variables.">Type_Time</a> (days,hours,minutes,seconds) format.  <a href="#gab03c9d788b4332245647b3169ac821dd"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">elemental function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#gac61bf52355c2c60e755f8855aee808ba">Data_Type_Time::not_eq</a> (time1, time2)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">elemental function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#gae45e3d2a72a1b594d930565528d202b2">Data_Type_Time::low</a> (time1, time2)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">elemental function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#gaf24c59a41a37884f4a94783d7d094555">Data_Type_Time::low_eq</a> (time1, time2)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">elemental function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga1d1ed67e1ffe4725d82d549e5b1a0099">Data_Type_Time::eq</a> (time1, time2)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">elemental function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga52411bd699ba338ea10ebbeb7e524143">Data_Type_Time::great_eq</a> (time1, time2)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">elemental function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga4b26c4d4daeb7463add7876d66e4ffde">Data_Type_Time::great</a> (time1, time2)</td></tr>
 </table>
 <hr/><h2>Function/Subroutine Documentation</h2>
-<a class="anchor" id="ga51d7e6aef45d1a6e74ce8275ca627ca7"></a><!-- doxytag: member="Data_Type_Time::not_eq" ref="ga51d7e6aef45d1a6e74ce8275ca627ca7" args="(time1, time2)" -->
+<a class="anchor" id="gab03c9d788b4332245647b3169ac821dd"></a><!-- doxytag: member="Data_Type_Time::sec2time" ref="gab03c9d788b4332245647b3169ac821dd" args="(Time, seconds)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">logical function <a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga51d7e6aef45d1a6e74ce8275ca627ca7">Data_Type_Time::not_eq</a> </td>
+          <td class="memname">elemental subroutine <a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#gab03c9d788b4332245647b3169ac821dd">Data_Type_Time::sec2time</a> </td>
+          <td>(</td>
+          <td class="paramtype">class(<a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time">Type_Time</a>), intent(inout)&#160;</td>
+          <td class="paramname"><em>Time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(R_P), intent(in)&#160;</td>
+          <td class="paramname"><em>seconds</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Subroutine for converting seconds to <a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time" title="Derived type containing time variables.">Type_Time</a> (days,hours,minutes,seconds) format. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">Time</td><td>Time in days,hours,minutes,seconds format. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">seconds</td><td>Number of seconds. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00091">91</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="gac61bf52355c2c60e755f8855aee808ba"></a><!-- doxytag: member="Data_Type_Time::not_eq" ref="gac61bf52355c2c60e755f8855aee808ba" args="(time1, time2)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">elemental function <a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#gac61bf52355c2c60e755f8855aee808ba">Data_Type_Time::not_eq</a> </td>
           <td>(</td>
           <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time">Type_Time</a>), intent(in)&#160;</td>
           <td class="paramname"><em>time1</em>, </td>
@@ -138,16 +178,16 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00085">85</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00107">107</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ga2d830605f98a77388e43487bd971342f"></a><!-- doxytag: member="Data_Type_Time::low" ref="ga2d830605f98a77388e43487bd971342f" args="(time1, time2)" -->
+<a class="anchor" id="gae45e3d2a72a1b594d930565528d202b2"></a><!-- doxytag: member="Data_Type_Time::low" ref="gae45e3d2a72a1b594d930565528d202b2" args="(time1, time2)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">logical function <a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga2d830605f98a77388e43487bd971342f">Data_Type_Time::low</a> </td>
+          <td class="memname">elemental function <a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#gae45e3d2a72a1b594d930565528d202b2">Data_Type_Time::low</a> </td>
           <td>(</td>
           <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time">Type_Time</a>), intent(in)&#160;</td>
           <td class="paramname"><em>time1</em>, </td>
@@ -167,16 +207,16 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00106">106</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00128">128</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ga37d2ca06f8b73bc0548a9dea6e9c52c9"></a><!-- doxytag: member="Data_Type_Time::low_eq" ref="ga37d2ca06f8b73bc0548a9dea6e9c52c9" args="(time1, time2)" -->
+<a class="anchor" id="gaf24c59a41a37884f4a94783d7d094555"></a><!-- doxytag: member="Data_Type_Time::low_eq" ref="gaf24c59a41a37884f4a94783d7d094555" args="(time1, time2)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">logical function <a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga37d2ca06f8b73bc0548a9dea6e9c52c9">Data_Type_Time::low_eq</a> </td>
+          <td class="memname">elemental function <a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#gaf24c59a41a37884f4a94783d7d094555">Data_Type_Time::low_eq</a> </td>
           <td>(</td>
           <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time">Type_Time</a>), intent(in)&#160;</td>
           <td class="paramname"><em>time1</em>, </td>
@@ -196,16 +236,16 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00146">146</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00168">168</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ga624e63b0a5ace21dc86841c191e8913e"></a><!-- doxytag: member="Data_Type_Time::eq" ref="ga624e63b0a5ace21dc86841c191e8913e" args="(time1, time2)" -->
+<a class="anchor" id="ga1d1ed67e1ffe4725d82d549e5b1a0099"></a><!-- doxytag: member="Data_Type_Time::eq" ref="ga1d1ed67e1ffe4725d82d549e5b1a0099" args="(time1, time2)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">logical function <a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga624e63b0a5ace21dc86841c191e8913e">Data_Type_Time::eq</a> </td>
+          <td class="memname">elemental function <a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga1d1ed67e1ffe4725d82d549e5b1a0099">Data_Type_Time::eq</a> </td>
           <td>(</td>
           <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time">Type_Time</a>), intent(in)&#160;</td>
           <td class="paramname"><em>time1</em>, </td>
@@ -225,16 +265,16 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00174">174</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00196">196</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ga56e9ee3f31a2288cb6b0bf7b762ba37b"></a><!-- doxytag: member="Data_Type_Time::great_eq" ref="ga56e9ee3f31a2288cb6b0bf7b762ba37b" args="(time1, time2)" -->
+<a class="anchor" id="ga52411bd699ba338ea10ebbeb7e524143"></a><!-- doxytag: member="Data_Type_Time::great_eq" ref="ga52411bd699ba338ea10ebbeb7e524143" args="(time1, time2)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">logical function <a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga56e9ee3f31a2288cb6b0bf7b762ba37b">Data_Type_Time::great_eq</a> </td>
+          <td class="memname">elemental function <a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga52411bd699ba338ea10ebbeb7e524143">Data_Type_Time::great_eq</a> </td>
           <td>(</td>
           <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time">Type_Time</a>), intent(in)&#160;</td>
           <td class="paramname"><em>time1</em>, </td>
@@ -254,16 +294,16 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00195">195</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00217">217</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="gaebf1eaf93fd962f05e934eb90bcff8eb"></a><!-- doxytag: member="Data_Type_Time::great" ref="gaebf1eaf93fd962f05e934eb90bcff8eb" args="(time1, time2)" -->
+<a class="anchor" id="ga4b26c4d4daeb7463add7876d66e4ffde"></a><!-- doxytag: member="Data_Type_Time::great" ref="ga4b26c4d4daeb7463add7876d66e4ffde" args="(time1, time2)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">logical function <a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#gaebf1eaf93fd962f05e934eb90bcff8eb">Data_Type_Time::great</a> </td>
+          <td class="memname">elemental function <a class="el" href="../../db/d28/group__Data__Type__TimePrivateProcedure.html#ga4b26c4d4daeb7463add7876d66e4ffde">Data_Type_Time::great</a> </td>
           <td>(</td>
           <td class="paramtype">type(<a class="el" href="../../dd/dfd/group__DerivedType.html#dc/d74/structData__Type__Time_1_1Type__Time">Type_Time</a>), intent(in)&#160;</td>
           <td class="paramname"><em>time1</em>, </td>
@@ -283,7 +323,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00235">235</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html#l00257">257</a> of file <a class="el" href="../../d2/d8f/Data__Type__Time_8f90_source.html">Data_Type_Time.f90</a>.</p>
 
 </div>
 </div>
@@ -306,7 +346,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri May 25 2012 09:01:24 for OFF by
+    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

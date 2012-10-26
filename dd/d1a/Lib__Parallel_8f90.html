@@ -96,8 +96,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div id="doc-content">
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Data Types</a> &#124;
-<a href="#func-members">Functions/Subroutines</a>  </div>
+<a href="#nested-classes">Data Types</a>  </div>
   <div class="headertitle">
 <div class="title">Lib_Parallel.f90 File Reference</div>  </div>
 </div><!--header-->
@@ -109,163 +108,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 Data Types</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">module &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dec/group__Library.html#d1/d0f/classLib__Parallel">Lib_Parallel</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This module contains the definition of procedures for send/receive data among processes for parallel (MPI) operations.  <a href="../../d6/dec/group__Library.html#d1/d0f/classLib__Parallel">More...</a><br/></td></tr>
-<tr><td colspan="2"><h2><a name="func-members"></a>
-Functions/Subroutines</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d1a/Lib__Parallel_8f90.html#a5bbe49df7f8d9b21931033c36e6db7f9">scan_proc</a> (NcR, proc, global, block, reqsmap, recvmap)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d1a/Lib__Parallel_8f90.html#a15b10d921326106ca809890636f24e52">scan_block</a> (NcR, block, proc, b, c, reqsmap, recvmap)</td></tr>
 </table>
-<hr/><h2>Function/Subroutine Documentation</h2>
-<a class="anchor" id="a5bbe49df7f8d9b21931033c36e6db7f9"></a><!-- doxytag: member="Lib_Parallel.f90::scan_proc" ref="a5bbe49df7f8d9b21931033c36e6db7f9" args="(NcR, proc, global, block, reqsmap, recvmap)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine <a class="el" href="../../dd/d1a/Lib__Parallel_8f90.html#a5bbe49df7f8d9b21931033c36e6db7f9">compute_recv_maps::scan_proc</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>NcR</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>proc</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Global), intent(in)&#160;</td>
-          <td class="paramname"><em>global</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Block), dimension(1:global%mesh%nb), intent(in)&#160;</td>
-          <td class="paramname"><em>block</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(I_P), dimension(1:4,1:ncr), intent(out)&#160;</td>
-          <td class="paramname"><em>reqsmap</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(I_P), dimension(1:4,1:ncr), intent(out)&#160;</td>
-          <td class="paramname"><em>recvmap</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../dd/d1a/Lib__Parallel_8f90_source.html#l00297">297</a> of file <a class="el" href="../../dd/d1a/Lib__Parallel_8f90_source.html">Lib_Parallel.f90</a>.</p>
-
-<p>References <a class="el" href="../../dd/d1a/Lib__Parallel_8f90_source.html#l00329">scan_block()</a>.</p>
-
-<p>Referenced by <a class="el" href="../../dd/d1a/Lib__Parallel_8f90_source.html#l00267">Lib_Parallel::compute_recv_maps()</a>.</p>
-
-<p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-0-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="../../dd/d1a/Lib__Parallel_8f90_a5bbe49df7f8d9b21931033c36e6db7f9_cgraph.png" border="0" usemap="#dd/d1a/Lib__Parallel_8f90_a5bbe49df7f8d9b21931033c36e6db7f9_cgraph" alt=""/></div>
-<map name="dd/d1a/Lib__Parallel_8f90_a5bbe49df7f8d9b21931033c36e6db7f9_cgraph" id="dd/d1a/Lib__Parallel_8f90_a5bbe49df7f8d9b21931033c36e6db7f9_cgraph">
-<area shape="rect" id="node3" href="../../dd/d1a/Lib__Parallel_8f90.html#a15b10d921326106ca809890636f24e52" title="scan_block" alt="" coords="136,5,224,35"/></map>
-</div>
-</p>
-
-<p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-1-trigger" src="../../closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="../../dd/d1a/Lib__Parallel_8f90_a5bbe49df7f8d9b21931033c36e6db7f9_icgraph.png" border="0" usemap="#dd/d1a/Lib__Parallel_8f90_a5bbe49df7f8d9b21931033c36e6db7f9_icgraph" alt=""/></div>
-<map name="dd/d1a/Lib__Parallel_8f90_a5bbe49df7f8d9b21931033c36e6db7f9_icgraph" id="dd/d1a/Lib__Parallel_8f90_a5bbe49df7f8d9b21931033c36e6db7f9_icgraph">
-<area shape="rect" id="node3" href="../../d6/dec/group__Library.html#abcc44b45fee083dcecf76b01b90318a5" title="Lib_Parallel::compute_recv_maps" alt="" coords="136,5,355,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a15b10d921326106ca809890636f24e52"></a><!-- doxytag: member="Lib_Parallel.f90::scan_block" ref="a15b10d921326106ca809890636f24e52" args="(NcR, block, proc, b, c, reqsmap, recvmap)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">subroutine <a class="el" href="../../dd/d1a/Lib__Parallel_8f90.html#a15b10d921326106ca809890636f24e52">compute_recv_maps::scan_block</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>NcR</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Block), intent(in)&#160;</td>
-          <td class="paramname"><em>block</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>proc</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(I_P), intent(in)&#160;</td>
-          <td class="paramname"><em>b</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(I_P), intent(inout)&#160;</td>
-          <td class="paramname"><em>c</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(I_P), dimension(1:4,1:ncr), intent(out)&#160;</td>
-          <td class="paramname"><em>reqsmap</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer(I_P), dimension(1:4,1:ncr), intent(out)&#160;</td>
-          <td class="paramname"><em>recvmap</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="../../dd/d1a/Lib__Parallel_8f90_source.html#l00329">329</a> of file <a class="el" href="../../dd/d1a/Lib__Parallel_8f90_source.html">Lib_Parallel.f90</a>.</p>
-
-<p>Referenced by <a class="el" href="../../dd/d1a/Lib__Parallel_8f90_source.html#l00297">scan_proc()</a>.</p>
-
-<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-2-trigger" src="../../closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-2-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="../../dd/d1a/Lib__Parallel_8f90_a15b10d921326106ca809890636f24e52_icgraph.png" border="0" usemap="#dd/d1a/Lib__Parallel_8f90_a15b10d921326106ca809890636f24e52_icgraph" alt=""/></div>
-<map name="dd/d1a/Lib__Parallel_8f90_a15b10d921326106ca809890636f24e52_icgraph" id="dd/d1a/Lib__Parallel_8f90_a15b10d921326106ca809890636f24e52_icgraph">
-<area shape="rect" id="node3" href="../../dd/d1a/Lib__Parallel_8f90.html#a5bbe49df7f8d9b21931033c36e6db7f9" title="scan_proc" alt="" coords="141,5,224,35"/><area shape="rect" id="node5" href="../../d6/dec/group__Library.html#abcc44b45fee083dcecf76b01b90318a5" title="Lib_Parallel::compute_recv_maps" alt="" coords="272,5,491,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
 </div><!-- contents -->
 </div>
 <!-- window showing the filter options -->
@@ -286,7 +129,7 @@ Functions/Subroutines</h2></td></tr>
     <ul>
       <li class="navelem"><a class="el" href="../../dd/d1a/Lib__Parallel_8f90.html">Lib_Parallel.f90</a>      </li>
 
-    <li class="footer">Generated on Fri May 25 2012 09:01:24 for OFF by
+    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

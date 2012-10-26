@@ -6,6 +6,8 @@ var group__Lib__VTK__IOPrivateProcedure_dup =
     [ "VTK_INI_XML_I4", "df/d7f/group__Lib__VTK__IOPrivateProcedure.html#ga0ee8d03d8de0493fd6c31889e8d774ed", null ],
     [ "VTK_VAR_XML_SCAL_R8_I4", "df/d7f/group__Lib__VTK__IOPrivateProcedure.html#ga89dcfc0513cd167191d79ae0260cf62a", null ],
     [ "Upper_Case", "df/d7f/group__Lib__VTK__IOPrivateProcedure.html#ga44050a1ca17c1405672185fa38ec6d90", null ],
+    [ "Bytes", "df/d7f/group__Lib__VTK__IOPrivateProcedure.html#gac8251f0abfe54c11bb8a386787dcc445", null ],
+    [ "ioffset_update", "df/d7f/group__Lib__VTK__IOPrivateProcedure.html#ga4bf53149a174b8d814bb13aa0bc02fb5", null ],
     [ "VTK_GEO_STRP_R4", "df/d7f/group__Lib__VTK__IOPrivateProcedure.html#ga93418a0797d05b8f4e2d7d0dd21725fa", null ],
     [ "VTK_GEO_STRG_R8", "df/d7f/group__Lib__VTK__IOPrivateProcedure.html#gae99ece2cd0539b6781c5b3126676940e", null ],
     [ "VTK_GEO_STRG_R4", "df/d7f/group__Lib__VTK__IOPrivateProcedure.html#gae4d4651beeb072872c990dbf0612dd82", null ],

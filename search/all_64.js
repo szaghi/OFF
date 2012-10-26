@@ -38,7 +38,7 @@ var searchData=
   ['delta2_5f2o',['delta2_2o',['../dd/d55/group__Interface.html#dd/d3d/interfaceLib__Math_1_1delta2__2o',1,'Lib_Math']]],
   ['delta2_5f2o_5fr4',['delta2_2o_R4',['../dd/d55/group__Interface.html#a35497f7fdb44c78ce038c805f1c9cd21',1,'Lib_Math::delta2_2o::delta2_2o_R4()'],['../d6/dec/group__Library.html#ae4fd75539da62628889c90085fab2e21',1,'Lib_Math::delta2_2o_R4()']]],
   ['delta2_5f2o_5fr8',['delta2_2o_R8',['../dd/d55/group__Interface.html#a1e91b1cdac3b7bc1c3481c0da2b0989f',1,'Lib_Math::delta2_2o::delta2_2o_R8()'],['../d6/dec/group__Library.html#a5601695a824d55461b6c080df790fecf',1,'Lib_Math::delta2_2o_R8()']]],
-  ['determinant',['determinant',['../d9/d2f/classData__Type__Tensor.html#a635b777e6fdc506f23ea0a0ebd87e11a',1,'Data_Type_Tensor']]],
+  ['determinant',['determinant',['../dd/dfd/group__DerivedType.html#afd99ff1118dcd687d6fa138ac0898021',1,'Data_Type_Tensor::Type_Tensor::determinant()'],['../d9/d0c/group__Data__Type__TensorPublicProcedure.html#ga635b777e6fdc506f23ea0a0ebd87e11a',1,'Data_Type_Tensor::determinant()']]],
   ['di1p',['DI1P',['../da/dd4/group__IR__Precision.html#ga5d0d5b0181ef2f17c73a1a0b068944dc',1,'IR_Precision']]],
   ['di2p',['DI2P',['../da/dd4/group__IR__Precision.html#gaa239925e89a9525b041c105153eec77c',1,'IR_Precision']]],
   ['di4p',['DI4P',['../da/dd4/group__IR__Precision.html#ga61bddae1e8a2f335790a680f703b8731',1,'IR_Precision']]],
@@ -54,5 +54,7 @@ var searchData=
   ['dr4p',['DR4P',['../da/dd4/group__IR__Precision.html#gad94596d4db4590f036a9f8dcec2169b8',1,'IR_Precision']]],
   ['dr8p',['DR8P',['../da/dd4/group__IR__Precision.html#gae87422d7f403e6fad4887d0f3d7c84f0',1,'IR_Precision']]],
   ['dr_5fp',['DR_P',['../da/dd4/group__IR__Precision.html#gadd4afb826e043512c74ac5c6f62c1eba',1,'IR_Precision']]],
-  ['dt',['Dt',['../dd/dfd/group__DerivedType.html#a892302aa6542dbed0eb2e5d1bf12079e',1,'Data_Type_Globals::Type_Fluid_Block']]]
+  ['dt',['Dt',['../dd/dfd/group__DerivedType.html#a892302aa6542dbed0eb2e5d1bf12079e',1,'Data_Type_Globals::Type_Fluid_Block']]],
+  ['dt0',['Dt0',['../dd/dfd/group__DerivedType.html#a1d2a942c06108be068274d42d2bb2b20',1,'Data_Type_Globals::Type_Adimensional_Global']]],
+  ['dudi_5ffv',['dudi_FV',['../de/d10/Lib__Fluxes__Diffusive_8f90.html#addd1950b7c5c2e8e55cba93bdb9a15db',1,'Lib_Fluxes_Diffusive.f90']]]
 ];

@@ -1,3 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d7/d68/Lib__Fluidynamic_8f90.html#ac27b512e170e1fd2ea188f68b54fe8ec" title="fluxes" alt="" coords="231,5,287,35"/>
+<area shape="rect" id="node3" href="$df/d83/Lib__Viscous__Fluxes_8f90.html#ab35b07db07db3184f890a2a5b1deb918" title="Function for computing the metrics (normals and interfaces area) of finite volume centered at interfa..." alt="" coords="232,5,371,35"/>
+<area shape="rect" id="node5" href="$df/d83/Lib__Viscous__Fluxes_8f90.html#a9689cecdf45ea9a30068faf569afbcba" title="Function for computing the velocity vector at interfaces of finite volume centered at interface i..." alt="" coords="231,59,372,88"/>
+<area shape="rect" id="node7" href="$df/d83/Lib__Viscous__Fluxes_8f90.html#a50a69cb5acc372ab2f6b94487523de7d" title="Function for computing the shear stress tensor at center of a finite volume." alt="" coords="253,112,349,141"/>
+<area shape="rect" id="node9" href="$df/d83/Lib__Viscous__Fluxes_8f90.html#a23486786243929a6dc36d1cc7eb79205" title="Function for computing first partial derivative by means of Finite Volumes approach (Green&#39;s theorem)..." alt="" coords="421,112,485,141"/>
 </map>

@@ -1,5 +1,5 @@
 var group__Data__Type__PrimitivePublicProcedure_dup =
 [
-    [ "prim2array", "d2/d15/group__Data__Type__PrimitivePublicProcedure.html#gae8c9fad0fd78585512e53003e92954b8", null ],
-    [ "array2prim", "d2/d15/group__Data__Type__PrimitivePublicProcedure.html#gaad03179150b6b89a56b56ee2b026561b", null ]
+    [ "write_primitive", "d2/d15/group__Data__Type__PrimitivePublicProcedure.html#gac3e079dc48b11fc85fff5ce010589813", null ],
+    [ "read_primitive", "d2/d15/group__Data__Type__PrimitivePublicProcedure.html#ga69ae2f96c124cf0b433b740a08b18b8a", null ]
 ];

@@ -109,116 +109,16 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions/Subroutines</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga83e7f576697486cf8ccee14ad855eb3d">p2c_reshape1D</a> (N, P, U)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency.  <a href="#ga83e7f576697486cf8ccee14ad855eb3d"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gaa8bed17d6b5136804543160600bd9c31">c2p_reshape1D</a> (N, U, P)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency.  <a href="#gaa8bed17d6b5136804543160600bd9c31"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gabb7369c20e4ef78216b6756d163cb469">Lib_Fluidynamic::compute_time</a> (global, block, Dtmin)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for evaluating the local and global time step value by CFL condition.  <a href="#gabb7369c20e4ef78216b6756d163cb469"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gabc9e93106542597ca7c9f624e849e93f">Lib_Fluidynamic::residuals</a> (s1, global, block)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing the residuals.  <a href="#gabc9e93106542597ca7c9f624e849e93f"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga3d0e47fc78f153168faa8200481e3fd9">Lib_Fluidynamic::rk_stages_sum</a> (s1, global, block)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for summing Runge-Kutta stages for updating primitive variables (block%fluid%P).  <a href="#ga3d0e47fc78f153168faa8200481e3fd9"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga21c7babcd053e5e947aa3d63acbce68a">rk_stg_reshape1D</a> (N, Dt, U, KS, P)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency.  <a href="#ga21c7babcd053e5e947aa3d63acbce68a"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gac8d097a8966b63e76049c7a18a2c9436">Lib_Fluidynamic::rk_time_integration</a> (global, block, RU)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing Runge-Kutta one time step integration.  <a href="#gac8d097a8966b63e76049c7a18a2c9436"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga758b5daf711f8241c6ccce4f5ba19931">rk_t_int_reshape1D</a> (N, Dt, KS, U, RU)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency.  <a href="#ga758b5daf711f8241c6ccce4f5ba19931"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gafcd52f4802d17f33ededcaf21feffd2f">Lib_Fluidynamic::rk_stages_sum</a> (s1, global, block)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for summing Runge-Kutta stages for updating primitive variables (block%fluid%P).  <a href="#gafcd52f4802d17f33ededcaf21feffd2f"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gae27a81762853e919a50a580cf5626590">Lib_Fluidynamic::rk_time_integration</a> (global, block, RU)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing Runge-Kutta one time step integration.  <a href="#gae27a81762853e919a50a580cf5626590"></a><br/></td></tr>
 </table>
 <hr/><h2>Function/Subroutine Documentation</h2>
-<a class="anchor" id="ga83e7f576697486cf8ccee14ad855eb3d"></a><!-- doxytag: member="Lib_Fluidynamic.f90::p2c_reshape1D" ref="ga83e7f576697486cf8ccee14ad855eb3d" args="(N, P, U)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">pure subroutine <a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga83e7f576697486cf8ccee14ad855eb3d">primitive2conservative::p2c_reshape1D</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I8P), intent(in)&#160;</td>
-          <td class="paramname"><em>N</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Primitive), dimension(1:n), intent(in)&#160;</td>
-          <td class="paramname"><em>P</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Conservative), dimension(1:n), intent(inout)&#160;</td>
-          <td class="paramname"><em>U</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency. </p>
-<p>The computation of the parent procedure is performed in 1D re-shaped arrays in order to augment the computational efficiency when using OpenMP shared parallel paradigm. As a matter of facts the scalability of OpenMP parallelism is exploited only when the parallelized loop is the largest one. In the case of multi-dimensional arrays the first index is not always the largest one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping there is only one index.</p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">N</td><td>Number of finite volumes. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">P</td><td>Primitive variables. </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">U</td><td>Conservative variables. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00158">158</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="gaa8bed17d6b5136804543160600bd9c31"></a><!-- doxytag: member="Lib_Fluidynamic.f90::c2p_reshape1D" ref="gaa8bed17d6b5136804543160600bd9c31" args="(N, U, P)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">pure subroutine <a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gaa8bed17d6b5136804543160600bd9c31">conservative2primitive::c2p_reshape1D</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I8P), intent(in)&#160;</td>
-          <td class="paramname"><em>N</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Conservative), dimension(1:n), intent(in)&#160;</td>
-          <td class="paramname"><em>U</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Primitive), dimension(1:n), intent(inout)&#160;</td>
-          <td class="paramname"><em>P</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency. </p>
-<p>The computation of the parent procedure is performed in 1D re-shaped arrays in order to augment the computational efficiency when using OpenMP shared parallel paradigm. As a matter of facts the scalability of OpenMP parallelism is exploited only when the parallelized loop is the largest one. In the case of multi-dimensional arrays the first index is not always the largest one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping there is only one index.</p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">N</td><td>Number of finite volumes. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">U</td><td>Conservative variables. </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">P</td><td>Primitive variables. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00205">205</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="gabb7369c20e4ef78216b6756d163cb469"></a><!-- doxytag: member="Lib_Fluidynamic::compute_time" ref="gabb7369c20e4ef78216b6756d163cb469" args="(global, block, Dtmin)" -->
 <div class="memitem">
 <div class="memproto">
@@ -260,7 +160,7 @@ Functions/Subroutines</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00230">230</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00175">175</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
 
 </div>
 </div>
@@ -296,31 +196,26 @@ Functions/Subroutines</h2></td></tr>
 <div class="memdoc">
 
 <p>Subroutine for computing the residuals. </p>
-<p>This the space operator. </p>
+<p>This the space operator. The residuals are stored in blockfluidKS(s1) conservative variables.</p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s1</td><td>Current Runge-kutta stage. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">global</td><td>Global-level data. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">block</td><td>Block-level data. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00358">358</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00455">fluxes()</a>.</p>
-
-<p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-1-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="../../dd/d35/group__Lib__FluidynamicPrivateProcedure_gabc9e93106542597ca7c9f624e849e93f_cgraph.png" border="0" usemap="#dd/d35/group__Lib__FluidynamicPrivateProcedure_gabc9e93106542597ca7c9f624e849e93f_cgraph" alt=""/></div>
-<map name="dd/d35/group__Lib__FluidynamicPrivateProcedure_gabc9e93106542597ca7c9f624e849e93f_cgraph" id="dd/d35/group__Lib__FluidynamicPrivateProcedure_gabc9e93106542597ca7c9f624e849e93f_cgraph">
-<area shape="rect" id="node3" href="../../d7/d68/Lib__Fluidynamic_8f90.html#ac27b512e170e1fd2ea188f68b54fe8ec" title="fluxes" alt="" coords="231,5,287,35"/></map>
-</div>
-</p>
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00302">302</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ga3d0e47fc78f153168faa8200481e3fd9"></a><!-- doxytag: member="Lib_Fluidynamic::rk_stages_sum" ref="ga3d0e47fc78f153168faa8200481e3fd9" args="(s1, global, block)" -->
+<a class="anchor" id="gafcd52f4802d17f33ededcaf21feffd2f"></a><!-- doxytag: member="Lib_Fluidynamic::rk_stages_sum" ref="gafcd52f4802d17f33ededcaf21feffd2f" args="(s1, global, block)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pure subroutine <a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga3d0e47fc78f153168faa8200481e3fd9">Lib_Fluidynamic::rk_stages_sum</a> </td>
+          <td class="memname">subroutine <a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gafcd52f4802d17f33ededcaf21feffd2f">Lib_Fluidynamic::rk_stages_sum</a> </td>
           <td>(</td>
           <td class="paramtype">integer(I_P), intent(in)&#160;</td>
           <td class="paramname"><em>s1</em>, </td>
@@ -356,89 +251,16 @@ Functions/Subroutines</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l01352">1352</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00848">848</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ga21c7babcd053e5e947aa3d63acbce68a"></a><!-- doxytag: member="Lib_Fluidynamic.f90::rk_stg_reshape1D" ref="ga21c7babcd053e5e947aa3d63acbce68a" args="(N, Dt, U, KS, P)" -->
+<a class="anchor" id="gae27a81762853e919a50a580cf5626590"></a><!-- doxytag: member="Lib_Fluidynamic::rk_time_integration" ref="gae27a81762853e919a50a580cf5626590" args="(global, block, RU)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pure subroutine <a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga21c7babcd053e5e947aa3d63acbce68a">rk_stages_sum::rk_stg_reshape1D</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I8P), intent(in)&#160;</td>
-          <td class="paramname"><em>N</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(R_P), dimension(1:n), intent(in)&#160;</td>
-          <td class="paramname"><em>Dt</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Conservative), dimension( 1:n), intent(in)&#160;</td>
-          <td class="paramname"><em>U</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Conservative), dimension(1:n,1:s1-1), intent(in)&#160;</td>
-          <td class="paramname"><em>KS</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Primitive), dimension( 1:n), intent(inout)&#160;</td>
-          <td class="paramname"><em>P</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency. </p>
-<p>The computation of the parent procedure is performed in 1D re-shaped arrays in order to augment the computational efficiency when using OpenMP shared parallel paradigm. As a matter of facts the scalability of OpenMP parallelism is exploited only when the parallelized loop is the largest one. In the case of multi-dimensional arrays the first index is not always the largest one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping there is only one index.</p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">N</td><td>Number of finite volumes. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">Dt</td><td>Time steps. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">U</td><td>Current conservative variables. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">KS</td><td>Runge-Kutta stages. </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">P</td><td>Updated primitive variables. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l01376">1376</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-<p>Referenced by <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l01430">rk_t_int_reshape1D()</a>.</p>
-
-<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-2-trigger" src="../../closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-2-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="../../dd/d35/group__Lib__FluidynamicPrivateProcedure_ga21c7babcd053e5e947aa3d63acbce68a_icgraph.png" border="0" usemap="#dd/d35/group__Lib__FluidynamicPrivateProcedure_ga21c7babcd053e5e947aa3d63acbce68a_icgraph" alt=""/></div>
-<map name="dd/d35/group__Lib__FluidynamicPrivateProcedure_ga21c7babcd053e5e947aa3d63acbce68a_icgraph" id="dd/d35/group__Lib__FluidynamicPrivateProcedure_ga21c7babcd053e5e947aa3d63acbce68a_icgraph">
-<area shape="rect" id="node3" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga758b5daf711f8241c6ccce4f5ba19931" title="Subroutine for doing the calculation on 1D&#45;reshaped arrays in order to augment computational efficien..." alt="" coords="183,5,316,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="gac8d097a8966b63e76049c7a18a2c9436"></a><!-- doxytag: member="Lib_Fluidynamic::rk_time_integration" ref="gac8d097a8966b63e76049c7a18a2c9436" args="(global, block, RU)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">pure subroutine <a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gac8d097a8966b63e76049c7a18a2c9436">Lib_Fluidynamic::rk_time_integration</a> </td>
+          <td class="memname">subroutine <a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gae27a81762853e919a50a580cf5626590">Lib_Fluidynamic::rk_time_integration</a> </td>
           <td>(</td>
           <td class="paramtype">type(Type_Global), intent(in)&#160;</td>
           <td class="paramname"><em>global</em>, </td>
@@ -474,80 +296,7 @@ Functions/Subroutines</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l01406">1406</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ga758b5daf711f8241c6ccce4f5ba19931"></a><!-- doxytag: member="Lib_Fluidynamic.f90::rk_t_int_reshape1D" ref="ga758b5daf711f8241c6ccce4f5ba19931" args="(N, Dt, KS, U, RU)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">pure subroutine <a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga758b5daf711f8241c6ccce4f5ba19931">rk_time_integration::rk_t_int_reshape1D</a> </td>
-          <td>(</td>
-          <td class="paramtype">integer(I8P), intent(in)&#160;</td>
-          <td class="paramname"><em>N</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(R_P), dimension(1:n), intent(in)&#160;</td>
-          <td class="paramname"><em>Dt</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Conservative), dimension(1:n,1:global%fluid%rk_ord), intent(in)&#160;</td>
-          <td class="paramname"><em>KS</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">type(Type_Conservative), dimension( 1:n), intent(inout)&#160;</td>
-          <td class="paramname"><em>U</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">real(R_P), dimension(1:global%fluid%nc), intent(out)&#160;</td>
-          <td class="paramname"><em>RU</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency. </p>
-<p>The computation of the parent procedure is performed in 1D re-shaped arrays in order to augment the computational efficiency when using OpenMP shared parallel paradigm. As a matter of facts the scalability of OpenMP parallelism is exploited only when the parallelized loop is the largest one. In the case of multi-dimensional arrays the first index is not always the largest one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping there is only one index.</p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">N</td><td>Number of finite volumes. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">Dt</td><td>Time steps. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">KS</td><td>Runge-Kutta stages. </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">U</td><td>Current conservative variables. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">RU</td><td>NormL2 of residuals of conservative variables. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l01430">1430</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
-
-<p>References <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l01376">rk_stg_reshape1D()</a>.</p>
-
-<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-3-trigger" src="../../closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-3-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="../../dd/d35/group__Lib__FluidynamicPrivateProcedure_ga758b5daf711f8241c6ccce4f5ba19931_cgraph.png" border="0" usemap="#dd/d35/group__Lib__FluidynamicPrivateProcedure_ga758b5daf711f8241c6ccce4f5ba19931_cgraph" alt=""/></div>
-<map name="dd/d35/group__Lib__FluidynamicPrivateProcedure_ga758b5daf711f8241c6ccce4f5ba19931_cgraph" id="dd/d35/group__Lib__FluidynamicPrivateProcedure_ga758b5daf711f8241c6ccce4f5ba19931_cgraph">
-<area shape="rect" id="node3" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga21c7babcd053e5e947aa3d63acbce68a" title="Subroutine for doing the calculation on 1D&#45;reshaped arrays in order to augment computational efficien..." alt="" coords="189,5,317,35"/></map>
-</div>
-</p>
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00879">879</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
 
 </div>
 </div>
@@ -570,7 +319,7 @@ Functions/Subroutines</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri May 25 2012 09:01:24 for OFF by
+    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

@@ -3,8 +3,6 @@ var searchData=
   ['b',['b',['../dd/dfd/group__DerivedType.html#a6ea8b8b12b9331c3d5d1004072883dc9',1,'Data_Type_BC::Type_Adj::b()'],['../dd/dfd/group__DerivedType.html#ab2808cce4b998ad76168bebd24fc82a9',1,'Data_Type_Probe::Type_Probe::b()']]],
   ['basedir',['basedir',['../d6/dec/group__Library.html#a9c187034b3ca92a55d9b97d40de71b5b',1,'Lib_IO_Misc']]],
   ['basename',['basename',['../d6/dec/group__Library.html#ab642dd05da6db5cffb5d31815cf6e726',1,'Lib_IO_Misc']]],
-  ['bbr',['bbR',['../d6/dec/group__Library.html#af2154946f03d37fdf459e03842867ffc',1,'Lib_Parallel']]],
-  ['bbs',['bbS',['../d6/dec/group__Library.html#aedff585ca167a3af7f9d515e7e01c534',1,'Lib_Parallel']]],
   ['bc',['bc',['../dd/dfd/group__DerivedType.html#a26e89f14c2bc1b8acaf95dfb828d0c81',1,'Data_Type_Globals::Type_Global::bc()'],['../dd/dfd/group__DerivedType.html#afe8d4b4d240ab2884ada05ff7a9cc2d6',1,'Data_Type_Globals::Type_Block::bc()'],['../d3/dc5/IBM_8f90.html#a083525622f062cf3d5d0d0dec9372076',1,'Type_Blocks::bc()'],['../dd/dfd/group__DerivedType.html#a2e3b4499fc40021a5218b37344a96f0e',1,'Lib_PostProcessing::Type_PP_Format::bc()']]],
   ['bc_5fadj',['bc_adj',['../d1/dd7/group__Data__Type__BC.html#gaf08bc0938997e15ec00462eef940b6be',1,'Data_Type_BC']]],
   ['bc_5fadj_5fstr',['bc_adj_str',['../d1/dd7/group__Data__Type__BC.html#gae5aaa28987e425cf32dceea7fdd1eb60',1,'Data_Type_BC']]],
@@ -32,5 +30,6 @@ var searchData=
   ['block_5fflip_5ffile_5fname',['Block_Flip_File_Name',['../dd/d55/group__Interface.html#a03392861a9438f182a25bc1c9b1ae13a',1,'Data_Type_Globals::file_name::Block_Flip_File_Name()'],['../d9/d8e/group__Data__Type__GlobalsPrivateProcedure.html#gadb7d2e312c95a9fe78f18affd734e921',1,'Data_Type_Globals::Block_Flip_File_Name()']]],
   ['block_5fstep_5ffile_5fname',['Block_Step_File_Name',['../dd/d55/group__Interface.html#a4538ea7e139f4e3507c539f2a1734e21',1,'Data_Type_Globals::file_name::Block_Step_File_Name()'],['../d9/d8e/group__Data__Type__GlobalsPrivateProcedure.html#ga497dada29a054e375feee26e99786dc6',1,'Data_Type_Globals::Block_Step_File_Name()']]],
   ['blockmap',['blockmap',['../df/d8c/group__Lib__Parallel.html#gad28dd5718d7ebb88d67db5150a9dc9e8',1,'Lib_Parallel']]],
-  ['boundary_5fconditions',['boundary_conditions',['../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga3cc6f55a99802e9ba522253542e7199b',1,'Lib_Fluidynamic']]]
+  ['boundary_5fconditions',['boundary_conditions',['../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga3cc6f55a99802e9ba522253542e7199b',1,'Lib_Fluidynamic']]],
+  ['bytes',['Bytes',['../df/d7f/group__Lib__VTK__IOPrivateProcedure.html#gac8251f0abfe54c11bb8a386787dcc445',1,'Lib_VTK_IO']]]
 ];

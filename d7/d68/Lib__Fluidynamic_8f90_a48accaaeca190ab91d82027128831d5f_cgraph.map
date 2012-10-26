@@ -1,8 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d7/d68/Lib__Fluidynamic_8f90.html#aef477167f825c3906129fd9265aeba87" title="set_ext_l" alt="" coords="345,5,420,35"/>
-<area shape="rect" id="node5" href="$d7/d68/Lib__Fluidynamic_8f90.html#a998c9c57c2c6c5179a166811ea9f1259" title="set_ext_r" alt="" coords="345,188,420,217"/>
-<area shape="rect" id="node7" href="$d7/d68/Lib__Fluidynamic_8f90.html#ac535f74269fbbe7145d18f56d56c1955" title="set_in1" alt="" coords="117,155,181,184"/>
-<area shape="rect" id="node10" href="$d7/d68/Lib__Fluidynamic_8f90.html#af72f6fa8ab8c25cffe5cf166ffecc950" title="set_ref_r" alt="" coords="347,85,419,115"/>
-<area shape="rect" id="node12" href="$d7/d68/Lib__Fluidynamic_8f90.html#ae5c4c82f162bd43ce5c612105ec3acbd" title="set_per" alt="" coords="231,85,295,115"/>
-<area shape="rect" id="node18" href="$d7/d68/Lib__Fluidynamic_8f90.html#ad7a3dee2ae4e8c52913831b0cc383f25" title="set_ref_l" alt="" coords="347,265,419,295"/>
+<area shape="rect" id="node3" href="$d7/d68/Lib__Fluidynamic_8f90.html#a998c9c57c2c6c5179a166811ea9f1259" title="set_ext_r" alt="" coords="356,5,431,35"/>
+<area shape="rect" id="node7" href="$d7/d68/Lib__Fluidynamic_8f90.html#ac535f74269fbbe7145d18f56d56c1955" title="set_in1" alt="" coords="361,211,425,240"/>
+<area shape="rect" id="node9" href="$d7/d68/Lib__Fluidynamic_8f90.html#ae5c4c82f162bd43ce5c612105ec3acbd" title="set_per" alt="" coords="119,101,183,131"/>
+<area shape="rect" id="node18" href="$d7/d68/Lib__Fluidynamic_8f90.html#af72f6fa8ab8c25cffe5cf166ffecc950" title="set_ref_r" alt="" coords="233,159,305,188"/>
+<area shape="rect" id="node5" href="$d7/d68/Lib__Fluidynamic_8f90.html#a4bf02cc42973508c87d58a78ff3591fd" title="Function for computing first partial derivative by means of Finite Volumes approach (Green&#39;s theorem)..." alt="" coords="480,5,544,35"/>
+<area shape="rect" id="node12" href="$d7/d68/Lib__Fluidynamic_8f90.html#aef477167f825c3906129fd9265aeba87" title="set_ext_l" alt="" coords="356,69,431,99"/>
+<area shape="rect" id="node16" href="$d7/d68/Lib__Fluidynamic_8f90.html#ad7a3dee2ae4e8c52913831b0cc383f25" title="set_ref_l" alt="" coords="357,145,429,175"/>
 </map>

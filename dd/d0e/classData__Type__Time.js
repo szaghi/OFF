@@ -1,13 +1,14 @@
 var classData__Type__Time =
 [
-    [ "not_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga51d7e6aef45d1a6e74ce8275ca627ca7", null ],
-    [ "low", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga2d830605f98a77388e43487bd971342f", null ],
-    [ "low_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga37d2ca06f8b73bc0548a9dea6e9c52c9", null ],
-    [ "eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga624e63b0a5ace21dc86841c191e8913e", null ],
-    [ "great_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga56e9ee3f31a2288cb6b0bf7b762ba37b", null ],
-    [ "great", "db/d28/group__Data__Type__TimePrivateProcedure.html#gaebf1eaf93fd962f05e934eb90bcff8eb", null ],
+    [ "sec2time", "db/d28/group__Data__Type__TimePrivateProcedure.html#gab03c9d788b4332245647b3169ac821dd", null ],
+    [ "not_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#gac61bf52355c2c60e755f8855aee808ba", null ],
+    [ "low", "db/d28/group__Data__Type__TimePrivateProcedure.html#gae45e3d2a72a1b594d930565528d202b2", null ],
+    [ "low_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#gaf24c59a41a37884f4a94783d7d094555", null ],
+    [ "eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga1d1ed67e1ffe4725d82d549e5b1a0099", null ],
+    [ "great_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga52411bd699ba338ea10ebbeb7e524143", null ],
+    [ "great", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga4b26c4d4daeb7463add7876d66e4ffde", null ],
     [ "Get_Date_String", "d1/d7b/group__Data__Type__TimePublicProcedure.html#ga9519e07de1e824a495921ecc964542ca", null ],
-    [ "Seconds_To_Time", "d1/d7b/group__Data__Type__TimePublicProcedure.html#gae610e70e666992cae88feb4ebe2ed674", null ],
-    [ "Crono", "d1/d7b/group__Data__Type__TimePublicProcedure.html#ga6dbd2fe5a735781736860fbdfdab1f60", null ],
-    [ "instant0", "dd/d0e/classData__Type__Time.html#a8ea936238de43caee769675cf3f79717", null ]
+    [ "Seconds_To_Time", "d1/d7b/group__Data__Type__TimePublicProcedure.html#ga4e14d5436c632387b9e1479ee288a3f5", null ],
+    [ "Crono", "d1/d7b/group__Data__Type__TimePublicProcedure.html#ga649688e244b670965c64680fa06fd692", null ],
+    [ "inst0", "dd/d0e/classData__Type__Time.html#a93ea41b39a8caf841409d7fd21a7adff", null ]
 ];

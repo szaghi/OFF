@@ -1,20 +1,12 @@
 var classData__Type__Conservative =
 [
-    [ "Init_Scalar", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga07bad12c9afb18369100c95895584f40", null ],
-    [ "Init_Array1D", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga16da8322e81df888fa9ddb3a89615e05", null ],
-    [ "Init_Array2D", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga929bae4fcef03a8ff6db42d535e7be7b", null ],
-    [ "Init_Array3D", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga4456a8a5ff5dd8811a657581d247c794", null ],
-    [ "Init_Array4D", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga6b188c867fd1297a8e6453211609ff75", null ],
-    [ "Set_Scalar", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga3bfcb37409935edb08c1d8ae2a57bd43", null ],
-    [ "Set_Array1D", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga2b9550877f476a3f85fdb6c91c64625a", null ],
-    [ "Set_Array2D", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaf52be5580451438b0e0954f226ddeb84", null ],
-    [ "Set_Array3D", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga85e58098ccbfbf2485434846c72d6ece", null ],
-    [ "Set_Array4D", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaee1bf57d998c408e3598f28294d335e8", null ],
-    [ "Free_Scalar", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaac03b95b82fec355525f392335e88e4b", null ],
-    [ "Free_Array1D", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga58a3f6e48c0b9a8b2e5a071380f48599", null ],
-    [ "Free_Array2D", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga09ded63da6ff669d68e1aab391b903c7", null ],
-    [ "Free_Array3D", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaaa73d39e2d88ae4151cebae040c88c2d", null ],
-    [ "Free_Array4D", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga71aac1d9369a78cbb65dcb08f452d0e2", null ],
+    [ "write_conservative", "dd/d22/group__Data__Type__ConservativePublicProcedure.html#ga1bf6f13113b9a3925dd53611d20b634c", null ],
+    [ "read_conservative", "dd/d22/group__Data__Type__ConservativePublicProcedure.html#ga9f3019662281d5dd69575b14e58a61cd", null ],
+    [ "init", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaffa1b85a8fbd976a8d2cd53b2add9e22", null ],
+    [ "free", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga8024db1fec24e276567f8c04b6798dd5", null ],
+    [ "cons2array", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gad5a3898ed9167f5853934ab2110cfb1d", null ],
+    [ "array2cons", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga0fce4592886c2bb6131a8ea602d7bcfb", null ],
+    [ "pprint", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga2302743961d129ed0b4284a934fa76ea", null ],
     [ "assign_cons", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga94e26326c95e2d5a71ca38b299f21912", null ],
     [ "assign_ScalR8P", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga06a24ec7988864288ca2547d10f93bbd", null ],
     [ "assign_ScalR4P", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga750cc03e6d77daeb7dcadde277afb962", null ],
@@ -82,7 +74,5 @@ var classData__Type__Conservative =
     [ "cons_dot_scalI8", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga6a21710ac0cfc0fd90c15c6e66a14456", null ],
     [ "cons_dot_scalI4", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga9e27e350e8e281e062f72c9cef9d2686", null ],
     [ "cons_dot_scalI2", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gad7503492c4298c5d5793eb4a6a34a940", null ],
-    [ "cons_dot_scalI1", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga7a1c6a8eb84837b0c2347a1cb8fa10f8", null ],
-    [ "cons2array", "dd/d22/group__Data__Type__ConservativePublicProcedure.html#ga7f10a37b44b2cd13ce782aa8534e58a5", null ],
-    [ "array2cons", "dd/d22/group__Data__Type__ConservativePublicProcedure.html#ga08c651699b0af0c98ab45fb932fd6d78", null ]
+    [ "cons_dot_scalI1", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga7a1c6a8eb84837b0c2347a1cb8fa10f8", null ]
 ];

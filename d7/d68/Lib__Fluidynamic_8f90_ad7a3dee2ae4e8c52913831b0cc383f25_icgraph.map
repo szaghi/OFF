@@ -1,5 +1,3 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d7/d68/Lib__Fluidynamic_8f90.html#a48accaaeca190ab91d82027128831d5f" title="set_adj" alt="" coords="125,57,189,87"/>
-<area shape="rect" id="node5" href="$d7/d68/Lib__Fluidynamic_8f90.html#ae5c4c82f162bd43ce5c612105ec3acbd" title="set_per" alt="" coords="239,5,303,35"/>
-<area shape="rect" id="node8" href="$d7/d68/Lib__Fluidynamic_8f90.html#ac535f74269fbbe7145d18f56d56c1955" title="set_in1" alt="" coords="352,37,416,67"/>
+<area shape="rect" id="node3" href="$d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga3cc6f55a99802e9ba522253542e7199b" title="Subroutine for imposing the boundary conditions of blocks of grid level &quot;l&quot; updating the ghost cells..." alt="" coords="125,5,368,35"/>
 </map>

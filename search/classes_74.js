@@ -1,6 +1,7 @@
 var searchData=
 [
   ['transpose',['transpose',['../dd/d55/group__Interface.html#d0/d6e/interfaceData__Type__Tensor_1_1transpose',1,'Data_Type_Tensor']]],
+  ['type_5fadimensional_5fglobal',['Type_Adimensional_Global',['../dd/dfd/group__DerivedType.html#d4/d39/structData__Type__Globals_1_1Type__Adimensional__Global',1,'Data_Type_Globals']]],
   ['type_5fadj',['Type_Adj',['../dd/dfd/group__DerivedType.html#db/db0/structData__Type__BC_1_1Type__Adj',1,'Data_Type_BC']]],
   ['type_5fbc',['Type_BC',['../dd/dfd/group__DerivedType.html#d2/dd8/structData__Type__BC_1_1Type__BC',1,'Data_Type_BC']]],
   ['type_5fbc_5fblock',['Type_BC_Block',['../dd/dfd/group__DerivedType.html#d2/deb/structData__Type__Globals_1_1Type__BC__Block',1,'Data_Type_Globals']]],

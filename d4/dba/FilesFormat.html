@@ -150,25 +150,34 @@ Solver Options File</h3>
 2                                                            rk_ord  = order of time convergence (Runge-Kutta stages)
 0.7d0                                                        CFL     = stability costant
 0.01d0                                                       Res_Tol = residuals tollerance
+                                  NON DIMENSIONAL NUMBERS
+1.d0                                                         Re = Reynolds number
+1.d0                                                         Fr = Froude   number
+1.d0                                                         Pr = Prandtl  number
+                                  REFERENCE VALUES
+1.d0                                                         L0 = reference length
+1.d0                                                         r0 = reference density
+1.d0                                                         v0 = reference velocity
+1.d0                                                         c0 = reference specific heat
 ------------------------------------------------------------------------------------------------------------------------------------
 </pre></div><p> The options are self explained.</p>
-<dl class="note"><dt><b>Note:</b></dt><dd>Note that lines 1, 2, and the last one are only comments, but they are necessary being records that are expected to be read from <em>OFF</em> parser.</dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>Note that lines 1, 2, 10, 15 and the last one are only comments, but they are necessary being records that are expected to be read from <em>OFF</em> parser.</dd></dl>
 <h2><a class="anchor" id="DataFiles"></a>
 Data Files</h2>
 <p>Among the possible choices it has been chosen to don't use multi-blocks file: each data file contains only one block data. The author thinks that this one-block file template provides more flexibility and an easier file handling with MPI multi-processes simulations.</p>
 <h3><a class="anchor" id="MeshFiles"></a>
 Mesh File</h3>
-<p>The data contained into mesh files and the format used are defined by <a class="el" href="../../d3/de1/group__Data__Type__GlobalsPublicProcedure.html#gadadf9a8b3a4bc4a0fdf654277e3e2487">loading</a> and <a class="el" href="../../d3/de1/group__Data__Type__GlobalsPublicProcedure.html#ga3bfac8cb784f0f1672aba803e524fb46">saving</a> procedures. The mesh files are binary (unformatted) files with the following naming convention: </p>
+<p>The data contained into mesh files and the format used are defined by <a class="el" href="../../d9/d8e/group__Data__Type__GlobalsPrivateProcedure.html#ga93b15cd854d72e93af16a89dbd3e7660">loading</a> and <a class="el" href="../../d9/d8e/group__Data__Type__GlobalsPrivateProcedure.html#gaaa82cff6c241bfb0874f2fdfa3b39b7c">saving</a> procedures. The mesh files are binary (unformatted) files with the following naming convention: </p>
 <div class="fragment"><pre class="fragment">mesh_base_name.g##.b###.geo
 </pre></div><p> where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific <a class="el" href="../../dd/d55/group__Interface.html#d9/d6b/interfaceData__Type__Globals_1_1file__name">procedure</a>.</p>
 <h3><a class="anchor" id="BCFiles"></a>
 Boundary Conditions File</h3>
-<p>The data contained into boundary conditions files and the format used are defined by <a class="el" href="../../d3/de1/group__Data__Type__GlobalsPublicProcedure.html#ga98adce4676c8d49078cbcdc8a7b735f8">loading</a> and <a class="el" href="../../d3/de1/group__Data__Type__GlobalsPublicProcedure.html#gae53011b91b36ead4faaaef0c7396fe1e">saving</a> procedures. The boundary conditions files are binary (unformatted) files with the following naming convention: </p>
+<p>The data contained into boundary conditions files and the format used are defined by <a class="el" href="../../d9/d8e/group__Data__Type__GlobalsPrivateProcedure.html#ga78d36917c35e9656f0c7921628333d02">loading</a> and <a class="el" href="../../d9/d8e/group__Data__Type__GlobalsPrivateProcedure.html#ga558206e5db8df28350dfa5b18074c7ca">saving</a> procedures. The boundary conditions files are binary (unformatted) files with the following naming convention: </p>
 <div class="fragment"><pre class="fragment">bc_base_name.g##.b###.bco
 </pre></div><p> where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific <a class="el" href="../../dd/d55/group__Interface.html#d9/d6b/interfaceData__Type__Globals_1_1file__name">procedure</a>.</p>
 <h3><a class="anchor" id="SolFiles"></a>
 Solution File</h3>
-<p>The data contained into solution files and the format used are defined by <a class="el" href="../../d3/de1/group__Data__Type__GlobalsPublicProcedure.html#ga85fa8284346f213155eba87e66abb458">loading</a> and <a class="el" href="../../d3/de1/group__Data__Type__GlobalsPublicProcedure.html#ga9b70839202975571187927d54a30c097">saving</a> procedures. The solution files are binary (unformatted) files with the following naming convention: </p>
+<p>The data contained into solution files and the format used are defined by <a class="el" href="../../d9/d8e/group__Data__Type__GlobalsPrivateProcedure.html#gae385a53142bb267009e6c140cac70003">loading</a> and <a class="el" href="../../d9/d8e/group__Data__Type__GlobalsPrivateProcedure.html#ga6b35bef092b768dca324a08f7dabf4d4">saving</a> procedures. The solution files are binary (unformatted) files with the following naming convention: </p>
 <div class="fragment"><pre class="fragment">sol_base_name.g##.b###.geo
 </pre></div><p> where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific <a class="el" href="../../dd/d55/group__Interface.html#d9/d6b/interfaceData__Type__Globals_1_1file__name">procedure</a>. </p>
 </div></div><!-- contents -->
@@ -190,7 +199,7 @@ Solution File</h3>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri May 25 2012 09:01:24 for OFF by
+    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

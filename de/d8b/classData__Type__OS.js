@@ -1,7 +1,6 @@
 var classData__Type__OS =
 [
-    [ "init", "de/d8b/classData__Type__OS.html#a99ffafeb59747890aeae4a7401d4fbd6", null ],
-    [ "set", "de/d8b/classData__Type__OS.html#a3dc77e00351c9487664eb6abcb25ed05", null ],
+    [ "init", "de/d8b/classData__Type__OS.html#a68f7af3ac34ab39203a30a915eb72748", null ],
     [ "c_uix_id", "d5/dee/group__Data__Type__OS.html#ga41dd9bb3cd1c1aa204ef3e4430a114df", null ],
     [ "uix_id", "d5/dee/group__Data__Type__OS.html#ga9a3762f692b3dbc3ccb019120023e7f0", null ],
     [ "uix_sep", "d5/dee/group__Data__Type__OS.html#ga4f443bd705a17ae82a701d990ad939a0", null ],

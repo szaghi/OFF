@@ -1,9 +1,10 @@
 var group__Data__Type__TimePrivateProcedure_dup =
 [
-    [ "not_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga51d7e6aef45d1a6e74ce8275ca627ca7", null ],
-    [ "low", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga2d830605f98a77388e43487bd971342f", null ],
-    [ "low_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga37d2ca06f8b73bc0548a9dea6e9c52c9", null ],
-    [ "eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga624e63b0a5ace21dc86841c191e8913e", null ],
-    [ "great_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga56e9ee3f31a2288cb6b0bf7b762ba37b", null ],
-    [ "great", "db/d28/group__Data__Type__TimePrivateProcedure.html#gaebf1eaf93fd962f05e934eb90bcff8eb", null ]
+    [ "sec2time", "db/d28/group__Data__Type__TimePrivateProcedure.html#gab03c9d788b4332245647b3169ac821dd", null ],
+    [ "not_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#gac61bf52355c2c60e755f8855aee808ba", null ],
+    [ "low", "db/d28/group__Data__Type__TimePrivateProcedure.html#gae45e3d2a72a1b594d930565528d202b2", null ],
+    [ "low_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#gaf24c59a41a37884f4a94783d7d094555", null ],
+    [ "eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga1d1ed67e1ffe4725d82d549e5b1a0099", null ],
+    [ "great_eq", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga52411bd699ba338ea10ebbeb7e524143", null ],
+    [ "great", "db/d28/group__Data__Type__TimePrivateProcedure.html#ga4b26c4d4daeb7463add7876d66e4ffde", null ]
 ];

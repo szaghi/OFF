@@ -118,6 +118,7 @@ Data Structures Hierarchy</h2>
 <li><a class="el" href="../../dd/dfd/group__DerivedType.html#d4/dbd/structData__Type__Globals_1_1Type__Mesh__Global">Global Mesh data</a>: these are data related to the mesh;</li>
 <li><a class="el" href="../../dd/dfd/group__DerivedType.html#db/dda/structData__Type__Globals_1_1Type__BC__Global">Global Boundary Conditions data</a>: these are data related to the boundary conditions;</li>
 <li><a class="el" href="../../dd/dfd/group__DerivedType.html#d5/d53/structData__Type__Globals_1_1Type__Fluid__Global">Global Fluid Dynamics data</a>: these are data related to the fluid dynamics;</li>
+<li><a class="el" href="../../dd/dfd/group__DerivedType.html#d4/d39/structData__Type__Globals_1_1Type__Adimensional__Global">Global Non dimensional data</a>: these are data related to the non-dimensionalization reference values and numbers;</li>
 </ul>
 </li>
 <li>Block data:<ul>
@@ -131,8 +132,8 @@ Data Structures Hierarchy</h2>
 <p>The block level data instance is allocated as a double indexed array: </p>
 <div class="fragment"><pre class="fragment">type(Type_Block), allocatable:: block(:,:) ! Dimensions [1:Nb,1:Nl] being Nb the number of blocks and Nl the number of grid levels
 </pre></div><p> where the inner index ranges in the blocks number while the outer index ranges in the grid (refinement) levels number. At today a bug afflicts multigrid algorithm thus the use of more different grid levels (Nl&gt;1) is not useful.</p>
-<p>Inside the block level data there are a lot of dynamically allocated 3D arrays. The use of nested dynamic data needs a careful treatment of the memory allocated. For those derived types (e.g. boundary conditions and fluid dynamics types) that have dynamic data specific procedures for allocating and freeing the memory have been provided (e.g. see <a class="el" href="../../dd/d22/group__Data__Type__ConservativePublicProcedure.html#d4/d33/interfaceData__Type__Conservative_1_1free">Type Conservative freeing memory procedure</a>).</p>
-<p>According to the data hierarchy there are procedures that operate on some level of data structure and other on different level. There are for example procedures operating on whole blocks of some grid level (e.g. see <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gab0878159386863d9df80b862dec04118">Lib_Fluidynamic::solve_grl</a> and <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga3cc6f55a99802e9ba522253542e7199b">Lib_Fluidynamic::boundary_conditions</a>) and other procedures operating on only one block at time (e.g. see <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gaef4eafa99842055224e85638feb2d333">Lib_Fluidynamic::conservative2primitive</a>). </p>
+<p>Inside the block level data there are a lot of dynamically allocated 3D arrays. The use of nested dynamic data needs a careful treatment of the memory allocated. For those derived types (e.g. boundary conditions and fluid dynamics types) that have dynamic data specific procedures for allocating and freeing the memory have been provided (e.g. see <a class="el" href="../../dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga8024db1fec24e276567f8c04b6798dd5">Type Conservative freeing memory procedure</a>).</p>
+<p>According to the data hierarchy there are procedures that operate on some level of data structure and other on different level. There are for example procedures operating on whole blocks of some grid level (e.g. see <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gab0878159386863d9df80b862dec04118">Lib_Fluidynamic::solve_grl</a> and <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga3cc6f55a99802e9ba522253542e7199b">Lib_Fluidynamic::boundary_conditions</a>) and other procedures operating on only one block at time (e.g. see <a class="el" href="../../d3/d31/group__Lib__FluidynamicPublicProcedure.html#gaaec639e0cd32cd1cd756eae90b2fd55d">Lib_Fluidynamic::conservative2primitive</a>). </p>
 </div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -152,7 +153,7 @@ Data Structures Hierarchy</h2>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri May 25 2012 09:01:24 for OFF by
+    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

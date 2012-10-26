@@ -175,7 +175,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html#l00101">101</a> of file <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html">Lib_Runge_Kutta.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html#l00102">102</a> of file <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html">Lib_Runge_Kutta.f90</a>.</p>
 
 </div>
 </div>
@@ -204,7 +204,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">type(Type_Conservative), dimension(1:s1-1), intent(in)&#160;</td>
+          <td class="paramtype">type(Type_Conservative), dimension(1:), intent(in)&#160;</td>
           <td class="paramname"><em>KS</em>, </td>
         </tr>
         <tr>
@@ -223,18 +223,19 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="memdoc">
 
 <p>Subroutine for computing <img class="formulaInl" alt="$s1^{th}$" src="../../form_192.png"/> Runge-Kutta stage. </p>
+<dl class="note"><dt><b>Note:</b></dt><dd>For avoid the creation of temporary arrays (improving the efficiency) the array <b>KS</b> is declared as assumed-shape with only the lower bound defined. Its extention is [1:s1-1]. </dd></dl>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">s1</td><td>Current Runge-Kutta stage number. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">Dt</td><td>Current time step. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">Un</td><td>Current integrating variable. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">KS</td><td>Previous Runge-Kutta stages. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">KS</td><td>Previous Runge-Kutta stages [1:s1-1]. </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">KS1</td><td>Current Runge-Kutta stage. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html#l00173">173</a> of file <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html">Lib_Runge_Kutta.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html#l00176">176</a> of file <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html">Lib_Runge_Kutta.f90</a>.</p>
 
 </div>
 </div>
@@ -279,14 +280,14 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">Dt</td><td>Current time step. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">un</td><td>Current integrating variable. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">Un</td><td>Current integrating variable. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">KS</td><td>Runge-Kutta stages. </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">Unp1</td><td>Time-integrated variable. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html#l00190">190</a> of file <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html">Lib_Runge_Kutta.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html#l00207">207</a> of file <a class="el" href="../../d8/dcf/Lib__Runge__Kutta_8f90_source.html">Lib_Runge_Kutta.f90</a>.</p>
 
 </div>
 </div>
@@ -309,7 +310,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri May 25 2012 09:01:24 for OFF by
+    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

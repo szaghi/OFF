@@ -1,3 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d7/d68/Lib__Fluidynamic_8f90.html#a99f9129de4308e887423c0d4e7da6988" title="LP" alt="" coords="97,5,135,35"/>
+<area shape="rect" id="node3" href="$d7/d68/Lib__Fluidynamic_8f90.html#a54cd55e6c76740e06c3c2e03f35fb3cf" title="Subroutine for computing interfaces convective fluxes." alt="" coords="97,5,223,35"/>
+<area shape="rect" id="node5" href="$dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gabc9e93106542597ca7c9f624e849e93f" title="Subroutine for computing the residuals." alt="" coords="272,5,448,35"/>
 </map>

@@ -1,12 +1,12 @@
 var group__Library =
 [
     [ "weno_init", "db/d22/group__Lib__WENOPublicProcedure.html#ga12ddef5212e444aa9d2d9060f4ab1662", null ],
-    [ "noweno_central", "db/d22/group__Lib__WENOPublicProcedure.html#ga9329e093c7635e22e7884d4631848878", null ],
-    [ "weno_optimal", "db/d22/group__Lib__WENOPublicProcedure.html#ga47430fff09742d9963802b0dd1cf9bc2", null ],
-    [ "weno", "db/d22/group__Lib__WENOPublicProcedure.html#gaf043f24262940e4e499aa9fdedba75df", null ],
-    [ "weno_polynomials", "de/de2/group__Lib__WENOPrivateProcedure.html#gab2c63052d096b9e9628b5068dfd1b62d", null ],
-    [ "weno_weights", "de/de2/group__Lib__WENOPrivateProcedure.html#gafb1a374b01e4ff60296cb4a48a308826", null ],
-    [ "weno_convolution", "de/de2/group__Lib__WENOPrivateProcedure.html#ga91d65b5ceb9ef37c52e5c39dc6c541e0", null ],
+    [ "noweno_central", "db/d22/group__Lib__WENOPublicProcedure.html#ga423849469cf89742a6b89a4de6fe2483", null ],
+    [ "weno_optimal", "db/d22/group__Lib__WENOPublicProcedure.html#gae8561586f225901448fdf77063cbd198", null ],
+    [ "weno", "db/d22/group__Lib__WENOPublicProcedure.html#ga6e6e6f50289dc3eca17b1e394a78925e", null ],
+    [ "weno_polynomials", "de/de2/group__Lib__WENOPrivateProcedure.html#ga9b67fb1a3403d91fc492532416a5c947", null ],
+    [ "weno_weights", "de/de2/group__Lib__WENOPrivateProcedure.html#ga0c0a02a5abf808e2a6152a0e05ed6799", null ],
+    [ "weno_convolution", "de/de2/group__Lib__WENOPrivateProcedure.html#gae11faea38bff96f933ce6d24cdeefd2c", null ],
     [ "udiff", "de/de2/group__Lib__WENOPrivateProcedure.html#ga3e6f5162258156b9bfc13cf34e8fa721", null ],
     [ "weno_c", "d4/df4/group__Lib__WENOPrivateVarPar.html#ga889b83b6c060c3bbb56dbdf2baedd69c", null ],
     [ "weno_a", "d4/df4/group__Lib__WENOPrivateVarPar.html#ga159b67dfba3ecd75b01352d5e2ced979", null ],

@@ -24,16 +24,21 @@
 !> @todo \b DocComplete: Complete the documentation of internal procedures
 module Data_Type_Tensor
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                     ! Integers and reals precision definition.
-USE Data_Type_Vector, set_vec => set, get_vec => get ! Definition of type Type_Vector.
+USE IR_Precision     ! Integers and reals precision definition.
+USE Data_Type_Vector ! Definition of type Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 private
 public:: unity
-public:: set,get
-public:: write,read
+public:: sq_norm
+public:: normL2
+public:: normalize
+public:: transpose
+public:: determinant
+public:: invert,invertible
+public:: write_tensor,read_tensor
 public:: assignment (=)
 public:: operator (*)
 public:: operator (/)
@@ -42,12 +47,6 @@ public:: operator (-)
 public:: operator (.ddot.)
 public:: operator (.dot.)
 public:: operator (.diad.)
-public:: sq_norm
-public:: normL2
-public:: normalize
-public:: transpose
-public:: determinant
-public:: invert,invertible
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -57,10 +56,22 @@ public:: invert,invertible
 !> =\left[{\begin{array}{*{20}{c}} {x\% x}&{x\% y}&{x\% z}\\ {y\% x}&{y\% y}&{y\% z}\\ {z\% x}&{z\% y}&{z\% z}\end{array}}\right]\f$
 !> @ingroup DerivedType
 type, public:: Type_Tensor
-  sequence
   type(Type_Vector):: x !< Cartesian vector component in x direction.
   type(Type_Vector):: y !< Cartesian vector component in y direction.
   type(Type_Vector):: z !< Cartesian vector component in z direction.
+  contains
+    procedure, non_overridable:: set                         ! Procedure for setting tensor components.
+    procedure, non_overridable:: sq_norm => sq_norm_ten      ! Procedure for computing the square of the norm of a tensor.
+    procedure, non_overridable:: normL2 => normL2_ten        ! Procedure for computing the norm L2 of a tensor.
+    procedure, non_overridable:: normalize => normalize_self ! Procedure for normalizing a tensor.
+    procedure, non_overridable:: transpose => transpose_self ! Procedure for transposing a tensor.
+    procedure, non_overridable:: determinant                 ! Procedure for computing the determinant of a tensor.
+    procedure, non_overridable:: invert => invert_self       ! Procedure for inverting a tensor.
+    procedure, non_overridable:: invertible                  ! Procedure for checking if a tensor is invertible.
+    procedure, non_overridable:: rotox                       ! Procedure for computing the rotation tensor along x axis.
+    procedure, non_overridable:: rotoy                       ! Procedure for computing the rotation tensor along y axis.
+    procedure, non_overridable:: rotoz                       ! Procedure for computing the rotation tensor along z axis.
+    procedure, non_overridable:: rotou                       ! Procedure for computing the rotation tensor along a vector axis.
 endtype Type_Tensor
 !> @ingroup Data_Type_Tensor
 !> @{
@@ -70,57 +81,29 @@ type(Type_Tensor), parameter:: unity = Type_Tensor(ex,ey,ez) !< Unity (identity)
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!> @brief Write overloading of Type_Tensor variable.
-!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for writing scalar variables,
-!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
-!> @code ...
-!> integer(I4P):: err,unit
-!> character(1):: format="*"
-!> type(Type_Tensor):: ten_scal,ten_1D(10),ten_2D(10,2),ten_3D(10,2,3)
-!> ...
-!> ! formatted writing of ten_scal, ten_1D, ten_2D and ten_3D
-!> err = write(unit,format,ten_scal)
-!> err = write(unit,format,ten_1D)
-!> err = write(unit,format,ten_2D)
-!> err = write(unit,format,ten_3D)
-!> ! binary writing of ten_scal, ten_1D, ten_2D and ten_3D
-!> err = write(unit,ten_scal)
-!> err = write(unit,ten_1D)
-!> err = write(unit,ten_2D)
-!> err = write(unit,ten_3D)
-!> ... @endcode
-!> @ingroup Interface,Data_Type_TensorPublicProcedure
-interface write
-  module procedure Write_Bin_Scalar, Write_Ascii_Scalar
-  module procedure Write_Bin_Array1D,Write_Ascii_Array1D
-  module procedure Write_Bin_Array2D,Write_Ascii_Array2D
-  module procedure Write_Bin_Array3D,Write_Ascii_Array3D
+!> @brief Square norm function \em sq_norm overloading.
+!> The function \em sq_norm defined for Type_Vector is overloaded for handling also Type_Tensor.
+!> @ingroup Interface
+interface sq_norm
+  module procedure sq_norm,sq_norm_ten
 endinterface
-!> @brief Read overloading of Type_Tensor variable.
-!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for reading scalar variables,
-!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
-!> @code ...
-!> integer(I4P):: err,unit
-!> character(1):: format="*"
-!> type(Type_Tensor):: ten_scal,ten_1D(10),ten_2D(10,2),ten_3D(10,2,3)
-!> ...
-!> ! formatted reading of ten_scal, ten_1D, ten_2D and ten_3D
-!> err = read(unit,format,ten_scal)
-!> err = read(unit,format,ten_1D)
-!> err = read(unit,format,ten_2D)
-!> err = read(unit,format,ten_3D)
-!> ! binary reading of ten_scal, ten_1D, ten_2D and ten_3D
-!> err = read(unit,ten_scal)
-!> err = read(unit,ten_1D)
-!> err = read(unit,ten_2D)
-!> err = read(unit,ten_3D)
-!> ... @endcode
-!> @ingroup Interface,Data_Type_TensorPublicProcedure
-interface read
-  module procedure Read_Bin_Scalar, Read_Ascii_Scalar
-  module procedure Read_Bin_Array1D,Read_Ascii_Array1D
-  module procedure Read_Bin_Array2D,Read_Ascii_Array2D
-  module procedure Read_Bin_Array3D,Read_Ascii_Array3D
+!> @brief L2 norm function \em normL2 overloading.
+!> The function \em normL2 defined for Type_Vector is overloaded for handling also Type_Tensor.
+!> @ingroup Interface
+interface normL2
+  module procedure normL2,normL2_ten
+endinterface
+!> @brief Normalize function \em normalize overloading.
+!> The function \em normalize defined for Type_Vector is overloaded for handling also Type_Tensor.
+!> @ingroup Interface
+interface normalize
+  module procedure normalize,normalize_ten
+endinterface
+!> @brief Transpose function \em transpose overloading.
+!> The built in function \em transpose defined for rank 2 arrays is overloaded for handling also Type_Tensor.
+!> @ingroup Interface
+interface transpose
+  module procedure transpose_ten
 endinterface
 !> @brief Assignment operator (=) overloading.
 !> @ingroup Interface
@@ -295,42 +278,200 @@ endinterface
 interface operator (.diad.)
   module procedure diadicproduct
 endinterface
-!> @brief Square norm function \em sq_norm overloading.
-!> The function \em sq_norm defined for Type_Vector is overloaded for handling also Type_Tensor.
-!> @ingroup Interface
-interface sq_norm
-  module procedure sq_norm,sq_norm_ten
-endinterface
-!> @brief L2 norm function \em normL2 overloading.
-!> The function \em normL2 defined for Type_Vector is overloaded for handling also Type_Tensor.
-!> @ingroup Interface
-interface normL2
-  module procedure normL2,normL2_ten
-endinterface
-!> @brief Normalize function \em normalize overloading.
-!> The function \em normalize defined for Type_Vector is overloaded for handling also Type_Tensor.
-!> @ingroup Interface
-interface normalize
-  module procedure normalize,normalize_ten
-endinterface
-!> @brief Transpose function \em transpose overloading.
-!> The built in function \em transpose defined for rank 2 arrays is overloaded for handling also Type_Tensor.
-!> @ingroup Interface
-interface transpose
-  module procedure transpose_ten
-endinterface
+
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @ingroup Data_Type_TensorPublicProcedure
   !> @{
-  !> Subroutine for setting components of Type_Tensor variable.
-  elemental subroutine set(x,y,z,ten)
+  !> @brief Function for computing the determinant of a tensor.
+  !> @return \b det real(R_P) variable
+  !> @note The determinant is computed according the following equation: \n
+  !> \f$ \det  = \left| {\begin{array}{*{20}{c}} {x\% x}&{x\% y}&{x\% z}\\ {y\% x}&{y\% y}&{y\% z}\\ {z\% x}&{z\% y}&{z\% z}
+  !> \end{array}} \right| = \f$ \n
+  !> \f$=x\%x(z\%z\cdot y\%y-z\%y\cdot y\%z)-\f$
+  !> \f$ y\%x(z\%z\cdot x\%y-z\%y\cdot x\%z)+\f$
+  !> \f$ z\%x(y\%z\cdot x\%y-y\%y\cdot x\%z) \f$
+  elemental function determinant(ten) result(det)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN), optional:: x   !< Cartesian vector component in x direction.
-  type(Type_Vector), intent(IN), optional:: y   !< Cartesian vector component in y direction.
-  type(Type_Vector), intent(IN), optional:: z   !< Cartesian vector component in z direction.
-  type(Type_Tensor), intent(INOUT)::        ten !< Tensor.
+  class(Type_Tensor), intent(IN):: ten !< Tensor.
+  real(R_P)::                      det !< Determinant.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  det=ten%x%x*(ten%z%z*ten%y%y-ten%z%y*ten%y%z)-ten%y%x*(ten%z%z*ten%x%y-ten%z%y*ten%x%z)+ten%z%x*(ten%y%z*ten%x%y-ten%y%y*ten%x%z)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction determinant
+
+  !> @brief Function for computing the inverse of a tensor.
+  !> If the tensor is not invertible a null tensor is returned.
+  !> @return \b inv type(Type_Tensor) variable
+  !> @note The inverse tensor is computed according the following equation: \n
+  !> \f$ T_{ij}^{ - 1} = \frac{1}{{\det (T)}}\left[ {\begin{array}{*{20}{c}}
+  !> {z\%z\cdot y\%y-z\%y\cdot y\%z}&{-(z\%z\cdot x\%y-z\%y\cdot x\%z)}&{y\%z\cdot x\%y-y\%y\cdot x\%z}\\{-(z\%z\cdot y\%x-
+  !> z\%x\cdot y\%z)}&{z\%z\cdot x\%x-z\%x\cdot x\%z}&{-(y\%z\cdot x\%x-y\%x\cdot x\%z)}\\{z\%y\cdot y\%x-z\%x\cdot y\%y}&{-(z\%y
+  !> \cdot x\%x-z\%x\cdot x\%y)}&{y\%y\cdot x\%x-y\%x\cdot x\%y} \end{array}} \right]\f$ \n
+  !> where det(T) is the determinant computed by means of the function determinant.
+  elemental function invert(ten) result(inv)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Tensor), intent(IN):: ten !< Tensor to be inverted.
+  type(Type_Tensor)::             inv !< Tensor inverted.
+  real(R_P)::                     det !< Determinant and 1/Determinant.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  det = determinant(ten)
+  if (det/=0._R_P) then
+    det = 1._R_P/det
+   inv%x=det*( (ten%z%z*ten%y%y-ten%z%y*ten%y%z)*ex - (ten%z%z*ten%x%y-ten%z%y*ten%x%z)*ey + (ten%y%z*ten%x%y-ten%y%y*ten%x%z)*ez)
+   inv%y=det*(-(ten%z%z*ten%y%x-ten%z%x*ten%y%z)*ex + (ten%z%z*ten%x%x-ten%z%x*ten%x%z)*ey - (ten%y%z*ten%x%x-ten%y%x*ten%x%z)*ez)
+   inv%z=det*( (ten%z%y*ten%y%x-ten%z%x*ten%y%y)*ex - (ten%z%y*ten%x%x-ten%z%x*ten%x%y)*ey + (ten%y%y*ten%x%x-ten%y%x*ten%x%y)*ez)
+  else
+    inv%x=0._R_P
+    inv%y=0._R_P
+    inv%z=0._R_P
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction invert
+
+  !> @brief Function for checking if a tensor is invertible (determinant /=0, not singular tensor).
+  !> @return \b inv logical variable
+  elemental function invertible(ten) result(inv)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Tensor), intent(IN):: ten !< Tensor to be inverted.
+  logical::                        inv !< True if the tensor is not singular.
+  real(R_P)::                      det !< Determinant.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  det = determinant(ten) ; inv = (det/=0._R_P)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction invertible
+
+  !> @brief Function for writing Type_Tensor data.
+  !> The vector data could be scalar, one, two and three dimensional array. The format could be ascii or binary.
+  !> @return \b err integer(I_P) variable for error trapping.
+  function write_tensor(scalar,array1D,array2D,array3D,format,unit) result(err)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Tensor), intent(IN), optional:: scalar         !< Scalar tensor data.
+  type(Type_Tensor), intent(IN), optional:: array1D(:)     !< One dimensional array tensor data.
+  type(Type_Tensor), intent(IN), optional:: array2D(:,:)   !< Two dimensional array tensor data.
+  type(Type_Tensor), intent(IN), optional:: array3D(:,:,:) !< Three dimensional array tensor data.
+  character(*),      intent(IN), optional:: format         !< Format specifier.
+  integer(I4P),      intent(IN)::           unit           !< Logic unit.
+  integer(I_P)::                            err            !< Error trapping flag: 0 no errors, >0 error occurs.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (present(format)) then
+    select case(adjustl(trim(format)))
+    case('*')
+      if (present(scalar)) then
+        write(unit,*,iostat=err)scalar
+      elseif (present(array1D)) then
+        write(unit,*,iostat=err)array1D
+      elseif (present(array2D)) then
+        write(unit,*,iostat=err)array2D
+      elseif (present(array3D)) then
+        write(unit,*,iostat=err)array3D
+      endif
+    case default
+      if (present(scalar)) then
+        write(unit,adjustl(trim(format)),iostat=err)scalar
+      elseif (present(array1D)) then
+        write(unit,adjustl(trim(format)),iostat=err)array1D
+      elseif (present(array2D)) then
+        write(unit,adjustl(trim(format)),iostat=err)array2D
+      elseif (present(array3D)) then
+        write(unit,adjustl(trim(format)),iostat=err)array3D
+      endif
+    endselect
+  else
+    if (present(scalar)) then
+      write(unit,iostat=err)scalar
+    elseif (present(array1D)) then
+      write(unit,iostat=err)array1D
+    elseif (present(array2D)) then
+      write(unit,iostat=err)array2D
+    elseif (present(array3D)) then
+      write(unit,iostat=err)array3D
+    endif
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction write_tensor
+
+  !> @brief Function for reading Type_Tensor data.
+  !> The vector data could be scalar, one, two and three dimensional array. The format could be ascii or binary.
+  !> @return \b err integer(I_P) variable for error trapping.
+  function read_tensor(scalar,array1D,array2D,array3D,format,unit) result(err)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Tensor), intent(INOUT), optional:: scalar         !< Scalar tensor data.
+  type(Type_Tensor), intent(INOUT), optional:: array1D(:)     !< One dimensional array tensor data.
+  type(Type_Tensor), intent(INOUT), optional:: array2D(:,:)   !< Two dimensional array tensor data.
+  type(Type_Tensor), intent(INOUT), optional:: array3D(:,:,:) !< Three dimensional array tensor data.
+  character(*),      intent(IN),    optional:: format         !< Format specifier.
+  integer(I4P),      intent(IN)::              unit           !< Logic unit.
+  integer(I_P)::                               err            !< Error trapping flag: 0 no errors, >0 error occurs.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (present(format)) then
+    select case(adjustl(trim(format)))
+    case('*')
+      if (present(scalar)) then
+        read(unit,*,iostat=err)scalar
+      elseif (present(array1D)) then
+        read(unit,*,iostat=err)array1D
+      elseif (present(array2D)) then
+        read(unit,*,iostat=err)array2D
+      elseif (present(array3D)) then
+        read(unit,*,iostat=err)array3D
+      endif
+    case default
+      if (present(scalar)) then
+        read(unit,adjustl(trim(format)),iostat=err)scalar
+      elseif (present(array1D)) then
+        read(unit,adjustl(trim(format)),iostat=err)array1D
+      elseif (present(array2D)) then
+        read(unit,adjustl(trim(format)),iostat=err)array2D
+      elseif (present(array3D)) then
+        read(unit,adjustl(trim(format)),iostat=err)array3D
+      endif
+    endselect
+  else
+    if (present(scalar)) then
+      read(unit,iostat=err)scalar
+    elseif (present(array1D)) then
+      read(unit,iostat=err)array1D
+    elseif (present(array2D)) then
+      read(unit,iostat=err)array2D
+    elseif (present(array3D)) then
+      read(unit,iostat=err)array3D
+    endif
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction read_tensor
+  !> @}
+
+  !> @ingroup Data_Type_TensorPrivateProcedure
+  !> @{
+  !> Subroutine for setting components of Type_Tensor variable.
+  elemental subroutine set(ten,x,y,z)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Tensor), intent(INOUT)::        ten !< Tensor.
+  type(Type_Vector),  intent(IN), optional:: x   !< Cartesian vector component in x direction.
+  type(Type_Vector),  intent(IN), optional:: y   !< Cartesian vector component in y direction.
+  type(Type_Vector),  intent(IN), optional:: z   !< Cartesian vector component in z direction.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -341,361 +482,234 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine set
 
-  !> Subroutine for extracting Type_Tensor variable components.
-  elemental subroutine get(x,y,z,ten)
+  !> @brief Function for computing the square of the norm of a tensor.
+  !> The square norm if defined as \f$ N = x_x^2  + x_y^2  + x_z^2 + y_x^2 + y_y^2  + y_z^2 +...\f$.
+  !> @return \b sq square norm
+  elemental function sq_norm_ten(ten) result(sq)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(OUT), optional:: x   !< Cartesian vector component in x direction.
-  type(Type_Vector), intent(OUT), optional:: y   !< Cartesian vector component in y direction.
-  type(Type_Vector), intent(OUT), optional:: z   !< Cartesian vector component in z direction.
-  type(Type_Tensor), intent(IN)::            ten !< Tensor.
+  class(Type_Tensor), intent(IN):: ten ! Tensor.
+  real(R_P)::                      sq  ! Square of the Norm.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(x)) x = ten%x
-  if (present(y)) y = ten%y
-  if (present(z)) z = ten%z
+  sq = sq_norm(ten%x) + sq_norm(ten%y) + sq_norm(ten%z)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine get
-  !> @}
+  endfunction sq_norm_ten
 
-  !> @ingroup Data_Type_TensorPrivateProcedure
-  !> @{
-  ! write
-  !!Function for writing Type_Tensor (binary, scalar).
-  function Write_Bin_Scalar(unit,ten) result(err)
+  !> @brief Function for computing the norm L2 of a tensor.
+  !> The norm L2 if defined as \f$N = \sqrt {x_x^2  + x_y^2  + x_z^2 + y_y^2  + y_z^2 +...}\f$.
+  !> @return \b norm norm L2
+  elemental function normL2_ten(ten) result(norm)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P),      intent(IN):: unit !< Logic unit.
-  type(Type_Tensor), intent(IN):: ten  !< Tensor.
-  integer(I_P)::                  err  !< Error trapping flag: 0 no errors, >0 error occurs.
+  class(Type_Tensor), intent(IN):: ten  ! Tensor.
+  real(R_P)::                      norm ! Norm L2.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,iostat=err)ten
+  norm = sqrt(sq_norm(ten%x) + sq_norm(ten%y) + sq_norm(ten%z))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Scalar
+  endfunction normL2_ten
 
-  function Write_Ascii_Scalar(unit,format,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Tensor (ascii, scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @brief Subroutine for normalizing a tensor.
+  !> The normalization is made by means of norm L2. If the norm L2 of the tensor is less than the parameter smallR_P the
+  !> normalization value is set to normL2(ten)+smallR_P.
+  elemental subroutine normalize_self(ten)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P),      intent(IN):: unit   ! Logic unit.
-  character(*),      intent(IN):: format ! Format specifier.
-  type(Type_Tensor), intent(IN):: ten    ! Tensor.
-  integer(I_P)::                  err    ! Error trapping flag: 0 no errors, >0 error occurs.
+  class(Type_Tensor), intent(INOUT):: ten ! Tensor to be normalized.
+  real(R_P)::                         nm  ! Norm L2 of tensor.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err)ten
-  case default
-    write(unit,adjustl(trim(format)),iostat=err)ten
-  endselect
+  nm = normL2_ten(ten)
+  if (nm < smallR_P) then
+    nm = nm + smallR_P
+  endif
+  ten%x = ten%x/nm
+  ten%y = ten%y/nm
+  ten%z = ten%z/nm
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Scalar
+  endsubroutine normalize_self
 
-  function Write_Bin_Array1D(unit,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Tensor (binary, array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @brief Function for normalizing a tensor.
+  !> The normalization is made by means of norm L2. If the norm L2 of the tensor is less than the parameter smallR_P the
+  !> normalization value is set to normL2(ten)+smallR_P.
+  !> @return \b norm normalized tensor
+  elemental function normalize_ten(ten) result(norm)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P),      intent(IN):: unit   ! Logic unit.
-  type(Type_Tensor), intent(IN):: ten(:) ! Tensor.
-  integer(I_P)::                  err    ! Error trapping flag: 0 no errors, >0 error occurs.
+  type(Type_Tensor), intent(IN):: ten  ! Tensor to be normalized.
+  type(Type_Tensor)::             norm ! Tensor normalized.
+  real(R_P)::                     nm   ! Norm L2 of tensor.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,iostat=err)ten
+  nm = normL2_ten(ten)
+  if (nm < smallR_P) then
+    nm = nm + smallR_P
+  endif
+  norm%x = ten%x/nm
+  norm%y = ten%y/nm
+  norm%z = ten%z/nm
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Array1D
+  endfunction normalize_ten
 
-  function Write_Ascii_Array1D(unit,format,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Tensor (ascii, array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @brief Subroutine for transposing a tensor.
+  !> The transpositions is done as following:
+  !> @code
+  !>       |x%x x%y x%z|           |x%x y%x z%x|
+  !> ten = |y%x y%y y%z| => tran = |x%y y%y z%y|
+  !>       |z%x z%y z%z|           |x%z y%z z%z|
+  !> @endcode
+  elemental subroutine transpose_self(ten)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P),      intent(IN):: unit   ! Logic unit.
-  character(*),      intent(IN):: format ! Format specifier.
-  type(Type_Tensor), intent(IN):: ten(:) ! Tensor.
-  integer(I_P)::                  err    ! Error trapping flag: 0 no errors, >0 error occurs.
+  class(Type_Tensor), intent(INOUT):: ten  !< Tensor to be transposed.
+  type(Type_Tensor)::                 tran !< Temporary tensor transposed.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err)ten
-  case default
-    write(unit,adjustl(trim(format)),iostat=err)ten
-  endselect
+  tran%x = ten.dot.ex
+  tran%y = ten.dot.ey
+  tran%z = ten.dot.ez
+  ten%x = tran%x
+  ten%y = tran%y
+  ten%z = tran%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Array1D
+  endsubroutine transpose_self
 
-  function Write_Bin_Array2D(unit,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Tensor (binary, array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @brief Function for transposing a tensor.
+  !> The transpositions is done as following:
+  !> @code
+  !>       |x%x x%y x%z|           |x%x y%x z%x|
+  !> ten = |y%x y%y y%z| => tran = |x%y y%y z%y|
+  !>       |z%x z%y z%z|           |x%z y%z z%z|
+  !> @endcode
+  elemental function transpose_ten(ten) result(tran)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P),      intent(IN):: unit     ! Logic unit.
-  type(Type_Tensor), intent(IN):: ten(:,:) ! Tensor.
-  integer(I_P)::                  err      ! Error trapping flag: 0 no errors, >0 error occurs.
+  type(Type_Tensor), intent(IN):: ten  !< Tensor to be transposed.
+  type(Type_Tensor)::             tran !< Tensor transposed.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,iostat=err)ten
+  tran%x = ten.dot.ex
+  tran%y = ten.dot.ey
+  tran%z = ten.dot.ez
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Array2D
+  endfunction transpose_ten
 
-  function Write_Ascii_Array2D(unit,format,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Tensor (ascii, array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @brief Subroutine for computing the inverse of a tensor.
+  !> If the tensor is not invertible a null tensor is returned.
+  !> @return \b inv type(Type_Tensor) variable
+  !> @note The inverse tensor is computed according the following equation: \n
+  !> \f$ T_{ij}^{ - 1} = \frac{1}{{\det (T)}}\left[ {\begin{array}{*{20}{c}}
+  !> {z\%z\cdot y\%y-z\%y\cdot y\%z}&{-(z\%z\cdot x\%y-z\%y\cdot x\%z)}&{y\%z\cdot x\%y-y\%y\cdot x\%z}\\{-(z\%z\cdot y\%x-
+  !> z\%x\cdot y\%z)}&{z\%z\cdot x\%x-z\%x\cdot x\%z}&{-(y\%z\cdot x\%x-y\%x\cdot x\%z)}\\{z\%y\cdot y\%x-z\%x\cdot y\%y}&{-(z\%y
+  !> \cdot x\%x-z\%x\cdot x\%y)}&{y\%y\cdot x\%x-y\%x\cdot x\%y} \end{array}} \right]\f$ \n
+  !> where det(T) is the determinant computed by means of the function determinant.
+  elemental subroutine invert_self(ten)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P),      intent(IN):: unit     ! Logic unit.
-  character(*),      intent(IN):: format   ! Format specifier.
-  type(Type_Tensor), intent(IN):: ten(:,:) ! Tensor.
-  integer(I_P)::                  err      ! Error trapping flag: 0 no errors, >0 error occurs.
+  class(Type_Tensor), intent(INOUT):: ten !< Tensor to be inverted.
+  type(Type_Tensor)::                 inv !< Temporary tensor inverted.
+  real(R_P)::                         det !< Determinant and 1/Determinant.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err)ten
-  case default
-    write(unit,adjustl(trim(format)),iostat=err)ten
-  endselect
+  det = determinant(ten)
+  if (det/=0._R_P) then
+   det = 1._R_P/det
+   inv%x=det*( (ten%z%z*ten%y%y-ten%z%y*ten%y%z)*ex - (ten%z%z*ten%x%y-ten%z%y*ten%x%z)*ey + (ten%y%z*ten%x%y-ten%y%y*ten%x%z)*ez)
+   inv%y=det*(-(ten%z%z*ten%y%x-ten%z%x*ten%y%z)*ex + (ten%z%z*ten%x%x-ten%z%x*ten%x%z)*ey - (ten%y%z*ten%x%x-ten%y%x*ten%x%z)*ez)
+   inv%z=det*( (ten%z%y*ten%y%x-ten%z%x*ten%y%y)*ex - (ten%z%y*ten%x%x-ten%z%x*ten%x%y)*ey + (ten%y%y*ten%x%x-ten%y%x*ten%x%y)*ez)
+  else
+    inv%x=0._R_P
+    inv%y=0._R_P
+    inv%z=0._R_P
+  endif
+  ten%x = inv%x
+  ten%y = inv%y
+  ten%z = inv%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Array2D
+  endsubroutine invert_self
 
-  function Write_Bin_Array3D(unit,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Tensor (binary, array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @brief Subroutine for computing the rotation tensor along x.
+  elemental subroutine rotox(ten,ang)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P),      intent(IN):: unit       ! Logic unit.
-  type(Type_Tensor), intent(IN):: ten(:,:,:) ! Tensor.
-  integer(I_P)::                  err        ! Error trapping flag: 0 no errors, >0 error occurs.
+  class(Type_Tensor), intent(INOUT):: ten !< Rotating tensor.
+  real(R_P),          intent(IN)::    ang !< Angle (radians) of rotation.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,iostat=err)ten
+  call ten%x%set(x = 1._R_P,y = 0._R_P  ,z =  0._R_P  )
+  call ten%y%set(x = 0._R_P,y = cos(ang),z = -sin(ang))
+  call ten%z%set(x = 0._R_P,y = sin(ang),z =  cos(ang))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Array3D
+  endsubroutine rotox
 
-  function Write_Ascii_Array3D(unit,format,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Tensor (ascii, Array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @brief Subroutine for computing the rotation tensor along y.
+  elemental subroutine rotoy(ten,ang)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P),      intent(IN):: unit       ! Logic unit
-  character(*),      intent(IN):: format     ! Format specifier.
-  type(Type_Tensor), intent(IN):: ten(:,:,:) ! Tensor.
-  integer(I_P)::                  err        ! Error trapping flag: 0 no errors, >0 error occurs.
+  class(Type_Tensor), intent(INOUT):: ten !< Rotating tensor.
+  real(R_P),          intent(IN)::    ang !< Angle (radians) of rotation.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err)ten
-  case default
-    write(unit,adjustl(trim(format)),iostat=err)ten
-  endselect
+  call ten%x%set(x =  cos(ang),y = 0._R_P,z = sin(ang))
+  call ten%y%set(x =  0._R_P  ,y = 1._R_P,z = 0._R_P  )
+  call ten%z%set(x = -sin(ang),y = 0._R_P,z = cos(ang))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Array3D
+  endsubroutine rotoy
 
-  ! read
-  function Read_Bin_Scalar(unit,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Tensor (binary, scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @brief Subroutine for computing the rotation tensor along z.
+  elemental subroutine rotoz(ten,ang)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P),      intent(IN)::    unit  ! Logic unit.
-  type(Type_Tensor), intent(INOUT):: ten   ! Tensor.
-  integer(I_P)::                     err   ! Error trapping flag: 0 no errors, >0 error occurs.
+  class(Type_Tensor), intent(INOUT):: ten !< Rotating tensor.
+  real(R_P),          intent(IN)::    ang !< Angle (radians) of rotation.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  read(unit,iostat=err)ten
+  call ten%x%set(x = cos(ang),y = -sin(ang),z = 0._R_P)
+  call ten%y%set(x = sin(ang),y =  cos(ang),z = 0._R_P)
+  call ten%z%set(x = 0._R_P  ,y =  0._R_P  ,z = 1._R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Scalar
+  endsubroutine rotoz
 
-  function Read_Ascii_Scalar(unit,format,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Tensor (ascii, scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @brief Subroutine for computing the rotation tensor along a generic vector axis.
+  elemental subroutine rotou(ten,u,ang)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P),      intent(IN)::    unit   ! Logic unit.
-  character(*),      intent(IN)::    format ! Format specifier.
-  type(Type_Tensor), intent(INOUT):: ten    ! Tensor.
-  integer(I_P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
+  class(Type_Tensor), intent(INOUT):: ten !< Rotating tensor.
+  type(Type_Vector),  intent(IN)::    u   !< Vector axis.
+  real(R_P),          intent(IN)::    ang !< Angle (radians) of rotation.
+  type(Type_Vector)::                 n   !< Normalized vector axis.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err)ten
-  case default
-    read(unit,adjustl(trim(format)),iostat=err)ten
-  endselect
+  n = u
+  call n%normalize
+  call ten%x%set(x=cos(ang)+n%x*n%x*(1-cos(ang))    ,y=n%x*n%y*(1-cos(ang))-u%z*sin(ang),z=n%x*n%z*(1-cos(ang))+u%y*sin(ang))
+  call ten%y%set(x=n%y*n%x*(1-cos(ang))+u%z*sin(ang),y=cos(ang)+n%y*n%y*(1-cos(ang))    ,z=n%y*n%z*(1-cos(ang))-u%x*sin(ang))
+  call ten%z%set(x=n%z*n%x*(1-cos(ang))-u%y*sin(ang),y=n%z*n%y*(1-cos(ang))+u%x*sin(ang),z=cos(ang)+n%z*n%z*(1-cos(ang))    )
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Scalar
-
-  function Read_Bin_Array1D(unit,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Tensor (binary, array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit   ! Logic unit.
-  type(Type_Tensor), intent(INOUT):: ten(:) ! Tensor.
-  integer(I_P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  read(unit,iostat=err)ten
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Array1D
-
-  function Read_Ascii_Array1D(unit,format,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Tensor (ascii, array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit   ! logic unit
-  character(*),      intent(IN)::    format ! format specifier
-  type(Type_Tensor), intent(INOUT):: ten(:) ! Tensor.
-  integer(I_P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err)ten
-  case default
-    read(unit,adjustl(trim(format)),iostat=err)ten
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Array1D
-
-  function Read_Bin_Array2D(unit,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Tensor (binary, array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit     ! Logic unit.
-  type(Type_Tensor), intent(INOUT):: ten(:,:) ! Tensor.
-  integer(I_P)::                     err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  read(unit,iostat=err)ten
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Array2D
-
-  function Read_Ascii_Array2D(unit,format,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Tensor (ascii, array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit     ! Logic unit.
-  character(*),      intent(IN)::    format   ! Format specifier.
-  type(Type_Tensor), intent(INOUT):: ten(:,:) ! Tensor.
-  integer(I_P)::                     err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err)ten
-  case default
-    read(unit,adjustl(trim(format)),iostat=err)ten
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Array2D
-
-  function Read_Bin_Array3D(unit,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Tensor (binary, array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit       ! Logic unit.
-  type(Type_Tensor), intent(INOUT):: ten(:,:,:) ! Tensor.
-  integer(I_P)::                     err        ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  read(unit,iostat=err)ten
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Array3D
-
-  function Read_Ascii_Array3D(unit,format,ten) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for reading Type_Tensor (ascii, array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit       ! Logic unit.
-  character(*),      intent(IN)::    format     ! Format specifier.
-  type(Type_Tensor), intent(INOUT):: ten(:,:,:) ! Tensor.
-  integer(I_P)::                     err        ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err)ten
-  case default
-    read(unit,adjustl(trim(format)),iostat=err)ten
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Array3D
+  endsubroutine rotou
 
   ! Assignment (=)
   elemental subroutine assign_Vec(ten,vec)
@@ -1976,7 +1990,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call set_vec(x=(ten%x.dot.vec),y=(ten%y.dot.vec),z=(ten%z.dot.vec),vec=dot)
+  call dot%set(x=(ten%x.dot.vec),y=(ten%y.dot.vec),z=(ten%z.dot.vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_dot_vec
@@ -1994,7 +2008,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call set_vec(x=((ten.dot.ex).dot.vec),y=((ten.dot.ey).dot.vec),z=((ten.dot.ez).dot.vec),vec=dot)
+  call dot%set(x=((ten.dot.ex).dot.vec),y=((ten.dot.ey).dot.vec),z=((ten.dot.ez).dot.vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_dot_ten
@@ -2038,162 +2052,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction diadicproduct
-
-  ! sq_norm
-  elemental function sq_norm_ten(ten) result(sq)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!This function computes the square of the norm of a tensor.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Tensor), intent(IN):: ten ! Tensor.
-  real(R_P)::                     sq  ! Square of the Norm.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  sq = sq_norm(ten%x) + sq_norm(ten%y) + sq_norm(ten%z)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction sq_norm_ten
-
-  ! normL2
-  elemental function normL2_ten(ten) result(norm)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!This function computes the norm L2 of a tensor.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Tensor), intent(IN):: ten  ! Tensor.
-  real(R_P)::                     norm ! Norm L2.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  norm = sqrt(sq_norm(ten%x) + sq_norm(ten%y) + sq_norm(ten%z))
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction normL2_ten
-
-  ! normalize
-  elemental function normalize_ten(ten) result(norm)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!This function normalize a tensor.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Tensor), intent(IN):: ten  ! Tensor to be normalized.
-  type(Type_Tensor)::             norm ! Tensor normalized.
-  real(R_P)::                     nm   ! Norm L2 of tensor.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  nm = normL2_ten(ten)
-  if (nm < smallR_P) then
-    nm = nm + smallR_P
-  endif
-  norm%x = ten%x/nm
-  norm%y = ten%y/nm
-  norm%z = ten%z/nm
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction normalize_ten
-  !> @}
-
-  !> @ingroup Data_Type_TensorPublicProcedure
-  !> @{
-  ! transpose
-  elemental function transpose_ten(ten) result(tran)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!This function transpose a tensor.
-  !       |x%x x%y x%z|           |x%x y%x z%x|
-  ! ten = |y%x y%y y%z| => tran = |x%y y%y z%y|
-  !       |z%x z%y z%z|           |x%z y%z z%z|
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Tensor), intent(IN):: ten  ! Tensor to be transposed.
-  type(Type_Tensor)::             tran ! Tensor transposed.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  tran%x = ten.dot.ex
-  tran%y = ten.dot.ey
-  tran%z = ten.dot.ez
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction transpose_ten
-
-  !> This function computes the determinant of a tensor.
-  !> @return \b det real(R_P) variable
-  !> @note The determinant is computed according the following equation: \n
-  !> \f$ \det  = \left| {\begin{array}{*{20}{c}} {x\% x}&{x\% y}&{x\% z}\\ {y\% x}&{y\% y}&{y\% z}\\ {z\% x}&{z\% y}&{z\% z}
-  !> \end{array}} \right| = \f$ \n
-  !> \f$=x\%x(z\%z\cdot y\%y-z\%y\cdot y\%z)-\f$
-  !> \f$ y\%x(z\%z\cdot x\%y-z\%y\cdot x\%z)+\f$
-  !> \f$ z\%x(y\%z\cdot x\%y-y\%y\cdot x\%z) \f$
-  elemental function determinant(ten) result(det)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Tensor), intent(IN):: ten !< Tensor.
-  real(R_P)::                     det !< Determinant.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  det=ten%x%x*(ten%z%z*ten%y%y-ten%z%y*ten%y%z)-ten%y%x*(ten%z%z*ten%x%y-ten%z%y*ten%x%z)+ten%z%x*(ten%y%z*ten%x%y-ten%y%y*ten%x%z)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction determinant
-
-  !> This function computes the inverse of a tensor.
-  !> If the tensor is not invertible a null tensor is returned.
-  !> @return \b inv type(Type_Tensor) variable
-  !> @note The inverse tensor is computed according the following equation: \n
-  !> \f$ T_{ij}^{ - 1} = \frac{1}{{\det (T)}}\left[ {\begin{array}{*{20}{c}}
-  !> {z\%z\cdot y\%y-z\%y\cdot y\%z}&{-(z\%z\cdot x\%y-z\%y\cdot x\%z)}&{y\%z\cdot x\%y-y\%y\cdot x\%z}\\{-(z\%z\cdot y\%x-
-  !> z\%x\cdot y\%z)}&{z\%z\cdot x\%x-z\%x\cdot x\%z}&{-(y\%z\cdot x\%x-y\%x\cdot x\%z)}\\{z\%y\cdot y\%x-z\%x\cdot y\%y}&{-(z\%y
-  !> \cdot x\%x-z\%x\cdot x\%y)}&{y\%y\cdot x\%x-y\%x\cdot x\%y} \end{array}} \right]\f$ \n
-  !> where det(T) is the determinant computed by means of the function determinant.
-  elemental function invert(ten) result(inv)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Tensor), intent(IN):: ten    !< Tensor to be inverted.
-  type(Type_Tensor)::             inv    !< Tensor inverted.
-  real(R_P)::                     det,di !< Determinant and 1/Determinant.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  det = determinant(ten)
-  if (det/=0._R_P) then
-    di = 1._R_P/det
-   inv%x=di*( (ten%z%z*ten%y%y-ten%z%y*ten%y%z)*ex - (ten%z%z*ten%x%y-ten%z%y*ten%x%z)*ey + (ten%y%z*ten%x%y-ten%y%y*ten%x%z)*ez)
-   inv%y=di*(-(ten%z%z*ten%y%x-ten%z%x*ten%y%z)*ex + (ten%z%z*ten%x%x-ten%z%x*ten%x%z)*ey - (ten%y%z*ten%x%x-ten%y%x*ten%x%z)*ez)
-   inv%z=di*( (ten%z%y*ten%y%x-ten%z%x*ten%y%y)*ex - (ten%z%y*ten%x%x-ten%z%x*ten%x%y)*ey + (ten%y%y*ten%x%x-ten%y%x*ten%x%y)*ez)
-  else
-    inv%x=0._R_P
-    inv%y=0._R_P
-    inv%z=0._R_P
-  endif
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction invert
-
-  !>This function check if a tensor is invertible (determinant /=0, not singular tensor).
-  !> @return \b inv logical variable
-  elemental function invertible(ten) result(inv)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Tensor), intent(IN):: ten !< Tensor to be inverted.
-  logical::                       inv !< True if the tensor is not singular.
-  real(R_P)::                     det !< Determinant.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  det = determinant(ten) ; inv = (det/=0._R_P)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction invertible
   !> @}
 endmodule Data_Type_Tensor

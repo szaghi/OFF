@@ -14,63 +14,27 @@
 !> @ingroup Library
 module Lib_Fluidynamic
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                                                 ! Integers and reals precision definition.
-USE Data_Type_BC, &                                                              ! Definition of Type_BC.
-                                        init_bc=>init, set_bc=>set               ! Function for initializing Type_BC.
-USE Data_Type_Conservative, &                                                    ! Definition of Type_Conservative.
-                                        init_cons=>init, set_cons=>set           ! Function for initializing Type_Conservative.
-USE Data_Type_Globals                                                            ! Definition of Type_Global and Type_Block.
-USE Data_Type_Primitive, &                                                       ! Definition of Type_Primitive.
-                                        init_prim=>init, set_prim=>set           ! Function for initializing Type_Primitive.
-USE Data_Type_Time                                                               ! Definition of Type_Time.
-USE Data_Type_Vector, &                                                          ! Definition of Type_Vector.
-                                        set_vec=>set                             ! Function for initializing Type_Vector.
-USE Lib_IO_Misc                                                                  ! Procedures for IO and strings operations.
-USE Lib_Math,                     only: interpolate1                             ! Function for computing linear interpolation.
-USE Lib_Parallel,                 only: blockmap, &                              ! Local/global blocks map.
-                                        Psendrecv                                ! Subroutine for send/receive Primitive variables.
-USE Lib_Riemann,                  only: &
-#ifdef SMSWliu
-                                        chk_smooth_liu,        &                 ! Liu's smoothness function.
-#elif defined SMSWvanleer || defined SMSWvanalbada || defined SMSWharten
-                                        chk_smooth_limiter,    &                 ! Slope limiter-based smoothness function.
-#else
-                                        chk_smooth_z,          &                 ! Riemann-Solver-like smoothness function.
+USE IR_Precision                                   ! Integers and reals precision definition.
+USE Data_Type_BC                                   ! Definition of Type_BC.
+USE Data_Type_Conservative                         ! Definition of Type_Conservative.
+USE Data_Type_Globals                              ! Definition of Type_Global and Type_Block.
+USE Data_Type_Primitive                            ! Definition of Type_Primitive.
+USE Data_Type_Time                                 ! Definition of Type_Time.
+USE Data_Type_Vector                               ! Definition of Type_Vector.
+USE Lib_Fluxes_Convective, only: fluxes_convective ! Subroutine for computing convective fluxes.
+USE Lib_Fluxes_Diffusive, only: fluxes_diffusive   ! Subroutine for computing diffusive fluxes.
+USE Lib_IO_Misc                                    ! Procedures for IO and strings operations.
+USE Lib_Math, only: interpolate1                   ! Function for computing linear interpolation.
+USE Lib_Parallel, only: blockmap                   ! Local/global blocks map.
+#ifdef PROFILING
+USE Lib_Profiling                                  ! Procedures for profiling the code.
 #endif
-#if defined RSHLLCb || defined RSHLLCc || defined RSHLLCp || defined RSHLLCt || defined RSHLLCz
-                                        Riem_Solver=>Riem_Solver_HLLC            ! HLLC Riemann solver.
-#elif RSEXA
-                                        Riem_Solver=>Riem_Solver_Exact_U         ! Exact Riemann solver.
-#elif RSPVL
-                                        Riem_Solver=>Riem_Solver_PVL             ! PVL Riemann solver.
-#elif RSTR
-                                        Riem_Solver=>Riem_Solver_TR              ! TR Riemann solver.
-#elif RSTS
-                                        Riem_Solver=>Riem_Solver_TS              ! TS Riemann solver.
-#elif RSAPRS
-                                        Riem_Solver=>Riem_Solver_APRS            ! APRS Riemann solver.
-#elif RSALFR
-                                        Riem_Solver=>Riem_Solver_ALFR            ! ALFR Riemann solver.
-#elif defined RSLFp || defined RSLFz
-                                        Riem_Solver=>Riem_Solver_LaxFriedrichs   ! Lax-Friedrichs Riemann solver.
-#elif RSROE
-                                        Riem_Solver=>Riem_Solver_Roe             ! Roe Riemann solver.
-#else
-                                        Riem_Solver=>Riem_Solver_HLLC            ! HLLC Riemann solver.
-#endif
-USE Lib_Runge_Kutta                                                              ! Runge-Kutta time integration library.
-USE Lib_Thermodynamic_Laws_Ideal, only: a                                        ! Function for computing speed of sound.
-USE Lib_WENO,                     only: &
-#ifdef HYBRIDC
-                                        noweno_central, &                        ! Function for comp. central diff. reconstruction.
-#elif HYBRID
-                                        weno_optimal,   &                        ! Function for comp. optimal WENO reconstruction.
-#endif
-                                        weno                                     ! Function for computing WENO reconstruction.
+USE Lib_Runge_Kutta                                ! Runge-Kutta time integration library.
+USE Lib_Thermodynamic_Laws_Ideal, only: a          ! Function for computing speed of sound.
 #ifdef MPI2
-USE Lib_Parallel,                 only: procmap, &                               ! Proc/blocks map.
-                                        blockmap                                 ! Local/global blocks map.
-USE MPI                                                                          ! MPI runtime library.
+USE Lib_Parallel, only: procmap, &                 ! Proc/blocks map.
+                        Psendrecv                  ! Subroutine for send/receive Primitive variables.
+USE MPI                                            ! MPI runtime library.
 #endif
 !-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -153,91 +117,53 @@ contains
   pure subroutine primitive2conservative(block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Block), intent(INOUT):: block !< Block-level data (see \ref Data_Type_Globals::Type_Block "Type_Block" definition).
+  type(Type_Block),  intent(INOUT):: block  !< Block-level data (see \ref Data_Type_Globals::Type_Block "Type_Block" definition).
+  integer(I_P)::                     i,j,k  !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call p2c_reshape1D(N = int(block%mesh%Ni*block%mesh%Nj*block%mesh%Nk,I8P),             &
-                     P = block%fluid%P(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk), &
-                     U = block%fluid%U(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk))
+  !$OMP PARALLEL DEFAULT(NONE) &
+  !$OMP PRIVATE(i,j,k)         &
+  !$OMP SHARED(block)
+  !$OMP DO
+  do k=1,block%mesh%Nk
+    do j=1,block%mesh%Nj
+      do i=1,block%mesh%Ni
+        call prim2cons(prim = block%fluid%P(i,j,k), cons = block%fluid%U(i,j,k))
+      enddo
+    enddo
+  enddo
+  !$OMP END PARALLEL
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  contains
-    !> Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency.
-    !> The computation of the parent procedure is performed in 1D re-shaped arrays in order to augment the computational efficiency
-    !> when using OpenMP shared parallel paradigm. As a matter of facts the scalability of OpenMP parallelism is exploited only when
-    !> the parallelized loop is the largest one. In the case of multi-dimensional arrays the first index is not always the largest
-    !> one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping
-    !> there is only one index.
-    !> @ingroup Lib_FluidynamicPrivateProcedure
-    pure subroutine p2c_reshape1D(N,P,U)
-    !-------------------------------------------------------------------------------------------------------------------------------
-    implicit none
-    integer(I8P),            intent(IN)::    N      !< Number of finite volumes.
-    type(Type_Primitive),    intent(IN)::    P(1:N) !< Primitive variables.
-    type(Type_Conservative), intent(INOUT):: U(1:N) !< Conservative variables.
-    integer(I8P)::                           i      !< Cell counter.
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    !$OMP PARALLEL DEFAULT(NONE)   &
-    !$OMP PRIVATE(i)               &
-    !$OMP SHARED(N,P,U)
-    !$OMP DO
-    do i=1,N
-      call prim2cons(prim = P(i), cons = U(i))
-    enddo
-    !$OMP END PARALLEL
-    return
-    !-------------------------------------------------------------------------------------------------------------------------------
-    endsubroutine p2c_reshape1D
   endsubroutine primitive2conservative
 
   !> Subroutine for converting conservative variables to primitive variables of all cells of a block.
   !> @note Only the inner cells of the block are converted.
   !> @ingroup Lib_FluidynamicPublicProcedure
-  pure subroutine conservative2primitive(global,block)
+  subroutine conservative2primitive(global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Global), intent(IN)::    global !< Global-level data (see \ref Data_Type_Globals::Type_Global "Type_Global" definition).
   type(Type_Block),  intent(INOUT):: block  !< Block-level data (see \ref Data_Type_Globals::Type_Block "Type_Block" definition).
+  integer(I_P)::                     i,j,k  !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call c2p_reshape1D(N = int(block%mesh%Ni*block%mesh%Nj*block%mesh%Nk,I8P),             &
-                     U = block%fluid%U(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk), &
-                     P = block%fluid%P(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk))
+  !$OMP PARALLEL DEFAULT(NONE) &
+  !$OMP PRIVATE(i,j,k)         &
+  !$OMP SHARED(global,block)
+  !$OMP DO
+  do k=1,block%mesh%Nk
+    do j=1,block%mesh%Nj
+      do i=1,block%mesh%Ni
+        call cons2prim(cp0 = global%fluid%cp0, cv0 = global%fluid%cv0, cons = block%fluid%U(i,j,k), prim = block%fluid%P(i,j,k))
+      enddo
+    enddo
+  enddo
+  !$OMP END PARALLEL
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  contains
-    !> Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency.
-    !> The computation of the parent procedure is performed in 1D re-shaped arrays in order to augment the computational efficiency
-    !> when using OpenMP shared parallel paradigm. As a matter of facts the scalability of OpenMP parallelism is exploited only when
-    !> the parallelized loop is the largest one. In the case of multi-dimensional arrays the first index is not always the largest
-    !> one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping
-    !> there is only one index.
-    !> @ingroup Lib_FluidynamicPrivateProcedure
-    pure subroutine c2p_reshape1D(N,U,P)
-    !-------------------------------------------------------------------------------------------------------------------------------
-    implicit none
-    integer(I8P),            intent(IN)::    N      !< Number of finite volumes.
-    type(Type_Conservative), intent(IN)::    U(1:N) !< Conservative variables.
-    type(Type_Primitive),    intent(INOUT):: P(1:N) !< Primitive variables.
-    integer(I8P)::                           i      !< Cell counter.
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    !$OMP PARALLEL DEFAULT(NONE)   &
-    !$OMP PRIVATE(i)               &
-    !$OMP SHARED(global,N,P,U)
-    !$OMP DO
-    do i=1,N
-      call cons2prim(cp0 = global%fluid%cp0, cv0 = global%fluid%cv0, cons = U(i), prim = P(i))
-    enddo
-    !$OMP END PARALLEL
-    return
-    !-------------------------------------------------------------------------------------------------------------------------------
-    endsubroutine c2p_reshape1D
   endsubroutine conservative2primitive
 
   !> Function for evaluating the local and global time step value by CFL condition.
@@ -249,7 +175,7 @@ contains
   type(Type_Block),  intent(INOUT):: block  !< Block-level data.
   real(R_P),         intent(OUT)::   Dtmin  !< Minimum Dt.
   real(R_P)::         vmax                          !< Maximum speed of waves.
-  real(R_P)::         a                             !< Speed of sound.
+  real(R_P)::         ss                            !< Speed of sound.
   real(R_P)::         vmiL,vmiR,vmjL,vmjR,vmkL,vmkR !< Dummy velocities.
   type(Type_Vector):: vm                            !< Dummy vectorial velocities.
   integer(I_P)::      Ni,Nj,Nk,gc(1:6)              !< Temp var for storing block dimensions.
@@ -262,53 +188,51 @@ contains
   Nk = block%mesh%Nk
   gc = block%mesh%gc
   ! computing the minimum Dt into the inner cells
-  !$OMP PARALLEL DEFAULT(NONE)                                  &
-  !$OMP PRIVATE(i,j,k,vmax,a,vmiL,vmiR,vmjL,vmjR,vmkL,vmkR,vm)  &
-  !$OMP SHARED(Ni,Nj,Nk,global,block)
+  !$OMP PARALLEL DEFAULT(NONE)                                   &
+  !$OMP PRIVATE(i,j,k,vmax,ss,vmiL,vmiR,vmjL,vmjR,vmkL,vmkR,vm)  &
+  !$OMP SHARED(gc,Ni,Nj,Nk,global,block,Dtmin)
   !$OMP DO
   do k=1,Nk
     do j=1,Nj
       do i=1,Ni
         ! computing the local speed of sound
-        a = sqrt((block%fluid%P(i,j,k)%g*block%fluid%P(i,j,k)%p)/(block%fluid%P(i,j,k)%d))
+        ss = a(p=block%fluid%P(i,j,k)%p,r=block%fluid%P(i,j,k)%d,g=block%fluid%P(i,j,k)%g)
         ! evaluating the maximum propagation speed of acoustic segnals multiplied for face area
         ! left i
         vm   = 0.5_R_P*(block%fluid%P(i-1,j,k)%v+block%fluid%P(i,j,k)%v)
         vmiL = (vm.dot.block%mesh%NFi(i-1,j,k))*block%mesh%Si(i-1,j,k)
-        vmiL = abs(vmiL) + a
+        vmiL = abs(vmiL) + ss
         ! right i
         vm   = 0.5_R_P*(block%fluid%P(i,j,k)%v+block%fluid%P(i+1,j,k)%v)
         vmiR = (vm.dot.block%mesh%NFi(i,j,k))*block%mesh%Si(i,j,k)
-        vmiR = abs(vmiR) + a
+        vmiR = abs(vmiR) + ss
         ! left j
         vm   = 0.5_R_P*(block%fluid%P(i,j-1,k)%v+block%fluid%P(i,j,k)%v)
         vmjL = (vm.dot.block%mesh%NFj(i,j-1,k))*block%mesh%Sj(i,j-1,k)
-        vmjL = abs(vmjL) + a
+        vmjL = abs(vmjL) + ss
         ! right j
         vm   = 0.5_R_P*(block%fluid%P(i,j,k)%v+block%fluid%P(i,j+1,k)%v)
         vmjR = (vm.dot.block%mesh%NFj(i,j,k))*block%mesh%Sj(i,j,k)
-        vmjR = abs(vmjR) + a
+        vmjR = abs(vmjR) + ss
         ! left k
         vm   = 0.5_R_P*(block%fluid%P(i,j,k-1)%v+block%fluid%P(i,j,k)%v)
         vmkL = (vm.dot.block%mesh%NFk(i,j,k-1))*block%mesh%Sk(i,j,k-1)
-        vmkL = abs(vmkL) + a
+        vmkL = abs(vmkL) + ss
         ! right k
         vm   = 0.5_R_P*(block%fluid%P(i,j,k)%v+block%fluid%P(i,j,k+1)%v)
         vmkR = (vm.dot.block%mesh%NFk(i,j,k))*block%mesh%Sk(i,j,k)
-        vmkR = abs(vmkR) + a
+        vmkR = abs(vmkR) + ss
         ! vmax
         vmax = max(vmiL,vmiR,vmjL,vmjR,vmkL,vmkR)
         block%fluid%Dt(i,j,k) = block%mesh%V(i,j,k)/vmax*global%fluid%CFL
       enddo
     enddo
   enddo
-  !$OMP END PARALLEL
   ! computing minimum Dt
+  !$OMP SINGLE
   Dtmin = minval(block%fluid%Dt(1:Ni,1:Nj,1:Nk))
+  !$OMP END SINGLE
   ! ghost cells estrapolation: imposing the minum value of Dt
-  !$OMP PARALLEL DEFAULT(NONE) &
-  !$OMP PRIVATE(i,j,k)         &
-  !$OMP SHARED(gc,Ni,Nj,Nk,Dtmin,block)
   ! left i frame
   !$OMP DO
   do k=1-gc(5),Nk+gc(6)
@@ -368,21 +292,25 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine compute_time
 
-  !> Subroutine for computing the residuals. This the space operator.
+  !> Subroutine for computing the residuals. This the space operator. The residuals are stored in block%fluid%KS(s1) conservative
+  !> variables.
   !> @ingroup Lib_FluidynamicPrivateProcedure
   subroutine residuals(s1,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    s1     ! Current Runge-kutta stage.
-  type(Type_Global), intent(IN)::    global ! Global-level data.
-  type(Type_Block),  intent(INOUT):: block  ! Block-level data.
-  type(Type_Conservative):: Fi(0:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk) ! I fluxes.
-  type(Type_Conservative):: Fj(1:block%mesh%Ni,0:block%mesh%Nj,1:block%mesh%Nk) ! J fluxes.
-  type(Type_Conservative):: Fk(1:block%mesh%Ni,1:block%mesh%Nj,0:block%mesh%Nk) ! K fluxes.
-  integer(I1P)::            gcu                                                 ! Number of ghost cells used.
-  integer(I_P)::            Ni,Nj,Nk,Ns                                         ! Temp var for storing block dims.
-  integer(I1P)::            gc(1:6)                                             ! Temp var for storing ghost cells num.
-  integer(I_P)::            i,j,k                                               ! Counters.
+  integer(I_P),      intent(IN)::    s1     !< Current Runge-kutta stage.
+  type(Type_Global), intent(IN)::    global !< Global-level data.
+  type(Type_Block),  intent(INOUT):: block  !< Block-level data.
+  type(Type_Conservative):: Fic(0:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk) ! I convective fluxes.
+  type(Type_Conservative):: Fjc(1:block%mesh%Ni,0:block%mesh%Nj,1:block%mesh%Nk) ! J convective fluxes.
+  type(Type_Conservative):: Fkc(1:block%mesh%Ni,1:block%mesh%Nj,0:block%mesh%Nk) ! K convective fluxes.
+  type(Type_Conservative):: Fid(0:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk) ! I diffusive fluxes.
+  type(Type_Conservative):: Fjd(1:block%mesh%Ni,0:block%mesh%Nj,1:block%mesh%Nk) ! J diffusive fluxes.
+  type(Type_Conservative):: Fkd(1:block%mesh%Ni,1:block%mesh%Nj,0:block%mesh%Nk) ! K diffusive fluxes.
+  integer(I1P)::            gcu                                                  ! Number of ghost cells used.
+  integer(I_P)::            Ni,Nj,Nk,Ns                                          ! Temp var for storing block dims.
+  integer(I1P)::            gc(1:6)                                              ! Temp var for storing ghost cells number.
+  integer(I_P)::            i,j,k,s                                              ! Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -391,114 +319,141 @@ contains
   Nk = block%mesh%Nk
   gc = block%mesh%gc
   Ns = global%fluid%Ns
+  call Fic%init(Ns=Ns)
+  call Fid%init(Ns=Ns)
+  call Fjc%init(Ns=Ns)
+  call Fjd%init(Ns=Ns)
+  call Fkc%init(Ns=Ns)
+  call Fkd%init(Ns=Ns)
+  ! computing convective fluxes
+  !$OMP PARALLEL DEFAULT(NONE) &
+  !$OMP PRIVATE(i,j,k,s)       &
+  !$OMP SHARED(s1,gc,gcu,Ni,Nj,Nk,Ns,global,block,Fic,Fjc,Fkc,Fid,Fjd,Fkd)
 #ifndef NULi
-  ! computing the fluxes in i direction
+  ! i direction
+  !$OMP SINGLE
   gcu = min(global%mesh%gco,gc(1),gc(2))
+  !$OMP END SINGLE
+  !$OMP DO
   do k=1,Nk
     do j=1,Nj
-      call fluxes(gc  = gcu,                              &
-                  N   = Ni,                               &
-                  Ns  = Ns,                               &
-                  cp0 = global%fluid%cp0,                 &
-                  cv0 = global%fluid%cv0,                 &
-                  NF  = block%mesh%NFi(0-gcu:Ni+gcu,j,k), &
-                  P   = block%fluid%P (1-gcu:Ni+gcu,j,k), &
-                  F   = Fi            (    0:Ni    ,j,k))
+      call fluxes_convective(gc  = gcu,                              &
+                             N   = Ni,                               &
+                             Ns  = Ns,                               &
+                             cp0 = global%fluid%cp0,                 &
+                             cv0 = global%fluid%cv0,                 &
+                             NF  = block%mesh%NFi(0-gcu:Ni+gcu,j,k), &
+                             P   = block%fluid%P (1-gcu:Ni+gcu,j,k), &
+                             F   = Fic           (    0:Ni    ,j,k))
     enddo
   enddo
 #endif
 #ifndef NULj
-  ! computing the fluxes in j direction
+  ! j direction
+  !$OMP SINGLE
   gcu = min(global%mesh%gco,gc(3),gc(4))
+  !$OMP END SINGLE
+  !$OMP DO
   do k=1,Nk
     do i=1,Ni
-      call fluxes(gc  = gcu,                              &
-                  N   = Nj,                               &
-                  Ns  = Ns,                               &
-                  cp0 = global%fluid%cp0,                 &
-                  cv0 = global%fluid%cv0,                 &
-                  NF  = block%mesh%NFj(i,0-gcu:Nj+gcu,k), &
-                  P   = block%fluid%P (i,1-gcu:Nj+gcu,k), &
-                  F   = Fj            (i,    0:Nj    ,k))
+      call fluxes_convective(gc  = gcu,                              &
+                             N   = Nj,                               &
+                             Ns  = Ns,                               &
+                             cp0 = global%fluid%cp0,                 &
+                             cv0 = global%fluid%cv0,                 &
+                             NF  = block%mesh%NFj(i,0-gcu:Nj+gcu,k), &
+                             P   = block%fluid%P (i,1-gcu:Nj+gcu,k), &
+                             F   = Fjc           (i,    0:Nj    ,k))
     enddo
   enddo
 #endif
 #ifndef NULk
-  ! computing the fluxes in k direction
+  ! k direction
+  !$OMP SINGLE
   gcu = min(global%mesh%gco,gc(5),gc(6))
+  !$OMP END SINGLE
+  !$OMP DO
   do j=1,Nj
     do i=1,Ni
-      call fluxes(gc  = gcu,                              &
-                  N   = Nk,                               &
-                  Ns  = Ns,                               &
-                  cp0 = global%fluid%cp0,                 &
-                  cv0 = global%fluid%cv0,                 &
-                  NF  = block%mesh%NFk(i,j,0-gcu:Nk+gcu), &
-                  P   = block%fluid%P (i,j,1-gcu:Nk+gcu), &
-                  F   = Fk            (i,j,    0:Nk    ))
+      call fluxes_convective(gc  = gcu,                              &
+                             N   = Nk,                               &
+                             Ns  = Ns,                               &
+                             cp0 = global%fluid%cp0,                 &
+                             cv0 = global%fluid%cv0,                 &
+                             NF  = block%mesh%NFk(i,j,0-gcu:Nk+gcu), &
+                             P   = block%fluid%P (i,j,1-gcu:Nk+gcu), &
+                             F   = Fkc           (i,j,    0:Nk    ))
     enddo
   enddo
 #endif
-#if defined NULi || NULj || NULk
-  ! nullify fluxes and velocity for 2D and 1D simulations
-  !$OMP PARALLEL DEFAULT(NONE) &
-  !$OMP PRIVATE(i,j,k)         &
-  !$OMP SHARED(Ni,Nj,Nk,Fi,Fj,Fk)
-#ifdef NULi
-  ! nullify i direction
-  !$OMP DO
-  do k=1,Nk
-    do j=1,Nj
-      do i=0,Ni
-        Fi(i,j,k) = 0._R_P
-      enddo
-    enddo
-  enddo
-#endif
-#ifdef NULj
-  ! nullify j direction
-  !$OMP DO
-  do k=1,Nk
-    do j=0,Nj
-      do i=1,Ni
-        Fj(i,j,k) = 0._R_P
-      enddo
-    enddo
-  enddo
-#endif
-#ifdef NULk
-  ! nullify k direction
-  !$OMP DO
-  do k=0,Nk
-    do j=1,Nj
-      do i=1,Ni
-        Fk(i,j,k) = 0._R_P
-      enddo
-    enddo
-  enddo
-#endif
-  !$OMP END PARALLEL
-#endif
-
-  ! computing the residuals
-  !$OMP PARALLEL DEFAULT(NONE) &
-  !$OMP PRIVATE(i,j,k)         &
-  !$OMP SHARED(s1,Ni,Nj,Nk,Ns,block,Fi,Fj,Fk)
-  !$OMP DO
-  do k=1,Nk
-    do j=1,Nj
-      do i=1,Ni
-        block%fluid%KS(i,j,k,s1) = (                                                                              &
+  ! computing diffusive fluxes
+  if (.not.global%fluid%inviscid) then
 #ifndef NULi
-                                    + block%mesh%Si(i-1,j,  k  )*Fi(i-1,j,  k  ) - block%mesh%Si(i,j,k)*Fi(i,j,k) &
+    ! i direction
+    !$OMP DO
+    do k=1,Nk
+      do j=1,Nj
+        do i=0,Ni
+          call fluxes_diffusive(global=global,block=block,i=i,j=j,k=k,dir='i',F=Fid(i,j,k))
+        enddo
+      enddo
+    enddo
 #endif
 #ifndef NULj
-                                    + block%mesh%Sj(i,  j-1,k  )*Fj(i,  j-1,k  ) - block%mesh%Sj(i,j,k)*Fj(i,j,k) &
+    ! j direction
+    !$OMP DO
+    do k=1,Nk
+      do j=0,Nj
+        do i=1,Ni
+          call fluxes_diffusive(global=global,block=block,i=i,j=j,k=k,dir='j',F=Fjd(i,j,k))
+        enddo
+      enddo
+    enddo
 #endif
 #ifndef NULk
-                                    + block%mesh%Sk(i,  j,  k-1)*Fk(i,  j,  k-1) - block%mesh%Sk(i,j,k)*Fk(i,j,k) &
+    ! k direction
+    !$OMP DO
+    do k=0,Nk
+      do j=1,Nj
+        do i=1,Ni
+          call fluxes_diffusive(global=global,block=block,i=i,j=j,k=k,dir='k',F=Fkd(i,j,k))
+        enddo
+      enddo
+    enddo
 #endif
-                                    )/block%mesh%V(i,j,k)
+  endif
+
+  ! computing the residuals
+  !$OMP DO
+  do k=1,Nk
+    do j=1,Nj
+      do i=1,Ni
+        ! overloaded operators form: not efficient!
+        !block%fluid%KS(i,j,k,s1) =                                                                                         &
+        !  (block%mesh%Si(i-1,j,  k  )*(Fic(i-1,j,  k  )+Fid(i-1,j,  k  )) - block%mesh%Si(i,j,k)*(Fic(i,j,k)+Fid(i,j,k)) + &
+        !   block%mesh%Sj(i,  j-1,k  )*(Fjc(i,  j-1,k  )+Fjd(i,  j-1,k  )) - block%mesh%Sj(i,j,k)*(Fjc(i,j,k)+Fjd(i,j,k)) + &
+        !   block%mesh%Sk(i,  j,  k-1)*(Fkc(i,  j,  k-1)+Fkd(i,  j,  k-1)) - block%mesh%Sk(i,j,k)*(Fkc(i,j,k)+Fkd(i,j,k))   &
+        !  )/block%mesh%V(i,j,k)
+        do s=1,Ns
+          block%fluid%KS(i,j,k,s1)%rs(s) =                                            &
+          (block%mesh%Si(i-1,j,  k  )*(Fic(i-1,j,  k  )%rs(s)+Fid(i-1,j,  k  )%rs(s))-&
+           block%mesh%Si(i,  j,  k  )*(Fic(i,  j,  k  )%rs(s)+Fid(i,  j,  k  )%rs(s))+&
+           block%mesh%Sj(i,  j-1,k  )*(Fjc(i,  j-1,k  )%rs(s)+Fjd(i,  j-1,k  )%rs(s))-&
+           block%mesh%Sj(i,  j,  k  )*(Fjc(i,  j,  k  )%rs(s)+Fjd(i,  j,  k  )%rs(s))+&
+           block%mesh%Sk(i,  j,  k-1)*(Fkc(i,  j,  k-1)%rs(s)+Fkd(i,  j,  k-1)%rs(s))-&
+           block%mesh%Sk(i,  j,  k  )*(Fkc(i,  j,  k  )%rs(s)+Fkd(i,  j,  k  )%rs(s)) &
+          )/block%mesh%V(i,j,k)
+        enddo
+        block%fluid%KS(i,j,k,s1)%rv =                                                                                            &
+        (block%mesh%Si(i-1,j,  k  )*(Fic(i-1,j,  k  )%rv+Fid(i-1,j,  k  )%rv)-block%mesh%Si(i,j,k)*(Fic(i,j,k)%rv+Fid(i,j,k)%rv)+&
+         block%mesh%Sj(i,  j-1,k  )*(Fjc(i,  j-1,k  )%rv+Fjd(i,  j-1,k  )%rv)-block%mesh%Sj(i,j,k)*(Fjc(i,j,k)%rv+Fjd(i,j,k)%rv)+&
+         block%mesh%Sk(i,  j,  k-1)*(Fkc(i,  j,  k-1)%rv+Fkd(i,  j,  k-1)%rv)-block%mesh%Sk(i,j,k)*(Fkc(i,j,k)%rv+Fkd(i,j,k)%rv) &
+        )/block%mesh%V(i,j,k)
+        block%fluid%KS(i,j,k,s1)%re =                                                                                            &
+        (block%mesh%Si(i-1,j,  k  )*(Fic(i-1,j,  k  )%re+Fid(i-1,j,  k  )%re)-block%mesh%Si(i,j,k)*(Fic(i,j,k)%re+Fid(i,j,k)%re)+&
+         block%mesh%Sj(i,  j-1,k  )*(Fjc(i,  j-1,k  )%re+Fjd(i,  j-1,k  )%re)-block%mesh%Sj(i,j,k)*(Fjc(i,j,k)%re+Fjd(i,j,k)%re)+&
+         block%mesh%Sk(i,  j,  k-1)*(Fkc(i,  j,  k-1)%re+Fkd(i,  j,  k-1)%re)-block%mesh%Sk(i,j,k)*(Fkc(i,j,k)%re+Fkd(i,j,k)%re) &
+        )/block%mesh%V(i,j,k)
       enddo
     enddo
   enddo
@@ -535,511 +490,6 @@ contains
   !$OMP END PARALLEL
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  contains
-    subroutine fluxes(gc,N,Ns,cp0,cv0,NF,P,F)
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Subroutine for computing interfaces fluxes. The 3D primitive variables are first projected in the 1D normal of the interface;
-    ! then the 1D Riemann problem is solved and the 3D fluxes are computed.
-    ! 1D remapping:
-    ! 1)    density of species 1    (r1)
-    ! 2)    density of species 2    (r2)
-    ! ...
-    ! s)    density of species s-th (rs)
-    ! ...
-    ! Ns)   density of species Ns   (rNs)
-    ! Ns+1) velocity                (u normal component)
-    ! Ns+2) pressure                (p)
-    ! Ns+3) density                 (r=sum(rs))
-    ! Ns+4) specific heats ratio    (g)
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    implicit none
-    integer(I1P),            intent(IN)::    gc                         ! Number of ghost cells used.
-    integer(I_P),            intent(IN)::    N                          ! Number of cells.
-    integer(I_P),            intent(IN)::    Ns                         ! Number of species.
-    real(R_P),               intent(IN)::    cp0(1:Ns)                  ! Initial specific heat cp.
-    real(R_P),               intent(IN)::    cv0(1:Ns)                  ! Initial specific heat cv.
-    type(Type_Vector),       intent(IN)::    NF (           0-gc:N+gc ) ! Face normal.
-    type(Type_Primitive),    intent(IN)::    P  (           1-gc:N+gc ) ! Primitive variables (3D).
-    type(Type_Conservative), intent(INOUT):: F  (              0:N    ) ! Flux of mass (3D).
-    type(Type_Vector)::                      ut (       1:2,1-gc:N+gc ) ! Tangential velocity: left (1) and right (2) interfaces.
-    real(R_P)::                              P1D(1:Ns+2,1:2,1-gc:-1+gc) ! Primitive variables 1D fixed to the current interface.
-#ifdef RECVC
-    real(R_P)::                              Pm (1:Ns+4,       0:N    ) ! Mean of primitive variables across interfaces.
-    real(R_P)::                              LPm(1:Ns+2,1:Ns+2,0:N    ) ! Mean left eigenvectors matrix.
-    real(R_P)::                              RPm(1:Ns+2,1:Ns+2,0:N    ) ! Mean right eigenvectors matrix.
-    real(R_P)::                              C  (1:Ns+2,1:2,1-gc:-1+gc) ! Interface value of characteristic variables.
-    real(R_P)::                              CR (1:Ns+2,1:2           ) ! Reconstructed interface value of characteristic variables.
-#endif
-    real(R_P)::                              PR (1:Ns+4,1:2,   0:N+1  ) ! Reconstructed interface values of primitive variables 1D.
-    real(R_P)::                              F_r                        ! Flux of mass (1D).
-    real(R_P)::                              F_u                        ! Flux of momentum (1D).
-    real(R_P)::                              F_e                        ! Flux of energy (1D).
-    integer(I_P)::                           i,j,k,v                    ! Counters.
-    logical::                                ROR(1:2)                   ! Logical flag for testing the result of WENO reconst.
-    integer(I_P)::                           or                         ! Counter of order for ROR algorithm.
-#if defined HYBRID || HYBRIDC
-    logical::                                smooth  (1-gc:N+gc  )      ! Logical flag for testing the smoothness of the stencils.
-    logical::                                smooth_f(1-gc:N+gc-1)      ! Logical flag for testing the smoothness of the stencils.
-#endif
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    call init_cons(Ns=Ns,cons=F)
-    !$OMP PARALLEL DEFAULT(NONE)                 &
-    !$OMP PRIVATE(i,j,k,v,or,ROR,P1D,F_r,F_u,F_e &
-#ifdef RECVC
-    !$OMP         ,C,CR)                         &
-#else
-    !$OMP         )                              &
-#endif
-    !$OMP SHARED(gc,N,Ns,NF,ut,cp0,cv0,P,PR,F    &
-#ifdef RECVC
-    !$OMP        ,Pm,LPm,RPm                     &
-#endif
-#if defined HYBRID || HYBRIDC
-    !$OMP        ,smooth,smooth_f)
-#else
-    !$OMP        )
-#endif
-
-    ! computing velocity vectors and its tangential component
-    !$OMP DO
-    do i=1-gc,N+gc
-      ! computing tangential velocity component
-      do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-        if (i==1-gc.AND.j==1) cycle
-        if (i==N+gc.AND.j==2) cycle
-        ut(j,i) = P(i)%v - (P(i)%v.paral.NF(i+j-2)) ! ut
-      enddo
-    enddo
-
-    ! computing the left and right states or Riemann Problems
-    select case(gc)
-    case(2_I1P,3_I1P,4_I1P) ! 3rd, 5th or 7th order WENO reconstruction
-#if defined HYBRID || HYBRIDC
-      ! checking the smoothness of the interface if high-order method is used
-#ifdef SMSWliu
-      !$OMP DO
-      do i=0,N+1 ! loop over cells
-        smooth(i) = chk_smooth_liu(pm1  =             P(i-1)%p,               &
-                                   rm1  =             P(i-1)%d,               &
-                                   um1  =            (P(i-1)%v.dot.NF(i-1)),  &
-                                   gm1  =             P(i-1)%g,               &
-                                   cpm1 = dot_product(P(i-1)%r/P(i-1)%d,cp0), &
-                                   cvm1 = dot_product(P(i-1)%r/P(i-1)%d,cv0), &
-                                   p1   =             P(i  )%p,               &
-                                   r1   =             P(i  )%d,               &
-                                   u1m  =            (P(i  )%v.dot.NF(i-1)),  &
-                                   u1p  =            (P(i  )%v.dot.NF(i  )),  &
-                                   g1   =             P(i  )%g,               &
-                                   cp1  = dot_product(P(i  )%r/P(i  )%d,cp0), &
-                                   cv1  = dot_product(P(i  )%r/P(i  )%d,cv0), &
-                                   pp1  =             P(i+1)%p,               &
-                                   rp1  =             P(i+1)%d,               &
-                                   up1  =            (P(i+1)%v.dot.NF(i  )),  &
-                                   gp1  =             P(i+1)%g,               &
-                                   cpp1 = dot_product(P(i+1)%r/P(i+1)%d,cp0), &
-                                   cvp1 = dot_product(P(i+1)%r/P(i+1)%d,cv0))
-      enddo
-#elif defined SMSWvanalbada || defined SMSWvanleer || defined SMSWharten
-      !$OMP DO
-      do i=0,N+1 ! loop over cells
-        smooth(i) = chk_smooth_limiter(pm1 =  P(i  )%p              -  P(i-1)%p,              &
-                                       pp1 =  P(i+1)%p              -  P(i  )%p,              &
-                                       rm1 =  P(i  )%d              -  P(i-1)%d,              &
-                                       rp1 =  P(i+1)%d              -  P(i  )%d,              &
-                                       um1 = (P(i  )%v.dot.NF(i-1)) - (P(i-1)%v.dot.NF(i-1)), &
-                                       up1 = (P(i+1)%v.dot.NF(i  )) - (P(i  )%v.dot.NF(i  )), &
-                                       gm1 =  P(i  )%g              -  P(i-1)%g,              &
-                                       gp1 =  P(i+1)%g              -  P(i  )%g)
-      enddo
-#elif defined SMSWz
-      !$OMP DO
-      do i=1-gc,N+gc-1 ! loop over interfaces
-        smooth_f(i) = chk_smooth_z(p1 =  P(i  )%p,            &
-                                   r1 =  P(i  )%d,            &
-                                   u1 = (P(i  )%v.dot.NF(i)), &
-                                   g1 =  P(i  )%g,            &
-                                   p4 =  P(i+1)%p,            &
-                                   r4 =  P(i+1)%d,            &
-                                   u4 = (P(i+1)%v.dot.NF(i)), &
-                                   g4 =  P(i+1)%g)
-      enddo
-      !$OMP DO
-      do i=1-gc+1,N+gc-1 ! loop over cells
-        smooth(i) = (smooth_f(i-1).AND.smooth_f(i))
-      enddo
-      !$OMP SINGLE
-      smooth(1-gc)=smooth(1-gc+1)
-      smooth(N+gc)=smooth(N+gc-1)
-      !$OMP END SINGLE
-#endif
-      !$OMP SINGLE
-      do i=1-gc,N+gc ! loop over cells
-      enddo
-      !$OMP END SINGLE
-#endif
-
-#ifdef RECVC
-      ! computing Pm, LPm and RPm across the interfaces  for the local characteristic projection
-      !$OMP DO
-      do i=0,N ! loop over interfaces
-        ! computing mean of primitive variables across the interface
-        Pm(1:Ns,i) = 0.5_R_P*( P(i)%r(1:NS)      +  P(i+1)%r(1:NS)     ) ! rs
-        Pm(Ns+1,i) = 0.5_R_P*((P(i)%v.dot.NF(i)) + (P(i+1)%v.dot.NF(i))) ! un
-        Pm(Ns+2,i) = 0.5_R_P*( P(i)%p            +  P(i+1)%p           ) ! p
-        Pm(Ns+3,i) = 0.5_R_P*( P(i)%d            +  P(i+1)%d           ) ! r
-        Pm(Ns+4,i) = 0.5_R_P*( P(i)%g            +  P(i+1)%g           ) ! g
-        ! computing mean left and right eigenvectors matrix across the interface
-        LPm(1:Ns+2,1:Ns+2,i) = LP(Ns,Pm(1:Ns+4,i))
-        RPm(1:Ns+2,1:Ns+2,i) = RP(Ns,Pm(1:Ns+4,i))
-      enddo
-#endif
-
-      ! computing the reconstruction
-      !$OMP DO
-      do i=0,N+1 ! loop over cells
-        ! computing 1D primitive variables for the stencil [i+1-gc,i-1+gc] fixing the velocity across the interfaces i+-1/2
-        do k=i+1-gc,i-1+gc
-          do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-            if (i==0  .AND.j==1) cycle
-            if (i==N+1.AND.j==2) cycle
-            P1D(1:Ns,j,k-i) =  P(k)%r(1:Ns)
-            P1D(Ns+1,j,k-i) = (P(k)%v.dot.NF(i+j-2))
-            P1D(Ns+2,j,k-i) =  P(k)%p
-          enddo
-        enddo
-
-#ifdef RECVC
-        ! transforming variables into local characteristic fields for the stencil [1-gc,-1+gc]
-        do k=i+1-gc,i-1+gc
-          do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-            if (i==0  .AND.j==1) cycle
-            if (i==N+1.AND.j==2) cycle
-            do v=1,Ns+2
-              C(v,j,k-i) = dot_product(LPm(v,1:Ns+2,i+j-2),P1D(1:Ns+2,j,k-i))
-            enddo
-          enddo
-        enddo
-#endif
-
-#ifdef HYBRID
-        ! if stencil is smooth the WENO algorithm is computed directly with optimal weights
-        if (all(smooth(i+1-gc:i-1+gc))) then
-          ! computing WENO reconstruction with ideal weights (without the computation of smoothness indicator)
-#ifdef RECVC
-          do v=1,Ns+2
-            CR(v,1:2) = weno_optimal(S=gc,V=C(v,1:2,1-gc:-1+gc))
-          enddo
-          ! trasforming local reconstructed characteristic variables to primitive ones
-          do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-            if (i==0  .AND.j==1) cycle
-            if (i==N+1.AND.j==2) cycle
-            do v=1,Ns+2
-              PR(v,j,i) = dot_product(RPm(v,1:Ns+2,i+j-2),CR(1:Ns+2,j))
-            enddo
-            PR(Ns+3,j,i) = sum(PR(1:Ns,j,i))
-            PR(Ns+4,j,i) = dot_product(PR(1:Ns,j,i)/PR(Ns+3,j,i),cp0(1:Ns))/dot_product(PR(1:Ns,j,i)/PR(Ns+3,j,i),cv0(1:Ns))
-          enddo
-#else
-          do v=1,Ns+2
-            PR(v,1:2,i) = weno_optimal(S=gc,V=P1D(v,1:2,1-gc:-1+gc))
-          enddo
-          ! computing the last reconstructed variables
-          do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-            if (i==0  .AND.j==1) cycle
-            if (i==N+1.AND.j==2) cycle
-            PR(Ns+3,j,i) = sum(PR(1:Ns,j,i))
-            PR(Ns+4,j,i) = dot_product(PR(1:Ns,j,i)/PR(Ns+3,j,i),cp0(1:Ns))/dot_product(PR(1:Ns,j,i)/PR(Ns+3,j,i),cv0(1:Ns))
-          enddo
-#endif
-          cycle ! the full WENO reconstructions are not necessary
-        endif
-#elif HYBRIDC
-        ! if stencil is smooth the WENO algorithm is switched to the central difference reconstruction
-        if (all(smooth(i+1-gc:i-1+gc))) then
-          ! computing central difference reconstruction
-#ifdef RECVC
-          do v=1,Ns+2
-            CR(v,1:2) = noweno_central(S=gc,V=C(v,1:2,1-gc:-1+gc))
-          enddo
-          ! trasforming local reconstructed characteristic variables to primitive ones
-          do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-            if (i==0  .AND.j==1) cycle
-            if (i==N+1.AND.j==2) cycle
-            do v=1,Ns+2
-              PR(v,j,i) = dot_product(RPm(v,1:Ns+2,i+j-2),CR(1:Ns+2,j))
-            enddo
-            PR(Ns+3,j,i) = sum(PR(1:Ns,j,i))
-            PR(Ns+4,j,i) = dot_product(PR(1:Ns,j,i)/PR(Ns+3,j,i),cp0(1:Ns))/dot_product(PR(1:Ns,j,i)/PR(Ns+3,j,i),cv0(1:Ns))
-          enddo
-#else
-          do v=1,Ns+2
-            PR(v,1:2,i) = noweno_central(S=gc,V=P1D(v,1:2,1-gc:-1+gc))
-          enddo
-          ! computing the last reconstructed variables
-          do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-            if (i==0  .AND.j==1) cycle
-            if (i==N+1.AND.j==2) cycle
-            PR(Ns+3,j,i) = sum(PR(1:Ns,j,i))
-            PR(Ns+4,j,i) = dot_product(PR(1:Ns,j,i)/PR(Ns+3,j,i),cp0(1:Ns))/dot_product(PR(1:Ns,j,i)/PR(Ns+3,j,i),cv0(1:Ns))
-          enddo
-#endif
-          cycle ! the full WENO reconstructions are not necessary
-        endif
-#endif
-
-        ! computing WENO reconstruction with ROR (Recursive Order Reduction) algorithm
-        ROR_check: do or=gc,2,-1
-          ! computing WENO reconstruction
-#ifdef RECVC
-          do v=1,Ns+2
-            CR(v,1:2) = weno(S=or,V=C(v,1:2,1-or:-1+or))
-          enddo
-          ! trasforming local reconstructed characteristic variables to primitive ones
-          do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-            if (i==0  .AND.j==1) cycle
-            if (i==N+1.AND.j==2) cycle
-            do v=1,Ns+2
-              PR(v,j,i) = dot_product(RPm(v,1:Ns+2,i+j-2),CR(1:Ns+2,j))
-            enddo
-          enddo
-#else
-          do v=1,Ns+2
-            PR(v,1:2,i) = weno(S=gc,V=P1D(v,1:2,1-gc:-1+gc))
-          enddo
-#endif
-          ! extrapolation of the reconstructed values for the non computed boundaries
-          if (i==0  ) PR(1:Ns+2,1,i) = PR(1:Ns+2,2,i)
-          if (i==N+1) PR(1:Ns+2,2,i) = PR(1:Ns+2,1,i)
-
-#ifdef PPL
-          ! applaying the maximum-principle-satisfying limiter to the reconstructed densities and pressure
-          do v=1,Ns
-            call positivity_preserving_limiter(o = gc, vmean = P(i)%r(v), vr = PR(v,1:2,i)) ! densities
-          enddo
-          call positivity_preserving_limiter(o = gc, vmean = P(i)%p, vr = PR(Ns+2,1:2,i))   ! pressure
-#endif
-
-          ! computing the reconstructed variables of total density and specific heats ratio
-          do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-            if (i==0  .AND.j==1) cycle
-            if (i==N+1.AND.j==2) cycle
-            PR(Ns+3,j,i) = sum(PR(1:Ns,j,i))
-            PR(Ns+4,j,i) = dot_product(PR(1:Ns,j,i)/PR(Ns+3,j,i),cp0(1:Ns))/dot_product(PR(1:Ns,j,i)/PR(Ns+3,j,i),cv0(1:Ns))
-          enddo
-
-          ! verifing the WENO reconstruction at order or-th
-          ROR = .true.
-          do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-            if (i==0  .AND.j==1) cycle
-            if (i==N+1.AND.j==2) cycle
-            ROR(j) = ((PR(Ns+2,j,i)>0._R_P).AND.(PR(Ns+3,j,i)>0._R_P).AND.(PR(Ns+4,j,i)>0._R_P))
-          enddo
-          if (ROR(1).AND.ROR(2)) exit ROR_check
-          if (or==2) then
-            ! the high order reconstruction is falied; used 1st order reconstruction
-            do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-              if (i==0  .AND.j==1) cycle
-              if (i==N+1.AND.j==2) cycle
-              PR(1:Ns,j,i) =  P(i)%r(1:Ns)          ! rs
-              PR(Ns+1,j,i) = (P(i)%v.dot.NF(i+j-2)) ! un
-              PR(Ns+2,j,i) =  P(i)%p                ! p
-              PR(Ns+3,j,i) =  P(i)%d                ! r
-              PR(Ns+4,j,i) =  P(i)%g                ! g
-            enddo
-          endif
-        enddo ROR_check
-      enddo
-    case(1_I1P) ! 1st order piecewise constant reconstruction
-      !$OMP DO
-      do i=0,N+1
-        do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-          if (i==0  .AND.j==1) cycle
-          if (i==N+1.AND.j==2) cycle
-          PR(1:Ns,j,i) =  P(i)%r(1:Ns)          ! rs
-          PR(Ns+1,j,i) = (P(i)%v.dot.NF(i+j-2)) ! un
-          PR(Ns+2,j,i) =  P(i)%p                ! p
-          PR(Ns+3,j,i) =  P(i)%d                ! r
-          PR(Ns+4,j,i) =  P(i)%g                ! g
-        enddo
-      enddo
-    endselect
-
-    ! solving Rimeann Problems
-    !$OMP DO
-    do i=0,N
-      ! face normal fluxes
-      call Riem_Solver(p1  = PR(Ns+2,2,i  ), & !| right value of cell i   (letf  of interface i+1/2)
-                       r1  = PR(Ns+3,2,i  ), & !|
-                       u1  = PR(Ns+1,2,i  ), & !|
-                       g1  = PR(Ns+4,2,i  ), & !|
-#if defined RSHLLCb || defined RSROE
-                       cp1 = dot_product(PR(1:Ns,2,i)/PR(Ns+3,2,i),cp0), &
-                       cv1 = dot_product(PR(1:Ns,2,i)/PR(Ns+3,2,i),cv0), &
-#endif
-                       p4  = PR(Ns+2,1,i+1), & !| left  value of cell i+1 (right of interface i+1/2)
-                       r4  = PR(Ns+3,1,i+1), & !|
-                       u4  = PR(Ns+1,1,i+1), & !|
-                       g4  = PR(Ns+4,1,i+1), & !|
-#if defined RSHLLCb || defined RSROE
-                       cp4 = dot_product(PR(1:Ns,1,i+1)/PR(Ns+3,1,i+1),cp0), &
-                       cv4 = dot_product(PR(1:Ns,1,i+1)/PR(Ns+3,1,i+1),cv0), &
-#endif
-                       F_r = F_r           , &
-                       F_u = F_u           , &
-                       F_E = F_e)
-      ! uptdating fluxes with tangential components
-      if (F_r>0._R_P) then
-        F(i)%rs = F_r*PR(1:Ns,2,i  )/PR(Ns+3,2,i  )
-        F(i)%rv = F_u*NF(i) + F_r*ut(2,i)
-        F(i)%re = F_e + F_r*sq_norm(ut(2,i))*0.5_R_P
-      else
-        F(i)%rs = F_r*PR(1:Ns,1,i+1)/PR(Ns+3,1,i+1)
-        F(i)%rv = F_u*NF(i) + F_r*ut(1,i+1)
-        F(i)%re = F_e + F_r*sq_norm(ut(1,i+1))*0.5_R_P
-      endif
-    enddo
-
-    !$OMP END PARALLEL
-    return
-    !-------------------------------------------------------------------------------------------------------------------------------
-    endsubroutine fluxes
-
-    pure function LP(Ns,primitive) result(L)
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Function for computing left eigenvectors from primitive variables.
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    implicit none
-    integer(I_P), intent(IN):: Ns                ! Number of species.
-    real(R_P),    intent(IN):: primitive(1:Ns+4) ! Primitive variables.
-    real(R_P)::                L(1:Ns+2,1:Ns+2)  ! Left eigenvectors matrix.
-    real(R_P)::                a                 ! Speed of sound.
-    real(R_P)::                a2                ! a^2.
-    real(R_P)::                r_inv             ! 1/r.
-    real(R_P)::                ar_inv            ! 1/(a*r).
-    integer(I_P)::             i                 ! Counter.
-    !real(R_P)::                gp                ! g*p.
-    !real(R_P)::                gp_a              ! g*p/a.
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! old not correct
-    !a    = sqrt(primitive(Ns+4)*primitive(Ns+2)/primitive(Ns+3))
-    !gp   = primitive(Ns+4)*primitive(Ns+2)
-    !gp_a = gp/a
-
-    !L = 0._R_P
-    !do i=1,Ns
-      !L(i,i) = gp
-      !L(i,Ns+2) =-primitive(i)
-    !enddo
-    !L(Ns+1,Ns+1) =-gp_a ; L(Ns+1,Ns+2) = 1._R_P
-    !L(Ns+2,Ns+1) = gp_a ; L(Ns+2,Ns+2) = 1._R_P
-    ! old not correct
-
-    a      = sqrt(primitive(Ns+4)*primitive(Ns+2)/primitive(Ns+3))
-    a2     = a*a
-    r_inv  = 1._R_P/(primitive(Ns+3))
-    ar_inv = r_inv*1._R_P/(a)
-
-    L = 0._R_P
-    do i=1,Ns
-      L(i,i   ) = a2
-      L(i,Ns+2) = -primitive(i)*r_inv
-    enddo
-    L(Ns+1,Ns+1) = -1._R_P ; L(Ns+1,Ns+2) = ar_inv
-    L(Ns+2,Ns+1) =  1._R_P ; L(Ns+2,Ns+2) = ar_inv
-    return
-    !-------------------------------------------------------------------------------------------------------------------------------
-    endfunction LP
-
-    pure function RP(Ns,primitive) result(R)
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Function for computing right eigenvectors from primitive variables.
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    implicit none
-    integer(I_P), intent(IN):: Ns                ! Number of species.
-    real(R_P),    intent(IN):: primitive(1:Ns+4) ! Primitive variables.
-    real(R_P)::                R(1:Ns+2,1:Ns+2)  ! Right eigenvectors matrix.
-    real(R_P)::                a                 ! Speed of sound.
-    real(R_P)::                a_inv             ! 1/a.
-    real(R_P)::                a2_inv            ! 1/(a^2).
-    real(R_P)::                a_2inv            ! 1/(2*a).
-    real(R_P)::                ar_2              ! a*r/2.
-    integer(I_P)::             i                 ! Counter.
-    !real(R_P)::                gp_inv            ! 1/(g*p).
-    !real(R_P)::                a_2gp             ! a/(2*g*p).
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! old not correct
-    !a      = sqrt(primitive(Ns+4)*primitive(Ns+2)/primitive(Ns+3))
-    !gp_inv = 1._R_P/(primitive(Ns+4)*primitive(Ns+2))
-    !a_2gp  = a*gp_inv*0.5_R_P
-
-    !R = 0._R_P
-    !do i=1,Ns
-      !R(i,i) = gp_inv
-      !R(i,Ns+1) = primitive(i)*gp_inv*0.5_R_P
-      !R(i,Ns+2) = R(i,Ns+1)
-    !enddo
-    !R(Ns+1,Ns+1) =-a_2gp   ; R(Ns+1,Ns+2) = a_2gp
-    !R(Ns+2,Ns+1) = 0.5_R_P ; R(Ns+2,Ns+2) = 0.5_R_P
-    ! old not correct
-
-    a      = sqrt(primitive(Ns+4)*primitive(Ns+2)/primitive(Ns+3))
-    a_inv  = 1._R_P/a
-    a2_inv = a_inv*a_inv
-    a_2inv = 0.5_R_P*a_inv
-    ar_2   = 0.5_R_P*a*primitive(Ns+3)
-
-    R = 0._R_P
-    do i=1,Ns
-      R(i,i   ) = a2_inv
-      R(i,Ns+1) = primitive(i)*a_2inv ; R(i,Ns+2) = R(i,Ns+1)
-    enddo
-    R(Ns+1,Ns+1) = -0.5_R_P ; R(Ns+1,Ns+2) = -R(Ns+1,Ns+1)
-    R(Ns+2,Ns+1) =  ar_2    ; R(Ns+2,Ns+2) =  R(Ns+2,Ns+1)
-    return
-    !-------------------------------------------------------------------------------------------------------------------------------
-    endfunction RP
-
-    pure subroutine positivity_preserving_limiter(o,vmean,vr)
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Positivity preserving limiter.
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    implicit none
-    integer(I_P), intent(IN)::    o                                        ! Order of space reconstruction.
-    real(R_P),    intent(IN)::    vmean                                    ! Mean value.
-    real(R_P),    intent(INOUT):: vr(1:2)                                  ! Reconstructed values.
-    real(R_P), parameter::        w1(2:4)=[1._R_P/6._R_P,  &               ! Weights of Gauss-Lobatto's 3 points quadrature.
-                                           1._R_P/12._R_P, &               ! Weights of Gauss-Lobatto's 4 points quadrature.
-                                           1._R_P/20._R_P]                 ! Weights of Gauss-Lobatto's 5 points quadrature.
-    real(R_P), parameter::        w2(2:4)=[1._R_P/(1._R_P-2._R_P*w1(2)), & ! 1/(1-2*w1)
-                                           1._R_P/(1._R_P-2._R_P*w1(3)), & ! 1/(1-2*w1)
-                                           1._R_P/(1._R_P-2._R_P*w1(4))]   ! 1/(1-2*w1)
-    real(R_P), parameter::        e  = tiny(1._R_P)                        ! Small number for avoid division for zero.
-    real(R_P)::                   vstar                                    ! Star value.
-    real(R_P)::                   theta                                    ! Limiter coefficient.
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    vstar = (vmean - w1(o)*(vr(1) + vr(2)))*w2(o)
-    theta = min((vmean-0.1_R_P*vmean)/(vmean - min(vstar,vr(1),vr(2)) + e),1._R_P)
-    vr(1) = theta*(vr(1) - vmean) + vmean
-    vr(2) = theta*(vr(2) - vmean) + vmean
-    return
-    !-------------------------------------------------------------------------------------------------------------------------------
-    endsubroutine positivity_preserving_limiter
   endsubroutine residuals
 
   !> Subroutine for imposing the boundary conditions of blocks of grid level "l" updating the ghost cells.
@@ -1070,15 +520,15 @@ contains
   ! doing the multi-processes communications if necessary
   call Psendrecv(myrank=myrank,l=l,global=global,block=block)
 #endif
-  !$OMP PARALLEL DEFAULT(NONE)       &
-  !$OMP PRIVATE(b,i,j,k,Ni,Nj,Nk,gc) &
-  !$OMP SHARED(l,global,block)
-  !$OMP DO
   do b=1,global%mesh%Nb
     Ni = block(b)%mesh%Ni
     Nj = block(b)%mesh%Nj
     Nk = block(b)%mesh%Nk
     gc = block(b)%mesh%gc
+    !$OMP PARALLEL DEFAULT(NONE) &
+    !$OMP PRIVATE(i,j,k)         &
+    !$OMP SHARED(b,l,Ni,Nj,Nk,gc,global,block)
+    !$OMP DO
     do k=1,Nk
       do j=1,Nj
         ! left i
@@ -1109,6 +559,7 @@ contains
         endselect
       enddo
     enddo
+    !$OMP DO
     do k=1,Nk
       do i=1,Ni
         ! left j
@@ -1139,6 +590,7 @@ contains
         endselect
       enddo
     enddo
+    !$OMP DO
     do j=1,Nj
       do i=1,Ni
         ! left k
@@ -1169,23 +621,22 @@ contains
         endselect
       enddo
     enddo
+    !$OMP END PARALLEL
   enddo
-  !$OMP END PARALLEL
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   contains
+    !> @brief Subroutine for imposing extrapolation of ghost cells from internal ones (left boundary).
+    !> @note For avoiding the creation of temporary arrays (improving the efficiency) the array \b P is declared as assumed-shape
+    !> with only the lower bound defined. Its extentions is: P [1-gc:0+gc].
     pure subroutine set_ext_l(gc,ic,N,P)
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! Subroutine for imposing extrapolation of ghost cells from internal ones (left boundary).
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc           ! Number of ghost cells.
-    integer(I_P),         intent(IN)::    ic           ! Number of internal cells used for extrapolation (1 or gc).
-    integer(I_P),         intent(IN)::    N            ! Number of internal cells.
-    type(Type_Primitive), intent(INOUT):: P(1-gc:0+gc) ! Primitive variables.
-    integer(I_P)::                        i            ! Cell counter.
+    integer(I_P),         intent(IN)::    gc       !< Number of ghost cells.
+    integer(I_P),         intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
+    integer(I_P),         intent(IN)::    N        !< Number of internal cells.
+    type(Type_Primitive), intent(INOUT):: P(1-gc:) !< Primitive variables [1-gc:0+gc].
+    integer(I_P)::                        i        !< Cell counter.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -1204,18 +655,17 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     endsubroutine set_ext_l
 
+    !> @brief Subroutine for imposing extrapolation of ghost cells from internal ones (right boundary).
+    !> @note For avoiding the creation of temporary arrays (improving the efficiency) the array \b P is declared as assumed-shape
+    !> with only the lower bound defined. Its extentions is: P [N-gc:N+gc].
     pure subroutine set_ext_r(gc,ic,N,P)
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! Subroutine for imposing extrapolation of ghost cells from internal ones (right boundary).
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc           ! Number of ghost cells.
-    integer(I_P),         intent(IN)::    ic           ! Number of internal cells used for extrapolation (1 or gc).
-    integer(I_P),         intent(IN)::    N            ! Number of internal cells.
-    type(Type_Primitive), intent(INOUT):: P(N-gc:N+gc) ! Primitive variables.
-    integer(I_P)::                        i            ! Cell counter.
+    integer(I_P),         intent(IN)::    gc       !< Number of ghost cells.
+    integer(I_P),         intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
+    integer(I_P),         intent(IN)::    N        !< Number of internal cells.
+    type(Type_Primitive), intent(INOUT):: P(N-gc:) !< Primitive variables [N-gc:N+gc].
+    integer(I_P)::                        i        !< Cell counter.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -1234,20 +684,19 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     endsubroutine set_ext_r
 
+    !> @brief Subroutine for imposing reflective boundary conditions (left boundary).
+    !> @note For avoiding the creation of temporary arrays (improving the efficiency) the array \b P is declared as assumed-shape
+    !> with only the lower bound defined. Its extentions is: P [1-gc:0+gc].
     pure subroutine set_ref_l(gc,ic,N,NF,P)
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! Subroutine for imposing reflective boundary conditions (left boundary).
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc           ! Number of ghost cells.
-    integer(I_P),         intent(IN)::    ic           ! Number of internal cells used for extrapolation (1 or gc).
-    integer(I_P),         intent(IN)::    N            ! Number of internal cells.
-    type(Type_Vector),    intent(IN)::    NF           ! Left face normal.
-    type(Type_Primitive), intent(INOUT):: P(1-gc:0+gc) ! Left section of primitive variables.
-    integer(I_P)::                        i            ! Cell counter.
-    type(Type_Vector)::                   vr           ! Reflected velocity vector.
+    integer(I_P),         intent(IN)::    gc       !< Number of ghost cells.
+    integer(I_P),         intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
+    integer(I_P),         intent(IN)::    N        !< Number of internal cells.
+    type(Type_Vector),    intent(IN)::    NF       !< Left face normal.
+    type(Type_Primitive), intent(INOUT):: P(1-gc:) !< Left section of primitive variables [1-gc:0+gc].
+    integer(I_P)::                        i        !< Cell counter.
+    type(Type_Vector)::                   vr       !< Reflected velocity vector.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -1276,20 +725,19 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     endsubroutine set_ref_l
 
+    !> @brief Subroutine for imposing reflective boundary conditions (right boundary).
+    !> @note For avoiding the creation of temporary arrays (improving the efficiency) the array \b P is declared as assumed-shape
+    !> with only the lower bound defined. Its extentions is: P [N-gc:N+gc].
     pure subroutine set_ref_r(gc,ic,N,NF,P)
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! Subroutine for imposing reflective boundary conditions (right boundary).
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc           ! Number of ghost cells.
-    integer(I_P),         intent(IN)::    ic           ! Number of internal cells used for extrapolation (1 or gc).
-    integer(I_P),         intent(IN)::    N            ! Number of internal cells.
-    type(Type_Vector),    intent(IN)::    NF           ! Right face normal.
-    type(Type_Primitive), intent(INOUT):: P(N-gc:N+gc) ! Right section of primitive variables.
-    integer(I_P)::                        i            ! Cell counter.
-    type(Type_Vector)::                   vr           ! Reflected velocity vector.
+    integer(I_P),         intent(IN)::    gc       !< Number of ghost cells.
+    integer(I_P),         intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
+    integer(I_P),         intent(IN)::    N        !< Number of internal cells.
+    type(Type_Vector),    intent(IN)::    NF       !< Right face normal.
+    type(Type_Primitive), intent(INOUT):: P(N-gc:) !< Right section of primitive variables [N-gc:N+gc].
+    integer(I_P)::                        i        !< Cell counter.
+    type(Type_Vector)::                   vr       !< Reflected velocity vector.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -1318,19 +766,18 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     endsubroutine set_ref_r
 
+    !> @brief Subroutine for imposing periodic boundary conditions.
+    !> @note For avoiding the creation of temporary arrays (improving the efficiency) the array \b P is declared as assumed-shape
+    !> with only the lower bound defined. Its extentions is: P [1-gc:N+gc].
     pure subroutine set_per(gc,ic,N,boundary,P)
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! Subroutine for imposing periodic boundary conditions.
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc           ! Number of ghost cells.
-    integer(I_P),         intent(IN)::    ic           ! Number of internal cells used for extrapolation (1 or gc).
-    integer(I_P),         intent(IN)::    N            ! Number of internal cells.
-    character(1),         intent(IN)::    boundary     ! Boundary left ('l') or right ('r').
-    type(Type_Primitive), intent(INOUT):: P(1-gc:N+gc) ! Left section of primitive variables.
-    integer(I_P)::                        i            ! Cell counter.
+    integer(I_P),         intent(IN)::    gc       !< Number of ghost cells.
+    integer(I_P),         intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
+    integer(I_P),         intent(IN)::    N        !< Number of internal cells.
+    character(1),         intent(IN)::    boundary !< Boundary left ('l') or right ('r').
+    type(Type_Primitive), intent(INOUT):: P(1-gc:) !< Left section of primitive variables [1-gc:N+gc].
+    integer(I_P)::                        i        !< Cell counter.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -1364,19 +811,18 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     endsubroutine set_per
 
+    !> @brief Subroutine for imposing adjacent boundary conditions.
+    !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b bc and \b P are declared as
+    !> assumed-shape with only the lower bound defined. Their extentions are: bc [1-gc:0], P [1-gc:0].
+    !> @note When this subroutine is called for a 'right' (Ni,Nj,Nk) boundary the section of arrays BC and P must be
+    !> properly remapped: in the section [1-gc:0] must be passed the actual section [N:N+gc-1] for BC and [N+1:N+gc] for P.
     pure subroutine set_adj(gc,bc,P)
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! Subroutine for imposing adjacent boundary conditions.
-    ! Note that when this subroutine is called for a 'right' (Ni,Nj,Nk) boundary the section of arrays BC and P must be
-    ! properly remapped: in the section [1-gc:0] must be passed the actual section [N:N+gc-1] for BC and [N+1:N+gc] for P.
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc         ! Number of ghost cells.
-    type(Type_BC),        intent(IN)::    bc(1-gc:0) ! Boundary conditions infos.
-    type(Type_Primitive), intent(INOUT):: P (1-gc:0) ! Left section of primitive variables.
-    integer(I_P)::                        i,b        ! Counters.
+    integer(I_P),         intent(IN)::    gc        !< Number of ghost cells.
+    type(Type_BC),        intent(IN)::    bc(1-gc:) !< Boundary conditions infos           [1-gc:0].
+    type(Type_Primitive), intent(INOUT):: P (1-gc:) !< Left section of primitive variables [1-gc:0].
+    integer(I_P)::                        i,b       !< Counters.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -1399,19 +845,18 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     endsubroutine set_adj
 
+    !> @brief Subroutine for imposing inflow 1 boundary conditions.
+    !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b bc and \b P are declared as
+    !> assumed-shape with only the lower bound defined. Their extentions are: bc [1-gc:0], P [1-gc:0].
+    !> @note When this subroutine is called for a 'right' (Ni,Nj,Nk) boundary the section of arrays BC and P must be
+    !> properly remapped: in the section [1-gc:0] must be passed the actual section [N:N+gc-1] for BC and [N+1:N+gc] for P.
     pure subroutine set_in1(gc,bc,P)
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! Subroutine for imposing inflow 1 boundary conditions.
-    ! Note that when this subroutine is called for a 'right' (Ni,Nj,Nk) boundary the section of arrays BC(i,j,k) and P must be
-    ! properly remapped: in the section [1-gc:0] must be passed the actual section [N:N+gc-1].
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc         ! Number of ghost cells.
-    type(Type_BC),        intent(IN)::    bc(1-gc:0) ! Boundary conditions.
-    type(Type_Primitive), intent(INOUT):: P (1-gc:0) ! Left section of primitive variables.
-    integer(I_P)::                        i          ! Cell counter.
+    integer(I_P),         intent(IN)::    gc        !< Number of ghost cells.
+    type(Type_BC),        intent(IN)::    bc(1-gc:) !< Boundary conditions                 [1-gc:0].
+    type(Type_Primitive), intent(INOUT):: P (1-gc:) !< Left section of primitive variables [1-gc:0].
+    integer(I_P)::                        i         !< Cell counter.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -1422,6 +867,79 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     endsubroutine set_in1
   endsubroutine boundary_conditions
+
+  !> Subroutine for summing Runge-Kutta stages for updating primitive variables (block\%fluid\%P).
+  !> @ingroup Lib_FluidynamicPrivateProcedure
+  subroutine rk_stages_sum(s1,global,block)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I_P),      intent(IN)::    s1      !< Current Runge-Kutta stage.
+  type(Type_Global), intent(IN)::    global  !< Global-level data.
+  type(Type_Block),  intent(INOUT):: block   !< Block-level data.
+  type(Type_Conservative)::          Ud      !< Dummy conservative variables.
+  integer(I8P)::                     i,j,k   !< Counters.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  !$OMP PARALLEL DEFAULT(NONE) &
+  !$OMP PRIVATE(i,j,k,Ud)      &
+  !$OMP SHARED(global,block,s1)
+  call Ud%init(Ns = global%fluid%Ns)
+  !$OMP DO
+  do k=1,block%mesh%Nk
+    do j=1,block%mesh%Nj
+      do i=1,block%mesh%Ni
+        call rk_stage(s1=s1,Dt=block%fluid%Dt(i,j,k),Un=block%fluid%U(i,j,k),KS=block%fluid%KS(i,j,k,1:s1-1),KS1=Ud)
+        call cons2prim(cp0 = global%fluid%cp0, cv0 = global%fluid%cv0, cons = Ud, prim = block%fluid%P(i,j,k))
+      enddo
+    enddo
+  enddo
+  !$OMP END PARALLEL
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine rk_stages_sum
+
+  !> Subroutine for computing Runge-Kutta one time step integration.
+  !> @ingroup Lib_FluidynamicPrivateProcedure
+  subroutine rk_time_integration(global,block,RU)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Global), intent(IN)::    global                !< Global-level data.
+  type(Type_Block),  intent(INOUT):: block                 !< Block-level data.
+  real(R_P),         intent(OUT)::   RU(1:global%fluid%Nc) !< NormL2 of residuals of conservative variables.
+  type(Type_Conservative)::          Ud,R                  !< Dummy conservative variables.
+  integer(I8P)::                     i,j,k                 !< counters.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  RU = 0._R_P
+  !$OMP PARALLEL DEFAULT(NONE) &
+  !$OMP PRIVATE(i,j,k,Ud,R)    &
+  !$OMP SHARED(global,block)   &
+  !$OMP REDUCTION(+: RU)
+  call Ud%init(Ns = global%fluid%Ns)
+  call R%init( Ns = global%fluid%Ns)
+  !$OMP DO
+  do k=1,block%mesh%Nk
+    do j=1,block%mesh%Nj
+      do i=1,block%mesh%Ni
+        call rk_time_integ(Dt=block%fluid%Dt(i,j,k),Un=block%fluid%U(i,j,k),KS=block%fluid%KS(i,j,k,1:global%fluid%rk_ord),Unp1=Ud)
+        R%rs = (Ud%rs - block%fluid%U(i,j,k)%rs)/block%fluid%Dt(i,j,k) ; R%rs = R%rs*R%rs
+        R%rv = (Ud%rv - block%fluid%U(i,j,k)%rv)/block%fluid%Dt(i,j,k) ; R%rv = R%rv*R%rv
+        R%re = (Ud%re - block%fluid%U(i,j,k)%re)/block%fluid%Dt(i,j,k) ; R%re = R%re*R%re
+        RU = RU + R%cons2array()
+        block%fluid%U(i,j,k) = Ud
+      enddo
+    enddo
+  enddo
+  !$OMP DO
+  do i=1,global%fluid%Nc
+   RU(i) = sqrt(RU(i))
+  enddo
+  !$OMP END PARALLEL
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine rk_time_integration
 
   !> @ingroup Lib_FluidynamicPublicProcedure
   !> Subroutine for solving (performing one time step integration) the conservation equations for grid level "l".
@@ -1452,12 +970,24 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! converting conservative variables to primitive ones
+#ifdef PROFILING
+  call profile(p=2,pstart=.true.,myrank=myrank)
+#endif
   do b=1,global%mesh%Nb
     call conservative2primitive(global = global, block = block(b))
   enddo
+#ifdef PROFILING
+  call profile(p=2,pstop=.true.,myrank=myrank)
+#endif
 
   ! imposing the boundary conditions
+#ifdef PROFILING
+  call profile(p=3,pstart=.true.,myrank=myrank)
+#endif
   call boundary_conditions(myrank = myrank, l = l, global = global, block = block)
+#ifdef PROFILING
+  call profile(p=3,pstop=.true.,myrank=myrank)
+#endif
 
   ! saving the actual solution
   if (global%file%sol_out>0) then
@@ -1465,9 +995,9 @@ contains
         (global%fluid%t==global%fluid%Tmax).OR.          &
         (global%fluid%n==global%fluid%Nmax)) then
       do b=1,global%mesh%Nb
-        err=save_bfluid(filename=file_name(basename=trim(global%file%Path_OutPut)//global%file%File_Sol,&
-                                           suffix='.sol',blk=blockmap(b),grl=l,n=global%fluid%n),       &
-                        global=global,block=block(b))
+        err= block(b)%save_fluid(filename=file_name(basename=trim(global%file%Path_OutPut)//global%file%File_Sol,&
+                                                    suffix='.sol',blk=blockmap(b),grl=l,n=global%fluid%n),       &
+                                 global=global)
       enddo
     endif
   endif
@@ -1478,17 +1008,23 @@ contains
       (global%fluid%n==global%fluid%Nmax)) then
     flip = 1_I1P - flip
     do b=1,global%mesh%Nb
-      err=save_bfluid(filename=file_name(basename=trim(global%file%Path_OutPut)//global%file%File_Sol,&
-                                         suffix='.sol',blk=blockmap(b),grl=l,flip=flip),              &
-                      global=global,block=block(b))
+      err= block(b)%save_fluid(filename=file_name(basename=trim(global%file%Path_OutPut)//global%file%File_Sol,&
+                                                  suffix='.sol',blk=blockmap(b),grl=l,flip=flip),              &
+                                                  global=global)
     enddo
   endif
 
   ! updating time varying variables: Dt,Dtmin
   global%fluid%n = global%fluid%n + 1_I8P
+#ifdef PROFILING
+  call profile(p=4,pstart=.true.,myrank=myrank)
+#endif
   do b=1,global%mesh%Nb
     call compute_time(global=global,block=block(b),Dtmin=Dtmin(b))
   enddo
+#ifdef PROFILING
+  call profile(p=4,pstop=.true.,myrank=myrank)
+#endif
   DtminL = minval(Dtmin)
 #ifdef MPI2
   ! for multi-processes simulation all processes must exchange their DtminL for computing the global variables
@@ -1518,7 +1054,7 @@ contains
         (global%fluid%t==global%fluid%Tmax).OR. &
         (global%fluid%n==global%fluid%Nmax).OR. &
         (global%fluid%n==1)) then
-      sec_elp=Crono()
+      sec_elp=Crono(instant0=.true.)
       if (global%fluid%Nmax>0) then
         progress = global%fluid%n*100/(global%fluid%Nmax*1._R_P)
         sec_res  = global%fluid%Nmax*sec_elp/global%fluid%n - sec_elp
@@ -1563,14 +1099,26 @@ contains
       call boundary_conditions(myrank = myrank, l = l, global = global, block = block)
     endif
     ! computing the s1-th Runge-Kutta stage: K_s1=R(Un+sum_s2=1^s1-1(Dt*rk_c2(s1,s2)*K_s2))
+#ifdef PROFILING
+    call profile(p=5,pstart=.true.,myrank=myrank)
+#endif
     do b=1,global%mesh%Nb
       call residuals(s1=s1,global=global,block=block(b))
     enddo
+#ifdef PROFILING
+    call profile(p=5,pstop=.true.,myrank=myrank)
+#endif
   enddo
   ! Runge-Kutta time integration
+#ifdef PROFILING
+    call profile(p=6,pstart=.true.,myrank=myrank)
+#endif
   do b=1,global%mesh%Nb
     call rk_time_integration(global=global,block=block(b),RU=RU(:,b))
   enddo
+#ifdef PROFILING
+    call profile(p=6,pstop=.true.,myrank=myrank)
+#endif
   ! finding the maximum value of residuals of actual process
   mRU = maxval(RU,dim=2)
 #ifdef MPI2
@@ -1593,120 +1141,4 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine solve_grl
-
-  !> Subroutine for summing Runge-Kutta stages for updating primitive variables (block\%fluid\%P).
-  !> @ingroup Lib_FluidynamicPrivateProcedure
-  pure subroutine rk_stages_sum(s1,global,block)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),      intent(IN)::    s1      !< Current Runge-Kutta stage.
-  type(Type_Global), intent(IN)::    global  !< Global-level data.
-  type(Type_Block),  intent(INOUT):: block   !< Block-level data.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  call rk_stg_reshape1D(N  = int(block%mesh%Ni*block%mesh%Nj*block%mesh%Nk,I8P),                     &
-                        Dt = block%fluid%Dt(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk       ), &
-                        U  = block%fluid%U (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk       ), &
-                        KS = block%fluid%KS(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk,1:s1-1), &
-                        P  = block%fluid%P (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk       ))
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  contains
-    !> Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency.
-    !> The computation of the parent procedure is performed in 1D re-shaped arrays in order to augment the computational efficiency
-    !> when using OpenMP shared parallel paradigm. As a matter of facts the scalability of OpenMP parallelism is exploited only when
-    !> the parallelized loop is the largest one. In the case of multi-dimensional arrays the first index is not always the largest
-    !> one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping
-    !> there is only one index.
-    !> @ingroup Lib_FluidynamicPrivateProcedure
-    pure subroutine rk_stg_reshape1D(N,Dt,U,KS,P)
-    !-------------------------------------------------------------------------------------------------------------------------------
-    implicit none
-    integer(I8P),            intent(IN)::    N              !< Number of finite volumes.
-    real(R_P),               intent(IN)::    Dt(1:N)        !< Time steps.
-    type(Type_Conservative), intent(IN)::    U( 1:N)        !< Current conservative variables.
-    type(Type_Conservative), intent(IN)::    KS(1:N,1:s1-1) !< Runge-Kutta stages.
-    type(Type_Primitive),    intent(INOUT):: P( 1:N)        !< Updated primitive variables.
-    type(Type_Conservative):: Ud                            !< Dummy conservative variablew.
-    integer(I8P)::            i                             !< Cell counter.
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    !$OMP PARALLEL DEFAULT(NONE) &
-    !$OMP PRIVATE(i,s,Ud)        &
-    !$OMP SHARED(global,s1,N,Dt,U,KS,P)
-    call init_cons(Ns = global%fluid%Ns, cons = Ud)
-    !$OMP DO
-    do i=1,N
-      call rk_stage(s1=s1,Dt=Dt(i),Un=U(i),KS=KS(i,1:s1-1),KS1=Ud)
-      call cons2prim(cp0 = global%fluid%cp0, cv0 = global%fluid%cv0, cons = Ud, prim = P(i))
-    enddo
-    !$OMP END PARALLEL
-    return
-    !-------------------------------------------------------------------------------------------------------------------------------
-    endsubroutine rk_stg_reshape1D
-  endsubroutine rk_stages_sum
-
-  !> Subroutine for computing Runge-Kutta one time step integration.
-  !> @ingroup Lib_FluidynamicPrivateProcedure
-  pure subroutine rk_time_integration(global,block,RU)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Global), intent(IN)::    global                !< Global-level data.
-  type(Type_Block),  intent(INOUT):: block                 !< Block-level data.
-  real(R_P),         intent(OUT)::   RU(1:global%fluid%Nc) !< NormL2 of residuals of conservative variables.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  call rk_t_int_reshape1D(N  = int(block%mesh%Ni*block%mesh%Nj*block%mesh%Nk,I8P),                                    &
-                          Dt = block%fluid%Dt(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk                      ), &
-                          KS = block%fluid%KS(1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk,1:global%fluid%rk_ord), &
-                          U  = block%fluid%U (1:block%mesh%Ni,1:block%mesh%Nj,1:block%mesh%Nk                      ), &
-                          RU = RU)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  contains
-    !> Subroutine for doing the calculation on 1D-reshaped arrays in order to augment computational efficiency.
-    !> The computation of the parent procedure is performed in 1D re-shaped arrays in order to augment the computational efficiency
-    !> when using OpenMP shared parallel paradigm. As a matter of facts the scalability of OpenMP parallelism is exploited only when
-    !> the parallelized loop is the largest one. In the case of multi-dimensional arrays the first index is not always the largest
-    !> one. Therefore the 1D reshaping ensures that the OpenMP parallelism is applied on the largest index because after reshaping
-    !> there is only one index.
-    !> @ingroup Lib_FluidynamicPrivateProcedure
-    pure subroutine rk_t_int_reshape1D(N,Dt,KS,U,RU)
-    !-------------------------------------------------------------------------------------------------------------------------------
-    implicit none
-    integer(I8P),            intent(IN)::    N                             !< Number of finite volumes.
-    real(R_P),               intent(IN)::    Dt(1:N)                       !< Time steps.
-    type(Type_Conservative), intent(IN)::    KS(1:N,1:global%fluid%rk_ord) !< Runge-Kutta stages.
-    type(Type_Conservative), intent(INOUT):: U( 1:N)                       !< Current conservative variables.
-    real(R_P),               intent(OUT)::   RU(1:global%fluid%Nc)         !< NormL2 of residuals of conservative variables.
-    type(Type_Conservative):: Ud,R                                         !< Dummy conservative variables.
-    integer(I8P)::            i                                            !< Cell counter.
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    RU = 0._R_P
-    !$OMP PARALLEL DEFAULT(NONE)   &
-    !$OMP PRIVATE(i,s,Ud,R)        &
-    !$OMP SHARED(global,N,Dt,KS,U) &
-    !$OMP REDUCTION(+: RU)
-    call init_cons(Ns = global%fluid%Ns, cons = Ud)
-    call init_cons(Ns = global%fluid%Ns, cons = R)
-    !$OMP DO
-    do i=1,N
-      call rk_time_integ(Dt=Dt(i),Un=U(i),KS=KS(i,1:global%fluid%rk_ord),Unp1=Ud)
-      R = (Ud-U(i))/Dt(i) ; R = R*R ; RU = RU + cons2array(R)
-      U(i) = Ud
-    enddo
-    !$OMP DO
-    do i=1,global%fluid%Nc
-     RU(i) = sqrt(RU(i))
-    enddo
-    !$OMP END PARALLEL
-    return
-    !-------------------------------------------------------------------------------------------------------------------------------
-    endsubroutine rk_t_int_reshape1D
-  endsubroutine rk_time_integration
 endmodule Lib_Fluidynamic

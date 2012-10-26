@@ -10,8 +10,11 @@
 !>                                                              with "\" character.
 module Data_Type_OS
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                                                    ! Integers and reals precision definition.
-USE, intrinsic:: ISO_FORTRAN_ENV, only: stdout => OUTPUT_UNIT, stderr => ERROR_UNIT ! Standard output/error logical units.
+USE IR_Precision                                             ! Integers and reals precision definition.
+USE, intrinsic:: ISO_FORTRAN_ENV, only: stderr => ERROR_UNIT ! Standard output/error logical units.
+#ifdef MPI2
+USE MPI                                                      ! MPI runtime library.
+#endif
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -19,7 +22,6 @@ implicit none
 private
 public:: uix_id, c_uix_id, uix_sep, uix_remove, uix_copy, uix_mkdir
 public:: win_id, c_win_id, win_sep, win_remove, win_copy, win_mkdir
-public:: init,set
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -40,62 +42,36 @@ character(3), parameter:: win_remove = "del"   !< MS Windows remove command.
 character(4), parameter:: win_copy   = "copy"  !< MS Windows copy command.
 character(5), parameter:: win_mkdir  = "mkdir" !< MS Windows make dir command.
 !> @}
-!> Derived type contains useful parameters for performing portable system calls.
+!> @brief Derived type contains useful parameters for performing portable system calls.
+!> @note By default the Unix/Linux initalization is used.
 !> @ingroup DerivedType
 type, public:: Type_OS
- sequence
  integer(I1P):: id     = uix_id     !< OS id.
  character(1):: sep    = uix_sep    !< OS directories separator.
  character(3):: remove = uix_remove !< OS remove command.
  character(4):: copy   = uix_copy   !< OS copy command.
  character(5):: mkdir  = uix_mkdir  !< OS make dir command.
+ contains
+   procedure, non_overridable:: init ! Procedure for initializing Type_OS.
 endtype Type_OS
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  !>Function for initializing Type_OS.
-  function init(id,c_id,sep,remove,copy,mkdir) result(OS)
+  !> @brief Subroutine for initializing Type_OS.
+  subroutine init(OS,myrank,id,c_id)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I1P), intent(IN), optional:: id     !< OS id parameter (integer).
-  character(*), intent(IN), optional:: c_id   !< OS id parameter (string).
-  character(*), intent(IN), optional:: sep    !< Directories separator.
-  character(*), intent(IN), optional:: remove !< Remove file command.
-  character(*), intent(IN), optional:: copy   !< Copy file command.
-  character(*), intent(IN), optional:: mkdir  !< Make directory command.
-  type(Type_OS)::                      OS     !< Output OS.
+  class(Type_OS), intent(INOUT)::        OS     !< Output OS.
+  integer(I_P),   intent(IN), optional:: myrank !< Actual rank process.
+  integer(I1P),   intent(IN), optional:: id     !< OS id parameter (integer).
+  character(*),   intent(IN), optional:: c_id   !< OS id parameter (string).
+  character(DI_P)::                      rks    !< String containing myrank.
+#ifdef MPI2
+  integer(I_P)::                         err    !< Error trapping flag: 0 no errors, >0 error occurs.
+#endif
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(id))     call Set(id=id,OS=OS)
-  if (present(c_id))   call Set(c_id=c_id,OS=OS)
-  if (present(sep))    OS%sep    = trim(sep)
-  if (present(remove)) OS%remove = trim(remove)
-  if (present(copy))   OS%copy   = trim(copy)
-  if (present(mkdir))  OS%mkdir  = trim(mkdir)
-  select case(OS%id)
-  case(uix_id)
-    write(stdout,'(A)')' The OS has been set as *nix like'
-  case(win_id)
-    write(stdout,'(A)')' The OS has been set as windows like'
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction init
-
-  !>Subroutine for setting Type_OS (id).
-  subroutine set(id,c_id,sep,remove,copy,mkdir,OS)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I1P),  intent(IN), optional:: id     !< OS id parameter (integer).
-  character(*),  intent(IN), optional:: c_id   !< OS id parameter (string).
-  character(*),  intent(IN), optional:: sep    !< Directories separator.
-  character(*),  intent(IN), optional:: remove !< Remove file command.
-  character(*),  intent(IN), optional:: copy   !< Copy file command.
-  character(*),  intent(IN), optional:: mkdir  !< Make directory command.
-  type(Type_OS), intent(INOUT)::        OS     !< Output OS.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
+  rks = 'rank'//trim(str(.true.,0_I_P)) ; if (present(myrank)) rks = 'rank'//trim(str(.true.,myrank))
   if (present(id)) then
     OS%id     = id
     select case(id)
@@ -110,14 +86,16 @@ contains
       OS%copy   = win_copy
       OS%mkdir  = win_mkdir
     case default
-      write(stderr,'(A)')' OS id not recognized!'
-      write(stderr,'(A)')' Valid integer id are:'
-      write(stderr,'(A)')' "'//trim(str(.true.,uix_id))//'" for *nix OS'
-      write(stderr,'(A)')' "'//trim(str(.true.,win_id))//'" for Windows OS'
+      write(stderr,'(A)')trim(rks)//' OS id not recognized!'
+      write(stderr,'(A)')trim(rks)//' Valid integer id are:'
+      write(stderr,'(A)')trim(rks)//' "'//trim(str(.true.,uix_id))//'" for *nix OS'
+      write(stderr,'(A)')trim(rks)//' "'//trim(str(.true.,win_id))//'" for Windows OS'
+#ifdef MPI2
+      call MPI_FINALIZE(err)
+#endif
       stop
     endselect
-  endif
-  if (present(c_id)) then
+  elseif (present(c_id)) then
     select case(c_id)
     case(c_uix_id)
       OS%id     = uix_id
@@ -132,18 +110,17 @@ contains
       OS%copy   = win_copy
       OS%mkdir  = win_mkdir
     case default
-      write(stderr,'(A)')' OS id not recognized!'
-      write(stderr,'(A)')' Valid charcter id are:'
-      write(stderr,'(A)')' "'//c_uix_id//'" for *nix OS'
-      write(stderr,'(A)')' "'//c_win_id//'" for Windows OS'
+      write(stderr,'(A)')trim(rks)//' OS id not recognized!'
+      write(stderr,'(A)')trim(rks)//' Valid charcter id are:'
+      write(stderr,'(A)')trim(rks)//' "'//c_uix_id//'" for *nix OS'
+      write(stderr,'(A)')trim(rks)//' "'//c_win_id//'" for Windows OS'
+#ifdef MPI2
+      call MPI_FINALIZE(err)
+#endif
       stop
     endselect
   endif
-  if (present(sep))    OS%sep    = trim(sep)
-  if (present(remove)) OS%remove = trim(remove)
-  if (present(copy))   OS%copy   = trim(copy)
-  if (present(mkdir))  OS%mkdir  = trim(mkdir)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine set
+  endsubroutine init
 endmodule Data_Type_OS

@@ -79,7 +79,6 @@
 !> For more details see \ref Compiling "Compiling Instructions".
 !> @bug <b>Multi-grid Models</b>: \n Multi-grid time convergence acceleration has been developed, but it is affected by some bugs
 !>                                that <em>blow up</em> steady simulations.
-!> @todo \b NavierStokesEq: Extension to viscous Navier-Stokes equations
 !> @todo \b MultiSpeciesModel: Introducing new multi-dimensional \f$\gamma,\eta,\chi\f$ conservation models of Favini, B. et al
 !> @todo \b MultiPhaseModel: Introducing fully-coupled Lagrangian particles transport model
 !> @todo \b AMR: Introducing AMR (Adaptive Mesh Refinement) model
@@ -90,10 +89,10 @@
 program OFF
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                        ! Integers and reals precision definition.
-USE Data_Type_BC, init_bc=>init                         ! Definition of Type_BC.
+USE Data_Type_BC                                        ! Definition of Type_BC.
 USE Data_Type_Globals                                   ! Definition of Type_Global and Type_Block.
 USE Data_Type_OS                                        ! Definition of Type_OS.
-USE Data_Type_Primitive, init_prim=>init, set_prim=>set ! Definition of Type_Primitive.
+USE Data_Type_Primitive                                 ! Definition of Type_Primitive.
 USE Data_Type_Probe                                     ! Definition of Type_Probe.
 USE Data_Type_Tensor                                    ! Definition of Type_Tensor.
 USE Data_Type_Time                                      ! Definition of Type_Time.
@@ -106,6 +105,9 @@ USE Lib_Math,        only: digit                        ! Function for computing
 USE Lib_Mesh,        only: mesh_metrics, &              ! Subroutine for computing metrics of the mesh.
                            mesh_metrics_correction      ! Subroutine for correcting metrics of the mesh according to bc.
 USE Lib_IO_Misc                                         ! Procedures for IO and strings operations.
+#ifdef PROFILING
+USE Lib_Profiling                                       ! Procedures for profiling the code.
+#endif
 USE Lib_WENO,        only: weno_init                    ! Subroutine for initializing WENO coefficients.
 #ifdef OPENMP
 USE OMP_LIB                                             ! OpenMP runtime library.
@@ -130,7 +132,6 @@ integer(I_P)::                  b             !< Blocks counter.
 integer(I_P)::                  l             !< Grid levels counter.
 integer(I_P)::                  err           !< Error trapping flag: 0 no errors, >0 error occurs.
 integer(I_P)::                  lockfile      !< Locking unit file.
-real::                          partial(1:10) !< Partial time counters for code profiling
 character(20)::                 date          !< Actual date.
 integer(I_P)::                  myrank        !< Actual rank process.
 integer(I_P)::                  Nprb = 0_I_P  !< Number of probes.
@@ -144,22 +145,30 @@ call off_init ! initializing the simulation
 
 l = 1  ! grid level initializing: using only the finest grid for unsteady simulation
 
+#ifdef PROFILING
+call profile(p=7,pstart=.true.,myrank=myrank)
+#endif
+
 Temporal_Loop: do
   ! computing the solution for the actual time step
-  partial(1) = Crono()
+#ifdef PROFILING
+  call profile(p=1,pstart=.true.,myrank=myrank)
+#endif
   call solve_grl(myrank = myrank, l = l, global = global, block= block(:,l))
-  partial(2) = Crono(instant1=partial(1))
+#ifdef PROFILING
+  call profile(p=1,pstop=.true.,myrank=myrank)
+#endif
   ! saving probes
   if (Nprb>0) then
     if ((mod(global%fluid%n,global%file%probe_out)==0).OR. &
         (global%fluid%t==global%fluid%Tmax).OR.            &
         (global%fluid%n==global%fluid%Nmax)) then
       do b=1,Nprb
-        unitprobe = Get_Unit()
-        open(unit=unitprobe,&
+        open(unit=Get_Unit(unitprobe),&
              file=trim(global%file%Path_OutPut)//'probe'//trim(strz(4,b))//'-N_'//trim(strz(10,global%fluid%n))//'.dat')
         write(unitprobe,FR_P,iostat=err)global%fluid%t
-        err = write(unitprobe,FR_P,block(blockmap(probes(b)%b),l)%fluid%P(probes(b)%i,probes(b)%j,probes(b)%k))
+        err = write_primitive(scalar=block(blockmap(probes(b)%b),l)%fluid%P(probes(b)%i,probes(b)%j,probes(b)%k), &
+                              unit=unitprobe,format=FR_P)
         close(unitprobe)
       enddo
     endif
@@ -181,9 +190,9 @@ do l=1,global%mesh%Nl
   call boundary_conditions(myrank = myrank, l = l, global = global, block= block(:,l))
   ! saving the output file
   do b=1,global%mesh%Nb
-    err = save_bfluid(filename=file_name(basename=trim(global%file%Path_OutPut)//global%file%File_Sol,&
-                                         suffix='.sol',blk=blockmap(b),grl=l,n=global%fluid%n),       &
-                      global=global,block=block(b,l))
+    err = block(b,l)%save_fluid(filename=file_name(basename=trim(global%file%Path_OutPut)//global%file%File_Sol,&
+                                                   suffix='.sol',blk=blockmap(b),grl=l,n=global%fluid%n),       &
+                                global=global)
   enddo
 enddo
 
@@ -196,6 +205,11 @@ endif
 #ifdef MPI2
 call MPI_FINALIZE(err)
 #endif
+#ifdef PROFILING
+! finalizing profiling
+call profile(p=7,pstop=.true.,myrank=myrank)
+call profile(finalize=.true.,myrank=myrank)
+#endif
 stop
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
@@ -204,16 +218,19 @@ contains
   subroutine off_init()
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P)::    b              !< Blocks counter.
-  integer(I_P)::    l              !< Grid levels counter.
-  integer(I_P)::    c              !< Cell and variable counter.
-  integer(I_P)::    Nca = 0        !< Number of command line arguments.
-  character(60)::   File_Option    !< Global option file name.
-  character(500)::  varname_res    !< Variables name for the gnuplot residuals file.
-  character(DI_P):: Ncstr          !< String containing current number id of conservative variables.
-  real::            instant0 = 0.0 !< The Crono starting instant (used for timing the code).
-  integer(I_P)::    UnitFree       !< Free logic unit.
-  logical::         is_file        !< Flag for inquiring the presence of file.
+  integer(I_P)::    b                 !< Blocks counter.
+  integer(I_P)::    l                 !< Grid levels counter.
+  integer(I_P)::    c                 !< Cell and variable counter.
+  integer(I_P)::    i,j,k             !< Space counters.
+  integer(I_P)::    Nca = 0           !< Number of command line arguments.
+  character(60)::   File_Option       !< Global option file name.
+  character(500)::  varname_res       !< Variables name for the gnuplot residuals file.
+  character(DI_P):: Ncstr             !< String containing current number id of conservative variables.
+  integer(I_P)::    UnitFree          !< Free logic unit.
+  logical::         is_file           !< Flag for inquiring the presence of file.
+#ifndef PROFILING
+  real(R8P)::       instant0 = 0._R8P !< The Crono starting instant used for profing the code.
+#endif
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -248,8 +265,7 @@ contains
       stop
     else
       ! creating a lockfile
-      lockfile = Get_Unit()
-      open(unit=lockfile,file='lockfile')
+      open(unit=Get_Unit(lockfile),file='lockfile')
       write(lockfile,'(A)')' Simulation started on'
       write(lockfile,'(A)')' '//date
       close(lockfile)
@@ -301,28 +317,27 @@ contains
     write(stdout,'(A)',iostat=err)'  Loading '//trim(global%file%Path_InPut)//trim(global%file%File_Solver)
   endif
   ! loading solver options
-  err = load_gfluid_soption(myrank=myrank, filename=trim(global%file%Path_InPut)//trim(global%file%File_Solver), global=global)
+  err = global%load_fluid_soption(myrank=myrank, filename=trim(global%file%Path_InPut)//trim(global%file%File_Solver))
   ! loading processes/blocks map and computing the number global/local blocks
   err = procmap_load(myrank = myrank, filename = trim(global%file%Path_InPut)//'procmap.dat', global = global)
   ! loading the number of initial species from the first block, finest grid level, fluid file
-  err = load_gfluid_Ns(binary   = .true.,                                                                         &
-                       myrank   = myrank,                                                                         &
-                       filename = file_name(basename = trim(global%file%Path_InPut)//trim(global%file%File_Init), &
-                                            suffix   = '.itc',                                                    &
-                                            blk      = 1,                                                         &
-                                            grl      = 1),                                                        &
-                       global   = global)
+  err = global%load_fluid_Ns(binary   = .true.,                                                                         &
+                             myrank   = myrank,                                                                         &
+                             filename = file_name(basename = trim(global%file%Path_InPut)//trim(global%file%File_Init), &
+                                                  suffix   = '.itc',                                                    &
+                                                  blk      = 1,                                                         &
+                                                  grl      = 1))
   if (myrank==0) then
     write(stdout,*)
   endif
 
   ! allocating global fluidynamic data
-  call alloc_global_fluid(global=global)
+  call global%alloc_fluid
   ! allocating blocks data
   if (allocated(block)) then
     do l=lbound(block,dim=2),ubound(block,dim=2)
       do b=lbound(block,dim=1),ubound(block,dim=1)
-        call free_block(block=block(b,l))
+        call block(b,l)%free
       enddo
     enddo
     deallocate(block)
@@ -331,14 +346,13 @@ contains
   do l=1,global%mesh%Nl
     do b=1,global%mesh%Nb
       ! getting dimensions of block
-      err = load_bmesh_dims(myrank   = myrank,                                                                         &
-                            filename = file_name(basename = trim(global%file%Path_InPut)//trim(global%file%File_Mesh), &
-                                                 suffix   = '.geo',                                                    &
-                                                 blk      = blockmap(b),                                               &
-                                                 grl      = l),                                                        &
-                            block    = block(b,l))
+      err = block(b,l)%load_mesh_dims(myrank   = myrank,                                                                         &
+                                      filename = file_name(basename = trim(global%file%Path_InPut)//trim(global%file%File_Mesh), &
+                                                           suffix   = '.geo',                                                    &
+                                                           blk      = blockmap(b),                                               &
+                                                           grl      = l))
       ! allocating block
-      call alloc_block(global=global,block=block(b,l))
+      call block(b,l)%alloc(global=global)
     enddo
   enddo
 
@@ -346,32 +360,82 @@ contains
   do l=1,global%mesh%Nl
     do b=1,global%mesh%Nb
       ! loading mesh
-      err = load_bmesh(myrank   = myrank,                                                                         &
-                       filename = file_name(basename = trim(global%file%Path_InPut)//trim(global%file%File_Mesh), &
-                                            suffix   = '.geo',                                                    &
-                                            blk      = blockmap(b),                                               &
-                                            grl      = l),                                                        &
-                       block    = block(b,l))
+      err = block(b,l)%load_mesh(myrank   = myrank,                                                                         &
+                                 filename = file_name(basename = trim(global%file%Path_InPut)//trim(global%file%File_Mesh), &
+                                                      suffix   = '.geo',                                                    &
+                                                      blk      = blockmap(b),                                               &
+                                                      grl      = l))
       ! loading boundary conditions
-      err = load_bbc(myrank   = myrank,                                                                       &
-                     filename = file_name(basename = trim(global%file%Path_InPut)//trim(global%file%File_BC), &
-                                          suffix   = '.bco',                                                  &
-                                          blk      = blockmap(b),                                             &
-                                          grl      = l),                                                      &
-                     block    = block(b,l))
+      err = block(b,l)%load_bc(myrank   = myrank,                                                                       &
+                               filename = file_name(basename = trim(global%file%Path_InPut)//trim(global%file%File_BC), &
+                                                    suffix   = '.bco',                                                  &
+                                                    blk      = blockmap(b),                                             &
+                                                    grl      = l))
       ! loading initial conditions
-      err = load_bfluid(myrank   = myrank,                                                                         &
-                        filename = file_name(basename = trim(global%file%Path_InPut)//trim(global%file%File_Init), &
-                                             suffix   = '.itc',                                                    &
-                                             blk      = blockmap(b),                                               &
-                                             grl      = l),                                                        &
-                        global   = global,block=block(b,l))
+      err = block(b,l)%load_fluid(myrank   = myrank,                                                                         &
+                                  filename = file_name(basename = trim(global%file%Path_InPut)//trim(global%file%File_Init), &
+                                                       suffix   = '.itc',                                                    &
+                                                       blk      = blockmap(b),                                               &
+                                                       grl      = l),                                                        &
+                                  global   = global)
       ! converting primitive variables to conservative ones
-      call primitive2conservative(block = block(b,l))
+      call primitive2conservative(block=block(b,l))
       ! print some informations of the fluid data loaded
-      err = print_info_bfluid(myrank=myrank,blk=b,grl=l,global=global,block=block(b,l))
+      err = block(b,l)%print_info_fluid(myrank=myrank,blk=b,grl=l,global=global)
     enddo
   enddo
+
+  ! loading inflow boundary conditions if necessary
+  ! inflow 1
+  do l=1,global%mesh%Nl
+    do b=1,global%mesh%Nb
+      do k=1-block(b,l)%mesh%gc(5),block(b,l)%mesh%Nk+block(b,l)%mesh%gc(6)
+        do j=1-block(b,l)%mesh%gc(3),block(b,l)%mesh%Nj+block(b,l)%mesh%gc(4)
+          do i=0-block(b,l)%mesh%gc(1),block(b,l)%mesh%Ni+block(b,l)%mesh%gc(2)
+            if (block(b,l)%bc%BCi(i,j,k)%tp==bc_in1) then
+              global%bc%Nin1 = max(global%bc%Nin1,block(b,l)%bc%BCi(i,j,k)%inf)
+            endif
+          enddo
+        enddo
+      enddo
+      do k=1-block(b,l)%mesh%gc(5),block(b,l)%mesh%Nk+block(b,l)%mesh%gc(6)
+        do j=0-block(b,l)%mesh%gc(3),block(b,l)%mesh%Nj+block(b,l)%mesh%gc(4)
+          do i=1-block(b,l)%mesh%gc(1),block(b,l)%mesh%Ni+block(b,l)%mesh%gc(2)
+            if (block(b,l)%bc%BCj(i,j,k)%tp==bc_in1) then
+              global%bc%Nin1 = max(global%bc%Nin1,block(b,l)%bc%BCj(i,j,k)%inf)
+            endif
+          enddo
+        enddo
+      enddo
+      do k=0-block(b,l)%mesh%gc(5),block(b,l)%mesh%Nk+block(b,l)%mesh%gc(6)
+        do j=1-block(b,l)%mesh%gc(3),block(b,l)%mesh%Nj+block(b,l)%mesh%gc(4)
+          do i=1-block(b,l)%mesh%gc(1),block(b,l)%mesh%Ni+block(b,l)%mesh%gc(2)
+            if (block(b,l)%bc%BCk(i,j,k)%tp==bc_in1) then
+              global%bc%Nin1 = max(global%bc%Nin1,block(b,l)%bc%BCk(i,j,k)%inf)
+            endif
+          enddo
+        enddo
+      enddo
+    enddo
+  enddo
+  if (global%bc%Nin1>0) then
+    if (myrank==0) then
+      write(stdout,'(A)')'rank0----------------------------------------------------------------------'
+      write(stdout,'(A)')'rank0 There are Nin1='//trim(str(.true.,global%bc%Nin1))//' "inflow 1"-type boundary conditions'
+      write(stdout,'(A)')'rank0----------------------------------------------------------------------'
+      write(stdout,*)
+    endif
+    call global%alloc_bc
+    do b=1,global%bc%Nin1
+      if (myrank==0) then
+        write(stdout,'(A)')'rank0----------------------------------------------------------------------'
+        write(stdout,'(A)')'rank0 Loading file "'//trim(global%file%Path_InPut)//'in1.'//trim(strz(3,b))//'.bco"'
+        write(stdout,'(A)')'rank0----------------------------------------------------------------------'
+        write(stdout,*)
+      endif
+      err = global%load_bc_in1(myrank=myrank,filename=trim(global%file%Path_InPut)//'in1.'//trim(strz(3,b))//'.bco',in1=b)
+    enddo
+  endif
 
   ! initializing Runge-Kutta coefficients
   call rk_init(global%fluid%rk_ord)
@@ -422,10 +486,10 @@ contains
   ! computing the mesh variables that are not loaded from input files
   do l=1,global%mesh%Nl
     do b=1,global%mesh%Nb
-      call mesh_metrics(           block= block(b,l))
-      call mesh_metrics_correction(block= block(b,l))
+      call mesh_metrics(           mesh  = block(b,l)%mesh)
+      call mesh_metrics_correction(block = block(b,l))
       ! print some informations of the mesh data loaded
-      err = print_info_bmesh(myrank=myrank,blk=b,grl=l,global=global,block=block(b,l))
+      err = block(b,l)%print_info_mesh(myrank=myrank,blk=b,grl=l,global=global)
     enddo
   enddo
 
@@ -436,8 +500,7 @@ contains
   if (myrank==0) then
     Ncstr = adjustl(trim(str(.true.,global%fluid%Nc)))
     ! creating the gnuplot script file for visualizing the residuals log file
-    global%file%unit_res = Get_Unit()
-    open(unit=global%file%unit_res,file=trim(global%file%Path_OutPut)//'gplot_res')
+    open(unit=Get_Unit(global%file%unit_res),file=trim(global%file%Path_OutPut)//'gplot_res')
     write(global%file%unit_res,'(A)')'set xlabel "Iteration"'
     write(global%file%unit_res,'(A)')'set ylabel "Residuals"'
     write(global%file%unit_res,'(A)')'set log y'
@@ -454,11 +517,9 @@ contains
     close(global%file%unit_res)
     ! initialize gnuplot log file of residuals
     if (global%fluid%n>0) then
-      global%file%unit_res = Get_Unit()
-      open(unit=global%file%unit_res,file=trim(global%file%Path_OutPut)//'residuals.log',position='APPEND')
+      open(unit=Get_Unit(global%file%unit_res),file=trim(global%file%Path_OutPut)//'residuals.log',position='APPEND')
     else
-      global%file%unit_res = Get_Unit()
-      open(unit=global%file%unit_res,file=trim(global%file%Path_OutPut)//'residuals.log')
+      open(unit=Get_Unit(global%file%unit_res),file=trim(global%file%Path_OutPut)//'residuals.log')
     endif
     ! initialize header
     global%file%varform_res = '('//trim(str(.true.,global%fluid%Nc))//&
@@ -485,7 +546,7 @@ contains
   ! checking the presence of probes file
   inquire(file=trim(global%file%Path_InPut)//'probes.dat',exist=is_file,iostat=err)
   if (is_file) then
-    UnitFree = Get_Unit() ; open(unit = UnitFree, file = trim(global%file%Path_InPut)//'probes.dat', action = 'READ')
+     open(unit = Get_Unit(UnitFree), file = trim(global%file%Path_InPut)//'probes.dat', action = 'READ')
     read(UnitFree,*)Nprb
     if (allocated(probes)) deallocate(probes) ; allocate(probes(1:Nprb))
     do b=1,Nprb
@@ -494,7 +555,18 @@ contains
     close(UnitFree)
   endif
 
-  instant0 = Crono(start=.true.) ! code timing start
+#ifdef PROFILING
+  ! code profiling initialization
+  call profile(Np=7,header=['ZONE T="solve_grl"             ', &
+                            'ZONE T="conservative2primitive"', &
+                            'ZONE T="boundary_conditions"   ', &
+                            'ZONE T="compute_time"          ', &
+                            'ZONE T="residuals"             ', &
+                            'ZONE T="rk_time_integration"   ', &
+                            'ZONE T="OFF"                   '],myrank=myrank)
+#else
+  instant0 = Crono(start=.true.)
+#endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine off_init
@@ -518,8 +590,7 @@ contains
   if (.NOT.is_file) then
       call File_Not_Found(myrank,filename,'load_off_option_file')
   endif
-  UnitFree = Get_Unit()
-  open(unit = UnitFree, file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
+  open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
   read(UnitFree,*,iostat=err) ! record skipped because unnecessary
   read(UnitFree,*,iostat=err) !               OS
   read(UnitFree,*,iostat=err)os_type
@@ -533,12 +604,12 @@ contains
   read(UnitFree,*,iostat=err) !               OUTPUT OPTIONS
   read(UnitFree,*,iostat=err)global%file%Path_OutPut
   read(UnitFree,*,iostat=err)global%file%File_Sol
-  read(UnitFree,*,iostat=err)global%file%Screen_out
+  read(UnitFree,*,iostat=err)global%file%screen_out
   read(UnitFree,*,iostat=err)global%file%sol_out
   read(UnitFree,*,iostat=err)global%file%restart_out
   read(UnitFree,*,iostat=err)global%file%probe_out
   close(UnitFree)
-  os_type = Upper_Case(os_type) ; OS = init(c_id=os_type)
+  os_type = Upper_Case(os_type) ; call OS%init(c_id=os_type,myrank=myrank)
 
   global%file%Path_InPut =string_OS_sep(global%file%Path_InPut ) ; global%file%Path_InPut  = adjustl(trim(global%file%Path_InPut ))
   global%file%File_Solver=string_OS_sep(global%file%File_Solver) ; global%file%File_Solver = adjustl(trim(global%file%File_Solver))

@@ -11,16 +11,16 @@
 !> @ingroup Program
 program IBM
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                           ! Integers and reals precision definition.
-USE Data_Type_BC, init_bc=>init, set_bc=>set               ! Definition of Type_BC.
-USE Data_Type_Cell, init_cell=>init, set_cell=>set         ! Definition of Type_Cell.
-USE Data_Type_Conservative, init_cons=>init, set_cons=>set ! Definition of Type_Conservative.
-USE Data_Type_Globals                                      ! Definition of Type_Global and Type_Block.
-USE Data_Type_OS, init_OS=>init, set_OS=>set               ! Definition of Type_OS.
-USE Data_Type_Primitive, init_prim=>init, set_prim=>set    ! Definition of Type_Primitive.
-USE Data_Type_Time, only: Get_Date_String                  ! Function for getting actual date.
-USE Data_Type_Vector, set_Vector=>set                      ! Definition of Type_Vector.
-USE Lib_IO_Misc                                            ! Procedures for IO and strings operations.
+USE IR_Precision                          ! Integers and reals precision definition.
+USE Data_Type_BC                          ! Definition of Type_BC.
+USE Data_Type_Cell                        ! Definition of Type_Cell.
+USE Data_Type_Conservative                ! Definition of Type_Conservative.
+USE Data_Type_Globals                     ! Definition of Type_Global and Type_Block.
+USE Data_Type_OS                          ! Definition of Type_OS.
+USE Data_Type_Primitive                   ! Definition of Type_Primitive.
+USE Data_Type_Time, only: Get_Date_String ! Function for getting actual date.
+USE Data_Type_Vector                      ! Definition of Type_Vector.
+USE Lib_IO_Misc                           ! Procedures for IO and strings operations.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ call icg_init(global)
 ! loading initial species
 write(stdout,'(A)',iostat=err)'----------------------------------------------------------------------'
 write(stdout,'(A)',iostat=err)' Loading '//adjustl(trim(global%file%Path_InPut))//trim(global%file%File_Spec)
-err = load_gfluid_0species(myrank=myrank,filename=adjustl(trim(global%file%Path_InPut))//trim(global%file%File_Spec),global=global)
+err = global%load_fluid_0species(myrank=myrank,filename=adjustl(trim(global%file%Path_InPut))//trim(global%file%File_Spec))
 
 ! computing the mesh, boundary and initial conditions and storing in scratch files
 select case(trim(In_type))
@@ -89,7 +89,7 @@ global%mesh%Nb = 1
 if (allocated(block)) then
   do l=lbound(block,dim=2),ubound(block,dim=2)
     do b=lbound(block,dim=1),ubound(block,dim=1)
-      call free_block(block=block(b,l))
+      call block(b,l)%free
     enddo
   enddo
   deallocate(block)
@@ -136,41 +136,39 @@ do b=1,global%mesh%Nb_tot
   endif
     ! allocating block
   do l=1,global%mesh%Nl
-    call alloc_block(global=global,block=block(1,l))
+    call block(1,l)%alloc(global=global)
   enddo
   do l=1,global%mesh%Nl
     write(stdout,'(A,I3)',iostat=err)'   Grid level ',l
     ! mesh files
-    err = read(UnitScratch(1,b,l),block(1,l)%mesh%node)
-    err = read(UnitScratch(1,b,l),block(1,l)%mesh%cell)
+    err = read_vector(array3D=block(1,l)%mesh%node,unit=UnitScratch(1,b,l))
+    err = read_cell(  array3D=block(1,l)%mesh%cell,unit=UnitScratch(1,b,l))
     close(UnitScratch(1,b,l))
-    err = save_bmesh(filename=file_name(basename = trim(global%file%Path_OutPut)//trim(global%file%File_Mesh), &
-                                        suffix   = '.geo',                                                     &
-                                        blk      = b,                                                          &
-                                        grl      = l),                                                         &
-                     block=block(1,l))
+    err = block(1,l)%save_mesh(filename=file_name(basename = trim(global%file%Path_OutPut)//trim(global%file%File_Mesh), &
+                                                  suffix   = '.geo',                                                     &
+                                                  blk      = b,                                                          &
+                                                  grl      = l))
 
     ! boundary condition files
-    err = read(UnitScratch(2,b,l),block(1,l)%bc%BCi)
-    err = read(UnitScratch(2,b,l),block(1,l)%bc%BCj)
-    err = read(UnitScratch(2,b,l),block(1,l)%bc%BCk)
+    err = read_bc(array3D=block(1,l)%bc%BCi,unit=UnitScratch(2,b,l))
+    err = read_bc(array3D=block(1,l)%bc%BCj,unit=UnitScratch(2,b,l))
+    err = read_bc(array3D=block(1,l)%bc%BCk,unit=UnitScratch(2,b,l))
     close(UnitScratch(2,b,l))
-    err = save_bbc(filename=file_name(basename = trim(global%file%Path_OutPut)//trim(global%file%File_BC), &
-                                      suffix   = '.bco',                                                   &
-                                      blk      = b,                                                        &
-                                      grl      = l),                                                       &
-                   block=block(1,l))
+    err = block(1,l)%save_bc(filename=file_name(basename = trim(global%file%Path_OutPut)//trim(global%file%File_BC), &
+                                                suffix   = '.bco',                                                   &
+                                                blk      = b,                                                        &
+                                                grl      = l))
 
     ! initial condition files
     read(UnitScratch(3,b,l),iostat=err)block(1,l)%fluid%Dt
-    err = read(UnitScratch(3,b,l),block(1,l)%fluid%P)
+    err = read_primitive(array3D=block(1,l)%fluid%P,unit=UnitScratch(3,b,l))
     close(UnitScratch(3,b,l))
-    err = save_bfluid(filename=file_name(basename = trim(global%file%Path_OutPut)//trim(global%file%File_Mesh), &
-                                         suffix   = '.itc',                                                     &
-                                         blk      = b,                                                          &
-                                         grl      = l),                                                         &
-                      global=global,                                                                            &
-                      block=block(1,l))
+    err = block(1,l)%save_fluid(filename=file_name(basename = trim(global%file%Path_OutPut)//trim(global%file%File_Mesh), &
+                                                   suffix   = '.itc',                                                     &
+                                                   blk      = b,                                                          &
+                                                   grl      = l),                                                         &
+                                global=global)
+
   enddo
   write(stdout,*)
 enddo
@@ -266,11 +264,10 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
   if (.NOT.is_file) call File_Not_Found(myrank,filename,'load_option')
-  UnitFree = Get_Unit()
-  open(unit = UnitFree, file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
+  open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
   read(UnitFree,*)
   read(UnitFree,*,iostat=err)!               OS
-  read(UnitFree,*,iostat=err)os_type ; os_type = Upper_Case(os_type) ; OS = init_OS(c_id=os_type)
+  read(UnitFree,*,iostat=err)os_type ; os_type = Upper_Case(os_type) ; call OS%init(c_id=os_type)
   read(UnitFree,*)!       INPUT FILES
   read(UnitFree,*,iostat=err)global%file%Path_InPut
   read(UnitFree,*,iostat=err)global%file%File_Spec
@@ -324,8 +321,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
   if (.NOT.is_file) call File_Not_Found(myrank,filename,'load_blocks')
-  UnitFree = Get_Unit()
-  open(unit = UnitFree, file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
+  open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
   read(UnitFree,*)
   read(UnitFree,*)
   read(UnitFree,*) f
@@ -341,13 +337,13 @@ contains
   ! allocating array for blocks informations
   if (allocated(blocks))  then
     do b=lbound(blocks,dim=1),ubound(blocks,dim=1)
-      err = free(blocks(b)%P)
-      err = free(blocks(b)%bc)
+      call blocks(b)%P%free
+      call blocks(b)%bc%free
     enddo
     deallocate(blocks)
   endif
   allocate(blocks(1:global%mesh%Nb_tot))
-  call init_prim(Ns=global%fluid%Ns,prim=blocks%P)
+  call blocks%P%init(Ns=global%fluid%Ns)
   if (allocated(UnitScratch)) deallocate(UnitScratch) ; allocate(UnitScratch(1:3,1:global%mesh%Nb_tot,1:global%mesh%Nl))
   ! reading informations of each block
   do b=1,global%mesh%Nb_tot
@@ -358,13 +354,11 @@ contains
     read(UnitFree,*) blocks(b)%xmax,blocks(b)%ymax,blocks(b)%zmax
     do f=1,6
       read(UnitFree,*) bc_str,l
-      blocks(b)%bc(f)%tp = get_bc_id(myrank,bc_str)
+      call blocks(b)%bc(f)%str2id(bc_str) ; call blocks(b)%bc(f)%init
       if (blocks(b)%bc(f)%tp==bc_adj) then
-        !blocks(b)%bc(f) = set_bc(adj=Type_Adj(b=l,i=0,j=0,k=0))
-        call set_bc(adj=Type_Adj(b=l,i=0,j=0,k=0),bc=blocks(b)%bc(f))
+        call blocks(b)%bc(f)%set(adj=Type_Adj(b=l,i=0,j=0,k=0))
       elseif (blocks(b)%bc(f)%tp==bc_in1.or.blocks(b)%bc(f)%tp==bc_in2) then
-        !blocks(b)%bc(f) = set_bc(inf=l)
-        call set_bc(inf=l,bc=blocks(b)%bc(f))
+        call blocks(b)%bc(f)%set(inf=l)
       endif
     enddo
     do f=1,global%fluid%Ns
@@ -382,9 +376,9 @@ contains
   ! opening the scratch file where the current block is temporarily stored
   do l=1,global%mesh%Nl
     do b=1,global%mesh%Nb_tot
-      UnitScratch(1,b,l)=Get_Unit() ; open(unit=UnitScratch(1,b,l),form='UNFORMATTED',status='SCRATCH',iostat=err) ! geo file
-      UnitScratch(2,b,l)=Get_Unit() ; open(unit=UnitScratch(2,b,l),form='UNFORMATTED',status='SCRATCH',iostat=err) ! bco file
-      UnitScratch(3,b,l)=Get_Unit() ; open(unit=UnitScratch(3,b,l),form='UNFORMATTED',status='SCRATCH',iostat=err) ! itc file
+      open(unit=Get_Unit(UnitScratch(1,b,l)),form='UNFORMATTED',status='SCRATCH',iostat=err) ! geo file
+      open(unit=Get_Unit(UnitScratch(2,b,l)),form='UNFORMATTED',status='SCRATCH',iostat=err) ! bco file
+      open(unit=Get_Unit(UnitScratch(3,b,l)),form='UNFORMATTED',status='SCRATCH',iostat=err) ! itc file
     enddo
   enddo
   ! the number of global blocks is artificially set to 1
@@ -393,7 +387,7 @@ contains
   if (allocated(block)) then
     do l=lbound(block,dim=2),ubound(block,dim=2)
       do b=lbound(block,dim=1),ubound(block,dim=1)
-        call free_block(block=block(b,l))
+        call block(b,l)%free
       enddo
     enddo
     deallocate(block)
@@ -440,7 +434,7 @@ contains
     endif
       ! allocating block
     do l=1,global%mesh%Nl
-      call alloc_block(global=global,block=block(1,l))
+      call block(1,l)%alloc(global=global)
     enddo
     ! node coordinates computing
     write(stdout,'(A)')'  Computing the nodes coordinates'
@@ -450,13 +444,9 @@ contains
     do k=0-block(1,1)%mesh%gc(5),block(1,1)%mesh%Nk+block(1,1)%mesh%gc(6)
       do j=0-block(1,1)%mesh%gc(3),block(1,1)%mesh%Nj+block(1,1)%mesh%gc(4)
         do i=0-block(1,1)%mesh%gc(1),block(1,1)%mesh%Ni+block(1,1)%mesh%gc(2)
-          !block(1,1)%mesh%node(i,j,k) = set_Vector(x = blocks(b)%xmin + real(i,R_P)*Di, &
-          !                                         y = blocks(b)%ymin + real(j,R_P)*Dj, &
-          !                                         z = blocks(b)%zmin + real(k,R_P)*Dk)
-          call set_Vector(x = blocks(b)%xmin + real(i,R_P)*Di, &
-                          y = blocks(b)%ymin + real(j,R_P)*Dj, &
-                          z = blocks(b)%zmin + real(k,R_P)*Dk, &
-                          vec=block(1,1)%mesh%node(i,j,k))
+          call block(1,1)%mesh%node(i,j,k)%set(x = blocks(b)%xmin + real(i,R_P)*Di, &
+                                               y = blocks(b)%ymin + real(j,R_P)*Dj, &
+                                               z = blocks(b)%zmin + real(k,R_P)*Dk)
         enddo
       enddo
     enddo
@@ -476,13 +466,9 @@ contains
         do k=0-block(1,l)%mesh%gc(5),block(1,l)%mesh%Nk+block(1,l)%mesh%gc(6)
           do j=0-block(1,l)%mesh%gc(3),block(1,l)%mesh%Nj+block(1,l)%mesh%gc(4)
             do i=0-block(1,l)%mesh%gc(1),-1
-              !block(1,l)%mesh%node(i,j,k) = set_Vector(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
-              !                                         y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
-              !                                         z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk)
-              call set_Vector(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
-                              y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
-                              z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk, &
-                              vec=block(1,l)%mesh%node(i,j,k))
+              call block(1,l)%mesh%node(i,j,k)%set(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
+                                                   y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
+                                                   z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk)
             enddo
           enddo
         enddo
@@ -490,13 +476,9 @@ contains
         do k=0-block(1,l)%mesh%gc(5),block(1,l)%mesh%Nk+block(1,l)%mesh%gc(6)
           do j=0-block(1,l)%mesh%gc(3),block(1,l)%mesh%Nj+block(1,l)%mesh%gc(4)
             do i=block(1,l)%mesh%Ni+1,block(1,l)%mesh%Ni+block(1,l)%mesh%gc(2)
-              !block(1,l)%mesh%node(i,j,k) = set_Vector(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
-              !                                         y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
-              !                                         z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk)
-              call set_Vector(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
-                              y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
-                              z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk, &
-                              vec=block(1,l)%mesh%node(i,j,k))
+              call block(1,l)%mesh%node(i,j,k)%set(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
+                                                   y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
+                                                   z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk)
             enddo
           enddo
         enddo
@@ -504,13 +486,9 @@ contains
         do k=0-block(1,l)%mesh%gc(5),block(1,l)%mesh%Nk+block(1,l)%mesh%gc(6)
           do j=0-block(1,l)%mesh%gc(3),-1
             do i=0-block(1,l)%mesh%gc(1),block(1,l)%mesh%Ni+block(1,l)%mesh%gc(2)
-              !block(1,l)%mesh%node(i,j,k) = set_Vector(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
-              !                                         y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
-              !                                         z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk)
-              call set_Vector(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
-                              y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
-                              z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk, &
-                              vec=block(1,l)%mesh%node(i,j,k))
+              call block(1,l)%mesh%node(i,j,k)%set(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
+                                                   y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
+                                                   z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk)
             enddo
           enddo
         enddo
@@ -518,13 +496,9 @@ contains
         do k=0-block(1,l)%mesh%gc(5),block(1,l)%mesh%Nk+block(1,l)%mesh%gc(6)
           do j=block(1,l)%mesh%Nj+1,block(1,l)%mesh%Nj+block(1,l)%mesh%gc(4)
             do i=0-block(1,l)%mesh%gc(1),block(1,l)%mesh%Ni+block(1,l)%mesh%gc(2)
-              !block(1,l)%mesh%node(i,j,k) = set_Vector(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
-              !                                         y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
-              !                                         z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk)
-              call set_Vector(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
-                              y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
-                              z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk, &
-                              vec=block(1,l)%mesh%node(i,j,k))
+              call block(1,l)%mesh%node(i,j,k)%set(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
+                                                   y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
+                                                   z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk)
             enddo
           enddo
         enddo
@@ -532,13 +506,9 @@ contains
         do k=0-block(1,l)%mesh%gc(5),-1
           do j=0-block(1,l)%mesh%gc(3),block(1,l)%mesh%Nj+block(1,l)%mesh%gc(4)
             do i=0-block(1,l)%mesh%gc(1),block(1,l)%mesh%Ni+block(1,l)%mesh%gc(2)
-              !block(1,l)%mesh%node(i,j,k) = set_Vector(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
-              !                                         y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
-              !                                         z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk)
-              call set_Vector(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
-                              y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
-                              z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk, &
-                              vec=block(1,l)%mesh%node(i,j,k))
+              call block(1,l)%mesh%node(i,j,k)%set(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
+                                                   y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
+                                                   z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk)
             enddo
           enddo
         enddo
@@ -546,13 +516,9 @@ contains
         do k=block(1,l)%mesh%Nk+1,block(1,l)%mesh%Nk+block(1,l)%mesh%gc(6)
           do j=0-block(1,l)%mesh%gc(3),block(1,l)%mesh%Nj+block(1,l)%mesh%gc(4)
             do i=0-block(1,l)%mesh%gc(1),block(1,l)%mesh%Ni+block(1,l)%mesh%gc(2)
-              !block(1,l)%mesh%node(i,j,k) = set_Vector(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
-              !                                         y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
-              !                                         z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk)
-              call set_Vector(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
-                              y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
-                              z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk, &
-                              vec=block(1,l)%mesh%node(i,j,k))
+              call block(1,l)%mesh%node(i,j,k)%set(x = blocks(b)%xmin + real(i*2*(l-1),R_P)*Di, &
+                                                   y = blocks(b)%ymin + real(j*2*(l-1),R_P)*Dj, &
+                                                   z = blocks(b)%zmin + real(k*2*(l-1),R_P)*Dk)
             enddo
           enddo
         enddo
@@ -565,21 +531,15 @@ contains
       do k=1,block(1,l)%mesh%Nk
         do j=1,block(1,l)%mesh%Nj
           do i=1-block(1,l)%mesh%gc(1),0
-            block(1,l)%bc%BCi(i,j,k)%tp = blocks(b)%bc(1)%tp
+            block(1,l)%bc%BCi(i,j,k)%tp = blocks(b)%bc(1)%tp ; call block(1,l)%bc%BCi(i,j,k)%init
             select case(blocks(b)%bc(1)%tp)
             case(bc_adj)
-              !block(1,l)%bc%BCi(i,j,k) = set_bc(adj=Type_Adj(b = blocks(b)%bc(1)%adj%b,                           &
-              !                                               i = blocks(blocks(b)%bc(1)%adj%b)%Ni/(2**(l-1)) + i, &
-              !                                               j = j,                                               &
-              !                                               k = k))
-              call set_bc(adj=Type_Adj(b = blocks(b)%bc(1)%adj%b,                           &
-                                       i = blocks(blocks(b)%bc(1)%adj%b)%Ni/(2**(l-1)) + i, &
-                                       j = j,                                               &
-                                       k = k),&
-                          bc=block(1,l)%bc%BCi(i,j,k))
+              call block(1,l)%bc%BCi(i,j,k)%set(adj=Type_Adj(b = blocks(b)%bc(1)%adj%b,                           &
+                                                             i = blocks(blocks(b)%bc(1)%adj%b)%Ni/(2**(l-1)) + i, &
+                                                             j = j,                                               &
+                                                             k = k))
             case(bc_in1)
-              !block(1,l)%bc%BCi(i,j,k) = set_bc(inf=blocks(b)%bc(1)%inf)
-              call set_bc(inf=blocks(b)%bc(1)%inf,bc=block(1,l)%bc%BCi(i,j,k))
+              call block(1,l)%bc%BCi(i,j,k)%set(inf=blocks(b)%bc(1)%inf)
             endselect
           enddo
         enddo
@@ -588,21 +548,15 @@ contains
       do k=1,block(1,l)%mesh%Nk
         do j=1,block(1,l)%mesh%Nj
           do i=block(1,l)%mesh%Ni+1,block(1,l)%mesh%Ni+block(1,l)%mesh%gc(2)
-            block(1,l)%bc%BCi(i-1,j,k)%tp = blocks(b)%bc(2)%tp
+            block(1,l)%bc%BCi(i-1,j,k)%tp = blocks(b)%bc(2)%tp ; call block(1,l)%bc%BCi(i-1,j,k)%init
             select case(blocks(b)%bc(2)%tp)
             case(bc_adj)
-              !block(1,l)%bc%BCi(i-1,j,k) = set_bc(adj=Type_Adj(b = blocks(b)%bc(2)%adj%b,             &
-              !                                                 i = i - block(1,l)%mesh%Ni/(2**(l-1)), &
-              !                                                 j = j,                                 &
-              !                                                 k = k))
-              call set_bc(adj=Type_Adj(b = blocks(b)%bc(2)%adj%b,             &
-                                       i = i - block(1,l)%mesh%Ni/(2**(l-1)), &
-                                       j = j,                                 &
-                                       k = k), &
-                          bc=block(1,l)%bc%BCi(i-1,j,k))
+              call block(1,l)%bc%BCi(i-1,j,k)%set(adj=Type_Adj(b = blocks(b)%bc(2)%adj%b,             &
+                                                               i = i - block(1,l)%mesh%Ni/(2**(l-1)), &
+                                                               j = j,                                 &
+                                                               k = k))
             case(bc_in1)
-              !block(1,l)%bc%BCi(i-1,j,k) = set_bc(inf=blocks(b)%bc(2)%inf)
-              call set_bc(inf=blocks(b)%bc(2)%inf,bc=block(1,l)%bc%BCi(i-1,j,k))
+              call block(1,l)%bc%BCi(i-1,j,k)%set(inf=blocks(b)%bc(2)%inf)
             endselect
           enddo
         enddo
@@ -611,21 +565,15 @@ contains
       do k=1,block(1,l)%mesh%Nk
         do i=1,block(1,l)%mesh%Ni
           do j=1-block(1,l)%mesh%gc(3),0
-            block(1,l)%bc%BCj(i,j,k)%tp = blocks(b)%bc(3)%tp
+            block(1,l)%bc%BCj(i,j,k)%tp = blocks(b)%bc(3)%tp ; call block(1,l)%bc%BCj(i,j,k)%init
             select case(blocks(b)%bc(3)%tp)
             case(bc_adj)
-              !block(1,l)%bc%BCj(i,j,k) = set_bc(adj=Type_Adj(b = blocks(b)%bc(3)%adj%b, &
-              !                                               i = i, &
-              !                                               j = blocks(blocks(b)%bc(3)%adj%b)%Nj/(2**(l-1)) + j, &
-              !                                               k = k))
-              call set_bc(adj=Type_Adj(b = blocks(b)%bc(3)%adj%b, &
-                                                             i = i, &
+              call block(1,l)%bc%BCj(i,j,k)%set(adj=Type_Adj(b = blocks(b)%bc(3)%adj%b,                           &
+                                                             i = i,                                               &
                                                              j = blocks(blocks(b)%bc(3)%adj%b)%Nj/(2**(l-1)) + j, &
-                                                             k = k), &
-                          bc=block(1,l)%bc%BCj(i,j,k))
+                                                             k = k))
             case(bc_in1)
-              !block(1,l)%bc%BCj(i,j,k) = set_bc(inf=blocks(b)%bc(3)%inf)
-              call set_bc(inf=blocks(b)%bc(3)%inf,bc=block(1,l)%bc%BCj(i,j,k))
+              call block(1,l)%bc%BCj(i,j,k)%set(inf=blocks(b)%bc(3)%inf)
             endselect
           enddo
         enddo
@@ -634,21 +582,15 @@ contains
       do k=1,block(1,l)%mesh%Nk
         do i=1,block(1,l)%mesh%Ni
           do j=block(1,l)%mesh%Nj+1,block(1,l)%mesh%Nj+block(1,l)%mesh%gc(4)
-            block(1,l)%bc%BCj(i,j-1,k)%tp = blocks(b)%bc(4)%tp
+            block(1,l)%bc%BCj(i,j-1,k)%tp = blocks(b)%bc(4)%tp ; call block(1,l)%bc%BCj(i,j-1,k)%init
             select case(blocks(b)%bc(4)%tp)
             case(bc_adj)
-              !block(1,l)%bc%BCj(i,j-1,k) = set_bc(adj=Type_Adj(b = blocks(b)%bc(4)%adj%b,             &
-              !                                                 i = i,                                 &
-              !                                                 j = j - block(1,l)%mesh%Nj/(2**(l-1)), &
-              !                                                 k = k))
-              call set_bc(adj=Type_Adj(b = blocks(b)%bc(4)%adj%b,             &
+              call block(1,l)%bc%BCj(i,j-1,k)%set(adj=Type_Adj(b = blocks(b)%bc(4)%adj%b,             &
                                                                i = i,                                 &
                                                                j = j - block(1,l)%mesh%Nj/(2**(l-1)), &
-                                                               k = k), &
-                          bc=block(1,l)%bc%BCj(i,j-1,k))
+                                                               k = k))
             case(bc_in1)
-              !block(1,l)%bc%BCj(i,j-1,k) = set_bc(inf=blocks(b)%bc(4)%inf)
-              call set_bc(inf=blocks(b)%bc(4)%inf,bc=block(1,l)%bc%BCj(i,j-1,k))
+              call block(1,l)%bc%BCj(i,j-1,k)%set(inf=blocks(b)%bc(4)%inf)
             endselect
           enddo
         enddo
@@ -657,21 +599,15 @@ contains
       do j=1,block(1,l)%mesh%Nj
         do i=1,block(1,l)%mesh%Ni
           do k=1-block(1,l)%mesh%gc(5),0
-            block(1,l)%bc%BCk(i,j,k)%tp = blocks(b)%bc(5)%tp
+            block(1,l)%bc%BCk(i,j,k)%tp = blocks(b)%bc(5)%tp ; call block(1,l)%bc%BCk(i,j,k)%init
             select case(blocks(b)%bc(5)%tp)
             case(bc_adj)
-              !block(1,l)%bc%BCk(i,j,k) = set_bc(adj=Type_Adj(b = blocks(b)%bc(5)%adj%b, &
-              !                                               i = i,                     &
-              !                                               j = j,                     &
-              !                                               k = blocks(blocks(b)%bc(5)%adj%b)%Nk/(2**(l-1)) + k))
-              call set_bc(adj=Type_Adj(b = blocks(b)%bc(5)%adj%b, &
+              call block(1,l)%bc%BCk(i,j,k)%set(adj=Type_Adj(b = blocks(b)%bc(5)%adj%b, &
                                                              i = i,                     &
                                                              j = j,                     &
-                                                             k = blocks(blocks(b)%bc(5)%adj%b)%Nk/(2**(l-1)) + k), &
-                          bc=block(1,l)%bc%BCk(i,j,k))
+                                                             k = blocks(blocks(b)%bc(5)%adj%b)%Nk/(2**(l-1)) + k))
             case(bc_in1)
-              !block(1,l)%bc%BCk(i,j,k) = set_bc(inf=blocks(b)%bc(5)%inf)
-              call set_bc(inf=blocks(b)%bc(5)%inf,bc=block(1,l)%bc%BCk(i,j,k))
+              call block(1,l)%bc%BCk(i,j,k)%set(inf=blocks(b)%bc(5)%inf)
             endselect
           enddo
         enddo
@@ -680,21 +616,15 @@ contains
       do j=1,block(1,l)%mesh%Nj
         do i=1,block(1,l)%mesh%Ni
           do k=block(1,l)%mesh%Nk+1,block(1,l)%mesh%Nk+block(1,l)%mesh%gc(6)
-            block(1,l)%bc%BCk(i,j,k-1)%tp = blocks(b)%bc(6)%tp
+            block(1,l)%bc%BCk(i,j,k-1)%tp = blocks(b)%bc(6)%tp ; call block(1,l)%bc%BCk(i,j,k-1)%init
             select case(blocks(b)%bc(6)%tp)
             case(bc_adj)
-              !block(1,l)%bc%BCk(i,j,k-1) = set_bc(adj=Type_Adj(b = blocks(b)%bc(6)%adj%b            , &
-              !                                                 i = i                                , &
-              !                                                 j = j                                , &
-              !                                                 k = k - block(1,l)%mesh%Nk/(2**(l-1))))
-              call set_bc(adj=Type_Adj(b = blocks(b)%bc(6)%adj%b            , &
+              call block(1,l)%bc%BCk(i,j,k-1)%set(adj=Type_Adj(b = blocks(b)%bc(6)%adj%b            , &
                                                                i = i                                , &
                                                                j = j                                , &
-                                                               k = k - block(1,l)%mesh%Nk/(2**(l-1))), &
-                          bc=block(1,l)%bc%BCk(i,j,k-1))
+                                                               k = k - block(1,l)%mesh%Nk/(2**(l-1))))
             case(bc_in1)
-              !block(1,l)%bc%BCk(i,j,k-1) = set_bc(inf=blocks(b)%bc(6)%inf)
-              call set_bc(inf=blocks(b)%bc(6)%inf,bc=block(1,l)%bc%BCk(i,j,k-1))
+              call block(1,l)%bc%BCk(i,j,k-1)%set(inf=blocks(b)%bc(6)%inf)
             endselect
           enddo
         enddo
@@ -703,22 +633,21 @@ contains
     ! initial conditions setting
     write(stdout,'(A)')'  Setting initial conditions'//str(.true.,b)
     do l=1,global%mesh%Nl
-      !call fluid_set(l = l, b = 1, P = blocks(b)%P)
       block(1,l)%fluid%P = blocks(b)%P
     enddo
 
     ! storing the mesh, boundary and initial conditions in the scratch files
     do l=1,global%mesh%Nl
       ! mesh data
-      err = write(UnitScratch(1,b,l),block(1,l)%mesh%node)
-      err = write(UnitScratch(1,b,l),block(1,l)%mesh%cell)
+      err = write_vector(array3D=block(1,l)%mesh%node,unit=UnitScratch(1,b,l))
+      err = write_cell(  array3D=block(1,l)%mesh%cell,unit=UnitScratch(1,b,l))
       ! boundary conditions data
-      err = write(UnitScratch(2,b,l),block(1,l)%bc%BCi)
-      err = write(UnitScratch(2,b,l),block(1,l)%bc%BCj)
-      err = write(UnitScratch(2,b,l),block(1,l)%bc%BCk)
+      err = write_bc(array3D=block(1,l)%bc%BCi,unit=UnitScratch(2,b,l))
+      err = write_bc(array3D=block(1,l)%bc%BCj,unit=UnitScratch(2,b,l))
+      err = write_bc(array3D=block(1,l)%bc%BCk,unit=UnitScratch(2,b,l))
       ! initial conditions data
       write(UnitScratch(3,b,l),iostat=err)block(1,l)%fluid%Dt
-      err = write(UnitScratch(3,b,l),block(1,l)%fluid%P)
+      err = write_primitive(array3D=block(1,l)%fluid%P,unit=UnitScratch(3,b,l))
       ! rewinding scratch files
       rewind(UnitScratch(1,b,l))
       rewind(UnitScratch(2,b,l))
@@ -780,8 +709,7 @@ contains
   global%mesh%Nb_tot = 0
   do f=1,Nf
     ! opening geometry file
-    UnitFree = Get_Unit()
-    open(unit = UnitFree, file = adjustl(trim(filenames(f)))//'.geo', status = 'OLD', action = 'READ', form = 'FORMATTED')
+    open(unit = Get_Unit(UnitFree), file = adjustl(trim(filenames(f)))//'.geo', status = 'OLD', action = 'READ', form = 'FORMATTED')
     blk_map(f)=0
     do
       read(UnitFree,'(A)',iostat=err) line
@@ -794,20 +722,19 @@ contains
   ! allocating array for blocks informations
   if (allocated(blocks))  then
     do b=lbound(blocks,dim=1),ubound(blocks,dim=1)
-      err = free(blocks(b)%P)
-      err = free(blocks(b)%bc)
+      call blocks(b)%P%free
+      call blocks(b)%bc%free
     enddo
     deallocate(blocks)
   endif
   allocate(blocks(1:global%mesh%Nb_tot))
-  call init_prim(Ns=global%fluid%Ns,prim=blocks%P)
+  call blocks%P%init(Ns=global%fluid%Ns)
   if (allocated(UnitScratch)) deallocate(UnitScratch) ; allocate(UnitScratch(0:3,1:global%mesh%Nb_tot,1:global%mesh%Nl))
   ! reading the number of cells for each blocks contained into the file
   b = 0
   do f=1,Nf
     ! opening geometry file
-    UnitFree = Get_Unit()
-    open(unit = UnitFree, file = adjustl(trim(filenames(f)))//'.geo', status = 'OLD', action = 'READ', form = 'FORMATTED')
+    open(unit = Get_Unit(UnitFree), file = adjustl(trim(filenames(f)))//'.geo', status = 'OLD', action = 'READ', form = 'FORMATTED')
     do
       read(UnitFree,'(A)',iostat=err) line
       if (err /= 0) exit
@@ -817,8 +744,7 @@ contains
         blocks(b)%Ni = blocks(b)%Ni - 1_I_P
         blocks(b)%Nj = blocks(b)%Nj - 1_I_P
         blocks(b)%Nk = blocks(b)%Nk - 1_I_P
-        Unit_gc = Get_Unit()
-        open(unit = Unit_gc, file = 'BLK'//trim(str(.true.,b))//'.gc', status = 'OLD', action = 'READ', form = 'FORMATTED')
+        open(unit=Get_Unit(Unit_gc), file='BLK'//trim(str(.true.,b))//'.gc', status='OLD', action='READ', form='FORMATTED')
         read(Unit_gc,*)(blocks(b)%gc(i),i=1,6)
         close(Unit_gc)
         write(stdout,*)
@@ -834,11 +760,11 @@ contains
   do l=1,global%mesh%Nl
     do b=1,global%mesh%Nb_tot
       if (l==1) then
-        UnitScratch(0,b,l)=Get_Unit() ; open(unit=UnitScratch(0,b,l),form=  'FORMATTED',status='SCRATCH',iostat=err) ! topo file
+        open(unit=Get_Unit(UnitScratch(0,b,l)),form=  'FORMATTED',status='SCRATCH',iostat=err) ! topo file
       endif
-        UnitScratch(1,b,l)=Get_Unit() ; open(unit=UnitScratch(1,b,l),form='UNFORMATTED',status='SCRATCH',iostat=err) ! geo file
-        UnitScratch(2,b,l)=Get_Unit() ; open(unit=UnitScratch(2,b,l),form='UNFORMATTED',status='SCRATCH',iostat=err) ! bco file
-        UnitScratch(3,b,l)=Get_Unit() ; open(unit=UnitScratch(3,b,l),form='UNFORMATTED',status='SCRATCH',iostat=err) ! itc file
+        open(unit=Get_Unit(UnitScratch(1,b,l)),form='UNFORMATTED',status='SCRATCH',iostat=err) ! geo file
+        open(unit=Get_Unit(UnitScratch(2,b,l)),form='UNFORMATTED',status='SCRATCH',iostat=err) ! bco file
+        open(unit=Get_Unit(UnitScratch(3,b,l)),form='UNFORMATTED',status='SCRATCH',iostat=err) ! itc file
     enddo
   enddo
   ! the number of global blocks is artificially set to 1
@@ -847,7 +773,7 @@ contains
   if (allocated(block)) then
     do l=lbound(block,dim=2),ubound(block,dim=2)
       do b=lbound(block,dim=1),ubound(block,dim=1)
-        call free_block(block=block(b,l))
+        call block(b,l)%free
       enddo
     enddo
     deallocate(block)
@@ -858,8 +784,7 @@ contains
   b = 0
   do f=1,Nf
     ! opening geometry file
-    UnitFree = Get_Unit()
-    open(unit = UnitFree, file = adjustl(trim(filenames(f)))//'.geo', status = 'OLD', action = 'READ', form = 'FORMATTED')
+    open(unit = Get_Unit(UnitFree), file = adjustl(trim(filenames(f)))//'.geo', status = 'OLD', action = 'READ', form = 'FORMATTED')
     do
       read(UnitFree,'(A)',iostat=err) line
       if (err /= 0) exit
@@ -904,7 +829,7 @@ contains
         endif
           ! allocating block
         do l=1,global%mesh%Nl
-          call alloc_block(global=global,block=block(1,l))
+          call block(1,l)%alloc(global=global)
         enddo
         ! reading node coordinates
         do k=0,block(1,1)%mesh%Nk
@@ -928,8 +853,8 @@ contains
         endif
         ! storing the mesh in the scratch files
         do l=1,global%mesh%Nl
-          err = write(UnitScratch(1,b,l),block(1,l)%mesh%node)
-          err = write(UnitScratch(1,b,l),block(1,l)%mesh%cell)
+          err = write_vector(array3D=block(1,l)%mesh%node,unit=UnitScratch(1,b,l))
+          err = write_cell(  array3D=block(1,l)%mesh%cell,unit=UnitScratch(1,b,l))
           ! rewinding scratch file
           rewind(UnitScratch(1,b,l))
         enddo
@@ -943,8 +868,7 @@ contains
   do f=1,Nf
     Nb_l = 0 ; if (f>1) Nb_l = sum(blk_map(1:f-1))
     ! opening geometry file
-    UnitFree = Get_Unit()
-    open(unit = UnitFree, file = adjustl(trim(filenames(f)))//'.topo', status = 'OLD', action = 'READ', form = 'FORMATTED')
+    open(unit=Get_Unit(UnitFree), file=adjustl(trim(filenames(f)))//'.topo', status='OLD', action='READ', form='FORMATTED')
     do
       read(UnitFree,'(A)',iostat=err) line
       if (err /= 0) exit
@@ -1041,7 +965,7 @@ contains
     endif
       ! allocating block
     do l=1,global%mesh%Nl
-      call alloc_block(global=global,block=block(1,l))
+      call block(1,l)%alloc(global=global)
     enddo
     do
       read(UnitScratch(0,b,1),'(A)',iostat=err) line
@@ -1237,9 +1161,7 @@ contains
                 do k=k1_min/2**(l-1)+1,k1_max/2**(l-1)
                   do j=j1_min/2**(l-1)+1,j1_max/2**(l-1)
                     do i=i1_min,i1_max
-                      block(1,l)%bc%BCi(i,j,k)%tp    = bc_adj
-                      if (allocated(block(1,l)%bc%BCi(i,j,k)%adj)) deallocate(block(1,l)%bc%BCi(i,j,k)%adj)
-                      allocate(block(1,l)%bc%BCi(i,j,k)%adj)
+                      block(1,l)%bc%BCi(i,j,k)%tp    = bc_adj ; call block(1,l)%bc%BCi(i,j,k)%init
                       block(1,l)%bc%BCi(i,j,k)%adj%b = b2
                       do o=2,4,2
                         select case(orientation(o1)(o:o))
@@ -1331,9 +1253,7 @@ contains
                 do k=k1_min/2**(l-1)+1,k1_max/2**(l-1)
                   do j=j1_min,j1_max
                     do i=i1_min/2**(l-1)+1,i1_max/2**(l-1)
-                      block(1,l)%bc%BCj(i,j,k)%tp    = bc_adj
-                      if (allocated(block(1,l)%bc%BCj(i,j,k)%adj)) deallocate(block(1,l)%bc%BCj(i,j,k)%adj)
-                      allocate(block(1,l)%bc%BCj(i,j,k)%adj)
+                      block(1,l)%bc%BCj(i,j,k)%tp    = bc_adj ; call block(1,l)%bc%BCj(i,j,k)%init
                       block(1,l)%bc%BCj(i,j,k)%adj%b = b2
                       do o=2,4,2
                         select case(orientation(o1)(o:o))
@@ -1425,9 +1345,7 @@ contains
                 do k=k1_min,k1_max
                   do j=j1_min/2**(l-1)+1,j1_max/2**(l-1)
                     do i=i1_min/2**(l-1)+1,i1_max/2**(l-1)
-                      block(1,l)%bc%BCk(i,j,k)%tp    = bc_adj
-                      if (allocated(block(1,l)%bc%BCk(i,j,k)%adj)) deallocate(block(1,l)%bc%BCk(i,j,k)%adj)
-                      allocate(block(1,l)%bc%BCk(i,j,k)%adj)
+                      block(1,l)%bc%BCk(i,j,k)%tp    = bc_adj ; call block(1,l)%bc%BCk(i,j,k)%init
                       block(1,l)%bc%BCk(i,j,k)%adj%b = b2
                       do o=2,4,2
                         select case(orientation(o1)(o:o))
@@ -1538,10 +1456,8 @@ contains
                       do k=k1_min/2**(l-1)+1,k1_max/2**(l-1)
                         do j=j1_min/2**(l-1)+1,j1_max/2**(l-1)
                           do i=1-block(1,l)%mesh%gc(1),0
-                            block(1,l)%bc%BCi(i,j,k)%tp = bc_list(bc)
+                            block(1,l)%bc%BCi(i,j,k)%tp = bc_list(bc) ; call block(1,l)%bc%BCi(i,j,k)%init
                             if (bc_list(bc)==bc_in1.OR.bc_list(bc)==bc_in2) then
-                              if (allocated(block(1,l)%bc%BCi(i,j,k)%inf)) deallocate(block(1,l)%bc%BCi(i,j,k)%inf)
-                              allocate(block(1,l)%bc%BCi(i,j,k)%inf)
                               block(1,l)%bc%BCi(i,j,k)%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
                                                                         index(line1,tab//'f')-1),1_I_P)
                             endif
@@ -1552,10 +1468,8 @@ contains
                       do k=k1_min/2**(l-1)+1,k1_max/2**(l-1)
                         do j=j1_min/2**(l-1)+1,j1_max/2**(l-1)
                           do i=i1_max/2**(l-1)+1,i1_max/2**(l-1)+block(1,l)%mesh%gc(2)
-                            block(1,l)%bc%BCi(i-1,j,k)%tp = bc_list(bc)
+                            block(1,l)%bc%BCi(i-1,j,k)%tp = bc_list(bc) ; call block(1,l)%bc%BCi(i-1,j,k)%init
                             if (bc_list(bc)==bc_in1.OR.bc_list(bc)==bc_in2) then
-                              if (allocated(block(1,l)%bc%BCi(i-1,j,k)%inf)) deallocate(block(1,l)%bc%BCi(i-1,j,k)%inf)
-                              allocate(block(1,l)%bc%BCi(i-1,j,k)%inf)
                               block(1,l)%bc%BCi(i-1,j,k)%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
                                                                           index(line1,tab//'f')-1),1_I_P)
                             endif
@@ -1569,10 +1483,8 @@ contains
                       do k=k1_min/2**(l-1)+1,k1_max/2**(l-1)
                         do j=1-block(1,l)%mesh%gc(3),0
                           do i=i1_min/2**(l-1)+1,i1_max/2**(l-1)
-                            block(1,l)%bc%BCj(i,j,k)%tp = bc_list(bc)
+                            block(1,l)%bc%BCj(i,j,k)%tp = bc_list(bc) ; call block(1,l)%bc%BCj(i,j,k)%init
                             if (bc_list(bc)==bc_in1.OR.bc_list(bc)==bc_in2) then
-                              if (allocated(block(1,l)%bc%BCj(i,j,k)%inf)) deallocate(block(1,l)%bc%BCj(i,j,k)%inf)
-                              allocate(block(1,l)%bc%BCj(i,j,k)%inf)
                               block(1,l)%bc%BCj(i,j,k)%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
                                                                         index(line1,tab//'f')-1),1_I_P)
                             endif
@@ -1583,10 +1495,8 @@ contains
                       do k=k1_min/2**(l-1)+1,k1_max/2**(l-1)
                         do j=j1_max/2**(l-1)+1,j1_max/2**(l-1)+block(1,l)%mesh%gc(4)
                           do i=i1_min/2**(l-1)+1,i1_max/2**(l-1)
-                            block(1,l)%bc%BCj(i,j-1,k)%tp = bc_list(bc)
+                            block(1,l)%bc%BCj(i,j-1,k)%tp = bc_list(bc) ; call block(1,l)%bc%BCj(i,j-1,k)%init
                             if (bc_list(bc)==bc_in1.OR.bc_list(bc)==bc_in2) then
-                              if (allocated(block(1,l)%bc%BCj(i,j-1,k)%inf)) deallocate(block(1,l)%bc%BCj(i,j-1,k)%inf)
-                              allocate(block(1,l)%bc%BCj(i,j-1,k)%inf)
                               block(1,l)%bc%BCj(i,j-1,k)%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
                                                                           index(line1,tab//'f')-1),1_I_P)
                             endif
@@ -1600,10 +1510,8 @@ contains
                       do k=1-block(1,l)%mesh%gc(5),0
                         do j=j1_min/2**(l-1)+1,j1_max/2**(l-1)
                           do i=i1_min/2**(l-1)+1,i1_max/2**(l-1)
-                            block(1,l)%bc%BCk(i,j,k)%tp = bc_list(bc)
+                            block(1,l)%bc%BCk(i,j,k)%tp = bc_list(bc) ; call block(1,l)%bc%BCk(i,j,k)%init
                             if (bc_list(bc)==bc_in1.OR.bc_list(bc)==bc_in2) then
-                              if (allocated(block(1,l)%bc%BCk(i,j,k)%inf)) deallocate(block(1,l)%bc%BCk(i,j,k)%inf)
-                              allocate(block(1,l)%bc%BCk(i,j,k)%inf)
                               block(1,l)%bc%BCk(i,j,k)%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
                                                                         index(line1,tab//'f')-1),1_I_P)
                             endif
@@ -1614,10 +1522,8 @@ contains
                       do k=k1_max/2**(l-1)+1,k1_max/2**(l-1)+block(1,l)%mesh%gc(6)
                         do j=j1_min/2**(l-1)+1,j1_max/2**(l-1)
                           do i=i1_min/2**(l-1)+1,i1_max/2**(l-1)
-                            block(1,l)%bc%BCk(i,j,k-1)%tp = bc_list(bc)
+                            block(1,l)%bc%BCk(i,j,k-1)%tp = bc_list(bc) ; call block(1,l)%bc%BCk(i,j,k-1)%init
                             if (bc_list(bc)==bc_in1.OR.bc_list(bc)==bc_in2) then
-                              if (allocated(block(1,l)%bc%BCk(i,j,k-1)%inf)) deallocate(block(1,l)%bc%BCk(i,j,k-1)%inf)
-                              allocate(block(1,l)%bc%BCk(i,j,k-1)%inf)
                               block(1,l)%bc%BCk(i,j,k-1)%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
                                                                           index(line1,tab//'f')-1),1_I_P)
                             endif
@@ -1638,8 +1544,7 @@ contains
                 write(stderr,'(A)')' File Not Found'
                 stop
               endif
-              Unit_itc = Get_Unit()
-              open(unit=Unit_itc,file=adjustl(trim(line1(1:index(line1,tab)-1)))//'.itc')
+              open(unit=Get_Unit(Unit_itc),file=adjustl(trim(line1(1:index(line1,tab)-1)))//'.itc')
               do v=1,global%fluid%Ns
                 read(Unit_itc,*) blocks(b)%P%r(v)
               enddo
@@ -1668,12 +1573,12 @@ contains
     ! storing the boundary and initial conditions in the scratch files
     do l=1,global%mesh%Nl
       ! boundary conditions data
-      err = write(UnitScratch(2,b,l),block(1,l)%bc%BCi)
-      err = write(UnitScratch(2,b,l),block(1,l)%bc%BCj)
-      err = write(UnitScratch(2,b,l),block(1,l)%bc%BCk)
+      err = write_bc(array3D=block(1,l)%bc%BCi,unit=UnitScratch(2,b,l))
+      err = write_bc(array3D=block(1,l)%bc%BCj,unit=UnitScratch(2,b,l))
+      err = write_bc(array3D=block(1,l)%bc%BCk,unit=UnitScratch(2,b,l))
       ! initial conditions data
       write(UnitScratch(3,b,l),iostat=err)block(1,l)%fluid%Dt
-      err = write(UnitScratch(3,b,l),block(1,l)%fluid%P)
+      err = write_primitive(array3D=block(1,l)%fluid%P,unit=UnitScratch(3,b,l))
       ! rewinding scratch files
       rewind(UnitScratch(2,b,l))
       rewind(UnitScratch(3,b,l))

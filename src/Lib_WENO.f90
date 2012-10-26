@@ -48,7 +48,7 @@ integer(I_P)::           weno_exp      !< Exponent for growing the diffusive par
 contains
   !> @ingroup Lib_WENOPublicProcedure
   !> @{
-  !> Subroutine for initialization of WENO coefficients.
+  !> @brief Subroutine for initialization of WENO coefficients.
   subroutine weno_init(myrank,global,block,S)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -295,14 +295,16 @@ contains
     endsubroutine get_min_sstep
   endsubroutine weno_init
 
-  !> Function for computing central difference reconstruction of \f$2S^{th}\f$ order instead of WENO \f$2S^{th}-1\f$ one.
-  pure function noweno_central(S,V) result(VR)
+  !> @brief Subroutine for computing central difference reconstruction of \f$2S^{th}\f$ order instead of WENO \f$2S^{th}-1\f$ one.
+  !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b V and \b VR are declared as
+  !> assumed-shape with only the lower bound defined. Their extentions are: V [1:2,0:2*S], VR [1:2].
+  pure subroutine noweno_central(S,V,VR)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN):: S             !< Number of stencils used.
-  real(R_P),    intent(IN):: V (1:2,0:2*S) !< Variable to be reconstructed.
-  real(R_P)::                VR(1:2      ) !< Left and right (1,2) interface value of reconstructed V.
-  integer(I_P)::             k,f           !< Counters.
+  integer(I_P), intent(IN)::  S         !< Number of stencils used.
+  real(R_P),    intent(IN)::  V (1:,0:) !< Variable to be reconstructed.                           [1:2,0:2*S].
+  real(R_P),    intent(OUT):: VR(1:)    !< Left and right (1,2) interface value of reconstructed V [1:2      ].
+  integer(I_P)::              k,f       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -315,67 +317,70 @@ contains
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction noweno_central
+  endsubroutine noweno_central
 
-  !> Function for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of
+  !> @brief Subroutine for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of
   !> \f$2S^{th}-1\f$ order.
-  pure function weno_optimal(S,V) result(VR)
+  !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b V and \b VR are declared as
+  !> assumed-shape with only the lower bound defined. Their extentions are: V [1:2,1-S:-1+S], VR [1:2].
+  pure subroutine weno_optimal(S,V,VR)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN):: S                !< Number of stencils used.
-  real(R_P),    intent(IN):: V (1:2,1-S:-1+S) !< Variable to be reconstructed.
-  real(R_P)::                VR(1:2         ) !< Left and right (1,2) interface value of reconstructed V.
-  real(R_P)::                VP(1:2,0:S-1   ) !< Polynomial reconstructions.
-  real(R_P)::                w (1:2,0:S-1   ) !< Weights of the stencils.
+  integer(I_P), intent(IN)::  S             !< Number of stencils used.
+  real(R_P),    intent(IN)::  V (1:,1-S:)   !< Variable to be reconstructed                            [1:2,1-S:-1+S].
+  real(R_P),    intent(OUT):: VR(1:)        !< Left and right (1,2) interface value of reconstructed V [1:2         ].
+  real(R_P)::                 VP(1:2,0:S-1) !< Polynomial reconstructions.
+  real(R_P)::                 w (1:2,0:S-1) !< Weights of the stencils.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! computing the polynomials
-  VP(1:2,0:S-1) = weno_polynomials( S = S, V = V(1:2,1-S:-1+S))
+  call weno_polynomials( S = S, V = V, VP = VP)
   ! using optimal weights
   w(1:2,0:S-1) = weno_a(1:2,0:S-1)
   ! computing the convultion of reconstructing plynomials
-  VR(1:2) = weno_convolution(S = S, VP = VP(1:2,0:S-1),w=w(1:2,0:S-1))
+  call weno_convolution(S = S, VP = VP, w = w, VR = VR)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction weno_optimal
+  endsubroutine weno_optimal
 
-  !> Function for computing WENO reconstruction of \f$2S^{th}-1\f$ order.
-  pure function weno(S,V) result(VR)
+  !> @brief Subroutine for computing WENO reconstruction of \f$2S^{th}-1\f$ order.
+  !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b V and \b VR are declared as
+  !> assumed-shape with only the lower bound defined. Their extentions are: V [1:2,1-S:-1+S], VR [1:2].
+  pure subroutine weno(S,V,VR)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN):: S                !< Number of stencils used.
-  real(R_P),    intent(IN):: V (1:2,1-S:-1+S) !< Variable to be reconstructed.
-  real(R_P)::                VR(1:2         ) !< Left and right (1,2) interface value of reconstructed V.
-  real(R_P)::                VP(1:2,0:S-1   ) !< Polynomial reconstructions.
-  real(R_P)::                w (1:2,0:S-1   ) !< Weights of the stencils.
+  integer(I_P), intent(IN)::  S             !< Number of stencils used.
+  real(R_P),    intent(IN)::  V (1:,1-S:)   !< Variable to be reconstructed                            [1:2,1-S:-1+S].
+  real(R_P),    intent(OUT):: VR(1:)        !< Left and right (1,2) interface value of reconstructed V [1:2         ].
+  real(R_P)::                 VP(1:2,0:S-1) !< Polynomial reconstructions.
+  real(R_P)::                 w (1:2,0:S-1) !< Weights of the stencils.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! computing the polynomials
-  VP(1:2,0:S-1) = weno_polynomials( S = S, V = V(1:2,1-S:-1+S))
+  call weno_polynomials( S = S, V = V, VP = VP)
   ! computing the weights associated to the polynomials
-  w(1:2,0:S-1) = weno_weights(S = S, V = V(1:2,1-S:-1+S))
+  call weno_weights(S = S, V = V, w = w)
   ! computing the convultion of reconstructing plynomials
-  VR(1:2) = weno_convolution(S = S, VP = VP(1:2,0:S-1),w=w(1:2,0:S-1))
+  call weno_convolution(S = S, VP = VP, w = w, VR = VR)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction weno
+  endsubroutine weno
   !> @}
 
   !> @ingroup Lib_WENOPrivateProcedure
   !> @{
-  pure function weno_polynomials(S,V) result(VP)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for computing WENO polynomials
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @brief Subroutine for computing WENO polynomials.
+  !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b V and \b VP are declared as
+  !> assumed-shape with only the lower bound defined. Their extentions are: V [1:2,1-S:-1+S], VP [1:2,0:S-1].
+  pure subroutine weno_polynomials(S,V,VP)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN):: S                ! Number of stencils used.
-  real(R_P),    intent(IN):: V (1:2,1-S:-1+S) ! Variable to be reconstructed.
-  real(R_P)::                VP(1:2,0:S-1   ) ! Polynomial reconstructions.
-  integer(I_P)::             s1,s2,f          ! Counters.
+  integer(I_P), intent(IN)::  S           !< Number of stencils used.
+  real(R_P),    intent(IN)::  V (1:,1-S:) !< Variable to be reconstructed [1:2,1-S:-1+S].
+  real(R_P),    intent(OUT):: VP(1:,0:)   !< Polynomial reconstructions   [1:2,  0:S-1 ].
+  integer(I_P)::              s1,s2,f     !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -390,25 +395,24 @@ contains
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction weno_polynomials
+  endsubroutine weno_polynomials
 
-  pure function weno_weights(S,V) result(w)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for computing WENO weights of the polynomial reconstructions.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @brief Subroutine for computing WENO weights of the polynomial reconstructions.
+  !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b V and \b w are declared as
+  !> assumed-shape with only the lower bound defined. Their extentions are: V [1:2,1-S:-1+S], w [1:2,0:S-1].
+  pure subroutine weno_weights(S,V,w)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN):: S                      ! Number of stencils used.
-  real(R_P),    intent(IN):: V    (1:2,1-S:-1+S)    ! Variable to be reconstructed.
-  real(R_P)::                w    (1:2,0:S-1)       ! Weights of the stencils.
-  real(R_P)::                IS   (1:2,0:S-1)       ! Smoothness indicators of the stencils.
-  real(R_P)::                a    (1:2,0:S-1)       ! Alpha coifficients for the weights.
-  real(R_P)::                a_tot(1:2)             ! Summ of the alpha coefficients.
+  integer(I_P), intent(IN)::  S                !< Number of stencils used.
+  real(R_P),    intent(IN)::  V    (1:,1-S:)   !< Variable to be reconstructed [1:2,1-S:-1+S].
+  real(R_P),    intent(OUT):: w    (1:,0:)     !< Weights of the stencils      [1:2,  0:S-1 ].
+  real(R_P)::                 IS   (1:2,0:S-1) !< Smoothness indicators of the stencils.
+  real(R_P)::                 a    (1:2,0:S-1) !< Alpha coifficients for the weights.
+  real(R_P)::                 a_tot(1:2)       !< Summ of the alpha coefficients.
 #ifdef WENOZ
-  real(R_P)::                tao  (1:2)             ! Normalization factor.
+  real(R_P)::                 tao  (1:2)       !< Normalization factor.
 #endif
-  integer(I_P)::             s1,s2,s3,f             ! Counters.
+  integer(I_P)::              s1,s2,s3,f       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -476,20 +480,19 @@ contains
 #endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction weno_weights
+  endsubroutine weno_weights
 
-  pure function weno_convolution(S,VP,w) result(VR)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  ! Function for computing the WENO convulution of the polynomial recontructions.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @brief Function for computing the WENO convulution of the polynomial recontructions.
+  !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b VP \b w and \b VR are declared as
+  !> assumed-shape with only the lower bound defined. Their extentions are: VP [1:2,0:S-1], w [1:2,0:S-1], V [1:2].
+  pure subroutine weno_convolution(S,VP,w,VR)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN):: S             ! Number of stencils used.
-  real(R_P),    intent(IN):: VP(1:2,0:S-1) ! Polynomial reconstructions.
-  real(R_P),    intent(IN):: w (1:2,0:S-1) ! Weights of the stencils.
-  real(R_P)::                VR(1:2      ) ! Left and right (1,2) interface value of reconstructed V.
-  integer(I_P)::             k,f           ! Counters.
+  integer(I_P), intent(IN)::  S         !< Number of stencils used.
+  real(R_P),    intent(IN)::  VP(1:,0:) !< Polynomial reconstructions                              [1:2,0:S-1].
+  real(R_P),    intent(IN)::  w (1:,0:) !< Weights of the stencils                                 [1:2,0:S-1].
+  real(R_P),    intent(OUT):: VR(1:   ) !< Left and right (1,2) interface value of reconstructed V [1:2      ].
+  integer(I_P)::              k,f       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -502,7 +505,7 @@ contains
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction weno_convolution
+  endsubroutine weno_convolution
 
   recursive pure function udiff(p,v) result(diff)
   !-------------------------------------------------------------------------------------------------------------------------------

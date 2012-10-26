@@ -13,15 +13,15 @@
 !> @defgroup Data_Type_VectorPrivateProcedure Data_Type_Vector
 !> @}
 
-!>This module contains the definition of Type_Vector and its procedures.
-!>This derived type is useful for manipulating vectors in 3D space. The components of the vectors are real with
-!>R_P kind as defined by the IR_Precision module. The components are defined in a three-dimensional cartesian frame of reference.
-!>All the vectorial math procedures (cross, dot products, parallel...) assume a three-dimensional cartesian frame of reference.
+!> This module contains the definition of Type_Vector and its procedures.
+!> This derived type is useful for manipulating vectors in 3D space. The components of the vectors are reals with
+!> R_P kind as defined by the IR_Precision module. The components are defined in a three-dimensional cartesian frame of reference.
+!> All the vectorial math procedures (cross, dot products, parallel...) assume a three-dimensional cartesian frame of reference.
 !> @note The operators of assignment (=), multiplication (*), division (/), sum (+) and subtraction (-) have been overloaded.
 !> Furthermore the \em dot and \em cross products have been defined.
 !> Therefore this module provides a far-complete algebra based on Type_Vector derived type. This algebra simplifies the
 !> vectorial operations of Partial Differential Equations (PDE) systems.
-!> @todo \b DocComplete: Complete the documentation of internal procedures
+!> @todo \b DocComplete: Complete the documentation
 module Data_Type_Vector
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision ! Integers and reals precision definition.
@@ -31,9 +31,11 @@ USE IR_Precision ! Integers and reals precision definition.
 implicit none
 private
 public:: ex,ey,ez
-public:: set,get
-public:: pprint
-public:: write,read
+public:: sq_norm
+public:: normL2
+public:: normalize
+public:: face_normal3,face_normal4
+public:: write_vector,read_vector
 public:: assignment (=)
 public:: operator (*)
 public:: operator (/)
@@ -49,20 +51,21 @@ public:: operator (.cross.)
 public:: operator (.dot.)
 public:: operator (.paral.)
 public:: operator (.ortho.)
-public:: sq_norm
-public:: normL2
-public:: normalize
-public:: face_normal3,face_normal4
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> Derived type defining vectors.
 !> @ingroup DerivedType
 type, public:: Type_Vector
-  sequence
   real(R_P):: x = 0._R_P !< Cartesian component in x direction.
   real(R_P):: y = 0._R_P !< Cartesian component in y direction.
   real(R_P):: z = 0._R_P !< Cartesian component in z direction.
+  contains
+    procedure, non_overridable:: set                         ! Procedure for setting vector components.
+    procedure, non_overridable:: pprint                      ! Procedure for printing vector components with a "pretty" format.
+    procedure, non_overridable:: sq_norm                     ! Procedure for computing the square of the norm of a vector.
+    procedure, non_overridable:: normL2                      ! Procedure for computing the norm L2 of a vector.
+    procedure, non_overridable:: normalize => normalize_self ! Procedure for normalizing a vector.
 endtype Type_Vector
 !> @ingroup Data_Type_Vector
 !> @{
@@ -76,58 +79,6 @@ type(Type_Vector), parameter:: ez = Type_Vector(0._R_P,0._R_P,1._R_P) !< Z direc
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!> @brief Write overloading of Type_Vector variable.
-!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for writing scalar variables,
-!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
-!> @code ...
-!> integer(I4P):: err,unit
-!> character(1):: format="*"
-!> type(Type_Vector):: vec_scal,vec_1D(10),vec_2D(10,2),vec_3D(10,2,3)
-!> ...
-!> ! formatted writing of vec_scal, vec_1D, vec_2D and vec_3D
-!> err = write(unit,format,vec_scal)
-!> err = write(unit,format,vec_1D)
-!> err = write(unit,format,vec_2D)
-!> err = write(unit,format,vec_3D)
-!> ! binary writing of vec_scal, vec_1D, vec_2D and vec_3D
-!> err = write(unit,vec_scal)
-!> err = write(unit,vec_1D)
-!> err = write(unit,vec_2D)
-!> err = write(unit,vec_3D)
-!> ... @endcode
-!> @ingroup Interface,Data_Type_VectorPublicProcedure
-interface write
-  module procedure Write_Bin_Scalar, Write_Ascii_Scalar
-  module procedure Write_Bin_Array1D,Write_Ascii_Array1D
-  module procedure Write_Bin_Array2D,Write_Ascii_Array2D
-  module procedure Write_Bin_Array3D,Write_Ascii_Array3D
-endinterface
-!> @brief Read overloading of Type_Vector variable.
-!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for reading scalar variables,
-!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
-!> @code ...
-!> integer(I4P):: err,unit
-!> character(1):: format="*"
-!> type(Type_Vector):: vec_scal,vec_1D(10),vec_2D(10,2),vec_3D(10,2,3)
-!> ...
-!> ! formatted reading of vec_scal, vec_1D, vec_2D and vec_3D
-!> err = read(unit,format,vec_scal)
-!> err = read(unit,format,vec_1D)
-!> err = read(unit,format,vec_2D)
-!> err = read(unit,format,vec_3D)
-!> ! binary reading of vec_scal, vec_1D, vec_2D and vec_3D
-!> err = read(unit,vec_scal)
-!> err = read(unit,vec_1D)
-!> err = read(unit,vec_2D)
-!> err = read(unit,vec_3D)
-!> ... @endcode
-!> @ingroup Interface,Data_Type_VectorPublicProcedure
-interface read
-  module procedure Read_Bin_Scalar, Read_Ascii_Scalar
-  module procedure Read_Bin_Array1D,Read_Ascii_Array1D
-  module procedure Read_Bin_Array2D,Read_Ascii_Array2D
-  module procedure Read_Bin_Array3D,Read_Ascii_Array3D
-endinterface
 !> @brief Assignment operator (=) overloading.
 !> @ingroup Interface
 interface assignment (=)
@@ -407,14 +358,254 @@ endinterface
 contains
   !> @ingroup Data_Type_VectorPublicProcedure
   !> @{
-  !> Subroutine for setting components of Type_Vector variable.
-  elemental subroutine set(x,y,z,vec)
+  !> @brief Function for computing the square of the norm of a vector.
+  !> The square norm if defined as \f$ N = x^2  + y^2  + z^2\f$.
+  !> @return \b sq square norm
+  elemental function sq_norm(vec) result(sq)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),         intent(IN), optional:: x   !< Cartesian component in x direction.
-  real(R_P),         intent(IN), optional:: y   !< Cartesian component in y direction.
-  real(R_P),         intent(IN), optional:: z   !< Cartesian component in z direction.
-  type(Type_Vector), intent(INOUT)::        vec !< Vector.
+  class(Type_Vector), intent(IN):: vec !< Vector.
+  real(R_P)::                      sq  !< Square of the Norm.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  sq = (vec%x*vec%x) + (vec%y*vec%y) + (vec%z*vec%z)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction sq_norm
+
+  !> @brief Function for computing the norm L2 of a vector.
+  !> The norm L2 if defined as \f$N = \sqrt {x^2  + y^2  + z^2 }\f$.
+  !> @return \b norm norm L2
+  elemental function normL2(vec) result(norm)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Vector), intent(IN):: vec  !< Vector.
+  real(R_P)::                      norm !< Norm L2.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  norm = sqrt((vec%x*vec%x) + (vec%y*vec%y) + (vec%z*vec%z))
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction normL2
+
+  !> @brief Function for normalizing a vector.
+  !> The normalization is made by means of norm L2. If the norm L2 of the vector is less than the parameter smallR_P the
+  !> normalization value is set to normL2(vec)+smallR_P.
+  !> @return \b norm normalized vector
+  elemental function normalize(vec) result(norm)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Vector), intent(IN):: vec  !< Vector to be normalized.
+  type(Type_Vector)::             norm !< Vector normalized.
+  real(R_P)::                     nm   !< Norm L2 of vector.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  nm = normL2(vec)
+  if (nm < smallR_P) then
+    nm = nm + smallR_P
+  endif
+  norm%x = vec%x/nm
+  norm%y = vec%y/nm
+  norm%z = vec%z/nm
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction normalize
+
+  !> @brief Function for calculating the normal of the face defined by 4 points vector pt1, pt2, pt3 and pt4.
+  !> The convention for the points numeration is the following:
+  !> @code
+  !> 1.----------.2
+  !>  |          |
+  !>  |          |
+  !>  |          |
+  !>  |          |
+  !> 4.----------.3
+  !> @endcode
+  !> The normal is calculated by the cross product of the diagonal d13 for the diagonal d24: d13 x d24.
+  !> The normal is normalized if the variable 'norm' is passed (with any value).
+  !> @return \b fnormal face normal
+  elemental function face_normal4(norm,pt1,pt2,pt3,pt4) result(fnormal)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(1),      intent(IN), optional:: norm    !< If 'norm' is passed as argument the normal is normalized.
+  type(Type_Vector), intent(IN)::           pt1     !< First face point.
+  type(Type_Vector), intent(IN)::           pt2     !< Second face point.
+  type(Type_Vector), intent(IN)::           pt3     !< Third face point.
+  type(Type_Vector), intent(IN)::           pt4     !< Fourth face point.
+  type(Type_Vector)::                       fnormal !< Face normal.
+  type(Type_Vector)::                       d13,d24 !< Face diagonals.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  d13 = pt3 - pt1
+  d24 = pt4 - pt2
+  if (present(norm)) then
+    fnormal = normalize(d13.cross.d24)
+  else
+    fnormal = 0.5_R_P*(d13.cross.d24)
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction face_normal4
+
+  !> @brief Function for calculating the normal of the face defined by the 3 points vector pt1, pt2 and pt3.
+  ! The convention for the points numeration is the following:
+  !> @code
+  !> 1.----.2
+  !>   \   |
+  !>    \  |
+  !>     \ |
+  !>      \|
+  !>       .3
+  !> @endcode
+  !> The normal is calculated by the cross product of the side s12 for the side s13: s12 x s13.
+  !> The normal is normalized if the variable 'norm' is passed (with any value).
+  !> @return \b fnormal face normal
+  elemental function face_normal3(norm,pt1,pt2,pt3) result(fnormal)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(1),      intent(IN), optional:: norm    !< If 'norm' is passed as argument the normal is normalized.
+  type(Type_Vector), intent(IN)::           pt1     !< First face point.
+  type(Type_Vector), intent(IN)::           pt2     !< Second face point.
+  type(Type_Vector), intent(IN)::           pt3     !< Third face point.
+  type(Type_Vector)::                       fnormal !< Face normal.
+  type(Type_Vector)::                       s12,s13 !< Face diagonals.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  s12 = pt2 - pt1
+  s13 = pt3 - pt1
+  if (present(norm)) then
+    fnormal = normalize(s12.cross.s13)
+  else
+    fnormal = 0.5_R_P*(s12.cross.s13)
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction face_normal3
+
+  !> @brief Function for writing Type_Vector data.
+  !> The vector data could be scalar, one, two and three dimensional array. The format could be ascii or binary.
+  !> @return \b err integer(I_P) variable for error trapping.
+  function write_vector(scalar,array1D,array2D,array3D,format,unit) result(err)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Vector), intent(IN), optional:: scalar         !< Scalar vector data.
+  type(Type_Vector), intent(IN), optional:: array1D(:)     !< One dimensional array vector data.
+  type(Type_Vector), intent(IN), optional:: array2D(:,:)   !< Two dimensional array vector data.
+  type(Type_Vector), intent(IN), optional:: array3D(:,:,:) !< Three dimensional array vector data.
+  character(*),      intent(IN), optional:: format         !< Format specifier.
+  integer(I4P),      intent(IN)::           unit           !< Logic unit.
+  integer(I_P)::                            err            !< Error trapping flag: 0 no errors, >0 error occurs.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (present(format)) then
+    select case(adjustl(trim(format)))
+    case('*')
+      if (present(scalar)) then
+        write(unit,*,iostat=err)scalar
+      elseif (present(array1D)) then
+        write(unit,*,iostat=err)array1D
+      elseif (present(array2D)) then
+        write(unit,*,iostat=err)array2D
+      elseif (present(array3D)) then
+        write(unit,*,iostat=err)array3D
+      endif
+    case default
+      if (present(scalar)) then
+        write(unit,adjustl(trim(format)),iostat=err)scalar
+      elseif (present(array1D)) then
+        write(unit,adjustl(trim(format)),iostat=err)array1D
+      elseif (present(array2D)) then
+        write(unit,adjustl(trim(format)),iostat=err)array2D
+      elseif (present(array3D)) then
+        write(unit,adjustl(trim(format)),iostat=err)array3D
+      endif
+    endselect
+  else
+    if (present(scalar)) then
+      write(unit,iostat=err)scalar
+    elseif (present(array1D)) then
+      write(unit,iostat=err)array1D
+    elseif (present(array2D)) then
+      write(unit,iostat=err)array2D
+    elseif (present(array3D)) then
+      write(unit,iostat=err)array3D
+    endif
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction write_vector
+
+  !> @brief Function for reading Type_Vector data.
+  !> The vector data could be scalar, one, two and three dimensional array. The format could be ascii or binary.
+  !> @return \b err integer(I_P) variable for error trapping.
+  function read_vector(scalar,array1D,array2D,array3D,format,unit) result(err)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Vector), intent(INOUT), optional:: scalar         !< Scalar vector data.
+  type(Type_Vector), intent(INOUT), optional:: array1D(:)     !< One dimensional array vector data.
+  type(Type_Vector), intent(INOUT), optional:: array2D(:,:)   !< Two dimensional array vector data.
+  type(Type_Vector), intent(INOUT), optional:: array3D(:,:,:) !< Three dimensional array vector data.
+  character(*),      intent(IN),    optional:: format         !< Format specifier.
+  integer(I4P),      intent(IN)::              unit           !< Logic unit.
+  integer(I_P)::                               err            !< Error trapping flag: 0 no errors, >0 error occurs.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (present(format)) then
+    select case(adjustl(trim(format)))
+    case('*')
+      if (present(scalar)) then
+        read(unit,*,iostat=err)scalar
+      elseif (present(array1D)) then
+        read(unit,*,iostat=err)array1D
+      elseif (present(array2D)) then
+        read(unit,*,iostat=err)array2D
+      elseif (present(array3D)) then
+        read(unit,*,iostat=err)array3D
+      endif
+    case default
+      if (present(scalar)) then
+        read(unit,adjustl(trim(format)),iostat=err)scalar
+      elseif (present(array1D)) then
+        read(unit,adjustl(trim(format)),iostat=err)array1D
+      elseif (present(array2D)) then
+        read(unit,adjustl(trim(format)),iostat=err)array2D
+      elseif (present(array3D)) then
+        read(unit,adjustl(trim(format)),iostat=err)array3D
+      endif
+    endselect
+  else
+    if (present(scalar)) then
+      read(unit,iostat=err)scalar
+    elseif (present(array1D)) then
+      read(unit,iostat=err)array1D
+    elseif (present(array2D)) then
+      read(unit,iostat=err)array2D
+    elseif (present(array3D)) then
+      read(unit,iostat=err)array3D
+    endif
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction read_vector
+  !> @}
+
+  !> @ingroup Data_Type_VectorPrivateProcedure
+  !> @{
+  !> @brief Subroutine for setting components of Type_Vector variable.
+  elemental subroutine set(vec,x,y,z)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Vector), intent(INOUT)::        vec !< Vector.
+  real(R_P),          intent(IN), optional:: x   !< Cartesian component in x direction.
+  real(R_P),          intent(IN), optional:: y   !< Cartesian component in y direction.
+  real(R_P),          intent(IN), optional:: z   !< Cartesian component in z direction.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -425,377 +616,48 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine set
 
-  !> Subroutine for extracting Type_Vector variable components.
-  elemental subroutine get(x,y,z,vec)
+  !> @brief Function for printing in a pretty ascii format the components of type Type_Vector.
+  !> @return \b err integer(I_P) variable for error trapping.
+  function pprint(vec,myrank,unit) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),         intent(OUT), optional:: x   !< Cartesian component in x direction.
-  real(R_P),         intent(OUT), optional:: y   !< Cartesian component in y direction.
-  real(R_P),         intent(OUT), optional:: z   !< Cartesian component in z direction.
-  type(Type_Vector), intent(IN)::            vec !< Vector.
+  class(Type_Vector), intent(IN)::           vec    !< Vector.
+  integer(I_P),       intent(IN), optional:: myrank !< Actual rank process.
+  integer(I_P),       intent(IN)::           unit   !< Logic unit.
+  integer(I_P)::                             err    !< Error trapping flag: 0 no errors, >0 error occurs.
+  character(DI_P)::                          rks    !< String containing myrank.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(x)) x = vec%x
-  if (present(y)) y = vec%y
-  if (present(z)) z = vec%z
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine get
-
-  !> Function that write to unit the components of vec with a "pretty" format.
-  function pprint(vec,unit) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Vector), intent(IN):: vec  !< Vector.
-  integer(I_P),      intent(IN):: unit !< Logic unit.
-  integer(I_P)::                  err  !< Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,'(A)',iostat=err)' Component x '//str(n=vec%x)
-  write(unit,'(A)',iostat=err)' Component y '//str(n=vec%y)
-  write(unit,'(A)',iostat=err)' Component z '//str(n=vec%z)
+  rks = 'rank'//trim(str(.true.,0_I_P)) ; if (present(myrank)) rks = 'rank'//trim(str(.true.,myrank))
+  write(unit,'(A)',iostat=err)trim(rks)//' Component x '//str(n=vec%x)
+  write(unit,'(A)',iostat=err)trim(rks)//' Component y '//str(n=vec%y)
+  write(unit,'(A)',iostat=err)trim(rks)//' Component z '//str(n=vec%z)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction pprint
-  !> @}
 
-  !> @ingroup Data_Type_VectorPrivateProcedure
-  !> @{
-  !> Function for writing Type_Vector (binary, scalar).
-  function Write_Bin_Scalar(unit,vec) result(err)
+  !> @brief Subroutine for normalizing a vector.
+  !> The normalization is made by means of norm L2. If the norm L2 of the vector is less than the parameter smallR_P the
+  !> normalization value is set to normL2(vec)+smallR_P.
+  elemental subroutine normalize_self(vec)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P),      intent(IN):: unit !< Logic unit.
-  type(Type_Vector), intent(IN):: vec  !< Vector.
-  integer(I_P)::                  err  !< Error trapping flag: 0 no errors, >0 error occurs.
+  class(Type_Vector), intent(INOUT):: vec !< Vector to be normalized.
+  real(R_P)::                         nm  !< Norm L2 of vector.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,iostat=err)vec
+  nm = normL2(vec)
+  if (nm < smallR_P) then
+    nm = nm + smallR_P
+  endif
+  vec%x = vec%x/nm
+  vec%y = vec%y/nm
+  vec%z = vec%z/nm
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Scalar
-
-  function Write_Ascii_Scalar(unit,format,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Vector (ascii, scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN):: unit   ! Logic unit.
-  character(*),      intent(IN):: format ! Format specifier.
-  type(Type_Vector), intent(IN):: vec    ! Vector.
-  integer(I_P)::                  err    ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err)vec
-  case default
-    write(unit,adjustl(trim(format)),iostat=err)vec
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Scalar
-
-  function Write_Bin_Array1D(unit,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Vector (binary, array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN):: unit   ! Logic unit.
-  type(Type_Vector), intent(IN):: vec(:) ! Vector.
-  integer(I_P)::                  err    ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,iostat=err)vec
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Array1D
-
-  function Write_Ascii_Array1D(unit,format,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Vector (ascii, array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN):: unit   ! Logic unit.
-  character(*),      intent(IN):: format ! Format specifier.
-  type(Type_Vector), intent(IN):: vec(:) ! Vector.
-  integer(I_P)::                  err    ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err)vec
-  case default
-    write(unit,adjustl(trim(format)),iostat=err)vec
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Array1D
-
-  function Write_Bin_Array2D(unit,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Vector (binary, array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN):: unit     ! Logic unit.
-  type(Type_Vector), intent(IN):: vec(:,:) ! Vector.
-  integer(I_P)::                  err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,iostat=err)vec
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Array2D
-
-  function Write_Ascii_Array2D(unit,format,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Vector (ascii, array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN):: unit     ! Logic unit.
-  character(*),      intent(IN):: format   ! Format specifier.
-  type(Type_Vector), intent(IN):: vec(:,:) ! Vector.
-  integer(I_P)::                  err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err)vec
-  case default
-    write(unit,adjustl(trim(format)),iostat=err)vec
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Array2D
-
-  function Write_Bin_Array3D(unit,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Vector (binary, array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN):: unit       ! Logic unit.
-  type(Type_Vector), intent(IN):: vec(:,:,:) ! Vector.
-  integer(I_P)::                  err        ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,iostat=err)vec
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Array3D
-
-  function Write_Ascii_Array3D(unit,format,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Vector (ascii, Array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN):: unit       ! Logic unit
-  character(*),      intent(IN):: format     ! Format specifier.
-  type(Type_Vector), intent(IN):: vec(:,:,:) ! Vector.
-  integer(I_P)::                  err        ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err)vec
-  case default
-    write(unit,adjustl(trim(format)),iostat=err)vec
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Array3D
-
-  ! read
-  function Read_Bin_Scalar(unit,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Vector (binary, scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit  ! Logic unit.
-  type(Type_Vector), intent(INOUT):: vec   ! Vector.
-  integer(I_P)::                     err   ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  read(unit,iostat=err)vec
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Scalar
-
-  function Read_Ascii_Scalar(unit,format,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Vector (ascii, scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit   ! Logic unit.
-  character(*),      intent(IN)::    format ! Format specifier.
-  type(Type_Vector), intent(INOUT):: vec    ! Vector.
-  integer(I_P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err)vec
-  case default
-    read(unit,adjustl(trim(format)),iostat=err)vec
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Scalar
-
-  function Read_Bin_Array1D(unit,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Vector (binary, array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit   ! Logic unit.
-  type(Type_Vector), intent(INOUT):: vec(:) ! Vector.
-  integer(I_P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  read(unit,iostat=err)vec
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Array1D
-
-  function Read_Ascii_Array1D(unit,format,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Vector (ascii, array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit   ! logic unit
-  character(*),      intent(IN)::    format ! format specifier
-  type(Type_Vector), intent(INOUT):: vec(:) ! Vector.
-  integer(I_P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err)vec
-  case default
-    read(unit,adjustl(trim(format)),iostat=err)vec
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Array1D
-
-  function Read_Bin_Array2D(unit,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Vector (binary, array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit     ! Logic unit.
-  type(Type_Vector), intent(INOUT):: vec(:,:) ! Vector.
-  integer(I_P)::                     err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  read(unit,iostat=err)vec
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Array2D
-
-  function Read_Ascii_Array2D(unit,format,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Vector (ascii, array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit     ! Logic unit.
-  character(*),      intent(IN)::    format   ! Format specifier.
-  type(Type_Vector), intent(INOUT):: vec(:,:) ! Vector.
-  integer(I_P)::                     err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err)vec
-  case default
-    read(unit,adjustl(trim(format)),iostat=err)vec
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Array2D
-
-  function Read_Bin_Array3D(unit,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Vector (binary, array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit       ! Logic unit.
-  type(Type_Vector), intent(INOUT):: vec(:,:,:) ! Vector.
-  integer(I_P)::                     err        ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  read(unit,iostat=err)vec
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Array3D
-
-  function Read_Ascii_Array3D(unit,format,vec) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for reading Type_Vector (ascii, array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),      intent(IN)::    unit       ! Logic unit.
-  character(*),      intent(IN)::    format     ! Format specifier.
-  type(Type_Vector), intent(INOUT):: vec(:,:,:) ! Vector.
-  integer(I_P)::                     err        ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err)vec
-  case default
-    read(unit,adjustl(trim(format)),iostat=err)vec
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Array3D
+  endsubroutine normalize_self
 
   ! Assignment (=)
 #ifdef r16p
@@ -2079,7 +1941,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R16P),        intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2096,7 +1958,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R16P),        intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2116,7 +1978,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R8P),         intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2133,7 +1995,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R8P),         intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2152,7 +2014,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R4P),         intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2169,7 +2031,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R4P),         intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2188,7 +2050,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I8P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2205,7 +2067,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I8P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2224,7 +2086,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I4P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2241,7 +2103,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I4P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2260,7 +2122,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I2P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2277,7 +2139,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I2P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2296,7 +2158,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I1P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2313,7 +2175,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I1P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2352,7 +2214,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R16P),        intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2369,7 +2231,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R16P),        intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2389,7 +2251,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R8P),         intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2406,7 +2268,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R8P),         intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2425,7 +2287,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R4P),         intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2442,7 +2304,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R4P),         intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2461,7 +2323,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I8P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2478,7 +2340,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I8P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2497,7 +2359,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I4P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2514,7 +2376,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I4P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2533,7 +2395,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I2P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2550,7 +2412,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I2P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2569,7 +2431,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I1P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2586,7 +2448,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I1P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2625,7 +2487,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R16P),        intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2642,7 +2504,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R16P),        intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2662,7 +2524,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R8P),         intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2679,7 +2541,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R8P),         intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2698,7 +2560,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R4P),         intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2715,7 +2577,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R4P),         intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2734,7 +2596,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I8P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2751,7 +2613,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I8P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2770,7 +2632,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I4P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2787,7 +2649,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I4P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2806,7 +2668,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I2P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2823,7 +2685,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I2P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2842,7 +2704,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I1P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2859,7 +2721,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I1P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2905,7 +2767,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R16P),        intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2922,7 +2784,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R16P),        intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2942,7 +2804,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R8P),         intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2959,7 +2821,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R8P),         intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2978,7 +2840,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R4P),         intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2995,7 +2857,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R4P),         intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3014,7 +2876,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I8P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3031,7 +2893,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I8P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3050,7 +2912,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I4P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3067,7 +2929,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I4P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3086,7 +2948,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I2P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3103,7 +2965,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I2P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3122,7 +2984,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I1P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3139,7 +3001,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I1P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3178,7 +3040,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R16P),        intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3195,7 +3057,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R16P),        intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3215,7 +3077,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R8P),         intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3232,7 +3094,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R8P),         intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3251,7 +3113,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R4P),         intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3268,7 +3130,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R4P),         intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3287,7 +3149,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I8P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3304,7 +3166,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I8P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3323,7 +3185,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I4P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3340,7 +3202,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I4P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3359,7 +3221,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I2P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3376,7 +3238,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I2P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3395,7 +3257,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I1P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3412,7 +3274,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I1P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3451,7 +3313,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R16P),        intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3468,7 +3330,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R16P),        intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3488,7 +3350,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R8P),         intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3505,7 +3367,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R8P),         intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3524,7 +3386,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R4P),         intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3541,7 +3403,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   real(R4P),         intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3560,7 +3422,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I8P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3577,7 +3439,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I8P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3596,7 +3458,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I4P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3613,7 +3475,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I4P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3632,7 +3494,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I2P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3649,7 +3511,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I2P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3668,7 +3530,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I1P),      intent(IN):: scal    ! Scalar.
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -3685,7 +3547,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Vector), intent(IN):: vec     ! 3D vector.
+  type(Type_Vector), intent(IN):: vec     ! Vector.
   integer(I1P),      intent(IN):: scal    ! Scalar.
   logical::                       compare ! The result of the comparison.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3754,7 +3616,7 @@ contains
   implicit none
   type(Type_Vector), intent(IN):: vec1  ! First vector.
   type(Type_Vector), intent(IN):: vec2  ! Second vector.
-  type(Type_Vector)::             paral ! vector parallel to vec2 with the module of vec1.
+  type(Type_Vector)::             paral ! Vector parallel to vec2 with the module of vec1.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3772,7 +3634,7 @@ contains
   implicit none
   type(Type_Vector), intent(IN):: vec1  ! First vector.
   type(Type_Vector), intent(IN):: vec2  ! Second vector.
-  type(Type_Vector)::             ortho ! vector orthogonal to vec2 with the module of vec1.
+  type(Type_Vector)::             ortho ! Vector orthogonal to vec2 with the module of vec1.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3780,137 +3642,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction orthogonal
-  !> @}
-
-  !> @ingroup Data_Type_VectorPublicProcedure
-  !> @{
-  !> Function for computing the square of the norm of a 3D vector.
-  !> The square norm if defined as \f$ N = x^2  + y^2  + z^2\f$.
-  !> @return \b sq square norm
-  elemental function sq_norm(vec) result(sq)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Vector), intent(IN):: vec !< Vector.
-  real(R_P)::                     sq  !< Square of the Norm.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  sq = (vec%x*vec%x) + (vec%y*vec%y) + (vec%z*vec%z)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction sq_norm
-
-  !> Function for computing the norm L2 of a 3D vector.
-  !> The norm L2 if defined as \f$N = \sqrt {x^2  + y^2  + z^2 }\f$.
-  !> @return \b norm norm L2
-  elemental function normL2(vec) result(norm)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Vector), intent(IN):: vec  !< Vector.
-  real(R_P)::                     norm !< Norm L2.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  norm = sqrt((vec%x*vec%x) + (vec%y*vec%y) + (vec%z*vec%z))
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction normL2
-
-  !> Function for normalizing a 3D vector.
-  !> The normalization is made by means of norm L2. If the norm L2 of the vector is less than the parameter smallR_P the
-  !> normalization value is set to normL2(vec)+smallR_P.
-  !> @return \b norm normalized vector
-  elemental function normalize(vec) result(norm)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Vector), intent(IN):: vec  !< Vector to be normalized.
-  type(Type_Vector)::             norm !< Vector normalized.
-  real(R_P)::                     nm   !< Norm L2 of 3D vector.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  nm = normL2(vec)
-  if (nm < smallR_P) then
-    nm = nm + smallR_P
-  endif
-  norm%x = vec%x/nm
-  norm%y = vec%y/nm
-  norm%z = vec%z/nm
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction normalize
-
-  !> Function for calculating the normal of the face defined by 4 points vector pt1, pt2, pt3 and pt4.
-  !> The convention for the points numeration is the following:
-  !> @code
-  !> 1.----------.2
-  !>  |          |
-  !>  |          |
-  !>  |          |
-  !>  |          |
-  !> 4.----------.3
-  !> @endcode
-  !> The normal is calculated by the cross product of the diagonal d13 for the diagonal d24: d13 x d24.
-  !> The normal is normalized if the variable 'norm' is passed (with any value).
-  !> @return \b fnormal face normal
-  elemental function face_normal4(norm,pt1,pt2,pt3,pt4) result(fnormal)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  character(1),      intent(IN), optional:: norm    !< If 'norm' is passed as argument the normal is normalized.
-  type(Type_Vector), intent(IN)::           pt1     !< First face point.
-  type(Type_Vector), intent(IN)::           pt2     !< Second face point.
-  type(Type_Vector), intent(IN)::           pt3     !< Third face point.
-  type(Type_Vector), intent(IN)::           pt4     !< Fourth face point.
-  type(Type_Vector)::                       fnormal !< Face normal.
-  type(Type_Vector)::                       d13,d24 !< Face diagonals.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  d13 = pt3 - pt1
-  d24 = pt4 - pt2
-  if (present(norm)) then
-    fnormal = normalize(d13.cross.d24)
-  else
-    fnormal = 0.5_R_P*(d13.cross.d24)
-  endif
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction face_normal4
-
-  !> Function for calculating the normal of the face defined by the 3 points vector pt1, pt2 and pt3.
-  ! The convention for the points numeration is the following:
-  !> @code
-  !> 1.----.2
-  !>   \   |
-  !>    \  |
-  !>     \ |
-  !>      \|
-  !>       .3
-  !> @endcode
-  !> The normal is calculated by the cross product of the side s12 for the side s13: s12 x s13.
-  !> The normal is normalized if the variable 'norm' is passed (with any value).
-  !> @return \b fnormal face normal
-  elemental function face_normal3(norm,pt1,pt2,pt3) result(fnormal)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  character(1),      intent(IN), optional:: norm    !< If 'norm' is passed as argument the normal is normalized.
-  type(Type_Vector), intent(IN)::           pt1     !< First face point.
-  type(Type_Vector), intent(IN)::           pt2     !< Second face point.
-  type(Type_Vector), intent(IN)::           pt3     !< Third face point.
-  type(Type_Vector)::                       fnormal !< Face normal.
-  type(Type_Vector)::                       s12,s13 !< Face diagonals.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  s12 = pt2 - pt1
-  s13 = pt3 - pt1
-  if (present(norm)) then
-    fnormal = normalize(s12.cross.s13)
-  else
-    fnormal = 0.5_R_P*(s12.cross.s13)
-  endif
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction face_normal3
   !> @}
 endmodule Data_Type_Vector

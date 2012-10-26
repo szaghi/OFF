@@ -14,24 +14,19 @@
 !> - Type_Block: derived type containing block-level data.
 module Data_Type_Globals
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                            !< Integers and reals precision definition.
-USE Data_Type_BC, init_bc=>init, set_bc=>set                !< Definition of Type_BC.
-USE Data_Type_Cell, init_cell=>init, set_cell=>set          !< Definition of Type_Cell.
-USE Data_Type_Conservative, init_cons=>init, set_cons=>set  !< Definition of Type_Conservative.
-USE Data_Type_Primitive, init_prim=>init, set_prim=>set     !< Definition of Type_Primitive.
-USE Data_Type_Vector, set_vec=>set                          !< Definition of Type_Vector.
-USE Lib_IO_Misc                                             !< Procedures for IO and strings operations.
+USE IR_Precision           !< Integers and reals precision definition.
+USE Data_Type_BC           !< Definition of Type_BC.
+USE Data_Type_Cell         !< Definition of Type_Cell.
+USE Data_Type_Conservative !< Definition of Type_Conservative.
+USE Data_Type_Primitive    !< Definition of Type_Primitive.
+USE Data_Type_Vector       !< Definition of Type_Vector.
+USE Lib_IO_Misc            !< Procedures for IO and strings operations.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 private
 public:: file_name
-public:: alloc_global_bc,alloc_global_fluid
-public:: free_block,alloc_block
-public:: load_bmesh_dims,load_bmesh,save_bmesh,print_info_bmesh
-public:: load_gbc_in1,load_bbc,save_bbc
-public:: load_gfluid_soption,load_gfluid_Ns,load_gfluid_0species,load_bfluid,save_bfluid,print_info_bfluid
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -119,6 +114,7 @@ type, public:: Type_Fluid_Global
   integer(I_P)::           Ns            = 1_I_P    !< Number of species.
   integer(I_P)::           Np            = 7_I_P    !< Number of primitive variables    (Np = Ns + 6).
   integer(I_P)::           Nc            = 5_I_P    !< Number of conservative variables (Nc = Ns + 4).
+  logical::                inviscid      = .true.   !< Type of simulation: inviscid (Euler's eq.) or viscous (Navier-Stokes eq.).
   logical::                unsteady      = .true.   !< Type of simulation: unsteady or not.
   integer(I8P)::           Nmax          = 0_I8P    !< Max number of iterations.
   real(R_P)::              Tmax          = 0._R_P   !< Max time, ignored if Nmax>0.
@@ -141,13 +137,49 @@ type, public:: Type_Fluid_Block
   type(Type_Conservative), allocatable:: KS(:,:,:,:) !< Runge-Kutta stages of conservative variables [1:rk_ord].
 endtype Type_Fluid_Block
 
+!> Derived type containing global-level non-dimensional numbers and reference values.
+!> @ingroup DerivedType
+type, public:: Type_Adimensional_Global
+  ! non dimensional numbers loaded from input file
+  real(R_P):: Re = 1._R_P !< \f$\rm{Re}=\frac{\rho_0 v_0 L_0}{\mu_0}\f$ Reynolds number.
+  real(R_P):: Fr = 1._R_P !< \f$\rm{Fr}=\sqrt{\frac{v_0^2}{f_0 L_0}}\f$ Froude number.
+  real(R_P):: Pr = 1._R_P !< \f$\rm{Pr}=\frac{\mu_0 c_p}{k_0}\f$ Prandtl number.
+  ! reference values loaded from input file
+  real(R_P):: L0 = 1._R_P !< Reference length.
+  real(R_P):: r0 = 1._R_P !< Reference density.
+  real(R_P):: v0 = 1._R_P !< Reference velocity.
+  real(R_P):: c0 = 1._R_P !< Reference specific heats (\f$cp_0 = cv_0 = R_0 = c_0\f$).
+  ! reference values computed by means of previous values
+  real(R_P):: mu0  = 1._R_P !< \f$\mu_0= \frac{\rho_0 v_0 L_0}{\rm{Re}}\f$ Reference dynamic viscosity.
+  real(R_P):: f0   = 1._R_P !< \f$f_0= \frac{v_0^2}{L_0 \rm{Fr}^2}\f$ Reference specific force.
+  real(R_P):: k0   = 1._R_P !< \f$k_0= \frac{\mu_0 c_0}{\rm{Pr}}\f$ Reference thermal conductivity coefficient.
+  real(R_P):: Dt0  = 1._R_P !< \f$Dt_0=\frac{L_0}{v_0}\f$ Reference time interval.
+  real(R_P):: p0   = 1._R_P !< \f$p_0=\rho_0 v_0^2\f$ Reference pressure.
+  real(R_P):: a0   = 1._R_P !< \f$a_0=v_0\f$ Reference speed of sound.
+  real(R_P):: T0   = 1._R_P !< \f$T_0=\frac{v_0^2}{c_0}\f$ Reference temperature.
+  real(R_P):: E0   = 1._R_P !< \f$E_0=v_0^2\f$ Reference specific energy.
+  real(R_P):: q0   = 1._R_P !< \f$q_0=\frac{v_0^3}{L_0}\f$ Reference specific heat.
+  ! equations coefficients computed by means of previous values
+  real(R_P):: Re_inv   = 1._R_P !< \f$\frac{1}{\rm{Re}}\f$ Inverse of Reynolds number (coefficient of viscous terms).
+  real(R_P):: Fr2_inv  = 1._R_P !< \f$\frac{1}{\rm{Fr}^2}\f$ Inverse of square of Froude number (coefficient of volume forces).
+  real(R_P):: PrRe_inv = 1._R_P !< \f$\frac{1}{\rm{Pr Re}}\f$ Inverse of Prandtl and Reynolds numbers (coef. of condution terms).
+endtype Type_Adimensional_Global
+
 !> @brief Derived type containing the global-level data.
 !> @ingroup DerivedType
 type, public:: Type_Global
-  type(Type_File_Global)::  file  !< File data.
-  type(Type_Mesh_Global)::  mesh  !< Mesh data.
-  type(Type_BC_Global)::    bc    !< Boundary conditions data.
-  type(Type_Fluid_Global):: fluid !< Fluid dynamic data.
+  type(Type_File_Global)::         file  !< File data.
+  type(Type_Mesh_Global)::         mesh  !< Mesh data.
+  type(Type_BC_Global)::           bc    !< Boundary conditions data.
+  type(Type_Fluid_Global)::        fluid !< Fluid dynamic data.
+  type(Type_Adimensional_Global):: adim  !< Non-dimensionalization data.
+  contains
+    procedure, non_overridable:: alloc_bc => alloc_gbc                       ! Procedure for allocating bc memory.
+    procedure, non_overridable:: load_bc_in1 => load_gbc_in1                 ! Procedure for loading the inflow1 bc data.
+    procedure, non_overridable:: load_fluid_soption => load_gfluid_soption   ! Procedure for loading the fuidynamic solver options.
+    procedure, non_overridable:: load_fluid_Ns => load_gfluid_Ns             ! Procedure for loading the number of species.
+    procedure, non_overridable:: load_fluid_0species => load_gfluid_0species ! Procedure for loading the initial species.
+    procedure, non_overridable:: alloc_fluid => alloc_gfluid                 ! Procedure for allocating the fluidynamic data.
 endtype Type_Global
 !> Derived type containing the block-level data.
 !> @ingroup DerivedType
@@ -155,6 +187,18 @@ type, public:: Type_Block
   type(Type_Mesh_Block)::  mesh  !< Mesh data.
   type(Type_BC_Block)::    bc    !< Boundary conditions data.
   type(Type_Fluid_Block):: fluid !< Fluid dynamic data.
+  contains
+    procedure, non_overridable:: free => free_block                    ! Procedure for freeing memory.
+    procedure, non_overridable:: alloc => alloc_block                  ! Procedure for allocating memory.
+    procedure, non_overridable:: load_mesh_dims => load_bmesh_dims     ! Procedure for loading the mesh data dimensions.
+    procedure, non_overridable:: load_mesh => load_bmesh               ! Procedure for loading the mesh data.
+    procedure, non_overridable:: save_mesh => save_bmesh               ! Procedure for saving the mesh data.
+    procedure, non_overridable:: print_info_mesh => print_info_bmesh   ! Procedure for printing of the mesh data.
+    procedure, non_overridable:: load_bc => load_bbc                   ! Procedure for loading the bc data.
+    procedure, non_overridable:: save_bc => save_bbc                   ! Procedure for saving the bc data.
+    procedure, non_overridable:: load_fluid => load_bfluid             ! Procedure for loading the fluidynamic data.
+    procedure, non_overridable:: save_fluid => save_bfluid             ! Procedure for saving the fluidynamic data.
+    procedure, non_overridable:: print_info_fluid => print_info_bfluid ! Procedure for printing of the mesh data.
 endtype Type_Block
 !-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -233,28 +277,54 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Block_Flip_File_Name
-  !> @}
 
-  !> @ingroup Data_Type_GlobalsPublicProcedure
-  !> @{
-  !> Subroutine for allocating dynamic data of Type_Global boundary conditions variables.
-  subroutine alloc_global_bc(global)
+  !> Subroutine for computing the reference values for non-dimensional quantities.
+  subroutine compute_values0(global)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global), intent(INOUT):: global !< Global data.
+  type(Type_Global), intent(INOUT):: global !< Global level data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(global%bc%in1)) deallocate(global%bc%in1) ; if (global%bc%Nin1>0) allocate(global%bc%in1(1:global%bc%Nin1))
+  ! reference values
+  global%adim%mu0  = (global%adim%r0*global%adim%v0*global%adim%L0)/global%adim%Re
+  global%adim%f0   = (global%adim%v0*global%adim%v0)/(global%adim%L0*global%adim%Fr*global%adim%Fr)
+  global%adim%k0   = (global%adim%mu0*global%adim%c0)/global%adim%Pr
+  global%adim%Dt0  = global%adim%L0/global%adim%v0
+  global%adim%p0   = global%adim%r0*global%adim%v0*global%adim%v0
+  global%adim%a0   = global%adim%v0
+  global%adim%T0   = (global%adim%v0*global%adim%v0)/global%adim%c0
+  global%adim%E0   = global%adim%v0*global%adim%v0
+  global%adim%q0   = (global%adim%v0*global%adim%v0*global%adim%v0)/global%adim%L0
+  ! equations coefficients
+  global%adim%Re_inv   = 1._R_P/global%adim%Re
+  global%adim%Fr2_inv  = 1._R_P/(global%adim%Fr*global%adim%Fr)
+  global%adim%PrRe_inv = 1._R_P/(global%adim%Pr*global%adim%Re)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine alloc_global_bc
+  endsubroutine compute_values0
 
-  !> Subroutine for allocating dynamic data of Type_Global fluid dynamic variables.
-  subroutine alloc_global_fluid(global)
+  !> Subroutine for allocating dynamic data of Type_Global boundary conditions variables.
+  subroutine alloc_gbc(global)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global), intent(INOUT):: global !< Global data.
+  class(Type_Global), intent(INOUT):: global !< Global data.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (allocated(global%bc%in1)) then
+    call global%bc%in1%free ; deallocate(global%bc%in1)
+  endif
+  if (global%bc%Nin1>0) allocate(global%bc%in1(1:global%bc%Nin1)) ; call global%bc%in1%init(Ns=global%fluid%Ns)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine alloc_gbc
+
+  !> Subroutine for allocating dynamic data of Type_Global fluid dynamic variables.
+  subroutine alloc_gfluid(global)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Global), intent(INOUT):: global !< Global data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -262,14 +332,13 @@ contains
   if (allocated(global%fluid%cv0)) deallocate(global%fluid%cv0) ; allocate(global%fluid%cv0(1:global%fluid%Ns))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine alloc_global_fluid
+  endsubroutine alloc_gfluid
 
-  !> Subroutine for free dynamic data of Type_Block variables.
+  !> Subroutine for freeing dynamic data of Type_Block variables.
   subroutine free_block(block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_block), intent(INOUT):: block !< Block data.
-  integer(I_P)::                    err   !< Error trapping flag: 0 no errors, >0 error occurs.
+  class(Type_block), intent(INOUT):: block !< Block data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -286,41 +355,35 @@ contains
   if (allocated(block%mesh%cell)) deallocate(block%mesh%cell)
   ! Boundary conditions data
   if (allocated(block%bc%BCi)) then
-    err = free(block%bc%BCi) ! free the dynamic memory of Type_BC data
-    deallocate(block%bc%BCi) ! free the block dynamic data
+    call block%bc%BCi%free ; deallocate(block%bc%BCi)
   endif
   if (allocated(block%bc%BCj)) then
-    err = free(block%bc%BCj) ! free the dynamic memory of Type_BC data
-    deallocate(block%bc%BCj) ! free the block dynamic data
+    call block%bc%BCj%free ; deallocate(block%bc%BCj)
   endif
   if (allocated(block%bc%BCk)) then
-    err = free(block%bc%BCk) ! free the dynamic memory of Type_BC data
-    deallocate(block%bc%BCk) ! free the block dynamic data
+    call block%bc%BCk%free ; deallocate(block%bc%BCk)
   endif
   ! Fluid dynamic data
   if (allocated(block%fluid%Dt)) deallocate(block%fluid%Dt)
   if (allocated(block%fluid%P)) then
-    err = free(block%fluid%P) ! free the dynamic memory of Type_Primitive data
-    deallocate(block%fluid%P) ! free the block dynamic data
+    call block%fluid%P%free ; deallocate(block%fluid%P)
   endif
   if (allocated(block%fluid%U)) then
-    err = free(block%fluid%U) ! free the dynamic memory of Type_Conservative data
-    deallocate(block%fluid%U) ! free the block dynamic data
+    call block%fluid%U%free ; deallocate(block%fluid%U)
   endif
   if (allocated(block%fluid%KS)) then
-    err = free(block%fluid%KS) ! free the dynamic memory of Type_Conservative data
-    deallocate(block%fluid%KS) ! free the block dynamic data
+    call block%fluid%KS%free ; deallocate(block%fluid%KS)
   endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine free_block
 
   !> Subroutine for allocating dynamic data of Type_Block variables.
-  subroutine alloc_block(global,block)
+  subroutine alloc_block(block,global)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
+  class(Type_block), intent(INOUT):: block    !< Block data.
   type(Type_Global), intent(IN)::    global   !< Global data.
-  type(Type_block),  intent(INOUT):: block    !< Block data.
   integer(I_P)::                     Ni,Nj,Nk !< Temporary variables for storing blocks dimensions.
   integer(I_P)::                     gc(1:6)  !< Temporary variable  for storing blocks ghost cells number.
   integer(I_P)::                     Ns       !< Temporary variable  for storing number of species.
@@ -329,7 +392,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! Free dynamic data block if previously allocated
-  call free_block(block)
+  call block%free
   ! Storing block dimensions into temporary variables to simplify the code
   Ni      = block%mesh%Ni
   Nj      = block%mesh%Nj
@@ -338,38 +401,38 @@ contains
   Ns      = global%fluid%Ns
   rk_ord  = global%fluid%rk_ord
   ! Mesh data
-  allocate(block%mesh%node(0-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6))) ; block%mesh%node=0._R_P
-  allocate(block%mesh%NFi (0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%NFi =0._R_P
-  allocate(block%mesh%NFj (1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%NFj =0._R_P
-  allocate(block%mesh%NFk (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6))) ; block%mesh%NFk =0._R_P
+  allocate(block%mesh%node(0-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)))
+  allocate(block%mesh%NFi (0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
+  allocate(block%mesh%NFj (1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
+  allocate(block%mesh%NFk (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)))
   allocate(block%mesh%Si  (0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%Si  =0._R_P
   allocate(block%mesh%Sj  (1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%Sj  =0._R_P
   allocate(block%mesh%Sk  (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6))) ; block%mesh%Sk  =0._R_P
   allocate(block%mesh%V   (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%V   =0._R_P
-  allocate(block%mesh%cell(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%cell=init_cell()
-  allocate(block%mesh%cent(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%mesh%cent=0._R_P
+  allocate(block%mesh%cell(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
+  allocate(block%mesh%cent(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
   ! Boundary conditions data
-  allocate(block%bc%BCi(0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%bc%BCi=init_bc()
-  allocate(block%bc%BCj(1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%bc%BCj=init_bc()
-  allocate(block%bc%BCk(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6))) ; block%bc%BCk=init_bc()
+  allocate(block%bc%BCi(0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
+  allocate(block%bc%BCj(1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
+  allocate(block%bc%BCk(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)))
   ! Fluid dynamic data
   allocate(block%fluid%Dt(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))          ; block%fluid%Dt = 0._R_P
-  allocate(block%fluid%P (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))          ; call init_prim(Ns=Ns,prim=block%fluid%P)
-  allocate(block%fluid%U (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))          ; call init_cons(Ns=Ns,cons=block%fluid%U)
-  allocate(block%fluid%KS(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6),1:rk_ord)) ; call init_cons(Ns=Ns,cons=block%fluid%KS)
+  allocate(block%fluid%P (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))          ; call block%fluid%P%init(Ns=Ns)
+  allocate(block%fluid%U (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))          ; call block%fluid%U%init(Ns=Ns)
+  allocate(block%fluid%KS(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6),1:rk_ord)) ; call block%fluid%KS%init(Ns=Ns)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine alloc_block
 
   !> Function for loading the mesh data dimensions of block from the mesh file "filename".
   !> @return \b err integer(I4P) variable.
-  function load_bmesh_dims(ascii,myrank,filename,block) result(err)
+  function load_bmesh_dims(block,ascii,myrank,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
+  class(Type_Block), intent(INOUT):: block    !< Block level data.
   logical, optional, intent(IN)::    ascii    !< Flag for ascii file.
   integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
   character(*),      intent(IN)::    filename !< Name of file where mesh variables are saved.
-  type(Type_Block),  intent(INOUT):: block    !< Block level data.
   integer(I_P)::                     UnitFree !< Free logic unit.
   logical::                          is_file  !< Flag for inquiring the presence of mesh file.
   integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
@@ -379,14 +442,12 @@ contains
   inquire(file=trim(filename),exist=is_file,iostat=err)
   if (.NOT.is_file) call File_Not_Found(myrank,filename,'load_bmesh_dims')
   if (present(ascii)) then
-    UnitFree = Get_Unit()
-    open(unit = UnitFree, file = trim(filename), status = 'OLD', action = 'READ', form = 'FORMATTED')
+    open(unit = Get_Unit(UnitFree), file = trim(filename), status = 'OLD', action = 'READ', form = 'FORMATTED')
     read(UnitFree,*,iostat=err)block%mesh%gc
     read(UnitFree,*,iostat=err)block%mesh%Ni,block%mesh%Nj,block%mesh%Nk
     close(UnitFree)
   else
-    UnitFree = Get_Unit()
-    open(unit = UnitFree, file = trim(filename), status = 'OLD', action = 'READ', form = 'UNFORMATTED')
+    open(unit = Get_Unit(UnitFree ), file = trim(filename), status = 'OLD', action = 'READ', form = 'UNFORMATTED')
     read(UnitFree,iostat=err)block%mesh%gc
     read(UnitFree,iostat=err)block%mesh%Ni,block%mesh%Nj,block%mesh%Nk
     close(UnitFree)
@@ -397,13 +458,13 @@ contains
 
   !> Function for loading block mesh file.
   !> @return \b err integer(I4P) variable.
-  function load_bmesh(ascii,myrank,filename,block) result(err)
+  function load_bmesh(block,ascii,myrank,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
+  class(Type_Block), intent(INOUT):: block    !< Block level data.
   logical, optional, intent(IN)::    ascii    !< Flag for ascii file.
   integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
   character(*),      intent(IN)::    filename !< Name of file where mesh variables are saved.
-  type(Type_Block),  intent(INOUT):: block    !< Block level data.
   integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
   integer(I_P)::                     UnitFree !< Free logic unit.
   logical::                          is_file  !< Flag for inquiring the presence of mesh file.
@@ -413,20 +474,18 @@ contains
   inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
   if (.NOT.is_file) call File_Not_Found(myrank,filename,'load_bmesh')
   if (present(ascii)) then
-    UnitFree = Get_Unit()
-    open(unit = UnitFree, file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
+    open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
     read(UnitFree,*,iostat=err)block%mesh%gc
     read(UnitFree,*,iostat=err)block%mesh%Ni,block%mesh%Nj,block%mesh%Nk
-    err = read(UnitFree,'*',block%mesh%node)
-    err = read(UnitFree,'*',block%mesh%cell)
+    err = read_vector(array3D=block%mesh%node,format='*',unit=UnitFree)
+    err = read_cell(array3D=block%mesh%cell,format='*',unit=UnitFree)
     close(UnitFree)
   else
-    UnitFree = Get_Unit()
-    open(unit = UnitFree, file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'UNFORMATTED')
+    open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'UNFORMATTED')
     read(UnitFree,iostat=err)block%mesh%gc
     read(UnitFree,iostat=err)block%mesh%Ni,block%mesh%Nj,block%mesh%Nk
-    err = read(UnitFree,block%mesh%node)
-    err = read(UnitFree,block%mesh%cell)
+    err = read_vector(array3D=block%mesh%node,unit=UnitFree)
+    err = read_cell(array3D=block%mesh%cell,unit=UnitFree)
     close(UnitFree)
   endif
   return
@@ -435,32 +494,30 @@ contains
 
   !> Function for saving block mesh file.
   !> @return \b err integer(I4P) variable.
-  function save_bmesh(ascii,filename,block) result(err)
+  function save_bmesh(block,ascii,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
+  class(Type_Block), intent(IN):: block    !< Block level data.
   logical, optional, intent(IN):: ascii    !< Flag for ascii file.
   character(*),      intent(IN):: filename !< Name of file where mesh variables are saved.
-  type(Type_Block),  intent(IN):: block    !< Block level data.
   integer(I_P)::                  err      !< Error trapping flag: 0 no errors, >0 error occurs.
   integer(I_P)::                  UnitFree !< Free logic unit.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   if (present(ascii)) then
-    UnitFree = Get_Unit()
-    open(unit = UnitFree, file = adjustl(trim(filename)), action = 'WRITE', form = 'FORMATTED')
+    open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), action = 'WRITE', form = 'FORMATTED')
     write(UnitFree,'(6('//FI1P//',1X))',iostat=err)block%mesh%gc
     write(UnitFree,'(3('//FI_P//',1X))',iostat=err)block%mesh%Ni,block%mesh%Nj,block%mesh%Nk
-    err = write(UnitFree,'*',block%mesh%node)
-    err = write(UnitFree,'*',block%mesh%cell)
+    err = write_vector(array3D=block%mesh%node,format='*',unit=UnitFree)
+    err = write_cell(array3D=block%mesh%cell,format='*',unit=UnitFree)
     close(UnitFree)
   else
-    UnitFree = Get_Unit()
-    open(unit = UnitFree, file = adjustl(trim(filename)), action = 'WRITE', form = 'UNFORMATTED')
+    open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), action = 'WRITE', form = 'UNFORMATTED')
     write(UnitFree,iostat=err)block%mesh%gc
     write(UnitFree,iostat=err)block%mesh%Ni,block%mesh%Nj,block%mesh%Nk
-    err = write(UnitFree,block%mesh%node)
-    err = write(UnitFree,block%mesh%cell)
+    err = write_vector(array3D=block%mesh%node,unit=UnitFree)
+    err = write_cell(array3D=block%mesh%cell,unit=UnitFree)
     close(UnitFree)
   endif
   return
@@ -469,14 +526,14 @@ contains
 
   !> Function for printing to standard output info of block mesh data.
   !> @return \b err integer(I4P) variable.
-  function print_info_bmesh(myrank,blk,grl,global,block) result(err)
+  function print_info_bmesh(block,myrank,blk,grl,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
+  class(Type_Block), intent(IN)::  block        !< Block level data.
   integer(I_P),      intent(IN)::  myrank       !< Rank process identification for MPI communications.
   integer(I_P),      intent(IN)::  blk          !< Actual block number.
   integer(I_P),      intent(IN)::  grl          !< Actual grid level number.
   type(Type_Global), intent(IN)::  global       !< Global level data.
-  type(Type_Block),  intent(IN)::  block        !< Block level data.
   integer(I_P)::                   err          !< Error trapping flag: 0 no errors, >0 error occurs.
   character(DR_P)::                vmax,vmin    !< String for printing max and min of variables.
   character(DR_P)::                xmm,ymm,zmm  !< String for printing max and min of variables.
@@ -545,12 +602,43 @@ contains
 
   !> Function for loading inflow 1 boundary conditions.
   !> @return \b err integer(I4P) variable.
-  function load_gbc_in1(myrank,filename,global) result(err)
+  function load_gbc_in1(global,myrank,filename,in1) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
+  class(Type_Global), intent(INOUT):: global   !< Global level data.
+  integer(I_P),       intent(IN)::    myrank   !< Actual rank process.
+  character(*),       intent(IN)::    filename !< Name of file where boundary conditions variables are saved.
+  integer(I_P),       intent(IN)::    in1      !< Actual in1 index.
+  integer(I_P)::                      err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                      UnitFree !< Free logic unit.
+  logical::                           is_file  !< Flag for inquiring the presence of boundary conditions file.
+  character(DI_P)::                   rks      !< String containing myrank.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
+  if (.NOT.is_file) call File_Not_Found(myrank,filename,'load_gbc_in1')
+  open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
+  err = read_primitive(scalar=global%bc%in1(in1),format='*',unit=UnitFree)
+  close(UnitFree)
+  rks = 'rank'//trim(str(.true.,myrank))
+  write(stdout,'(A)',iostat=err)trim(rks)//'----------------------------------------------------------------------'
+  write(stdout,'(A)',iostat=err)trim(rks)//' Inflow 1 primitive variables loaded:'
+  err = global%bc%in1(in1)%pprint(myrank=myrank,unit=stdout)
+  write(stdout,'(A)',iostat=err)trim(rks)//'----------------------------------------------------------------------'
+  write(stdout,*,iostat=err)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction load_gbc_in1
+
+  !> Function for loading block boundary conditions file.
+  !> @return \b err integer(I4P) variable.
+  function load_bbc(block,myrank,filename) result(err)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Block), intent(INOUT):: block    !< Block level data.
   integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
-  character(*),      intent(IN)::    filename !< Name of file where boundary conditions variables are saved.
-  type(Type_Global), intent(INOUT):: global   !< Global level data.
+  character(*),      intent(IN)::    filename !< Name of file where mesh variables are saved.
   integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
   integer(I_P)::                     UnitFree !< Free logic unit.
   logical::                          is_file  !< Flag for inquiring the presence of boundary conditions file.
@@ -558,36 +646,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
-  if (.NOT.is_file) call File_Not_Found(myrank,filename,'load_gbc_in1')
-  UnitFree = Get_Unit()
-  open(unit = UnitFree, file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
-  err = read(UnitFree,'*',global%bc%in1)
-  close(UnitFree)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction load_gbc_in1
-
-  !> Function for loading block boundary conditions file.
-  !> @return \b err integer(I4P) variable.
-  function load_bbc(myrank,filename,block) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),     intent(IN)::    myrank   !< Actual rank process.
-  character(*),     intent(IN)::    filename !< Name of file where mesh variables are saved.
-  type(Type_Block), intent(INOUT):: block    !< Block level data.
-  integer(I_P)::                    err      !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I_P)::                    UnitFree !< Free logic unit.
-  logical::                         is_file  !< Flag for inquiring the presence of boundary conditions file.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
   if (.NOT.is_file) call File_Not_Found(myrank,filename,'load_bbc')
-  UnitFree = Get_Unit()
-  open(unit=UnitFree, file=adjustl(trim(filename)), status='OLD', action='READ', form='UNFORMATTED')
-  err = read(UnitFree,block%bc%BCi)
-  err = read(UnitFree,block%bc%BCj)
-  err = read(UnitFree,block%bc%BCk)
+  open(unit=Get_Unit(UnitFree), file=adjustl(trim(filename)), status='OLD', action='READ', form='UNFORMATTED')
+  err = read_bc(array3D=block%bc%BCi,unit=UnitFree)
+  err = read_bc(array3D=block%bc%BCj,unit=UnitFree)
+  err = read_bc(array3D=block%bc%BCk,unit=UnitFree)
   close(UnitFree)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -595,21 +658,20 @@ contains
 
   !> Function for saving block boundary conditions file.
   !> @return \b err integer(I4P) variable.
-  function save_bbc(filename,block) result(err)
+  function save_bbc(block,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  character(*),     intent(IN):: filename !< Name of file where mesh variables are saved.
-  type(Type_Block), intent(IN):: block    !< Block level data.
-  integer(I_P)::                 err      !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I_P)::                 UnitFree !< Free logic unit.
+  class(Type_Block), intent(IN):: block    !< Block level data.
+  character(*),      intent(IN):: filename !< Name of file where mesh variables are saved.
+  integer(I_P)::                  err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                  UnitFree !< Free logic unit.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  UnitFree = Get_Unit()
-  open(unit=UnitFree, file=adjustl(trim(filename)), action='WRITE', form='UNFORMATTED')
-  err = write(UnitFree,block%bc%BCi)
-  err = write(UnitFree,block%bc%BCj)
-  err = write(UnitFree,block%bc%BCk)
+  open(unit=Get_Unit(UnitFree), file=adjustl(trim(filename)), action='WRITE', form='UNFORMATTED')
+  err = write_bc(array3D=block%bc%BCi,unit=UnitFree)
+  err = write_bc(array3D=block%bc%BCj,unit=UnitFree)
+  err = write_bc(array3D=block%bc%BCk,unit=UnitFree)
   close(UnitFree)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -617,24 +679,23 @@ contains
 
   !> Function for loading solver option variables.
   !> @return \b err integer(I4P) variable.
-  function load_gfluid_soption(myrank,filename,global) result(err)
+  function load_gfluid_soption(global,myrank,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank   !< Rank process identification for MPI communications.
-  character(*),      intent(IN)::    filename !< Name of file where option variables are saved.
-  type(Type_Global), intent(INOUT):: global   !< Global level data.
-  integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I_P)::                     UnitFree !< Free logic unit.
-  logical::                          is_file  !< Flag for inquiring the presence of option file.
-  character(8)::                     timing   !< timing = 'unsteady' simulation otherwise steady one.
+  class(Type_Global), intent(INOUT):: global   !< Global level data.
+  integer(I_P),       intent(IN)::    myrank   !< Rank process identification for MPI communications.
+  character(*),       intent(IN)::    filename !< Name of file where option variables are saved.
+  integer(I_P)::                      err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                      UnitFree !< Free logic unit.
+  logical::                           is_file  !< Flag for inquiring the presence of option file.
+  character(8)::                      timing   !< timing = 'unsteady' simulation otherwise steady one.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   err = 1
   inquire(file=adjustl(trim(filename)),exist=is_file)
   if (.NOT.is_file) call File_Not_Found(myrank,filename,'load_gfluid_soption')
-  UnitFree = Get_Unit()
-  open(unit = UnitFree, file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
+  open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
   read(UnitFree,*,iostat=err) ! record skipped because unnecessary
   read(UnitFree,*,iostat=err) ! record skipped because unnecessary
   read(UnitFree,*,iostat=err)timing ; timing = Upper_Case(timing) ; global%fluid%unsteady = (adjustl(trim(timing))=='UNSTEADY')
@@ -644,6 +705,15 @@ contains
   read(UnitFree,*,iostat=err)global%fluid%rk_ord
   read(UnitFree,*,iostat=err)global%fluid%CFL
   read(UnitFree,*,iostat=err)global%fluid%residual_toll
+  read(UnitFree,*,iostat=err) ! record skipped because unnecessary
+  read(UnitFree,*,iostat=err)global%adim%Re
+  read(UnitFree,*,iostat=err)global%adim%Fr
+  read(UnitFree,*,iostat=err)global%adim%Pr
+  read(UnitFree,*,iostat=err) ! record skipped because unnecessary
+  read(UnitFree,*,iostat=err)global%adim%L0
+  read(UnitFree,*,iostat=err)global%adim%r0
+  read(UnitFree,*,iostat=err)global%adim%v0
+  read(UnitFree,*,iostat=err)global%adim%c0
   close(UnitFree)
   if (global%fluid%unsteady) then
     if (global%fluid%Nmax>0_I8P) then
@@ -652,33 +722,33 @@ contains
   else
     global%fluid%Tmax=-1._R_P ! the value of Tmax is ignored because steady simulation
   endif
+  call compute_values0(global) ! computing the reference values for non-dimensional quantities
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction load_gfluid_soption
 
   !> Function for loading the number of species from fluid dynamic file "filename".
   !> @return \b err integer(I4P) variable.
-  function load_gfluid_Ns(binary,myrank,filename,global) result(err)
+  function load_gfluid_Ns(global,binary,myrank,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  logical,           intent(IN), optional:: binary   !< Flag for binary of ascii input file.
-  integer(I_P),      intent(IN)::           myrank   !< Actual rank process.
-  character(*),      intent(IN)::           filename !< Name of file where mesh variables are saved.
-  type(Type_Global), intent(INOUT)::        global   !< Global level data.
-  integer(I_P)::                            err      !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I_P)::                            UnitFree !< Free logic unit.
-  logical::                                 is_file  !< Flag for inquiring the presence of fluid dynamic file.
+  class(Type_Global), intent(INOUT)::        global   !< Global level data.
+  logical,            intent(IN), optional:: binary   !< Flag for binary of ascii input file.
+  integer(I_P),       intent(IN)::           myrank   !< Actual rank process.
+  character(*),       intent(IN)::           filename !< Name of file where mesh variables are saved.
+  integer(I_P)::                             err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                             UnitFree !< Free logic unit.
+  logical::                                  is_file  !< Flag for inquiring the presence of fluid dynamic file.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   inquire(file=trim(filename),exist=is_file,iostat=err)
   if (.NOT.is_file) call File_Not_Found(myrank,filename,'load_gfluid_Ns')
-  UnitFree = Get_Unit()
   if (present(binary)) then
-    open(unit = UnitFree, file = trim(filename), status = 'OLD', action = 'READ', form = 'UNFORMATTED')
+    open(unit = Get_Unit(UnitFree), file = trim(filename), status = 'OLD', action = 'READ', form = 'UNFORMATTED')
     read(UnitFree,iostat=err)global%fluid%Ns
   else
-    open(unit = UnitFree, file = trim(filename), status = 'OLD', action = 'READ', form = 'FORMATTED')
+    open(unit = Get_Unit(UnitFree), file = trim(filename), status = 'OLD', action = 'READ', form = 'FORMATTED')
     read(UnitFree,*,iostat=err) ! record skipped
     read(UnitFree,*,iostat=err) ! record skipped
     read(UnitFree,*,iostat=err)global%fluid%Ns
@@ -692,28 +762,27 @@ contains
 
   !> Function for loading initial species from ascii file.
   !> @return \b err integer(I4P) variable.
-  function load_gfluid_0species(myrank,filename,global) result(err)
+  function load_gfluid_0species(global,myrank,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
-  character(*),      intent(IN)::    filename !< Name of file where initial species are saved.
-  type(Type_Global), intent(INOUT):: global   !< Global level data.
-  integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I_P)::                     UnitFree !< Free logic unit.
-  logical::                          is_file  !< Flag for inquiring the presence of initial species file.
-  integer(I_P)::                     s        !< Species counter.
-  real(R_P)::                        g        !< Specific heats ratio (cp/cv).
-  real(R_P)::                        R        !< Specific heats difference (cp-cv).
+  class(Type_Global), intent(INOUT):: global   !< Global level data.
+  integer(I_P),       intent(IN)::    myrank   !< Actual rank process.
+  character(*),       intent(IN)::    filename !< Name of file where initial species are saved.
+  integer(I_P)::                      err      !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                      UnitFree !< Free logic unit.
+  logical::                           is_file  !< Flag for inquiring the presence of initial species file.
+  integer(I_P)::                      s        !< Species counter.
+  real(R_P)::                         g        !< Specific heats ratio (cp/cv).
+  real(R_P)::                         R        !< Specific heats difference (cp-cv).
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
   if (.NOT.is_file) call File_Not_Found(myrank,filename,'load_gfluid_0species')
-  UnitFree = Get_Unit()
-  open(unit = UnitFree, file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
+  open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
   read(UnitFree,*,iostat=err) ! record skipped
   read(UnitFree,*,iostat=err) ! record skipped
-  read(UnitFree,*,iostat=err)global%fluid%Ns ; call alloc_global_fluid(global=global)
+  read(UnitFree,*,iostat=err)global%fluid%Ns ; call global%alloc_fluid
   do s=1,global%fluid%Ns
     read(UnitFree,*,iostat=err) ! record skipped
     read(UnitFree,*,iostat=err)g
@@ -740,13 +809,13 @@ contains
 
   !> Function for loading fluid dynamic file.
   !> @return \b err integer(I4P) variable.
-  function load_bfluid(myrank,filename,global,block) result(err)
+  function load_bfluid(block,myrank,filename,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
+  class(Type_Block), intent(INOUT):: block    !< Block level data.
   integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
   character(*),      intent(IN)::    filename !< Name of file where mesh variables are saved.
   type(Type_Global), intent(INOUT):: global   !< Global level data.
-  type(Type_Block),  intent(INOUT):: block    !< Block level data.
   integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
   integer(I_P)::                     UnitFree !< Free logic unit.
   logical::                          is_file  !< Flag for inquiring the presence of fluid dynamic file.
@@ -755,14 +824,13 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
   if (.NOT.is_file) call File_Not_Found(myrank,filename,'load_bfluid')
-  UnitFree = Get_Unit()
-  open(unit = UnitFree, file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'UNFORMATTED')
+  open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'UNFORMATTED')
   read(UnitFree,iostat=err)global%fluid%Ns
   read(UnitFree,iostat=err)global%fluid%cp0,global%fluid%cv0
   read(UnitFree,iostat=err)global%fluid%n
   read(UnitFree,iostat=err)global%fluid%t
   read(UnitFree,iostat=err)block%fluid%Dt
-  err = read(UnitFree,block%fluid%P)
+  err = read_primitive(array3D=block%fluid%P,unit=UnitFree)
   close(UnitFree)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -770,25 +838,24 @@ contains
 
   !> Function for saving fluid dynamic file.
   !> @return \b err integer(I4P) variable.
-  function save_bfluid(filename,global,block) result(err)
+  function save_bfluid(block,filename,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
+  class(Type_Block), intent(IN):: block    !< Block level data.
   character(*),      intent(IN):: filename !< Name of file where mesh variables are saved.
   type(Type_Global), intent(IN):: global   !< Global level data.
-  type(Type_Block),  intent(IN):: block    !< Block level data.
   integer(I_P)::                  err      !< Error trapping flag: 0 no errors, >0 error occurs.
   integer(I_P)::                  UnitFree !< Free logic unit.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  UnitFree = Get_Unit()
-  open(unit = UnitFree, file = adjustl(trim(filename)), action = 'WRITE', form = 'UNFORMATTED')
+  open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), action = 'WRITE', form = 'UNFORMATTED')
   write(UnitFree,iostat=err)global%fluid%Ns
   write(UnitFree,iostat=err)global%fluid%cp0,global%fluid%cv0
   write(UnitFree,iostat=err)global%fluid%n
   write(UnitFree,iostat=err)global%fluid%t
   write(UnitFree,iostat=err)block%fluid%Dt
-  err = write(UnitFree,block%fluid%P)
+  err = write_primitive(array3D=block%fluid%P,unit=UnitFree)
   close(UnitFree)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -796,14 +863,14 @@ contains
 
   !> Function for printing to standard output info of block fluid data.
   !> @return \b err integer(I4P) variable.
-  function print_info_bfluid(myrank,blk,grl,global,block) result(err)
+  function print_info_bfluid(block,myrank,blk,grl,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
+  class(Type_Block), intent(IN):: block          !< Block level data.
   integer(I_P),      intent(IN):: myrank         !< Rank process identification for MPI communications.
   integer(I_P),      intent(IN):: blk            !< Actual block number.
   integer(I_P),      intent(IN):: grl            !< Actual grid level number.
   type(Type_Global), intent(IN):: global         !< Global level data.
-  type(Type_Block),  intent(IN):: block          !< Block level data.
   integer(I_P)::                  err            !< Error trapping flag: 0 no errors, >0 error occurs.
   character(DR_P)::               vmax,vmin      !< String for printing max and min of variables.
   real(R_P), allocatable::        dummy(:,:,:,:) !<  Dummy variables for printing only internal cells info.
@@ -829,7 +896,7 @@ contains
   do k=1,Nk
     do j=1,Nj
       do i=1,Ni
-        dummy(:,i,j,k) = cons2array(block%fluid%U(i,j,k))
+        dummy(:,i,j,k) = block%fluid%U(i,j,k)%cons2array()
       enddo
     enddo
   enddo
@@ -842,7 +909,7 @@ contains
   do k=1,Nk
     do j=1,Nj
       do i=1,Ni
-        dummy(:,i,j,k) = prim2array(block%fluid%P(i,j,k))
+        dummy(:,i,j,k) = block%fluid%P(i,j,k)%prim2array()
       enddo
     enddo
   enddo

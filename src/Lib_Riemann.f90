@@ -1,5 +1,16 @@
-!> This module contains procedures for computing the solution of a Riemann Problem.
+!> This module contains procedures for computing the solution of the Riemann Problem for the Euler's conservation laws.
 !> This is a library module.
+!> The Riemann Problem solvers provide as solution the convective fluxes
+!> \f$(\overline{\overline F} - \overline{\overline {{Q_S}}})_{conv} \f$ normal to
+!> the interface direction. The solvers contained into this library have a unique API. They take as input the primitive variables
+!> in the left (state 1) and right (state 4) cells with respect the interface and provide the convective fluxes as output:
+!> @code
+!> ...
+!> call Riem_Solver(p1,r1,u1,g1,p4,r4,u4,g4,F_r,F_u,F_E)
+!> ...
+!> @endcode
+!> where \f$p_1,\rho_1,u_1,\gamma_1\f$ define the left state, \f$p_4,\rho_4,u_4,\gamma_4\f$ define the right state and \f$F_r\f$,
+!> \f$F_u\f$ and \f$F_E\f$ are the convective fluxes of mass, momentum and energy conservation, respectively.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
 !> @ingroup Library
 module Lib_Riemann
@@ -487,9 +498,9 @@ contains
   endsubroutine InterStates23up
 
   subroutine sampling_fluxes(p1,r1,u1,a1,g1,delta1,eta1, &
-                                       p4,r4,u4,a4,g4,delta4,eta4, &
-                                       p23,r2,r3,S,S1,S2,S3,S4,    &
-                                       F_r,F_u,F_E)
+                             p4,r4,u4,a4,g4,delta4,eta4, &
+                             p23,r2,r3,S,S1,S2,S3,S4,    &
+                             F_r,F_u,F_E)
   !---------------------------------------------------------------------------------------------------------------------------------
   ! Subroutine for sampling interface solution and computing fluxes.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -523,7 +534,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  write(*,'(A,6E29.17)')'cazzo ',-S1,S1*S2,S2*S,S*S3,S3*S4,S4
   select case(minloc([-S1,S1*S2,S2*S,S*S3,S3*S4,S4],dim=1))
   case(1) ! left supersonic
     call fluxes(p = p1, r = r1, u = u1, g = g1, F_r = F_r, F_u = F_u, F_E = F_E)

@@ -13,28 +13,23 @@
 !> @note The operators of assignment (=), multiplication (*), division (/), sum (+) and subtraction (-) have been overloaded.
 !> Therefore this module provides a far-complete algebra based on Type_Conservative derived type. This algebra simplifies the
 !> numerical integration of Partial Differential Equations (PDE) systems based on conservative formulation.
-!> @todo \b WriteRead: Complete the write and read functions
 !> @todo \b DocComplete: Complete the documentation of internal procedures
 module Data_Type_Conservative
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                              ! Integers and reals precision definition.
-USE Data_Type_Vector,                       & ! Definition of Type_Vector.
-                      set_vector  => set,   & ! Function for setting Type_Vector.
-                      get_vector  => get      ! Function for getting Type_Vector.
+USE IR_Precision     ! Integers and reals precision definition.
+USE Data_Type_Vector ! Definition of Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 private
-public:: init,set,free
-!public:: write,read
+public:: write_conservative,read_conservative
 public:: assignment (=)
 public:: operator (*)
 public:: operator (/)
 public:: operator (+)
 public:: operator (-)
 public:: operator (.dot.)
-public:: cons2array,array2cons
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -45,76 +40,19 @@ public:: cons2array,array2cons
 !> a variable defined as Type_Conservative the free function must be invoked to free the memory of the dynamic component.
 !> @ingroup DerivedType
 type, public:: Type_Conservative
-  sequence
   real(R_P), allocatable:: rs(:)       !< Density of single species [1:Ns].
   type(Type_Vector)::      rv          !< Momentum vector.
   real(R_P)::              re = 0._R_P !< Product of density for specific total internal energy (sum(r)*E).
+  contains
+    procedure, non_overridable:: init       ! Procedure for initilizing allocatable variables.
+    procedure, non_overridable:: free       ! Procedure for freeing the memory of allocatable variables.
+    procedure, non_overridable:: cons2array ! Procedure for converting derived type Type_Conservative to array.
+    procedure, non_overridable:: array2cons ! Procedure for converting array to derived type Type_Conservative.
+    procedure, non_overridable:: pprint     ! Procedure for printing Type_Conservative components with a "pretty" format.
 endtype Type_Conservative
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!> @brief Subroutine for initializing Type_Conservative variable.
-!> It is a generic interface to 5 different subroutines as it can be used for initializing scalar variables, 1D/2D/3D or 4D arrays.
-!> The calling signatures are:
-!> @code ...
-!> integer(I_P):: Ns
-!> real(R_P):: rs(1:Ns)
-!> type(Type_Vector):: rv
-!> real(R_P):: re
-!> type(Type_Conservative):: cons_scal,cons_1D(10),cons_2D(10,2),cons_3D(10,2,3),cons_4D(10,2,3,4)
-!> ...
-!> ! initializing cons_scal, cons_1D, cons_2D, cons_3D  and cons_4D
-!> call init(rs,rv,re,Ns,cons_scal)
-!> call init(rs,rv,re,Ns,cons_1D)
-!> call init(rs,rv,re,Ns,cons_2D)
-!> call init(rs,rv,re,Ns,cons_3D)
-!> call init(rs,rv,re,Ns,cons_4D)
-!> ... @endcode
-!> @note rs,rv,re,Ns are optional.
-!> @ingroup Interface,Data_Type_ConservativePublicProcedure
-interface init
-  module procedure Init_Scalar,Init_Array1D,Init_Array2D,Init_Array3D,Init_Array4D
-endinterface
-!> @brief Subroutine for setting Type_Conservative variable.
-!> It is a generic interface to 5 different subroutines as it can be used for setting scalar variables, 1D/2D/3D or 4D arrays.
-!> The calling signatures are:
-!> @code ...
-!> integer(I_P):: Ns
-!> real(R_P):: rs(1:Ns)
-!> type(Type_Vector):: rv
-!> real(R_P):: re
-!> type(Type_Conservative):: cons_scal,cons_1D(10),cons_2D(10,2),cons_3D(10,2,3),cons_4D(10,2,3,4)
-!> ...
-!> ! setting cons_scal, cons_1D, cons_2D, cons_3D  and cons_4D
-!> call set(rs,rv,re,Ns,cons_scal)
-!> call set(rs,rv,re,Ns,cons_1D)
-!> call set(rs,rv,re,Ns,cons_2D)
-!> call set(rs,rv,re,Ns,cons_3D)
-!> call set(rs,rv,re,Ns,cons_4D)
-!> ... @endcode
-!> @note rs,rv,re,Ns are optional.
-!> @ingroup Interface,Data_Type_ConservativePublicProcedure
-interface set
-  module procedure Set_Scalar,Set_Array1D,Set_Array2D,Set_Array3D,Set_Array4D
-endinterface
-!> @brief Function for freeing the memory of Type_Conservative \em dynamic components.
-!> This is a generic interface to 5 functions as it can be used for scalar variables, 1D/2D/3D or 4D arrays. The calling signatures
-!> are:
-!> @code ...
-!> integer(I4P):: err
-!> type(Type_Conservative):: cons_scal,cons_1D(10),cons_2D(10,2),cons_3D(10,2,3),cons_4D(10,2,3,4)
-!> ...
-!> ! freeing dynamic components memory of cons_scal, cons_1D, cons_2D, cons_3D  and cons_4D
-!> err = free(cons_scal)
-!> err = free(cons_1D)
-!> err = free(cons_2D)
-!> err = free(cons_3D)
-!> err = free(cons_4D)
-!> ... @endcode
-!> @ingroup Interface,Data_Type_ConservativePublicProcedure
-interface free
-  module procedure Free_Scalar,Free_Array1D,Free_Array2D,Free_Array3D,Free_Array4D
-endinterface
 !> @brief Assignment operator (=) overloading.
 !> @ingroup Interface
 interface assignment (=)
@@ -284,361 +222,337 @@ interface operator (.dot.)
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  !> @ingroup Data_Type_ConservativePrivateProcedure
+  !> @ingroup Data_Type_ConservativePublicProcedure
   !> @{
-  !>Subroutine for initializing components of Type_Conservative (scalar) variable.
-  pure subroutine Init_Scalar(rs,rv,re,Ns,cons)
+  !> @brief Function for writing Type_Conservative data.
+  !> The vector data could be scalar, one, two and three dimensional array. The format could be ascii or binary.
+  !> @return \b err integer(I_P) variable for error trapping.
+  function write_conservative(scalar,array1D,array2D,array3D,format,unit) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),               intent(IN), optional:: rs(:) !< Density of single species [1:Ns].
-  type(Type_Vector),       intent(IN), optional:: rv    !< Momentum vector.
-  real(R_P),               intent(IN), optional:: re    !< Product of density for total internal energy (sum(r)*E).
-  integer(I_P),            intent(IN)::           Ns    !< Number of species.
-  type(Type_Conservative), intent(INOUT)::        cons  !< Conservative initialized data.
+  type(Type_Conservative), intent(IN), optional:: scalar                !< Scalar conservative data.
+  type(Type_Conservative), intent(IN), optional:: array1D(:)            !< One dimensional array conservative data.
+  type(Type_Conservative), intent(IN), optional:: array2D(:,:)          !< Two dimensional array conservative data.
+  type(Type_Conservative), intent(IN), optional:: array3D(:,:,:)        !< Three dimensional array conservative data.
+  character(*),            intent(IN), optional:: format                !< Format specifier.
+  integer(I4P),            intent(IN)::           unit                  !< Logic unit.
+  integer(I_P)::                                  err                   !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                                  i1,i2,i3,N(1:2,1:3),j !< Counters.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (present(format)) then
+    select case(adjustl(trim(format)))
+    case('*')
+      if (present(scalar)) then
+        write(unit,*,iostat=err)scalar%rs(:)
+        err = write_vector(scalar=scalar%rv,format=format,unit=unit)
+        write(unit,*,iostat=err)scalar%re
+      elseif (present(array1D)) then
+        do j=1,1
+          N(1,j) = lbound(array1D,dim=j)
+          N(2,j) = ubound(array1D,dim=j)
+        enddo
+        write(unit,*,iostat=err)(array1D(i1)%rs(:),i1=N(1,1),N(2,1))
+        err = write_vector(array1D=array1D%rv,format=format,unit=unit)
+        write(unit,*,iostat=err)array1D%re
+      elseif (present(array2D)) then
+        do j=1,2
+          N(1,j) = lbound(array2D,dim=j)
+          N(2,j) = ubound(array2D,dim=j)
+        enddo
+        write(unit,*,iostat=err)((array2D(i1,i2)%rs(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2))
+        err = write_vector(array2D=array2D%rv,format=format,unit=unit)
+        write(unit,*,iostat=err)array2D%re
+      elseif (present(array3D)) then
+        do j=1,3
+          N(1,j) = lbound(array3D,dim=j)
+          N(2,j) = ubound(array3D,dim=j)
+        enddo
+        write(unit,*,iostat=err)(((array3D(i1,i2,i3)%rs(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2)),i3=N(1,3),N(2,3))
+        err = write_vector(array3D=array3D%rv,format=format,unit=unit)
+        write(unit,*,iostat=err)array3D%re
+      endif
+    case default
+      if (present(scalar)) then
+        write(unit,adjustl(trim(format)),iostat=err)scalar%rs(:)
+        err = write_vector(scalar=scalar%rv,format=format,unit=unit)
+        write(unit,adjustl(trim(format)),iostat=err)scalar%re
+      elseif (present(array1D)) then
+        do j=1,1
+          N(1,j) = lbound(array1D,dim=j)
+          N(2,j) = ubound(array1D,dim=j)
+        enddo
+        write(unit,adjustl(trim(format)),iostat=err)(array1D(i1)%rs(:),i1=N(1,1),N(2,1))
+        err = write_vector(array1D=array1D%rv,format=format,unit=unit)
+        write(unit,adjustl(trim(format)),iostat=err)array1D%re
+      elseif (present(array2D)) then
+        do j=1,2
+          N(1,j) = lbound(array2D,dim=j)
+          N(2,j) = ubound(array2D,dim=j)
+        enddo
+        write(unit,adjustl(trim(format)),iostat=err)((array2D(i1,i2)%rs(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2))
+        err = write_vector(array2D=array2D%rv,format=format,unit=unit)
+        write(unit,adjustl(trim(format)),iostat=err)array2D%re
+      elseif (present(array3D)) then
+        do j=1,3
+          N(1,j) = lbound(array3D,dim=j)
+          N(2,j) = ubound(array3D,dim=j)
+        enddo
+        write(unit,adjustl(trim(format)),iostat=err)(((array3D(i1,i2,i3)%rs(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2)),i3=N(1,3),N(2,3))
+        err = write_vector(array3D=array3D%rv,format=format,unit=unit)
+        write(unit,adjustl(trim(format)),iostat=err)array3D%re
+      endif
+    endselect
+  else
+    if (present(scalar)) then
+      write(unit,iostat=err)scalar%rs(:)
+      err = write_vector(scalar=scalar%rv,unit=unit)
+      write(unit,iostat=err)scalar%re
+    elseif (present(array1D)) then
+      do j=1,1
+        N(1,j) = lbound(array1D,dim=j)
+        N(2,j) = ubound(array1D,dim=j)
+      enddo
+      write(unit,iostat=err)(array1D(i1)%rs(:),i1=N(1,1),N(2,1))
+      err = write_vector(array1D=array1D%rv,unit=unit)
+      write(unit,iostat=err)array1D%re
+    elseif (present(array2D)) then
+      do j=1,2
+        N(1,j) = lbound(array2D,dim=j)
+        N(2,j) = ubound(array2D,dim=j)
+      enddo
+      write(unit,iostat=err)((array2D(i1,i2)%rs(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2))
+      err = write_vector(array2D=array2D%rv,unit=unit)
+      write(unit,iostat=err)array2D%re
+    elseif (present(array3D)) then
+      do j=1,3
+        N(1,j) = lbound(array3D,dim=j)
+        N(2,j) = ubound(array3D,dim=j)
+      enddo
+      write(unit,iostat=err)(((array3D(i1,i2,i3)%rs(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2)),i3=N(1,3),N(2,3))
+      err = write_vector(array3D=array3D%rv,unit=unit)
+      write(unit,iostat=err)array3D%re
+    endif
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction write_conservative
+
+  !> @brief Function for reading Type_Conservative data.
+  !> The vector data could be scalar, one, two and three dimensional array. The format could be ascii or binary.
+  !> @return \b err integer(I_P) variable for error trapping.
+  function read_conservative(scalar,array1D,array2D,array3D,format,unit) result(err)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Conservative), intent(INOUT), optional:: scalar                !< Scalar conservative data.
+  type(Type_Conservative), intent(INOUT), optional:: array1D(:)            !< One dimensional array conservative data.
+  type(Type_Conservative), intent(INOUT), optional:: array2D(:,:)          !< Two dimensional array conservative data.
+  type(Type_Conservative), intent(INOUT), optional:: array3D(:,:,:)        !< Three dimensional array conservative data.
+  character(*),            intent(IN),    optional:: format                !< Format specifier.
+  integer(I4P),            intent(IN)::              unit                  !< Logic unit.
+  integer(I_P)::                                     err                   !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                                     i1,i2,i3,N(1:2,1:3),j !< Counters.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (present(format)) then
+    select case(adjustl(trim(format)))
+    case('*')
+      if (present(scalar)) then
+        read(unit,*,iostat=err)scalar%rs(:)
+        err = read_vector(scalar=scalar%rv,format=format,unit=unit)
+        read(unit,*,iostat=err)scalar%re
+      elseif (present(array1D)) then
+        do j=1,1
+          N(1,j) = lbound(array1D,dim=j)
+          N(2,j) = ubound(array1D,dim=j)
+        enddo
+        read(unit,*,iostat=err)(array1D(i1)%rs(:),i1=N(1,1),N(2,1))
+        err = read_vector(array1D=array1D%rv,format=format,unit=unit)
+        read(unit,*,iostat=err)array1D%re
+      elseif (present(array2D)) then
+        do j=1,2
+          N(1,j) = lbound(array2D,dim=j)
+          N(2,j) = ubound(array2D,dim=j)
+        enddo
+        read(unit,*,iostat=err)((array2D(i1,i2)%rs(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2))
+        err = read_vector(array2D=array2D%rv,format=format,unit=unit)
+        read(unit,*,iostat=err)array2D%re
+      elseif (present(array3D)) then
+        do j=1,3
+          N(1,j) = lbound(array3D,dim=j)
+          N(2,j) = ubound(array3D,dim=j)
+        enddo
+        read(unit,*,iostat=err)(((array3D(i1,i2,i3)%rs(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2)),i3=N(1,3),N(2,3))
+        err = read_vector(array3D=array3D%rv,format=format,unit=unit)
+        read(unit,*,iostat=err)array3D%re
+      endif
+    case default
+      if (present(scalar)) then
+        read(unit,adjustl(trim(format)),iostat=err)scalar%rs(:)
+        err = read_vector(scalar=scalar%rv,format=format,unit=unit)
+        read(unit,adjustl(trim(format)),iostat=err)scalar%re
+      elseif (present(array1D)) then
+        do j=1,1
+          N(1,j) = lbound(array1D,dim=j)
+          N(2,j) = ubound(array1D,dim=j)
+        enddo
+        read(unit,adjustl(trim(format)),iostat=err)(array1D(i1)%rs(:),i1=N(1,1),N(2,1))
+        err = read_vector(array1D=array1D%rv,format=format,unit=unit)
+        read(unit,adjustl(trim(format)),iostat=err)array1D%re
+      elseif (present(array2D)) then
+        do j=1,2
+          N(1,j) = lbound(array2D,dim=j)
+          N(2,j) = ubound(array2D,dim=j)
+        enddo
+        read(unit,adjustl(trim(format)),iostat=err)((array2D(i1,i2)%rs(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2))
+        err = read_vector(array2D=array2D%rv,format=format,unit=unit)
+        read(unit,adjustl(trim(format)),iostat=err)array2D%re
+      elseif (present(array3D)) then
+        do j=1,3
+          N(1,j) = lbound(array3D,dim=j)
+          N(2,j) = ubound(array3D,dim=j)
+        enddo
+        read(unit,adjustl(trim(format)),iostat=err)(((array3D(i1,i2,i3)%rs(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2)),i3=N(1,3),N(2,3))
+        err = read_vector(array3D=array3D%rv,format=format,unit=unit)
+        read(unit,adjustl(trim(format)),iostat=err)array3D%re
+      endif
+    endselect
+  else
+    if (present(scalar)) then
+      read(unit,iostat=err)scalar%rs(:)
+      err = read_vector(scalar=scalar%rv,unit=unit)
+      read(unit,iostat=err)scalar%re
+    elseif (present(array1D)) then
+      do j=1,1
+        N(1,j) = lbound(array1D,dim=j)
+        N(2,j) = ubound(array1D,dim=j)
+      enddo
+      read(unit,iostat=err)(array1D(i1)%rs(:),i1=N(1,1),N(2,1))
+      err = read_vector(array1D=array1D%rv,unit=unit)
+      read(unit,iostat=err)array1D%re
+    elseif (present(array2D)) then
+      do j=1,2
+        N(1,j) = lbound(array2D,dim=j)
+        N(2,j) = ubound(array2D,dim=j)
+      enddo
+      read(unit,iostat=err)((array2D(i1,i2)%rs(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2))
+      err = read_vector(array2D=array2D%rv,unit=unit)
+      read(unit,iostat=err)array2D%re
+    elseif (present(array3D)) then
+      do j=1,3
+        N(1,j) = lbound(array3D,dim=j)
+        N(2,j) = ubound(array3D,dim=j)
+      enddo
+      read(unit,iostat=err)(((array3D(i1,i2,i3)%rs(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2)),i3=N(1,3),N(2,3))
+      err = read_vector(array3D=array3D%rv,unit=unit)
+      read(unit,iostat=err)array3D%re
+    endif
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction read_conservative
+  !> @}
+
+  !> @ingroup Data_Type_ConservativePrivateProcedure
+  !> @{
+  !> @brief Subroutine for initializing Type_Conservative allocatable variables.
+  elemental subroutine init(cons,Ns)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Conservative), intent(INOUT):: cons !< Conservative initialized data.
+  integer(I_P),             intent(IN)::    Ns   !< Number of species.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   if (allocated(cons%rs)) deallocate(cons%rs) ; allocate(cons%rs(1:Ns)) ; cons%rs = 0._R_P
-  if (present(rs)) cons%rs = rs
-  if (present(rv)) cons%rv = rv
-  if (present(re)) cons%re = re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Init_Scalar
+  endsubroutine init
 
-  !>Subroutine for initializing components of Type_Conservative (array 1D) variable.
-  pure subroutine Init_Array1D(rs,rv,re,Ns,cons)
+  !> @brief Subroutine for freeing the memory of Type_Conservative allocatable variables.
+  elemental subroutine free(cons)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),               intent(IN), optional:: rs(:)   !< Density of single species [1:Ns].
-  type(Type_Vector),       intent(IN), optional:: rv      !< Momentum vector.
-  real(R_P),               intent(IN), optional:: re      !< Product of density for total internal energy (sum(r)*E).
-  integer(I_P),            intent(IN)::           Ns      !< Number of species.
-  type(Type_Conservative), intent(INOUT)::        cons(:) !< Conservative initialized data.
-  integer(I4P)::                                  i       !< Counter.
+  class(Type_Conservative), intent(INOUT):: cons !< Conservative data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  do i=lbound(cons,dim=1),ubound(cons,dim=1)
-    if (allocated(cons(i)%rs)) deallocate(cons(i)%rs) ; allocate(cons(i)%rs(1:Ns)) ; cons(i)%rs=0._R_P
-    if (present(rs)) cons(i)%rs = rs
-    if (present(rv)) cons(i)%rv = rv
-    if (present(re)) cons(i)%re = re
+  if (allocated(cons%rs)) deallocate(cons%rs)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine free
+
+  !> @brief Function for converting derived type Type_Conservative to array.
+  !> @return \b array real(R_P), dimension(1:size(cons\%rs)+4) variable.
+  pure function cons2array(cons) result(array)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Conservative), intent(IN):: cons                     !< Derived type conservative data.
+  real(R_P)::                            array(1:size(cons%rs)+4) !< Conservative data in the form of array.
+  integer(I_P)::                         Ns                       !< Number of species.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  Ns = size(cons%rs)
+  array(1:Ns) = cons%rs
+  array(Ns+1) = cons%rv%x
+  array(Ns+2) = cons%rv%y
+  array(Ns+3) = cons%rv%z
+  array(Ns+4) = cons%re
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction cons2array
+
+  !> Subroutine for converting array to derived type Type_Conservative.
+  pure subroutine array2cons(cons,array)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Conservative), intent(INOUT):: cons     !< Derived type conservative data.
+  real(R_P),                intent(IN)::    array(:) !< Conservative data in the form of array.
+  integer(I_P)::                            Ns       !< Number of species.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  Ns = size(array)-4
+  if (allocated(cons%rs)) deallocate(cons%rs) ; allocate(cons%rs(1:Ns))
+  cons%rs   = array(1:Ns)
+  cons%rv%x = array(Ns+1)
+  cons%rv%y = array(Ns+2)
+  cons%rv%z = array(Ns+3)
+  cons%re   = array(Ns+4)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine array2cons
+
+  !> @brief Function for printing in a pretty ascii format the components of type Type_Conservative.
+  !> @return \b err integer(I_P) variable for error trapping.
+  function pprint(cons,myrank,unit) result(err)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Conservative), intent(IN)::           cons   !< Conservatives.
+  integer(I_P),             intent(IN), optional:: myrank !< Actual rank process.
+  integer(I4P),             intent(IN)::           unit   !< Logic unit.
+  integer(I_P)::                                   err    !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                                   Ns     !< Number of species.
+  integer(I_P)::                                   s      !< Species counter.
+  character(DI_P)::                                rks    !< String containing myrank.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  rks = 'rank'//trim(str(.true.,0_I_P)) ; if (present(myrank)) rks = 'rank'//trim(str(.true.,myrank))
+  Ns  = size(cons%rs)
+  do s=1,Ns
+    write(unit,'(A)',iostat=err)trim(rks)//' rs('//trim(str(.true.,s))//')='//str(n=cons%rs(s))
   enddo
+    write(unit,'(A)',iostat=err)trim(rks)//' rv(x)='//str(n=cons%rv%x)
+    write(unit,'(A)',iostat=err)trim(rks)//' rv(y)='//str(n=cons%rv%y)
+    write(unit,'(A)',iostat=err)trim(rks)//' rv(z)='//str(n=cons%rv%z)
+    write(unit,'(A)',iostat=err)trim(rks)//' re   ='//str(n=cons%re  )
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Init_Array1D
-
-  !>Subroutine for initializing components of Type_Conservative (array 2D) variable.
-  pure subroutine Init_Array2D(rs,rv,re,Ns,cons)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),               intent(IN), optional:: rs(:)     !< Density of single species [1:Ns].
-  type(Type_Vector),       intent(IN), optional:: rv        !< Momentum vector.
-  real(R_P),               intent(IN), optional:: re        !< Product of density for total internal energy (sum(r)*E).
-  integer(I_P),            intent(IN)::           Ns        !< Number of species.
-  type(Type_Conservative), intent(INOUT)::        cons(:,:) !< Conservative initialized data.
-  integer(I4P)::                                  i,j       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  do j=lbound(cons,dim=2),ubound(cons,dim=2)
-    do i=lbound(cons,dim=1),ubound(cons,dim=1)
-      if (allocated(cons(i,j)%rs)) deallocate(cons(i,j)%rs) ; allocate(cons(i,j)%rs(1:Ns)) ; cons(i,j)%rs=0._R_P
-      if (present(rs)) cons(i,j)%rs = rs
-      if (present(rv)) cons(i,j)%rv = rv
-      if (present(re)) cons(i,j)%re = re
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Init_Array2D
-
-  !>Subroutine for initializing components of Type_Conservative (array 3D) variable.
-  pure subroutine Init_Array3D(rs,rv,re,Ns,cons)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),               intent(IN), optional:: rs(:)       !< Density of single species [1:Ns].
-  type(Type_Vector),       intent(IN), optional:: rv          !< Momentum vector.
-  real(R_P),               intent(IN), optional:: re          !< Product of density for total internal energy (sum(r)*E).
-  integer(I_P),            intent(IN)::           Ns          !< Number of species.
-  type(Type_Conservative), intent(INOUT)::        cons(:,:,:) !< Conservative initialized data.
-  integer(I4P)::                                  i,j,k       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  do k=lbound(cons,dim=3),ubound(cons,dim=3)
-    do j=lbound(cons,dim=2),ubound(cons,dim=2)
-      do i=lbound(cons,dim=1),ubound(cons,dim=1)
-        if (allocated(cons(i,j,k)%rs)) deallocate(cons(i,j,k)%rs) ; allocate(cons(i,j,k)%rs(1:Ns)) ; cons(i,j,k)%rs=0._R_P
-        if (present(rs)) cons(i,j,k)%rs = rs
-        if (present(rv)) cons(i,j,k)%rv = rv
-        if (present(re)) cons(i,j,k)%re = re
-      enddo
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Init_Array3D
-
-  !>Subroutine for initializing components of Type_Conservative (array 4D) variable.
-  pure subroutine Init_Array4D(rs,rv,re,Ns,cons)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),               intent(IN), optional:: rs(:)         !< Density of single species [1:Ns].
-  type(Type_Vector),       intent(IN), optional:: rv            !< Momentum vector.
-  real(R_P),               intent(IN), optional:: re            !< Product of density for total internal energy (sum(r)*E).
-  integer(I_P),            intent(IN)::           Ns            !< Number of species.
-  type(Type_Conservative), intent(INOUT)::        cons(:,:,:,:) !< Conservative initialized data.
-  integer(I4P)::                                  i,j,k,p       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  do p=lbound(cons,dim=4),ubound(cons,dim=4)
-    do k=lbound(cons,dim=3),ubound(cons,dim=3)
-      do j=lbound(cons,dim=2),ubound(cons,dim=2)
-        do i=lbound(cons,dim=1),ubound(cons,dim=1)
-          if (allocated(cons(i,j,k,p)%rs)) deallocate(cons(i,j,k,p)%rs)
-          allocate(cons(i,j,k,p)%rs(1:Ns)) ; cons(i,j,k,p)%rs=0._R_P
-          if (present(rs)) cons(i,j,k,p)%rs = rs
-          if (present(rv)) cons(i,j,k,p)%rv = rv
-          if (present(re)) cons(i,j,k,p)%re = re
-        enddo
-      enddo
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Init_Array4D
-
-  !>Subroutine for setting components of Type_Conservative (scalar) variable.
-  pure subroutine Set_Scalar(rs,rv,re,cons)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),               intent(IN), optional:: rs(:) !< Density of single species [1:Ns].
-  type(Type_Vector),       intent(IN), optional:: rv    !< Momentum vector.
-  real(R_P),               intent(IN), optional:: re    !< Product of density for total internal energy (sum(r)*E).
-  type(Type_Conservative), intent(INOUT)::        cons  !< Conservative set data.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(rs)) then
-    if (allocated(cons%rs)) deallocate(cons%rs) ; allocate(cons%rs(1:size(rs,dim=1))) ; cons%rs = rs
-  endif
-  if (present(rv)) cons%rv = rv
-  if (present(re)) cons%re = re
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Set_Scalar
-
-  !>Subroutine for setting components of Type_Conservative (array 1D) variable.
-  pure subroutine Set_Array1D(rs,rv,re,cons)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),               intent(IN), optional:: rs(:)   !< Density of single species [1:Ns].
-  type(Type_Vector),       intent(IN), optional:: rv      !< Momentum vector.
-  real(R_P),               intent(IN), optional:: re      !< Product of density for total internal energy (sum(r)*E).
-  type(Type_Conservative), intent(INOUT)::        cons(:) !< Conservative set data.
-  integer(I4P)::                                  i       !< Counter.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  do i=lbound(cons,dim=1),ubound(cons,dim=1)
-    if (present(rs)) then
-      if (allocated(cons(i)%rs)) deallocate(cons(i)%rs) ; allocate(cons(i)%rs(1:size(rs,dim=1))) ; cons(i)%rs = rs
-    endif
-    if (present(rv)) cons(i)%rv = rv
-    if (present(re)) cons(i)%re = re
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Set_Array1D
-
-  !>Subroutine for setting components of Type_Conservative (array 2D) variable.
-  pure subroutine Set_Array2D(rs,rv,re,cons)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),               intent(IN), optional:: rs(:)     !< Density of single species [1:Ns].
-  type(Type_Vector),       intent(IN), optional:: rv        !< Momentum vector.
-  real(R_P),               intent(IN), optional:: re        !< Product of density for total internal energy (sum(r)*E).
-  type(Type_Conservative), intent(INOUT)::        cons(:,:) !< Conservative set data.
-  integer(I4P)::                                  i,j       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  do j=lbound(cons,dim=2),ubound(cons,dim=2)
-    do i=lbound(cons,dim=1),ubound(cons,dim=1)
-      if (present(rs)) then
-        if (allocated(cons(i,j)%rs)) deallocate(cons(i,j)%rs) ; allocate(cons(i,j)%rs(1:size(rs,dim=1))) ; cons(i,j)%rs = rs
-      endif
-      if (present(rv)) cons(i,j)%rv = rv
-      if (present(re)) cons(i,j)%re = re
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Set_Array2D
-
-  !>Subroutine for setting components of Type_Conservative (array 3D) variable.
-  pure subroutine Set_Array3D(rs,rv,re,cons)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),               intent(IN), optional:: rs(:)       !< Density of single species [1:Ns].
-  type(Type_Vector),       intent(IN), optional:: rv          !< Momentum vector.
-  real(R_P),               intent(IN), optional:: re          !< Product of density for total internal energy (sum(r)*E).
-  type(Type_Conservative), intent(INOUT)::        cons(:,:,:) !< Conservative set data.
-  integer(I4P)::                                  i,j,k       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  do k=lbound(cons,dim=3),ubound(cons,dim=3)
-    do j=lbound(cons,dim=2),ubound(cons,dim=2)
-      do i=lbound(cons,dim=1),ubound(cons,dim=1)
-        if (present(rs)) then
-          if (allocated(cons(i,j,k)%rs)) deallocate(cons(i,j,k)%rs) ; allocate(cons(i,j,k)%rs(1:size(rs,dim=1))) ; cons(i,j,k)%rs=rs
-        endif
-        if (present(rv)) cons(i,j,k)%rv = rv
-        if (present(re)) cons(i,j,k)%re = re
-      enddo
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Set_Array3D
-
-  !>Subroutine for setting components of Type_Conservative (array 4D) variable.
-  pure subroutine Set_Array4D(rs,rv,re,cons)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),               intent(IN), optional:: rs(:)         !< Density of single species [1:Ns].
-  type(Type_Vector),       intent(IN), optional:: rv            !< Momentum vector.
-  real(R_P),               intent(IN), optional:: re            !< Product of density for total internal energy (sum(r)*E).
-  type(Type_Conservative), intent(INOUT)::        cons(:,:,:,:) !< Conservative set data.
-  integer(I4P)::                                  i,j,k,p       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  do p=lbound(cons,dim=4),ubound(cons,dim=4)
-    do k=lbound(cons,dim=3),ubound(cons,dim=3)
-      do j=lbound(cons,dim=2),ubound(cons,dim=2)
-        do i=lbound(cons,dim=1),ubound(cons,dim=1)
-          if (present(rs)) then
-            if (allocated(cons(i,j,k,p)%rs)) deallocate(cons(i,j,k,p)%rs)
-            allocate(cons(i,j,k,p)%rs(1:size(rs,dim=1))) ; cons(i,j,k,p)%rs=rs
-          endif
-          if (present(rv)) cons(i,j,k,p)%rv = rv
-          if (present(re)) cons(i,j,k,p)%re = re
-        enddo
-      enddo
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Set_Array4D
-
-  !>Function for freeing the memory of Type_Conservative \em dynamic components (scalar).
-  !> @return \b err integer(I4P) variable.
-  function Free_Scalar(cons) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Conservative), intent(INOUT):: cons !< Conservative data.
-  integer(I4P)::                           err  ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  err = 0_I4P
-  if (allocated(cons%rs)) deallocate(cons%rs,stat=err)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Free_Scalar
-
-  !>Function for freeing the memory of Type_Conservative \em dynamic components (array 1D).
-  !> @return \b err integer(I4P) variable.
-  function Free_Array1D(cons) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Conservative), intent(INOUT):: cons(:) !< Conservative data.
-  integer(I4P)::                           err     !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                           i       !< Counter.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  err = 0_I4P
-  do i=lbound(cons,dim=1),ubound(cons,dim=1)
-    if (allocated(cons(i)%rs)) deallocate(cons(i)%rs,stat=err)
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Free_Array1D
-
-  !>Function for freeing the memory of Type_Conservative \em dynamic components (array 2D).
-  !> @return \b err integer(I4P) variable.
-  function Free_Array2D(cons) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Conservative), intent(INOUT):: cons(:,:) !< Conservative data.
-  integer(I4P)::                           err       !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                           i,j       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  err = 0_I4P
-  do j=lbound(cons,dim=2),ubound(cons,dim=2)
-    do i=lbound(cons,dim=1),ubound(cons,dim=1)
-      if (allocated(cons(i,J)%rs)) deallocate(cons(i,J)%rs,stat=err)
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Free_Array2D
-
-  !>Function for freeing the memory of Type_Conservative \em dynamic components (array 3D).
-  !> @return \b err integer(I4P) variable.
-  function Free_Array3D(cons) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Conservative), intent(INOUT):: cons(:,:,:) !< Conservative data.
-  integer(I4P)::                           err         !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                           i,j,k       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  err = 0_I4P
-  do k=lbound(cons,dim=3),ubound(cons,dim=3)
-    do j=lbound(cons,dim=2),ubound(cons,dim=2)
-      do i=lbound(cons,dim=1),ubound(cons,dim=1)
-        if (allocated(cons(i,j,k)%rs)) deallocate(cons(i,j,k)%rs,stat=err)
-      enddo
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Free_Array3D
-
-  !>Function for freeing the memory of Type_Conservative \em dynamic components (array 4D).
-  !> @return \b err integer(I4P) variable.
-  function Free_Array4D(cons) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Conservative), intent(INOUT):: cons(:,:,:,:) !< Conservative data.
-  integer(I4P)::                           err           !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                           i,j,k,p       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  err = 0_I4P
-  do p=lbound(cons,dim=4),ubound(cons,dim=4)
-    do k=lbound(cons,dim=3),ubound(cons,dim=3)
-      do j=lbound(cons,dim=2),ubound(cons,dim=2)
-        do i=lbound(cons,dim=1),ubound(cons,dim=1)
-          if (allocated(cons(i,j,k,p)%rs)) deallocate(cons(i,j,k,p)%rs,stat=err)
-        enddo
-      enddo
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Free_Array4D
+  endfunction pprint
 
   ! Assignment (=)
   elemental subroutine assign_cons(cons1,cons2)
@@ -653,9 +567,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(cons1%rs).and.allocated(cons2%rs)) cons1%rs = cons2%rs
-                                                   cons1%rv = cons2%rv
-                                                   cons1%re = cons2%re
+  cons1%rs = cons2%rs
+  cons1%rv = cons2%rv
+  cons1%re = cons2%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_cons
@@ -673,9 +587,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(cons%rs)) cons%rs = real(scal,R_P)
-                          cons%rv = real(scal,R_P)
-                          cons%re = real(scal,R_P)
+  cons%rs = real(scal,R_P)
+  cons%rv = real(scal,R_P)
+  cons%re = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR16P
@@ -693,9 +607,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(cons%rs)) cons%rs = real(scal,R_P)
-                          cons%rv = real(scal,R_P)
-                          cons%re = real(scal,R_P)
+  cons%rs = real(scal,R_P)
+  cons%rv = real(scal,R_P)
+  cons%re = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR8P
@@ -712,9 +626,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(cons%rs)) cons%rs = real(scal,R_P)
-                          cons%rv = real(scal,R_P)
-                          cons%re = real(scal,R_P)
+  cons%rs = real(scal,R_P)
+  cons%rv = real(scal,R_P)
+  cons%re = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR4P
@@ -731,9 +645,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(cons%rs)) cons%rs = real(scal,R_P)
-                          cons%rv = real(scal,R_P)
-                          cons%re = real(scal,R_P)
+  cons%rs = real(scal,R_P)
+  cons%rv = real(scal,R_P)
+  cons%re = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI8P
@@ -750,9 +664,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(cons%rs)) cons%rs = real(scal,R_P)
-                          cons%rv = real(scal,R_P)
-                          cons%re = real(scal,R_P)
+  cons%rs = real(scal,R_P)
+  cons%rv = real(scal,R_P)
+  cons%re = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI4P
@@ -769,9 +683,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(cons%rs)) cons%rs = real(scal,R_P)
-                          cons%rv = real(scal,R_P)
-                          cons%re = real(scal,R_P)
+  cons%rs = real(scal,R_P)
+  cons%rv = real(scal,R_P)
+  cons%re = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI2P
@@ -788,9 +702,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(cons%rs)) cons%rs = real(scal,R_P)
-                          cons%rv = real(scal,R_P)
-                          cons%re = real(scal,R_P)
+  cons%rs = real(scal,R_P)
+  cons%rv = real(scal,R_P)
+  cons%re = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI1P
@@ -809,7 +723,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons1%rs)))
+  allocate(mul%rs(1:size(cons1%rs)))
   mul%rs = cons1%rs * cons2%rs
   mul%rv = cons1%rv * cons2%rv
   mul%re = cons1%re * cons2%re
@@ -831,7 +745,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -852,7 +766,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -874,7 +788,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -895,7 +809,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -916,7 +830,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -937,7 +851,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -958,7 +872,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -979,7 +893,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -1000,7 +914,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -1021,7 +935,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -1042,7 +956,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -1063,7 +977,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -1084,7 +998,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -1105,7 +1019,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%rs)) allocate(mul%rs(1:size(cons%rs)))
+  allocate(mul%rs(1:size(cons%rs)))
   mul%rs = real(scal,R_P) * cons%rs
   mul%rv = real(scal,R_P) * cons%rv
   mul%re = real(scal,R_P) * cons%re
@@ -1127,7 +1041,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%rs)) allocate(div%rs(1:size(cons1%rs)))
+  allocate(div%rs(1:size(cons1%rs)))
   div%rs = cons1%rs / cons2%rs
   div%rv = cons1%rv / cons2%rv
   div%re = cons1%re / cons2%re
@@ -1149,7 +1063,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%rs)) allocate(div%rs(1:size(cons%rs)))
+  allocate(div%rs(1:size(cons%rs)))
   div%rs = cons%rs / real(scal,R_P)
   div%rv = cons%rv / real(scal,R_P)
   div%re = cons%re / real(scal,R_P)
@@ -1171,7 +1085,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%rs)) allocate(div%rs(1:size(cons%rs)))
+  allocate(div%rs(1:size(cons%rs)))
   div%rs = cons%rs / real(scal,R_P)
   div%rv = cons%rv / real(scal,R_P)
   div%re = cons%re / real(scal,R_P)
@@ -1192,7 +1106,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%rs)) allocate(div%rs(1:size(cons%rs)))
+  allocate(div%rs(1:size(cons%rs)))
   div%rs = cons%rs / real(scal,R_P)
   div%rv = cons%rv / real(scal,R_P)
   div%re = cons%re / real(scal,R_P)
@@ -1213,7 +1127,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%rs)) allocate(div%rs(1:size(cons%rs)))
+  allocate(div%rs(1:size(cons%rs)))
   div%rs = cons%rs / real(scal,R_P)
   div%rv = cons%rv / real(scal,R_P)
   div%re = cons%re / real(scal,R_P)
@@ -1234,7 +1148,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%rs)) allocate(div%rs(1:size(cons%rs)))
+  allocate(div%rs(1:size(cons%rs)))
   div%rs = cons%rs / real(scal,R_P)
   div%rv = cons%rv / real(scal,R_P)
   div%re = cons%re / real(scal,R_P)
@@ -1255,7 +1169,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%rs)) allocate(div%rs(1:size(cons%rs)))
+  allocate(div%rs(1:size(cons%rs)))
   div%rs = cons%rs / real(scal,R_P)
   div%rv = cons%rv / real(scal,R_P)
   div%re = cons%re / real(scal,R_P)
@@ -1276,7 +1190,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%rs)) allocate(div%rs(1:size(cons%rs)))
+  allocate(div%rs(1:size(cons%rs)))
   div%rs = cons%rs / real(scal,R_P)
   div%rv = cons%rv / real(scal,R_P)
   div%re = cons%re / real(scal,R_P)
@@ -1297,7 +1211,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(pos%rs)) allocate(pos%rs(1:size(cons%rs)))
+  allocate(pos%rs(1:size(cons%rs)))
   pos%rs =  + cons%rs
   pos%rv =  + cons%rv
   pos%re =  + cons%re
@@ -1318,7 +1232,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons1%rs)))
+  allocate(summ%rs(1:size(cons1%rs)))
   summ%rs = cons1%rs + cons2%rs
   summ%rv = cons1%rv + cons2%rv
   summ%re = cons1%re + cons2%re
@@ -1340,7 +1254,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1361,7 +1275,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1383,7 +1297,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1404,7 +1318,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1425,7 +1339,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1446,7 +1360,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1467,7 +1381,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1488,7 +1402,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1509,7 +1423,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1530,7 +1444,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1551,7 +1465,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1572,7 +1486,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1593,7 +1507,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1614,7 +1528,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%rs)) allocate(summ%rs(1:size(cons%rs)))
+  allocate(summ%rs(1:size(cons%rs)))
   summ%rs = real(scal,R_P) + cons%rs
   summ%rv = real(scal,R_P) + cons%rv
   summ%re = real(scal,R_P) + cons%re
@@ -1635,7 +1549,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(neg%rs)) allocate(neg%rs(1:size(cons%rs)))
+  allocate(neg%rs(1:size(cons%rs)))
   neg%rs =  - cons%rs
   neg%rv =  - cons%rv
   neg%re =  - cons%re
@@ -1656,7 +1570,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons1%rs)))
+  allocate(sub%rs(1:size(cons1%rs)))
   sub%rs = cons1%rs - cons2%rs
   sub%rv = cons1%rv - cons2%rv
   sub%re = cons1%re - cons2%re
@@ -1678,7 +1592,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = real(scal,R_P) - cons%rs
   sub%rv = real(scal,R_P) - cons%rv
   sub%re = real(scal,R_P) - cons%re
@@ -1699,7 +1613,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = cons%rs - real(scal,R_P)
   sub%rv = cons%rv - real(scal,R_P)
   sub%re = cons%re - real(scal,R_P)
@@ -1721,7 +1635,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = real(scal,R_P) - cons%rs
   sub%rv = real(scal,R_P) - cons%rv
   sub%re = real(scal,R_P) - cons%re
@@ -1742,7 +1656,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = cons%rs - real(scal,R_P)
   sub%rv = cons%rv - real(scal,R_P)
   sub%re = cons%re - real(scal,R_P)
@@ -1763,7 +1677,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = real(scal,R_P) - cons%rs
   sub%rv = real(scal,R_P) - cons%rv
   sub%re = real(scal,R_P) - cons%re
@@ -1784,7 +1698,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = cons%rs - real(scal,R_P)
   sub%rv = cons%rv - real(scal,R_P)
   sub%re = cons%re - real(scal,R_P)
@@ -1805,7 +1719,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = real(scal,R_P) - cons%rs
   sub%rv = real(scal,R_P) - cons%rv
   sub%re = real(scal,R_P) - cons%re
@@ -1826,7 +1740,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = cons%rs - real(scal,R_P)
   sub%rv = cons%rv - real(scal,R_P)
   sub%re = cons%re - real(scal,R_P)
@@ -1847,7 +1761,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = real(scal,R_P) - cons%rs
   sub%rv = real(scal,R_P) - cons%rv
   sub%re = real(scal,R_P) - cons%re
@@ -1868,7 +1782,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = cons%rs - real(scal,R_P)
   sub%rv = cons%rv - real(scal,R_P)
   sub%re = cons%re - real(scal,R_P)
@@ -1889,7 +1803,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = real(scal,R_P) - cons%rs
   sub%rv = real(scal,R_P) - cons%rv
   sub%re = real(scal,R_P) - cons%re
@@ -1910,7 +1824,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = cons%rs - real(scal,R_P)
   sub%rv = cons%rv - real(scal,R_P)
   sub%re = cons%re - real(scal,R_P)
@@ -1931,7 +1845,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = real(scal,R_P) - cons%rs
   sub%rv = real(scal,R_P) - cons%rv
   sub%re = real(scal,R_P) - cons%re
@@ -1952,7 +1866,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%rs)) allocate(sub%rs(1:size(cons%rs)))
+  allocate(sub%rs(1:size(cons%rs)))
   sub%rs = cons%rs - real(scal,R_P)
   sub%rv = cons%rv - real(scal,R_P)
   sub%re = cons%re - real(scal,R_P)
@@ -2219,51 +2133,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_dot_scalI1
-  !> @}
-
-  !> @ingroup Data_Type_ConservativePublicProcedure
-  !> @{
-  !>Function for converting derived type Type_Conservative to 1D array.
-  !> @return \b array real(R_P), dimension(1:size(cons\%rs)+4) variable.
-  pure function cons2array(cons) result(array)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Conservative), intent(IN):: cons                     !< Derived type conservative data.
-  real(R_P)::                           array(1:size(cons%rs)+4) !< Conservative data in the form 1D array.
-  integer(I_P)::                        Ns                       !< Number of species.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ns = size(cons%rs)
-  array(1:Ns) = cons%rs
-  array(Ns+1) = cons%rv%x
-  array(Ns+2) = cons%rv%y
-  array(Ns+3) = cons%rv%z
-  array(Ns+4) = cons%re
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction cons2array
-
-  !>Function for converting 1D array to derived type Type_Conservative.
-  !> @return \b cons type(Type_Conservative) variable.
-  pure function array2cons(array) result(cons)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P), intent(IN)::   array(:) !< Conservative data in the form 1D array.
-  type(Type_Conservative):: cons     !< Derived type conservative data.
-  integer(I_P)::            Ns       !< Number of species.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ns = size(array)-4
-  if (allocated(cons%rs)) deallocate(cons%rs) ; allocate(cons%rs(1:Ns))
-  cons%rs   = array(1:Ns)
-  cons%rv%x = array(Ns+1)
-  cons%rv%y = array(Ns+2)
-  cons%rv%z = array(Ns+3)
-  cons%re   = array(Ns+4)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction array2cons
   !> @}
 endmodule Data_Type_Conservative

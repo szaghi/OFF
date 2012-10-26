@@ -18,9 +18,9 @@ program POG
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                            ! Integers and reals precision definition.
 USE Data_Type_Globals                       ! Definition of Type_Global and Type_Block.
-USE Data_Type_OS, init_os=>init             ! Definition of Type_OS.
+USE Data_Type_OS                            ! Definition of Type_OS.
 USE Data_Type_Time                          ! Definition of Type_Time.
-USE Data_Type_Vector, set_vec=>set          ! Definition of Type_Vector.
+USE Data_Type_Vector                        ! Definition of Type_Vector.
 USE Lib_IO_Misc                             ! Procedures for IO and strings operations.
 USE Lib_Mesh,           only: node2center   ! Subroutine for computing cell center cell nodes ones.
 USE Lib_PostProcessing, only: pp_format,  & ! Post-processing data format.
@@ -33,7 +33,6 @@ implicit none
 type(Type_Global)::             global            ! Global-level data.
 type(Type_Block), allocatable:: block(:)          ! Block-level data.
 logical::                       meshonly = .true. ! Flag for post-process only mesh.
-integer(I_P)::                  b,l               ! Counters.
 integer(I_P)::                  err               ! Error trapping flag: 0 no errors, >0 error occurs.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -45,32 +44,31 @@ call parsing_command_line
 global%mesh%Nl = 1 ; global%mesh%Nb = 1
 ! allocating block-level data
 if (allocated(block)) then
-  call free_block(block=block(1))
-  deallocate(block)
+  call block(1)%free ; deallocate(block)
 endif
 allocate(block(1))
 ! getting dimensions of block
-err = load_bmesh_dims(myrank = 0, filename = global%file%File_Mesh, block = block(1))
+err = block(1)%load_mesh_dims(myrank = 0, filename = global%file%File_Mesh)
 ! allocating block
-call alloc_block(global=global,block=block(1))
+call block(1)%alloc(global=global)
 
 write(stdout,'(A)',IOSTAT=err)'----------------------------------------------------------------------'
 write(stdout,'(A)',IOSTAT=err)' Loading '//trim(global%file%File_Mesh)
 
-err = load_bmesh(myrank = 0, filename = global%file%File_Mesh, block = block(1))
+err = block(1)%load_mesh(myrank = 0, filename = global%file%File_Mesh)
 if (.not.meshonly) then
   write(stdout,'(A)',IOSTAT=err)' Loading '//trim(global%file%File_Sol)
-  err = load_gfluid_Ns(binary = .true., myrank = 0, filename = global%file%File_Sol, global = global)
+  err = global%load_fluid_Ns(binary = .true., myrank = 0, filename = global%file%File_Sol)
   ! allocating global fluid dynamic data
-  call alloc_global_fluid(global=global)
-  err = load_bfluid(myrank = 0, filename = global%file%File_Sol, global = global, block = block(1))
+  call global%alloc_fluid
+  err = block(1)%load_fluid(myrank = 0, filename = global%file%File_Sol, global = global)
 endif
 write(stdout,*)
 
 write(stdout,'(A)',IOSTAT=err)' Computing the mesh variables that are not loaded from input files'
 ! computing the cell-center coordinates
 write(stdout,'(A)',IOSTAT=err)'   Computing cells centers coordinates'
-call node2center(block = block(1))
+call node2center(mesh = block(1)%mesh)
 
 write(stdout,'(A)',IOSTAT=err)'----------------------------------------------------------------------'
 write(stdout,'(A)',IOSTAT=err)' Processing data'
@@ -198,7 +196,7 @@ contains
     stop
   endif
   ! set OS type
-  OS=init_os(c_id=os_type)
+  call OS%init(c_id=os_type)
   if (adjustl(trim(global%file%File_Mesh))=='unset') then
     write(stderr,'(A)') ' File name of mesh file must be provided!'
     write(stderr,*)

@@ -34,7 +34,8 @@
 !> {\;\;\;\;\;\;\;}&{c_1^1}&{\;\;\;\;\;c_1^2}&{\;\;\;\;\; \cdots }&{c_1^{Ns}} \end{array} \end{array}\f$ \n
 !> Moreover the following relation always holds:
 !> \f$ c_3^s = \sum_{i=1}^{Ns}c_2^{s,i} \f$ \n
-!> According to the number of stages used different schemes are available. See the \ref rk_init "procedure rk_init" for more details.
+!> According to the number of stages used different schemes are available. See the \ref rk_init "procedure rk_init" for more
+!> details.
 !>
 !> @todo \b RK-implicit: Implement (semi)-implicit schemes.
 !> @ingroup Library
@@ -166,18 +167,34 @@ contains
   endsubroutine rk_init
 
   !> Subroutine for computing \f$s1^{th}\f$ Runge-Kutta stage.
+  !> @note For avoid the creation of temporary arrays (improving the efficiency) the array \b KS is declared as assumed-shape with
+  !> only the lower bound defined. Its extention is [1:s1-1].
   pure subroutine rk_stage(s1,Dt,Un,KS,KS1)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),            intent(IN)::    s1         !< Current Runge-Kutta stage number.
-  real(R_P),               intent(IN)::    Dt         !< Current time step.
-  type(Type_Conservative), intent(IN)::    Un         !< Current integrating variable.
-  type(Type_Conservative), intent(IN)::    KS(1:s1-1) !< Previous Runge-Kutta stages.
-  type(Type_Conservative), intent(INOUT):: KS1        !< Current Runge-Kutta stage.
+  integer(I_P),            intent(IN)::    s1     !< Current Runge-Kutta stage number.
+  real(R_P),               intent(IN)::    Dt     !< Current time step.
+  type(Type_Conservative), intent(IN)::    Un     !< Current integrating variable.
+  type(Type_Conservative), intent(IN)::    KS(1:) !< Previous Runge-Kutta stages [1:s1-1].
+  type(Type_Conservative), intent(INOUT):: KS1    !< Current Runge-Kutta stage.
+  real(R_P)::                              ssum   !< Stages sum of partial densities.
+  integer(I_P)::                           s      !< Species counter.
+  integer(I_P)::                           ss     !< Stages counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  Ks1 = Un + Dt*(c2(s1,1:s1-1).dot.KS(1:s1-1))
+  !Ks1 = Un + Dt*(c2(s1,1:s1-1).dot.KS(1:s1-1)) ! overloaded operators form: non efficient!
+  do s=1,size(Un%rs) ! loop over species
+    ssum = 0._R_P
+    do ss=1,s1-1 ! loop over stages
+      ssum = ssum + c2(s1,ss)*KS(ss)%rs(s)
+    enddo
+    Ks1%rs(s) = Un%rs(s) + Dt*ssum
+  enddo
+  Ks1%rv%x = Un%rv%x + Dt*(dot_product(c2(s1,1:s1-1),KS(1:s1-1)%rv%x))
+  Ks1%rv%y = Un%rv%y + Dt*(dot_product(c2(s1,1:s1-1),KS(1:s1-1)%rv%y))
+  Ks1%rv%z = Un%rv%z + Dt*(dot_product(c2(s1,1:s1-1),KS(1:s1-1)%rv%z))
+  Ks1%re = Un%re + Dt*(dot_product(c2(s1,1:s1-1),KS(1:s1-1)%re))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine rk_stage
@@ -187,13 +204,27 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R_P),               intent(IN)::    Dt    !< Current time step.
-  type(Type_Conservative), intent(IN)::    un    !< Current integrating variable.
+  type(Type_Conservative), intent(IN)::    Un    !< Current integrating variable.
   type(Type_Conservative), intent(IN)::    KS(:) !< Runge-Kutta stages.
   type(Type_Conservative), intent(INOUT):: Unp1  !< Time-integrated variable.
+  real(R_P)::                              ssum  !< Stages sum of partial densities.
+  integer(I_P)::                           s     !< Species counter.
+  integer(I_P)::                           ss    !< Stages counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  Unp1 = Un + Dt*(c1.dot.KS)
+  !Unp1 = Un + Dt*(c1.dot.KS) ! overloaded operators form: non efficient!
+  do s=1,size(Un%rs) ! loop over species
+    ssum = 0._R_P
+    do ss=1,size(KS) ! loop over stages
+      ssum = ssum + c1(ss)*KS(ss)%rs(s)
+    enddo
+    Unp1%rs(s) = Un%rs(s) + Dt*ssum
+  enddo
+  Unp1%rv%x = Un%rv%x + Dt*(dot_product(c1,KS%rv%x))
+  Unp1%rv%y = Un%rv%y + Dt*(dot_product(c1,KS%rv%y))
+  Unp1%rv%z = Un%rv%z + Dt*(dot_product(c1,KS%rv%z))
+  Unp1%re = Un%re + Dt*(dot_product(c1,KS%re))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine rk_time_integ

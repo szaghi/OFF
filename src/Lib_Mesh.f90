@@ -1,3 +1,8 @@
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Lib_MeshPublicProcedure Lib_Mesh
+!> @}
+
 !> This module contains mesh procedures.
 !> @ingroup Library
 module Lib_Mesh
@@ -17,45 +22,46 @@ public:: mesh_metrics_correction
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> Subroutine for computing cell center coordinates from cell nodes ones.
-  subroutine node2center(block)
+  !> @ingroup Lib_MeshPublicProcedure
+  subroutine node2center(mesh)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Block), intent(INOUT):: block !< Block-level data.
-  integer(I_P)::                    i,j,k !< Counters.
+  type(Type_Mesh_Block), intent(INOUT):: mesh  !< Block-level mesh data.
+  integer(I_P)::                         i,j,k !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   !$OMP PARALLEL DEFAULT(NONE) &
   !$OMP PRIVATE(i,j,k)         &
-  !$OMP SHARED(block)
+  !$OMP SHARED(mesh)
   !$OMP DO
-  do k=1-block%mesh%gc(5),block%mesh%Nk+block%mesh%gc(6)
-    do j=1-block%mesh%gc(3),block%mesh%Nj+block%mesh%gc(4)
-      do i=1-block%mesh%gc(1),block%mesh%Ni+block%mesh%gc(2)
-        block%mesh%cent(i,j,k)%x = (block%mesh%node(i,  j,  k  )%x + &
-                                    block%mesh%node(i-1,j,  k  )%x + &
-                                    block%mesh%node(i  ,j-1,k  )%x + &
-                                    block%mesh%node(i  ,j  ,k-1)%x + &
-                                    block%mesh%node(i-1,j-1,k-1)%x + &
-                                    block%mesh%node(i  ,j-1,k-1)%x + &
-                                    block%mesh%node(i-1,j  ,k-1)%x + &
-                                    block%mesh%node(i-1,j-1,k  )%x)*0.125_R_P
-        block%mesh%cent(i,j,k)%y = (block%mesh%node(i,  j,  k  )%y + &
-                                    block%mesh%node(i-1,j,  k  )%y + &
-                                    block%mesh%node(i  ,j-1,k  )%y + &
-                                    block%mesh%node(i  ,j  ,k-1)%y + &
-                                    block%mesh%node(i-1,j-1,k-1)%y + &
-                                    block%mesh%node(i  ,j-1,k-1)%y + &
-                                    block%mesh%node(i-1,j  ,k-1)%y + &
-                                    block%mesh%node(i-1,j-1,k  )%y)*0.125_R_P
-        block%mesh%cent(i,j,k)%z = (block%mesh%node(i,  j,  k  )%z + &
-                                    block%mesh%node(i-1,j,  k  )%z + &
-                                    block%mesh%node(i  ,j-1,k  )%z + &
-                                    block%mesh%node(i  ,j  ,k-1)%z + &
-                                    block%mesh%node(i-1,j-1,k-1)%z + &
-                                    block%mesh%node(i  ,j-1,k-1)%z + &
-                                    block%mesh%node(i-1,j  ,k-1)%z + &
-                                    block%mesh%node(i-1,j-1,k  )%z)*0.125_R_P
+  do k=1-mesh%gc(5),mesh%Nk+mesh%gc(6)
+    do j=1-mesh%gc(3),mesh%Nj+mesh%gc(4)
+      do i=1-mesh%gc(1),mesh%Ni+mesh%gc(2)
+        mesh%cent(i,j,k)%x = (mesh%node(i,  j,  k  )%x + &
+                              mesh%node(i-1,j,  k  )%x + &
+                              mesh%node(i  ,j-1,k  )%x + &
+                              mesh%node(i  ,j  ,k-1)%x + &
+                              mesh%node(i-1,j-1,k-1)%x + &
+                              mesh%node(i  ,j-1,k-1)%x + &
+                              mesh%node(i-1,j  ,k-1)%x + &
+                              mesh%node(i-1,j-1,k  )%x)*0.125_R_P
+        mesh%cent(i,j,k)%y = (mesh%node(i,  j,  k  )%y + &
+                              mesh%node(i-1,j,  k  )%y + &
+                              mesh%node(i  ,j-1,k  )%y + &
+                              mesh%node(i  ,j  ,k-1)%y + &
+                              mesh%node(i-1,j-1,k-1)%y + &
+                              mesh%node(i  ,j-1,k-1)%y + &
+                              mesh%node(i-1,j  ,k-1)%y + &
+                              mesh%node(i-1,j-1,k  )%y)*0.125_R_P
+        mesh%cent(i,j,k)%z = (mesh%node(i,  j,  k  )%z + &
+                              mesh%node(i-1,j,  k  )%z + &
+                              mesh%node(i  ,j-1,k  )%z + &
+                              mesh%node(i  ,j  ,k-1)%z + &
+                              mesh%node(i-1,j-1,k-1)%z + &
+                              mesh%node(i  ,j-1,k-1)%z + &
+                              mesh%node(i-1,j  ,k-1)%z + &
+                              mesh%node(i-1,j-1,k  )%z)*0.125_R_P
       enddo
     enddo
   enddo
@@ -65,181 +71,183 @@ contains
   endsubroutine node2center
 
   !> Subroutine for computing the metrics of blocks.
-  subroutine mesh_metrics(block)
+  !> @ingroup Lib_MeshPublicProcedure
+  subroutine mesh_metrics(mesh)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Block), intent(INOUT):: block             !< Block-level data.
-  type(Type_Vector)::               NFS,s1,s2,nd,db   !< Dummy vector variables.
-  real(R_P)::                       signi,signj,signk !< Dummy variables for checking the directions of normals.
-  real(R_P)::                       Vx,Vy,Vz          !< Dummy variables for computing volume.
-  real(R_P)::                       xp,yp,zp          !< Dummy variables for computing face coordinates.
-  real(R_P)::                       xm,ym,zm          !< Dummy variables for computing face coordinates.
-  integer(I_P)::                    i,j,k             !< Counters.
+  type(Type_Mesh_Block), intent(INOUT):: mesh              !< Block-level mesh data.
+  type(Type_Vector)::                    NFS,s1,s2,nd,db   !< Dummy vector variables.
+  real(R_P)::                            signi,signj,signk !< Dummy variables for checking the directions of normals.
+  real(R_P)::                            Vx,Vy,Vz          !< Dummy variables for computing volume.
+  real(R_P)::                            xp,yp,zp          !< Dummy variables for computing face coordinates.
+  real(R_P)::                            xm,ym,zm          !< Dummy variables for computing face coordinates.
+  integer(I_P)::                         i,j,k             !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! computing faces normals
   ! positioning at the middle of the block
-  i = max(1,block%mesh%Ni)
-  j = max(1,block%mesh%Nj)
-  k = max(1,block%mesh%Nk)
+  i = max(1,mesh%Ni)
+  j = max(1,mesh%Nj)
+  k = max(1,mesh%Nk)
   ! checking the direction of i normals
-  s1 = block%mesh%node(i,j  ,k) - block%mesh%node(i,j-1,k-1)
-  s2 = block%mesh%node(i,j-1,k) - block%mesh%node(i,j,  k-1)
+  s1 = mesh%node(i,j  ,k) - mesh%node(i,j-1,k-1)
+  s2 = mesh%node(i,j-1,k) - mesh%node(i,j,  k-1)
   nd = s1.cross.s2
-  s1 = 0.25_R_P*(block%mesh%node(i,  j,k)+block%mesh%node(i,  j-1,k)+block%mesh%node(i,  j,k-1)+block%mesh%node(i,  j-1,k-1))
-  s2 = 0.25_R_P*(block%mesh%node(i-1,j,k)+block%mesh%node(i-1,j-1,k)+block%mesh%node(i-1,j,k-1)+block%mesh%node(i-1,j-1,k-1))
+  s1 = 0.25_R_P*(mesh%node(i,  j,k)+mesh%node(i,  j-1,k)+mesh%node(i,  j,k-1)+mesh%node(i,  j-1,k-1))
+  s2 = 0.25_R_P*(mesh%node(i-1,j,k)+mesh%node(i-1,j-1,k)+mesh%node(i-1,j,k-1)+mesh%node(i-1,j-1,k-1))
   db = s1 - s2
   signi = sign(1._R_P,(nd.dot.db))
   ! checking the direction of j normals
-  s1 = block%mesh%node(i,j,k  ) - block%mesh%node(i-1,j,k-1)
-  s2 = block%mesh%node(i,j,k-1) - block%mesh%node(i-1,j,k  )
+  s1 = mesh%node(i,j,k  ) - mesh%node(i-1,j,k-1)
+  s2 = mesh%node(i,j,k-1) - mesh%node(i-1,j,k  )
   nd = s1.cross.s2
-  s1 = 0.25_R_P*(block%mesh%node(i,j,  k)+block%mesh%node(i-1,j,  k)+block%mesh%node(i,j,  k-1)+block%mesh%node(i-1,j,  k-1))
-  s2 = 0.25_R_P*(block%mesh%node(i,j-1,k)+block%mesh%node(i-1,j-1,k)+block%mesh%node(i,j-1,k-1)+block%mesh%node(i-1,j-1,k-1))
+  s1 = 0.25_R_P*(mesh%node(i,j,  k)+mesh%node(i-1,j,  k)+mesh%node(i,j,  k-1)+mesh%node(i-1,j,  k-1))
+  s2 = 0.25_R_P*(mesh%node(i,j-1,k)+mesh%node(i-1,j-1,k)+mesh%node(i,j-1,k-1)+mesh%node(i-1,j-1,k-1))
   db = s1 - s2
   signj = sign(1._R_P,(nd.dot.db))
   ! checking the direction of k normals
-  s1 = block%mesh%node(i,  j,k) - block%mesh%node(i-1,j-1,k)
-  s2 = block%mesh%node(i-1,j,k) - block%mesh%node(i,  j-1,k)
+  s1 = mesh%node(i,  j,k) - mesh%node(i-1,j-1,k)
+  s2 = mesh%node(i-1,j,k) - mesh%node(i,  j-1,k)
   nd = s1.cross.s2
-  s1 = 0.25_R_P*(block%mesh%node(i,j,k  )+block%mesh%node(i-1,j,k  )+block%mesh%node(i,j-1,k  )+block%mesh%node(i-1,j-1,k  ))
-  s2 = 0.25_R_P*(block%mesh%node(i,j,k-1)+block%mesh%node(i-1,j,k-1)+block%mesh%node(i,j-1,k-1)+block%mesh%node(i-1,j-1,k-1))
+  s1 = 0.25_R_P*(mesh%node(i,j,k  )+mesh%node(i-1,j,k  )+mesh%node(i,j-1,k  )+mesh%node(i-1,j-1,k  ))
+  s2 = 0.25_R_P*(mesh%node(i,j,k-1)+mesh%node(i-1,j,k-1)+mesh%node(i,j-1,k-1)+mesh%node(i-1,j-1,k-1))
   db = s1 - s2
   signk = sign(1._R_P,(nd.dot.db))
   !$OMP PARALLEL DEFAULT(NONE)                        &
   !$OMP PRIVATE(i,j,k,NFS,Vx,Vy,Vz,xp,yp,zp,xm,ym,zm) &
-  !$OMP SHARED(block,signi,signj,signk)
+  !$OMP SHARED(mesh,signi,signj,signk)
   !$OMP DO
-  do k=1,block%mesh%Nk
-    do j=1,block%mesh%Nj
-      do i=0,block%mesh%Ni
-        NFS = face_normal4(pt1 = block%mesh%node(i,j-1,k-1), &
-                           pt2 = block%mesh%node(i,j  ,k-1), &
-                           pt3 = block%mesh%node(i,j  ,k  ), &
-                           pt4 = block%mesh%node(i,j-1,k  ))
+  do k=1,mesh%Nk
+    do j=1,mesh%Nj
+      do i=0,mesh%Ni
+        NFS = face_normal4(pt1 = mesh%node(i,j-1,k-1), &
+                           pt2 = mesh%node(i,j  ,k-1), &
+                           pt3 = mesh%node(i,j  ,k  ), &
+                           pt4 = mesh%node(i,j-1,k  ))
         NFS = NFS*signi
-        block%mesh%NFi(i,j,k) = normalize(NFS)
-        block%mesh%Si (i,j,k) =    normL2(NFS)
+        mesh%NFi(i,j,k) = normalize(NFS)
+        mesh%Si (i,j,k) =    normL2(NFS)
       enddo
     enddo
   enddo
   !$OMP DO
-  do k=1,block%mesh%Nk
-    do j=0,block%mesh%Nj
-      do i=1,block%mesh%Ni
-        NFS = face_normal4(pt1 = block%mesh%node(i-1,j,k-1), &
-                           pt2 = block%mesh%node(i-1,j,k  ), &
-                           pt3 = block%mesh%node(i  ,j,k  ), &
-                           pt4 = block%mesh%node(i  ,j,k-1))
+  do k=1,mesh%Nk
+    do j=0,mesh%Nj
+      do i=1,mesh%Ni
+        NFS = face_normal4(pt1 = mesh%node(i-1,j,k-1), &
+                           pt2 = mesh%node(i-1,j,k  ), &
+                           pt3 = mesh%node(i  ,j,k  ), &
+                           pt4 = mesh%node(i  ,j,k-1))
         NFS = NFS*signj
-        block%mesh%NFj(i,j,k) = normalize(NFS)
-        block%mesh%Sj (i,j,k) =    normL2(NFS)
+        mesh%NFj(i,j,k) = normalize(NFS)
+        mesh%Sj (i,j,k) =    normL2(NFS)
       enddo
     enddo
   enddo
   !$OMP DO
-  do k=0,block%mesh%Nk
-    do j=1,block%mesh%Nj
-      do i=1,block%mesh%Ni
-        NFS = face_normal4(pt1 = block%mesh%node(i-1,j-1,k), &
-                           pt2 = block%mesh%node(i  ,j-1,k), &
-                           pt3 = block%mesh%node(i  ,j  ,k), &
-                           pt4 = block%mesh%node(i-1,j  ,k))
+  do k=0,mesh%Nk
+    do j=1,mesh%Nj
+      do i=1,mesh%Ni
+        NFS = face_normal4(pt1 = mesh%node(i-1,j-1,k), &
+                           pt2 = mesh%node(i  ,j-1,k), &
+                           pt3 = mesh%node(i  ,j  ,k), &
+                           pt4 = mesh%node(i-1,j  ,k))
         NFS = NFS*signk
-        block%mesh%NFk(i,j,k) = normalize(NFS)
-        block%mesh%Sk (i,j,k) =    normL2(NFS)
+        mesh%NFk(i,j,k) = normalize(NFS)
+        mesh%Sk (i,j,k) =    normL2(NFS)
       enddo
     enddo
   enddo
   ! computing finte volumes
   !$OMP DO
-  do k=1,block%mesh%Nk
-    do j=1,block%mesh%Nj
-      do i=1,block%mesh%Ni
+  do k=1,mesh%Nk
+    do j=1,mesh%Nj
+      do i=1,mesh%Ni
         Vx = 0._R_P
         Vy = 0._R_P
         Vz = 0._R_P
 
-        xp = 0.25_R_P*(block%mesh%node(i  ,j  ,k  )%x + block%mesh%node(i  ,j  ,k-1)%x + &
-                       block%mesh%node(i  ,j-1,k  )%x + block%mesh%node(i  ,j-1,k-1)%x)
-        yp = 0.25_R_P*(block%mesh%node(i  ,j  ,k  )%y + block%mesh%node(i  ,j  ,k-1)%y + &
-                       block%mesh%node(i  ,j-1,k  )%y + block%mesh%node(i  ,j-1,k-1)%y)
-        zp = 0.25_R_P*(block%mesh%node(i  ,j  ,k  )%z + block%mesh%node(i  ,j  ,k-1)%z + &
-                       block%mesh%node(i  ,j-1,k  )%z + block%mesh%node(i  ,j-1,k-1)%z)
-        xm = 0.25_R_P*(block%mesh%node(i-1,j  ,k  )%x + block%mesh%node(i-1,j  ,k-1)%x + &
-                       block%mesh%node(i-1,j-1,k  )%x + block%mesh%node(i-1,j-1,k-1)%x)
-        ym = 0.25_R_P*(block%mesh%node(i-1,j  ,k  )%y + block%mesh%node(i-1,j  ,k-1)%y + &
-                       block%mesh%node(i-1,j-1,k  )%y + block%mesh%node(i-1,j-1,k-1)%y)
-        zm = 0.25_R_P*(block%mesh%node(i-1,j  ,k  )%z + block%mesh%node(i-1,j  ,k-1)%z + &
-                       block%mesh%node(i-1,j-1,k  )%z + block%mesh%node(i-1,j-1,k-1)%z)
+        xp = 0.25_R_P*(mesh%node(i  ,j  ,k  )%x + mesh%node(i  ,j  ,k-1)%x + &
+                       mesh%node(i  ,j-1,k  )%x + mesh%node(i  ,j-1,k-1)%x)
+        yp = 0.25_R_P*(mesh%node(i  ,j  ,k  )%y + mesh%node(i  ,j  ,k-1)%y + &
+                       mesh%node(i  ,j-1,k  )%y + mesh%node(i  ,j-1,k-1)%y)
+        zp = 0.25_R_P*(mesh%node(i  ,j  ,k  )%z + mesh%node(i  ,j  ,k-1)%z + &
+                       mesh%node(i  ,j-1,k  )%z + mesh%node(i  ,j-1,k-1)%z)
+        xm = 0.25_R_P*(mesh%node(i-1,j  ,k  )%x + mesh%node(i-1,j  ,k-1)%x + &
+                       mesh%node(i-1,j-1,k  )%x + mesh%node(i-1,j-1,k-1)%x)
+        ym = 0.25_R_P*(mesh%node(i-1,j  ,k  )%y + mesh%node(i-1,j  ,k-1)%y + &
+                       mesh%node(i-1,j-1,k  )%y + mesh%node(i-1,j-1,k-1)%y)
+        zm = 0.25_R_P*(mesh%node(i-1,j  ,k  )%z + mesh%node(i-1,j  ,k-1)%z + &
+                       mesh%node(i-1,j-1,k  )%z + mesh%node(i-1,j-1,k-1)%z)
 
-        Vx = Vx + xp*block%mesh%NFi(i,j,k)%x*block%mesh%Si(i,j,k) - xm*block%mesh%NFi(i-1,j,k)%x*block%mesh%Si(i-1,j,k)
-        Vy = Vy + yp*block%mesh%NFi(i,j,k)%y*block%mesh%Si(i,j,k) - ym*block%mesh%NFi(i-1,j,k)%y*block%mesh%Si(i-1,j,k)
-        Vz = Vz + zp*block%mesh%NFi(i,j,k)%z*block%mesh%Si(i,j,k) - zm*block%mesh%NFi(i-1,j,k)%z*block%mesh%Si(i-1,j,k)
+        Vx = Vx + xp*mesh%NFi(i,j,k)%x*mesh%Si(i,j,k) - xm*mesh%NFi(i-1,j,k)%x*mesh%Si(i-1,j,k)
+        Vy = Vy + yp*mesh%NFi(i,j,k)%y*mesh%Si(i,j,k) - ym*mesh%NFi(i-1,j,k)%y*mesh%Si(i-1,j,k)
+        Vz = Vz + zp*mesh%NFi(i,j,k)%z*mesh%Si(i,j,k) - zm*mesh%NFi(i-1,j,k)%z*mesh%Si(i-1,j,k)
 
-        xp = 0.25_R_P*(block%mesh%node(i  ,j  ,k  )%x + block%mesh%node(i  ,j  ,k-1)%x + &
-                       block%mesh%node(i-1,j  ,k  )%x + block%mesh%node(i-1,j  ,k-1)%x)
-        yp = 0.25_R_P*(block%mesh%node(i  ,j  ,k  )%y + block%mesh%node(i  ,j  ,k-1)%y + &
-                       block%mesh%node(i-1,j  ,k  )%y + block%mesh%node(i-1,j  ,k-1)%y)
-        zp = 0.25_R_P*(block%mesh%node(i  ,j  ,k  )%z + block%mesh%node(i  ,j  ,k-1)%z + &
-                       block%mesh%node(i-1,j  ,k  )%z + block%mesh%node(i-1,j  ,k-1)%z)
-        xm = 0.25_R_P*(block%mesh%node(i  ,j-1,k  )%x + block%mesh%node(i  ,j-1,k-1)%x + &
-                       block%mesh%node(i-1,j-1,k  )%x + block%mesh%node(i-1,j-1,k-1)%x)
-        ym = 0.25_R_P*(block%mesh%node(i  ,j-1,k  )%y + block%mesh%node(i  ,j-1,k-1)%y + &
-                       block%mesh%node(i-1,j-1,k  )%y + block%mesh%node(i-1,j-1,k-1)%y)
-        zm = 0.25_R_P*(block%mesh%node(i  ,j-1,k  )%z + block%mesh%node(i  ,j-1,k-1)%z + &
-                       block%mesh%node(i-1,j-1,k  )%z + block%mesh%node(i-1,j-1,k-1)%z)
+        xp = 0.25_R_P*(mesh%node(i  ,j  ,k  )%x + mesh%node(i  ,j  ,k-1)%x + &
+                       mesh%node(i-1,j  ,k  )%x + mesh%node(i-1,j  ,k-1)%x)
+        yp = 0.25_R_P*(mesh%node(i  ,j  ,k  )%y + mesh%node(i  ,j  ,k-1)%y + &
+                       mesh%node(i-1,j  ,k  )%y + mesh%node(i-1,j  ,k-1)%y)
+        zp = 0.25_R_P*(mesh%node(i  ,j  ,k  )%z + mesh%node(i  ,j  ,k-1)%z + &
+                       mesh%node(i-1,j  ,k  )%z + mesh%node(i-1,j  ,k-1)%z)
+        xm = 0.25_R_P*(mesh%node(i  ,j-1,k  )%x + mesh%node(i  ,j-1,k-1)%x + &
+                       mesh%node(i-1,j-1,k  )%x + mesh%node(i-1,j-1,k-1)%x)
+        ym = 0.25_R_P*(mesh%node(i  ,j-1,k  )%y + mesh%node(i  ,j-1,k-1)%y + &
+                       mesh%node(i-1,j-1,k  )%y + mesh%node(i-1,j-1,k-1)%y)
+        zm = 0.25_R_P*(mesh%node(i  ,j-1,k  )%z + mesh%node(i  ,j-1,k-1)%z + &
+                       mesh%node(i-1,j-1,k  )%z + mesh%node(i-1,j-1,k-1)%z)
 
-        Vx = Vx + xp*block%mesh%NFj(i,j,k)%x*block%mesh%Sj(i,j,k) - xm*block%mesh%NFj(i,j-1,k)%x*block%mesh%Sj(i,j-1,k)
-        Vy = Vy + yp*block%mesh%NFj(i,j,k)%y*block%mesh%Sj(i,j,k) - ym*block%mesh%NFj(i,j-1,k)%y*block%mesh%Sj(i,j-1,k)
-        Vz = Vz + zp*block%mesh%NFj(i,j,k)%z*block%mesh%Sj(i,j,k) - zm*block%mesh%NFj(i,j-1,k)%z*block%mesh%Sj(i,j-1,k)
+        Vx = Vx + xp*mesh%NFj(i,j,k)%x*mesh%Sj(i,j,k) - xm*mesh%NFj(i,j-1,k)%x*mesh%Sj(i,j-1,k)
+        Vy = Vy + yp*mesh%NFj(i,j,k)%y*mesh%Sj(i,j,k) - ym*mesh%NFj(i,j-1,k)%y*mesh%Sj(i,j-1,k)
+        Vz = Vz + zp*mesh%NFj(i,j,k)%z*mesh%Sj(i,j,k) - zm*mesh%NFj(i,j-1,k)%z*mesh%Sj(i,j-1,k)
 
-        xp = 0.25_R_P*(block%mesh%node(i  ,j  ,k  )%x + block%mesh%node(i  ,j-1,k  )%x + &
-                       block%mesh%node(i-1,j  ,k  )%x + block%mesh%node(i-1,j-1,k  )%x)
-        yp = 0.25_R_P*(block%mesh%node(i  ,j  ,k  )%y + block%mesh%node(i  ,j-1,k  )%y + &
-                       block%mesh%node(i-1,j  ,k  )%y + block%mesh%node(i-1,j-1,k  )%y)
-        zp = 0.25_R_P*(block%mesh%node(i  ,j  ,k  )%z + block%mesh%node(i  ,j-1,k  )%z + &
-                       block%mesh%node(i-1,j  ,k  )%z + block%mesh%node(i-1,j-1,k  )%z)
-        xm = 0.25_R_P*(block%mesh%node(i  ,j  ,k-1)%x + block%mesh%node(i  ,j-1,k-1)%x + &
-                       block%mesh%node(i-1,j  ,k-1)%x + block%mesh%node(i-1,j-1,k-1)%x)
-        ym = 0.25_R_P*(block%mesh%node(i  ,j  ,k-1)%y + block%mesh%node(i  ,j-1,k-1)%y + &
-                       block%mesh%node(i-1,j  ,k-1)%y + block%mesh%node(i-1,j-1,k-1)%y)
-        zm = 0.25_R_P*(block%mesh%node(i  ,j  ,k-1)%z + block%mesh%node(i  ,j-1,k-1)%z + &
-                       block%mesh%node(i-1,j  ,k-1)%z + block%mesh%node(i-1,j-1,k-1)%z)
+        xp = 0.25_R_P*(mesh%node(i  ,j  ,k  )%x + mesh%node(i  ,j-1,k  )%x + &
+                       mesh%node(i-1,j  ,k  )%x + mesh%node(i-1,j-1,k  )%x)
+        yp = 0.25_R_P*(mesh%node(i  ,j  ,k  )%y + mesh%node(i  ,j-1,k  )%y + &
+                       mesh%node(i-1,j  ,k  )%y + mesh%node(i-1,j-1,k  )%y)
+        zp = 0.25_R_P*(mesh%node(i  ,j  ,k  )%z + mesh%node(i  ,j-1,k  )%z + &
+                       mesh%node(i-1,j  ,k  )%z + mesh%node(i-1,j-1,k  )%z)
+        xm = 0.25_R_P*(mesh%node(i  ,j  ,k-1)%x + mesh%node(i  ,j-1,k-1)%x + &
+                       mesh%node(i-1,j  ,k-1)%x + mesh%node(i-1,j-1,k-1)%x)
+        ym = 0.25_R_P*(mesh%node(i  ,j  ,k-1)%y + mesh%node(i  ,j-1,k-1)%y + &
+                       mesh%node(i-1,j  ,k-1)%y + mesh%node(i-1,j-1,k-1)%y)
+        zm = 0.25_R_P*(mesh%node(i  ,j  ,k-1)%z + mesh%node(i  ,j-1,k-1)%z + &
+                       mesh%node(i-1,j  ,k-1)%z + mesh%node(i-1,j-1,k-1)%z)
 
-        Vx = Vx + xp*block%mesh%NFk(i,j,k)%x*block%mesh%Sk(i,j,k) - xm*block%mesh%NFk(i,j,k-1)%x*block%mesh%Sk(i,j,k-1)
-        Vy = Vy + yp*block%mesh%NFk(i,j,k)%y*block%mesh%Sk(i,j,k) - ym*block%mesh%NFk(i,j,k-1)%y*block%mesh%Sk(i,j,k-1)
-        Vz = Vz + zp*block%mesh%NFk(i,j,k)%z*block%mesh%Sk(i,j,k) - zm*block%mesh%NFk(i,j,k-1)%z*block%mesh%Sk(i,j,k-1)
+        Vx = Vx + xp*mesh%NFk(i,j,k)%x*mesh%Sk(i,j,k) - xm*mesh%NFk(i,j,k-1)%x*mesh%Sk(i,j,k-1)
+        Vy = Vy + yp*mesh%NFk(i,j,k)%y*mesh%Sk(i,j,k) - ym*mesh%NFk(i,j,k-1)%y*mesh%Sk(i,j,k-1)
+        Vz = Vz + zp*mesh%NFk(i,j,k)%z*mesh%Sk(i,j,k) - zm*mesh%NFk(i,j,k-1)%z*mesh%Sk(i,j,k-1)
 
-        block%mesh%V(i,j,k) = max(Vx,Vy,Vz)
+        mesh%V(i,j,k) = max(Vx,Vy,Vz)
       enddo
     enddo
   enddo
   !$OMP END PARALLEL
 #ifdef NULi
-  block%mesh%NFj(:,:,:)%x=0._R_P
-  block%mesh%NFk(:,:,:)%x=0._R_P
-  block%mesh%NFi(:,:,:)%y=0._R_P
-  block%mesh%NFi(:,:,:)%z=0._R_P
+  mesh%NFj(:,:,:)%x=0._R_P
+  mesh%NFk(:,:,:)%x=0._R_P
+  mesh%NFi(:,:,:)%y=0._R_P
+  mesh%NFi(:,:,:)%z=0._R_P
 #endif
 #ifdef NULj
-  block%mesh%NFi(:,:,:)%y=0._R_P
-  block%mesh%NFk(:,:,:)%y=0._R_P
-  block%mesh%NFj(:,:,:)%x=0._R_P
-  block%mesh%NFj(:,:,:)%z=0._R_P
+  mesh%NFi(:,:,:)%y=0._R_P
+  mesh%NFk(:,:,:)%y=0._R_P
+  mesh%NFj(:,:,:)%x=0._R_P
+  mesh%NFj(:,:,:)%z=0._R_P
 #endif
 #ifdef NULk
-  block%mesh%NFi(:,:,:)%z=0._R_P
-  block%mesh%NFj(:,:,:)%z=0._R_P
-  block%mesh%NFk(:,:,:)%x=0._R_P
-  block%mesh%NFk(:,:,:)%y=0._R_P
+  mesh%NFi(:,:,:)%z=0._R_P
+  mesh%NFj(:,:,:)%z=0._R_P
+  mesh%NFk(:,:,:)%x=0._R_P
+  mesh%NFk(:,:,:)%y=0._R_P
 #endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine mesh_metrics
 
   !> Subroutine for correcting the metrics of natural (and negative volume) boundary conditions cells.
+  !> @ingroup Lib_MeshPublicProcedure
   subroutine mesh_metrics_correction(block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none

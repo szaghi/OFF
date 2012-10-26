@@ -2,7 +2,7 @@
 OFF
 ==========
 
-OFF, Open source Finite volume Fluid dynamics code [see documentation](http://szaghi.github.com/OFF/index.html).
+OFF, Open source Finite volumes Fluid dynamics code [see documentation](http://szaghi.github.com/OFF/index.html).
 
 It is written in in standard (compliant) Fortran 2003 with highly modularity as design target.
 

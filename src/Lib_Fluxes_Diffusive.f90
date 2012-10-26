@@ -14,12 +14,12 @@
 !> @ingroup Library
 module Lib_Fluxes_Diffusive
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                           ! Integers and reals precision definition.
-USE Data_Type_Conservative, init_cons=>init, set_cons=>set ! Definition of Type_Conservative.
-USE Data_Type_Globals                                      ! Definition of Type_Global and Type_Block.
-USE Data_Type_Primitive, init_prim=>init, set_prim=>set    ! Definition of Type_Primitive.
-USE Data_Type_Tensor, set_ten=>set                         ! Definition of Type_Tensor.
-USE Data_Type_Vector, set_vec=>set                         ! Definition of Type_Vector.
+USE IR_Precision           ! Integers and reals precision definition.
+USE Data_Type_Conservative ! Definition of Type_Conservative.
+USE Data_Type_Globals      ! Definition of Type_Global and Type_Block.
+USE Data_Type_Primitive    ! Definition of Type_Primitive.
+USE Data_Type_Tensor       ! Definition of Type_Tensor.
+USE Data_Type_Vector       ! Definition of Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -35,7 +35,9 @@ contains
   implicit none
   type(Type_Global),       intent(IN)::    global !< Global-level data.
   type(Type_Block),        intent(IN)::    block  !< Block-level data.
-  integer(I_P),            intent(IN)::    i,j,k  !< Interface indexes.
+  integer(I_P),            intent(IN)::    i      !< Interface i indexe.
+  integer(I_P),            intent(IN)::    j      !< Interface j indexe.
+  integer(I_P),            intent(IN)::    k      !< Interface k indexe.
   character(1),            intent(IN)::    dir    !< Direction of fluxes ('i','j','k').
   type(Type_Conservative), intent(INOUT):: F      !< Diffusive fluxes at the interface.
   type(Type_Vector):: NFS(1:6) !< Normals, with interfaces area as module, of the 6 hexahedron's faces of finite

@@ -31,9 +31,7 @@ public:: cell_probe,cell_probe_str
 public:: cell_isoss,cell_isoss_str
 public:: Nid
 public:: cell_list,cell_list_str
-public:: init,set,get
-public:: write,read
-public:: get_cell_id_str,get_cell_id
+public:: write_cell,read_cell
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -68,515 +66,166 @@ integer(I1P), parameter:: cell_list(1:Nid) = &
 !> Derived type containing cell informations.
 !> @ingroup DerivedType
 type, public:: Type_Cell
-  sequence
   integer(I1P):: id = cell_active !< Id identifier.
   integer(I1P):: oc = 0_I1P       !< Octree refinement: oc>0 cell is refined oc-times.
+  contains
+    procedure, non_overridable:: str2id ! Procedure for setting integer id from string id.
+    procedure, non_overridable:: id2str ! Procedure for converting integer id to string id.
 endtype Type_Cell
-!-----------------------------------------------------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------------------------------------------------
-!> @brief Write overloading of Type_Cell variable.
-!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for writing scalar variables,
-!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
-!> @code ...
-!> integer(I4P):: err,unit
-!> character(1):: format="*"
-!> type(Type_BC):: cell_scal,cell_1D(10),cell_2D(10,2),cell_3D(10,2,3)
-!> ...
-!> ! formatted writing of cell_scal, cell_1D, cell_2D and cell_3D
-!> err = write(unit,format,cell_scal)
-!> err = write(unit,format,cell_1D)
-!> err = write(unit,format,cell_2D)
-!> err = write(unit,format,cell_3D)
-!> ! binary writing of cell_scal, cell_1D, cell_2D and cell_3D
-!> err = write(unit,cell_scal)
-!> err = write(unit,cell_1D)
-!> err = write(unit,cell_2D)
-!> err = write(unit,cell_3D)
-!> ... @endcode
-!> @ingroup Interface,Data_Type_CellPublicProcedure
-interface write
-  module procedure Write_Bin_Scalar, Write_Ascii_Scalar
-  module procedure Write_Bin_Array1D,Write_Ascii_Array1D
-  module procedure Write_Bin_Array2D,Write_Ascii_Array2D
-  module procedure Write_Bin_Array3D,Write_Ascii_Array3D
-endinterface
-!> @brief Read overloading of Type_Cell variable.
-!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for reading scalar variables,
-!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
-!> @code ...
-!> integer(I4P):: err,unit
-!> character(1):: format="*"
-!> type(Type_BC):: cell_scal,cell_1D(10),cell_2D(10,2),cell_3D(10,2,3)
-!> ...
-!> ! formatted reading of cell_scal, cell_1D, cell_2D and cell_3D
-!> err = read(unit,format,cell_scal)
-!> err = read(unit,format,cell_1D)
-!> err = read(unit,format,cell_2D)
-!> err = read(unit,format,cell_3D)
-!> ! binary reading of cell_scal, cell_1D, cell_2D and cell_3D
-!> err = read(unit,cell_scal)
-!> err = read(unit,cell_1D)
-!> err = read(unit,cell_2D)
-!> err = read(unit,cell_3D)
-!> ... @endcode
-!> @ingroup Interface,Data_Type_CellPublicProcedure
-interface read
-  module procedure Read_Bin_Scalar, Read_Ascii_Scalar
-  module procedure Read_Bin_Array1D,Read_Ascii_Array1D
-  module procedure Read_Bin_Array2D,Read_Ascii_Array2D
-  module procedure Read_Bin_Array3D,Read_Ascii_Array3D
-endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @ingroup Data_Type_CellPublicProcedure
   !> @{
-  !>Function for initializing Type_Cell variable.
-  !> @return \b cell Type_Cell variable.
-  elemental function init(id,oc) result(cell)
+  !> @brief Function for writing Type_Cell data.
+  !> The vector data could be scalar, one, two and three dimensional array. The format could be ascii or binary.
+  !> @return \b err integer(I_P) variable for error trapping.
+  function write_cell(scalar,array1D,array2D,array3D,format,unit) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I1P), intent(IN), optional:: id   !< Id identifier.
-  integer(I1P), intent(IN), optional:: oc   !< Octree refinement: oc>0 cell is refined oc-times.
-  type(Type_Cell)::                    cell !< Cell informations data.
+  type(Type_Cell), intent(IN), optional:: scalar         !< Scalar vector data.
+  type(Type_Cell), intent(IN), optional:: array1D(:)     !< One dimensional array vector data.
+  type(Type_Cell), intent(IN), optional:: array2D(:,:)   !< Two dimensional array vector data.
+  type(Type_Cell), intent(IN), optional:: array3D(:,:,:) !< Three dimensional array vector data.
+  character(*),    intent(IN), optional:: format         !< Format specifier.
+  integer(I4P),    intent(IN)::           unit           !< Logic unit.
+  integer(I_P)::                          err            !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(id)) cell%id = id
-  if (present(oc)) cell%oc = oc
+  if (present(format)) then
+    select case(adjustl(trim(format)))
+    case('*')
+      if (present(scalar)) then
+        write(unit,*,iostat=err)scalar
+      elseif (present(array1D)) then
+        write(unit,*,iostat=err)array1D
+      elseif (present(array2D)) then
+        write(unit,*,iostat=err)array2D
+      elseif (present(array3D)) then
+        write(unit,*,iostat=err)array3D
+      endif
+    case default
+      if (present(scalar)) then
+        write(unit,adjustl(trim(format)),iostat=err)scalar
+      elseif (present(array1D)) then
+        write(unit,adjustl(trim(format)),iostat=err)array1D
+      elseif (present(array2D)) then
+        write(unit,adjustl(trim(format)),iostat=err)array2D
+      elseif (present(array3D)) then
+        write(unit,adjustl(trim(format)),iostat=err)array3D
+      endif
+    endselect
+  else
+    if (present(scalar)) then
+      write(unit,iostat=err)scalar
+    elseif (present(array1D)) then
+      write(unit,iostat=err)array1D
+    elseif (present(array2D)) then
+      write(unit,iostat=err)array2D
+    elseif (present(array3D)) then
+      write(unit,iostat=err)array3D
+    endif
+  endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction init
+  endfunction write_cell
 
-  !>Subroutine for assignment Type_Cell variable.
-  !> @return \b cell Type_Cell variable.
-  elemental subroutine set(id,oc,cell)
+  !> @brief Function for reading Type_Cell data.
+  !> The vector data could be scalar, one, two and three dimensional array. The format could be ascii or binary.
+  !> @return \b err integer(I_P) variable for error trapping.
+  function read_cell(scalar,array1D,array2D,array3D,format,unit) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I1P),    intent(IN), optional:: id   !< Id identifier.
-  integer(I1P),    intent(IN), optional:: oc   !< Octree refinement: oc>0 cell is refined oc-times.
-  type(Type_Cell), intent(INOUT)::        cell !< Cell informations data.
+  type(Type_Cell), intent(INOUT), optional:: scalar         !< Scalar vector data.
+  type(Type_Cell), intent(INOUT), optional:: array1D(:)     !< One dimensional array vector data.
+  type(Type_Cell), intent(INOUT), optional:: array2D(:,:)   !< Two dimensional array vector data.
+  type(Type_Cell), intent(INOUT), optional:: array3D(:,:,:) !< Three dimensional array vector data.
+  character(*),    intent(IN),    optional:: format         !< Format specifier.
+  integer(I4P),    intent(IN)::              unit           !< Logic unit.
+  integer(I_P)::                             err            !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(id)) cell%id = id
-  if (present(oc)) cell%oc = oc
+  if (present(format)) then
+    select case(adjustl(trim(format)))
+    case('*')
+      if (present(scalar)) then
+        read(unit,*,iostat=err)scalar
+      elseif (present(array1D)) then
+        read(unit,*,iostat=err)array1D
+      elseif (present(array2D)) then
+        read(unit,*,iostat=err)array2D
+      elseif (present(array3D)) then
+        read(unit,*,iostat=err)array3D
+      endif
+    case default
+      if (present(scalar)) then
+        read(unit,adjustl(trim(format)),iostat=err)scalar
+      elseif (present(array1D)) then
+        read(unit,adjustl(trim(format)),iostat=err)array1D
+      elseif (present(array2D)) then
+        read(unit,adjustl(trim(format)),iostat=err)array2D
+      elseif (present(array3D)) then
+        read(unit,adjustl(trim(format)),iostat=err)array3D
+      endif
+    endselect
+  else
+    if (present(scalar)) then
+      read(unit,iostat=err)scalar
+    elseif (present(array1D)) then
+      read(unit,iostat=err)array1D
+    elseif (present(array2D)) then
+      read(unit,iostat=err)array2D
+    elseif (present(array3D)) then
+      read(unit,iostat=err)array3D
+    endif
+  endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine set
-
-  !> Subroutine for extracting Type_Cell variable components.
-  elemental subroutine get(id,oc,cell)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I1P),    intent(OUT), optional:: id   !< Id identifier.
-  integer(I1P),    intent(OUT), optional:: oc   !< Octree refinement: oc>0 cell is refined oc-times.
-  type(Type_Cell), intent(IN)::            cell !< Cell informations data.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(id)) id = cell%id
-  if (present(oc)) oc = cell%oc
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine get
+  endfunction read_cell
   !> @}
 
   !> @ingroup Data_Type_CellPrivateProcedure
   !> @{
-  ! write
-  function Write_Bin_Scalar(unit,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (binary, scalar) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
+  !> @brief Subroutine for setting integer id from string id.
+  elemental subroutine str2id(cell,id_str)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),    intent(IN):: unit  ! logic unit
-  type(Type_Cell), intent(IN):: cell
-  integer(I_P)::                err   ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,iostat=err) cell
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Scalar
-
-  function Write_Ascii_Scalar(unit,format,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (ascii, scalar) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN):: unit   ! logic unit
-  character(*),    intent(IN):: format ! format specifier
-  type(Type_Cell), intent(IN):: cell
-  integer(I_P)::                err    ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err) cell
-  case default
-    write(unit,adjustl(trim(format)),iostat=err) cell
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Scalar
-
-  function Write_Bin_Array1D(unit,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (binary, array 1D) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN):: unit     ! logic unit
-  type(Type_Cell), intent(IN):: cell(:)
-  integer(I_P)::                err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,iostat=err) cell
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Array1D
-
-  function Write_Ascii_Array1D(unit,format,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (ascii, array 1D) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN):: unit    ! logic unit
-  character(*),    intent(IN):: format  ! format specifier
-  type(Type_Cell), intent(IN):: cell(:)
-  integer(I_P)::                err     ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err) cell
-  case default
-    write(unit,adjustl(trim(format)),iostat=err) cell
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Array1D
-
-  function Write_Bin_Array2D(unit,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (binary, array 2D) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN):: unit     ! logic unit
-  type(Type_Cell), intent(IN):: cell(:,:)
-  integer(I_P)::                err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,iostat=err) cell
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Array2D
-
-  function Write_Ascii_Array2D(unit,format,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (ascii, array 2D) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN):: unit    ! logic unit
-  character(*),    intent(IN):: format  ! format specifier
-  type(Type_Cell), intent(IN):: cell(:,:)
-  integer(I_P)::                err     ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err) cell
-  case default
-    write(unit,adjustl(trim(format)),iostat=err) cell
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Array2D
-
-  function Write_Bin_Array3D(unit,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (binary, array 3D) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN):: unit     ! logic unit
-  type(Type_Cell), intent(IN):: cell(:,:,:)
-  integer(I_P)::                err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,iostat=err) cell
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Array3D
-
-  function Write_Ascii_Array3D(unit,format,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing (ascii, array 3D) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN):: unit    ! logic unit
-  character(*),    intent(IN):: format  ! format specifier
-  type(Type_Cell), intent(IN):: cell(:,:,:)
-  integer(I_P)::                err     ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err) cell
-  case default
-    write(unit,adjustl(trim(format)),iostat=err) cell
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Array3D
-
-  ! read
-  function Read_Bin_Scalar(unit,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (binary, scalar) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN)::    unit  ! logic unit
-  type(Type_Cell), intent(INOUT):: cell
-  integer(I_P)::                   err   ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  read(unit,iostat=err) cell
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Scalar
-
-  function Read_Ascii_Scalar(unit,format,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (ascii, scalar) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN)::    unit   ! logic unit
-  character(*),    intent(IN)::    format ! format specifier
-  type(Type_Cell), intent(INOUT):: cell
-  integer(I_P)::                   err    ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err) cell
-  case default
-    read(unit,adjustl(trim(format)),iostat=err) cell
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Scalar
-
-  function Read_Bin_Array1D(unit,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (binary, array 1D) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN)::    unit  ! logic unit
-  type(Type_Cell), intent(INOUT):: cell(:)
-  integer(I_P)::                   err   ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  read(unit,iostat=err) cell
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Array1D
-
-  function Read_Ascii_Array1D(unit,format,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (ascii, array 1D) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN)::    unit     ! logic unit
-  character(*),    intent(IN)::    format   ! format specifier
-  type(Type_Cell), intent(INOUT):: cell(:)
-  integer(I_P)::                   err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err) cell
-  case default
-    read(unit,adjustl(trim(format)),iostat=err) cell
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Array1D
-
-  function Read_Bin_Array2D(unit,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (binary, array 2D) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN)::    unit  ! logic unit
-  type(Type_Cell), intent(INOUT):: cell(:,:)
-  integer(I_P)::                   err   ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  read(unit,iostat=err) cell
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Array2D
-
-  function Read_Ascii_Array2D(unit,format,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (ascii, array 2D) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN)::    unit     ! logic unit
-  character(*),    intent(IN)::    format   ! format specifier
-  type(Type_Cell), intent(INOUT):: cell(:,:)
-  integer(I_P)::                   err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err) cell
-  case default
-    read(unit,adjustl(trim(format)),iostat=err) cell
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Array2D
-
-  function Read_Bin_Array3D(unit,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (binary, array 3D) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN)::    unit  ! logic unit
-  type(Type_Cell), intent(INOUT):: cell(:,:,:)
-  integer(I_P)::                   err   ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  read(unit,iostat=err) cell
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Array3D
-
-  function Read_Ascii_Array3D(unit,format,cell) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading (ascii, array 3D) Type_Cell.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I_P),    intent(IN)::    unit     ! logic unit
-  character(*),    intent(IN)::    format   ! format specifier
-  type(Type_Cell), intent(INOUT):: cell(:,:,:)
-  integer(I_P)::                   err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err) cell
-  case default
-    read(unit,adjustl(trim(format)),iostat=err) cell
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Array3D
-  !> @}
-
-  !> @ingroup Data_Type_CellPublicProcedure
-  !> @{
-  !> Function for getting integer id from the corresponding string id.
-  !> @return \b id integer(I1P) variable.
-  function get_cell_id(id_str) result(id)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  character(*), intent(IN):: id_str !< String id.
-  integer(I1P)::             id     !< Integer id.
-  integer(I_P)::             i      !< Identifier counter.
+  class(Type_Cell), intent(INOUT):: cell   !< Cell data.
+  character(3),     intent(IN)::    id_str !< String of id.
+  integer(I_P)::                    i      !< Cell id counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   do i=1,Nid
     if (adjustl(trim(id_str))==adjustl(trim(cell_list_str(i)))) then
-      id = cell_list(i)
+      cell%id = cell_list(i)
       exit
-    elseif (i==Nid) then
-      write(stderr,'(A)')' Attention!'
-      write(stderr,'(A)')' The cell identifier:'
-      write(stderr,'(A)')' '//adjustl(trim(id_str))
-      write(stderr,'(A)')' is unknown!'
-      stop
     endif
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction get_cell_id
+  endsubroutine str2id
 
-  !> Function for getting string id from the corresponding integer id.
-  !> @return \b id_str character(3) variable.
-  function get_cell_id_str(id) result(id_str)
+  !> @brief Function for converting integer id to string id.
+  !> @return \b bc_str character(3) variable.
+  elemental function id2str(cell) result(id_str)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I1P), intent(IN):: id     !< Integer id.
-  character(3)::             id_str !< String id.
-  integer(I_P)::             i      !< Identifier counter.
+  class(Type_Cell), intent(IN):: cell   !< Cell data.
+  character(3)::                 id_str !< String of id.
+  integer(I_P)::                 i      !< Cell id counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   do i=1,Nid
-    if (id==cell_list(i)) then
+    if (cell%id==cell_list(i)) then
       id_str = adjustl(trim(cell_list_str(i)))
       exit
-    elseif (i==Nid) then
-      write(stderr,'(A)')' Attention!'
-      write(stderr,'(A)')' The cell identifier:'
-      write(stderr,FI_P) id
-      write(stderr,'(A)')' is unknown!'
-      stop
     endif
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction get_cell_id_str
+  endfunction id2str
   !> @}
 endmodule Data_Type_Cell

@@ -56,7 +56,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call init(Ns=global%fluid%Ns,prim=P)
+  call P%init(Ns=global%fluid%Ns)
 #if !defined NULi && !defined NULj && !defined NULk
   ! 3D data
   mf = 0.125_R_P
@@ -221,11 +221,10 @@ contains
     stop
 #endif
   else
-    tecunit = Get_Unit()
     if (filename(len_trim(filename)-4:len_trim(filename))/=".dat") then
-      open(unit=tecunit,file=trim(filename)//".dat")
+      open(unit=Get_Unit(tecunit),file=trim(filename)//".dat")
     else
-      open(unit=tecunit,file=trim(filename))
+      open(unit=Get_Unit(tecunit),file=trim(filename))
     endif
     write(tecunit,'(A)',iostat=err)trim(tecvarname)
   endif

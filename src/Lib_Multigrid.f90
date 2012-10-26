@@ -5,7 +5,7 @@ module Lib_Multigrid
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                     ! Integers and reals precision definition.
 USE Data_Type_BC, init_bc => init, set_bc => set     ! Definition of Type_BC.
-USE Data_Type_Vector, set_vec => set                 ! Definition of Type_Vector.
+USE Data_Type_Vector                                 ! Definition of Type_Vector.
 USE Lib_Fluidynamic, only: conservative2primitive, & ! Function for converting conservative variables to primitive ones.
                            residuals,              & ! Subroutine for computing conservative variables residuals.
                            boundary_conditions       ! Subroutine for setting boundary conditions.

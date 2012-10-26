@@ -16,25 +16,19 @@
 !> @todo \b DocComplete: Complete the documentation of internal procedures
 module Data_Type_Primitive
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                ! Integers and reals precision definition.
-USE Data_Type_Vector,                         & ! Definition of Type_Vector.
-                      set_vector    => set,   & ! Function for setting Type_Vector.
-                      get_vector    => get,   & ! Function for getting Type_Vector.
-                      write_vector  => write, & ! Function for writing Type_Vector.
-                      read_vector   => read     ! Function for reading Type_Vector.
+USE IR_Precision     ! Integers and reals precision definition.
+USE Data_Type_Vector ! Definition of Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 private
-public:: init,set,free
-public:: write,read
+public:: write_primitive,read_primitive
 public:: assignment (=)
 public:: operator (*)
 public:: operator (/)
 public:: operator (+)
 public:: operator (-)
-public:: prim2array,array2prim
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -45,127 +39,21 @@ public:: prim2array,array2prim
 !> a variable defined as Type_Primitive the free function must be invoked to free the memory of the dynamic component.
 !> @ingroup DerivedType
 type, public:: Type_Primitive
-  sequence
   real(R_P), allocatable:: r(:)       !< Density of single species [1:Ns].
   type(Type_Vector)::      v          !< Velocity vector.
   real(R_P)::              p = 0._R_P !< Pressure.
   real(R_P)::              d = 0._R_P !< Density = sum(r(1:Ns)).
   real(R_P)::              g = 0._R_P !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
+  contains
+    procedure, non_overridable:: init       ! Procedure for initilizing allocatable variables.
+    procedure, non_overridable:: free       ! Procedure for freeing the memory of allocatable variables.
+    procedure, non_overridable:: prim2array ! Procedure for converting derived type Type_Primitive to array.
+    procedure, non_overridable:: array2prim ! Procedure for converting array to derived type Type_Primitive.
+    procedure, non_overridable:: pprint     ! Procedure for printing Type_Primitive components with a "pretty" format.
 endtype Type_Primitive
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!> @brief Subroutine for initializing Type_Primitive variable.
-!> It is a generic interface to 4 different subroutines as it can be used for initializing scalar variables, 1D/2D or 3D arrays.
-!> The calling signatures are:
-!> @code ...
-!> integer(I_P):: Ns
-!> real(R_P):: r(1:Ns)
-!> type(Type_Vector):: v
-!> real(R_P):: p,d,g
-!> type(Type_Primitive):: prim_scal,prim_1D(10),prim_2D(10,2),prim_3D(10,2,3)
-!> ...
-!> ! initializing prim_scal, prim_1D, prim_2D and prim_3D
-!> call init(r,v,p,d,g,Ns,prim_scal)
-!> call init(r,v,p,d,g,Ns,prim_1D)
-!> call init(r,v,p,d,g,Ns,prim_2D)
-!> call init(r,v,p,d,g,Ns,prim_3D)
-!> ... @endcode
-!> @note r,v,p,d,g,Ns are optional.
-!> @ingroup Interface,Data_Type_PrimitivePublicProcedure
-interface init
-  module procedure Init_Scalar,Init_Array1D,Init_Array2D,Init_Array3D
-endinterface
-!> @brief Subroutine for setting Type_Primitive variable.
-!> It is a generic interface to 4 different subroutines as it can be used for setting scalar variables, 1D/2D or 3D arrays.
-!> The calling signatures are:
-!> @code ...
-!> integer(I_P):: Ns
-!> real(R_P):: r(1:Ns)
-!> type(Type_Vector):: v
-!> real(R_P):: p,d,g
-!> type(Type_Primitive):: prim_scal,prim_1D(10),prim_2D(10,2),prim_3D(10,2,3)
-!> ...
-!> ! setting prim_scal, prim_1D, prim_2D and prim_3D
-!> call set(r,v,p,d,g,Ns,prim_scal)
-!> call set(r,v,p,d,g,Ns,prim_1D)
-!> call set(r,v,p,d,g,Ns,prim_2D)
-!> call set(r,v,p,d,g,Ns,prim_3D)
-!> ... @endcode
-!> @note r,v,p,d,g,Ns are optional.
-!> @ingroup Interface,Data_Type_PrimitivePublicProcedure
-interface set
-  module procedure Set_Scalar,Set_Array1D,Set_Array2D,Set_Array3D
-endinterface
-!> @brief Function for freeing the memory of Type_Primitive \em dynamic components.
-!> This is a generic interface to 4 functions as it can be used for scalar variables, 1D/2D or 3D arrays. The calling signatures
-!> are:
-!> @code ...
-!> integer(I4P):: err
-!> type(Type_Primitive):: prim_scal,prim_1D(10),prim_2D(10,2),prim_3D(10,2,3)
-!> ...
-!> ! freeing dynamic components memory of prim_scal, prim_1D, prim_2D, and prim_3D
-!> err = free(prim_scal)
-!> err = free(prim_1D)
-!> err = free(prim_2D)
-!> err = free(prim_3D)
-!> ... @endcode
-!> @ingroup Interface,Data_Type_PrimitivePublicProcedure
-interface free
-  module procedure Free_Scalar,Free_Array1D,Free_Array2D,Free_Array3D
-endinterface
-!> @brief Write overloading of Type_Primitive variable.
-!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for writing scalar variables,
-!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
-!> @code ...
-!> integer(I4P):: err,unit
-!> character(1):: format="*"
-!> type(Type_Primitive):: prim_scal,prim_1D(10),prim_2D(10,2),prim_3D(10,2,3)
-!> ...
-!> ! formatted writing of prim_scal, prim_1D, prim_2D and prim_3D
-!> err = write(unit,format,prim_scal)
-!> err = write(unit,format,prim_1D)
-!> err = write(unit,format,prim_2D)
-!> err = write(unit,format,prim_3D)
-!> ! binary writing of prim_scal, prim_1D, prim_2D and prim_3D
-!> err = write(unit,prim_scal)
-!> err = write(unit,prim_1D)
-!> err = write(unit,prim_2D)
-!> err = write(unit,prim_3D)
-!> ... @endcode
-!> @ingroup Interface,Data_Type_PrimitivePublicProcedure
-interface write
-  module procedure Write_Bin_Scalar, Write_Ascii_Scalar
-  module procedure Write_Bin_Array1D,Write_Ascii_Array1D
-  module procedure Write_Bin_Array2D,Write_Ascii_Array2D
-  module procedure Write_Bin_Array3D,Write_Ascii_Array3D
-endinterface
-!> @brief Read overloading of Type_Primitive variable.
-!> This is a generic interface to 8 functions: there are 2 functions (one binary and another ascii) for reading scalar variables,
-!> 1D/2D or 3D arrays. The functions return an error integer code. The calling signatures are:
-!> @code ...
-!> integer(I4P):: err,unit
-!> character(1):: format="*"
-!> type(Type_Primitive):: prim_scal,prim_1D(10),prim_2D(10,2),prim_3D(10,2,3)
-!> ...
-!> ! formatted reading of prim_scal, prim_1D, prim_2D and prim_3D
-!> err = read(unit,format,prim_scal)
-!> err = read(unit,format,prim_1D)
-!> err = read(unit,format,prim_2D)
-!> err = read(unit,format,prim_3D)
-!> ! binary reading of prim_scal, prim_1D, prim_2D and prim_3D
-!> err = read(unit,prim_scal)
-!> err = read(unit,prim_1D)
-!> err = read(unit,prim_2D)
-!> err = read(unit,prim_3D)
-!> ... @endcode
-!> @ingroup Interface,Data_Type_PrimitivePublicProcedure
-interface read
-  module procedure Read_Bin_Scalar, Read_Ascii_Scalar
-  module procedure Read_Bin_Array1D,Read_Ascii_Array1D
-  module procedure Read_Bin_Array2D,Read_Ascii_Array2D
-  module procedure Read_Bin_Array3D,Read_Ascii_Array3D
-endinterface
 !> @brief Assignment operator (=) overloading.
 !> @ingroup Interface
 interface assignment (=)
@@ -179,7 +67,7 @@ interface assignment (=)
   module procedure assign_ScalI4P
   module procedure assign_ScalI2P
   module procedure assign_ScalI1P
-end interface
+endinterface
 !> @brief Multiplication operator (*) overloading.
 !> @note The admissible multiplications are:
 !>       - Type_Primitive * Type_Primitive: each component of first primitive variable (prim1) is multiplied for the
@@ -348,841 +236,392 @@ interface operator (-)
 endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  !> @ingroup Data_Type_PrimitivePrivateProcedure
+  !> @ingroup Data_Type_PrimitivePublicProcedure
   !> @{
-  !>Subroutine for initializing components of Type_Primitive (scalar) variable.
-  pure subroutine Init_Scalar(r,v,p,d,g,Ns,prim)
+  !> @brief Function for writing Type_Primitive data.
+  !> The vector data could be scalar, one, two and three dimensional array. The format could be ascii or binary.
+  !> @return \b err integer(I_P) variable for error trapping.
+  function write_primitive(scalar,array1D,array2D,array3D,format,unit) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),            intent(IN), optional:: r(:) !< Density of single species [1:Ns].
-  type(Type_Vector),    intent(IN), optional:: v    !< Velocity vector.
-  real(R_P),            intent(IN), optional:: p    !< Pressure.
-  real(R_P),            intent(IN), optional:: d    !< Density = sum(r(1:Ns)).
-  real(R_P),            intent(IN), optional:: g    !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
-  integer(I_P),         intent(IN)::           Ns   !< Number of species.
-  type(Type_Primitive), intent(INOUT)::        prim !< Primitive initialized data.
+  type(Type_Primitive), intent(IN), optional:: scalar                !< Scalar primitive data.
+  type(Type_Primitive), intent(IN), optional:: array1D(:)            !< One dimensional array primitive data.
+  type(Type_Primitive), intent(IN), optional:: array2D(:,:)          !< Two dimensional array primitive data.
+  type(Type_Primitive), intent(IN), optional:: array3D(:,:,:)        !< Three dimensional array primitive data.
+  character(*),         intent(IN), optional:: format                !< Format specifier.
+  integer(I4P),         intent(IN)::           unit                  !< Logic unit.
+  integer(I_P)::                               err                   !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                               i1,i2,i3,N(1:2,1:3),j !< Counters.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (present(format)) then
+    select case(adjustl(trim(format)))
+    case('*')
+      if (present(scalar)) then
+        write(unit,*,iostat=err)scalar%r(:)
+        err = write_vector(scalar=scalar%v,format=format,unit=unit)
+        write(unit,*,iostat=err)scalar%p
+        write(unit,*,iostat=err)scalar%d
+        write(unit,*,iostat=err)scalar%g
+      elseif (present(array1D)) then
+        do j=1,1
+          N(1,j) = lbound(array1D,dim=j)
+          N(2,j) = ubound(array1D,dim=j)
+        enddo
+        write(unit,*,iostat=err)(array1D(i1)%r(:),i1=N(1,1),N(2,1))
+        err = write_vector(array1D=array1D%v,format=format,unit=unit)
+        write(unit,*,iostat=err)array1D%p
+        write(unit,*,iostat=err)array1D%d
+        write(unit,*,iostat=err)array1D%g
+      elseif (present(array2D)) then
+        do j=1,2
+          N(1,j) = lbound(array2D,dim=j)
+          N(2,j) = ubound(array2D,dim=j)
+        enddo
+        write(unit,*,iostat=err)((array2D(i1,i2)%r(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2))
+        err = write_vector(array2D=array2D%v,format=format,unit=unit)
+        write(unit,*,iostat=err)array2D%p
+        write(unit,*,iostat=err)array2D%d
+        write(unit,*,iostat=err)array2D%g
+      elseif (present(array3D)) then
+        do j=1,3
+          N(1,j) = lbound(array3D,dim=j)
+          N(2,j) = ubound(array3D,dim=j)
+        enddo
+        write(unit,*,iostat=err)(((array3D(i1,i2,i3)%r(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2)),i3=N(1,3),N(2,3))
+        err = write_vector(array3D=array3D%v,format=format,unit=unit)
+        write(unit,*,iostat=err)array3D%p
+        write(unit,*,iostat=err)array3D%d
+        write(unit,*,iostat=err)array3D%g
+      endif
+    case default
+      if (present(scalar)) then
+        write(unit,adjustl(trim(format)),iostat=err)scalar%r(:)
+        err = write_vector(scalar=scalar%v,format=format,unit=unit)
+        write(unit,adjustl(trim(format)),iostat=err)scalar%p
+        write(unit,adjustl(trim(format)),iostat=err)scalar%d
+        write(unit,adjustl(trim(format)),iostat=err)scalar%g
+      elseif (present(array1D)) then
+        do j=1,1
+          N(1,j) = lbound(array1D,dim=j)
+          N(2,j) = ubound(array1D,dim=j)
+        enddo
+        write(unit,adjustl(trim(format)),iostat=err)(array1D(i1)%r(:),i1=N(1,1),N(2,1))
+        err = write_vector(array1D=array1D%v,format=format,unit=unit)
+        write(unit,adjustl(trim(format)),iostat=err)array1D%p
+        write(unit,adjustl(trim(format)),iostat=err)array1D%d
+        write(unit,adjustl(trim(format)),iostat=err)array1D%g
+      elseif (present(array2D)) then
+        do j=1,2
+          N(1,j) = lbound(array2D,dim=j)
+          N(2,j) = ubound(array2D,dim=j)
+        enddo
+        write(unit,adjustl(trim(format)),iostat=err)((array2D(i1,i2)%r(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2))
+        err = write_vector(array2D=array2D%v,format=format,unit=unit)
+        write(unit,adjustl(trim(format)),iostat=err)array2D%p
+        write(unit,adjustl(trim(format)),iostat=err)array2D%d
+        write(unit,adjustl(trim(format)),iostat=err)array2D%g
+      elseif (present(array3D)) then
+        do j=1,3
+          N(1,j) = lbound(array3D,dim=j)
+          N(2,j) = ubound(array3D,dim=j)
+        enddo
+        write(unit,adjustl(trim(format)),iostat=err)(((array3D(i1,i2,i3)%r(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2)),i3=N(1,3),N(2,3))
+        err = write_vector(array3D=array3D%v,format=format,unit=unit)
+        write(unit,adjustl(trim(format)),iostat=err)array3D%p
+        write(unit,adjustl(trim(format)),iostat=err)array3D%d
+        write(unit,adjustl(trim(format)),iostat=err)array3D%g
+      endif
+    endselect
+  else
+    if (present(scalar)) then
+      write(unit,iostat=err)scalar%r(:)
+      err = write_vector(scalar=scalar%v,unit=unit)
+      write(unit,iostat=err)scalar%p
+      write(unit,iostat=err)scalar%d
+      write(unit,iostat=err)scalar%g
+    elseif (present(array1D)) then
+      do j=1,1
+        N(1,j) = lbound(array1D,dim=j)
+        N(2,j) = ubound(array1D,dim=j)
+      enddo
+      write(unit,iostat=err)(array1D(i1)%r(:),i1=N(1,1),N(2,1))
+      err = write_vector(array1D=array1D%v,unit=unit)
+      write(unit,iostat=err)array1D%p
+      write(unit,iostat=err)array1D%d
+      write(unit,iostat=err)array1D%g
+    elseif (present(array2D)) then
+      do j=1,2
+        N(1,j) = lbound(array2D,dim=j)
+        N(2,j) = ubound(array2D,dim=j)
+      enddo
+      write(unit,iostat=err)((array2D(i1,i2)%r(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2))
+      err = write_vector(array2D=array2D%v,unit=unit)
+      write(unit,iostat=err)array2D%p
+      write(unit,iostat=err)array2D%d
+      write(unit,iostat=err)array2D%g
+    elseif (present(array3D)) then
+      do j=1,3
+        N(1,j) = lbound(array3D,dim=j)
+        N(2,j) = ubound(array3D,dim=j)
+      enddo
+      write(unit,iostat=err)(((array3D(i1,i2,i3)%r(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2)),i3=N(1,3),N(2,3))
+      err = write_vector(array3D=array3D%v,unit=unit)
+      write(unit,iostat=err)array3D%p
+      write(unit,iostat=err)array3D%d
+      write(unit,iostat=err)array3D%g
+    endif
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction write_primitive
+
+  !> @brief Function for reading Type_Primitive data.
+  !> The vector data could be scalar, one, two and three dimensional array. The format could be ascii or binary.
+  !> @return \b err integer(I_P) variable for error trapping.
+  function read_primitive(scalar,array1D,array2D,array3D,format,unit) result(err)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Primitive), intent(INOUT), optional:: scalar                !< Scalar primitive data.
+  type(Type_Primitive), intent(INOUT), optional:: array1D(:)            !< One dimensional array primitive data.
+  type(Type_Primitive), intent(INOUT), optional:: array2D(:,:)          !< Two dimensional array primitive data.
+  type(Type_Primitive), intent(INOUT), optional:: array3D(:,:,:)        !< Three dimensional array primitive data.
+  character(*),         intent(IN),    optional:: format                !< Format specifier.
+  integer(I4P),         intent(IN)::              unit                  !< Logic unit.
+  integer(I_P)::                                  err                   !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                                  i1,i2,i3,N(1:2,1:3),j !< Counters.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (present(format)) then
+    select case(adjustl(trim(format)))
+    case('*')
+      if (present(scalar)) then
+        read(unit,*,iostat=err)scalar%r(:)
+        err = read_vector(scalar=scalar%v,format=format,unit=unit)
+        read(unit,*,iostat=err)scalar%p
+        read(unit,*,iostat=err)scalar%d
+        read(unit,*,iostat=err)scalar%g
+      elseif (present(array1D)) then
+        do j=1,1
+          N(1,j) = lbound(array1D,dim=j)
+          N(2,j) = ubound(array1D,dim=j)
+        enddo
+        read(unit,*,iostat=err)(array1D(i1)%r(:),i1=N(1,1),N(2,1))
+        err = read_vector(array1D=array1D%v,format=format,unit=unit)
+        read(unit,*,iostat=err)array1D%p
+        read(unit,*,iostat=err)array1D%d
+        read(unit,*,iostat=err)array1D%g
+      elseif (present(array2D)) then
+        do j=1,2
+          N(1,j) = lbound(array2D,dim=j)
+          N(2,j) = ubound(array2D,dim=j)
+        enddo
+        read(unit,*,iostat=err)((array2D(i1,i2)%r(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2))
+        err = read_vector(array2D=array2D%v,format=format,unit=unit)
+        read(unit,*,iostat=err)array2D%p
+        read(unit,*,iostat=err)array2D%d
+        read(unit,*,iostat=err)array2D%g
+      elseif (present(array3D)) then
+        do j=1,3
+          N(1,j) = lbound(array3D,dim=j)
+          N(2,j) = ubound(array3D,dim=j)
+        enddo
+        read(unit,*,iostat=err)(((array3D(i1,i2,i3)%r(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2)),i3=N(1,3),N(2,3))
+        err = read_vector(array3D=array3D%v,format=format,unit=unit)
+        read(unit,*,iostat=err)array3D%p
+        read(unit,*,iostat=err)array3D%d
+        read(unit,*,iostat=err)array3D%g
+      endif
+    case default
+      if (present(scalar)) then
+        read(unit,adjustl(trim(format)),iostat=err)scalar%r(:)
+        err = read_vector(scalar=scalar%v,format=format,unit=unit)
+        read(unit,adjustl(trim(format)),iostat=err)scalar%p
+        read(unit,adjustl(trim(format)),iostat=err)scalar%d
+        read(unit,adjustl(trim(format)),iostat=err)scalar%g
+      elseif (present(array1D)) then
+        do j=1,1
+          N(1,j) = lbound(array1D,dim=j)
+          N(2,j) = ubound(array1D,dim=j)
+        enddo
+        read(unit,adjustl(trim(format)),iostat=err)(array1D(i1)%r(:),i1=N(1,1),N(2,1))
+        err = read_vector(array1D=array1D%v,format=format,unit=unit)
+        read(unit,adjustl(trim(format)),iostat=err)array1D%p
+        read(unit,adjustl(trim(format)),iostat=err)array1D%d
+        read(unit,adjustl(trim(format)),iostat=err)array1D%g
+      elseif (present(array2D)) then
+        do j=1,2
+          N(1,j) = lbound(array2D,dim=j)
+          N(2,j) = ubound(array2D,dim=j)
+        enddo
+        read(unit,adjustl(trim(format)),iostat=err)((array2D(i1,i2)%r(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2))
+        err = read_vector(array2D=array2D%v,format=format,unit=unit)
+        read(unit,adjustl(trim(format)),iostat=err)array2D%p
+        read(unit,adjustl(trim(format)),iostat=err)array2D%d
+        read(unit,adjustl(trim(format)),iostat=err)array2D%g
+      elseif (present(array3D)) then
+        do j=1,3
+          N(1,j) = lbound(array3D,dim=j)
+          N(2,j) = ubound(array3D,dim=j)
+        enddo
+        read(unit,adjustl(trim(format)),iostat=err)(((array3D(i1,i2,i3)%r(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2)),i3=N(1,3),N(2,3))
+        err = read_vector(array3D=array3D%v,format=format,unit=unit)
+        read(unit,adjustl(trim(format)),iostat=err)array3D%p
+        read(unit,adjustl(trim(format)),iostat=err)array3D%d
+        read(unit,adjustl(trim(format)),iostat=err)array3D%g
+      endif
+    endselect
+  else
+    if (present(scalar)) then
+      read(unit,iostat=err)scalar%r(:)
+      err = read_vector(scalar=scalar%v,unit=unit)
+      read(unit,iostat=err)scalar%p
+      read(unit,iostat=err)scalar%d
+      read(unit,iostat=err)scalar%g
+    elseif (present(array1D)) then
+      do j=1,1
+        N(1,j) = lbound(array1D,dim=j)
+        N(2,j) = ubound(array1D,dim=j)
+      enddo
+      read(unit,iostat=err)(array1D(i1)%r(:),i1=N(1,1),N(2,1))
+      err = read_vector(array1D=array1D%v,unit=unit)
+      read(unit,iostat=err)array1D%p
+      read(unit,iostat=err)array1D%d
+      read(unit,iostat=err)array1D%g
+    elseif (present(array2D)) then
+      do j=1,2
+        N(1,j) = lbound(array2D,dim=j)
+        N(2,j) = ubound(array2D,dim=j)
+      enddo
+      read(unit,iostat=err)((array2D(i1,i2)%r(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2))
+      err = read_vector(array2D=array2D%v,unit=unit)
+      read(unit,iostat=err)array2D%p
+      read(unit,iostat=err)array2D%d
+      read(unit,iostat=err)array2D%g
+    elseif (present(array3D)) then
+      do j=1,3
+        N(1,j) = lbound(array3D,dim=j)
+        N(2,j) = ubound(array3D,dim=j)
+      enddo
+      read(unit,iostat=err)(((array3D(i1,i2,i3)%r(:),i1=N(1,1),N(2,1)),i2=N(1,2),N(2,2)),i3=N(1,3),N(2,3))
+      err = read_vector(array3D=array3D%v,unit=unit)
+      read(unit,iostat=err)array3D%p
+      read(unit,iostat=err)array3D%d
+      read(unit,iostat=err)array3D%g
+    endif
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction read_primitive
+  !> @}
+
+  !> @ingroup Data_Type_PrimitivePrivateProcedure
+  !> @{
+  !> @brief Subroutine for initializing Type_Primitive allocatable variables.
+  elemental subroutine init(prim,Ns)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Primitive), intent(INOUT):: prim !< Primitive initialized data.
+  integer(I_P),          intent(IN)::    Ns   !< Number of species.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   if (allocated(prim%r)) deallocate(prim%r) ; allocate(prim%r(1:Ns)) ; prim%r = 0._R_P
-  if (present(r)) prim%r = r
-  if (present(v)) prim%v = v
-  if (present(p)) prim%p = p
-  if (present(d)) prim%d = d
-  if (present(g)) prim%g = g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Init_Scalar
+  endsubroutine init
 
-  !>Subroutine for initializing components of Type_Primitive (array 1D) variable.
-  pure subroutine Init_Array1D(r,v,p,d,g,Ns,prim)
+  !> @brief Subroutine for freeing the memory of Type_Primitive allocatable variables.
+  elemental subroutine free(prim)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P),            intent(IN), optional:: r(:)    !< Density of single species [1:Ns].
-  type(Type_Vector),    intent(IN), optional:: v       !< Velocity vector.
-  real(R_P),            intent(IN), optional:: p       !< Pressure.
-  real(R_P),            intent(IN), optional:: d       !< Density = sum(r(1:Ns)).
-  real(R_P),            intent(IN), optional:: g       !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
-  integer(I_P),         intent(IN)::           Ns      !< Number of species.
-  type(Type_Primitive), intent(INOUT)::        prim(:) !< Primitive initialized data.
-  integer(I4P)::                               i       !< Counter.
+  class(Type_Primitive), intent(INOUT):: prim !< Primitive data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  do i=lbound(prim,dim=1),ubound(prim,dim=1)
-    if (allocated(prim(i)%r)) deallocate(prim(i)%r) ; allocate(prim(i)%r(1:Ns)) ; prim(i)%r = 0._R_P
-    if (present(r)) prim(i)%r = r
-    if (present(v)) prim(i)%v = v
-    if (present(p)) prim(i)%p = p
-    if (present(d)) prim(i)%d = d
-    if (present(g)) prim(i)%g = g
+  if (allocated(prim%r)) deallocate(prim%r)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine free
+
+  !> @brief Function for converting derived type Type_Primitive to array.
+  !> @return \b array real(R_P), dimension(1:size(prim\%r)+6) variable.
+  pure function prim2array(prim) result(array)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Primitive), intent(IN):: prim                    !< Derived type primitive data.
+  real(R_P)::                         array(1:size(prim%r)+6) !< Primitive data in the form of array.
+  integer(I_P)::                      Ns                      !< Number of species.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  Ns = size(prim%r)
+  array(1:Ns) = prim%r
+  array(Ns+1) = prim%v%x
+  array(Ns+2) = prim%v%y
+  array(Ns+3) = prim%v%z
+  array(Ns+4) = prim%p
+  array(Ns+5) = prim%d
+  array(Ns+6) = prim%g
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction prim2array
+
+  !> @brief Function for converting array to derived type Type_Primitive.
+  !> @return \b prim type(Type_Primitive) variable.
+  pure subroutine array2prim(prim,array)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Primitive), intent(INOUT):: prim     !< Derived type primitive data.
+  real(R_P),             intent(IN)::    array(:) !< Primitive data in the form of array.
+  integer(I_P)::                         Ns       !< Number of species.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  Ns = size(array)-6
+  if (allocated(prim%r)) deallocate(prim%r)  ; allocate(prim%r(1:Ns))
+  prim%r   = array(1:Ns)
+  prim%v%x = array(Ns+1)
+  prim%v%y = array(Ns+2)
+  prim%v%z = array(Ns+3)
+  prim%p   = array(Ns+4)
+  prim%d   = array(Ns+5)
+  prim%g   = array(Ns+6)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine array2prim
+
+  !> @brief Function for printing in a pretty ascii format the components of type Type_Primitive.
+  !> @return \b err integer(I_P) variable for error trapping.
+  function pprint(prim,myrank,unit) result(err)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Primitive), intent(IN)::           prim   !< Primitives.
+  integer(I_P),          intent(IN), optional:: myrank !< Actual rank process.
+  integer(I4P),          intent(IN)::           unit   !< Logic unit.
+  integer(I_P)::                                err    !< Error trapping flag: 0 no errors, >0 error occurs.
+  integer(I_P)::                                Ns     !< Number of species.
+  integer(I_P)::                                s      !< Species counter.
+  character(DI_P)::                             rks    !< String containing myrank.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  rks = 'rank'//trim(str(.true.,0_I_P)) ; if (present(myrank)) rks = 'rank'//trim(str(.true.,myrank))
+  Ns  = size(prim%r)
+  do s=1,Ns
+    write(unit,'(A)',iostat=err)trim(rks)//' r('//trim(str(.true.,s))//')='//str(n=prim%r(s))
   enddo
+    write(unit,'(A)',iostat=err)trim(rks)//' v(x)='//str(n=prim%v%x)
+    write(unit,'(A)',iostat=err)trim(rks)//' v(y)='//str(n=prim%v%y)
+    write(unit,'(A)',iostat=err)trim(rks)//' v(z)='//str(n=prim%v%z)
+    write(unit,'(A)',iostat=err)trim(rks)//' p   ='//str(n=prim%p  )
+    write(unit,'(A)',iostat=err)trim(rks)//' d   ='//str(n=prim%d  )
+    write(unit,'(A)',iostat=err)trim(rks)//' g   ='//str(n=prim%g  )
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Init_Array1D
-
-  !>Subroutine for initializing components of Type_Primitive (array 3D) variable.
-  pure subroutine Init_Array2D(r,v,p,d,g,Ns,prim)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),            intent(IN), optional:: r(:)      !< Density of single species [1:Ns].
-  type(Type_Vector),    intent(IN), optional:: v         !< Velocity vector.
-  real(R_P),            intent(IN), optional:: p         !< Pressure.
-  real(R_P),            intent(IN), optional:: d         !< Density = sum(r(1:Ns)).
-  real(R_P),            intent(IN), optional:: g         !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
-  integer(I_P),         intent(IN)::           Ns        !< Number of species.
-  type(Type_Primitive), intent(INOUT)::        prim(:,:) !< Primitive initialized data.
-  integer(I4P)::                               i,j       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  do j=lbound(prim,dim=2),ubound(prim,dim=2)
-    do i=lbound(prim,dim=1),ubound(prim,dim=1)
-      if (allocated(prim(i,j)%r)) deallocate(prim(i,j)%r) ; allocate(prim(i,j)%r(1:Ns)) ; prim(i,j)%r = 0._R_P
-      if (present(r)) prim(i,j)%r = r
-      if (present(v)) prim(i,j)%v = v
-      if (present(p)) prim(i,j)%p = p
-      if (present(d)) prim(i,j)%d = d
-      if (present(g)) prim(i,j)%g = g
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Init_Array2D
-
-  !>Subroutine for initializing components of Type_Primitive (array 3D) variable.
-  pure subroutine Init_Array3D(r,v,p,d,g,Ns,prim)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),            intent(IN), optional:: r(:)        !< Density of single species [1:Ns].
-  type(Type_Vector),    intent(IN), optional:: v           !< Velocity vector.
-  real(R_P),            intent(IN), optional:: p           !< Pressure.
-  real(R_P),            intent(IN), optional:: d           !< Density = sum(r(1:Ns)).
-  real(R_P),            intent(IN), optional:: g           !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
-  integer(I_P),         intent(IN)::           Ns          !< Number of species.
-  type(Type_Primitive), intent(INOUT)::        prim(:,:,:) !< Primitive initialized data.
-  integer(I4P)::                               i,j,k       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  do k=lbound(prim,dim=3),ubound(prim,dim=3)
-    do j=lbound(prim,dim=2),ubound(prim,dim=2)
-      do i=lbound(prim,dim=1),ubound(prim,dim=1)
-        if (allocated(prim(i,j,k)%r)) deallocate(prim(i,j,k)%r) ; allocate(prim(i,j,k)%r(1:Ns)) ; prim(i,j,k)%r = 0._R_P
-        if (present(r)) prim(i,j,k)%r = r
-        if (present(v)) prim(i,j,k)%v = v
-        if (present(p)) prim(i,j,k)%p = p
-        if (present(d)) prim(i,j,k)%d = d
-        if (present(g)) prim(i,j,k)%g = g
-      enddo
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Init_Array3D
-
-  !>Subroutine for setting components of Type_Primitive (scalar) variable.
-  pure subroutine Set_Scalar(r,v,p,d,g,prim)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for setting Type_Primitive (scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),            intent(IN), optional:: r(:) !< Density of single species [1:Ns].
-  type(Type_Vector),    intent(IN), optional:: v    !< Velocity vector.
-  real(R_P),            intent(IN), optional:: p    !< Pressure.
-  real(R_P),            intent(IN), optional:: d    !< Density = sum(r(1:Ns)).
-  real(R_P),            intent(IN), optional:: g    !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
-  type(Type_Primitive), intent(INOUT)::        prim !< Primitive set data.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(r)) then
-    if (allocated(prim%r)) deallocate(prim%r) ; allocate(prim%r(1:size(r,dim=1))) ; prim%r = r
-  endif
-  if (present(v)) prim%v = v
-  if (present(p)) prim%p = p
-  if (present(d)) prim%d = d
-  if (present(g)) prim%g = g
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Set_Scalar
-
-  !>Subroutine for setting components of Type_Primitive (array 1D) variable.
-  pure subroutine Set_Array1D(r,v,p,d,g,prim)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for setting Type_Primitive (array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),            intent(IN), optional:: r(:)    !< Density of single species [1:Ns].
-  type(Type_Vector),    intent(IN), optional:: v       !< Velocity vector.
-  real(R_P),            intent(IN), optional:: p       !< Pressure.
-  real(R_P),            intent(IN), optional:: d       !< Density = sum(r(1:Ns)).
-  real(R_P),            intent(IN), optional:: g       !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
-  type(Type_Primitive), intent(INOUT)::        prim(:) !< Primitive set data.
-  integer(I4P)::                               i       !< Counter.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  do i=lbound(prim,dim=1),ubound(prim,dim=1)
-    if (present(r)) then
-      if (allocated(prim(i)%r)) deallocate(prim(i)%r) ; allocate(prim(i)%r(1:size(r,dim=1))) ; prim(i)%r = r
-    endif
-    if (present(v)) prim(i)%v = v
-    if (present(p)) prim(i)%p = p
-    if (present(d)) prim(i)%d = d
-    if (present(g)) prim(i)%g = g
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Set_Array1D
-
-  !>Subroutine for setting components of Type_Primitive (array 2D) variable.
-  pure subroutine Set_Array2D(r,v,p,d,g,prim)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for setting Type_Primitive (array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),            intent(IN), optional:: r(:)      !< Density of single species [1:Ns].
-  type(Type_Vector),    intent(IN), optional:: v         !< Velocity vector.
-  real(R_P),            intent(IN), optional:: p         !< Pressure.
-  real(R_P),            intent(IN), optional:: d         !< Density = sum(r(1:Ns)).
-  real(R_P),            intent(IN), optional:: g         !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
-  type(Type_Primitive), intent(INOUT)::        prim(:,:) !< Primitive set data.
-  integer(I4P)::                               i,j       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  do j=lbound(prim,dim=2),ubound(prim,dim=2)
-    do i=lbound(prim,dim=1),ubound(prim,dim=1)
-      if (present(r)) then
-        if (allocated(prim(i,j)%r)) deallocate(prim(i,j)%r) ; allocate(prim(i,j)%r(1:size(r,dim=1))) ; prim(i,j)%r = r
-      endif
-      if (present(v)) prim(i,j)%v = v
-      if (present(p)) prim(i,j)%p = p
-      if (present(d)) prim(i,j)%d = d
-      if (present(g)) prim(i,j)%g = g
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Set_Array2D
-
-  !>Subroutine for setting components of Type_Primitive (array 3D) variable.
-  pure subroutine Set_Array3D(r,v,p,d,g,prim)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for setting Type_Primitive (array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P),            intent(IN), optional:: r(:)        !< Density of single species [1:Ns].
-  type(Type_Vector),    intent(IN), optional:: v           !< Velocity vector.
-  real(R_P),            intent(IN), optional:: p           !< Pressure.
-  real(R_P),            intent(IN), optional:: d           !< Density = sum(r(1:Ns)).
-  real(R_P),            intent(IN), optional:: g           !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
-  type(Type_Primitive), intent(INOUT)::        prim(:,:,:) !< Primitive set data.
-  integer(I4P)::                               i,j,k       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  do k=lbound(prim,dim=3),ubound(prim,dim=3)
-    do j=lbound(prim,dim=2),ubound(prim,dim=2)
-      do i=lbound(prim,dim=1),ubound(prim,dim=1)
-        if (present(r)) then
-          if (allocated(prim(i,j,k)%r)) deallocate(prim(i,j,k)%r) ; allocate(prim(i,j,k)%r(1:size(r,dim=1))) ; prim(i,j,k)%r = r
-        endif
-        if (present(v)) prim(i,j,k)%v = v
-        if (present(p)) prim(i,j,k)%p = p
-        if (present(d)) prim(i,j,k)%d = d
-        if (present(g)) prim(i,j,k)%g = g
-      enddo
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Set_Array3D
-
-  !>Function for freeing the memory of Type_Primitive \em dynamic components (scalar).
-  !> @return \b err integer(I4P) variable.
-  function Free_Scalar(prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_Primitive (scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Primitive), intent(INOUT):: prim !< Primitive data.
-  integer(I4P)::                        err  !< Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  err = 0_I4P
-  if (allocated(prim%r)) deallocate(prim%r,stat=err)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Free_Scalar
-
-  !>Function for freeing the memory of Type_Primitive \em dynamic components (array 1D).
-  !> @return \b err integer(I4P) variable.
-  function Free_Array1D(prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_Primitive (array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Primitive), intent(INOUT):: prim(:) !< Primitive data.
-  integer(I4P)::                        err     !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                        i       !< Counter.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  err = 0_I4P
-  do i=lbound(prim,dim=1),ubound(prim,dim=1)
-    if (allocated(prim(i)%r)) deallocate(prim(i)%r,stat=err)
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Free_Array1D
-
-  !>Function for freeing the memory of Type_Primitive \em dynamic components (array 2D).
-  !> @return \b err integer(I4P) variable.
-  function Free_Array2D(prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_Primitive (array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Primitive), intent(INOUT):: prim(:,:) !< Primitive data.
-  integer(I4P)::                        err       !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                        i,j       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  err = 0_I4P
-  do j=lbound(prim,dim=2),ubound(prim,dim=2)
-    do i=lbound(prim,dim=1),ubound(prim,dim=1)
-      if (allocated(prim(i,J)%r)) deallocate(prim(i,J)%r,stat=err)
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Free_Array2D
-
-  !>Function for freeing the memory of Type_Primitive \em dynamic components (array 3D).
-  !> @return \b err integer(I4P) variable.
-  function Free_Array3D(prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_Primitive (array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Primitive), intent(INOUT):: prim(:,:,:) !< Primitive data.
-  integer(I4P)::                        err         !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                        i,j,k       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  err = 0_I4P
-  do k=lbound(prim,dim=3),ubound(prim,dim=3)
-    do j=lbound(prim,dim=2),ubound(prim,dim=2)
-      do i=lbound(prim,dim=1),ubound(prim,dim=1)
-        if (allocated(prim(i,j,k)%r)) deallocate(prim(i,j,k)%r,stat=err)
-      enddo
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Free_Array3D
-
-  !>Function for freeing the memory of Type_Primitive \em dynamic components (array 4D).
-  !> @return \b err integer(I4P) variable.
-  function Free_Array4D(prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for freeing the memory of Type_Primitive (array 4D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Primitive), intent(INOUT):: prim(:,:,:,:) !< Primitive data.
-  integer(I4P)::                        err           !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                        i,j,k,p       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  err = 0_I4P
-  do p=lbound(prim,dim=4),ubound(prim,dim=4)
-    do k=lbound(prim,dim=3),ubound(prim,dim=3)
-      do j=lbound(prim,dim=2),ubound(prim,dim=2)
-        do i=lbound(prim,dim=1),ubound(prim,dim=1)
-          if (allocated(prim(i,j,k,p)%r)) deallocate(prim(i,j,k,p)%r,stat=err)
-        enddo
-      enddo
-    enddo
-  enddo
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Free_Array4D
-
-  ! write
-  function Write_Bin_Scalar(unit,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Primitive (binary, scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN):: unit ! logic unit
-  type(Type_Primitive), intent(IN):: prim
-  integer(I4P)::                     err  ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  write(unit,iostat=err)prim%r(:)
-  err = write_vector(unit,prim%v)
-  write(unit,iostat=err)prim%p
-  write(unit,iostat=err)prim%d
-  write(unit,iostat=err)prim%g
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Scalar
-
-  function Write_Ascii_Scalar(unit,format,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Primitive (ascii, scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN):: unit   ! logic unit
-  character(*),         intent(IN):: format ! format specifier
-  type(Type_Primitive), intent(IN):: prim
-  integer(I4P)::                     err    ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err)prim%r(:)
-    err = write_vector(unit,format,prim%v)
-    write(unit,*,iostat=err)prim%p
-    write(unit,*,iostat=err)prim%d
-    write(unit,*,iostat=err)prim%g
-  case default
-    write(unit,adjustl(trim(format)),iostat=err)prim%r(:)
-    err = write_vector(unit,format,prim%v)
-    write(unit,adjustl(trim(format)),iostat=err)prim%p
-    write(unit,adjustl(trim(format)),iostat=err)prim%d
-    write(unit,adjustl(trim(format)),iostat=err)prim%g
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Scalar
-
-  function Write_Bin_Array1D(unit,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Primitive (binary, array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN):: unit    ! logic unit
-  type(Type_Primitive), intent(IN):: prim(:)
-  integer(I4P)::                     err     ! Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                     Ni,i
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ni = size(prim,dim=1)
-  write(unit,iostat=err)(prim(i)%r(:),i=1,Ni)
-  err = write_vector(unit,prim%v)
-  write(unit,iostat=err)prim%p
-  write(unit,iostat=err)prim%d
-  write(unit,iostat=err)prim%g
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Array1D
-
-  function Write_Ascii_Array1D(unit,format,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Primitive (ascii, array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN):: unit    ! logic unit
-  character(*),         intent(IN):: format
-  type(Type_Primitive), intent(IN):: prim(:)
-  integer(I4P)::                     err     ! Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                     Ni,i
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ni = size(prim,dim=1)
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err)(prim(i)%r(:),i=1,Ni)
-    err = write_vector(unit,format,prim%v)
-    write(unit,*,iostat=err)prim%p
-    write(unit,*,iostat=err)prim%d
-    write(unit,*,iostat=err)prim%g
-  case default
-    write(unit,adjustl(trim(format)),iostat=err)(prim(i)%r(:),i=1,Ni)
-    err = write_vector(unit,format,prim%v)
-    write(unit,adjustl(trim(format)),iostat=err)prim%p
-    write(unit,adjustl(trim(format)),iostat=err)prim%d
-    write(unit,adjustl(trim(format)),iostat=err)prim%g
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Array1D
-
-  function Write_Bin_Array2D(unit,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Primitive (binary, array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN):: unit     ! logic unit
-  type(Type_Primitive), intent(IN):: prim(:,:)
-  integer(I4P)::                     err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                     Ni,Nj,i,j
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ni = size(prim,dim=1)
-  Nj = size(prim,dim=2)
-  write(unit,iostat=err)((prim(i,j)%r(:),i=1,Ni),j=1,Nj)
-  err = write_vector(unit,prim%v)
-  write(unit,iostat=err)prim%p
-  write(unit,iostat=err)prim%d
-  write(unit,iostat=err)prim%g
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Array2D
-
-  function Write_Ascii_Array2D(unit,format,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Primitive (ascii, array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN):: unit      ! logic unit
-  character(*),         intent(IN):: format
-  type(Type_Primitive), intent(IN):: prim(:,:)
-  integer(I4P)::                     err       ! Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                     Ni,Nj,i,j
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ni = size(prim,dim=1)
-  Nj = size(prim,dim=2)
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err)((prim(i,j)%r(:),i=1,Ni),j=1,Nj)
-    err = write_vector(unit,format,prim%v)
-    write(unit,*,iostat=err)prim%p
-    write(unit,*,iostat=err)prim%d
-    write(unit,*,iostat=err)prim%g
-  case default
-    write(unit,adjustl(trim(format)),iostat=err)((prim(i,j)%r(:),i=1,Ni),j=1,Nj)
-    err = write_vector(unit,format,prim%v)
-    write(unit,adjustl(trim(format)),iostat=err)prim%p
-    write(unit,adjustl(trim(format)),iostat=err)prim%d
-    write(unit,adjustl(trim(format)),iostat=err)prim%g
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Array2D
-
-  function Write_Bin_Array3D(unit,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Primitive (binary, array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN):: unit        ! logic unit
-  type(Type_Primitive), intent(IN):: prim(:,:,:)
-  integer(I4P)::                     err         ! Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                     Ni,Nj,Nk,i,j,k
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ni = size(prim,dim=1)
-  Nj = size(prim,dim=2)
-  Nk = size(prim,dim=3)
-  write(unit,iostat=err)(((prim(i,j,k)%r(:),i=1,Ni),j=1,Nj),k=1,Nk)
-  err = write_vector(unit,prim%v)
-  write(unit,iostat=err)prim%p
-  write(unit,iostat=err)prim%d
-  write(unit,iostat=err)prim%g
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Bin_Array3D
-
-  function Write_Ascii_Array3D(unit,format,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for writing Type_Primitive (ascii, array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN):: unit        ! logic unit
-  character(*),         intent(IN):: format
-  type(Type_Primitive), intent(IN):: prim(:,:,:)
-  integer(I4P)::                     err         ! Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                     Ni,Nj,Nk,i,j,k
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ni = size(prim,dim=1)
-  Nj = size(prim,dim=2)
-  Nk = size(prim,dim=3)
-  select case(adjustl(trim(format)))
-  case('*')
-    write(unit,*,iostat=err)(((prim(i,j,k)%r(:),i=1,Ni),j=1,Nj),k=1,Nk)
-    err = write_vector(unit,format,prim%v)
-    write(unit,*,iostat=err)prim%p
-    write(unit,*,iostat=err)prim%d
-    write(unit,*,iostat=err)prim%g
-  case default
-    write(unit,adjustl(trim(format)),iostat=err)(((prim(i,j,k)%r(:),i=1,Ni),j=1,Nj),k=1,Nk)
-    err = write_vector(unit,format,prim%v)
-    write(unit,adjustl(trim(format)),iostat=err)prim%p
-    write(unit,adjustl(trim(format)),iostat=err)prim%d
-    write(unit,adjustl(trim(format)),iostat=err)prim%g
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Write_Ascii_Array3D
-
-  ! read
-  function Read_Bin_Scalar(unit,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Primitive (binary, scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN)::    unit ! logic unit
-  type(Type_Primitive), intent(INOUT):: prim
-  integer(I4P)::                        err  ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  read(unit,iostat=err)prim%r(:)
-  err = read_vector(unit,prim%v)
-  read(unit,iostat=err)prim%p
-  read(unit,iostat=err)prim%d
-  read(unit,iostat=err)prim%g
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Scalar
-
-  function Read_Ascii_Scalar(unit,format,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Primitive (ascii, scalar).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN)::    unit   ! logic unit
-  character(*),         intent(IN)::    format ! format specifier
-  type(Type_Primitive), intent(INOUT):: prim
-  integer(I4P)::                        err    ! Error trapping flag: 0 no errors, >0 error occurs.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err)prim%r(:)
-    err = read_vector(unit,format,prim%v)
-    read(unit,*,iostat=err)prim%p
-    read(unit,*,iostat=err)prim%d
-    read(unit,*,iostat=err)prim%g
-  case default
-    read(unit,adjustl(trim(format)),iostat=err)prim%r(:)
-    err = read_vector(unit,format,prim%v)
-    read(unit,adjustl(trim(format)),iostat=err)prim%p
-    read(unit,adjustl(trim(format)),iostat=err)prim%d
-    read(unit,adjustl(trim(format)),iostat=err)prim%g
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Scalar
-
-  function Read_Bin_Array1D(unit,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Primitive (binary, array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN)::    unit    ! logic unit
-  type(Type_Primitive), intent(INOUT):: prim(:)
-  integer(I4P)::                        err     ! Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                        Ni,i
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ni = size(prim,dim=1)
-  read(unit,iostat=err)(prim(i)%r(:),i=1,Ni)
-  err = read_vector(unit,prim%v)
-  read(unit,iostat=err)prim%p
-  read(unit,iostat=err)prim%d
-  read(unit,iostat=err)prim%g
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Array1D
-
-  function Read_Ascii_Array1D(unit,format,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Primitive (ascii, array 1D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN)::    unit    ! logic unit
-  character(*),         intent(IN)::    format  ! format specifier
-  type(Type_Primitive), intent(INOUT):: prim(:)
-  integer(I4P)::                        err     ! Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                        Ni,i
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ni = size(prim,dim=1)
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err)(prim(i)%r(:),i=1,Ni)
-    err = read_vector(unit,format,prim%v)
-    read(unit,*,iostat=err)prim%p
-    read(unit,*,iostat=err)prim%d
-    read(unit,*,iostat=err)prim%g
-  case default
-    read(unit,adjustl(trim(format)),iostat=err)(prim(i)%r(:),i=1,Ni)
-    err = read_vector(unit,format,prim%v)
-    read(unit,adjustl(trim(format)),iostat=err)prim%p
-    read(unit,adjustl(trim(format)),iostat=err)prim%d
-    read(unit,adjustl(trim(format)),iostat=err)prim%g
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Array1D
-
-  function Read_Bin_Array2D(unit,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Primitive (binary, array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN)::    unit      ! logic unit
-  type(Type_Primitive), intent(INOUT):: prim(:,:)
-  integer(I4P)::                        err       ! Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                        Ni,Nj,i,j
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ni = size(prim,dim=1)
-  Nj = size(prim,dim=2)
-  read(unit,iostat=err)((prim(i,j)%r(:),i=1,Ni),j=1,Nj)
-  err = read_vector(unit,prim%v)
-  read(unit,iostat=err)prim%p
-  read(unit,iostat=err)prim%d
-  read(unit,iostat=err)prim%g
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Array2D
-
-  function Read_Ascii_Array2D(unit,format,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Primitive (ascii, array 2D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN)::    unit     ! logic unit
-  character(*),         intent(IN)::    format   ! format specifier
-  type(Type_Primitive), intent(INOUT):: prim(:,:)
-  integer(I4P)::                        err      ! Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                        Ni,Nj,i,j
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ni = size(prim,dim=1)
-  Nj = size(prim,dim=2)
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err)((prim(i,j)%r(:),i=1,Ni),j=1,Nj)
-    err = read_vector(unit,format,prim%v)
-    read(unit,*,iostat=err)prim%p
-    read(unit,*,iostat=err)prim%d
-    read(unit,*,iostat=err)prim%g
-  case default
-    read(unit,adjustl(trim(format)),iostat=err)((prim(i,j)%r(:),i=1,Ni),j=1,Nj)
-    err = read_vector(unit,format,prim%v)
-    read(unit,adjustl(trim(format)),iostat=err)prim%p
-    read(unit,adjustl(trim(format)),iostat=err)prim%d
-    read(unit,adjustl(trim(format)),iostat=err)prim%g
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Array2D
-
-  function Read_Bin_Array3D(unit,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for reading Type_Primitive (binary, Array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN)::    unit        ! logic unit
-  type(Type_Primitive), intent(INOUT):: prim(:,:,:)
-  integer(I4P)::                        err        ! Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                        Ni,Nj,Nk,Ns,i,j,k,s
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ni = size(prim,dim=1)
-  Nj = size(prim,dim=2)
-  Nk = size(prim,dim=3)
-  Ns = size(prim(1,1,1)%r(:),dim=1)
-  read(unit,iostat=err)((((prim(i,j,k)%r(s),s=1,Ns),i=1,Ni),j=1,Nj),k=1,Nk)
-  err = read_vector(unit,prim%v)
-  read(unit,iostat=err)prim%p
-  read(unit,iostat=err)prim%d
-  read(unit,iostat=err)prim%g
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Bin_Array3D
-
-  function Read_Ascii_Array3D(unit,format,prim) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for reading Type_Primitive (ascii, array 3D).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),         intent(IN)::    unit        ! logic unit
-  character(*),         intent(IN)::    format      ! format specifier
-  type(Type_Primitive), intent(INOUT):: prim(:,:,:)
-  integer(I4P)::                        err         ! Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                        Ni,Nj,Nk,i,j,k
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ni = size(prim,dim=1)
-  Nj = size(prim,dim=2)
-  Nk = size(prim,dim=3)
-  !Ns = size(prim(1,1,1)%r(:))
-  select case(adjustl(trim(format)))
-  case('*')
-    read(unit,*,iostat=err)(((prim(i,j,k)%r(:),i=1,Ni),j=1,Nj),k=1,Nk)
-    err = read_vector(unit,format,prim%v)
-    read(unit,*,iostat=err)prim%p
-    read(unit,*,iostat=err)prim%d
-    read(unit,*,iostat=err)prim%g
-  case default
-    read(unit,adjustl(trim(format)),iostat=err)(((prim(i,j,k)%r(:),i=1,Ni),j=1,Nj),k=1,Nk)
-    err = read_vector(unit,format,prim%v)
-    read(unit,adjustl(trim(format)),iostat=err)prim%p
-    read(unit,adjustl(trim(format)),iostat=err)prim%d
-    read(unit,adjustl(trim(format)),iostat=err)prim%g
-  endselect
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Read_Ascii_Array3D
+  endfunction pprint
 
   ! Assignment (=)
   elemental subroutine assign_prim(prim1,prim2)
@@ -1197,11 +636,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(prim1%r).and.allocated(prim2%r)) prim1%r = prim2%r
-                                                 prim1%v = prim2%v
-                                                 prim1%p = prim2%p
-                                                 prim1%d = prim2%d
-                                                 prim1%g = prim2%g
+  prim1%r = prim2%r
+  prim1%v = prim2%v
+  prim1%p = prim2%p
+  prim1%d = prim2%d
+  prim1%g = prim2%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_prim
@@ -1219,11 +658,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(prim%r))  prim%r = real(scal,R_P)
-                          prim%v = real(scal,R_P)
-                          prim%p = real(scal,R_P)
-                          prim%d = real(scal,R_P)
-                          prim%g = real(scal,R_P)
+  prim%r = real(scal,R_P)
+  prim%v = real(scal,R_P)
+  prim%p = real(scal,R_P)
+  prim%d = real(scal,R_P)
+  prim%g = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR16P
@@ -1241,11 +680,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(prim%r))  prim%r = real(scal,R_P)
-                          prim%v = real(scal,R_P)
-                          prim%p = real(scal,R_P)
-                          prim%d = real(scal,R_P)
-                          prim%g = real(scal,R_P)
+  prim%r = real(scal,R_P)
+  prim%v = real(scal,R_P)
+  prim%p = real(scal,R_P)
+  prim%d = real(scal,R_P)
+  prim%g = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR8P
@@ -1262,11 +701,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(prim%r))  prim%r = real(scal,R_P)
-                          prim%v = real(scal,R_P)
-                          prim%p = real(scal,R_P)
-                          prim%d = real(scal,R_P)
-                          prim%g = real(scal,R_P)
+  prim%r = real(scal,R_P)
+  prim%v = real(scal,R_P)
+  prim%p = real(scal,R_P)
+  prim%d = real(scal,R_P)
+  prim%g = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR4P
@@ -1283,11 +722,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(prim%r))  prim%r = real(scal,R_P)
-                          prim%v = real(scal,R_P)
-                          prim%p = real(scal,R_P)
-                          prim%d = real(scal,R_P)
-                          prim%g = real(scal,R_P)
+  prim%r = real(scal,R_P)
+  prim%v = real(scal,R_P)
+  prim%p = real(scal,R_P)
+  prim%d = real(scal,R_P)
+  prim%g = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI8P
@@ -1304,11 +743,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(prim%r))  prim%r = real(scal,R_P)
-                          prim%v = real(scal,R_P)
-                          prim%p = real(scal,R_P)
-                          prim%d = real(scal,R_P)
-                          prim%g = real(scal,R_P)
+  prim%r = real(scal,R_P)
+  prim%v = real(scal,R_P)
+  prim%p = real(scal,R_P)
+  prim%d = real(scal,R_P)
+  prim%g = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI4P
@@ -1325,11 +764,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(prim%r))  prim%r = real(scal,R_P)
-                          prim%v = real(scal,R_P)
-                          prim%p = real(scal,R_P)
-                          prim%d = real(scal,R_P)
-                          prim%g = real(scal,R_P)
+  prim%r = real(scal,R_P)
+  prim%v = real(scal,R_P)
+  prim%p = real(scal,R_P)
+  prim%d = real(scal,R_P)
+  prim%g = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI2P
@@ -1346,11 +785,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(prim%r))  prim%r = real(scal,R_P)
-                          prim%v = real(scal,R_P)
-                          prim%p = real(scal,R_P)
-                          prim%d = real(scal,R_P)
-                          prim%g = real(scal,R_P)
+  prim%r = real(scal,R_P)
+  prim%v = real(scal,R_P)
+  prim%p = real(scal,R_P)
+  prim%d = real(scal,R_P)
+  prim%g = real(scal,R_P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI1P
@@ -1369,7 +808,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim1%r)))
+  allocate(mul%r(1:size(prim1%r)))
   mul%r = prim1%r * prim2%r
   mul%v = prim1%v * prim2%v
   mul%p = prim1%p * prim2%p
@@ -1393,7 +832,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1416,7 +855,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1440,7 +879,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1463,7 +902,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1486,7 +925,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1509,7 +948,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1532,7 +971,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1555,7 +994,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1578,7 +1017,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1601,7 +1040,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1624,7 +1063,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1647,7 +1086,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1670,7 +1109,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1693,7 +1132,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(mul%r)) allocate(mul%r(1:size(prim%r)))
+  allocate(mul%r(1:size(prim%r)))
   mul%r = real(scal,R_P) * prim%r
   mul%v = real(scal,R_P) * prim%v
   mul%p = real(scal,R_P) * prim%p
@@ -1717,7 +1156,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%r)) allocate(div%r(1:size(prim1%r)))
+  allocate(div%r(1:size(prim1%r)))
   div%r = prim1%r / prim2%r
   div%v = prim1%v / prim2%v
   div%p = prim1%p / prim2%p
@@ -1741,7 +1180,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%r)) allocate(div%r(1:size(prim1%r)))
+  allocate(div%r(1:size(prim1%r)))
   div%r = prim%r / real(scal,R_P)
   div%v = prim%v / real(scal,R_P)
   div%p = prim%p / real(scal,R_P)
@@ -1765,7 +1204,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%r)) allocate(div%r(1:size(prim%r)))
+  allocate(div%r(1:size(prim%r)))
   div%r = prim%r / real(scal,R_P)
   div%v = prim%v / real(scal,R_P)
   div%p = prim%p / real(scal,R_P)
@@ -1788,7 +1227,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%r)) allocate(div%r(1:size(prim%r)))
+  allocate(div%r(1:size(prim%r)))
   div%r = prim%r / real(scal,R_P)
   div%v = prim%v / real(scal,R_P)
   div%p = prim%p / real(scal,R_P)
@@ -1811,7 +1250,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%r)) allocate(div%r(1:size(prim%r)))
+  allocate(div%r(1:size(prim%r)))
   div%r = prim%r / real(scal,R_P)
   div%v = prim%v / real(scal,R_P)
   div%p = prim%p / real(scal,R_P)
@@ -1834,7 +1273,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%r)) allocate(div%r(1:size(prim%r)))
+  allocate(div%r(1:size(prim%r)))
   div%r = prim%r / real(scal,R_P)
   div%v = prim%v / real(scal,R_P)
   div%p = prim%p / real(scal,R_P)
@@ -1857,7 +1296,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%r)) allocate(div%r(1:size(prim%r)))
+  allocate(div%r(1:size(prim%r)))
   div%r = prim%r / real(scal,R_P)
   div%v = prim%v / real(scal,R_P)
   div%p = prim%p / real(scal,R_P)
@@ -1880,7 +1319,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(div%r)) allocate(div%r(1:size(prim%r)))
+  allocate(div%r(1:size(prim%r)))
   div%r = prim%r / real(scal,R_P)
   div%v = prim%v / real(scal,R_P)
   div%p = prim%p / real(scal,R_P)
@@ -1903,7 +1342,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(pos%r)) allocate(pos%r(1:size(prim%r)))
+  allocate(pos%r(1:size(prim%r)))
   pos%r =  + prim%r
   pos%v =  + prim%v
   pos%p =  + prim%p
@@ -1926,7 +1365,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim1%r)))
+  allocate(summ%r(1:size(prim1%r)))
   summ%r = prim1%r + prim2%r
   summ%v = prim1%v + prim2%v
   summ%p = prim1%p + prim2%p
@@ -1950,7 +1389,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -1973,7 +1412,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -1997,7 +1436,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -2020,7 +1459,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -2043,7 +1482,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -2066,7 +1505,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -2089,7 +1528,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -2112,7 +1551,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -2135,7 +1574,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -2158,7 +1597,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -2181,7 +1620,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -2204,7 +1643,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -2227,7 +1666,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -2250,7 +1689,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(summ%r)) allocate(summ%r(1:size(prim%r)))
+  allocate(summ%r(1:size(prim%r)))
   summ%r = real(scal,R_P) + prim%r
   summ%v = real(scal,R_P) + prim%v
   summ%p = real(scal,R_P) + prim%p
@@ -2273,7 +1712,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(neg%r)) allocate(neg%r(1:size(prim%r)))
+  allocate(neg%r(1:size(prim%r)))
   neg%r =  - prim%r
   neg%v =  - prim%v
   neg%p =  - prim%p
@@ -2296,7 +1735,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim1%r)))
+  allocate(sub%r(1:size(prim1%r)))
   sub%r = prim1%r - prim2%r
   sub%v = prim1%v - prim2%v
   sub%p = prim1%p - prim2%p
@@ -2320,7 +1759,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = real(scal,R_P) - prim%r
   sub%v = real(scal,R_P) - prim%v
   sub%p = real(scal,R_P) - prim%p
@@ -2343,7 +1782,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = prim%r - real(scal,R_P)
   sub%v = prim%v - real(scal,R_P)
   sub%p = prim%p - real(scal,R_P)
@@ -2367,7 +1806,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = real(scal,R_P) - prim%r
   sub%v = real(scal,R_P) - prim%v
   sub%p = real(scal,R_P) - prim%p
@@ -2390,7 +1829,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = prim%r - real(scal,R_P)
   sub%v = prim%v - real(scal,R_P)
   sub%p = prim%p - real(scal,R_P)
@@ -2413,7 +1852,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = real(scal,R_P) - prim%r
   sub%v = real(scal,R_P) - prim%v
   sub%p = real(scal,R_P) - prim%p
@@ -2436,7 +1875,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = prim%r - real(scal,R_P)
   sub%v = prim%v - real(scal,R_P)
   sub%p = prim%p - real(scal,R_P)
@@ -2459,7 +1898,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = real(scal,R_P) - prim%r
   sub%v = real(scal,R_P) - prim%v
   sub%p = real(scal,R_P) - prim%p
@@ -2482,7 +1921,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = prim%r - real(scal,R_P)
   sub%v = prim%v - real(scal,R_P)
   sub%p = prim%p - real(scal,R_P)
@@ -2505,7 +1944,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = real(scal,R_P) - prim%r
   sub%v = real(scal,R_P) - prim%v
   sub%p = real(scal,R_P) - prim%p
@@ -2528,7 +1967,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = prim%r - real(scal,R_P)
   sub%v = prim%v - real(scal,R_P)
   sub%p = prim%p - real(scal,R_P)
@@ -2551,7 +1990,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = real(scal,R_P) - prim%r
   sub%v = real(scal,R_P) - prim%v
   sub%p = real(scal,R_P) - prim%p
@@ -2574,7 +2013,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = prim%r - real(scal,R_P)
   sub%v = prim%v - real(scal,R_P)
   sub%p = prim%p - real(scal,R_P)
@@ -2597,7 +2036,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = real(scal,R_P) - prim%r
   sub%v = real(scal,R_P) - prim%v
   sub%p = real(scal,R_P) - prim%p
@@ -2620,7 +2059,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(sub%r)) allocate(sub%r(1:size(prim%r)))
+  allocate(sub%r(1:size(prim%r)))
   sub%r = prim%r - real(scal,R_P)
   sub%v = prim%v - real(scal,R_P)
   sub%p = prim%p - real(scal,R_P)
@@ -2629,59 +2068,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sub_ScalI1P
-  !> @}
-
-  !> @ingroup Data_Type_PrimitivePublicProcedure
-  !> @{
-  !>Function for converting derived type Type_Primitive to 1D array.
-  !> @return \b array real(R_P), dimension(1:size(prim\%r)+6) variable.
-  pure function prim2array(prim) result(array)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Primitive), intent(IN):: prim                    !< Derived type primitive data.
-  real(R_P)::                        array(1:size(prim%r)+6) !< Primitive data in the form 1D array.
-  integer(I_P)::                     Ns                      !< Number of species.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ns = size(prim%r)
-  array(1:Ns) = prim%r
-  array(Ns+1) = prim%v%x
-  array(Ns+2) = prim%v%y
-  array(Ns+3) = prim%v%z
-  array(Ns+4) = prim%p
-  array(Ns+5) = prim%d
-  array(Ns+6) = prim%g
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction prim2array
-
-  !>Function for converting 1D array to derived type Type_Primitive.
-  !> @return \b prim type(Type_Primitive) variable.
-  pure function array2prim(array) result(prim)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  !!Function for converting array to derived type Type_Primitive.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R_P), intent(IN):: array(:) !< Primitive data in the form 1D array.
-  type(Type_Primitive)::  prim     !< Derived type primitive data.
-  integer(I_P)::          Ns       !< Number of species.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Ns = size(array)-6
-  if (allocated(prim%r)) deallocate(prim%r)  ; allocate(prim%r(1:Ns))
-  prim%r   = array(1:Ns)
-  prim%v%x = array(Ns+1)
-  prim%v%y = array(Ns+2)
-  prim%v%z = array(Ns+3)
-  prim%p   = array(Ns+4)
-  prim%d   = array(Ns+5)
-  prim%g   = array(Ns+6)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction array2prim
   !> @}
 endmodule Data_Type_Primitive

@@ -14,6 +14,9 @@
 module Data_Type_Time
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision ! Integers and reals precision definition.
+#ifdef OPENMP
+USE OMP_LIB      ! OpenMP runtime library.
+#endif
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -39,8 +42,10 @@ type, public:: Type_Time
   integer(I_P) Hours   !< Number of hours.
   integer(I_P) Minutes !< Number of minutes.
   real(R_P)    Seconds !< Number of seconds.
+  contains
+    procedure, non_overridable:: sec2time ! Procedure for converting seconds to Type_Time format.
 endtype Type_Time
-real:: instant0 = 0.0 !< The Crono starting instant (used for timing the code).
+real(R8P):: inst0 = 0._R8P !< The Crono starting instant used for profing the code.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -78,7 +83,24 @@ endinterface
 contains
   !> @ingroup Data_Type_TimePrivateProcedure
   !> @{
-  function not_eq(time1,time2) result(compare)
+  !> Subroutine for converting seconds to Type_Time (days,hours,minutes,seconds) format.
+  elemental subroutine sec2time(Time,seconds)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Time), intent(INOUT):: Time    !< Time in days,hours,minutes,seconds format.
+  real(R_P),        intent(IN)::    seconds !< Number of seconds.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  Time%Days    = int(Seconds/86400)
+  Time%Hours   = int((Seconds-Time%Days*86400)/3600)
+  Time%Minutes = int((Seconds-Time%Days*86400-Time%Hours*3600)/60)
+  Time%Seconds =      Seconds-Time%Days*86400-Time%Hours*3600-Time%Minutes*60
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine sec2time
+
+  elemental function not_eq(time1,time2) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function returns .true. if the the time time1 is /= with respect the time time2, .false. otherwise.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -99,7 +121,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction not_eq
 
-  function low(time1,time2) result(compare)
+  elemental function low(time1,time2) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function returns .true. if the the time time1 is < with respect the time time2, .false. otherwise.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -139,7 +161,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction low
 
-  function low_eq(time1,time2) result(compare)
+  elemental function low_eq(time1,time2) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function returns .true. if the the time time1 is <= with respect the time time2, .false. otherwise.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -167,7 +189,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction low_eq
 
-  function eq(time1,time2) result(compare)
+  elemental function eq(time1,time2) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function returns .true. if the the time time1 is = with respect the time time2, .false. otherwise.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -188,7 +210,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction eq
 
-  function great_eq(time1,time2) result(compare)
+  elemental function great_eq(time1,time2) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function returns .true. if the the time time1 is >= with respect the time time2, .false. otherwise.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -228,7 +250,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction great_eq
 
-  function great(time1,time2) result(compare)
+  elemental function great(time1,time2) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function returns .true. if the the time time1 is > with respect the time time2, .false. otherwise.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -298,9 +320,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Get_Date_String
 
-  !> Function for converting seconds to Type_Time (days,hours,minutes,seconds) derived type.
+  !> Function for converting seconds to Type_Time (days,hours,minutes,seconds) format.
   !> @return \b Time type(Type_Time) variable.
-  function Seconds_To_Time(seconds) result(Time)
+  elemental function Seconds_To_Time(seconds) result(Time)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   real(R_P), intent(IN):: seconds !< Number of seconds.
@@ -317,23 +339,28 @@ contains
   endfunction Seconds_To_Time
 
   !> A simple stop/watch function.
-  !> @return \b seconds real variable.
-  function Crono(start,instant1) result(seconds)
+  !> @return \b seconds real(R8P) variable.
+  function Crono(start,instant1,instant0) result(seconds)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  logical, intent(IN), optional:: start    !< Flag for starting time measurament.
-  real,    intent(IN), optional:: instant1 !< Starting instant1 (external supplied) different from instant0.
-  real::                          seconds  !< Seconds from instant0 or instant1.
+  logical,   intent(IN), optional:: start    !< Flag for starting time measurament.
+  real(R8P), intent(IN), optional:: instant1 !< Seconds from instant1 (external supplied, different from instant0).
+  logical,   intent(IN), optional:: instant0 !< Seconds from instant0.
+  real(R8P)::                       seconds  !< Seconds from instant0 or instant1.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
+#ifdef OPENMP
+  seconds = omp_get_wtime()      ! Getting seconds.
+#else
   call CPU_TIME(seconds)         ! Getting seconds.
+#endif
   if (present(start)) then
-    instant0 = seconds           ! Initialize instant0.
+    inst0 = seconds              ! Initialize instant0.
   elseif (present(instant1)) then
     seconds = seconds - instant1 ! Shifting time from instant1 (external supplied).
-  else
-    seconds = seconds - instant0 ! Shifting time from instant0 (internal supplied).
+  elseif (present(instant0)) then
+    seconds = seconds - inst0    ! Shifting time from instant0 (internal supplied).
   endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------

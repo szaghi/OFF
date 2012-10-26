@@ -10,25 +10,27 @@ $(VERBOSE).SILENT:
 
 #----------------------------------------------------------------------------------------------------------------------------------
 # User options
-COMPILER = gnu
-DEBUG    = yes
-F03STD   = yes
-OPTIMIZE = no
-OPENMP   = no
-MPI      = no
-R16P     = no
-NULi     = no
-NULj     = no
-NULk     = no
-WENO     = WENO
-RECV     = RECVC
-RSU      = HLLCp
-VACUUM   = no
-WS       = WSup
-SMSW     = SMSWz
-HYBRID   = NOHYBRID
-PPL      = no
-TECIO    = no
+COMPILER  = gnu
+DEBUG     = yes
+F03STD    = yes
+PROFILING = no
+OPTIMIZE  = no
+OPENMP    = no
+MPI       = no
+R16P      = no
+NULi      = no
+NULj      = no
+NULk      = no
+WENO      = WENO
+RECV      = RECVC
+RSU       = HLLCp
+VACUUM    = no
+WS        = WSup
+SMSW      = SMSWz
+HYBRID    = NOHYBRID
+PPL       = no
+LMA       = no
+TECIO     = no
 
 .PHONY : DEFAULTRULE
 DEFAULTRULE: $(DEXE)OFF
@@ -46,11 +48,12 @@ help:
 	@echo -e '\033[1;31m  COMPILER=$(COMPILER)  \033[0m\033[1m => default         \033[0m'
 	@echo
 	@echo -e '\033[1;31m Compiling options\033[0m'
-	@echo -e '\033[1;31m  DEBUG=yes(no)   \033[0m\033[1m => on(off) debug                  (default $(DEBUG))\033[0m'
-	@echo -e '\033[1;31m  F03STD=yes(no)  \033[0m\033[1m => on(off) check standard fortran (default $(F03STD))\033[0m'
-	@echo -e '\033[1;31m  OPTIMIZE=yes(no)\033[0m\033[1m => on(off) optimization           (default $(OPTIMIZE))\033[0m'
-	@echo -e '\033[1;31m  OPENMP=yes(no)  \033[0m\033[1m => on(off) OpenMP directives      (default $(OPENMP))\033[0m'
-	@echo -e '\033[1;31m  MPI=yes(no)     \033[0m\033[1m => on(off) MPI    directives      (default $(MPI)) \033[0m'
+	@echo -e '\033[1;31m  DEBUG=yes(no)    \033[0m\033[1m => on(off) debug                  (default $(DEBUG))\033[0m'
+	@echo -e '\033[1;31m  F03STD=yes(no)   \033[0m\033[1m => on(off) check standard fortran (default $(F03STD))\033[0m'
+	@echo -e '\033[1;31m  PROFILING=yes(no)\033[0m\033[1m => on(off) profile the code       (default $(PROFILING))\033[0m'
+	@echo -e '\033[1;31m  OPTIMIZE=yes(no) \033[0m\033[1m => on(off) optimization           (default $(OPTIMIZE))\033[0m'
+	@echo -e '\033[1;31m  OPENMP=yes(no)   \033[0m\033[1m => on(off) OpenMP directives      (default $(OPENMP))\033[0m'
+	@echo -e '\033[1;31m  MPI=yes(no)      \033[0m\033[1m => on(off) MPI    directives      (default $(MPI)) \033[0m'
 	@echo
 	@echo -e '\033[1;31m Preprocessing options\033[0m'
 	@echo -e '\033[1;31m  R16P=yes(no)\033[0m\033[1m => on(off) definition of real with "128 bit" (default $(R16P))\033[0m'
@@ -58,6 +61,7 @@ help:
 	@echo -e '\033[1;31m  NULj=yes(no)\033[0m\033[1m => on(off) nullify j direction (1D or 2D)    (default $(NULj))\033[0m'
 	@echo -e '\033[1;31m  NULk=yes(no)\033[0m\033[1m => on(off) nullify k direction (1D or 2D)    (default $(NULk))\033[0m'
 	@echo -e '\033[1;31m  PPL=yes(no) \033[0m\033[1m => on(off) Positivity Preserving Limiter     (default $(PPL))\033[0m'
+	@echo -e '\033[1;31m  LMA=yes(no) \033[0m\033[1m => on(off) Low Mach number Adjsutment        (default $(LMA))\033[0m'
 	@echo -e '\033[1;31m  WENO=WENO/WENOZ/WENOM\033[0m\033[1m WENO algorithm (default $(WENO))\033[0m'
 	@echo -e '\033[1m   WENO  => Original Jiang-Shu\033[0m'
 	@echo -e '\033[1m   WENOZ => Improved Borges-Carmona-Costa-Don\033[0m'
@@ -146,14 +150,17 @@ ifeq "$(COMPILER)" "gnu"
   # debug
   ifeq "$(DEBUG)" "yes"
     PREPROC := $(PREPROC) -DDEBUG
-    OPTSC := $(OPTSC) -O0 -Wall -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow,precision,denormal
-    OPTSL := $(OPTSL) -O0 -Wall -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow,precision,denormal
-#-Warray-temporaries
+    OPTSC := $(OPTSC) -O0 -Wall -Warray-temporaries -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow
+    OPTSL := $(OPTSL) -O0 -Wall -Warray-temporaries -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow
   endif
   # standard
   ifeq "$(F03STD)" "yes"
     OPTSC := $(OPTSC) -std=f2008 -fall-intrinsics
     OPTSL := $(OPTSL) -std=f2008 -fall-intrinsics
+  endif
+  # profiling
+  ifeq "$(PROFILING)" "yes"
+    PREPROC := $(PREPROC) -DPROFILING
   endif
   # optimization
   ifeq "$(OPTIMIZE)" "yes"
@@ -180,7 +187,7 @@ ifeq "$(COMPILER)" "intel"
   # debug
   ifeq "$(DEBUG)" "yes"
     PREPROC := $(PREPROC) -DDEBUG
-    CHK = -check all -check noarg_temp_created
+    CHK = -check all
     DEB = -debug all
     WRN = -warn all
     OPTSC := $(OPTSC) -O0 -fpe-all=0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
@@ -191,10 +198,14 @@ ifeq "$(COMPILER)" "intel"
     OPTSC := $(OPTSC) -std03
     OPTSL := $(OPTSL) -std03
   endif
+  # profiling
+  ifeq "$(PROFILING)" "yes"
+    PREPROC := $(PREPROC) -DPROFILING
+  endif
   # optimization
   ifeq "$(OPTIMIZE)" "yes"
-    OPTSC := $(OPTSC) -O3 -ipo
-    OPTSL := $(OPTSL) -O3 -ipo
+    OPTSC := $(OPTSC) -O3 -ipo -inline all
+    OPTSL := $(OPTSL) -O3 -ipo -inline all
   endif
   # openmp
   ifeq "$(OPENMP)" "yes"
@@ -224,6 +235,10 @@ ifeq "$(COMPILER)" "pgi"
   ifeq "$(F03STD)" "yes"
     OPTSC := $(OPTSC) -Mstandard
     OPTSL := $(OPTSL) -Mstandard
+  endif
+  # profiling
+  ifeq "$(PROFILING)" "yes"
+    PREPROC := $(PREPROC) -DPROFILING
   endif
   # optimization
   ifeq "$(OPTIMIZE)" "yes"
@@ -257,6 +272,10 @@ ifeq "$(COMPILER)" "g95"
   ifeq "$(F03STD)" "yes"
     OPTSC := $(OPTSC) -std=f2003 -fintrinsic-extensions
     OPTSL := $(OPTSL) -std=f2003 -fintrinsic-extensions
+  endif
+  # profiling
+  ifeq "$(PROFILING)" "yes"
+    PREPROC := $(PREPROC) -DPROFILING
   endif
   # optimization
   ifeq "$(OPTIMIZE)" "yes"
@@ -308,6 +327,15 @@ endif
 ifeq "$(PPL)" "yes"
   PPLCHK = (Known PPL switch) Used PPL=$(PPL)
   PREPROC := $(PREPROC) -DPPL
+endif
+# Low Mach number Adjustment
+LMACHK = (Unknown LMA switch) Used default LMA=no
+ifeq "$(LMA)" "no"
+  LMACHK = (Known LMA switch) Used LMA=$(LMA)
+endif
+ifeq "$(LMA)" "yes"
+  LMACHK = (Known LMA switch) Used LMA=$(LMA)
+  PREPROC := $(PREPROC) -DLMA
 endif
 # WENO algorithms
 WENOCHK = (Unknown WENO switch) Used default WENO=WENO
@@ -449,6 +477,7 @@ PRINTCHK = "\\033[1;31m Compiler used \\033[0m\\033[1m $(COMPILER) => $(WHICHFC)
             \\033[1;31mLibraries     \\033[0m\\033[1m $(LIBS)\\033[0m \n \n\
             \\033[1;31m Debug         \\033[0m\\033[1m $(DEBUG)\\033[0m \n\
             \\033[1;31m F-standard    \\033[0m\\033[1m $(F03STD)\\033[0m \n\
+            \\033[1;31m Profiling     \\033[0m\\033[1m $(PROFILING)\\033[0m \n\
             \\033[1;31m Optimize      \\033[0m\\033[1m $(OPTIMIZE)\\033[0m \n\
             \\033[1;31m OpenMP        \\033[0m\\033[1m $(OPENMP)\\033[0m \n\
             \\033[1;31m MPI           \\033[0m\\033[1m $(MPI)\\033[0m \n\
@@ -457,6 +486,7 @@ PRINTCHK = "\\033[1;31m Compiler used \\033[0m\\033[1m $(COMPILER) => $(WHICHFC)
             \\033[1;31m Nullify j     \\033[0m\\033[1m $(NULjCHK)\\033[0m \n\
             \\033[1;31m Nullify k     \\033[0m\\033[1m $(NULkCHK)\\033[0m \n\
             \\033[1;31m PP Limiter    \\033[0m\\033[1m $(PPLCHK)\\033[0m \n\
+            \\033[1;31m LMA Limiter   \\033[0m\\033[1m $(LMACHK)\\033[0m \n\
             \\033[1;31m WENO          \\033[0m\\033[1m $(WENOCHK)\\033[0m \n\
             \\033[1;31m RECV type     \\033[0m\\033[1m $(RECVCHK)\\033[0m \n\
             \\033[1;31m Riemann Solver\\033[0m\\033[1m $(RSUCHK)\\033[0m \n\
@@ -638,14 +668,36 @@ $(DOBJ)lib_fluidynamic.o : Lib_Fluidynamic.f90 \
 	$(DOBJ)data_type_primitive.o \
 	$(DOBJ)data_type_time.o \
 	$(DOBJ)data_type_vector.o \
+	$(DOBJ)lib_fluxes_convective.o \
+	$(DOBJ)lib_fluxes_diffusive.o \
 	$(DOBJ)lib_io_misc.o \
 	$(DOBJ)lib_math.o \
 	$(DOBJ)lib_parallel.o \
-	$(DOBJ)lib_riemann.o \
+	$(DOBJ)lib_profiling.o \
 	$(DOBJ)lib_runge_kutta.o \
 	$(DOBJ)lib_thermodynamic_laws_ideal.o \
-	$(DOBJ)lib_weno.o \
 	$(DOBJ)lib_parallel.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_fluxes_convective.o : Lib_Fluxes_Convective.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_conservative.o \
+	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_vector.o \
+	$(DOBJ)lib_riemann.o \
+	$(DOBJ)lib_weno.o \
+	$(DOBJ)lib_thermodynamic_laws_ideal.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_fluxes_diffusive.o : Lib_Fluxes_Diffusive.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_conservative.o \
+	$(DOBJ)data_type_globals.o \
+	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_tensor.o \
+	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
@@ -695,6 +747,13 @@ $(DOBJ)lib_postprocessing.o : Lib_PostProcessing.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
+$(DOBJ)lib_profiling.o : Lib_Profiling.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_time.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
 $(DOBJ)lib_riemann.o : Lib_Riemann.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)lib_thermodynamic_laws_ideal.o
@@ -737,6 +796,7 @@ $(DOBJ)off.o : OFF.f90 \
 	$(DOBJ)lib_math.o \
 	$(DOBJ)lib_mesh.o \
 	$(DOBJ)lib_io_misc.o \
+	$(DOBJ)lib_profiling.o \
 	$(DOBJ)lib_weno.o \
 	$(DOBJ)lib_parallel.o \
 	$(DOBJ)lib_parallel.o

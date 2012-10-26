@@ -27,6 +27,6 @@ for file in $( ls ./input/*b001*N_*.sol ); do
 done
 n=`printf "%10.10d" $nlast`
 tout=$1" yes"                                                                                        # type of output
-./POG -m ./input/sod.g01.b001.geo -s ./input/sod.g01.b001-N_$n.sol -o output/sod.g01.b001-N_$n $tout -cell # post-processing block 1
-./POG -m ./input/sod.g01.b002.geo -s ./input/sod.g01.b002-N_$n.sol -o output/sod.g01.b002-N_$n $tout -cell # post-processing block 2
+./POG -m ./input/sod.g01.b001.geo -s ./input/sod.g01.b001-N_$n.sol -o output/sod.g01.b001-N_$n $tout #-cell # post-processing block 1
+./POG -m ./input/sod.g01.b002.geo -s ./input/sod.g01.b002-N_$n.sol -o output/sod.g01.b002-N_$n $tout #-cell # post-processing block 2
 exit 0

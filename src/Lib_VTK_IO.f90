@@ -500,6 +500,48 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Upper_Case
+
+  !> @brief Function for computing number of bytes of variables.
+  !>@return N_Byte_Compute
+  function Bytes(dims,var_type)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I8P), intent(IN):: dims     !< Dimensions (number) of arrays (variables).
+  character(2), intent(IN):: var_type !< Varable type = R8,R4,I8,I4,I2,I1.
+  integer(I8P)::             Bytes    !< Number of bytes of input variables.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  select case(Upper_Case(var_type))
+  case('R8')
+    Bytes = int(dims*int(sizeof(Tipo_R8)),I8P)
+  case('R4')
+    Bytes = int(dims*int(sizeof(Tipo_R4)),I8P)
+  case('I8')
+    Bytes = int(dims*int(sizeof(Tipo_I8)),I8P)
+  case('I4')
+    Bytes = int(dims*int(sizeof(Tipo_I4)),I8P)
+  case('I2')
+    Bytes = int(dims*int(sizeof(Tipo_I2)),I8P)
+  case('I1')
+    Bytes = int(dims*int(sizeof(Tipo_I1)),I8P)
+  endselect
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction Bytes
+
+  !> @brief Subroutine for updating ioffset pointer.
+  subroutine ioffset_update(N_Byte)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I8P), intent(IN):: N_Byte !< Number of bytes saved.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  ioffset = ioffset + int(sizeof(Tipo_I8),I8P) + N_Byte
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine ioffset_update
   !> @}
 
   !> @brief Function for initializing VTK-legacy file.
@@ -1336,7 +1378,7 @@ contains
          action     = 'READWRITE',     &
          status     = 'SCRATCH',       &
          iostat     = E_IO)
-    ioffset = 0 ! initializing offset puntator
+    ioffset = 0 ! initializing offset pointer
   endselect
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1379,9 +1421,9 @@ contains
     ! writing header of file
     write(unit=Unit_VTK,fmt='(A)',iostat=E_IO)'<?xml version="1.0"?>'
     if (endian==endianL) then
-      write(unit=Unit_VTK,fmt='(A)',iostat=E_IO)'<VTKFile type="'//trim(topology)//'" version="0.1" byte_order="LittleEndian">'
+      write(unit=Unit_VTK,fmt='(A)',iostat=E_IO)'<VTKFile type="'//trim(topology)//'" version="1.0" byte_order="LittleEndian">'
     else
-      write(unit=Unit_VTK,fmt='(A)',iostat=E_IO)'<VTKFile type="'//trim(topology)//'" version="0.1" byte_order="BigEndian">'
+      write(unit=Unit_VTK,fmt='(A)',iostat=E_IO)'<VTKFile type="'//trim(topology)//'" version="1.0" byte_order="BigEndian">'
     endif
     indent = 2
     select case(trim(topology))
@@ -1407,9 +1449,11 @@ contains
     ! writing header of file
     write(unit=Unit_VTK,iostat=E_IO)'<?xml version="1.0"?>'//end_rec
     if (endian==endianL) then
-      write(unit=Unit_VTK,iostat=E_IO)'<VTKFile type="'//trim(topology)//'" version="0.1" byte_order="LittleEndian">'//end_rec
+      write(unit=Unit_VTK,iostat=E_IO)'<VTKFile type="'//trim(topology)//&
+                                      '" version="1.0" byte_order="LittleEndian" header_type="UInt64">'//end_rec
     else
-      write(unit=Unit_VTK,iostat=E_IO)'<VTKFile type="'//trim(topology)//'" version="0.1" byte_order="BigEndian">'//end_rec
+      write(unit=Unit_VTK,iostat=E_IO)'<VTKFile type="'//trim(topology)//&
+                                      '" version="1.0" byte_order="BigEndian" header_type="UInt64">'//end_rec
     endif
     indent = 2
     select case(trim(topology))
@@ -1433,7 +1477,7 @@ contains
          action     = 'READWRITE',     &
          status     = 'SCRATCH',       &
          iostat     = E_IO)
-    ioffset = 0 ! initializing offset puntator
+    ioffset = 0 ! initializing offset pointer
   endselect
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1483,9 +1527,9 @@ contains
                                     trim(str(.true.,ioffset)),                                                                  &
                                     '">'//                                                                                      &
                                     end_rec
-    N_Byte  = 3*NN*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',3*NN
+    N_Byte  = Bytes(dims=int(3*NN,I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int(3*NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(X(n1),Y(n1),Z(n1),n1=1,NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -1539,9 +1583,9 @@ contains
                                     trim(str(.true.,ioffset)),                                                                  &
                                     '">'//                                                                                      &
                                     end_rec
-    N_Byte  = 3*NN*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',3*NN
+    N_Byte  = Bytes(dims=int(3*NN,I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int(3*NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(X(n1),Y(n1),Z(n1),n1=1,NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -1595,9 +1639,9 @@ contains
                                     trim(str(.true.,ioffset)),                                                                  &
                                     '">'//                                                                                      &
                                     end_rec
-    N_Byte  = 3*NN*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',3*NN
+    N_Byte  = Bytes(dims=int(3*NN,I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int(3*NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(X(n1),Y(n1),Z(n1),n1=1,NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -1651,9 +1695,9 @@ contains
                                     trim(str(.true.,ioffset)),                                                                  &
                                     '">'//                                                                                      &
                                     end_rec
-    N_Byte  = 3*NN*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',3*NN
+    N_Byte  = Bytes(dims=int(3*NN,I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int(3*NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(X(n1),Y(n1),Z(n1),n1=1,NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -1711,9 +1755,9 @@ contains
                                     trim(str(.true.,ioffset)),                                       &
                                     '">'//                                                           &
                                     end_rec
-    N_Byte  = (nx2-nx1+1)*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',nx2-nx1+1
+    N_Byte  = Bytes(dims=int((nx2-nx1+1),I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int((nx2-nx1+1),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(X(n1),n1=nx1,nx2)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)// &
@@ -1721,9 +1765,9 @@ contains
                                     trim(str(.true.,ioffset)),                                       &
                                     '">'//                                                           &
                                     end_rec
-    N_Byte  = (ny2-ny1+1)*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',ny2-ny1+1
+    N_Byte  = Bytes(dims=int((ny2-ny1+1),I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int((ny2-ny1+1),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(Y(n1),n1=ny1,ny2)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//                                             &
@@ -1731,9 +1775,9 @@ contains
                                     trim(str(.true.,ioffset)),                                       &
                                     '">'//                                                           &
                                     end_rec
-    N_Byte  = (nz2-nz1+1)*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',nz2-nz1+1
+    N_Byte  = Bytes(dims=int((nz2-nz1+1),I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int((nz2-nz1+1),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(Z(n1),n1=nz1,nz2)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -1791,9 +1835,9 @@ contains
                                     trim(str(.true.,ioffset)),                                       &
                                     '">'//                                                           &
                                     end_rec
-    N_Byte  = (nx2-nx1+1)*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',nx2-nx1+1
+    N_Byte  = Bytes(dims=int((nx2-nx1+1),I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int((nx2-nx1+1),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(X(n1),n1=nx1,nx2)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)// &
@@ -1801,9 +1845,9 @@ contains
                                     trim(str(.true.,ioffset)),                                       &
                                     '">'//                                                           &
                                     end_rec
-    N_Byte  = (ny2-ny1+1)*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',ny2-ny1+1
+    N_Byte  = Bytes(dims=int((ny2-ny1+1),I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int((ny2-ny1+1),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(Y(n1),n1=ny1,ny2)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//                                             &
@@ -1811,9 +1855,9 @@ contains
                                     trim(str(.true.,ioffset)),                                       &
                                     '">'//                                                           &
                                     end_rec
-    N_Byte  = (nz2-nz1+1)*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',nz2-nz1+1
+    N_Byte  = Bytes(dims=int((nz2-nz1+1),I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int((nz2-nz1+1),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(Z(n1),n1=nz1,nz2)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -1871,9 +1915,9 @@ contains
                                     trim(str(.true.,ioffset)),                                       &
                                     '">'//                                                           &
                                     end_rec
-    N_Byte  = (nx2-nx1+1)*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',nx2-nx1+1
+    N_Byte  = Bytes(dims=int((nx2-nx1+1),I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int((nx2-nx1+1),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(X(n1),n1=nx1,nx2)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//                                             &
@@ -1881,9 +1925,9 @@ contains
                                     trim(str(.true.,ioffset)),                                       &
                                     '">'//                                                           &
                                     end_rec
-    N_Byte  = (ny2-ny1+1)*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',ny2-ny1+1
+    N_Byte  = Bytes(dims=int((ny2-ny1+1),I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int((ny2-ny1+1),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(Y(n1),n1=ny1,ny2)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//                                             &
@@ -1891,9 +1935,9 @@ contains
                                     trim(str(.true.,ioffset)),                                       &
                                     '">'//                                                           &
                                     end_rec
-    N_Byte  = (nz2-nz1+1)*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',nz2-nz1+1
+    N_Byte  = Bytes(dims=int((nz2-nz1+1),I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int((nz2-nz1+1),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(Z(n1),n1=nz1,nz2)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -1951,9 +1995,9 @@ contains
                                     trim(str(.true.,ioffset)),                                       &
                                     '">'//                                                           &
                                     end_rec
-    N_Byte  = (nx2-nx1+1)*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',nx2-nx1+1
+    N_Byte  = Bytes(dims=int((nx2-nx1+1),I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int((nx2-nx1+1),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(X(n1),n1=nx1,nx2)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//                                             &
@@ -1961,9 +2005,9 @@ contains
                                     trim(str(.true.,ioffset)),                                       &
                                     '">'//                                                           &
                                     end_rec
-    N_Byte  = (ny2-ny1+1)*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',ny2-ny1+1
+    N_Byte  = Bytes(dims=int((ny2-ny1+1),I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int((ny2-ny1+1),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(Y(n1),n1=ny1,ny2)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//                                             &
@@ -1971,9 +2015,9 @@ contains
                                     trim(str(.true.,ioffset)),                                       &
                                     '">'//                                                           &
                                     end_rec
-    N_Byte  = (nz2-nz1+1)*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',nz2-nz1+1
+    N_Byte  = Bytes(dims=int((nz2-nz1+1),I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int((nz2-nz1+1),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(Z(n1),n1=nz1,nz2)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -2032,9 +2076,9 @@ contains
                                     trim(str(.true.,ioffset)),                                                                  &
                                     '">'//                                                                                      &
                                     end_rec
-    N_Byte  = 3*NN*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',3*NN
+    N_Byte  = Bytes(dims=int(3*NN,I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int(3*NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(X(n1),Y(n1),Z(n1),n1=1,NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -2093,9 +2137,9 @@ contains
                                     trim(str(.true.,ioffset)),                                                                  &
                                     '">'//                                                                                      &
                                     end_rec
-    N_Byte  = 3*NN*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',3*NN
+    N_Byte  = Bytes(dims=int(3*NN,I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int(3*NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(X(n1),Y(n1),Z(n1),n1=1,NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -2154,9 +2198,9 @@ contains
                                     trim(str(.true.,ioffset)),                                                                  &
                                     '">'//                                                                                      &
                                     end_rec
-    N_Byte  = 3*NN*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',3*NN
+    N_Byte  = Bytes(dims=int(3*NN,I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int(3*NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(X(n1),Y(n1),Z(n1),n1=1,NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -2215,9 +2259,9 @@ contains
                                     trim(str(.true.,ioffset)),                                                                  &
                                     '">'//                                                                                      &
                                     end_rec
-    N_Byte  = 3*NN*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',3*NN
+    N_Byte  = Bytes(dims=int(3*NN,I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int(3*NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(X(n1),Y(n1),Z(n1),n1=1,NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -2284,9 +2328,9 @@ contains
                                     trim(str(.true.,ioffset)),                                                &
                                     '">'//                                                                    &
                                     end_rec
-    N_Byte  = size(connect)*int(sizeof(Tipo_I4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',size(connect)
+    N_Byte  = Bytes(dims=int(size(connect),I8P),var_type='I4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',int(size(connect),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(connect(n1),n1=1,size(connect))
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//                                                 &
@@ -2294,9 +2338,9 @@ contains
                                     trim(str(.true.,ioffset)),                                           &
                                     '">'//                                                               &
                                     end_rec
-    N_Byte  = NC*int(sizeof(Tipo_I4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',NC
+    N_Byte  = Bytes(dims=int(NC,I8P),var_type='I4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',int(NC,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(offset(n1),n1=1,NC)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//                                              &
@@ -2304,9 +2348,9 @@ contains
                                     trim(str(.true.,ioffset)),                                        &
                                     '">'//                                                            &
                                     end_rec
-    N_Byte  = NC*int(sizeof(Tipo_I1),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',NC
+    N_Byte  = Bytes(dims=int(NC,I8P),var_type='I1')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',int(NC,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(cell_type(n1),n1=1,NC)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -2353,9 +2397,9 @@ contains
                                     trim(str(.true.,ioffset)),                                                &
                                     '">'//                                                                    &
                                     end_rec
-    N_Byte  = size(connect)*int(sizeof(Tipo_I4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',size(connect)
+    N_Byte  = Bytes(dims=int(size(connect),I8P),var_type='I4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',int(size(connect),I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(connect(n1),n1=1,size(connect))
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//                                                 &
@@ -2363,9 +2407,9 @@ contains
                                     trim(str(.true.,ioffset)),                                           &
                                     '">'//                                                               &
                                     end_rec
-    N_Byte  = NC*int(sizeof(Tipo_I4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',NC
+    N_Byte  = Bytes(dims=int(NC,I8P),var_type='I4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',int(NC,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(offset(n1),n1=1,NC)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//                                              &
@@ -2373,9 +2417,9 @@ contains
                                     trim(str(.true.,ioffset)),                                        &
                                     '">'//                                                            &
                                     end_rec
-    N_Byte  = NC*int(sizeof(Tipo_I1),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',NC
+    N_Byte  = Bytes(dims=int(NC,I8P),var_type='I1')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',int(NC,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(cell_type(n1),n1=1,NC)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
     indent = indent - 2
@@ -2490,9 +2534,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = NC_NN*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',NC_NN
+    N_Byte  = Bytes(dims=int(NC_NN,I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int(NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(var(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -2529,9 +2573,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = NC_NN*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',NC_NN
+    N_Byte  = Bytes(dims=int(NC_NN,I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int(NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(var(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -2568,9 +2612,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = NC_NN*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',NC_NN
+    N_Byte  = Bytes(dims=int(NC_NN,I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int(NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(var(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -2607,9 +2651,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = NC_NN*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',NC_NN
+    N_Byte  = Bytes(dims=int(NC_NN,I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int(NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(var(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -2646,9 +2690,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = NC_NN*int(sizeof(Tipo_I8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',NC_NN
+    N_Byte  = Bytes(dims=int(NC_NN,I8P),var_type='I8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',int(NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(var(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -2685,9 +2729,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = NC_NN*int(sizeof(Tipo_I8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',NC_NN
+    N_Byte  = Bytes(dims=int(NC_NN,I8P),var_type='I8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',int(NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(var(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -2724,9 +2768,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = NC_NN*int(sizeof(Tipo_I4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',NC_NN
+    N_Byte  = Bytes(dims=int(NC_NN,I8P),var_type='I4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',int(NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(var(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -2763,9 +2807,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = NC_NN*int(sizeof(Tipo_I4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',NC_NN
+    N_Byte  = Bytes(dims=int(NC_NN,I8P),var_type='I4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',int(NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(var(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -2802,9 +2846,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = NC_NN*int(sizeof(Tipo_I2),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I2',NC_NN
+    N_Byte  = Bytes(dims=int(NC_NN,I8P),var_type='I2')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I2',int(NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(var(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -2841,9 +2885,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = NC_NN*int(sizeof(Tipo_I2),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I2',NC_NN
+    N_Byte  = Bytes(dims=int(NC_NN,I8P),var_type='I2')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I2',int(NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(var(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -2880,9 +2924,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = NC_NN*int(sizeof(Tipo_I1),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',NC_NN
+    N_Byte  = Bytes(dims=int(NC_NN,I8P),var_type='I1')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',int(NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(var(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -2919,9 +2963,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = NC_NN*int(sizeof(Tipo_I1),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',NC_NN
+    N_Byte  = Bytes(dims=int(NC_NN,I8P),var_type='I1')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',int(NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(var(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -2960,9 +3004,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = 3*NC_NN*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',3*NC_NN
+    N_Byte  = Bytes(dims=int(3*NC_NN,I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int(3*NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(varX(n1),varY(n1),varZ(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -3001,9 +3045,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = 3*NC_NN*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',3*NC_NN
+    N_Byte  = Bytes(dims=int(3*NC_NN,I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int(3*NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(varX(n1),varY(n1),varZ(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -3042,9 +3086,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = 3*NC_NN*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',3*NC_NN
+    N_Byte  = Bytes(dims=int(3*NC_NN,I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int(3*NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(varX(n1),varY(n1),varZ(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -3083,9 +3127,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = 3*NC_NN*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',3*NC_NN
+    N_Byte  = Bytes(dims=int(3*NC_NN,I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int(3*NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(varX(n1),varY(n1),varZ(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -3124,9 +3168,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = 3*NC_NN*int(sizeof(Tipo_I8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',3*NC_NN
+    N_Byte  = Bytes(dims=int(3*NC_NN,I8P),var_type='I8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',int(3*NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(varX(n1),varY(n1),varZ(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -3165,9 +3209,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = 3*NC_NN*int(sizeof(Tipo_I8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',3*NC_NN
+    N_Byte  = Bytes(dims=int(3*NC_NN,I8P),var_type='I8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',int(3*NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(varX(n1),varY(n1),varZ(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -3206,9 +3250,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = 3*NC_NN*int(sizeof(Tipo_I4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',3*NC_NN
+    N_Byte  = Bytes(dims=int(3*NC_NN,I8P),var_type='I4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',int(3*NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(varX(n1),varY(n1),varZ(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -3247,9 +3291,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = 3*NC_NN*int(sizeof(Tipo_I4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',3*NC_NN
+    N_Byte  = Bytes(dims=int(3*NC_NN,I8P),var_type='I4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',int(3*NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(varX(n1),varY(n1),varZ(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -3288,9 +3332,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = 3*NC_NN*int(sizeof(Tipo_I2),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I2',3*NC_NN
+    N_Byte  = Bytes(dims=int(3*NC_NN,I8P),var_type='I2')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I2',int(3*NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(varX(n1),varY(n1),varZ(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -3329,9 +3373,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = 3*NC_NN*int(sizeof(Tipo_I2),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I2',3*NC_NN
+    N_Byte  = Bytes(dims=int(3*NC_NN,I8P),var_type='I2')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I2',int(3*NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(varX(n1),varY(n1),varZ(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -3370,9 +3414,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = 3*NC_NN*int(sizeof(Tipo_I1),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',3*NC_NN
+    N_Byte  = Bytes(dims=int(3*NC_NN,I8P),var_type='I1')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',int(3*NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(varX(n1),varY(n1),varZ(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -3411,9 +3455,9 @@ contains
                                     trim(str(.true.,ioffset)),                             &
                                     '">'//                                                 &
                                     end_rec
-    N_Byte  = 3*NC_NN*int(sizeof(Tipo_I1),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',3*NC_NN
+    N_Byte  = Bytes(dims=int(3*NC_NN,I8P),var_type='I1')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',int(3*NC_NN,I8P)
     write(unit=Unit_VTK_Append,iostat=E_IO)(varX(n1),varY(n1),varZ(n1),n1=1,NC_NN)
     write(unit=Unit_VTK,iostat=E_IO)repeat(' ',indent)//'</DataArray>'//end_rec
   endselect
@@ -3456,9 +3500,9 @@ contains
                                      '" format="appended" offset="',      &
                                      trim(str(.true.,ioffset)),'">'//     &
                                      end_rec
-    N_Byte  = N_COL*NC_NN*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',N_COL*NC_NN
+    N_Byte  = Bytes(dims=int(N_COL*NC_NN,I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int(N_COL*NC_NN,I8P)
     do n1=1,NC_NN
       write(unit=Unit_VTK_Append,iostat=E_IO) var(n1,:)
     enddo
@@ -3503,9 +3547,9 @@ contains
                                      '" format="appended" offset="',      &
                                      trim(str(.true.,ioffset)),'">'//     &
                                      end_rec
-    N_Byte  = N_COL*NC_NN*int(sizeof(Tipo_R8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',N_COL*NC_NN
+    N_Byte  = Bytes(dims=int(N_COL*NC_NN,I8P),var_type='R8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R8',int(N_COL*NC_NN,I8P)
     do n1=1,NC_NN
       write(unit=Unit_VTK_Append,iostat=E_IO) var(n1,:)
     enddo
@@ -3550,9 +3594,9 @@ contains
                                      '" format="appended" offset="',      &
                                      trim(str(.true.,ioffset)),'">'//     &
                                      end_rec
-    N_Byte  = N_COL*NC_NN*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',N_COL*NC_NN
+    N_Byte  = Bytes(dims=int(N_COL*NC_NN,I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int(N_COL*NC_NN,I8P)
     do n1=1,NC_NN
       write(unit=Unit_VTK_Append,iostat=E_IO) var(n1,:)
     enddo
@@ -3597,9 +3641,9 @@ contains
                                      '" format="appended" offset="',      &
                                      trim(str(.true.,ioffset)),'">'//     &
                                      end_rec
-    N_Byte  = N_COL*NC_NN*int(sizeof(Tipo_R4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',N_COL*NC_NN
+    N_Byte  = Bytes(dims=int(N_COL*NC_NN,I8P),var_type='R4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'R4',int(N_COL*NC_NN,I8P)
     do n1=1,NC_NN
       write(unit=Unit_VTK_Append,iostat=E_IO) var(n1,:)
     enddo
@@ -3644,9 +3688,9 @@ contains
                                      '" format="appended" offset="',    &
                                      trim(str(.true.,ioffset)),         &
                                      '">'//end_rec
-    N_Byte  = N_COL*NC_NN*int(sizeof(Tipo_I8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',N_COL*NC_NN
+    N_Byte  = Bytes(dims=int(N_COL*NC_NN,I8P),var_type='I8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',int(N_COL*NC_NN,I8P)
     do n1=1,NC_NN
       write(unit=Unit_VTK_Append,iostat=E_IO) var(n1,:)
     enddo
@@ -3691,9 +3735,9 @@ contains
                                      '" format="appended" offset="',    &
                                      trim(str(.true.,ioffset)),         &
                                      '">'//end_rec
-    N_Byte  = N_COL*NC_NN*int(sizeof(Tipo_I8),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',N_COL*NC_NN
+    N_Byte  = Bytes(dims=int(N_COL*NC_NN,I8P),var_type='I8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I8',int(N_COL*NC_NN,I8P)
     do n1=1,NC_NN
       write(unit=Unit_VTK_Append,iostat=E_IO) var(n1,:)
     enddo
@@ -3738,9 +3782,9 @@ contains
                                      '" format="appended" offset="',    &
                                      trim(str(.true.,ioffset)),         &
                                      '">'//end_rec
-    N_Byte  = N_COL*NC_NN*int(sizeof(Tipo_I4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',N_COL*NC_NN
+    N_Byte  = Bytes(dims=int(N_COL*NC_NN,I8P),var_type='I8')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',int(N_COL*NC_NN,I8P)
     do n1=1,NC_NN
       write(unit=Unit_VTK_Append,iostat=E_IO) var(n1,:)
     enddo
@@ -3785,9 +3829,9 @@ contains
                                      '" format="appended" offset="',    &
                                      trim(str(.true.,ioffset)),         &
                                      '">'//end_rec
-    N_Byte  = N_COL*NC_NN*int(sizeof(Tipo_I4),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',N_COL*NC_NN
+    N_Byte  = Bytes(dims=int(N_COL*NC_NN,I8P),var_type='I4')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I4',int(N_COL*NC_NN,I8P)
     do n1=1,NC_NN
       write(unit=Unit_VTK_Append,iostat=E_IO) var(n1,:)
     enddo
@@ -3832,9 +3876,9 @@ contains
                                      '" format="appended" offset="',    &
                                      trim(str(.true.,ioffset)),         &
                                      '">'//end_rec
-    N_Byte  = N_COL*NC_NN*int(sizeof(Tipo_I2),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I2',N_COL*NC_NN
+    N_Byte  = Bytes(dims=int(N_COL*NC_NN,I8P),var_type='I2')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I2',int(N_COL*NC_NN,I8P)
     do n1=1,NC_NN
       write(unit=Unit_VTK_Append,iostat=E_IO) var(n1,:)
     enddo
@@ -3879,9 +3923,9 @@ contains
                                      '" format="appended" offset="',    &
                                      trim(str(.true.,ioffset)),         &
                                      '">'//end_rec
-    N_Byte  = N_COL*NC_NN*int(sizeof(Tipo_I2),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I2',N_COL*NC_NN
+    N_Byte  = Bytes(dims=int(N_COL*NC_NN,I8P),var_type='I2')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I2',int(N_COL*NC_NN,I8P)
     do n1=1,NC_NN
       write(unit=Unit_VTK_Append,iostat=E_IO) var(n1,:)
     enddo
@@ -3926,9 +3970,9 @@ contains
                                      '" format="appended" offset="',   &
                                      trim(str(.true.,ioffset)),        &
                                      '">'//end_rec
-    N_Byte  = N_COL*NC_NN*int(sizeof(Tipo_I1),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',N_COL*NC_NN
+    N_Byte  = Bytes(dims=int(N_COL*NC_NN,I8P),var_type='I1')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',int(N_COL*NC_NN,I8P)
     do n1=1,NC_NN
       write(unit=Unit_VTK_Append,iostat=E_IO) var(n1,:)
     enddo
@@ -3973,9 +4017,9 @@ contains
                                      '" format="appended" offset="',   &
                                      trim(str(.true.,ioffset)),        &
                                      '">'//end_rec
-    N_Byte  = N_COL*NC_NN*int(sizeof(Tipo_I1),I8P)
-    ioffset = ioffset + int(sizeof(Tipo_I4),I8P) + N_Byte
-    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',N_COL*NC_NN
+    N_Byte  = Bytes(dims=int(N_COL*NC_NN,I8P),var_type='I1')
+    call ioffset_update(N_Byte)
+    write(unit=Unit_VTK_Append,iostat=E_IO)N_Byte,'I1',int(N_COL*NC_NN,I8P)
     do n1=1,NC_NN
       write(unit=Unit_VTK_Append,iostat=E_IO) var(n1,:)
     enddo
@@ -3986,11 +4030,10 @@ contains
   endfunction VTK_VAR_XML_LIST_I1_I8
   !> @}
 
-  !> This function is used to finalize the file opened and it has not inputs, @libvtk manages the file unit without the
-  !> user's action.
+  !> @brief Function for finalizing the VTK-XML file.
   !> @note An example of usage is: \n
   !> @code ...
-  !> E_IO=VTK_END_XML()
+  !> E_IO = VTK_END_XML()
   !> ... @endcode
   !> @return E_IO: integer(I4P) error flag
   !> @ingroup Lib_VTK_IOPublicProcedure
@@ -4005,8 +4048,8 @@ contains
   integer(I4P), allocatable:: v_I4(:)  !< I4 vector for IO in AppendData.
   integer(I2P), allocatable:: v_I2(:)  !< I2 vector for IO in AppendData.
   integer(I1P), allocatable:: v_I1(:)  !< I1 vector for IO in AppendData.
-  integer(I4P)::              N_v      !< Vector dimension
-  integer(I4P)::              n1       !< Counter
+  integer(I8P)::              N_v      !< Vector dimension
+  integer(I8P)::              n1       !< Counter
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -4028,32 +4071,32 @@ contains
       case('R8')
         allocate(v_R8(1:N_v))
         read(unit =Unit_VTK_Append,iostat=E_IO)(v_R8(n1),n1=1,N_v)
-        write(unit=Unit_VTK,       iostat=E_IO)N_Byte,(v_R8(n1),n1=1,N_v)
+        write(unit=Unit_VTK,       iostat=E_IO)int(N_Byte,I4P),(v_R8(n1),n1=1,N_v)
         deallocate(v_R8)
       case('R4')
         allocate(v_R4(1:N_v))
         read(unit =Unit_VTK_Append,iostat=E_IO)(v_R4(n1),n1=1,N_v)
-        write(unit=Unit_VTK,       iostat=E_IO)N_Byte,(v_R4(n1),n1=1,N_v)
+        write(unit=Unit_VTK,       iostat=E_IO)int(N_Byte,I4P),(v_R4(n1),n1=1,N_v)
         deallocate(v_R4)
       case('I8')
         allocate(v_I8(1:N_v))
         read(unit =Unit_VTK_Append,iostat=E_IO)(v_I8(n1),n1=1,N_v)
-        write(unit=Unit_VTK,       iostat=E_IO)N_Byte,(v_I8(n1),n1=1,N_v)
+        write(unit=Unit_VTK,       iostat=E_IO)int(N_Byte,I4P),(v_I8(n1),n1=1,N_v)
         deallocate(v_I8)
       case('I4')
         allocate(v_I4(1:N_v))
         read(unit =Unit_VTK_Append,iostat=E_IO)(v_I4(n1),n1=1,N_v)
-        write(unit=Unit_VTK,       iostat=E_IO)N_Byte,(v_I4(n1),n1=1,N_v)
+        write(unit=Unit_VTK,       iostat=E_IO)int(N_Byte,I4P),(v_I4(n1),n1=1,N_v)
         deallocate(v_I4)
       case('I2')
         allocate(v_I2(1:N_v))
         read(unit =Unit_VTK_Append,iostat=E_IO)(v_I2(n1),n1=1,N_v)
-        write(unit=Unit_VTK,       iostat=E_IO)N_Byte,(v_I2(n1),n1=1,N_v)
+        write(unit=Unit_VTK,       iostat=E_IO)int(N_Byte,I4P),(v_I2(n1),n1=1,N_v)
         deallocate(v_I2)
       case('I1')
         allocate(v_I1(1:N_v))
         read(unit =Unit_VTK_Append,iostat=E_IO)(v_I1(n1),n1=1,N_v)
-        write(unit=Unit_VTK,       iostat=E_IO)N_Byte,(v_I1(n1),n1=1,N_v)
+        write(unit=Unit_VTK,       iostat=E_IO)int(N_Byte,I4P),(v_I1(n1),n1=1,N_v)
         deallocate(v_I1)
       case default
         E_IO = 1

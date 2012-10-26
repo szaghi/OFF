@@ -12,8 +12,7 @@
 
 It is written in in standard (compliant) Fortran 2003 with highly modularity as design target.
 
-The aim of @off is to solve, numerically, the compressible Navier-Stokes equations of fluid dynamics (\ref Equations "see governing equations") by means of Finite Volumes techniques.
-The main features of @off code are the following:
+The aim of @off is to solve, numerically, the compressible Navier-Stokes equations of fluid dynamics (\ref Equations "see governing equations") by means of Finite Volumes techniques. The main features of @off code are the following:
 - Finite Volume, Godunov-like scheme based on Euler conservation Laws written in fully conservative formulation:
   - the extension to viscous Navier-Stokes equations is under developing;
 - Underling Riemann Problem solver for convective fluxes:
@@ -40,27 +39,22 @@ The main features of @off code are the following:
   - \f$2^{nd}\f$,\f$3^{rd}\f$,\f$4^{th}\f$ order Strong-Stability-Preserving explicit Runge-Kutta integration;
 - Local pseudo-time convergence acceleration for steady simulations;
 - Multi-grid time convergence acceleration:
-  - Multi-grid model has been already developed, but it is affected by some not yet recognized bugs. Testing and bugs fixing
-    are in progress.
+  - Multi-grid model has been already developed, but it is affected by some not yet recognized bugs. Testing and bugs fixing are in progress.
 - Underling numerical grid models:
   - 3D, general curvilinear, body-fitted, structured multi-blocks mesh;
   - Adaptive Mesh Refinement, AMR model (under developing);
   - Blocks overlapping, overset (Chimera) model (to be developed in future);
 - Computational parallelism ability:
-  - Domain decomposition by means of Message Passing Interface (MPI) paradigm providing the ability to use distributed-memory
-    cluster facilities;
+  - Domain decomposition by means of Message Passing Interface (MPI) paradigm providing the ability to use distributed-memory cluster facilities;
   - Fine, local parallelism by means of OpenMP paradigm providing the ability to use shared-memory cluster facilities;
-  - Fine, local parallelism by means of GPU programming (e.g. CUDA framework) providing the ability to use GPUs cluster
-    facilities (to be developed in future).
+  - Fine, local parallelism by means of GPU programming (e.g. CUDA framework) providing the ability to use GPUs cluster facilities (to be developed in future).
 
 @note
 <b>Compiling Instructions</b> \n
-@off is shipped with a makefile for compiling the codes on Unix/GNU Linux architectures. Other OS are not supported.
-For more details see \ref Compiling "Compiling Instructions".
+@off is shipped with a makefile for compiling the codes on Unix/GNU Linux architectures. Other OS are not supported. For more details see \ref Compiling "Compiling Instructions".
 
 @bug <b>Multi-grid Models</b>: \n Multi-grid time convergence acceleration has been developed, but it is affected by some bugs
                                that <em>blow up</em> steady simulations.
-@todo \b NavierStokesEq: Extension to viscous Navier-Stokes equations
 @todo \b MultiSpeciesModel: Introducing new multi-dimensional \f$\gamma,\eta,\chi\f$ conservation models of Favini, B. et al
 @todo \b MultiPhaseModel: Introducing fully-coupled Lagrangian particles transport model
 @todo \b AMR: Introducing AMR (Adaptive Mesh Refinement) model
@@ -71,7 +65,6 @@ For more details see \ref Compiling "Compiling Instructions".
 @subsection AuxCodes Auxiliary Codes
 
 There are two useful auxiliary codes:
-
 -  IBM: Initial and Boundary conditions, Mesh generator for @off;
 -  POG: Post-processor Outout Generator for @off.
 
@@ -79,27 +72,17 @@ There are two useful auxiliary codes:
 
 It is an Initial and Boundary conditions, Mesh generator for @off.
 
-This is an auxiliary tool useful for building proper inputs for @off code. ICG can build Initial Conditions files, Mesh files and
-Boundary Conditions files. It accepts two kinds of inputs: \n
-- Direct Blocks Description: this is the simplest available input. The initial and boundary descriptions as well as the geometry
-  are directly described by means of simple ascii files. This kind of inputs can describe only simple Cartesian grids.
-- Ansys (http://www.ansys.com) IcemCFD Multiblock INFO importer: this is a more complex (but more flexible) input. The initial
-  conditions are described by means of simple ascii files similar to the Direct Block Description input, but the boundary
-  conditions and the geometry are loaded by Ansys IcemCFD Multiblock INFO files. These files can describe more complex scenario
-  with general curvilinear grids.
+This is an auxiliary tool useful for building proper inputs for @off code. ICG can build Initial Conditions files, Mesh files and Boundary Conditions files. It accepts two kinds of inputs:
+- Direct Blocks Description: this is the simplest available input. The initial and boundary descriptions as well as the geometry are directly described by means of simple ascii files. This kind of inputs can describe only simple Cartesian grids.
+- Ansys (http://www.ansys.com) IcemCFD Multiblock INFO importer: this is a more complex (but more flexible) input. The initial conditions are described by means of simple ascii files similar to the Direct Block Description input, but the boundary conditions and the geometry are loaded by Ansys IcemCFD Multiblock INFO files. These files can describe more complex scenario with general curvilinear grids.
 
 @section POG
 
 It is a Post-processor Output Generator for @off.
 
-This is an auxiliary tool useful for post-processing @off simulations outputs. It can manipulate @off outputs and it can produce
-files ready to be visualized. Two different visualization standards are supported:
-- Tecplot, Inc.: Tecplot is a wide-used visualization tool (http://www.tecplot.com/). POG can produce both ascii and binary files
-  in Tecplot standard.
-- VTK: The Visualization Toolkit (VTK) is an open-source, freely available software system for 3D computer graphics, image
-  processing and visualization (http://www.vtk.org/). A lot of visualization tools support VTK standard. Among those tools
-  Paraview (http://www.paraview.org/) seems to be one of the most complete. POG can produce both ascii and binary files in VTK
-  standard. To this aim the Lib_VTK_IO is used.
+This is an auxiliary tool useful for post-processing @off simulations outputs. It can manipulate @off outputs and it can produce files ready to be visualized. Two different visualization standards are supported:
+- Tecplot, Inc.: Tecplot is a wide-used visualization tool (http://www.tecplot.com/). POG can produce both ascii and binary files in Tecplot standard.
+- VTK: The Visualization Toolkit (VTK) is an open-source, freely available software system for 3D computer graphics, image processing and visualization (http://www.vtk.org/). A lot of visualization tools support VTK standard. Among those tools Paraview (http://www.paraview.org/) seems to be one of the most complete. POG can produce both ascii and binary files in VTK standard. To this aim the Lib_VTK_IO is used.
 
 @section Copyrights
 
@@ -111,6 +94,8 @@ files ready to be visualized. Two different visualization standards are supporte
 It can be found at: https://github.com/szaghi/OFF
 
 @page Equations Governing Equations
+
+@section conseq Conservation Laws
 
 The turbulent motion of compressible viscous fluid is described by a system of equations, that read, in integral, dimensional form:
 
@@ -147,7 +132,7 @@ where:
  - \f$p\f$ is the static, isotropic pressure (\f$\overline{\overline I}\f$ is the identity tensor);
  - \f$\overline{\overline \tau}\f$ is the viscous shear stress tensor.
 
- The viscous shear stress tensor, in general case, is defined as:
+The viscous shear stress tensor, in general case, is defined as:
 
 \f${\tau _{ij}} = \mu \left( {{\partial _i}{v_j} + {\partial _j}{v_i}} \right) + \lambda \left( {\overrightarrow \nabla   \cdot \vec v} \right){\delta _{ij}}\f$ \n
 where:
@@ -155,7 +140,7 @@ where:
  - the second viscosity is defined as \f$\lambda = -\frac{2}{3}\mu\f$ for a Newtonian fluid in local thermodynamic equilibrium (except very high temperature or pressure ranges); this is the Stokes hypothesis;
  - \f$\delta_{ij}\f$ is the Kronecker delta \f${\delta _{ij}} = \left\{ {\begin{array}{*{20}{c}} {0{\rm{,}}\;{\rm{if}}\;i \ne j}\\ {{\rm{1,}}\;{\rm{if}}\;i = j} \end{array}} \right.\f$.
 
- In tensorial form the shear stress tensor could be written as:
+In tensorial form the shear stress tensor could be written as:
 
 \f$\overline{\overline \tau }  = 2\mu \frac{1}{2}\left( {\overrightarrow \nabla  \vec v + \overrightarrow \nabla  {{\vec v}^T}} \right) + \lambda \left( {\overrightarrow \nabla   \cdot \vec v} \right)\overline{\overline I} \f$ \n
 where \f$ \frac{1}{2}\left( {\overrightarrow \nabla  \vec v + \overrightarrow \nabla  {{\vec v}^T}} \right)\f$ is the symmetric part of the velocity vector gradient.
@@ -172,32 +157,70 @@ The other equations of state are:
 
  - \f$ E = c_v T + \frac{|\vec v|^2}{2} = \frac{p}{\rho(\gamma-1)} + \frac{|\vec v|^2}{2}\f$ is the total specific energy definition;
  - \f$ a = \sqrt{\frac{\gamma p}{\rho}} \f$ is the speed of sound (acoustic velocity);
- - \f$ H = c_p T + \frac{|\vec v|^2}{2} = \frac{\gamma p}{\rho(\gamma-1)} + \frac{|\vec v|^2}{2}= \frac{a^2}{\gamma-1} + \frac{|\vec v|^2}{2}\f$ is the total specific entalpy definition;
+ - \f$ H = c_p T + \frac{|\vec v|^2}{2} = \frac{\gamma p}{\rho(\gamma-1)} + \frac{|\vec v|^2}{2}= \frac{a^2}{\gamma-1} + \frac{|\vec v|^2}{2}\f$ is the total specific enthalpy definition.
 
-The above equations are non-dimensionalized by arbitrary reference quantities. The selected reference values are:
- - \f$ L_0 \f$ reference legnth;
- - \f$ T_0 \f$ reference temperature;
- - \f$ \rho_0 \f$ reference density.
+@subsection adim Non-Dimensional Form
 
-These selections fix all other reference quantities:
- - \f$ a_0 = sqrt{\gamma R T} = v_0 \f$ reference speed;
- - \f$ E_0 = a_0^2 \f$ reference energy;
- - \f$ t_0 = \frac{L_0}{a_0} \f$ reference time;
- - \f$ p_0 = \rho a_0^2 \f$ reference pressure;
- - \f$ \tau_0 = \frac{\mu_0 a_0}{L_0} \f$ reference shear stress;
- - \f$ f_0 = \frac{a_0^2}{L_0} \f$ reference specific force;
- - \f$ q_0 = \frac{a_0^3}{L_0} \f$ reference specific heat.
+In order to derive the non-dimensional form let us introduce non-dimensional quantities \f$x'=\frac{x}{x_0}\f$ being \f$x\f$ dimensional quantity and \f$x_0\f$ an arbitrary reference value. With this nomenclature using a dimensional analysis the above equations could be written as:
 
- It has been assumed that the viscosity depends only by the temperature thus \f$\mu_0 = \mu (T_0)\f$. Assuming a constant Prandtl number we have also \f$ k_0 = k(\mu(T_0)) \f$.
+\f$ \begin{array}{l} \frac{{{\rho _0}L_0^3}}{{{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'}  + {\rho _0}{v_0}L_0^2\oint\limits_{S'(V')} {\rho '\overrightarrow {v'}  \cdot \vec ndS'}  = 0\\ \frac{{{\rho _0}{v_0}L_0^3}}{{{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'}  + {\rho _0}v_0^2L_0^2\oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \overrightarrow {v'}  \cdot \vec ndS'}  + {p_0}L_0^2\oint\limits_{S'(V')} {p'\overline{\overline I}  \cdot \vec ndS'}  - {\tau _0}L_0^2\oint\limits_{S'(V')} {\overline{\overline {\tau '}}  \cdot \vec ndS'}  = {\rho _0}{f_0}L_0^3\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ \frac{{{\rho _0}{E_0}L_0^3}}{{{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'}  + {\rho _0}{E_0}{v_0}L_0^2\oint\limits_{S'(V')} {\rho 'E'\overrightarrow {v'}  \cdot \vec ndS'}  + {p_0}L_0^2\oint\limits_{S'(V')} {p'\overrightarrow {v'}  \cdot \vec ndS'}  - {\tau _0}{v_0}L_0^2\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}}  \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'}  + \\ -\frac{{{k_0}{T_0}L_0^2}}{{{L_0}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'}  = {\rho _0}{f_0}{v_0}L_0^3\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}}  \cdot \overrightarrow {v'} dV'}  + {\rho _0}{q_0}L_0^3\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array} \f$
 
-Using the above reference values the non-dimensional form of the conservation equations is (using the same symbols of aboves for dimensionless quantities):
+In order to make non-dimensional the above system divide for \f${\rho _0}{v_0}L_0^2\f$, \f${\rho _0}{v_0^2}L_0^2\f$ and \f${\rho _0}{E_0}{v_0}L_0^2\f$ the conservation equation of mass, momentum and energy respectively, obtaining:
 
-\f$\begin{array}{*{20}{c}} {\frac{\partial }{{\partial t}}\int\limits_V {\rho dV}  + \oint\limits_S {\rho \vec v \cdot \overrightarrow n dS}  = 0}\\ {\frac{\partial }{{\partial t}}\int\limits_V {\rho \vec vdV}  + \oint\limits_S {\left[ {\left( {\rho \vec v\vec v + p\overline{\overline I} } \right) - \frac{1}{{{\mathop{\rm Re}\nolimits} }}\overline{\overline \tau } } \right] \cdot \overrightarrow n dS}  = \int\limits_V {\rho \overrightarrow {{f_e}} dV} }\\ {\frac{\partial }{{\partial t}}\int\limits_V {\rho EdV}  + \oint\limits_S {\left[ {\left( {\rho E + p} \right)\vec v - \frac{1}{{{\mathop{\rm Re}\nolimits} }}\overline{\overline \tau }  \cdot \vec v - \frac{1}{{{\mathop{\rm Re}\nolimits} \Pr \left( {\gamma  - 1} \right)}}k\overrightarrow \nabla  T} \right] \cdot \overrightarrow n dS}  = \int\limits_V {\left( {\rho \overrightarrow {{f_e}}  \cdot \vec v + {q_h}} \right)dV} } \end{array}\f$ \n
-where:
- - \f$Re\f$ is the Reynolds number defined as: \f$Re=\frac{\rho_0 v_0 L_0}{\mu_0}\f$;
- - \f$Pr\f$ is the Prandtl number defined as: \f$Pr=\frac{\mu_0 c_p}{k_0}\f$.
+\f$ \begin{array}{l} \frac{{{L_0}}}{{{v_0}{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'}  + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'}  \cdot \vec ndS'}  = 0\\ \frac{{{L_0}}}{{{v_0}{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'}  + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \overrightarrow {v'}  \cdot \vec ndS'}  + \frac{{{p_0}}}{{{\rho _0}v_0^2}}\oint\limits_{S'(V')} {p'\overline{\overline I}  \cdot \vec ndS'}  - \frac{{{\tau _0}}}{{{\rho _0}v_0^2}}\oint\limits_{S'(V')} {\overline{\overline {\tau '}}  \cdot \vec ndS'}  = \frac{{{f_0}{L_0}}}{{v_0^2}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ \frac{{{L_0}}}{{{v_0}{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'}  + \oint\limits_{S'(V')} {\rho 'E'\overrightarrow {v'}  \cdot \vec ndS'}  + \frac{{{p_0}}}{{{\rho _0}{E_0}{v_0}}}\oint\limits_{S'(V')} {p'\overrightarrow {v'}  \cdot \vec ndS'}  - \frac{{{\tau _0}}}{{{\rho _0}{E_0}}}\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}}  \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'}  + \\ - \frac{{{k_0}{T_0}}}{{{\rho _0}{E_0}{v_0}{L_0}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'}  = \frac{{{f_0}{L_0}}}{{{E_0}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}}  \cdot \overrightarrow {v'} dV'}  + \frac{{{q_0}{L_0}}}{{{E_0}{v_0}}}\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array}\f$
 
-@note The viscous terms are not yet implemented (they are under developing). The system actually resolved is the Euler one (the inviscid one).
+It is possible to recognize 7 non-dimensional numbers:
+ - \f$ \rm{St} = \frac{L_0}{v_0 t_0}\f$ Strouhal number; it is the ratio between characteristic frequency and the fluid dynamic one; for non periodic flow it is set to 1;
+ - \f$ \rm{Ru} = \frac{\rho_0 v_0^2}{p_0}\f$ Ruark number; it is the ratio between inertial (convective) force and pressure one; for a Newtonian fluid it is set to 1;
+ - \f$ \rm{Ma} = \frac{v_0}{a_0}\f$ Mach number; it is the ratio between velocity and speed of sound;
+ - \f$ \rm{Re} = \frac{\rho_0 v_0 L_0}{\mu_0}\f$ Reynolds number; it is the ratio between inertial (convective) force and viscous one;
+ - \f$ \rm{Fr} = \sqrt{\frac{v_0^2}{f_0 L_0}}\f$ Froude number; it is the ratio between inertial (convective) force and volume (mass) one;
+ - \f$ \rm{Pr} = \frac{\mu_0 c_{p0}}{k_0}\f$ Prandtl number; it is the ratio between momentum diffusion and heat one;
+ - \f$ \rm{Ec} = \frac{v_0^2}{c_{p0}T_0}\f$ Eckert number; it is the ratio between kinetic energy and enthalpy one;
+
+By means of the above non-dimensional numbers the conservation equations could be written as:
+
+\f$ \begin{array}{l} {\rm{St}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'}  + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'}  \cdot \vec ndS'}  = 0\\ {\rm{St}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'}  + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \overrightarrow {v'}  \cdot \vec ndS'}  + \frac{1}{{{\rm{Ru}}}}\oint\limits_{S'(V')} {p'\overline{\overline I}  \cdot \vec ndS'}  - \frac{1}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\overline{\overline {\tau '}}  \cdot \vec ndS'}  = \frac{1}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ {\rm{St}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'}  + \oint\limits_{S'(V')} {\rho 'E'\overrightarrow {v'}  \cdot \vec ndS'}  + \frac{{{\rm{Ec}}}}{{{\rm{Ru}}}}\oint\limits_{S'(V')} {p'\overrightarrow {v'}  \cdot \vec ndS'}  - \frac{{{\rm{Ec}}}}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}}  \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'}  + \\ - \frac{1}{{{\rm{PrRe}}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'}  = \frac{{{\rm{Ec}}}}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}}  \cdot \overrightarrow {v'} dV'}  + \frac{{{q_0}{L_0}}}{{{E_0}{v_0}}}\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array} \f$
+
+We are interested in Newtonian fluid in which \f$\rm{St} = 1\f$, \f$\rm{Ru} = 1 => \rm{Ma} = \frac{1}{\sqrt{\gamma}}\f$ and \f$\rm{Ec} = 1\f$:
+ - \f$ t_0 = \frac{L_0}{v_0}\f$
+ - \f$ p_0 = \rho_0 v_0^2 => a_0 = \sqrt{\gamma}v_0\f$
+ - \f$ c_{p0}T_0 = v_0^2\f$
+
+As a consequence the non dimensional conservation equations are:
+
+\f$ \begin{array}{l} \frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'}  + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'}  \cdot \vec ndS'}  = 0\\ \frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'}  + \oint\limits_{S'(V')} {\left( {\rho '\overrightarrow {v'} \overrightarrow {v'}  + p'\overline{\overline I} } \right) \cdot \vec ndS'}  - \frac{1}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\overline{\overline {\tau '}}  \cdot \vec ndS'}  = \frac{1}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ \frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'}  + \oint\limits_{S'(V')} {\left( {\rho 'E' + p'} \right)\overrightarrow {v'}  \cdot \vec ndS'}  - \frac{{\rm{1}}}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}}  \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'}  - \frac{1}{{{\rm{PrRe}}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'}  = \\ \frac{{\rm{1}}}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}}  \cdot \overrightarrow {v'} dV'}  + \frac{{{q_0}{L_0}}}{{{E_0}{v_0}}}\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array} \f$
+
+The selected non-dimensional numbers are:
+ - \f$ \rm{Re} = \frac{\rho_0 v_0 L_0}{\mu_0}\f$ Reynolds number;
+ - \f$ \rm{Fr} = \sqrt{\frac{v_0^2}{f_0 L_0}}\f$ Froude number;
+ - \f$ \rm{Pr} = \frac{\mu_0 c_{p0}}{k_0}\f$ Prandtl number;
+
+The above non-dimensional numbers are dependent each other. In Reynolds and Froude numbers \f$L_0\f$ and \f$v_0\f$ are present.  Similarly in Reynolds and Prandtl numbers \f$\mu_0\f$ is present. Therefore fixing the above non-dimensional numbers the following reference values must be fixed:
+ - \f$ L_0 \f$ reference length;
+ - \f$ \rho_0 \f$ reference density;
+ - \f$ v_0 \f$ reference velocity;
+ - \f$ \mu_0 \f$ reference dynamic viscosity;
+ - \f$ f_0 \f$ reference specific force;
+ - \f$ c_0 \f$ reference specific heat;
+ - \f$ k_0 \f$ reference thermal conductivity coefficient.
+
+We have fixed the following reference values:
+ - \f$ L_0 \f$ reference length;
+ - \f$ \rho_0 \f$ reference density;
+ - \f$ v_0 \f$ reference velocity;
+ - \f$ c_0 \f$ reference specific heat.
+
+These selections with the above selected non-dimensional numbers fix all other reference quantities:
+ - \f$ \mu_0 = \frac{\rho_0 v_0 L_0}{\rm{Re}}\f$ reference dynamic viscosity;
+ - \f$ f_0 = \frac{v_0^2}{L_0 \rm{Fr}^2}\f$ reference specific force;
+ - \f$ k_0 = \frac{\mu_0 c_0}{\rm{Pr}}\f$ reference thermal conductivity coefficient.
+ - \f$ t_0 = \frac{L_0}{v_0}\f$ reference time;
+ - \f$ p_0 = \rho_0 v_0^2 \f$ reference pressure;
+ - \f$ a_0 = \sqrt{\gamma}v_0 \f$ reference speed of sound;
+ - \f$ T_0 = \frac{v_0^2}{c_0} \f$ reference temperature;
+ - \f$ E_0 = v_0^2 \f$ reference specific energy;
+ - \f$ q_0 = \frac{v_0^3}{L_0} \f$ reference specific heat.
 
 The above equations constitute a system of partial differential equations closed by enforcing appropriate boundary conditions and initial conditions (at physical and computational boundaries).
 
@@ -211,15 +234,13 @@ where \f$S_s\f$ is the \f$s^{th}\f$ face of the finite volume \f$D_{ijk}\f$ whos
 This system could be written in terms of \em residual \em function:
 
 \f$\begin{array}{l} \frac{\partial }{{\partial t}}\int\limits_{{V_{ijk}}} {\overrightarrow U d{V_{ijk}}}  = R\left( {\overrightarrow U } \right)\\ R\left( {\overrightarrow U } \right) =  - \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline F}  \cdot \overrightarrow {{n_s}} d{S_s}} }  + \int\limits_{{V_{ijk}}} {\overrightarrow {{Q_V}} d{V_{ijk}}}  + \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline {{Q_S}}}  \cdot \overrightarrow {{n_s}} d{S_s}} } \end{array}\f$ \n
-where the residual function \f$R\left({\overrightarrow U }\right)\f$ is the space operator. In order to compute this operator
-several different schemes are adopted for each different term of the operator.
+where the residual function \f$R\left({\overrightarrow U }\right)\f$ is the space operator. In order to compute this operator several different schemes are adopted for each different term of the operator.
 
-For computing the numerical fluxes several different solvers are used.
+For computing the numerical fluxes several different solvers are used. It is useful to distinguish between convective and diffusive fluxes:
 
-For the convective fluxes \f$(\overline{\overline F}  - \overline{\overline {{Q_S}}})_{conv}  = \left[ {\begin{array}{*{20}{c}}
-{\rho \vec v}\\ {\rho \vec v\vec v + p\overline{\overline I } }\\ {(\rho E+p)\vec v } \end{array}} \right]\f$ Riemann Problem solvers are used (see \ref Lib_Riemann "Riemann module library"). High order approximation of numerical fluxes is obtained by means of WENO (Weighted Essentially Non Oscillatory) reconstruction, see \ref Lib_WENO "WENO module library".
+For the convective fluxes \f$(\overline{\overline F}  - \overline{\overline {{Q_S}}})_{conv}  = \left[ {\begin{array}{*{20}{c}} {\rho \vec v}\\ {\rho \vec v\vec v + p\overline{\overline I } }\\ {(\rho E+p)\vec v } \end{array}} \right]\f$ Riemann Problem solvers are used (see \ref Lib_Riemann "Riemann module library"). High order approximation of numerical fluxes is obtained by means of WENO (Weighted Essentially Non Oscillatory) reconstruction, see \ref Lib_WENO "WENO module library".
 
-@note The viscous fluxes are under developing.
+For the diffusive fluxes \f${\left( {\overline{\overline F}  - \overline{\overline {{Q_S}}} } \right)_{diff}} = \left[ {\begin{array}{*{20}{c}} 0\\ { - \overline{\overline \tau } }\\ { - \overline{\overline \tau }  \cdot \vec v - k\overrightarrow \nabla  T} \end{array}} \right]\f$ a standard central second order approximation is used (based on Finite-Volume derivative approximation).
 
 The time integration of the unsteady terms is computed by means of Runge-Kutta schemes, see \ref Lib_Runge_Kutta "Runge-Kutta module library".
 
@@ -238,31 +259,17 @@ A set of sub-models are implemented in order to taking into account other physic
 
 @off data structures are based on derived typed, dynamic allocatable objects.
 
-The programming style is similar to Object Oriented Programming (OOP), but it is not a fully OOP code (Fortran 2003 is not fully
-compliant with OOP). The programming style is based on modules: each derived type has its own module containing the definition of
-type (object) and the procedures and local/global variables (and parameters) to handle it.
-Moreover also the libraries of procedures (e.g. Runge-Kutta, WENO, mesh, fluid dynamics... procedures) are contained in modules.
-Everywhere is possible the procedures are nested (OOP encapsulation) into the scope where they are necessary and they are not visible
-outside that scope. OOP dynamic dispatching by means of generic interfaces has been used when it was considered useful. A very basic
-OOP inheritance is present among some derived type (e.g. boundary conditions types, vector and tensor types, fluid dynamics ones).
-Finally some OOP polymorphism is present.
+The programming style is similar to Object Oriented Programming (OOP), but it is not a fully OOP code (Fortran 2003 is not fully compliant with OOP). The programming style is based on modules: each derived type has its own module containing the definition of type (object) and the procedures and local/global variables (and parameters) to handle it.  Moreover also the libraries of procedures (e.g. Runge-Kutta, WENO, mesh, fluid dynamics... procedures) are contained in modules.  Everywhere is possible the procedures are nested (OOP encapsulation) into the scope where they are necessary and they are not visible outside that scope. OOP dynamic dispatching by means of generic interfaces has been used when it was considered useful. A very basic OOP inheritance is present among some derived type (e.g. boundary conditions types, vector and tensor types, fluid dynamics ones).  Finally some OOP polymorphism is present.
 
-The basic module that \b all other modules and programs must use it the \ref IR_Precision "IR_Precision portable kinds library".
-This module contains a parametric definition of portable (architecture independent) kinds for integers and reals representation. By
-means of this module the code uses always the same precision (with the same significant digits) for representing numbers
-independently on what architecture is using.
+The basic module that \b all other modules and programs must use it the \ref IR_Precision "IR_Precision portable kinds library".  This module contains a parametric definition of portable (architecture independent) kinds for integers and reals representation. By means of this module the code uses always the same precision (with the same significant digits) for representing numbers independently on what architecture is using.
 
 @section Hierarchy Data Structures Hierarchy
 
-The underling numerical mesh adopted is a multi-blocks (presently without overlapping) structured grid. As a consequence the main
-data structures of @off have been divided into two different types:
-- Global level data: are data related to all grid blocks; this kind of data has \em global pertinence; there is only one global
-  level allocated variable (instance in OOP view);
-- Block level data: are data related to only one block; this kind of data has \em block pertinence; each block has its own block
-  level data (many instances how are the blocks).
+The underling numerical mesh adopted is a multi-blocks (presently without overlapping) structured grid. As a consequence the main data structures of @off have been divided into two different types:
+- Global level data: are data related to all grid blocks; this kind of data has \em global pertinence; there is only one global level allocated variable (instance in OOP view);
+- Block level data: are data related to only one block; this kind of data has \em block pertinence; each block has its own block level data (many instances how are the blocks).
 
-The two above data structures are defined by two derived types contained into the library \ref Data_Type_Globals
-"Data_Type_Globals". The two derived types are:
+The two above data structures are defined by two derived types contained into the library \ref Data_Type_Globals "Data_Type_Globals". The two derived types are:
 - \ref Data_Type_Globals::Type_Block;
 - \ref Data_Type_Globals::Type_Global.
 
@@ -272,6 +279,7 @@ Nested to these two derived types are many different kinds of data that are them
   - \ref Data_Type_Globals::Type_Mesh_Global "Global Mesh data": these are data related to the mesh;
   - \ref Data_Type_Globals::Type_BC_Global "Global Boundary Conditions data": these are data related to the boundary conditions;
   - \ref Data_Type_Globals::Type_Fluid_Global "Global Fluid Dynamics data": these are data related to the fluid dynamics;
+  - \ref Data_Type_Globals::Type_Adimensional_Global "Global Non dimensional data": these are data related to the non-dimensionalization reference values and numbers;
 - Block data:
   - \ref Data_Type_Globals::Type_Mesh_Block "Block Mesh data": these are data related to the mesh;
   - \ref Data_Type_Globals::Type_BC_Block "Block Boundary Conditions data": these are data related to the boundary conditions;
@@ -283,18 +291,11 @@ The block level data instance is allocated as a double indexed array:
 @code
 type(Type_Block), allocatable:: block(:,:) ! Dimensions [1:Nb,1:Nl] being Nb the number of blocks and Nl the number of grid levels
 @endcode
-where the inner index ranges in the blocks number while the outer index ranges in the grid (refinement) levels number. At today
-a bug afflicts multigrid algorithm thus the use of more different grid levels (Nl>1) is not useful.
+where the inner index ranges in the blocks number while the outer index ranges in the grid (refinement) levels number. At today a bug afflicts multigrid algorithm thus the use of more different grid levels (Nl>1) is not useful.
 
-Inside the block level data there are a lot of dynamically allocated 3D arrays. The use of nested dynamic data needs a careful
-treatment of the memory allocated. For those derived types (e.g. boundary conditions and fluid dynamics types) that have dynamic
-data specific procedures for allocating and freeing the memory have been provided (e.g. see
-\ref Data_Type_Conservative::free "Type Conservative freeing memory procedure").
+Inside the block level data there are a lot of dynamically allocated 3D arrays. The use of nested dynamic data needs a careful treatment of the memory allocated. For those derived types (e.g. boundary conditions and fluid dynamics types) that have dynamic data specific procedures for allocating and freeing the memory have been provided (e.g. see \ref Data_Type_Conservative::free "Type Conservative freeing memory procedure").
 
-According to the data hierarchy there are procedures that operate on some level of data structure and other on different level.
-There are for example procedures operating on whole blocks of some grid level (e.g. see \ref Lib_Fluidynamic::solve_grl and
-\ref Lib_Fluidynamic::boundary_conditions) and other procedures operating on only one block at time (e.g. see
-\ref Lib_Fluidynamic::conservative2primitive).
+According to the data hierarchy there are procedures that operate on some level of data structure and other on different level.  There are for example procedures operating on whole blocks of some grid level (e.g. see \ref Lib_Fluidynamic::solve_grl and \ref Lib_Fluidynamic::boundary_conditions) and other procedures operating on only one block at time (e.g. see \ref Lib_Fluidynamic::conservative2primitive).
 
 @page FilesFormat Input Output Files Structures
 
@@ -356,11 +357,20 @@ The options concerning with the different solvers are saved in an ascii file org
 2                                                            rk_ord  = order of time convergence (Runge-Kutta stages)
 0.7d0                                                        CFL     = stability costant
 0.01d0                                                       Res_Tol = residuals tollerance
+                                  NON DIMENSIONAL NUMBERS
+1.d0                                                         Re = Reynolds number
+1.d0                                                         Fr = Froude   number
+1.d0                                                         Pr = Prandtl  number
+                                  REFERENCE VALUES
+1.d0                                                         L0 = reference length
+1.d0                                                         r0 = reference density
+1.d0                                                         v0 = reference velocity
+1.d0                                                         c0 = reference specific heat
 ------------------------------------------------------------------------------------------------------------------------------------
 @endcode
 The options are self explained.
 
-@note Note that lines 1, 2, and the last one are only comments, but they are necessary being records that are expected to be read from @off parser.
+@note Note that lines 1, 2, 10, 15 and the last one are only comments, but they are necessary being records that are expected to be read from @off parser.
 
 @section DataFiles Data Files
 
@@ -396,21 +406,15 @@ The codes provided (@off, IBM and POG) have been successfully compiled with the 
 - GNU gfortran (from version 4.6.3)
 - Intel Fortran Compiler ifort (from version 11.0)
 
-Other compilers are not supported. For the Portland Group Compiler pgf it is known the presence of problems (and lack of performance
-due to the dynamic data nested into derived types).
+Other compilers are not supported. For the Portland Group Compiler pgf it is known the presence of problems (and lack of performance due to the dynamic data nested into derived types).
 
-@off can run over High Performance Computing facilities. It is parallelizated by
-means MPI paradigm for running over large distributed memory clusters and by means OpenMP paradigm for shared memory architectures.
-Both the supported compilers provides OpenMP paradigm support. For MPI support a MPI implementation is necessary. @off has been
-successfully compiled by means OpenMPI and MPCH2 implementations. In particular the supported implementations are:
-
+@off can run over High Performance Computing facilities. It is parallelizated by means MPI paradigm for running over large distributed memory clusters and by means OpenMP paradigm for shared memory architectures.  Both the supported compilers provides OpenMP paradigm support. For MPI support a MPI implementation is necessary. @off has been successfully compiled by means OpenMPI and MPCH2 implementations. In particular the supported implementations are:
 - OpenMPI (from version 1.4.5)  compiled against GNU gfortran;
 - OpenMPI (from version 1.4.5)  compiled against Intel Fortran Compiler ifort;
 - MPICH2 (from version 1.4.1)  compiled against GNU gfortran;
 - MPICH2 (from version 1.4.1)  compiled against Intel Fortran Compiler ifort.
 
-The codes are constituted by several modules. Therefore there are many dependences. The most easy way to compile the code is to
-start with the provided makefile thus it is necessary that the system has "Make" program (preferably GNU make http://www.gnu.org/software/make/).
+The codes are constituted by several modules. Therefore there are many dependences. The most easy way to compile the code is to start with the provided makefile thus it is necessary that the system has "Make" program (preferably GNU make http://www.gnu.org/software/make/).
 
 Examples of compiling are:
 - @off code with default options:
@@ -443,8 +447,7 @@ In the following subsections there are more details of each option and rule of t
 
 @section Makefile
 
-The provided makefile has several options. It has one rule that prints all options available and the default settings.
-Typing in the shell prompt: @code make help @endcode the following output will be printed:
+The provided makefile has several options. It has one rule that prints all options available and the default settings. Typing in the shell prompt: @code make help @endcode the following output will be printed:
 
 @code
  Make options of OFF codes
@@ -526,8 +529,7 @@ Typing in the shell prompt: @code make help @endcode the following output will b
 
 @subsection Mopts Makefile Options
 
-The makefiles provides several options. These can be divided in make options (compiler choice and compiling options) and in
-pre-processing options. For the pre-processing options the C pre-process paradigm has been used.
+The makefiles provides several options. These can be divided in make options (compiler choice and compiling options) and in pre-processing options. For the pre-processing options the C pre-process paradigm has been used.
 
 The meaning of the options are:
 
@@ -589,10 +591,8 @@ The makefiles provides several rules. Their meanings are:
 
 - <b>help    </b>: print help message in the shell prompt providing informations about the options and the rules available;
 - <b>OFF     </b>: build OFF code according to the options chosen; the parallel options OPENMPI and MPI can be used;
-- <b>IBM     </b>: build IBM code according to the options chosen; IBM has no parallel symbols thus activating the
-                   parallel options OPENMPI and MPI has no sense;
-- <b>POG     </b>: build POG code according to the options chosen; POG has only OPENMPI symbols thus activating the
-                   parallel option MPI has no sense;
+- <b>IBM     </b>: build IBM code according to the options chosen; IBM has no parallel symbols thus activating the parallel options OPENMPI and MPI has no sense;
+- <b>POG     </b>: build POG code according to the options chosen; POG has only OPENMPI symbols thus activating the parallel option MPI has no sense;
 - <b>cleanobj</b>: clean compiled object file .o that are saved in obj directory by default;
 - <b>cleanmod</b>: clean modules files .mod that are saved in obj directory by default;
 - <b>cleanmsg</b>: clean log massage files of the make compilation that are "error_message" and "diagnostic_messages";
@@ -611,14 +611,7 @@ In order to build the documentation the following dependences must be satisfied:
 All of the above pre-requisites are satisfied if the GitHub repository (https://github.com/szaghi/OFF) is cloned. \n
 \n
 @note
-POG code can produce Tecplot binary files. To this aim the proprietary library tecio.a (or tecio64.a) from Tecplot Inc. company
-must be available (these libraries are shipped within Tecplot installer or they can be freely downloaded
-from http://download.tecplot.com/tecio/). By default the provided makefile search this libraries in ./lib/. The makefile try to
-recognized the type of OS (32 or 64 bit) by means of the <em>getconf LONG_BIT</em> shell command. According to the result of this
-command the library lib/32bit/tecio.a or lib/64bit/tecio64.a is passed to the linker. Note that for complete the building with
-these libraries the standard c++ library stdc++5 must be explicitly passed to the linker. The author prefers to put this last
-system library into the directories lib/32bit/ and lib/64bit/ to facilitate the makefile searching. The user must provide the
-necessary libraries and he must update the makefile with the correct paths.
+POG code can produce Tecplot binary files. To this aim the proprietary library tecio.a (or tecio64.a) from Tecplot Inc. company must be available (these libraries are shipped within Tecplot installer or they can be freely downloaded from http://download.tecplot.com/tecio/). By default the provided makefile search this libraries in ./lib/. The makefile try to recognized the type of OS (32 or 64 bit) by means of the <em>getconf LONG_BIT</em> shell command. According to the result of this command the library lib/32bit/tecio.a or lib/64bit/tecio64.a is passed to the linker. Note that for complete the building with these libraries the standard c++ library stdc++5 must be explicitly passed to the linker. The author prefers to put this last system library into the directories lib/32bit/ and lib/64bit/ to facilitate the makefile searching. The user must provide the necessary libraries and he must update the makefile with the correct paths.
 
 @page Examples Examples of usage
 

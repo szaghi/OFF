@@ -190,8 +190,8 @@ ifeq "$(COMPILER)" "intel"
     CHK = -check all
     DEB = -debug all
     WRN = -warn all
-    OPTSC := $(OPTSC) -O0 -fpe-all=0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
-    OPTSL := $(OPTSL) -O0 -fpe-all=0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
+    OPTSC := $(OPTSC) -O0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
+    OPTSL := $(OPTSL) -O0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
   endif
   # standard
   ifeq "$(F03STD)" "yes"

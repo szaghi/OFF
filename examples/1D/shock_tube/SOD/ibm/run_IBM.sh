@@ -11,22 +11,19 @@ function print_usage {
   echo "Bash srcipt for running IBM code"
   echo "Usage"
   echo "   1) ./run_IBM.sh         => print this help message;"
-  echo "   2) ./run_IBM.sh -no_mpi => produce output for simulation without MPI (link to procmap-no_mpi.dat);"
-  echo "   3) ./run_IBM.sh -mpi    => produce output for simulation with    MPI (link to procmap-mpi.dat)."
+  echo "   2) ./run_IBM.sh -out => produce output for simulation."
   exit 1
 }
 if [ $# -eq 0 ] ; then
   print_usage
 fi
 rm -rf output         # cleaning working directory
+mkdir output          # creating outout directory
 ./IBM ibm_options.dat # running IBM with options defined in "ibm_options.dat"
 # making simbolic links
 cd output
 ln -fs ../solver.dat .
-if [ "$1" = "-no_mpi"  ] ; then
-  ln -fs ../procmap-no_mpi.dat procmap.dat
-elif [ "$1" = "-mpi"  ] ; then
-  ln -fs ../procmap-mpi.dat procmap.dat
-fi
+ln -fs ../procmap-no_mpi.dat .
+ln -fs ../procmap-mpi.dat .
 cd ../
 exit 0

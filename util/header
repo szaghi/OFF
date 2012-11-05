@@ -187,7 +187,7 @@ ifeq "$(COMPILER)" "intel"
   # debug
   ifeq "$(DEBUG)" "yes"
     PREPROC := $(PREPROC) -DDEBUG
-    CHK = -check all -check noarg_temp_created
+    CHK = -check all
     DEB = -debug all
     WRN = -warn all
     OPTSC := $(OPTSC) -O0 -fpe-all=0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)

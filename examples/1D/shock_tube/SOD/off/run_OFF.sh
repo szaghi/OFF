@@ -21,8 +21,14 @@ fi
 rm -rf output lockfile input # cleaning working directory
 ln -fs ../ibm/output input # link to IBM output
 if [ "$1" = "-no_mpi"  ] ; then
+  cd input
+  ln -fs procmap-no_mpi.dat procmap.dat
+  cd ../
   ./OFF off_options.dat # running OFF without MPI
 elif [ "$1" = "-mpi"  ] ; then
+  cd input
+  ln -fs procmap-mpi.dat procmap.dat
+  cd ../
   mpirun -n 2 ./OFF off_options.dat # running OFF with MPI
 fi
 exit 0

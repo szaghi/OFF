@@ -3,8 +3,8 @@
 'unsteady'                                                   Timing  = 'unsteady' simulation or steady one otherwise
 0                                                            Nmax    = max number of iterations
 0.20d0                                                       Tmax    = max time, ignored if Nmax>0
-1                                                            sp_ord  = order of space convergence (order of state reconstruction)
-1                                                            rk_ord  = order of time convergence (Runge-Kutta stages)
+7                                                            sp_ord  = order of space convergence (order of state reconstruction)
+5                                                            rk_ord  = order of time convergence (Runge-Kutta stages)
 0.7d0                                                        CFL     = stability costant
 0.01d0                                                       Res_Tol = residuals tollerance
                                   NON DIMENSIONAL NUMBERS

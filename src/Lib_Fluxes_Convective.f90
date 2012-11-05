@@ -69,15 +69,14 @@ contains
   !> 1D slice of N+2*gc cells the subroutine returns in ouput the N+1 convective fluxes at cells interfaces.
   !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b NF, \b P and \b F are declared as
   !> assumed-shape with only the lower bound defined. Their extentions are: NF [0-gc:N+gc], P [1-gc:N+gc], F [0:N].
-  !> @note The 3D primitive variables are projected in the 1D normal direction to the interface.
-  !> The 1D remapping is as following:
+  !> @note The 3D primitive variables are projected (and remapped) in a 1D array as following:
   !>  - 1)    density of species 1    (r1)
   !>  - 2)    density of species 2    (r2)
   !>  - ...
   !>  - s)    density of species s-th (rs)
   !>  - ...
   !>  - Ns)   density of species Ns   (rNs)
-  !>  - Ns+1) velocity                (interface's normal component)
+  !>  - Ns+1) velocity                (velocity vector module along a specific direction...)
   !>  - Ns+2) pressure                (p)
   !>  - Ns+3) density                 (r=sum(rs))
   !>  - Ns+4) specific heats ratio    (g)
@@ -94,39 +93,20 @@ contains
   type(Type_Primitive),    intent(IN)::    P  (           1-gc:     ) !< Primitive variables (3D format) [1-gc:N+gc].
   type(Type_Conservative), intent(INOUT):: F  (              0:     ) !< Convective fluxes (3D format)   [   0:N   ].
   type(Type_Vector)::                      ut (       1:2,1-gc:N+gc ) !< Tangential velocity: left (1) and right (2) interfaces.
-  real(R_P)::                              P1D(1:Ns+2,1:2,1-gc:-1+gc) !< Primitive variables 1D fixed to the current interface.
-#ifdef RECVC
-  real(R_P)::                              Pm (1:Ns+4,       0:N    ) !< Mean of primitive variables across interfaces.
-  real(R_P)::                              LPm(1:Ns+2,1:Ns+2,0:N    ) !< Mean left eigenvectors matrix.
-  real(R_P)::                              RPm(1:Ns+2,1:Ns+2,0:N    ) !< Mean right eigenvectors matrix.
-  real(R_P)::                              C  (1:Ns+2,1:2,1-gc:-1+gc) !< Interface value of characteristic variables.
-  real(R_P)::                              CR (1:Ns+2,1:2           ) !< Reconstructed interface value of charac. variables.
-#endif
 #ifdef LMA
   real(R_P)::                              ulma(1:2)                  !< Left (1) and right (2) reconstructed normal speed adjusted
                                                                       !< for low Mach number flows.
   real(R_P)::                              z                          !< Scaling coefficient for Low Mach number Adjustment.
 #endif
-  real(R_P)::                              PR (1:Ns+4,1:2,   0:N+1  ) !< Reconstructed interface values of primitive variables 1D.
+  real(R_P)::                              PR (1:Ns+4,1:2,   0:N+1  ) !< Reconstructed interface values of 1D primitive variables.
   real(R_P)::                              F_r                        !< Flux of mass (1D).
   real(R_P)::                              F_u                        !< Flux of momentum (1D).
   real(R_P)::                              F_E                        !< Flux of energy (1D).
-  integer(I_P)::                           i,j,k,v                    !< Counters.
-  logical::                                ROR(1:2)                   !< Logical flag for testing the result of WENO reconst.
-  integer(I_P)::                           or                         !< Counter of order for ROR algorithm.
+  integer(I_P)::                           i,j                        !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!$OMP PARALLEL DEFAULT(NONE)         &
-  !!$OMP FIRSTPRIVATE(F)                &
-  !!$OMP PRIVATE(i,j,k,v,or,ROR, &
-#ifdef RECVC
-  !!$OMP         Pm,LPm,RPm,C,CR,       &
-#endif
-  !!$OMP         F_r,F_u,F_e)        &
-  !!$OMP SHARED(gc,N,Ns,cp0,cv0,NF,P,ut,P1D,PR)
   ! computing velocity vectors and its tangential component
-  !!$OMP DO
   do i=1-gc,N+gc
     ! computing tangential velocity component
     do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
@@ -138,23 +118,95 @@ contains
   ! computing the left and right states or Riemann Problems
   select case(gc)
   case(2_I1P,3_I1P,4_I1P) ! 3rd, 5th or 7th order WENO reconstruction
-#ifdef RECVC
-    ! computing Pm, LPm and RPm across the interfaces  for the local characteristic projection
-    !!$OMP DO
-    do i=0,N ! loop over interfaces
-      ! computing mean of primitive variables across the interface
-      Pm(1:Ns,i) = 0.5_R_P*( P(i)%r(1:NS)      +  P(i+1)%r(1:NS)     ) ! rs
-      Pm(Ns+1,i) = 0.5_R_P*((P(i)%v.dot.NF(i)) + (P(i+1)%v.dot.NF(i))) ! un
-      Pm(Ns+2,i) = 0.5_R_P*( P(i)%p            +  P(i+1)%p           ) ! p
-      Pm(Ns+3,i) = 0.5_R_P*( P(i)%d            +  P(i+1)%d           ) ! r
-      Pm(Ns+4,i) = 0.5_R_P*( P(i)%g            +  P(i+1)%g           ) ! g
-      ! computing mean left and right eigenvectors matrix across the interface
-      LPm(1:Ns+2,1:Ns+2,i) = LP(Ns,Pm(1:Ns+4,i))
-      RPm(1:Ns+2,1:Ns+2,i) = RP(Ns,Pm(1:Ns+4,i))
-    enddo
-#endif
     ! computing the reconstruction
-    !!$OMP DO
+    call preconstruct_n(gc=gc,N=N,Ns=Ns,cp0=cp0,cv0=cv0,NF=NF,P=P,PR=PR)
+  case(1_I1P) ! 1st order piecewise constant reconstruction
+    do i=0,N+1
+      do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
+        if (i==0  .AND.j==1) cycle
+        if (i==N+1.AND.j==2) cycle
+        PR(1:Ns,j,i) =  P(i)%r(1:Ns)          ! rs
+        PR(Ns+1,j,i) = (P(i)%v.dot.NF(i+j-2)) ! un
+        PR(Ns+2,j,i) =  P(i)%p                ! p
+        PR(Ns+3,j,i) =  P(i)%d                ! r
+        PR(Ns+4,j,i) =  P(i)%g                ! g
+      enddo
+    enddo
+  endselect
+#ifdef LMA
+  ! applying Low Mach number Adjustment for decreasing the dissipation in local low Mach number region
+  do i=0,N
+    z = min(1._R_P,max(sqrt(PR(Ns+1,2,i  )*PR(Ns+1,2,i  )+sq_norm(ut(2,i  )))/a(p=P(i  )%p,r=P(i  )%d,g=P(i  )%g),&
+                       sqrt(PR(Ns+1,1,i+1)*PR(Ns+1,1,i+1)+sq_norm(ut(1,i+1)))/a(p=P(i+1)%p,r=P(i+1)%d,g=P(i+1)%g)))
+    ulma(1) = 0.5_R_P*(PR(Ns+1,2,i) + PR(Ns+1,1,i+1)) + z*0.5_R_P*(PR(Ns+1,2,i) - PR(Ns+1,1,i+1))
+    ulma(2) = 0.5_R_P*(PR(Ns+1,2,i) + PR(Ns+1,1,i+1)) - z*0.5_R_P*(PR(Ns+1,2,i) - PR(Ns+1,1,i+1))
+    PR(Ns+1,2,i  ) = ulma(1)
+    PR(Ns+1,1,i+1) = ulma(2)
+  enddo
+#endif
+  ! solving Riemann Problems
+  do i=0,N
+    ! face normal fluxes
+    call Riem_Solver(p1  = PR(Ns+2,2,i  ), & !| right value of cell i   (letf  of interface i+1/2)
+                     r1  = PR(Ns+3,2,i  ), & !|
+                     u1  = PR(Ns+1,2,i  ), & !|
+                     g1  = PR(Ns+4,2,i  ), & !|
+#if defined RSHLLCb || defined RSROE
+                     cp1 = dot_product(PR(1:Ns,2,i)/PR(Ns+3,2,i),cp0), &
+                     cv1 = dot_product(PR(1:Ns,2,i)/PR(Ns+3,2,i),cv0), &
+#endif
+                     p4  = PR(Ns+2,1,i+1), & !| left  value of cell i+1 (right of interface i+1/2)
+                     r4  = PR(Ns+3,1,i+1), & !|
+                     u4  = PR(Ns+1,1,i+1), & !|
+                     g4  = PR(Ns+4,1,i+1), & !|
+#if defined RSHLLCb || defined RSROE
+                     cp4 = dot_product(PR(1:Ns,1,i+1)/PR(Ns+3,1,i+1),cp0), &
+                     cv4 = dot_product(PR(1:Ns,1,i+1)/PR(Ns+3,1,i+1),cv0), &
+#endif
+                     F_r = F_r           , &
+                     F_u = F_u           , &
+                     F_E = F_E)
+    ! uptdating fluxes with tangential components
+    if (F_r>0._R_P) then
+      F(i)%rs = F_r*PR(1:Ns,2,i  )/PR(Ns+3,2,i  )
+      F(i)%rv = F_u*NF(i) + F_r*ut(2,i)
+      F(i)%re = F_E + F_r*sq_norm(ut(2,i))*0.5_R_P
+    else
+      F(i)%rs = F_r*PR(1:Ns,1,i+1)/PR(Ns+3,1,i+1)
+      F(i)%rv = F_u*NF(i) + F_r*ut(1,i+1)
+      F(i)%re = F_E + F_r*sq_norm(ut(1,i+1))*0.5_R_P
+    endif
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> Subroutine for reconstructing primitive variables along direction "NF".
+    !> @ingroup Lib_Fluxes_ConvectivePrivateProcedure
+    pure subroutine preconstruct_n(gc,N,Ns,cp0,cv0,NF,P,PR)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I1P),         intent(IN)::  gc                                !< Number of ghost cells used.
+    integer(I_P),         intent(IN)::  N                                 !< Number of cells.
+    integer(I_P),         intent(IN)::  Ns                                !< Number of species.
+    real(R_P),            intent(IN)::  cp0(1:Ns)                         !< Initial specific heat cp.
+    real(R_P),            intent(IN)::  cv0(1:Ns)                         !< Initial specific heat cv.
+    type(Type_Vector),    intent(IN)::  NF (                  0-gc: N+gc) !< Interface normal       [0-gc:N+gc].
+    type(Type_Primitive), intent(IN)::  P  (                  1-gc: N+gc) !< 3D primitive variables [1-gc:N+gc].
+    real(R_P),            intent(OUT):: PR (1:Ns+4,       1:2,   0: N+1 ) !< Reconstructed interface values 1D primitive variables.
+    real(R_P)::                         P1D(1:Ns+2,       1:2,1-gc:-1+gc) !< 1D primitive variables at interfaces.
+#ifdef RECVC
+    real(R_P)::                         Pm (1:Ns+4                      ) !< Mean of primitive variables across interfaces.
+    real(R_P)::                         LPm(1:Ns+2,1:Ns+2,1:2           ) !< Mean left eigenvectors matrix.
+    real(R_P)::                         RPm(1:Ns+2,1:Ns+2,1:2           ) !< Mean right eigenvectors matrix.
+    real(R_P)::                         C  (1:Ns+2,       1:2,1-gc:-1+gc) !< Interface value of characteristic variables.
+    real(R_P)::                         CR (1:Ns+2,       1:2           ) !< Reconstructed interface value of charac. variables.
+#endif
+    logical::                           ROR(1:2)                          !< Logical flag for testing the result of WENO reconst.
+    integer(I_P)::                      or                                !< Counter of order for ROR algorithm.
+    integer(I_P)::                      i,j,k,v                           !< Counters.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
     do i=0,N+1 ! loop over cells
       ! computing 1D primitive variables for the stencil [i+1-gc,i-1+gc] fixing the velocity across the interfaces i+-1/2
       do k=i+1-gc,i-1+gc
@@ -167,13 +219,27 @@ contains
         enddo
       enddo
 #ifdef RECVC
+      ! computing mean left and right eigenvectors matrix across the interface
+      do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
+        if (i==0  .AND.j==1) cycle
+        if (i==N+1.AND.j==2) cycle
+        ! computing mean of primitive variables across the interface
+        Pm(1:Ns) = 0.5_R_P*( P(i+j-1)%r(1:NS)          +  P(i+j-2)%r(1:NS)         ) ! rs
+        Pm(Ns+1) = 0.5_R_P*((P(i+j-1)%v.dot.NF(i+j-2)) + (P(i+j-2)%v.dot.NF(i+j-2))) ! un
+        Pm(Ns+2) = 0.5_R_P*( P(i+j-1)%p                +  P(i+j-2)%p               ) ! p
+        Pm(Ns+3) = 0.5_R_P*( P(i+j-1)%d                +  P(i+j-2)%d               ) ! r
+        Pm(Ns+4) = 0.5_R_P*( P(i+j-1)%g                +  P(i+j-2)%g               ) ! g
+        ! computing mean left and right eigenvectors matrix across the interface
+        LPm(1:Ns+2,1:Ns+2,j) = LP(Ns,Pm(1:Ns+4))
+        RPm(1:Ns+2,1:Ns+2,j) = RP(Ns,Pm(1:Ns+4))
+      enddo
       ! transforming variables into local characteristic fields for the stencil [1-gc,-1+gc]
       do k=i+1-gc,i-1+gc
         do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
           if (i==0  .AND.j==1) cycle
           if (i==N+1.AND.j==2) cycle
           do v=1,Ns+2
-            C(v,j,k-i) = dot_product(LPm(v,1:Ns+2,i+j-2),P1D(1:Ns+2,j,k-i))
+            C(v,j,k-i) = dot_product(LPm(v,1:Ns+2,j),P1D(1:Ns+2,j,k-i))
           enddo
         enddo
       enddo
@@ -191,7 +257,7 @@ contains
           if (i==0  .AND.j==1) cycle
           if (i==N+1.AND.j==2) cycle
           do v=1,Ns+2
-            PR(v,j,i) = dot_product(RPm(v,1:Ns+2,i+j-2),CR(1:Ns+2,j))
+            PR(v,j,i) = dot_product(RPm(v,1:Ns+2,j),CR(1:Ns+2,j))
           enddo
         enddo
 #else
@@ -239,69 +305,10 @@ contains
         endif
       enddo ROR_check
     enddo
-  case(1_I1P) ! 1st order piecewise constant reconstruction
-    !!$OMP DO
-    do i=0,N+1
-      do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-        if (i==0  .AND.j==1) cycle
-        if (i==N+1.AND.j==2) cycle
-        PR(1:Ns,j,i) =  P(i)%r(1:Ns)          ! rs
-        PR(Ns+1,j,i) = (P(i)%v.dot.NF(i+j-2)) ! un
-        PR(Ns+2,j,i) =  P(i)%p                ! p
-        PR(Ns+3,j,i) =  P(i)%d                ! r
-        PR(Ns+4,j,i) =  P(i)%g                ! g
-      enddo
-    enddo
-  endselect
-#ifdef LMA
-  ! applying Low Mach number Adjustment for decreasing the dissipation in local low Mach number region
-  do i=0,N
-    z = min(1._R_P,max(sqrt(PR(Ns+1,2,i  )*PR(Ns+1,2,i  )+sq_norm(ut(2,i  )))/a(p=P(i  )%p,r=P(i  )%d,g=P(i  )%g),&
-                       sqrt(PR(Ns+1,1,i+1)*PR(Ns+1,1,i+1)+sq_norm(ut(1,i+1)))/a(p=P(i+1)%p,r=P(i+1)%d,g=P(i+1)%g)))
-    ulma(1) = 0.5_R_P*(PR(Ns+1,2,i) + PR(Ns+1,1,i+1)) + z*0.5_R_P*(PR(Ns+1,2,i) - PR(Ns+1,1,i+1))
-    ulma(2) = 0.5_R_P*(PR(Ns+1,2,i) + PR(Ns+1,1,i+1)) - z*0.5_R_P*(PR(Ns+1,2,i) - PR(Ns+1,1,i+1))
-    PR(Ns+1,2,i  ) = ulma(1)
-    PR(Ns+1,1,i+1) = ulma(2)
-  enddo
-#endif
-  ! solving Riemann Problems
-  !!$OMP DO
-  do i=0,N
-    ! face normal fluxes
-    call Riem_Solver(p1  = PR(Ns+2,2,i  ), & !| right value of cell i   (letf  of interface i+1/2)
-                     r1  = PR(Ns+3,2,i  ), & !|
-                     u1  = PR(Ns+1,2,i  ), & !|
-                     g1  = PR(Ns+4,2,i  ), & !|
-#if defined RSHLLCb || defined RSROE
-                     cp1 = dot_product(PR(1:Ns,2,i)/PR(Ns+3,2,i),cp0), &
-                     cv1 = dot_product(PR(1:Ns,2,i)/PR(Ns+3,2,i),cv0), &
-#endif
-                     p4  = PR(Ns+2,1,i+1), & !| left  value of cell i+1 (right of interface i+1/2)
-                     r4  = PR(Ns+3,1,i+1), & !|
-                     u4  = PR(Ns+1,1,i+1), & !|
-                     g4  = PR(Ns+4,1,i+1), & !|
-#if defined RSHLLCb || defined RSROE
-                     cp4 = dot_product(PR(1:Ns,1,i+1)/PR(Ns+3,1,i+1),cp0), &
-                     cv4 = dot_product(PR(1:Ns,1,i+1)/PR(Ns+3,1,i+1),cv0), &
-#endif
-                     F_r = F_r           , &
-                     F_u = F_u           , &
-                     F_E = F_E)
-    ! uptdating fluxes with tangential components
-    if (F_r>0._R_P) then
-      F(i)%rs = F_r*PR(1:Ns,2,i  )/PR(Ns+3,2,i  )
-      F(i)%rv = F_u*NF(i) + F_r*ut(2,i)
-      F(i)%re = F_E + F_r*sq_norm(ut(2,i))*0.5_R_P
-    else
-      F(i)%rs = F_r*PR(1:Ns,1,i+1)/PR(Ns+3,1,i+1)
-      F(i)%rv = F_u*NF(i) + F_r*ut(1,i+1)
-      F(i)%re = F_E + F_r*sq_norm(ut(1,i+1))*0.5_R_P
-    endif
-  enddo
-  !!$OMP END PARALLEL
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  contains
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine preconstruct_n
+
     !> Function for computing left eigenvectors matrix (L) of the Jacobian fluxes matrix \f$A=R \Lambda L\f$ in primitive variables
     !> form.
     !> @note This function consider only the normal direction:

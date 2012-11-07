@@ -105,489 +105,490 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a name="l00015"></a>00015 
 <a name="l00019"></a>00019 <span class="keyword">module</span> <a class="code" href="../../d6/dec/group__Library.html#d7/d0a/classLib__WENO">Lib_WENO</a>
 <a name="l00020"></a>00020 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00021"></a>00021 USE <span class="keywordflow">IR_Precision</span>      <span class="comment">! Integers and reals precision definition.</span>
-<a name="l00022"></a>00022 USE <span class="keywordflow">Data_Type_Globals</span> <span class="comment">! Definition of Type_Global and Type_Block.</span>
-<a name="l00023"></a><a class="code" href="../../d6/dec/group__Library.html">00023</a> <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00024"></a>00024 
-<a name="l00025"></a>00025 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00026"></a>00026 <span class="keyword">implicit none</span>
-<a name="l00027"></a>00027 <span class="keywordtype">save</span>
-<a name="l00028"></a>00028 <span class="keywordtype">private</span>
-<a name="l00029"></a>00029 <span class="keywordtype">public</span>:: weno_init
-<a name="l00030"></a>00030 <span class="keywordtype">public</span>:: noweno_central
-<a name="l00031"></a>00031 <span class="keywordtype">public</span>:: weno_optimal
-<a name="l00032"></a>00032 <span class="keywordtype">public</span>:: weno
-<a name="l00033"></a>00033 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00034"></a>00034 
-<a name="l00035"></a>00035 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00036"></a>00036 <span class="comment">! WENO coefficients (S = number of stencils used)</span>
-<a name="l00039"></a>00039 <span class="keywordtype">real(R_P)</span>, <span class="keywordtype">allocatable</span>:: weno_c(:,:)   <span class="comment">!&lt; Central difference coefficients    [1:2,1:2*S].</span>
-<a name="l00040"></a>00040 <span class="keywordtype">real(R_P)</span>, <span class="keywordtype">allocatable</span>:: weno_a(:,:)   <span class="comment">!&lt; Optimal weights                    [1:2,0:S-1].</span>
-<a name="l00041"></a>00041 <span class="keywordtype">real(R_P)</span>, <span class="keywordtype">allocatable</span>:: weno_p(:,:,:) <span class="comment">!&lt; Polynomials coefficients           [1:2,0:S-1,0:S-1].</span>
-<a name="l00042"></a>00042 <span class="keywordtype">real(R_P)</span>, <span class="keywordtype">allocatable</span>:: weno_d(:,:,:) <span class="comment">!&lt; Smoothness indicators coefficients [0:S-1,0:S-1,0:S-1].</span>
-<a name="l00043"></a><a class="code" href="../../d4/df4/group__Lib__WENOPrivateVarPar.html#ga889b83b6c060c3bbb56dbdf2baedd69c">00043</a> <span class="keywordtype">real(R_P)</span>::              weno_eps      <span class="comment">!&lt; Parameter for avoiding divided by zero when computing smoothness indicators.</span>
-<a name="l00044"></a><a class="code" href="../../d4/df4/group__Lib__WENOPrivateVarPar.html#ga159b67dfba3ecd75b01352d5e2ced979">00044</a> <span class="keywordtype">integer(I_P)</span>::           weno_odd      <span class="comment">!&lt; Constant for distinguishing between odd and even number of stencils (mod(S,2)).</span>
-<a name="l00045"></a><a class="code" href="../../d4/df4/group__Lib__WENOPrivateVarPar.html#ga4f1726de285e2480840168c19161e65f">00045</a> <span class="keywordtype">integer(I_P)</span>::           weno_exp      <span class="comment">!&lt; Exponent for growing the diffusive part of weights.</span>
-<a name="l00046"></a><a class="code" href="../../d4/df4/group__Lib__WENOPrivateVarPar.html#gac1c16939fe2c2e74d38c3a0c6798b076">00046</a> 
-<a name="l00048"></a><a class="code" href="../../d4/df4/group__Lib__WENOPrivateVarPar.html#gab1686032e6c83161a1e53e05edb8d079">00048</a> <span class="keyword">contains</span>
-<a name="l00052"></a>00052   <span class="keyword">subroutine </span>weno_init(myrank,global,block,S)
-<a name="l00053"></a>00053   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00054"></a>00054   <span class="keyword">implicit none</span>
-<a name="l00055"></a>00055   <span class="keywordtype">integer(I_P)</span>,      <span class="keywordtype">intent(IN)</span>:: myrank                  <span class="comment">!&lt; Actual rank process.</span>
-<a name="l00056"></a><a class="code" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga12ddef5212e444aa9d2d9060f4ab1662">00056</a>   <span class="keywordtype">type(Type_Global)</span>, <span class="keywordtype">intent(IN)</span>:: global                  <span class="comment">!&lt; Global-level data.</span>
-<a name="l00057"></a>00057   <span class="keywordtype">type(Type_Block)</span>,  <span class="keywordtype">intent(IN)</span>:: block(1:global%mesh%Nb) <span class="comment">!&lt; Block-level data.</span>
-<a name="l00058"></a>00058   <span class="keywordtype">integer(I1P)</span>,      <span class="keywordtype">intent(IN)</span>:: S                       <span class="comment">!&lt; Number of stencils used.</span>
-<a name="l00059"></a>00059   <span class="keywordtype">integer(I_P)</span>::                  b                       <span class="comment">!&lt; Blocks counter.</span>
-<a name="l00060"></a>00060   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00061"></a>00061 
-<a name="l00062"></a>00062   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00063"></a>00063   <span class="comment">! initialize weno_exp</span>
-<a name="l00064"></a>00064   weno_exp = S
-<a name="l00065"></a>00065   <span class="keyword">if</span> (S&gt;4) weno_exp = S - 1
-<a name="l00066"></a>00066   <span class="comment">! computing weno_odd</span>
-<a name="l00067"></a>00067   weno_odd = mod(S,2_I1P)
-<a name="l00068"></a>00068   <span class="comment">! computing a reasonable value of weno_eps according to the (finest) grid spacing</span>
-<a name="l00069"></a>00069   weno_eps = MaxR_P
-<a name="l00070"></a>00070   <span class="keyword">do</span> b=1,global%mesh%Nb
-<a name="l00071"></a>00071     call <a class="code" href="../../d3/d4e/Lib__WENO_8f90.html#a1e29c2f4423bbe764fb4bf42c431cec8">get_min_sstep</a>(block = block(b), ss = weno_eps)
-<a name="l00072"></a>00072   <span class="keyword">enddo</span>
-<a name="l00073"></a>00073   weno_eps = weno_eps**(3_I1P*S-4_I1P)
-<a name="l00074"></a>00074   <span class="keyword">if</span> (myrank==0) <span class="keyword">then</span>
-<a name="l00075"></a>00075     <span class="keyword">write</span>(*,<span class="stringliteral">&#39;(A)&#39;</span>)           <span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
-<a name="l00076"></a>00076     <span class="keyword">write</span>(*,<span class="stringliteral">&#39;(A,&#39;</span>//FR_P//<span class="stringliteral">&#39;)&#39;</span>)<span class="stringliteral">&#39; The &quot;eps&quot; WENO parameter used is: &#39;</span>,weno_eps
-<a name="l00077"></a>00077     <span class="keyword">write</span>(*,<span class="stringliteral">&#39;(A,&#39;</span>//FI_P//<span class="stringliteral">&#39;)&#39;</span>)<span class="stringliteral">&#39; The &quot;exp&quot; WENO parameter used is: &#39;</span>,weno_exp
-<a name="l00078"></a>00078     <span class="keyword">write</span>(*,<span class="stringliteral">&#39;(A,&#39;</span>//FI1P//<span class="stringliteral">&#39;)&#39;</span>)<span class="stringliteral">&#39; The &quot;S&quot;   WENO parameter used is: &#39;</span>,S
-<a name="l00079"></a>00079     <span class="keyword">write</span>(*,<span class="stringliteral">&#39;(A)&#39;</span>)           <span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
-<a name="l00080"></a>00080     <span class="keyword">write</span>(*,*)
-<a name="l00081"></a>00081   <span class="keyword">endif</span>
-<a name="l00082"></a>00082   <span class="comment">! allocating variables</span>
-<a name="l00083"></a>00083   <span class="keyword">if</span> (<span class="keyword">allocated</span>(weno_c)) <span class="keyword">deallocate</span>(weno_c) ; <span class="keyword">allocate</span>(weno_c(1:2,1:2*S))
-<a name="l00084"></a>00084   <span class="keyword">if</span> (<span class="keyword">allocated</span>(weno_a)) <span class="keyword">deallocate</span>(weno_a) ; <span class="keyword">allocate</span>(weno_a(1:2,0:S-1))
-<a name="l00085"></a>00085   <span class="keyword">if</span> (<span class="keyword">allocated</span>(weno_p)) <span class="keyword">deallocate</span>(weno_p) ; <span class="keyword">allocate</span>(weno_p(1:2,0:S-1,0:S-1))
-<a name="l00086"></a>00086   <span class="keyword">if</span> (<span class="keyword">allocated</span>(weno_d)) <span class="keyword">deallocate</span>(weno_d) ; <span class="keyword">allocate</span>(weno_d(0:S-1,0:S-1,0:S-1))
-<a name="l00087"></a>00087   <span class="comment">! inizializing the coefficients</span>
-<a name="l00088"></a>00088   <span class="keyword">select</span> <span class="keyword">case</span>(S)
-<a name="l00089"></a>00089   <span class="keyword">case</span>(2_I1P) <span class="comment">! 3rd order WENO reconstruction</span>
-<a name="l00090"></a>00090     <span class="comment">! central difference coefficients</span>
-<a name="l00091"></a>00091     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
-<a name="l00092"></a>00092     weno_c(1,1) = -1._R_P/12._R_P <span class="comment">! cell -2</span>
-<a name="l00093"></a>00093     weno_c(1,2) =  7._R_P/12._R_P <span class="comment">! cell -1</span>
-<a name="l00094"></a>00094     weno_c(1,3) =  7._R_P/12._R_P <span class="comment">! cell  0</span>
-<a name="l00095"></a>00095     weno_c(1,4) = -1._R_P/12._R_P <span class="comment">! cell  1</span>
-<a name="l00096"></a>00096     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
-<a name="l00097"></a>00097     weno_c(2,1) = -1._R_P/12._R_P <span class="comment">! cell -1</span>
-<a name="l00098"></a>00098     weno_c(2,2) =  7._R_P/12._R_P <span class="comment">! cell  0</span>
-<a name="l00099"></a>00099     weno_c(2,3) =  7._R_P/12._R_P <span class="comment">! cell  1</span>
-<a name="l00100"></a>00100     weno_c(2,4) = -1._R_P/12._R_P <span class="comment">! cell  2</span>
-<a name="l00101"></a>00101 
-<a name="l00102"></a>00102     <span class="comment">! optimal weights</span>
-<a name="l00103"></a>00103     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
-<a name="l00104"></a>00104     weno_a(1,0) = 2._R_P/3._R_P <span class="comment">! stencil 0</span>
-<a name="l00105"></a>00105     weno_a(1,1) = 1._R_P/3._R_P <span class="comment">! stencil 1</span>
-<a name="l00106"></a>00106     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
-<a name="l00107"></a>00107     weno_a(2,0) = 1._R_P/3._R_P <span class="comment">! stencil 0</span>
-<a name="l00108"></a>00108     weno_a(2,1) = 2._R_P/3._R_P <span class="comment">! stencil 1</span>
-<a name="l00109"></a>00109 
-<a name="l00110"></a>00110     <span class="comment">! polinomials coefficients</span>
-<a name="l00111"></a>00111     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
-<a name="l00112"></a>00112     <span class="comment">!  cell  0               ;    cell  1</span>
-<a name="l00113"></a>00113     weno_p(1,0,0) =  0.5_R_P ; weno_p(1,1,0) =  0.5_R_P <span class="comment">! stencil 0</span>
-<a name="l00114"></a>00114     weno_p(1,0,1) = -0.5_R_P ; weno_p(1,1,1) =  1.5_R_P <span class="comment">! stencil 1</span>
-<a name="l00115"></a>00115     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
-<a name="l00116"></a>00116     <span class="comment">!  cell  0               ;    cell  1</span>
-<a name="l00117"></a>00117     weno_p(2,0,0) =  1.5_R_P ; weno_p(2,1,0) = -0.5_R_P <span class="comment">! stencil 0</span>
-<a name="l00118"></a>00118     weno_p(2,0,1) =  0.5_R_P ; weno_p(2,1,1) =  0.5_R_P <span class="comment">! stencil 1</span>
-<a name="l00119"></a>00119 
-<a name="l00120"></a>00120     <span class="comment">! smoothness indicators coefficients</span>
-<a name="l00121"></a>00121     <span class="comment">! stencil 0</span>
-<a name="l00122"></a>00122     <span class="comment">!      i*i             ;       (i-1)*i</span>
-<a name="l00123"></a>00123     weno_d(0,0,0) = 1._R_P ; weno_d(1,0,0) =-2._R_P
-<a name="l00124"></a>00124     <span class="comment">!      /               ;       (i-1)*(i-1)</span>
-<a name="l00125"></a>00125     weno_d(0,1,0) = 0._R_P ; weno_d(1,1,0) = 1._R_P
-<a name="l00126"></a>00126     <span class="comment">! stencil 1</span>
-<a name="l00127"></a>00127     <span class="comment">!     (i+1)*(i+1)      ;       (i+1)*i</span>
-<a name="l00128"></a>00128     weno_d(0,0,1) = 1._R_P ; weno_d(1,0,1) =-2._R_P
-<a name="l00129"></a>00129     <span class="comment">!      /               ;        i*i</span>
-<a name="l00130"></a>00130     weno_d(0,1,1) = 0._R_P ; weno_d(1,1,1) = 1._R_P
-<a name="l00131"></a>00131   <span class="keyword">case</span>(3_I1P) <span class="comment">! 5th order WENO reconstruction</span>
-<a name="l00132"></a>00132     <span class="comment">! central difference coefficients</span>
-<a name="l00133"></a>00133     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
-<a name="l00134"></a>00134     weno_c(1,1) =  1._R_P/60._R_P <span class="comment">! cell -3</span>
-<a name="l00135"></a>00135     weno_c(1,2) = -7.5_R_P        <span class="comment">! cell -2</span>
-<a name="l00136"></a>00136     weno_c(1,3) = 37._R_P/60._R_P <span class="comment">! cell -1</span>
-<a name="l00137"></a>00137     weno_c(1,4) = 37._R_P/60._R_P <span class="comment">! cell  0</span>
-<a name="l00138"></a>00138     weno_c(1,5) = -7.5_R_P        <span class="comment">! cell  1</span>
-<a name="l00139"></a>00139     weno_c(1,6) =  1._R_P/60._R_P <span class="comment">! cell  2</span>
-<a name="l00140"></a>00140     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
-<a name="l00141"></a>00141     weno_c(1,1) =  1._R_P/60._R_P <span class="comment">! cell -2</span>
-<a name="l00142"></a>00142     weno_c(1,2) = -7.5_R_P        <span class="comment">! cell -1</span>
-<a name="l00143"></a>00143     weno_c(1,3) = 37._R_P/60._R_P <span class="comment">! cell  0</span>
-<a name="l00144"></a>00144     weno_c(1,4) = 37._R_P/60._R_P <span class="comment">! cell  1</span>
-<a name="l00145"></a>00145     weno_c(1,5) = -7.5_R_P        <span class="comment">! cell  2</span>
-<a name="l00146"></a>00146     weno_c(1,6) =  1._R_P/60._R_P <span class="comment">! cell  3</span>
-<a name="l00147"></a>00147 
-<a name="l00148"></a>00148     <span class="comment">! optimal weights</span>
-<a name="l00149"></a>00149     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
-<a name="l00150"></a>00150     weno_a(1,0) = 0.3_R_P <span class="comment">! stencil 0</span>
-<a name="l00151"></a>00151     weno_a(1,1) = 0.6_R_P <span class="comment">! stencil 1</span>
-<a name="l00152"></a>00152     weno_a(1,2) = 0.1_R_P <span class="comment">! stencil 2</span>
-<a name="l00153"></a>00153     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
-<a name="l00154"></a>00154     weno_a(2,0) = 0.1_R_P <span class="comment">! stencil 0</span>
-<a name="l00155"></a>00155     weno_a(2,1) = 0.6_R_P <span class="comment">! stencil 1</span>
-<a name="l00156"></a>00156     weno_a(2,2) = 0.3_R_P <span class="comment">! stencil 2</span>
-<a name="l00157"></a>00157 
-<a name="l00158"></a>00158     <span class="comment">! polinomials coefficients</span>
-<a name="l00159"></a>00159     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
-<a name="l00160"></a>00160     <span class="comment">!  cell  0                     ;    cell  1                     ;    cell  2</span>
-<a name="l00161"></a>00161     weno_p(1,0,0) =  1._R_P/3._R_P ; weno_p(1,1,0) =  5._R_P/6._R_P ; weno_p(1,2,0) = -1._R_P/6._R_P <span class="comment">! stencil 0</span>
-<a name="l00162"></a>00162     weno_p(1,0,1) = -1._R_P/6._R_P ; weno_p(1,1,1) =  5._R_P/6._R_P ; weno_p(1,2,1) =  1._R_P/3._R_P <span class="comment">! stencil 1</span>
-<a name="l00163"></a>00163     weno_p(1,0,2) =  1._R_P/3._R_P ; weno_p(1,1,2) = -7._R_P/6._R_P ; weno_p(1,2,2) = 11._R_P/6._R_P <span class="comment">! stencil 2</span>
-<a name="l00164"></a>00164     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
-<a name="l00165"></a>00165     <span class="comment">!  cell  0                     ;    cell  1                     ;    cell  2</span>
-<a name="l00166"></a>00166     weno_p(2,0,0) = 11._R_P/6._R_P ; weno_p(2,1,0) = -7._R_P/6._R_P ; weno_p(2,2,0) =  1._R_P/3._R_P <span class="comment">! stencil 0</span>
-<a name="l00167"></a>00167     weno_p(2,0,1) =  1._R_P/3._R_P ; weno_p(2,1,1) =  5._R_P/6._R_P ; weno_p(2,2,1) = -1._R_P/6._R_P <span class="comment">! stencil 1</span>
-<a name="l00168"></a>00168     weno_p(2,0,2) = -1._R_P/6._R_P ; weno_p(2,1,2) =  5._R_P/6._R_P ; weno_p(2,2,2) =  1._R_P/3._R_P <span class="comment">! stencil 2</span>
-<a name="l00169"></a>00169 
-<a name="l00170"></a>00170     <span class="comment">! smoothness indicators coefficients</span>
-<a name="l00171"></a>00171     <span class="comment">! stencil 0</span>
-<a name="l00172"></a>00172     <span class="comment">!      i*i                      ;       (i-1)*i                   ;       (i-2)*i</span>
-<a name="l00173"></a>00173     weno_d(0,0,0) =  10._R_P/3._R_P ; weno_d(1,0,0) = -31._R_P/3._R_P ; weno_d(2,0,0) =  11._R_P/3._R_P
-<a name="l00174"></a>00174     <span class="comment">!      /                        ;       (i-1)*(i-1)               ;       (i-2)*(i-1)</span>
-<a name="l00175"></a>00175     weno_d(0,1,0) =   0._R_P        ; weno_d(1,1,0) =  25._R_P/3._R_P ; weno_d(2,1,0) = -19._R_P/3._R_P
-<a name="l00176"></a>00176     <span class="comment">!      /                        ;        /                        ;       (i-2)*(i-2)</span>
-<a name="l00177"></a>00177     weno_d(0,2,0) =   0._R_P        ; weno_d(1,2,0) =   0._R_P        ; weno_d(2,2,0) =   4._R_P/3._R_P
-<a name="l00178"></a>00178     <span class="comment">! stencil 1</span>
-<a name="l00179"></a>00179     <span class="comment">!     (i+1)*(i+1)               ;        i*(i+1)                  ;       (i-1)*(i+1)</span>
-<a name="l00180"></a>00180     weno_d(0,0,1) =   4._R_P/3._R_P ; weno_d(1,0,1) = -13._R_P/3._R_P ; weno_d(2,0,1) =   5._R_P/3._R_P
-<a name="l00181"></a>00181     <span class="comment">!      /                        ;        i*i                      ;       (i-1)*i</span>
-<a name="l00182"></a>00182     weno_d(0,1,1) =   0._R_P        ; weno_d(1,1,1) =  13._R_P/3._R_P ; weno_d(2,1,1) = -13._R_P/3._R_P
-<a name="l00183"></a>00183     <span class="comment">!      /                        ;        /                        ;       (i-1)*(i-1)</span>
-<a name="l00184"></a>00184     weno_d(0,2,1) =   0._R_P        ; weno_d(1,2,1) =   0._R_P        ; weno_d(2,2,1) =   4._R_P/3._R_P
-<a name="l00185"></a>00185     <span class="comment">! stencil 2</span>
-<a name="l00186"></a>00186     <span class="comment">!     (i+2)*(i+2)               ;       (i+1)*(i+2)               ;        i*(i+2)</span>
-<a name="l00187"></a>00187     weno_d(0,0,2) =   4._R_P/3._R_P ; weno_d(1,0,2) = -19._R_P/3._R_P ; weno_d(2,0,2) =  11._R_P/3._R_P
-<a name="l00188"></a>00188     <span class="comment">!      /                        ;       (i+1)*(i+1)               ;        i*(i+1)</span>
-<a name="l00189"></a>00189     weno_d(0,1,2) =   0._R_P        ; weno_d(1,1,2) =  25._R_P/3._R_P ; weno_d(2,1,2) = -31._R_P/3._R_P
-<a name="l00190"></a>00190     <span class="comment">!      /                        ;        /                        ;        i*i</span>
-<a name="l00191"></a>00191     weno_d(0,2,2) =   0._R_P        ; weno_d(1,2,2) =   0._R_P        ; weno_d(2,2,2) =  10._R_P/3._R_P
-<a name="l00192"></a>00192   <span class="keyword">case</span>(4_I1P) <span class="comment">! 7th order WENO reconstruction</span>
-<a name="l00193"></a>00193     <span class="comment">! optimal weights</span>
-<a name="l00194"></a>00194     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
-<a name="l00195"></a>00195     weno_a(1,0) =  4._R_P/35._R_P <span class="comment">! stencil 0</span>
-<a name="l00196"></a>00196     weno_a(1,1) = 18._R_P/35._R_P <span class="comment">! stencil 1</span>
-<a name="l00197"></a>00197     weno_a(1,2) = 12._R_P/35._R_P <span class="comment">! stencil 2</span>
-<a name="l00198"></a>00198     weno_a(1,3) =  1._R_P/35._R_P <span class="comment">! stencil 3</span>
-<a name="l00199"></a>00199     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
-<a name="l00200"></a>00200     weno_a(2,0) =  1._R_P/35._R_P <span class="comment">! stencil 0</span>
-<a name="l00201"></a>00201     weno_a(2,1) = 12._R_P/35._R_P <span class="comment">! stencil 1</span>
-<a name="l00202"></a>00202     weno_a(2,2) = 18._R_P/35._R_P <span class="comment">! stencil 2</span>
-<a name="l00203"></a>00203     weno_a(2,3) =  4._R_P/35._R_P <span class="comment">! stencil 3</span>
-<a name="l00204"></a>00204 
-<a name="l00205"></a>00205     <span class="comment">! polinomials coefficients</span>
-<a name="l00206"></a>00206     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
-<a name="l00207"></a>00207     <span class="comment">!  cell  0                   ;   cell  1                   ;   cell  2                    ;   cell  3</span>
-<a name="l00208"></a>00208     weno_p(1,0,0)= 1._R_P/4._R_P ;weno_p(1,1,0)=13._R_P/12._R_P;weno_p(1,2,0)= -5._R_P/12._R_P;weno_p(1,3,0)= 1._R_P/12._R_P<span class="comment">! sten 0</span>
-<a name="l00209"></a>00209     weno_p(1,0,1)=-1._R_P/12._R_P;weno_p(1,1,1)= 7._R_P/12._R_P;weno_p(1,2,1)=  7._R_P/12._R_P;weno_p(1,3,1)=-1._R_P/12._R_P<span class="comment">! sten 1</span>
-<a name="l00210"></a>00210     weno_p(1,0,2)= 1._R_P/12._R_P;weno_p(1,1,2)=-5._R_P/12._R_P;weno_p(1,2,2)= 13._R_P/12._R_P;weno_p(1,3,2)= 1._R_P/4._R_P <span class="comment">! sten 2</span>
-<a name="l00211"></a>00211     weno_p(1,0,3)=-1._R_P/4._R_P ;weno_p(1,1,3)=13._R_P/12._R_P;weno_p(1,2,3)=-23._R_P/12._R_P;weno_p(1,3,3)=25._R_P/12._R_P<span class="comment">! sten 3</span>
-<a name="l00212"></a>00212     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
-<a name="l00213"></a>00213     <span class="comment">!  cell  0                   ;   cell  1                    ;   cell  2                   ;   cell  3</span>
-<a name="l00214"></a>00214     weno_p(2,0,0)=25._R_P/12._R_P;weno_p(2,1,0)=-23._R_P/12._R_P;weno_p(2,2,0)=13._R_P/12._R_P;weno_p(2,3,0)=-1._R_P/4._R_P <span class="comment">! sten 0</span>
-<a name="l00215"></a>00215     weno_p(2,0,1)= 1._R_P/4._R_P ;weno_p(2,1,1)= 13._R_P/12._R_P;weno_p(2,2,1)=-5._R_P/12._R_P;weno_p(2,3,1)= 1._R_P/12._R_P<span class="comment">! sten 1</span>
-<a name="l00216"></a>00216     weno_p(2,0,2)=-1._R_P/12._R_P;weno_p(2,1,2)=  7._R_P/12._R_P;weno_p(2,2,2)= 7._R_P/12._R_P;weno_p(2,3,2)=-1._R_P/12._R_P<span class="comment">! sten 2</span>
-<a name="l00217"></a>00217     weno_p(2,0,3)= 1._R_P/12._R_P;weno_p(2,1,3)= -5._R_P/12._R_P;weno_p(2,2,3)=13._R_P/12._R_P;weno_p(2,3,3)= 1._R_P/4._R_P <span class="comment">! sten 3</span>
-<a name="l00218"></a>00218 
-<a name="l00219"></a>00219     <span class="comment">! smoothness indicators coefficients</span>
-<a name="l00220"></a>00220     <span class="comment">! stencil 0</span>
-<a name="l00221"></a>00221     <span class="comment">!      i*i                ;       (i-1)*i             ;       (i-2)*i              ;       (i-3)*i</span>
-<a name="l00222"></a>00222     weno_d(0,0,0) = 2107._R_P ; weno_d(1,0,0) =-9402._R_P ; weno_d(2,0,0) = 7042._R_P  ; weno_d(3,0,0) = -1854._R_P
-<a name="l00223"></a>00223     <span class="comment">!      /                  ;       (i-1)*(i-1)         ;       (i-2)*(i-1)          ;       (i-3)*(i-1)</span>
-<a name="l00224"></a>00224     weno_d(0,1,0) =   0._R_P  ; weno_d(1,1,0) =11003._R_P ; weno_d(2,1,0) =-17246._R_P ; weno_d(3,1,0) =  4642._R_P
-<a name="l00225"></a>00225     <span class="comment">!      /                  ;        /                  ;       (i-2)*(i-2)          ;       (i-3)*(i-2)</span>
-<a name="l00226"></a>00226     weno_d(0,2,0) =   0._R_P  ; weno_d(1,2,0) =   0._R_P  ; weno_d(2,2,0) = 7043._R_P  ; weno_d(3,2,0) = -3882._R_P
-<a name="l00227"></a>00227     <span class="comment">!      /                  ;        /                  ;        /                   ;       (i-3)*(i-3)</span>
-<a name="l00228"></a>00228     weno_d(0,3,0) =   0._R_P  ; weno_d(1,3,0) =   0._R_P  ; weno_d(2,3,0) =   0._R_P   ; weno_d(3,3,0) = 547._R_P
-<a name="l00229"></a>00229     <span class="comment">! stencil 1</span>
-<a name="l00230"></a>00230     <span class="comment">!     (i+1)*(i+1)         ;        i*(i+1)            ;       (i-1)*(i+1)          ;       (i-2)*(i+1)</span>
-<a name="l00231"></a>00231     weno_d(0,0,1) =  547._R_P ; weno_d(1,0,1) =-2522._R_P ; weno_d(2,0,1) = 1922._R_P  ; weno_d(3,0,1) = -494._R_P
-<a name="l00232"></a>00232     <span class="comment">!      /                  ;        i*i                ;       (i-1)*i              ;       (i-2)*i</span>
-<a name="l00233"></a>00233     weno_d(0,1,1) =   0._R_P  ; weno_d(1,1,1) = 3443._R_P ; weno_d(2,1,1) = -5966._R_P ; weno_d(3,1,1) =  1602._R_P
-<a name="l00234"></a>00234     <span class="comment">!      /                  ;        /                  ;       (i-1)*(i-1)          ;       (i-2)*(i-1)</span>
-<a name="l00235"></a>00235     weno_d(0,2,1) =   0._R_P  ; weno_d(1,2,1) =   0._R_P  ; weno_d(2,2,1) = 2843._R_P  ; weno_d(3,2,1) = -1642._R_P
-<a name="l00236"></a>00236     <span class="comment">!      /                  ;        /                  ;        /                   ;       (i-2)*(i-2)</span>
-<a name="l00237"></a>00237     weno_d(0,3,1) =   0._R_P  ; weno_d(1,3,1) =   0._R_P  ; weno_d(2,3,1) =   0._R_P   ; weno_d(3,3,1) = 267._R_P
-<a name="l00238"></a>00238     <span class="comment">! stencil 2</span>
-<a name="l00239"></a>00239     <span class="comment">!     (i+2)*(i+2)         ;       (i+1)*(i+2)         ;        i*(i+2)             ;       (i-1)*(i+2)</span>
-<a name="l00240"></a>00240     weno_d(0,0,2) =  267._R_P ; weno_d(1,0,2) =-1642._R_P ; weno_d(2,0,2) = 1602._R_P  ; weno_d(3,0,2) = -494._R_P
-<a name="l00241"></a>00241     <span class="comment">!      /                  ;       (i+1)*(i+1)         ;        i*(i+1)             ;       (i-1)*(i+1)</span>
-<a name="l00242"></a>00242     weno_d(0,1,2) =   0._R_P  ; weno_d(1,1,2) = 2843._R_P ; weno_d(2,1,2) = -5966._R_P ; weno_d(3,1,2) =  1922._R_P
-<a name="l00243"></a>00243     <span class="comment">!      /                  ;        /                  ;        i*i                 ;       (i-1)*i</span>
-<a name="l00244"></a>00244     weno_d(0,2,2) =   0._R_P  ; weno_d(1,2,2) =   0._R_P  ; weno_d(2,2,2) = 3443._R_P  ; weno_d(3,2,2) = -2522._R_P
-<a name="l00245"></a>00245     <span class="comment">!      /                  ;        /                  ;        /                   ;       (i-1)*(i-1)</span>
-<a name="l00246"></a>00246     weno_d(0,3,2) =   0._R_P  ; weno_d(1,3,2) =   0._R_P  ; weno_d(2,3,2) =   0._R_P   ; weno_d(3,3,2) = 547._R_P
-<a name="l00247"></a>00247     <span class="comment">! stencil 3</span>
-<a name="l00248"></a>00248     <span class="comment">!     (i+3)*(i+3)         ;       (i+2)*(i+3)         ;       (i+1)*(i+3)          ;        i*(i+3)</span>
-<a name="l00249"></a>00249     weno_d(0,0,3) =  547._R_P ; weno_d(1,0,3) =-3882._R_P ; weno_d(2,0,3) = 4642._R_P  ; weno_d(3,0,3) = -1854._R_P
-<a name="l00250"></a>00250     <span class="comment">!      /                  ;       (i+2)*(i+2)         ;       (i+1)*(i+2)          ;        i*(i+2)</span>
-<a name="l00251"></a>00251     weno_d(0,1,3) =   0._R_P  ; weno_d(1,1,3) = 7043._R_P ; weno_d(2,1,3) =-17246._R_P ; weno_d(3,1,3) =  7042._R_P
-<a name="l00252"></a>00252     <span class="comment">!      /                  ;        /                  ;       (i+1)*(i+1)          ;        i*(i+1)</span>
-<a name="l00253"></a>00253     weno_d(0,2,3) =   0._R_P  ; weno_d(1,2,3) =   0._R_P  ; weno_d(2,2,3) =11003._R_P  ; weno_d(3,2,3) = -9402._R_P
-<a name="l00254"></a>00254     <span class="comment">!      /                  ;        /                  ;        /                   ;        i*i</span>
-<a name="l00255"></a>00255     weno_d(0,3,3) =   0._R_P  ; weno_d(1,3,3) =   0._R_P  ; weno_d(2,3,3) =   0._R_P   ; weno_d(3,3,3) = 2107._R_P
-<a name="l00256"></a>00256   endselect
-<a name="l00257"></a>00257   return
-<a name="l00258"></a>00258   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00259"></a>00259   <span class="keyword">contains</span>
-<a name="l00260"></a>00260     <span class="keywordtype">pure</span> <span class="keyword">subroutine </span><a class="code" href="../../d3/d4e/Lib__WENO_8f90.html#a1e29c2f4423bbe764fb4bf42c431cec8">get_min_sstep</a>(block,ss)
-<a name="l00261"></a>00261     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00262"></a>00262     <span class="comment">! Function for evaluating minimum space step.</span>
-<a name="l00263"></a>00263     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00264"></a><a class="code" href="../../d3/d4e/Lib__WENO_8f90.html#a1e29c2f4423bbe764fb4bf42c431cec8">00264</a> 
-<a name="l00265"></a>00265     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00266"></a>00266     <span class="keyword">implicit none</span>
-<a name="l00267"></a>00267     <span class="keywordtype">type(Type_Block)</span>, <span class="keywordtype">intent(IN)</span>::    block <span class="comment">! Block-level data.</span>
-<a name="l00268"></a>00268     <span class="keywordtype">real(R_P)</span>,        <span class="keywordtype">intent(INOUT)</span>:: ss    <span class="comment">! Minimum space step.</span>
-<a name="l00269"></a>00269     <span class="keywordtype">integer(I_P)</span>::                    i,j,k <span class="comment">! Counters.</span>
-<a name="l00270"></a>00270     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00271"></a>00271 
-<a name="l00272"></a>00272     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00273"></a>00273     <span class="keyword">do</span> k=1,block%mesh%Nk
-<a name="l00274"></a>00274       <span class="keyword">do</span> j=1,block%mesh%Nj
-<a name="l00275"></a>00275         <span class="keyword">do</span> i=1,block%mesh%Ni
-<a name="l00276"></a>00276           ss = min(ss,                                                                           &amp;
-<a name="l00277"></a>00277                    (0.25_R_P*(block%mesh%node(i  ,j  ,k  )%x + block%mesh%node(i  ,j-1,k  )%x +  &amp;
-<a name="l00278"></a>00278                               block%mesh%node(i  ,j-1,k-1)%x + block%mesh%node(i  ,j  ,k-1)%x)-  &amp;
-<a name="l00279"></a>00279                     0.25_R_P*(block%mesh%node(i-1,j  ,k  )%x + block%mesh%node(i-1,j-1,k  )%x +  &amp;
-<a name="l00280"></a>00280                               block%mesh%node(i-1,j-1,k-1)%x + block%mesh%node(i-1,j  ,k-1)%x)), &amp;
-<a name="l00281"></a>00281                    (0.25_R_P*(block%mesh%node(i  ,j  ,k  )%y + block%mesh%node(i-1,j  ,k  )%y +  &amp;
-<a name="l00282"></a>00282                               block%mesh%node(i-1,j  ,k-1)%y + block%mesh%node(i  ,j  ,k-1)%y)-  &amp;
-<a name="l00283"></a>00283                     0.25_R_P*(block%mesh%node(i  ,j-1,k  )%y + block%mesh%node(i-1,j-1,k  )%y +  &amp;
-<a name="l00284"></a>00284                               block%mesh%node(i-1,j-1,k-1)%y + block%mesh%node(i  ,j-1,k-1)%y)), &amp;
-<a name="l00285"></a>00285                    (0.25_R_P*(block%mesh%node(i  ,j  ,k  )%z + block%mesh%node(i-1,j-1,k  )%z +  &amp;
-<a name="l00286"></a>00286                               block%mesh%node(i-1,j  ,k  )%z + block%mesh%node(i  ,j-1,k  )%z)-  &amp;
-<a name="l00287"></a>00287                     0.25_R_P*(block%mesh%node(i  ,j  ,k-1)%z + block%mesh%node(i-1,j-1,k-1)%z +  &amp;
-<a name="l00288"></a>00288                               block%mesh%node(i-1,j  ,k-1)%z + block%mesh%node(i  ,j-1,k-1)%z)))
-<a name="l00289"></a>00289 
-<a name="l00290"></a>00290         <span class="keyword">enddo</span>
-<a name="l00291"></a>00291       <span class="keyword">enddo</span>
-<a name="l00292"></a>00292     <span class="keyword">enddo</span>
-<a name="l00293"></a>00293     return
-<a name="l00294"></a>00294     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00295"></a>00295 <span class="keyword">    endsubroutine get_min_sstep</span>
-<a name="l00296"></a>00296 <span class="keyword">  endsubroutine weno_init</span>
-<a name="l00297"></a>00297 
-<a name="l00301"></a>00301   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>noweno_central(S,V,VR)
-<a name="l00302"></a>00302   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00303"></a>00303   <span class="keyword">implicit none</span>
-<a name="l00304"></a>00304   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>::  S         <span class="comment">!&lt; Number of stencils used.</span>
-<a name="l00305"></a><a class="code" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga423849469cf89742a6b89a4de6fe2483">00305</a>   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  V (1:,0:) <span class="comment">!&lt; Variable to be reconstructed.                           [1:2,0:2*S].</span>
-<a name="l00306"></a>00306   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(OUT)</span>:: VR(1:)    <span class="comment">!&lt; Left and right (1,2) interface value of reconstructed V [1:2      ].</span>
-<a name="l00307"></a>00307   <span class="keywordtype">integer(I_P)</span>::              k,f       <span class="comment">!&lt; Counters.</span>
-<a name="l00308"></a>00308   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00309"></a>00309 
-<a name="l00310"></a>00310   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00311"></a>00311   <span class="comment">! computing the central difference reconstruction</span>
-<a name="l00312"></a>00312   VR = 0._R_P
-<a name="l00313"></a>00313   <span class="keyword">do</span> k=1,2*S
-<a name="l00314"></a>00314     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
-<a name="l00315"></a>00315       VR(f) = VR(f) + weno_c(f,k)*V(f,k+f-2)
-<a name="l00316"></a>00316     <span class="keyword">enddo</span>
-<a name="l00317"></a>00317   <span class="keyword">enddo</span>
-<a name="l00318"></a>00318   return
-<a name="l00319"></a>00319   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00320"></a>00320 <span class="keyword">  endsubroutine noweno_central</span>
-<a name="l00321"></a>00321 
-<a name="l00326"></a>00326   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>weno_optimal(S,V,VR)
-<a name="l00327"></a>00327   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00328"></a>00328   <span class="keyword">implicit none</span>
-<a name="l00329"></a>00329   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>::  S             <span class="comment">!&lt; Number of stencils used.</span>
-<a name="l00330"></a><a class="code" href="../../db/d22/group__Lib__WENOPublicProcedure.html#gae8561586f225901448fdf77063cbd198">00330</a>   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  V (1:,1-S:)   <span class="comment">!&lt; Variable to be reconstructed                            [1:2,1-S:-1+S].</span>
-<a name="l00331"></a>00331   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(OUT)</span>:: VR(1:)        <span class="comment">!&lt; Left and right (1,2) interface value of reconstructed V [1:2         ].</span>
-<a name="l00332"></a>00332   <span class="keywordtype">real(R_P)</span>::                 VP(1:2,0:S-1) <span class="comment">!&lt; Polynomial reconstructions.</span>
-<a name="l00333"></a>00333   <span class="keywordtype">real(R_P)</span>::                 w (1:2,0:S-1) <span class="comment">!&lt; Weights of the stencils.</span>
-<a name="l00334"></a>00334   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00335"></a>00335 
-<a name="l00336"></a>00336   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00337"></a>00337   <span class="comment">! computing the polynomials</span>
-<a name="l00338"></a>00338   call weno_polynomials( S = S, V = V, VP = VP)
-<a name="l00339"></a>00339   <span class="comment">! using optimal weights</span>
-<a name="l00340"></a>00340   w(1:2,0:S-1) = weno_a(1:2,0:S-1)
-<a name="l00341"></a>00341   <span class="comment">! computing the convultion of reconstructing plynomials</span>
-<a name="l00342"></a>00342   call weno_convolution(S = S, VP = VP, w = w, VR = VR)
-<a name="l00343"></a>00343   return
-<a name="l00344"></a>00344   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00345"></a>00345 <span class="keyword">  endsubroutine weno_optimal</span>
-<a name="l00346"></a>00346 
-<a name="l00350"></a>00350   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>weno(S,V,VR)
-<a name="l00351"></a>00351   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00352"></a>00352   <span class="keyword">implicit none</span>
-<a name="l00353"></a>00353   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>::  S             <span class="comment">!&lt; Number of stencils used.</span>
-<a name="l00354"></a><a class="code" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga6e6e6f50289dc3eca17b1e394a78925e">00354</a>   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  V (1:,1-S:)   <span class="comment">!&lt; Variable to be reconstructed                            [1:2,1-S:-1+S].</span>
-<a name="l00355"></a>00355   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(OUT)</span>:: VR(1:)        <span class="comment">!&lt; Left and right (1,2) interface value of reconstructed V [1:2         ].</span>
-<a name="l00356"></a>00356   <span class="keywordtype">real(R_P)</span>::                 VP(1:2,0:S-1) <span class="comment">!&lt; Polynomial reconstructions.</span>
-<a name="l00357"></a>00357   <span class="keywordtype">real(R_P)</span>::                 w (1:2,0:S-1) <span class="comment">!&lt; Weights of the stencils.</span>
-<a name="l00358"></a>00358   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00359"></a>00359 
-<a name="l00360"></a>00360   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00361"></a>00361   <span class="comment">! computing the polynomials</span>
-<a name="l00362"></a>00362   call weno_polynomials( S = S, V = V, VP = VP)
-<a name="l00363"></a>00363   <span class="comment">! computing the weights associated to the polynomials</span>
-<a name="l00364"></a>00364   call weno_weights(S = S, V = V, w = w)
-<a name="l00365"></a>00365   <span class="comment">! computing the convultion of reconstructing plynomials</span>
-<a name="l00366"></a>00366   call weno_convolution(S = S, VP = VP, w = w, VR = VR)
-<a name="l00367"></a>00367   return
-<a name="l00368"></a>00368   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00369"></a>00369 <span class="keyword">  endsubroutine weno</span>
-<a name="l00371"></a>00371 
-<a name="l00377"></a>00377   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>weno_polynomials(S,V,VP)
-<a name="l00378"></a>00378   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00379"></a>00379   <span class="keyword">implicit none</span>
-<a name="l00380"></a>00380   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>::  S           <span class="comment">!&lt; Number of stencils used.</span>
-<a name="l00381"></a><a class="code" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#ga9b67fb1a3403d91fc492532416a5c947">00381</a>   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  V (1:,1-S:) <span class="comment">!&lt; Variable to be reconstructed [1:2,1-S:-1+S].</span>
-<a name="l00382"></a>00382   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(OUT)</span>:: VP(1:,0:)   <span class="comment">!&lt; Polynomial reconstructions   [1:2,  0:S-1 ].</span>
-<a name="l00383"></a>00383   <span class="keywordtype">integer(I_P)</span>::              s1,s2,f     <span class="comment">!&lt; Counters.</span>
-<a name="l00384"></a>00384   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00385"></a>00385 
-<a name="l00386"></a>00386   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00387"></a>00387   <span class="comment">! computing the polynomials</span>
-<a name="l00388"></a>00388   VP = 0._R_P
-<a name="l00389"></a>00389   <span class="keyword">do</span> s1=0,S-1 <span class="comment">! stencil counter</span>
-<a name="l00390"></a>00390     <span class="keyword">do</span> s2=0,S-1 <span class="comment">! cell counter counter</span>
-<a name="l00391"></a>00391       <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
-<a name="l00392"></a>00392         VP(f,s1) = VP(f,s1) + weno_p(f,s2,s1)*V(f,-s2+s1)
-<a name="l00393"></a>00393       <span class="keyword">enddo</span>
-<a name="l00394"></a>00394     <span class="keyword">enddo</span>
-<a name="l00395"></a>00395   <span class="keyword">enddo</span>
-<a name="l00396"></a>00396   return
-<a name="l00397"></a>00397   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00398"></a>00398 <span class="keyword">  endsubroutine weno_polynomials</span>
-<a name="l00399"></a>00399 
-<a name="l00403"></a>00403   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>weno_weights(S,V,w)
-<a name="l00404"></a>00404   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00405"></a>00405   <span class="keyword">implicit none</span>
-<a name="l00406"></a>00406   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>::  S                <span class="comment">!&lt; Number of stencils used.</span>
-<a name="l00407"></a><a class="code" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#ga0c0a02a5abf808e2a6152a0e05ed6799">00407</a>   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  V    (1:,1-S:)   <span class="comment">!&lt; Variable to be reconstructed [1:2,1-S:-1+S].</span>
-<a name="l00408"></a>00408   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(OUT)</span>:: w    (1:,0:)     <span class="comment">!&lt; Weights of the stencils      [1:2,  0:S-1 ].</span>
-<a name="l00409"></a>00409   <span class="keywordtype">real(R_P)</span>::                 IS   (1:2,0:S-1) <span class="comment">!&lt; Smoothness indicators of the stencils.</span>
-<a name="l00410"></a>00410   <span class="keywordtype">real(R_P)</span>::                 a    (1:2,0:S-1) <span class="comment">!&lt; Alpha coifficients for the weights.</span>
-<a name="l00411"></a>00411   <span class="keywordtype">real(R_P)</span>::                 a_tot(1:2)       <span class="comment">!&lt; Summ of the alpha coefficients.</span>
-<a name="l00412"></a>00412 <span class="preprocessor">#ifdef WENOZ</span>
-<a name="l00413"></a>00413   <span class="keywordtype">real(R_P)</span>::                 tao  (1:2)       <span class="comment">!&lt; Normalization factor.</span>
-<a name="l00414"></a>00414 <span class="preprocessor">#endif</span>
-<a name="l00415"></a>00415   <span class="keywordtype">integer(I_P)</span>::              s1,s2,s3,f       <span class="comment">!&lt; Counters.</span>
-<a name="l00416"></a>00416   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00417"></a>00417 
-<a name="l00418"></a>00418   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00419"></a>00419   <span class="comment">! computing smoothness indicators</span>
-<a name="l00420"></a>00420   <span class="keyword">do</span> s1=0,S-1 <span class="comment">! stencil counter</span>
-<a name="l00421"></a>00421     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
-<a name="l00422"></a>00422       IS(f,s1) = 0._R_P
-<a name="l00423"></a>00423       <span class="keyword">do</span> s2=0,S-1
-<a name="l00424"></a>00424         <span class="keyword">do</span> s3=0,S-1
-<a name="l00425"></a>00425           IS(f,s1) = IS(f,s1) + weno_d(s3,s2,s1)*V(f,s1-s3)*V(f,s1-s2)
-<a name="l00426"></a>00426         <span class="keyword">enddo</span>
-<a name="l00427"></a>00427       <span class="keyword">enddo</span>
-<a name="l00428"></a>00428     <span class="keyword">enddo</span>
-<a name="l00429"></a>00429   <span class="keyword">enddo</span>
-<a name="l00430"></a>00430 <span class="preprocessor">#ifdef WENOZ</span>
-<a name="l00431"></a>00431   <span class="comment">! computing smooth-difference tao</span>
-<a name="l00432"></a>00432   <span class="keyword">if</span> (S&gt;2) <span class="keyword">then</span>
-<a name="l00433"></a>00433     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
-<a name="l00434"></a>00434       tao(f) = abs(IS(f,0) - (1-weno_odd)*IS(f,1) - (1-weno_odd)*IS(f,S-2) + (1-2*weno_odd)*IS(f,S-1))
-<a name="l00435"></a>00435     <span class="keyword">enddo</span>
-<a name="l00436"></a>00436   <span class="keyword">else</span>
-<a name="l00437"></a>00437     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
-<a name="l00438"></a>00438       tao(f) = udiff(p=2*S-2,v=V(f,1-S:S-1))
-<a name="l00439"></a>00439       tao(f) = tao(f)*tao(f)
-<a name="l00440"></a>00440     <span class="keyword">enddo</span>
-<a name="l00441"></a>00441   <span class="keyword">endif</span>
-<a name="l00442"></a>00442 <span class="preprocessor">#endif</span>
-<a name="l00443"></a>00443   <span class="comment">! computing alfa coefficients</span>
-<a name="l00444"></a>00444   a_tot = 0._R_P
-<a name="l00445"></a>00445   <span class="keyword">do</span> s1=0,S-1
-<a name="l00446"></a>00446     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
-<a name="l00447"></a>00447 <span class="preprocessor">#ifdef WENOZ</span>
-<a name="l00448"></a>00448       <span class="keyword">if</span> (tao(f)&gt;minval(IS(f,:))) <span class="keyword">then</span>
-<a name="l00449"></a>00449         a(f,s1) = weno_a(f,s1)*(1._R_P+(tao(f)/(weno_eps+IS(f,s1)))**(weno_exp)) ; a_tot(f) = a_tot(f) + a(f,s1)
-<a name="l00450"></a>00450       <span class="keyword">else</span>
-<a name="l00451"></a>00451         a(f,s1) = weno_a(f,s1)                                                   ; a_tot(f) = a_tot(f) + a(f,s1)
-<a name="l00452"></a>00452       <span class="keyword">endif</span>
-<a name="l00453"></a>00453 <span class="preprocessor">#else</span>
-<a name="l00454"></a>00454       a(f,s1) = weno_a(f,s1)*(1._R_P/(weno_eps+IS(f,s1))**S)                     ; a_tot(f) = a_tot(f) + a(f,s1)
-<a name="l00455"></a>00455 <span class="preprocessor">#endif</span>
-<a name="l00456"></a>00456     <span class="keyword">enddo</span>
-<a name="l00457"></a>00457   <span class="keyword">enddo</span>
-<a name="l00458"></a>00458   <span class="comment">! computing the weights</span>
-<a name="l00459"></a>00459   <span class="keyword">do</span> s1=0,S-1
-<a name="l00460"></a>00460     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
-<a name="l00461"></a>00461       w(f,s1) = a(f,s1)/a_tot(f)
-<a name="l00462"></a>00462     <span class="keyword">enddo</span>
-<a name="l00463"></a>00463   <span class="keyword">enddo</span>
-<a name="l00464"></a><a class="code" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#gae11faea38bff96f933ce6d24cdeefd2c">00464</a> <span class="preprocessor">#ifdef WENOM</span>
-<a name="l00465"></a>00465   <span class="comment">! Henrick mapping</span>
-<a name="l00466"></a>00466   a_tot = 0._R_P
-<a name="l00467"></a>00467   <span class="keyword">do</span> s1=0,S-1
-<a name="l00468"></a>00468     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
-<a name="l00469"></a>00469       a(f,s1)  = ( w(f,s1)*( weno_a(f,s1) + weno_a(f,s1)*weno_a(f,s1) - 3._R_P*weno_a(f,s1)*w(f,s1) + w(f,s1)*w(f,s1) ) )/ &amp;
-<a name="l00470"></a>00470                  ( weno_a(f,s1)*weno_a(f,s1) + w(f,s1)*( 1._R_P - 2._R_P*weno_a(f,s1) ) )
-<a name="l00471"></a>00471       a_tot(f) = a_tot(f) + a(f,s1)
-<a name="l00472"></a>00472     <span class="keyword">enddo</span>
-<a name="l00473"></a>00473   <span class="keyword">enddo</span>
-<a name="l00474"></a>00474   <span class="comment">! computing the weights with the mapped a(f,s1)</span>
-<a name="l00475"></a>00475   <span class="keyword">do</span> s1=0,S-1
-<a name="l00476"></a>00476     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
-<a name="l00477"></a>00477       w(f,s1) = a(f,s1)/a_tot(f)
-<a name="l00478"></a>00478     <span class="keyword">enddo</span>
-<a name="l00479"></a>00479   <span class="keyword">enddo</span>
-<a name="l00480"></a>00480 <span class="preprocessor">#endif</span>
-<a name="l00481"></a>00481   return
-<a name="l00482"></a>00482   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00483"></a>00483 <span class="keyword">  endsubroutine weno_weights</span>
-<a name="l00484"></a>00484 
-<a name="l00488"></a>00488   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>weno_convolution(S,VP,w,VR)
-<a name="l00489"></a>00489   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00490"></a>00490   <span class="keyword">implicit none</span>
-<a name="l00491"></a>00491   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>::  S         <span class="comment">!&lt; Number of stencils used.</span>
-<a name="l00492"></a>00492   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  VP(1:,0:) <span class="comment">!&lt; Polynomial reconstructions                              [1:2,0:S-1].</span>
-<a name="l00493"></a>00493   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  w (1:,0:) <span class="comment">!&lt; Weights of the stencils                                 [1:2,0:S-1].</span>
-<a name="l00494"></a>00494   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(OUT)</span>:: VR(1:   ) <span class="comment">!&lt; Left and right (1,2) interface value of reconstructed V [1:2      ].</span>
-<a name="l00495"></a>00495   <span class="keywordtype">integer(I_P)</span>::              k,f       <span class="comment">!&lt; Counters.</span>
-<a name="l00496"></a>00496   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00497"></a>00497 
-<a name="l00498"></a>00498   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00499"></a>00499   <span class="comment">! computing the convultion</span>
-<a name="l00500"></a>00500   VR = 0._R_P
-<a name="l00501"></a>00501   <span class="keyword">do</span> k=0,S-1
-<a name="l00502"></a>00502     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
-<a name="l00503"></a>00503       VR(f) = VR(f) + w(f,k)*VP(f,k)
-<a name="l00504"></a>00504     <span class="keyword">enddo</span>
-<a name="l00505"></a>00505   <span class="keyword">enddo</span>
-<a name="l00506"></a>00506   return
-<a name="l00507"></a>00507   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00508"></a>00508 <span class="keyword">  endsubroutine weno_convolution</span>
-<a name="l00509"></a>00509 
-<a name="l00510"></a>00510   <span class="keywordtype">recursive</span> <span class="keywordtype">pure</span> <span class="keyword">function </span>udiff(p,v) result(diff)
-<a name="l00511"></a>00511   <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00512"></a>00512   <span class="comment">! Function for computing finite undivided difference of order p of nodal function v.</span>
-<a name="l00513"></a>00513   <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00514"></a>00514 
-<a name="l00515"></a>00515   <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00516"></a>00516   <span class="keyword">implicit none</span>
-<a name="l00517"></a>00517   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>:: p        <span class="comment">! Order of finite undivided difference.</span>
-<a name="l00518"></a>00518   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>:: v(1:p+1) <span class="comment">! Nodal values of function.</span>
-<a name="l00519"></a>00519   <span class="keywordtype">real(R_P)</span>::                diff     <span class="comment">! Finite undivided difference.</span>
-<a name="l00520"></a>00520   <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00521"></a>00521 
-<a name="l00522"></a>00522   <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00523"></a>00523   <span class="keyword">if</span> (p==1_I_P) <span class="keyword">then</span>
-<a name="l00524"></a>00524     diff = v(2) - v(1)
-<a name="l00525"></a>00525   <span class="keyword">else</span>
-<a name="l00526"></a>00526     diff = udiff(p=p-1,v=v(2:p)) - udiff(p=p-1,v=v(1:p-1))
-<a name="l00527"></a>00527   <span class="keyword">endif</span>
-<a name="l00528"></a>00528   return
-<a name="l00529"></a>00529   <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00530"></a>00530 <span class="keyword">  endfunction udiff</span>
-<a name="l00532"></a>00532 <span class="keyword">endmodule Lib_WENO</span>
+<a name="l00021"></a>00021 USE <span class="keywordflow">IR_Precision</span>     <span class="comment">! Integers and reals precision definition.</span>
+<a name="l00022"></a>00022 USE <span class="keywordflow">Data_Type_Global</span> <span class="comment">! Definition of Type_Global.</span>
+<a name="l00023"></a><a class="code" href="../../d6/dec/group__Library.html">00023</a> USE <span class="keywordflow">Data_Type_SBlock</span> <span class="comment">! Definition of Type_SBlock.</span>
+<a name="l00024"></a>00024 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00025"></a>00025 
+<a name="l00026"></a>00026 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00027"></a>00027 <span class="keyword">implicit none</span>
+<a name="l00028"></a>00028 <span class="keywordtype">save</span>
+<a name="l00029"></a>00029 <span class="keywordtype">private</span>
+<a name="l00030"></a>00030 <span class="keywordtype">public</span>:: weno_init
+<a name="l00031"></a>00031 <span class="keywordtype">public</span>:: noweno_central
+<a name="l00032"></a>00032 <span class="keywordtype">public</span>:: weno_optimal
+<a name="l00033"></a>00033 <span class="keywordtype">public</span>:: weno
+<a name="l00034"></a>00034 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00035"></a>00035 
+<a name="l00036"></a>00036 <span class="comment">!-----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00037"></a>00037 <span class="comment">! WENO coefficients (S = number of stencils used)</span>
+<a name="l00040"></a>00040 <span class="keywordtype">real(R_P)</span>, <span class="keywordtype">allocatable</span>:: weno_c(:,:)   <span class="comment">!&lt; Central difference coefficients    [1:2,1:2*S].</span>
+<a name="l00041"></a>00041 <span class="keywordtype">real(R_P)</span>, <span class="keywordtype">allocatable</span>:: weno_a(:,:)   <span class="comment">!&lt; Optimal weights                    [1:2,0:S-1].</span>
+<a name="l00042"></a>00042 <span class="keywordtype">real(R_P)</span>, <span class="keywordtype">allocatable</span>:: weno_p(:,:,:) <span class="comment">!&lt; Polynomials coefficients           [1:2,0:S-1,0:S-1].</span>
+<a name="l00043"></a>00043 <span class="keywordtype">real(R_P)</span>, <span class="keywordtype">allocatable</span>:: weno_d(:,:,:) <span class="comment">!&lt; Smoothness indicators coefficients [0:S-1,0:S-1,0:S-1].</span>
+<a name="l00044"></a><a class="code" href="../../d4/df4/group__Lib__WENOPrivateVarPar.html#ga889b83b6c060c3bbb56dbdf2baedd69c">00044</a> <span class="keywordtype">real(R_P)</span>::              weno_eps      <span class="comment">!&lt; Parameter for avoiding divided by zero when computing smoothness indicators.</span>
+<a name="l00045"></a><a class="code" href="../../d4/df4/group__Lib__WENOPrivateVarPar.html#ga159b67dfba3ecd75b01352d5e2ced979">00045</a> <span class="keywordtype">integer(I_P)</span>::           weno_odd      <span class="comment">!&lt; Constant for distinguishing between odd and even number of stencils (mod(S,2)).</span>
+<a name="l00046"></a><a class="code" href="../../d4/df4/group__Lib__WENOPrivateVarPar.html#ga4f1726de285e2480840168c19161e65f">00046</a> <span class="keywordtype">integer(I_P)</span>::           weno_exp      <span class="comment">!&lt; Exponent for growing the diffusive part of weights.</span>
+<a name="l00047"></a><a class="code" href="../../d4/df4/group__Lib__WENOPrivateVarPar.html#gac1c16939fe2c2e74d38c3a0c6798b076">00047</a> 
+<a name="l00049"></a><a class="code" href="../../d4/df4/group__Lib__WENOPrivateVarPar.html#gab1686032e6c83161a1e53e05edb8d079">00049</a> <span class="keyword">contains</span>
+<a name="l00053"></a>00053   <span class="keyword">subroutine </span>weno_init(myrank,global,block,S)
+<a name="l00054"></a>00054   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00055"></a>00055   <span class="keyword">implicit none</span>
+<a name="l00056"></a>00056   <span class="keywordtype">integer(I_P)</span>,      <span class="keywordtype">intent(IN)</span>:: myrank             <span class="comment">!&lt; Actual rank process.</span>
+<a name="l00057"></a><a class="code" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga12ddef5212e444aa9d2d9060f4ab1662">00057</a>   <span class="keywordtype">type(Type_Global)</span>, <span class="keywordtype">intent(IN)</span>:: global             <span class="comment">!&lt; Global-level data.</span>
+<a name="l00058"></a>00058   <span class="keywordtype">type(Type_SBlock)</span>, <span class="keywordtype">intent(IN)</span>:: block(1:global%Nb) <span class="comment">!&lt; Block-level data.</span>
+<a name="l00059"></a>00059   <span class="keywordtype">integer(I1P)</span>,      <span class="keywordtype">intent(IN)</span>:: S                  <span class="comment">!&lt; Number of stencils used.</span>
+<a name="l00060"></a>00060   <span class="keywordtype">integer(I_P)</span>::                  b                  <span class="comment">!&lt; Blocks counter.</span>
+<a name="l00061"></a>00061   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00062"></a>00062 
+<a name="l00063"></a>00063   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00064"></a>00064   <span class="comment">! initialize weno_exp</span>
+<a name="l00065"></a>00065   weno_exp = S
+<a name="l00066"></a>00066   <span class="keyword">if</span> (S&gt;4) weno_exp = S - 1
+<a name="l00067"></a>00067   <span class="comment">! computing weno_odd</span>
+<a name="l00068"></a>00068   weno_odd = mod(S,2_I1P)
+<a name="l00069"></a>00069   <span class="comment">! computing a reasonable value of weno_eps according to the (finest) grid spacing</span>
+<a name="l00070"></a>00070   weno_eps = MaxR_P
+<a name="l00071"></a>00071   <span class="keyword">do</span> b=1,global%Nb
+<a name="l00072"></a>00072     call <a class="code" href="../../d3/d4e/Lib__WENO_8f90.html#a1e29c2f4423bbe764fb4bf42c431cec8">get_min_sstep</a>(block = block(b), ss = weno_eps)
+<a name="l00073"></a>00073   <span class="keyword">enddo</span>
+<a name="l00074"></a>00074   weno_eps = weno_eps**(3_I1P*S-4_I1P)
+<a name="l00075"></a>00075   <span class="keyword">if</span> (myrank==0) <span class="keyword">then</span>
+<a name="l00076"></a>00076     <span class="keyword">write</span>(*,<span class="stringliteral">&#39;(A)&#39;</span>)           <span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
+<a name="l00077"></a>00077     <span class="keyword">write</span>(*,<span class="stringliteral">&#39;(A,&#39;</span>//FR_P//<span class="stringliteral">&#39;)&#39;</span>)<span class="stringliteral">&#39; The &quot;eps&quot; WENO parameter used is: &#39;</span>,weno_eps
+<a name="l00078"></a>00078     <span class="keyword">write</span>(*,<span class="stringliteral">&#39;(A,&#39;</span>//FI_P//<span class="stringliteral">&#39;)&#39;</span>)<span class="stringliteral">&#39; The &quot;exp&quot; WENO parameter used is: &#39;</span>,weno_exp
+<a name="l00079"></a>00079     <span class="keyword">write</span>(*,<span class="stringliteral">&#39;(A,&#39;</span>//FI1P//<span class="stringliteral">&#39;)&#39;</span>)<span class="stringliteral">&#39; The &quot;S&quot;   WENO parameter used is: &#39;</span>,S
+<a name="l00080"></a>00080     <span class="keyword">write</span>(*,<span class="stringliteral">&#39;(A)&#39;</span>)           <span class="stringliteral">&#39;----------------------------------------------------------------------&#39;</span>
+<a name="l00081"></a>00081     <span class="keyword">write</span>(*,*)
+<a name="l00082"></a>00082   <span class="keyword">endif</span>
+<a name="l00083"></a>00083   <span class="comment">! allocating variables</span>
+<a name="l00084"></a>00084   <span class="keyword">if</span> (<span class="keyword">allocated</span>(weno_c)) <span class="keyword">deallocate</span>(weno_c) ; <span class="keyword">allocate</span>(weno_c(1:2,1:2*S))
+<a name="l00085"></a>00085   <span class="keyword">if</span> (<span class="keyword">allocated</span>(weno_a)) <span class="keyword">deallocate</span>(weno_a) ; <span class="keyword">allocate</span>(weno_a(1:2,0:S-1))
+<a name="l00086"></a>00086   <span class="keyword">if</span> (<span class="keyword">allocated</span>(weno_p)) <span class="keyword">deallocate</span>(weno_p) ; <span class="keyword">allocate</span>(weno_p(1:2,0:S-1,0:S-1))
+<a name="l00087"></a>00087   <span class="keyword">if</span> (<span class="keyword">allocated</span>(weno_d)) <span class="keyword">deallocate</span>(weno_d) ; <span class="keyword">allocate</span>(weno_d(0:S-1,0:S-1,0:S-1))
+<a name="l00088"></a>00088   <span class="comment">! inizializing the coefficients</span>
+<a name="l00089"></a>00089   <span class="keyword">select</span> <span class="keyword">case</span>(S)
+<a name="l00090"></a>00090   <span class="keyword">case</span>(2_I1P) <span class="comment">! 3rd order WENO reconstruction</span>
+<a name="l00091"></a>00091     <span class="comment">! central difference coefficients</span>
+<a name="l00092"></a>00092     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
+<a name="l00093"></a>00093     weno_c(1,1) = -1._R_P/12._R_P <span class="comment">! cell -2</span>
+<a name="l00094"></a>00094     weno_c(1,2) =  7._R_P/12._R_P <span class="comment">! cell -1</span>
+<a name="l00095"></a>00095     weno_c(1,3) =  7._R_P/12._R_P <span class="comment">! cell  0</span>
+<a name="l00096"></a>00096     weno_c(1,4) = -1._R_P/12._R_P <span class="comment">! cell  1</span>
+<a name="l00097"></a>00097     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
+<a name="l00098"></a>00098     weno_c(2,1) = -1._R_P/12._R_P <span class="comment">! cell -1</span>
+<a name="l00099"></a>00099     weno_c(2,2) =  7._R_P/12._R_P <span class="comment">! cell  0</span>
+<a name="l00100"></a>00100     weno_c(2,3) =  7._R_P/12._R_P <span class="comment">! cell  1</span>
+<a name="l00101"></a>00101     weno_c(2,4) = -1._R_P/12._R_P <span class="comment">! cell  2</span>
+<a name="l00102"></a>00102 
+<a name="l00103"></a>00103     <span class="comment">! optimal weights</span>
+<a name="l00104"></a>00104     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
+<a name="l00105"></a>00105     weno_a(1,0) = 2._R_P/3._R_P <span class="comment">! stencil 0</span>
+<a name="l00106"></a>00106     weno_a(1,1) = 1._R_P/3._R_P <span class="comment">! stencil 1</span>
+<a name="l00107"></a>00107     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
+<a name="l00108"></a>00108     weno_a(2,0) = 1._R_P/3._R_P <span class="comment">! stencil 0</span>
+<a name="l00109"></a>00109     weno_a(2,1) = 2._R_P/3._R_P <span class="comment">! stencil 1</span>
+<a name="l00110"></a>00110 
+<a name="l00111"></a>00111     <span class="comment">! polinomials coefficients</span>
+<a name="l00112"></a>00112     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
+<a name="l00113"></a>00113     <span class="comment">!  cell  0               ;    cell  1</span>
+<a name="l00114"></a>00114     weno_p(1,0,0) =  0.5_R_P ; weno_p(1,1,0) =  0.5_R_P <span class="comment">! stencil 0</span>
+<a name="l00115"></a>00115     weno_p(1,0,1) = -0.5_R_P ; weno_p(1,1,1) =  1.5_R_P <span class="comment">! stencil 1</span>
+<a name="l00116"></a>00116     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
+<a name="l00117"></a>00117     <span class="comment">!  cell  0               ;    cell  1</span>
+<a name="l00118"></a>00118     weno_p(2,0,0) =  1.5_R_P ; weno_p(2,1,0) = -0.5_R_P <span class="comment">! stencil 0</span>
+<a name="l00119"></a>00119     weno_p(2,0,1) =  0.5_R_P ; weno_p(2,1,1) =  0.5_R_P <span class="comment">! stencil 1</span>
+<a name="l00120"></a>00120 
+<a name="l00121"></a>00121     <span class="comment">! smoothness indicators coefficients</span>
+<a name="l00122"></a>00122     <span class="comment">! stencil 0</span>
+<a name="l00123"></a>00123     <span class="comment">!      i*i             ;       (i-1)*i</span>
+<a name="l00124"></a>00124     weno_d(0,0,0) = 1._R_P ; weno_d(1,0,0) =-2._R_P
+<a name="l00125"></a>00125     <span class="comment">!      /               ;       (i-1)*(i-1)</span>
+<a name="l00126"></a>00126     weno_d(0,1,0) = 0._R_P ; weno_d(1,1,0) = 1._R_P
+<a name="l00127"></a>00127     <span class="comment">! stencil 1</span>
+<a name="l00128"></a>00128     <span class="comment">!     (i+1)*(i+1)      ;       (i+1)*i</span>
+<a name="l00129"></a>00129     weno_d(0,0,1) = 1._R_P ; weno_d(1,0,1) =-2._R_P
+<a name="l00130"></a>00130     <span class="comment">!      /               ;        i*i</span>
+<a name="l00131"></a>00131     weno_d(0,1,1) = 0._R_P ; weno_d(1,1,1) = 1._R_P
+<a name="l00132"></a>00132   <span class="keyword">case</span>(3_I1P) <span class="comment">! 5th order WENO reconstruction</span>
+<a name="l00133"></a>00133     <span class="comment">! central difference coefficients</span>
+<a name="l00134"></a>00134     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
+<a name="l00135"></a>00135     weno_c(1,1) =  1._R_P/60._R_P <span class="comment">! cell -3</span>
+<a name="l00136"></a>00136     weno_c(1,2) = -7.5_R_P        <span class="comment">! cell -2</span>
+<a name="l00137"></a>00137     weno_c(1,3) = 37._R_P/60._R_P <span class="comment">! cell -1</span>
+<a name="l00138"></a>00138     weno_c(1,4) = 37._R_P/60._R_P <span class="comment">! cell  0</span>
+<a name="l00139"></a>00139     weno_c(1,5) = -7.5_R_P        <span class="comment">! cell  1</span>
+<a name="l00140"></a>00140     weno_c(1,6) =  1._R_P/60._R_P <span class="comment">! cell  2</span>
+<a name="l00141"></a>00141     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
+<a name="l00142"></a>00142     weno_c(1,1) =  1._R_P/60._R_P <span class="comment">! cell -2</span>
+<a name="l00143"></a>00143     weno_c(1,2) = -7.5_R_P        <span class="comment">! cell -1</span>
+<a name="l00144"></a>00144     weno_c(1,3) = 37._R_P/60._R_P <span class="comment">! cell  0</span>
+<a name="l00145"></a>00145     weno_c(1,4) = 37._R_P/60._R_P <span class="comment">! cell  1</span>
+<a name="l00146"></a>00146     weno_c(1,5) = -7.5_R_P        <span class="comment">! cell  2</span>
+<a name="l00147"></a>00147     weno_c(1,6) =  1._R_P/60._R_P <span class="comment">! cell  3</span>
+<a name="l00148"></a>00148 
+<a name="l00149"></a>00149     <span class="comment">! optimal weights</span>
+<a name="l00150"></a>00150     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
+<a name="l00151"></a>00151     weno_a(1,0) = 0.3_R_P <span class="comment">! stencil 0</span>
+<a name="l00152"></a>00152     weno_a(1,1) = 0.6_R_P <span class="comment">! stencil 1</span>
+<a name="l00153"></a>00153     weno_a(1,2) = 0.1_R_P <span class="comment">! stencil 2</span>
+<a name="l00154"></a>00154     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
+<a name="l00155"></a>00155     weno_a(2,0) = 0.1_R_P <span class="comment">! stencil 0</span>
+<a name="l00156"></a>00156     weno_a(2,1) = 0.6_R_P <span class="comment">! stencil 1</span>
+<a name="l00157"></a>00157     weno_a(2,2) = 0.3_R_P <span class="comment">! stencil 2</span>
+<a name="l00158"></a>00158 
+<a name="l00159"></a>00159     <span class="comment">! polinomials coefficients</span>
+<a name="l00160"></a>00160     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
+<a name="l00161"></a>00161     <span class="comment">!  cell  0                     ;    cell  1                     ;    cell  2</span>
+<a name="l00162"></a>00162     weno_p(1,0,0) =  1._R_P/3._R_P ; weno_p(1,1,0) =  5._R_P/6._R_P ; weno_p(1,2,0) = -1._R_P/6._R_P <span class="comment">! stencil 0</span>
+<a name="l00163"></a>00163     weno_p(1,0,1) = -1._R_P/6._R_P ; weno_p(1,1,1) =  5._R_P/6._R_P ; weno_p(1,2,1) =  1._R_P/3._R_P <span class="comment">! stencil 1</span>
+<a name="l00164"></a>00164     weno_p(1,0,2) =  1._R_P/3._R_P ; weno_p(1,1,2) = -7._R_P/6._R_P ; weno_p(1,2,2) = 11._R_P/6._R_P <span class="comment">! stencil 2</span>
+<a name="l00165"></a>00165     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
+<a name="l00166"></a>00166     <span class="comment">!  cell  0                     ;    cell  1                     ;    cell  2</span>
+<a name="l00167"></a>00167     weno_p(2,0,0) = 11._R_P/6._R_P ; weno_p(2,1,0) = -7._R_P/6._R_P ; weno_p(2,2,0) =  1._R_P/3._R_P <span class="comment">! stencil 0</span>
+<a name="l00168"></a>00168     weno_p(2,0,1) =  1._R_P/3._R_P ; weno_p(2,1,1) =  5._R_P/6._R_P ; weno_p(2,2,1) = -1._R_P/6._R_P <span class="comment">! stencil 1</span>
+<a name="l00169"></a>00169     weno_p(2,0,2) = -1._R_P/6._R_P ; weno_p(2,1,2) =  5._R_P/6._R_P ; weno_p(2,2,2) =  1._R_P/3._R_P <span class="comment">! stencil 2</span>
+<a name="l00170"></a>00170 
+<a name="l00171"></a>00171     <span class="comment">! smoothness indicators coefficients</span>
+<a name="l00172"></a>00172     <span class="comment">! stencil 0</span>
+<a name="l00173"></a>00173     <span class="comment">!      i*i                      ;       (i-1)*i                   ;       (i-2)*i</span>
+<a name="l00174"></a>00174     weno_d(0,0,0) =  10._R_P/3._R_P ; weno_d(1,0,0) = -31._R_P/3._R_P ; weno_d(2,0,0) =  11._R_P/3._R_P
+<a name="l00175"></a>00175     <span class="comment">!      /                        ;       (i-1)*(i-1)               ;       (i-2)*(i-1)</span>
+<a name="l00176"></a>00176     weno_d(0,1,0) =   0._R_P        ; weno_d(1,1,0) =  25._R_P/3._R_P ; weno_d(2,1,0) = -19._R_P/3._R_P
+<a name="l00177"></a>00177     <span class="comment">!      /                        ;        /                        ;       (i-2)*(i-2)</span>
+<a name="l00178"></a>00178     weno_d(0,2,0) =   0._R_P        ; weno_d(1,2,0) =   0._R_P        ; weno_d(2,2,0) =   4._R_P/3._R_P
+<a name="l00179"></a>00179     <span class="comment">! stencil 1</span>
+<a name="l00180"></a>00180     <span class="comment">!     (i+1)*(i+1)               ;        i*(i+1)                  ;       (i-1)*(i+1)</span>
+<a name="l00181"></a>00181     weno_d(0,0,1) =   4._R_P/3._R_P ; weno_d(1,0,1) = -13._R_P/3._R_P ; weno_d(2,0,1) =   5._R_P/3._R_P
+<a name="l00182"></a>00182     <span class="comment">!      /                        ;        i*i                      ;       (i-1)*i</span>
+<a name="l00183"></a>00183     weno_d(0,1,1) =   0._R_P        ; weno_d(1,1,1) =  13._R_P/3._R_P ; weno_d(2,1,1) = -13._R_P/3._R_P
+<a name="l00184"></a>00184     <span class="comment">!      /                        ;        /                        ;       (i-1)*(i-1)</span>
+<a name="l00185"></a>00185     weno_d(0,2,1) =   0._R_P        ; weno_d(1,2,1) =   0._R_P        ; weno_d(2,2,1) =   4._R_P/3._R_P
+<a name="l00186"></a>00186     <span class="comment">! stencil 2</span>
+<a name="l00187"></a>00187     <span class="comment">!     (i+2)*(i+2)               ;       (i+1)*(i+2)               ;        i*(i+2)</span>
+<a name="l00188"></a>00188     weno_d(0,0,2) =   4._R_P/3._R_P ; weno_d(1,0,2) = -19._R_P/3._R_P ; weno_d(2,0,2) =  11._R_P/3._R_P
+<a name="l00189"></a>00189     <span class="comment">!      /                        ;       (i+1)*(i+1)               ;        i*(i+1)</span>
+<a name="l00190"></a>00190     weno_d(0,1,2) =   0._R_P        ; weno_d(1,1,2) =  25._R_P/3._R_P ; weno_d(2,1,2) = -31._R_P/3._R_P
+<a name="l00191"></a>00191     <span class="comment">!      /                        ;        /                        ;        i*i</span>
+<a name="l00192"></a>00192     weno_d(0,2,2) =   0._R_P        ; weno_d(1,2,2) =   0._R_P        ; weno_d(2,2,2) =  10._R_P/3._R_P
+<a name="l00193"></a>00193   <span class="keyword">case</span>(4_I1P) <span class="comment">! 7th order WENO reconstruction</span>
+<a name="l00194"></a>00194     <span class="comment">! optimal weights</span>
+<a name="l00195"></a>00195     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
+<a name="l00196"></a>00196     weno_a(1,0) =  4._R_P/35._R_P <span class="comment">! stencil 0</span>
+<a name="l00197"></a>00197     weno_a(1,1) = 18._R_P/35._R_P <span class="comment">! stencil 1</span>
+<a name="l00198"></a>00198     weno_a(1,2) = 12._R_P/35._R_P <span class="comment">! stencil 2</span>
+<a name="l00199"></a>00199     weno_a(1,3) =  1._R_P/35._R_P <span class="comment">! stencil 3</span>
+<a name="l00200"></a>00200     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
+<a name="l00201"></a>00201     weno_a(2,0) =  1._R_P/35._R_P <span class="comment">! stencil 0</span>
+<a name="l00202"></a>00202     weno_a(2,1) = 12._R_P/35._R_P <span class="comment">! stencil 1</span>
+<a name="l00203"></a>00203     weno_a(2,2) = 18._R_P/35._R_P <span class="comment">! stencil 2</span>
+<a name="l00204"></a>00204     weno_a(2,3) =  4._R_P/35._R_P <span class="comment">! stencil 3</span>
+<a name="l00205"></a>00205 
+<a name="l00206"></a>00206     <span class="comment">! polinomials coefficients</span>
+<a name="l00207"></a>00207     <span class="comment">! 1 =&gt; left interface (i-1/2)</span>
+<a name="l00208"></a>00208     <span class="comment">!  cell  0                   ;   cell  1                   ;   cell  2                    ;   cell  3</span>
+<a name="l00209"></a>00209     weno_p(1,0,0)= 1._R_P/4._R_P ;weno_p(1,1,0)=13._R_P/12._R_P;weno_p(1,2,0)= -5._R_P/12._R_P;weno_p(1,3,0)= 1._R_P/12._R_P<span class="comment">! sten 0</span>
+<a name="l00210"></a>00210     weno_p(1,0,1)=-1._R_P/12._R_P;weno_p(1,1,1)= 7._R_P/12._R_P;weno_p(1,2,1)=  7._R_P/12._R_P;weno_p(1,3,1)=-1._R_P/12._R_P<span class="comment">! sten 1</span>
+<a name="l00211"></a>00211     weno_p(1,0,2)= 1._R_P/12._R_P;weno_p(1,1,2)=-5._R_P/12._R_P;weno_p(1,2,2)= 13._R_P/12._R_P;weno_p(1,3,2)= 1._R_P/4._R_P <span class="comment">! sten 2</span>
+<a name="l00212"></a>00212     weno_p(1,0,3)=-1._R_P/4._R_P ;weno_p(1,1,3)=13._R_P/12._R_P;weno_p(1,2,3)=-23._R_P/12._R_P;weno_p(1,3,3)=25._R_P/12._R_P<span class="comment">! sten 3</span>
+<a name="l00213"></a>00213     <span class="comment">! 2 =&gt; right interface (i+1/2)</span>
+<a name="l00214"></a>00214     <span class="comment">!  cell  0                   ;   cell  1                    ;   cell  2                   ;   cell  3</span>
+<a name="l00215"></a>00215     weno_p(2,0,0)=25._R_P/12._R_P;weno_p(2,1,0)=-23._R_P/12._R_P;weno_p(2,2,0)=13._R_P/12._R_P;weno_p(2,3,0)=-1._R_P/4._R_P <span class="comment">! sten 0</span>
+<a name="l00216"></a>00216     weno_p(2,0,1)= 1._R_P/4._R_P ;weno_p(2,1,1)= 13._R_P/12._R_P;weno_p(2,2,1)=-5._R_P/12._R_P;weno_p(2,3,1)= 1._R_P/12._R_P<span class="comment">! sten 1</span>
+<a name="l00217"></a>00217     weno_p(2,0,2)=-1._R_P/12._R_P;weno_p(2,1,2)=  7._R_P/12._R_P;weno_p(2,2,2)= 7._R_P/12._R_P;weno_p(2,3,2)=-1._R_P/12._R_P<span class="comment">! sten 2</span>
+<a name="l00218"></a>00218     weno_p(2,0,3)= 1._R_P/12._R_P;weno_p(2,1,3)= -5._R_P/12._R_P;weno_p(2,2,3)=13._R_P/12._R_P;weno_p(2,3,3)= 1._R_P/4._R_P <span class="comment">! sten 3</span>
+<a name="l00219"></a>00219 
+<a name="l00220"></a>00220     <span class="comment">! smoothness indicators coefficients</span>
+<a name="l00221"></a>00221     <span class="comment">! stencil 0</span>
+<a name="l00222"></a>00222     <span class="comment">!      i*i                ;       (i-1)*i             ;       (i-2)*i              ;       (i-3)*i</span>
+<a name="l00223"></a>00223     weno_d(0,0,0) = 2107._R_P ; weno_d(1,0,0) =-9402._R_P ; weno_d(2,0,0) = 7042._R_P  ; weno_d(3,0,0) = -1854._R_P
+<a name="l00224"></a>00224     <span class="comment">!      /                  ;       (i-1)*(i-1)         ;       (i-2)*(i-1)          ;       (i-3)*(i-1)</span>
+<a name="l00225"></a>00225     weno_d(0,1,0) =   0._R_P  ; weno_d(1,1,0) =11003._R_P ; weno_d(2,1,0) =-17246._R_P ; weno_d(3,1,0) =  4642._R_P
+<a name="l00226"></a>00226     <span class="comment">!      /                  ;        /                  ;       (i-2)*(i-2)          ;       (i-3)*(i-2)</span>
+<a name="l00227"></a>00227     weno_d(0,2,0) =   0._R_P  ; weno_d(1,2,0) =   0._R_P  ; weno_d(2,2,0) = 7043._R_P  ; weno_d(3,2,0) = -3882._R_P
+<a name="l00228"></a>00228     <span class="comment">!      /                  ;        /                  ;        /                   ;       (i-3)*(i-3)</span>
+<a name="l00229"></a>00229     weno_d(0,3,0) =   0._R_P  ; weno_d(1,3,0) =   0._R_P  ; weno_d(2,3,0) =   0._R_P   ; weno_d(3,3,0) = 547._R_P
+<a name="l00230"></a>00230     <span class="comment">! stencil 1</span>
+<a name="l00231"></a>00231     <span class="comment">!     (i+1)*(i+1)         ;        i*(i+1)            ;       (i-1)*(i+1)          ;       (i-2)*(i+1)</span>
+<a name="l00232"></a>00232     weno_d(0,0,1) =  547._R_P ; weno_d(1,0,1) =-2522._R_P ; weno_d(2,0,1) = 1922._R_P  ; weno_d(3,0,1) = -494._R_P
+<a name="l00233"></a>00233     <span class="comment">!      /                  ;        i*i                ;       (i-1)*i              ;       (i-2)*i</span>
+<a name="l00234"></a>00234     weno_d(0,1,1) =   0._R_P  ; weno_d(1,1,1) = 3443._R_P ; weno_d(2,1,1) = -5966._R_P ; weno_d(3,1,1) =  1602._R_P
+<a name="l00235"></a>00235     <span class="comment">!      /                  ;        /                  ;       (i-1)*(i-1)          ;       (i-2)*(i-1)</span>
+<a name="l00236"></a>00236     weno_d(0,2,1) =   0._R_P  ; weno_d(1,2,1) =   0._R_P  ; weno_d(2,2,1) = 2843._R_P  ; weno_d(3,2,1) = -1642._R_P
+<a name="l00237"></a>00237     <span class="comment">!      /                  ;        /                  ;        /                   ;       (i-2)*(i-2)</span>
+<a name="l00238"></a>00238     weno_d(0,3,1) =   0._R_P  ; weno_d(1,3,1) =   0._R_P  ; weno_d(2,3,1) =   0._R_P   ; weno_d(3,3,1) = 267._R_P
+<a name="l00239"></a>00239     <span class="comment">! stencil 2</span>
+<a name="l00240"></a>00240     <span class="comment">!     (i+2)*(i+2)         ;       (i+1)*(i+2)         ;        i*(i+2)             ;       (i-1)*(i+2)</span>
+<a name="l00241"></a>00241     weno_d(0,0,2) =  267._R_P ; weno_d(1,0,2) =-1642._R_P ; weno_d(2,0,2) = 1602._R_P  ; weno_d(3,0,2) = -494._R_P
+<a name="l00242"></a>00242     <span class="comment">!      /                  ;       (i+1)*(i+1)         ;        i*(i+1)             ;       (i-1)*(i+1)</span>
+<a name="l00243"></a>00243     weno_d(0,1,2) =   0._R_P  ; weno_d(1,1,2) = 2843._R_P ; weno_d(2,1,2) = -5966._R_P ; weno_d(3,1,2) =  1922._R_P
+<a name="l00244"></a>00244     <span class="comment">!      /                  ;        /                  ;        i*i                 ;       (i-1)*i</span>
+<a name="l00245"></a>00245     weno_d(0,2,2) =   0._R_P  ; weno_d(1,2,2) =   0._R_P  ; weno_d(2,2,2) = 3443._R_P  ; weno_d(3,2,2) = -2522._R_P
+<a name="l00246"></a>00246     <span class="comment">!      /                  ;        /                  ;        /                   ;       (i-1)*(i-1)</span>
+<a name="l00247"></a>00247     weno_d(0,3,2) =   0._R_P  ; weno_d(1,3,2) =   0._R_P  ; weno_d(2,3,2) =   0._R_P   ; weno_d(3,3,2) = 547._R_P
+<a name="l00248"></a>00248     <span class="comment">! stencil 3</span>
+<a name="l00249"></a>00249     <span class="comment">!     (i+3)*(i+3)         ;       (i+2)*(i+3)         ;       (i+1)*(i+3)          ;        i*(i+3)</span>
+<a name="l00250"></a>00250     weno_d(0,0,3) =  547._R_P ; weno_d(1,0,3) =-3882._R_P ; weno_d(2,0,3) = 4642._R_P  ; weno_d(3,0,3) = -1854._R_P
+<a name="l00251"></a>00251     <span class="comment">!      /                  ;       (i+2)*(i+2)         ;       (i+1)*(i+2)          ;        i*(i+2)</span>
+<a name="l00252"></a>00252     weno_d(0,1,3) =   0._R_P  ; weno_d(1,1,3) = 7043._R_P ; weno_d(2,1,3) =-17246._R_P ; weno_d(3,1,3) =  7042._R_P
+<a name="l00253"></a>00253     <span class="comment">!      /                  ;        /                  ;       (i+1)*(i+1)          ;        i*(i+1)</span>
+<a name="l00254"></a>00254     weno_d(0,2,3) =   0._R_P  ; weno_d(1,2,3) =   0._R_P  ; weno_d(2,2,3) =11003._R_P  ; weno_d(3,2,3) = -9402._R_P
+<a name="l00255"></a>00255     <span class="comment">!      /                  ;        /                  ;        /                   ;        i*i</span>
+<a name="l00256"></a>00256     weno_d(0,3,3) =   0._R_P  ; weno_d(1,3,3) =   0._R_P  ; weno_d(2,3,3) =   0._R_P   ; weno_d(3,3,3) = 2107._R_P
+<a name="l00257"></a>00257   endselect
+<a name="l00258"></a>00258   return
+<a name="l00259"></a>00259   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00260"></a>00260   <span class="keyword">contains</span>
+<a name="l00261"></a>00261     <span class="keywordtype">pure</span> <span class="keyword">subroutine </span><a class="code" href="../../d3/d4e/Lib__WENO_8f90.html#a1e29c2f4423bbe764fb4bf42c431cec8">get_min_sstep</a>(block,ss)
+<a name="l00262"></a>00262     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00263"></a>00263     <span class="comment">! Function for evaluating minimum space step.</span>
+<a name="l00264"></a>00264     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00265"></a><a class="code" href="../../d3/d4e/Lib__WENO_8f90.html#a1e29c2f4423bbe764fb4bf42c431cec8">00265</a> 
+<a name="l00266"></a>00266     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00267"></a>00267     <span class="keyword">implicit none</span>
+<a name="l00268"></a>00268     <span class="keywordtype">type(Type_SBlock)</span>, <span class="keywordtype">intent(IN)</span>::    block <span class="comment">! Block-level data.</span>
+<a name="l00269"></a>00269     <span class="keywordtype">real(R_P)</span>,         <span class="keywordtype">intent(INOUT)</span>:: ss    <span class="comment">! Minimum space step.</span>
+<a name="l00270"></a>00270     <span class="keywordtype">integer(I_P)</span>::                     i,j,k <span class="comment">! Counters.</span>
+<a name="l00271"></a>00271     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00272"></a>00272 
+<a name="l00273"></a>00273     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00274"></a>00274     <span class="keyword">do</span> k=1,block%Nk
+<a name="l00275"></a>00275       <span class="keyword">do</span> j=1,block%Nj
+<a name="l00276"></a>00276         <span class="keyword">do</span> i=1,block%Ni
+<a name="l00277"></a>00277           ss = min(ss,                                                                 &amp;
+<a name="l00278"></a>00278                    (0.25_R_P*(block%node(i  ,j  ,k  )%x + block%node(i  ,j-1,k  )%x +  &amp;
+<a name="l00279"></a>00279                               block%node(i  ,j-1,k-1)%x + block%node(i  ,j  ,k-1)%x)-  &amp;
+<a name="l00280"></a>00280                     0.25_R_P*(block%node(i-1,j  ,k  )%x + block%node(i-1,j-1,k  )%x +  &amp;
+<a name="l00281"></a>00281                               block%node(i-1,j-1,k-1)%x + block%node(i-1,j  ,k-1)%x)), &amp;
+<a name="l00282"></a>00282                    (0.25_R_P*(block%node(i  ,j  ,k  )%y + block%node(i-1,j  ,k  )%y +  &amp;
+<a name="l00283"></a>00283                               block%node(i-1,j  ,k-1)%y + block%node(i  ,j  ,k-1)%y)-  &amp;
+<a name="l00284"></a>00284                     0.25_R_P*(block%node(i  ,j-1,k  )%y + block%node(i-1,j-1,k  )%y +  &amp;
+<a name="l00285"></a>00285                               block%node(i-1,j-1,k-1)%y + block%node(i  ,j-1,k-1)%y)), &amp;
+<a name="l00286"></a>00286                    (0.25_R_P*(block%node(i  ,j  ,k  )%z + block%node(i-1,j-1,k  )%z +  &amp;
+<a name="l00287"></a>00287                               block%node(i-1,j  ,k  )%z + block%node(i  ,j-1,k  )%z)-  &amp;
+<a name="l00288"></a>00288                     0.25_R_P*(block%node(i  ,j  ,k-1)%z + block%node(i-1,j-1,k-1)%z +  &amp;
+<a name="l00289"></a>00289                               block%node(i-1,j  ,k-1)%z + block%node(i  ,j-1,k-1)%z)))
+<a name="l00290"></a>00290 
+<a name="l00291"></a>00291         <span class="keyword">enddo</span>
+<a name="l00292"></a>00292       <span class="keyword">enddo</span>
+<a name="l00293"></a>00293     <span class="keyword">enddo</span>
+<a name="l00294"></a>00294     return
+<a name="l00295"></a>00295     <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00296"></a>00296 <span class="keyword">    endsubroutine get_min_sstep</span>
+<a name="l00297"></a>00297 <span class="keyword">  endsubroutine weno_init</span>
+<a name="l00298"></a>00298 
+<a name="l00302"></a>00302   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>noweno_central(S,V,VR)
+<a name="l00303"></a>00303   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00304"></a>00304   <span class="keyword">implicit none</span>
+<a name="l00305"></a>00305   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>::  S         <span class="comment">!&lt; Number of stencils used.</span>
+<a name="l00306"></a><a class="code" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga423849469cf89742a6b89a4de6fe2483">00306</a>   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  V (1:,0:) <span class="comment">!&lt; Variable to be reconstructed.                           [1:2,0:2*S].</span>
+<a name="l00307"></a>00307   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(OUT)</span>:: VR(1:)    <span class="comment">!&lt; Left and right (1,2) interface value of reconstructed V [1:2      ].</span>
+<a name="l00308"></a>00308   <span class="keywordtype">integer(I_P)</span>::              k,f       <span class="comment">!&lt; Counters.</span>
+<a name="l00309"></a>00309   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00310"></a>00310 
+<a name="l00311"></a>00311   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00312"></a>00312   <span class="comment">! computing the central difference reconstruction</span>
+<a name="l00313"></a>00313   VR = 0._R_P
+<a name="l00314"></a>00314   <span class="keyword">do</span> k=1,2*S
+<a name="l00315"></a>00315     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
+<a name="l00316"></a>00316       VR(f) = VR(f) + weno_c(f,k)*V(f,k+f-2)
+<a name="l00317"></a>00317     <span class="keyword">enddo</span>
+<a name="l00318"></a>00318   <span class="keyword">enddo</span>
+<a name="l00319"></a>00319   return
+<a name="l00320"></a>00320   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00321"></a>00321 <span class="keyword">  endsubroutine noweno_central</span>
+<a name="l00322"></a>00322 
+<a name="l00327"></a>00327   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>weno_optimal(S,V,VR)
+<a name="l00328"></a>00328   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00329"></a>00329   <span class="keyword">implicit none</span>
+<a name="l00330"></a>00330   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>::  S             <span class="comment">!&lt; Number of stencils used.</span>
+<a name="l00331"></a><a class="code" href="../../db/d22/group__Lib__WENOPublicProcedure.html#gae8561586f225901448fdf77063cbd198">00331</a>   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  V (1:,1-S:)   <span class="comment">!&lt; Variable to be reconstructed                            [1:2,1-S:-1+S].</span>
+<a name="l00332"></a>00332   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(OUT)</span>:: VR(1:)        <span class="comment">!&lt; Left and right (1,2) interface value of reconstructed V [1:2         ].</span>
+<a name="l00333"></a>00333   <span class="keywordtype">real(R_P)</span>::                 VP(1:2,0:S-1) <span class="comment">!&lt; Polynomial reconstructions.</span>
+<a name="l00334"></a>00334   <span class="keywordtype">real(R_P)</span>::                 w (1:2,0:S-1) <span class="comment">!&lt; Weights of the stencils.</span>
+<a name="l00335"></a>00335   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00336"></a>00336 
+<a name="l00337"></a>00337   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00338"></a>00338   <span class="comment">! computing the polynomials</span>
+<a name="l00339"></a>00339   call weno_polynomials( S = S, V = V, VP = VP)
+<a name="l00340"></a>00340   <span class="comment">! using optimal weights</span>
+<a name="l00341"></a>00341   w(1:2,0:S-1) = weno_a(1:2,0:S-1)
+<a name="l00342"></a>00342   <span class="comment">! computing the convultion of reconstructing plynomials</span>
+<a name="l00343"></a>00343   call weno_convolution(S = S, VP = VP, w = w, VR = VR)
+<a name="l00344"></a>00344   return
+<a name="l00345"></a>00345   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00346"></a>00346 <span class="keyword">  endsubroutine weno_optimal</span>
+<a name="l00347"></a>00347 
+<a name="l00351"></a>00351   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>weno(S,V,VR)
+<a name="l00352"></a>00352   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00353"></a>00353   <span class="keyword">implicit none</span>
+<a name="l00354"></a>00354   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>::  S             <span class="comment">!&lt; Number of stencils used.</span>
+<a name="l00355"></a><a class="code" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga6e6e6f50289dc3eca17b1e394a78925e">00355</a>   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  V (1:,1-S:)   <span class="comment">!&lt; Variable to be reconstructed                            [1:2,1-S:-1+S].</span>
+<a name="l00356"></a>00356   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(OUT)</span>:: VR(1:)        <span class="comment">!&lt; Left and right (1,2) interface value of reconstructed V [1:2         ].</span>
+<a name="l00357"></a>00357   <span class="keywordtype">real(R_P)</span>::                 VP(1:2,0:S-1) <span class="comment">!&lt; Polynomial reconstructions.</span>
+<a name="l00358"></a>00358   <span class="keywordtype">real(R_P)</span>::                 w (1:2,0:S-1) <span class="comment">!&lt; Weights of the stencils.</span>
+<a name="l00359"></a>00359   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00360"></a>00360 
+<a name="l00361"></a>00361   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00362"></a>00362   <span class="comment">! computing the polynomials</span>
+<a name="l00363"></a>00363   call weno_polynomials( S = S, V = V, VP = VP)
+<a name="l00364"></a>00364   <span class="comment">! computing the weights associated to the polynomials</span>
+<a name="l00365"></a>00365   call weno_weights(S = S, V = V, w = w)
+<a name="l00366"></a>00366   <span class="comment">! computing the convultion of reconstructing plynomials</span>
+<a name="l00367"></a>00367   call weno_convolution(S = S, VP = VP, w = w, VR = VR)
+<a name="l00368"></a>00368   return
+<a name="l00369"></a>00369   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00370"></a>00370 <span class="keyword">  endsubroutine weno</span>
+<a name="l00372"></a>00372 
+<a name="l00378"></a>00378   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>weno_polynomials(S,V,VP)
+<a name="l00379"></a>00379   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00380"></a>00380   <span class="keyword">implicit none</span>
+<a name="l00381"></a>00381   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>::  S           <span class="comment">!&lt; Number of stencils used.</span>
+<a name="l00382"></a><a class="code" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#ga9b67fb1a3403d91fc492532416a5c947">00382</a>   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  V (1:,1-S:) <span class="comment">!&lt; Variable to be reconstructed [1:2,1-S:-1+S].</span>
+<a name="l00383"></a>00383   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(OUT)</span>:: VP(1:,0:)   <span class="comment">!&lt; Polynomial reconstructions   [1:2,  0:S-1 ].</span>
+<a name="l00384"></a>00384   <span class="keywordtype">integer(I_P)</span>::              s1,s2,f     <span class="comment">!&lt; Counters.</span>
+<a name="l00385"></a>00385   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00386"></a>00386 
+<a name="l00387"></a>00387   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00388"></a>00388   <span class="comment">! computing the polynomials</span>
+<a name="l00389"></a>00389   VP = 0._R_P
+<a name="l00390"></a>00390   <span class="keyword">do</span> s1=0,S-1 <span class="comment">! stencil counter</span>
+<a name="l00391"></a>00391     <span class="keyword">do</span> s2=0,S-1 <span class="comment">! cell counter counter</span>
+<a name="l00392"></a>00392       <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
+<a name="l00393"></a>00393         VP(f,s1) = VP(f,s1) + weno_p(f,s2,s1)*V(f,-s2+s1)
+<a name="l00394"></a>00394       <span class="keyword">enddo</span>
+<a name="l00395"></a>00395     <span class="keyword">enddo</span>
+<a name="l00396"></a>00396   <span class="keyword">enddo</span>
+<a name="l00397"></a>00397   return
+<a name="l00398"></a>00398   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00399"></a>00399 <span class="keyword">  endsubroutine weno_polynomials</span>
+<a name="l00400"></a>00400 
+<a name="l00404"></a>00404   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>weno_weights(S,V,w)
+<a name="l00405"></a>00405   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00406"></a>00406   <span class="keyword">implicit none</span>
+<a name="l00407"></a>00407   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>::  S                <span class="comment">!&lt; Number of stencils used.</span>
+<a name="l00408"></a><a class="code" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#ga0c0a02a5abf808e2a6152a0e05ed6799">00408</a>   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  V    (1:,1-S:)   <span class="comment">!&lt; Variable to be reconstructed [1:2,1-S:-1+S].</span>
+<a name="l00409"></a>00409   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(OUT)</span>:: w    (1:,0:)     <span class="comment">!&lt; Weights of the stencils      [1:2,  0:S-1 ].</span>
+<a name="l00410"></a>00410   <span class="keywordtype">real(R_P)</span>::                 IS   (1:2,0:S-1) <span class="comment">!&lt; Smoothness indicators of the stencils.</span>
+<a name="l00411"></a>00411   <span class="keywordtype">real(R_P)</span>::                 a    (1:2,0:S-1) <span class="comment">!&lt; Alpha coifficients for the weights.</span>
+<a name="l00412"></a>00412   <span class="keywordtype">real(R_P)</span>::                 a_tot(1:2)       <span class="comment">!&lt; Summ of the alpha coefficients.</span>
+<a name="l00413"></a>00413 <span class="preprocessor">#ifdef WENOZ</span>
+<a name="l00414"></a>00414   <span class="keywordtype">real(R_P)</span>::                 tao  (1:2)       <span class="comment">!&lt; Normalization factor.</span>
+<a name="l00415"></a>00415 <span class="preprocessor">#endif</span>
+<a name="l00416"></a>00416   <span class="keywordtype">integer(I_P)</span>::              s1,s2,s3,f       <span class="comment">!&lt; Counters.</span>
+<a name="l00417"></a>00417   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00418"></a>00418 
+<a name="l00419"></a>00419   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00420"></a>00420   <span class="comment">! computing smoothness indicators</span>
+<a name="l00421"></a>00421   <span class="keyword">do</span> s1=0,S-1 <span class="comment">! stencil counter</span>
+<a name="l00422"></a>00422     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
+<a name="l00423"></a>00423       IS(f,s1) = 0._R_P
+<a name="l00424"></a>00424       <span class="keyword">do</span> s2=0,S-1
+<a name="l00425"></a>00425         <span class="keyword">do</span> s3=0,S-1
+<a name="l00426"></a>00426           IS(f,s1) = IS(f,s1) + weno_d(s3,s2,s1)*V(f,s1-s3)*V(f,s1-s2)
+<a name="l00427"></a>00427         <span class="keyword">enddo</span>
+<a name="l00428"></a>00428       <span class="keyword">enddo</span>
+<a name="l00429"></a>00429     <span class="keyword">enddo</span>
+<a name="l00430"></a>00430   <span class="keyword">enddo</span>
+<a name="l00431"></a>00431 <span class="preprocessor">#ifdef WENOZ</span>
+<a name="l00432"></a>00432   <span class="comment">! computing smooth-difference tao</span>
+<a name="l00433"></a>00433   <span class="keyword">if</span> (S&gt;2) <span class="keyword">then</span>
+<a name="l00434"></a>00434     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
+<a name="l00435"></a>00435       tao(f) = abs(IS(f,0) - (1-weno_odd)*IS(f,1) - (1-weno_odd)*IS(f,S-2) + (1-2*weno_odd)*IS(f,S-1))
+<a name="l00436"></a>00436     <span class="keyword">enddo</span>
+<a name="l00437"></a>00437   <span class="keyword">else</span>
+<a name="l00438"></a>00438     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
+<a name="l00439"></a>00439       tao(f) = udiff(p=2*S-2,v=V(f,1-S:S-1))
+<a name="l00440"></a>00440       tao(f) = tao(f)*tao(f)
+<a name="l00441"></a>00441     <span class="keyword">enddo</span>
+<a name="l00442"></a>00442   <span class="keyword">endif</span>
+<a name="l00443"></a>00443 <span class="preprocessor">#endif</span>
+<a name="l00444"></a>00444   <span class="comment">! computing alfa coefficients</span>
+<a name="l00445"></a>00445   a_tot = 0._R_P
+<a name="l00446"></a>00446   <span class="keyword">do</span> s1=0,S-1
+<a name="l00447"></a>00447     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
+<a name="l00448"></a>00448 <span class="preprocessor">#ifdef WENOZ</span>
+<a name="l00449"></a>00449       <span class="keyword">if</span> (tao(f)&gt;minval(IS(f,:))) <span class="keyword">then</span>
+<a name="l00450"></a>00450         a(f,s1) = weno_a(f,s1)*(1._R_P+(tao(f)/(weno_eps+IS(f,s1)))**(weno_exp)) ; a_tot(f) = a_tot(f) + a(f,s1)
+<a name="l00451"></a>00451       <span class="keyword">else</span>
+<a name="l00452"></a>00452         a(f,s1) = weno_a(f,s1)                                                   ; a_tot(f) = a_tot(f) + a(f,s1)
+<a name="l00453"></a>00453       <span class="keyword">endif</span>
+<a name="l00454"></a>00454 <span class="preprocessor">#else</span>
+<a name="l00455"></a>00455       a(f,s1) = weno_a(f,s1)*(1._R_P/(weno_eps+IS(f,s1))**S)                     ; a_tot(f) = a_tot(f) + a(f,s1)
+<a name="l00456"></a>00456 <span class="preprocessor">#endif</span>
+<a name="l00457"></a>00457     <span class="keyword">enddo</span>
+<a name="l00458"></a>00458   <span class="keyword">enddo</span>
+<a name="l00459"></a>00459   <span class="comment">! computing the weights</span>
+<a name="l00460"></a>00460   <span class="keyword">do</span> s1=0,S-1
+<a name="l00461"></a>00461     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
+<a name="l00462"></a>00462       w(f,s1) = a(f,s1)/a_tot(f)
+<a name="l00463"></a>00463     <span class="keyword">enddo</span>
+<a name="l00464"></a>00464   <span class="keyword">enddo</span>
+<a name="l00465"></a><a class="code" href="../../de/de2/group__Lib__WENOPrivateProcedure.html#gae11faea38bff96f933ce6d24cdeefd2c">00465</a> <span class="preprocessor">#ifdef WENOM</span>
+<a name="l00466"></a>00466   <span class="comment">! Henrick mapping</span>
+<a name="l00467"></a>00467   a_tot = 0._R_P
+<a name="l00468"></a>00468   <span class="keyword">do</span> s1=0,S-1
+<a name="l00469"></a>00469     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
+<a name="l00470"></a>00470       a(f,s1)  = ( w(f,s1)*( weno_a(f,s1) + weno_a(f,s1)*weno_a(f,s1) - 3._R_P*weno_a(f,s1)*w(f,s1) + w(f,s1)*w(f,s1) ) )/ &amp;
+<a name="l00471"></a>00471                  ( weno_a(f,s1)*weno_a(f,s1) + w(f,s1)*( 1._R_P - 2._R_P*weno_a(f,s1) ) )
+<a name="l00472"></a>00472       a_tot(f) = a_tot(f) + a(f,s1)
+<a name="l00473"></a>00473     <span class="keyword">enddo</span>
+<a name="l00474"></a>00474   <span class="keyword">enddo</span>
+<a name="l00475"></a>00475   <span class="comment">! computing the weights with the mapped a(f,s1)</span>
+<a name="l00476"></a>00476   <span class="keyword">do</span> s1=0,S-1
+<a name="l00477"></a>00477     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
+<a name="l00478"></a>00478       w(f,s1) = a(f,s1)/a_tot(f)
+<a name="l00479"></a>00479     <span class="keyword">enddo</span>
+<a name="l00480"></a>00480   <span class="keyword">enddo</span>
+<a name="l00481"></a>00481 <span class="preprocessor">#endif</span>
+<a name="l00482"></a>00482   return
+<a name="l00483"></a>00483   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00484"></a>00484 <span class="keyword">  endsubroutine weno_weights</span>
+<a name="l00485"></a>00485 
+<a name="l00489"></a>00489   <span class="keywordtype">pure</span> <span class="keyword">subroutine </span>weno_convolution(S,VP,w,VR)
+<a name="l00490"></a>00490   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00491"></a>00491   <span class="keyword">implicit none</span>
+<a name="l00492"></a>00492   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>::  S         <span class="comment">!&lt; Number of stencils used.</span>
+<a name="l00493"></a>00493   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  VP(1:,0:) <span class="comment">!&lt; Polynomial reconstructions                              [1:2,0:S-1].</span>
+<a name="l00494"></a>00494   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>::  w (1:,0:) <span class="comment">!&lt; Weights of the stencils                                 [1:2,0:S-1].</span>
+<a name="l00495"></a>00495   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(OUT)</span>:: VR(1:   ) <span class="comment">!&lt; Left and right (1,2) interface value of reconstructed V [1:2      ].</span>
+<a name="l00496"></a>00496   <span class="keywordtype">integer(I_P)</span>::              k,f       <span class="comment">!&lt; Counters.</span>
+<a name="l00497"></a>00497   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00498"></a>00498 
+<a name="l00499"></a>00499   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00500"></a>00500   <span class="comment">! computing the convultion</span>
+<a name="l00501"></a>00501   VR = 0._R_P
+<a name="l00502"></a>00502   <span class="keyword">do</span> k=0,S-1
+<a name="l00503"></a>00503     <span class="keyword">do</span> f=1,2 <span class="comment">! 1 =&gt; left interface (i-1/2), 2 =&gt; right interface (i+1/2)</span>
+<a name="l00504"></a>00504       VR(f) = VR(f) + w(f,k)*VP(f,k)
+<a name="l00505"></a>00505     <span class="keyword">enddo</span>
+<a name="l00506"></a>00506   <span class="keyword">enddo</span>
+<a name="l00507"></a>00507   return
+<a name="l00508"></a>00508   <span class="comment">!---------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00509"></a>00509 <span class="keyword">  endsubroutine weno_convolution</span>
+<a name="l00510"></a>00510 
+<a name="l00511"></a>00511   <span class="keywordtype">recursive</span> <span class="keywordtype">pure</span> <span class="keyword">function </span>udiff(p,v) result(diff)
+<a name="l00512"></a>00512   <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00513"></a>00513   <span class="comment">! Function for computing finite undivided difference of order p of nodal function v.</span>
+<a name="l00514"></a>00514   <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00515"></a>00515 
+<a name="l00516"></a>00516   <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00517"></a>00517   <span class="keyword">implicit none</span>
+<a name="l00518"></a>00518   <span class="keywordtype">integer(I_P)</span>, <span class="keywordtype">intent(IN)</span>:: p        <span class="comment">! Order of finite undivided difference.</span>
+<a name="l00519"></a>00519   <span class="keywordtype">real(R_P)</span>,    <span class="keywordtype">intent(IN)</span>:: v(1:p+1) <span class="comment">! Nodal values of function.</span>
+<a name="l00520"></a>00520   <span class="keywordtype">real(R_P)</span>::                diff     <span class="comment">! Finite undivided difference.</span>
+<a name="l00521"></a>00521   <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00522"></a>00522 
+<a name="l00523"></a>00523   <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00524"></a>00524   <span class="keyword">if</span> (p==1_I_P) <span class="keyword">then</span>
+<a name="l00525"></a>00525     diff = v(2) - v(1)
+<a name="l00526"></a>00526   <span class="keyword">else</span>
+<a name="l00527"></a>00527     diff = udiff(p=p-1,v=v(2:p)) - udiff(p=p-1,v=v(1:p-1))
+<a name="l00528"></a>00528   <span class="keyword">endif</span>
+<a name="l00529"></a>00529   return
+<a name="l00530"></a>00530   <span class="comment">!-------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00531"></a>00531 <span class="keyword">  endfunction udiff</span>
+<a name="l00533"></a>00533 <span class="keyword">endmodule Lib_WENO</span>
 </pre></div></div><!-- contents -->
 </div>
 <!-- window showing the filter options -->
@@ -608,7 +609,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
     <ul>
       <li class="navelem"><a class="el" href="../../d3/d4e/Lib__WENO_8f90.html">Lib_WENO.f90</a>      </li>
 
-    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
+    <li class="footer">Generated on Wed Nov 7 2012 14:31:45 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

@@ -2574,32 +2574,32 @@ Functions/Subroutines</h2></td></tr>
 <div class="memdoc">
 <div class="textblock"><p>Function that <b>must</b> be used when unstructured grid is used, it saves the connectivity of the unstructured gird. </p>
 <p>This is an interface to two functions: one for common dimension mesh (with number of nodes that can be represented by means integer I4P) and another for huge dimension mesh (with number of nodes that needs integer I8P representation). </p>
-<dl class="note"><dt><b>Note:</b></dt><dd>The vector <b>connect</b> must follow the VTK-legacy standard. It is passed as <em>assumed-shape</em> array because its dimensions is related to the mesh dimensions in a complex way. Its dimensions can be calculated by the following equation: <img class="formulaInl" alt="$dc = dc = \sum\limits_{i = 1}^{NC} {nvertex_i }$" src="../../form_198.png"/>. Note that this equation is different from the legacy one. The XML connectivity convention is quite different from the legacy standard. As an example suppose we have a mesh composed by 2 cells, one hexahedron (8 vertices) and one pyramid with square basis (5 vertices) and suppose that the basis of pyramid is constitute by a face of the hexahedron and so the two cells share 4 vertices. The above equation gives <img class="formulaInl" alt="$dc=8+5=13$" src="../../form_199.png"/>. The connectivity vector for this mesh can be: <br/>
+<dl class="note"><dt><b>Note:</b></dt><dd>The vector <b>connect</b> must follow the VTK-legacy standard. It is passed as <em>assumed-shape</em> array because its dimensions is related to the mesh dimensions in a complex way. Its dimensions can be calculated by the following equation: <img class="formulaInl" alt="$dc = dc = \sum\limits_{i = 1}^{NC} {nvertex_i }$" src="../../form_232.png"/>. Note that this equation is different from the legacy one. The XML connectivity convention is quite different from the legacy standard. As an example suppose we have a mesh composed by 2 cells, one hexahedron (8 vertices) and one pyramid with square basis (5 vertices) and suppose that the basis of pyramid is constitute by a face of the hexahedron and so the two cells share 4 vertices. The above equation gives <img class="formulaInl" alt="$dc=8+5=13$" src="../../form_233.png"/>. The connectivity vector for this mesh can be: <br/>
  first cell <br/>
- connect(1) = 0 identification flag of <img class="formulaInl" alt="$1^\circ$" src="../../form_200.png"/> vertex of 1° cell <br/>
- connect(2) = 1 identification flag of <img class="formulaInl" alt="$2^\circ$" src="../../form_201.png"/> vertex of 1° cell <br/>
- connect(3) = 2 identification flag of <img class="formulaInl" alt="$3^\circ$" src="../../form_202.png"/> vertex of 1° cell <br/>
- connect(4) = 3 identification flag of <img class="formulaInl" alt="$4^\circ$" src="../../form_203.png"/> vertex of 1° cell <br/>
- connect(5) = 4 identification flag of <img class="formulaInl" alt="$5^\circ$" src="../../form_204.png"/> vertex of 1° cell <br/>
- connect(6) = 5 identification flag of <img class="formulaInl" alt="$6^\circ$" src="../../form_205.png"/> vertex of 1° cell <br/>
- connect(7) = 6 identification flag of <img class="formulaInl" alt="$7^\circ$" src="../../form_206.png"/> vertex of 1° cell <br/>
- connect(8) = 7 identification flag of <img class="formulaInl" alt="$8^\circ$" src="../../form_207.png"/> vertex of 1° cell <br/>
+ connect(1) = 0 identification flag of <img class="formulaInl" alt="$1^\circ$" src="../../form_234.png"/> vertex of 1° cell <br/>
+ connect(2) = 1 identification flag of <img class="formulaInl" alt="$2^\circ$" src="../../form_235.png"/> vertex of 1° cell <br/>
+ connect(3) = 2 identification flag of <img class="formulaInl" alt="$3^\circ$" src="../../form_236.png"/> vertex of 1° cell <br/>
+ connect(4) = 3 identification flag of <img class="formulaInl" alt="$4^\circ$" src="../../form_237.png"/> vertex of 1° cell <br/>
+ connect(5) = 4 identification flag of <img class="formulaInl" alt="$5^\circ$" src="../../form_238.png"/> vertex of 1° cell <br/>
+ connect(6) = 5 identification flag of <img class="formulaInl" alt="$6^\circ$" src="../../form_239.png"/> vertex of 1° cell <br/>
+ connect(7) = 6 identification flag of <img class="formulaInl" alt="$7^\circ$" src="../../form_240.png"/> vertex of 1° cell <br/>
+ connect(8) = 7 identification flag of <img class="formulaInl" alt="$8^\circ$" src="../../form_241.png"/> vertex of 1° cell <br/>
  second cell <br/>
- connect(9 ) = 0 identification flag of <img class="formulaInl" alt="$1^\circ$" src="../../form_200.png"/> vertex of 2° cell <br/>
- connect(10) = 1 identification flag of <img class="formulaInl" alt="$2^\circ$" src="../../form_201.png"/> vertex of 2° cell <br/>
- connect(11) = 2 identification flag of <img class="formulaInl" alt="$3^\circ$" src="../../form_202.png"/> vertex of 2° cell <br/>
- connect(12) = 3 identification flag of <img class="formulaInl" alt="$4^\circ$" src="../../form_203.png"/> vertex of 2° cell <br/>
- connect(13) = 8 identification flag of <img class="formulaInl" alt="$5^\circ$" src="../../form_204.png"/> vertex of 2° cell <br/>
+ connect(9 ) = 0 identification flag of <img class="formulaInl" alt="$1^\circ$" src="../../form_234.png"/> vertex of 2° cell <br/>
+ connect(10) = 1 identification flag of <img class="formulaInl" alt="$2^\circ$" src="../../form_235.png"/> vertex of 2° cell <br/>
+ connect(11) = 2 identification flag of <img class="formulaInl" alt="$3^\circ$" src="../../form_236.png"/> vertex of 2° cell <br/>
+ connect(12) = 3 identification flag of <img class="formulaInl" alt="$4^\circ$" src="../../form_237.png"/> vertex of 2° cell <br/>
+ connect(13) = 8 identification flag of <img class="formulaInl" alt="$5^\circ$" src="../../form_238.png"/> vertex of 2° cell <br/>
  Therefore this connectivity vector convention is more simple than the legacy convention, now we must create also the <em>offset</em> vector that contains the data now missing in the <em>connect</em> vector. The offset vector for this mesh can be: <br/>
  first cell <br/>
- offset(1) = 8 =&gt; summ of nodes of <img class="formulaInl" alt="$1^\circ$" src="../../form_200.png"/> cell <br/>
+ offset(1) = 8 =&gt; summ of nodes of <img class="formulaInl" alt="$1^\circ$" src="../../form_234.png"/> cell <br/>
  second cell <br/>
- offset(2) = 13 =&gt; summ of nodes of <img class="formulaInl" alt="$1^\circ$" src="../../form_200.png"/> and <img class="formulaInl" alt="$2^\circ$" src="../../form_201.png"/> cells <br/>
- The value of every cell-offset can be calculated by the following equation: <img class="formulaInl" alt="$offset_c=\sum\limits_{i=1}^{c}{nvertex_i}$" src="../../form_208.png"/> where <img class="formulaInl" alt="$offset_c$" src="../../form_209.png"/> is the value of <img class="formulaInl" alt="$c^{th}$" src="../../form_210.png"/> cell and <img class="formulaInl" alt="$nvertex_i$" src="../../form_211.png"/> is the number of vertices of <img class="formulaInl" alt="$i^{th}$" src="../../form_212.png"/> cell. The function <a class="el" href="../../dd/d55/group__Interface.html#d8/da2/interfaceLib__VTK__IO_1_1VTK__CON__XML" title="Function that must be used when unstructured grid is used, it saves the connectivity of the unstructu...">VTK_CON_XML</a> does not calculate the connectivity and offset vectors: it writes the connectivity and offset vectors conforming the VTK-XML standard, but does not calculate them. The vector variable <em>cell_type</em> must conform the VTK-XML standard (see the file VTK-Standard at the Kitware homepage) that is the same of the legacy standard. It contains the <em>type</em> of each cells. For the above example this vector is: <br/>
+ offset(2) = 13 =&gt; summ of nodes of <img class="formulaInl" alt="$1^\circ$" src="../../form_234.png"/> and <img class="formulaInl" alt="$2^\circ$" src="../../form_235.png"/> cells <br/>
+ The value of every cell-offset can be calculated by the following equation: <img class="formulaInl" alt="$offset_c=\sum\limits_{i=1}^{c}{nvertex_i}$" src="../../form_242.png"/> where <img class="formulaInl" alt="$offset_c$" src="../../form_243.png"/> is the value of <img class="formulaInl" alt="$c^{th}$" src="../../form_244.png"/> cell and <img class="formulaInl" alt="$nvertex_i$" src="../../form_245.png"/> is the number of vertices of <img class="formulaInl" alt="$i^{th}$" src="../../form_246.png"/> cell. The function <a class="el" href="../../dd/d55/group__Interface.html#d8/da2/interfaceLib__VTK__IO_1_1VTK__CON__XML" title="Function that must be used when unstructured grid is used, it saves the connectivity of the unstructu...">VTK_CON_XML</a> does not calculate the connectivity and offset vectors: it writes the connectivity and offset vectors conforming the VTK-XML standard, but does not calculate them. The vector variable <em>cell_type</em> must conform the VTK-XML standard (see the file VTK-Standard at the Kitware homepage) that is the same of the legacy standard. It contains the <em>type</em> of each cells. For the above example this vector is: <br/>
  first cell <br/>
- cell_type(1) = 12 hexahedron type of <img class="formulaInl" alt="$1^\circ$" src="../../form_200.png"/> cell <br/>
+ cell_type(1) = 12 hexahedron type of <img class="formulaInl" alt="$1^\circ$" src="../../form_234.png"/> cell <br/>
  second cell <br/>
- cell_type(2) = 14 pyramid type of <img class="formulaInl" alt="$2^\circ$" src="../../form_201.png"/> cell <br/>
+ cell_type(2) = 14 pyramid type of <img class="formulaInl" alt="$2^\circ$" src="../../form_235.png"/> cell <br/>
  </dd></dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>E_IO: integer(I4P) error flag , </dd></dl>
 
@@ -4831,29 +4831,29 @@ Functions/Subroutines</h2></td></tr>
 <div class="memdoc">
 
 <p>Function that <b>must</b> be used when unstructured grid is used, it saves the connectivity of the unstructured gird. </p>
-<dl class="note"><dt><b>Note:</b></dt><dd>The vector <b>connect</b> must follow the VTK-legacy standard. It is passed as <em>assumed-shape</em> array because its dimensions is related to the mesh dimensions in a complex way. Its dimensions can be calculated by the following equation: <img class="formulaInl" alt="$dc = NC + \sum\limits_{i = 1}^{NC} {nvertex_i }$" src="../../form_213.png"/> where <img class="formulaInl" alt="$dc$" src="../../form_214.png"/> is connectivity vector dimension and <img class="formulaInl" alt="$nvertex_i$" src="../../form_211.png"/> is the number of vertices of <img class="formulaInl" alt="$i^{th}$" src="../../form_212.png"/> cell. The VTK- legacy standard for the mesh connectivity is quite obscure at least at first sight. It is more simple analyzing an example. Suppose we have a mesh composed by 2 cells, one hexahedron (8 vertices) and one pyramid with square basis (5 vertices) and suppose that the basis of pyramid is constitute by a face of the hexahedron and so the two cells share 4 vertices. The above equation !&gt; gives <img class="formulaInl" alt="$dc=2+8+5=15$" src="../../form_215.png"/>. The connectivity vector for this mesh can be: <br/>
+<dl class="note"><dt><b>Note:</b></dt><dd>The vector <b>connect</b> must follow the VTK-legacy standard. It is passed as <em>assumed-shape</em> array because its dimensions is related to the mesh dimensions in a complex way. Its dimensions can be calculated by the following equation: <img class="formulaInl" alt="$dc = NC + \sum\limits_{i = 1}^{NC} {nvertex_i }$" src="../../form_247.png"/> where <img class="formulaInl" alt="$dc$" src="../../form_248.png"/> is connectivity vector dimension and <img class="formulaInl" alt="$nvertex_i$" src="../../form_245.png"/> is the number of vertices of <img class="formulaInl" alt="$i^{th}$" src="../../form_246.png"/> cell. The VTK- legacy standard for the mesh connectivity is quite obscure at least at first sight. It is more simple analyzing an example. Suppose we have a mesh composed by 2 cells, one hexahedron (8 vertices) and one pyramid with square basis (5 vertices) and suppose that the basis of pyramid is constitute by a face of the hexahedron and so the two cells share 4 vertices. The above equation !&gt; gives <img class="formulaInl" alt="$dc=2+8+5=15$" src="../../form_249.png"/>. The connectivity vector for this mesh can be: <br/>
  first cell <br/>
- connect(1) = 8 number of vertices of <img class="formulaInl" alt="$1^\circ$" src="../../form_200.png"/> cell <br/>
- connect(2) = 0 identification flag of <img class="formulaInl" alt="$1^\circ$" src="../../form_200.png"/> vertex of 1° cell <br/>
- connect(3) = 1 identification flag of <img class="formulaInl" alt="$2^\circ$" src="../../form_201.png"/> vertex of 1° cell <br/>
- connect(4) = 2 identification flag of <img class="formulaInl" alt="$3^\circ$" src="../../form_202.png"/> vertex of 1° cell <br/>
- connect(5) = 3 identification flag of <img class="formulaInl" alt="$4^\circ$" src="../../form_203.png"/> vertex of 1° cell <br/>
- connect(6) = 4 identification flag of <img class="formulaInl" alt="$5^\circ$" src="../../form_204.png"/> vertex of 1° cell <br/>
- connect(7) = 5 identification flag of <img class="formulaInl" alt="$6^\circ$" src="../../form_205.png"/> vertex of 1° cell <br/>
- connect(8) = 6 identification flag of <img class="formulaInl" alt="$7^\circ$" src="../../form_206.png"/> vertex of 1° cell <br/>
- connect(9) = 7 identification flag of <img class="formulaInl" alt="$8^\circ$" src="../../form_207.png"/> vertex of 1° cell <br/>
+ connect(1) = 8 number of vertices of <img class="formulaInl" alt="$1^\circ$" src="../../form_234.png"/> cell <br/>
+ connect(2) = 0 identification flag of <img class="formulaInl" alt="$1^\circ$" src="../../form_234.png"/> vertex of 1° cell <br/>
+ connect(3) = 1 identification flag of <img class="formulaInl" alt="$2^\circ$" src="../../form_235.png"/> vertex of 1° cell <br/>
+ connect(4) = 2 identification flag of <img class="formulaInl" alt="$3^\circ$" src="../../form_236.png"/> vertex of 1° cell <br/>
+ connect(5) = 3 identification flag of <img class="formulaInl" alt="$4^\circ$" src="../../form_237.png"/> vertex of 1° cell <br/>
+ connect(6) = 4 identification flag of <img class="formulaInl" alt="$5^\circ$" src="../../form_238.png"/> vertex of 1° cell <br/>
+ connect(7) = 5 identification flag of <img class="formulaInl" alt="$6^\circ$" src="../../form_239.png"/> vertex of 1° cell <br/>
+ connect(8) = 6 identification flag of <img class="formulaInl" alt="$7^\circ$" src="../../form_240.png"/> vertex of 1° cell <br/>
+ connect(9) = 7 identification flag of <img class="formulaInl" alt="$8^\circ$" src="../../form_241.png"/> vertex of 1° cell <br/>
  second cell <br/>
- connect(10) = 5 number of vertices of <img class="formulaInl" alt="$2^\circ $" src="../../form_216.png"/>cell <br/>
- connect(11) = 0 identification flag of <img class="formulaInl" alt="$1^\circ$" src="../../form_200.png"/> vertex of 2° cell <br/>
- connect(12) = 1 identification flag of <img class="formulaInl" alt="$2^\circ$" src="../../form_201.png"/> vertex of 2° cell <br/>
- connect(13) = 2 identification flag of <img class="formulaInl" alt="$3^\circ$" src="../../form_202.png"/> vertex of 2° cell <br/>
- connect(14) = 3 identification flag of <img class="formulaInl" alt="$4^\circ$" src="../../form_203.png"/> vertex of 2° cell <br/>
- connect(15) = 8 identification flag of <img class="formulaInl" alt="$5^\circ$" src="../../form_204.png"/> vertex of 2° cell <br/>
+ connect(10) = 5 number of vertices of <img class="formulaInl" alt="$2^\circ $" src="../../form_250.png"/>cell <br/>
+ connect(11) = 0 identification flag of <img class="formulaInl" alt="$1^\circ$" src="../../form_234.png"/> vertex of 2° cell <br/>
+ connect(12) = 1 identification flag of <img class="formulaInl" alt="$2^\circ$" src="../../form_235.png"/> vertex of 2° cell <br/>
+ connect(13) = 2 identification flag of <img class="formulaInl" alt="$3^\circ$" src="../../form_236.png"/> vertex of 2° cell <br/>
+ connect(14) = 3 identification flag of <img class="formulaInl" alt="$4^\circ$" src="../../form_237.png"/> vertex of 2° cell <br/>
+ connect(15) = 8 identification flag of <img class="formulaInl" alt="$5^\circ$" src="../../form_238.png"/> vertex of 2° cell <br/>
  Note that the first 4 identification flags of pyramid vertices as the same of the first 4 identification flags of the hexahedron because the two cells share this face. It is also important to note that the identification flags start form $0$ value: this is impose to the VTK standard. The function VTK_CON does not calculate the connectivity vector: it writes the connectivity vector conforming the VTK standard, but does not calculate it. The vector variable <em>cell_type</em> must conform the VTK-legacy standard (see the file VTK-Standard at the Kitware homepage). It contains the <em>type</em> of each cells. For the above example this vector is: <br/>
  first cell <br/>
- cell_type(1) = 12 hexahedron type of <img class="formulaInl" alt="$1^\circ$" src="../../form_200.png"/> cell <br/>
+ cell_type(1) = 12 hexahedron type of <img class="formulaInl" alt="$1^\circ$" src="../../form_234.png"/> cell <br/>
  second cell <br/>
- cell_type(2) = 14 pyramid type of <img class="formulaInl" alt="$2^\circ$" src="../../form_201.png"/> cell <br/>
+ cell_type(2) = 14 pyramid type of <img class="formulaInl" alt="$2^\circ$" src="../../form_235.png"/> cell <br/>
  </dd></dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>E_IO: integer(I4P) error flag</dd></dl>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
@@ -5154,7 +5154,7 @@ Functions/Subroutines</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
+    <li class="footer">Generated on Wed Nov 7 2012 14:31:45 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

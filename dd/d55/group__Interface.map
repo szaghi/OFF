@@ -1,5 +1,5 @@
 <map id="structs" name="structs">
-<area shape="rect" id="node1" href="$d3/de1/group__Data__Type__GlobalsPublicProcedure.html" title="Data_Type_Globals" alt="" coords="316,17,452,47"/>
-<area shape="rect" id="node3" href="$d5/d47/group__Lib__VTK__IOPublicProcedure.html" title="Lib_VTK_IO" alt="" coords="337,152,431,181"/>
-<area shape="rect" id="node4" href="$d7/d79/group__IR__PrecisionPublicProcedure.html" title="IR_Precision" alt="" coords="336,235,432,264"/>
+<area shape="rect" id="node2" href="$d5/d47/group__Lib__VTK__IOPublicProcedure.html" title="Lib_VTK_IO" alt="" coords="331,97,424,127"/>
+<area shape="rect" id="node3" href="$d7/d79/group__IR__PrecisionPublicProcedure.html" title="IR_Precision" alt="" coords="329,180,425,209"/>
+<area shape="rect" id="node4" href="$d1/d25/group__Data__Type__GlobalPublicProcedure.html" title="Data_Type_Global" alt="" coords="312,233,443,263"/>
 </map>

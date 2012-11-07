@@ -108,9 +108,9 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <tr><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d23/group__Lib__Runge__KuttaPublicProcedure.html#ga448bfdc6c9a7ebde2191ad6fd1ac393c">Lib_Runge_Kutta::rk_init</a> (S)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for initializing Runge-Kutta coefficients.  <a href="#ga448bfdc6c9a7ebde2191ad6fd1ac393c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d23/group__Lib__Runge__KuttaPublicProcedure.html#ga43a82cfaac991c8e38dcce3957e98870">Lib_Runge_Kutta::rk_stage</a> (s1, Dt, Un, KS, KS1)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing <img class="formulaInl" alt="$s1^{th}$" src="../../form_192.png"/> Runge-Kutta stage.  <a href="#ga43a82cfaac991c8e38dcce3957e98870"></a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing <img class="formulaInl" alt="$s1^{th}$" src="../../form_226.png"/> Runge-Kutta stage.  <a href="#ga43a82cfaac991c8e38dcce3957e98870"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d23/group__Lib__Runge__KuttaPublicProcedure.html#ga6b4391fd5761d2862570a7d89808f3d6">Lib_Runge_Kutta::rk_time_integ</a> (Dt, Un, KS, Unp1)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing Runge-Kutta one time step integration <img class="formulaInl" alt="$u^{n+1}$" src="../../form_193.png"/>.  <a href="#ga6b4391fd5761d2862570a7d89808f3d6"></a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing Runge-Kutta one time step integration <img class="formulaInl" alt="$u^{n+1}$" src="../../form_227.png"/>.  <a href="#ga6b4391fd5761d2862570a7d89808f3d6"></a><br/></td></tr>
 </table>
 <hr/><h2>Function/Subroutine Documentation</h2>
 <a class="anchor" id="ga448bfdc6c9a7ebde2191ad6fd1ac393c"></a><!-- doxytag: member="Lib_Runge_Kutta::rk_init" ref="ga448bfdc6c9a7ebde2191ad6fd1ac393c" args="(S)" -->
@@ -130,40 +130,40 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 
 <p>Subroutine for initializing Runge-Kutta coefficients. </p>
 <dl class="note"><dt><b>Note:</b></dt><dd>Currently 5 different schemes are available whose coefficients are (see <a class="el" href="../../d6/dec/group__Library.html#d6/dc1/classLib__Runge__Kutta">definition</a> in Runge-Kutta library):<ul>
-<li><b> 1 stage</b>: Forward Euler, one stage, <img class="formulaInl" alt="$1^{st}$" src="../../form_173.png"/> order <br/>
+<li><b> 1 stage</b>: Forward Euler, one stage, <img class="formulaInl" alt="$1^{st}$" src="../../form_207.png"/> order <br/>
 <ul>
-<li><img class="formulaInl" alt="$ c_1 = \left[1\right]$" src="../../form_174.png"/></li>
-<li><img class="formulaInl" alt="$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&amp;0 \end{array}} \right] $" src="../../form_175.png"/></li>
-<li><img class="formulaInl" alt="$ c_3 = \left[0\right]$" src="../../form_176.png"/></li>
+<li><img class="formulaInl" alt="$ c_1 = \left[1\right]$" src="../../form_208.png"/></li>
+<li><img class="formulaInl" alt="$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&amp;0 \end{array}} \right] $" src="../../form_209.png"/></li>
+<li><img class="formulaInl" alt="$ c_3 = \left[0\right]$" src="../../form_210.png"/></li>
 </ul>
 </li>
-<li><b> 2 stages</b>: Strong Stability Preserving, two stages, <img class="formulaInl" alt="$2^{nd}$" src="../../form_177.png"/> order <br/>
+<li><b> 2 stages</b>: Strong Stability Preserving, two stages, <img class="formulaInl" alt="$2^{nd}$" src="../../form_211.png"/> order <br/>
 <ul>
-<li><img class="formulaInl" alt="$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{1}{2}&amp;\frac{1}{2} \end{array}} \right] $" src="../../form_178.png"/></li>
-<li><img class="formulaInl" alt="$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&amp;0\\ 1&amp;0 \end{array}} \right] $" src="../../form_179.png"/></li>
-<li><img class="formulaInl" alt="$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \end{array}} \right] $" src="../../form_180.png"/></li>
+<li><img class="formulaInl" alt="$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{1}{2}&amp;\frac{1}{2} \end{array}} \right] $" src="../../form_212.png"/></li>
+<li><img class="formulaInl" alt="$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&amp;0\\ 1&amp;0 \end{array}} \right] $" src="../../form_213.png"/></li>
+<li><img class="formulaInl" alt="$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \end{array}} \right] $" src="../../form_214.png"/></li>
 </ul>
 </li>
-<li><b> 3 stages</b>: Strong Stability Preserving, three stages, <img class="formulaInl" alt="$3^{rd}$" src="../../form_181.png"/> order <br/>
+<li><b> 3 stages</b>: Strong Stability Preserving, three stages, <img class="formulaInl" alt="$3^{rd}$" src="../../form_215.png"/> order <br/>
 <ul>
-<li><img class="formulaInl" alt="$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{1}{6}&amp;\frac{1}{6}&amp;\frac{1}{3} \end{array}} \right] $" src="../../form_182.png"/></li>
-<li><img class="formulaInl" alt="$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&amp;0&amp;0\\ 1&amp;0&amp;0\\ \frac{1}{4}&amp;\frac{1}{4}&amp;0 \end{array}} \right] $" src="../../form_183.png"/></li>
-<li><img class="formulaInl" alt="$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \\ \frac{1}{2} \end{array}} \right] $" src="../../form_184.png"/></li>
+<li><img class="formulaInl" alt="$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{1}{6}&amp;\frac{1}{6}&amp;\frac{1}{3} \end{array}} \right] $" src="../../form_216.png"/></li>
+<li><img class="formulaInl" alt="$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&amp;0&amp;0\\ 1&amp;0&amp;0\\ \frac{1}{4}&amp;\frac{1}{4}&amp;0 \end{array}} \right] $" src="../../form_217.png"/></li>
+<li><img class="formulaInl" alt="$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \\ \frac{1}{2} \end{array}} \right] $" src="../../form_218.png"/></li>
 </ul>
 </li>
-<li><b> 4 stages</b>: four stages, <img class="formulaInl" alt="$4^{rd}$" src="../../form_185.png"/> order <br/>
+<li><b> 4 stages</b>: four stages, <img class="formulaInl" alt="$4^{rd}$" src="../../form_219.png"/> order <br/>
 <ul>
-<li><img class="formulaInl" alt="$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{55}{108}&amp;\frac{1}{3}&amp;\frac{1}{3}&amp;\frac{1}{6} \end{array}} \right] $" src="../../form_186.png"/></li>
-<li><img class="formulaInl" alt="$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&amp;0&amp;0&amp;0\\ 1&amp;0&amp;0&amp;0\\ \frac{1}{4}&amp;\frac{1}{2}&amp;0&amp;0\\ \frac{5}{18}&amp;0&amp;1&amp;0 \end{array}} \right] $" src="../../form_187.png"/></li>
-<li><img class="formulaInl" alt="$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \\ \frac{3}{4} \\ \frac{23}{18} \end{array}} \right] $" src="../../form_188.png"/></li>
+<li><img class="formulaInl" alt="$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{55}{108}&amp;\frac{1}{3}&amp;\frac{1}{3}&amp;\frac{1}{6} \end{array}} \right] $" src="../../form_220.png"/></li>
+<li><img class="formulaInl" alt="$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&amp;0&amp;0&amp;0\\ 1&amp;0&amp;0&amp;0\\ \frac{1}{4}&amp;\frac{1}{2}&amp;0&amp;0\\ \frac{5}{18}&amp;0&amp;1&amp;0 \end{array}} \right] $" src="../../form_221.png"/></li>
+<li><img class="formulaInl" alt="$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \\ \frac{3}{4} \\ \frac{23}{18} \end{array}} \right] $" src="../../form_222.png"/></li>
 </ul>
 </li>
-<li><b> 5 stages</b>: Strong Stability Preserving, five stages, <img class="formulaInl" alt="$4^{rd}$" src="../../form_185.png"/> order <br/>
+<li><b> 5 stages</b>: Strong Stability Preserving, five stages, <img class="formulaInl" alt="$4^{rd}$" src="../../form_219.png"/> order <br/>
  <br/>
 <ul>
-<li><img class="formulaInl" alt="$ c_1 = \left[ {\begin{array}{*{20}{c}} 0.14681187618661&amp;0.24848290924556&amp;0.10425883036650&amp;0.27443890091960&amp; 0.22600748319395 \end{array}} \right] $" src="../../form_189.png"/></li>
-<li><img class="formulaInl" alt="$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&amp;0&amp;0&amp;0&amp;0 \\ 0.39175222700392&amp;0&amp;0&amp;0&amp;0 \\ 0.21766909633821&amp;0.36841059262959&amp;0&amp;0&amp;0 \\ 0.08269208670950&amp; 0.13995850206999&amp;0.25189177424738&amp;0&amp;0 \\ 0.06796628370320&amp;0.11503469844438&amp;0.20703489864929&amp;0.54497475021237&amp;0 \end{array}} \right] $" src="../../form_190.png"/></li>
-<li><img class="formulaInl" alt="$ c_3 = \left[ {\begin{array}{*{20}{c}} 0\\0.39175222700392\\0.58607968896780\\0.47454236302687\\0.93501063100924 \end{array}} \right] $" src="../../form_191.png"/> </li>
+<li><img class="formulaInl" alt="$ c_1 = \left[ {\begin{array}{*{20}{c}} 0.14681187618661&amp;0.24848290924556&amp;0.10425883036650&amp;0.27443890091960&amp; 0.22600748319395 \end{array}} \right] $" src="../../form_223.png"/></li>
+<li><img class="formulaInl" alt="$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&amp;0&amp;0&amp;0&amp;0 \\ 0.39175222700392&amp;0&amp;0&amp;0&amp;0 \\ 0.21766909633821&amp;0.36841059262959&amp;0&amp;0&amp;0 \\ 0.08269208670950&amp; 0.13995850206999&amp;0.25189177424738&amp;0&amp;0 \\ 0.06796628370320&amp;0.11503469844438&amp;0.20703489864929&amp;0.54497475021237&amp;0 \end{array}} \right] $" src="../../form_224.png"/></li>
+<li><img class="formulaInl" alt="$ c_3 = \left[ {\begin{array}{*{20}{c}} 0\\0.39175222700392\\0.58607968896780\\0.47454236302687\\0.93501063100924 \end{array}} \right] $" src="../../form_225.png"/> </li>
 </ul>
 </li>
 </ul>
@@ -222,7 +222,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Subroutine for computing <img class="formulaInl" alt="$s1^{th}$" src="../../form_192.png"/> Runge-Kutta stage. </p>
+<p>Subroutine for computing <img class="formulaInl" alt="$s1^{th}$" src="../../form_226.png"/> Runge-Kutta stage. </p>
 <dl class="note"><dt><b>Note:</b></dt><dd>For avoid the creation of temporary arrays (improving the efficiency) the array <b>KS</b> is declared as assumed-shape with only the lower bound defined. Its extention is [1:s1-1]. </dd></dl>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
@@ -276,7 +276,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div>
 <div class="memdoc">
 
-<p>Subroutine for computing Runge-Kutta one time step integration <img class="formulaInl" alt="$u^{n+1}$" src="../../form_193.png"/>. </p>
+<p>Subroutine for computing Runge-Kutta one time step integration <img class="formulaInl" alt="$u^{n+1}$" src="../../form_227.png"/>. </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">Dt</td><td>Current time step. </td></tr>
@@ -310,7 +310,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
+    <li class="footer">Generated on Wed Nov 7 2012 14:31:45 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

@@ -111,812 +111,875 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <a name="l00010"></a>00010 
 <a name="l00011"></a>00011 #----------------------------------------------------------------------------------------------------------------------------------
 <a name="l00012"></a>00012 # User options
-<a name="l00013"></a>00013 COMPILER  = gnu
-<a name="l00014"></a>00014 DEBUG     = yes
-<a name="l00015"></a>00015 F03STD    = yes
-<a name="l00016"></a>00016 PROFILING = no
-<a name="l00017"></a>00017 OPTIMIZE  = no
-<a name="l00018"></a>00018 OPENMP    = no
-<a name="l00019"></a>00019 MPI       = no
-<a name="l00020"></a>00020 R16P      = no
-<a name="l00021"></a>00021 NULi      = no
-<a name="l00022"></a>00022 NULj      = no
-<a name="l00023"></a>00023 NULk      = no
-<a name="l00024"></a>00024 WENO      = WENO
-<a name="l00025"></a>00025 RECV      = RECVC
-<a name="l00026"></a>00026 RSU       = HLLCp
-<a name="l00027"></a>00027 VACUUM    = no
-<a name="l00028"></a>00028 WS        = WSup
-<a name="l00029"></a>00029 SMSW      = SMSWz
-<a name="l00030"></a>00030 HYBRID    = NOHYBRID
-<a name="l00031"></a>00031 PPL       = no
-<a name="l00032"></a>00032 LMA       = no
-<a name="l00033"></a>00033 TECIO     = no
-<a name="l00034"></a>00034 
-<a name="l00035"></a>00035 .PHONY : DEFAULTRULE
-<a name="l00036"></a>00036 DEFAULTRULE: $(DEXE)<a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>
-<a name="l00037"></a>00037 
-<a name="l00038"></a>00038 .PHONY : help
-<a name="l00039"></a>00039 help:
-<a name="l00040"></a>00040         @echo
-<a name="l00041"></a>00041         @echo -e &#39;\033[1;31m Make options of <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a> codes\033[0m&#39;
-<a name="l00042"></a>00042         @echo
-<a name="l00043"></a>00043         @echo -e &#39;\033[1;31m Compiler choice\033[0m&#39;
-<a name="l00044"></a>00044         @echo -e &#39;\033[1;31m  COMPILER=gnu  \033[0m\033[1m =&gt; GNU gfortran          \033[0m&#39;
-<a name="l00045"></a>00045         @echo -e &#39;\033[1;31m  COMPILER=intel\033[0m\033[1m =&gt; Intel Fortran         \033[0m&#39;
-<a name="l00046"></a>00046         @echo -e &#39;\033[1;31m  COMPILER=pgi  \033[0m\033[1m =&gt; Portland Group Fortran\033[0m&#39;
-<a name="l00047"></a>00047         @echo -e &#39;\033[1;31m  COMPILER=g95  \033[0m\033[1m =&gt; free g95              \033[0m&#39;
-<a name="l00048"></a>00048         @echo -e &#39;\033[1;31m  COMPILER=$(COMPILER)  \033[0m\033[1m =&gt; default         \033[0m&#39;
-<a name="l00049"></a>00049         @echo
-<a name="l00050"></a>00050         @echo -e &#39;\033[1;31m Compiling options\033[0m&#39;
-<a name="l00051"></a>00051         @echo -e &#39;\033[1;31m  DEBUG=yes(no)    \033[0m\033[1m =&gt; on(off) debug                  (default $(DEBUG))\033[0m&#39;
-<a name="l00052"></a>00052         @echo -e &#39;\033[1;31m  F03STD=yes(no)   \033[0m\033[1m =&gt; on(off) check standard fortran (default $(F03STD))\033[0m&#39;
-<a name="l00053"></a>00053         @echo -e &#39;\033[1;31m  PROFILING=yes(no)\033[0m\033[1m =&gt; on(off) profile the code       (default $(PROFILING))\033[0m&#39;
-<a name="l00054"></a>00054         @echo -e &#39;\033[1;31m  OPTIMIZE=yes(no) \033[0m\033[1m =&gt; on(off) optimization           (default $(OPTIMIZE))\033[0m&#39;
-<a name="l00055"></a>00055         @echo -e &#39;\033[1;31m  OPENMP=yes(no)   \033[0m\033[1m =&gt; on(off) OpenMP directives      (default $(OPENMP))\033[0m&#39;
-<a name="l00056"></a>00056         @echo -e &#39;\033[1;31m  MPI=yes(no)      \033[0m\033[1m =&gt; on(off) MPI    directives      (default $(MPI)) \033[0m&#39;
-<a name="l00057"></a>00057         @echo
-<a name="l00058"></a>00058         @echo -e &#39;\033[1;31m Preprocessing options\033[0m&#39;
-<a name="l00059"></a>00059         @echo -e &#39;\033[1;31m  R16P=yes(no)\033[0m\033[1m =&gt; on(off) definition of real with &quot;128 bit&quot; (default $(R16P))\033[0m&#39;
-<a name="l00060"></a>00060         @echo -e &#39;\033[1;31m  NULi=yes(no)\033[0m\033[1m =&gt; on(off) nullify i direction (1D or 2D)    (default $(NULi))\033[0m&#39;
-<a name="l00061"></a>00061         @echo -e &#39;\033[1;31m  NULj=yes(no)\033[0m\033[1m =&gt; on(off) nullify j direction (1D or 2D)    (default $(NULj))\033[0m&#39;
-<a name="l00062"></a>00062         @echo -e &#39;\033[1;31m  NULk=yes(no)\033[0m\033[1m =&gt; on(off) nullify k direction (1D or 2D)    (default $(NULk))\033[0m&#39;
-<a name="l00063"></a>00063         @echo -e &#39;\033[1;31m  PPL=yes(no) \033[0m\033[1m =&gt; on(off) Positivity Preserving Limiter     (default $(PPL))\033[0m&#39;
-<a name="l00064"></a>00064         @echo -e &#39;\033[1;31m  LMA=yes(no) \033[0m\033[1m =&gt; on(off) Low Mach number Adjsutment        (default $(LMA))\033[0m&#39;
-<a name="l00065"></a>00065         @echo -e &#39;\033[1;31m  WENO=WENO/WENOZ/WENOM\033[0m\033[1m WENO algorithm (default $(WENO))\033[0m&#39;
-<a name="l00066"></a>00066         @echo -e &#39;\033[1m   WENO  =&gt; Original Jiang-Shu\033[0m&#39;
-<a name="l00067"></a>00067         @echo -e &#39;\033[1m   WENOZ =&gt; Improved Borges-Carmona-Costa-Don\033[0m&#39;
-<a name="l00068"></a>00068         @echo -e &#39;\033[1m   WENOM =&gt; Improved Henrick-Aslam-Powers    \033[0m&#39;
-<a name="l00069"></a>00069         @echo -e &#39;\033[1;31m  RECV=RECVC/RECVP\033[0m\033[1m reconstruction variables type (default $(RECV))\033[0m&#39;
-<a name="l00070"></a>00070         @echo -e &#39;\033[1m   RECVC =&gt; reconstruction in (local) characteristic variables\033[0m&#39;
-<a name="l00071"></a>00071         @echo -e &#39;\033[1m   RECVP =&gt; reconstruction in primitive variables             \033[0m&#39;
-<a name="l00072"></a>00072         @echo -e &#39;\033[1;31m  RSU=HLLCb/HLLCc/HLLCp/HLLCt/HLLCz/EXA/PVL/TR/TS/APRS/ALFR/LF/LFz/ROE\033[0m\033[1m Riemann solver algorithm (default $(RSU))\033[0m&#39;
-<a name="l00073"></a>00073         @echo -e &#39;\033[1m   HLLCb =&gt; Approximate HLLC solver using BCLC waves speed estimation         \033[0m&#39;
-<a name="l00074"></a>00074         @echo -e &#39;\033[1m   HLLCc =&gt; Approximate HLLC solver using CVL  waves speed estimation         \033[0m&#39;
-<a name="l00075"></a>00075         @echo -e &#39;\033[1m   HLLCp =&gt; Approximate HLLC solver using PVL  waves speed estimation         \033[0m&#39;
-<a name="l00076"></a>00076         @echo -e &#39;\033[1m   HLLCt =&gt; Approximate HLLC solver using TR   waves speed estimation         \033[0m&#39;
-<a name="l00077"></a>00077         @echo -e &#39;\033[1m   HLLCz =&gt; Approximate HLLC solver using Z    waves speed estimation         \033[0m&#39;
-<a name="l00078"></a>00078         @echo -e &#39;\033[1m   EXA   =&gt; Exact solver                                                      \033[0m&#39;
-<a name="l00079"></a>00079         @echo -e &#39;\033[1m   PVL   =&gt; Approximate PVL solver                                            \033[0m&#39;
-<a name="l00080"></a>00080         @echo -e &#39;\033[1m   TR    =&gt; Approximate TR solver                                             \033[0m&#39;
-<a name="l00081"></a>00081         @echo -e &#39;\033[1m   TS    =&gt; Approximate TS solver                                             \033[0m&#39;
-<a name="l00082"></a>00082         @echo -e &#39;\033[1m   APRS  =&gt; Approximate APRS solver                                           \033[0m&#39;
-<a name="l00083"></a>00083         @echo -e &#39;\033[1m   ALFR  =&gt; Approximate ALFR solver                                           \033[0m&#39;
-<a name="l00084"></a>00084         @echo -e &#39;\033[1m   LFp   =&gt; Approximate Lax-Friedrichs solver using PVL waves speed estimation\033[0m&#39;
-<a name="l00085"></a>00085         @echo -e &#39;\033[1m   LFz   =&gt; Approximate Lax-Friedrichs solver using Z   waves speed estimation\033[0m&#39;
-<a name="l00086"></a>00086         @echo -e &#39;\033[1m   ROE   =&gt; Approximate Roe solver                                            \033[0m&#39;
-<a name="l00087"></a>00087         @echo -e &#39;\033[1;31m  WS=WSu/WSup\033[0m\033[1m Waves Speed estimation algorithm (default $(WS))\033[0m&#39;
-<a name="l00088"></a>00088         @echo -e &#39;\033[1m   WSu  =&gt; WavesSpeed14u  or WavesSpeed1234u  algorithm\033[0m&#39;
-<a name="l00089"></a>00089         @echo -e &#39;\033[1m   WSup =&gt; WavesSpeed14up or WavesSpeed1234up algorithm\033[0m&#39;
-<a name="l00090"></a>00090         @echo -e &#39;\033[1;31m  SMSW=SMSWz/SMSWliu/SMSWvanleer/SMSWvanalbada/SMSWharten\033[0m\033[1m smoothness switchg algorithm (default $(SMSW))\033[0m&#39;
-<a name="l00091"></a>00091         @echo -e &#39;\033[1m   SMSWz         =&gt; Riemann-solver-like algorithm      \033[0m&#39;
-<a name="l00092"></a>00092         @echo -e &#39;\033[1m   SMSWliu       =&gt; Liu algorithm                      \033[0m&#39;
-<a name="l00093"></a>00093         @echo -e &#39;\033[1m   SMSWvanleer   =&gt; van Leer slope limiter algorithm   \033[0m&#39;
-<a name="l00094"></a>00094         @echo -e &#39;\033[1m   SMSWvanAlbada =&gt; van Albada slope limiter  algorithm\033[0m&#39;
-<a name="l00095"></a>00095         @echo -e &#39;\033[1m   SMSWharten    =&gt; Harten slope limiter algorithm     \033[0m&#39;
-<a name="l00096"></a>00096         @echo -e &#39;\033[1;31m  HYBRID=NOHYBRID/HYBRID/HYBRIDC\033[0m\033[1m hybrid scheme (default $(HYBRID))\033[0m&#39;
-<a name="l00097"></a>00097         @echo -e &#39;\033[1m   NOHYBRID =&gt; no hybrid scheme                 \033[0m&#39;
-<a name="l00098"></a>00098         @echo -e &#39;\033[1m   HYBRID   =&gt; hybrid weno/weno_optimal scheme  \033[0m&#39;
-<a name="l00099"></a>00099         @echo -e &#39;\033[1m   HYBRIDC  =&gt; hybrid weno/noweno_central scheme\033[0m&#39;
-<a name="l00100"></a>00100         @echo
-<a name="l00101"></a>00101         @echo -e &#39;\033[1;31m External libraries\033[0m&#39;
-<a name="l00102"></a>00102         @echo -e &#39;\033[1;31m  TECIO=yes(no)\033[0m\033[1m =&gt; on(off) Tecplot IO library linking (default $(TECIO))\033[0m&#39;
-<a name="l00103"></a>00103         @echo
-<a name="l00104"></a>00104         @echo -e &#39;\033[1;31m Provided Rules\033[0m&#39;
-<a name="l00105"></a>00105         @echo -e &#39;\033[1;31m  Defualt rule =&gt;\033[0m\033[1m <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>\033[0m&#39;
-<a name="l00106"></a>00106         @echo -e &#39;\033[1;31m  help         =&gt;\033[0m\033[1m printing this help message\033[0m&#39;
-<a name="l00107"></a>00107         @echo -e &#39;\033[1;31m  <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>          =&gt;\033[0m\033[1m building <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a> code\033[0m&#39;
-<a name="l00108"></a>00108         @echo -e &#39;\033[1;31m  <a class="code" href="../../db/db0/group__Program.html#gab26dc33da06d747e4982826462b7d43a" title="IBM, Initial and Boundary conditions, Mesh generator for OFF (Open Finite volume Fluid dynamics code)...">IBM</a>          =&gt;\033[0m\033[1m building <a class="code" href="../../db/db0/group__Program.html#gab26dc33da06d747e4982826462b7d43a" title="IBM, Initial and Boundary conditions, Mesh generator for OFF (Open Finite volume Fluid dynamics code)...">IBM</a> code\033[0m&#39;
-<a name="l00109"></a>00109         @echo -e &#39;\033[1;31m  <a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a" title="POG, Post-processor Output Generator for OFF (Open Finite volume Fluid dynamics code).">POG</a>          =&gt;\033[0m\033[1m building <a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a" title="POG, Post-processor Output Generator for OFF (Open Finite volume Fluid dynamics code).">POG</a> code\033[0m&#39;
-<a name="l00110"></a>00110         @echo -e &#39;\033[1;31m  cleanobj     =&gt;\033[0m\033[1m cleaning compiled <span class="keywordtype">object</span>\033[0m&#39;
-<a name="l00111"></a>00111         @echo -e &#39;\033[1;31m  cleanmod     =&gt;\033[0m\033[1m cleaning .mod files\033[0m&#39;
-<a name="l00112"></a>00112         @echo -e &#39;\033[1;31m  cleanmsg     =&gt;\033[0m\033[1m cleaning make-log massage files\033[0m&#39;
-<a name="l00113"></a>00113         @echo -e &#39;\033[1;31m  cleanexe     =&gt;\033[0m\033[1m cleaning executable files\033[0m&#39;
-<a name="l00114"></a>00114         @echo -e &#39;\033[1;31m  clean        =&gt;\033[0m\033[1m running cleanobj, cleanmod and cleanmsg\033[0m&#39;
-<a name="l00115"></a>00115         @echo -e &#39;\033[1;31m  cleanall     =&gt;\033[0m\033[1m running clean and cleanexe\033[0m&#39;
-<a name="l00116"></a>00116         @echo -e &#39;\033[1;31m  tar          =&gt;\033[0m\033[1m creating a tar archive of the project\033[0m&#39;
-<a name="l00117"></a>00117         @echo -e &#39;\033[1;31m  doc          =&gt;\033[0m\033[1m building the documentation\033[0m&#39;
-<a name="l00118"></a>00118         @echo
-<a name="l00119"></a>00119 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00120"></a>00120 <span class="preprocessor"></span>
-<a name="l00121"></a>00121 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00122"></a>00122 <span class="preprocessor"></span><span class="preprocessor"># directory &amp; file</span>
-<a name="l00123"></a>00123 <span class="preprocessor"></span>DSRC  = ./src/
-<a name="l00124"></a>00124 DOBJ  = ./obj/
-<a name="l00125"></a>00125 DMOD  = ./mod/
-<a name="l00126"></a>00126 DLIB  = ./lib/
-<a name="l00127"></a>00127 DEXE  = ./
-<a name="l00128"></a>00128 VPATH = $(DSRC) $(DOBJ) $(DMOD) $(DLIB)
-<a name="l00129"></a>00129 
-<a name="l00130"></a>00130 MKDIRS = $(DOBJ) $(DMOD) $(DEXE)
-<a name="l00131"></a>00131 LBITS := $(shell getconf LONG_BIT)
-<a name="l00132"></a>00132 ifeq <span class="stringliteral">&quot;$(TECIO)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00133"></a>00133   PREPROC = -DTECIO
-<a name="l00134"></a>00134         ifeq ($(LBITS),64)
-<a name="l00135"></a>00135   LIBS = $(DLIB)64bit/tecio64.a $(DLIB)64bit/libstdc++64.5.0.7.so
-<a name="l00136"></a>00136         else
-<a name="l00137"></a>00137                 LIBS = $(DLIB)32bit/tecio.a $(DLIB)32bit/libstdc++.5.0.7.so
-<a name="l00138"></a>00138         endif
-<a name="l00139"></a>00139 else
-<a name="l00140"></a>00140   PREPROC =
-<a name="l00141"></a>00141   LIBS =
-<a name="l00142"></a>00142 endif
-<a name="l00143"></a>00143 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00144"></a>00144 <span class="preprocessor"></span>
-<a name="l00145"></a>00145 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00146"></a>00146 <span class="preprocessor"></span><span class="preprocessor"># compiling and linking options</span>
-<a name="l00147"></a>00147 <span class="preprocessor"></span>ifeq <span class="stringliteral">&quot;$(COMPILER)&quot;</span> <span class="stringliteral">&quot;gnu&quot;</span>
-<a name="l00148"></a>00148   OPTSC   = -cpp -c -J$(DMOD)
-<a name="l00149"></a>00149   OPTSL   =
-<a name="l00150"></a>00150   # debug
-<a name="l00151"></a>00151   ifeq <span class="stringliteral">&quot;$(DEBUG)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00152"></a>00152     PREPROC := $(PREPROC) -DDEBUG
-<a name="l00153"></a>00153     OPTSC := $(OPTSC) -O0 -Wall -Warray-temporaries -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow
-<a name="l00154"></a>00154     OPTSL := $(OPTSL) -O0 -Wall -Warray-temporaries -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow
-<a name="l00155"></a>00155   endif
-<a name="l00156"></a>00156 <span class="preprocessor">  # standard</span>
-<a name="l00157"></a>00157 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(F03STD)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00158"></a>00158     OPTSC := $(OPTSC) -std=f2008 -fall-intrinsics
-<a name="l00159"></a>00159     OPTSL := $(OPTSL) -std=f2008 -fall-intrinsics
-<a name="l00160"></a>00160   endif
-<a name="l00161"></a>00161 <span class="preprocessor">  # profiling</span>
-<a name="l00162"></a>00162 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(PROFILING)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00163"></a>00163     PREPROC := $(PREPROC) -DPROFILING
-<a name="l00164"></a>00164   endif
-<a name="l00165"></a>00165   # optimization
-<a name="l00166"></a>00166   ifeq <span class="stringliteral">&quot;$(OPTIMIZE)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00167"></a>00167     OPTSC := $(OPTSC) -O3
-<a name="l00168"></a>00168     OPTSL := $(OPTSL) -O3
-<a name="l00169"></a>00169   endif
-<a name="l00170"></a>00170   # openmp
-<a name="l00171"></a>00171   ifeq <span class="stringliteral">&quot;$(OPENMP)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00172"></a>00172     OPTSC := $(OPTSC) -fopenmp
-<a name="l00173"></a>00173     OPTSL := $(OPTSL) -fopenmp
-<a name="l00174"></a>00174     PREPROC := $(PREPROC) -DOPENMP
-<a name="l00175"></a>00175   endif
-<a name="l00176"></a>00176 <span class="preprocessor">  # mpi</span>
-<a name="l00177"></a>00177 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(MPI)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00178"></a>00178     PREPROC := $(PREPROC) -DMPI2
-<a name="l00179"></a>00179     FC = mpif90
-<a name="l00180"></a>00180   <span class="keywordflow">else</span>
-<a name="l00181"></a>00181     FC = gfortran
-<a name="l00182"></a>00182   endif
-<a name="l00183"></a>00183 endif
-<a name="l00184"></a>00184 ifeq <span class="stringliteral">&quot;$(COMPILER)&quot;</span> <span class="stringliteral">&quot;intel&quot;</span>
-<a name="l00185"></a>00185   OPTSC   = -cpp -c -module $(DMOD)
-<a name="l00186"></a>00186   OPTSL   =
-<a name="l00187"></a>00187 <span class="preprocessor">  # debug</span>
-<a name="l00188"></a>00188 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(DEBUG)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00189"></a>00189     PREPROC := $(PREPROC) -DDEBUG
-<a name="l00190"></a>00190     CHK = -check all
-<a name="l00191"></a>00191     DEB = -debug all
-<a name="l00192"></a>00192     WRN = -warn all
-<a name="l00193"></a>00193     OPTSC := $(OPTSC) -O0 -fpe-all=0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
-<a name="l00194"></a>00194     OPTSL := $(OPTSL) -O0 -fpe-all=0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
-<a name="l00195"></a>00195   endif
-<a name="l00196"></a>00196   # standard
-<a name="l00197"></a>00197   ifeq <span class="stringliteral">&quot;$(F03STD)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00198"></a>00198     OPTSC := $(OPTSC) -std03
-<a name="l00199"></a>00199     OPTSL := $(OPTSL) -std03
-<a name="l00200"></a>00200   endif
-<a name="l00201"></a>00201   # profiling
-<a name="l00202"></a>00202   ifeq <span class="stringliteral">&quot;$(PROFILING)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00203"></a>00203     PREPROC := $(PREPROC) -DPROFILING
-<a name="l00204"></a>00204   endif
-<a name="l00205"></a>00205 <span class="preprocessor">  # optimization</span>
-<a name="l00206"></a>00206 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(OPTIMIZE)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00207"></a>00207     OPTSC := $(OPTSC) -O3 -ipo -<span class="keyword">inline</span> all
-<a name="l00208"></a>00208     OPTSL := $(OPTSL) -O3 -ipo -<span class="keyword">inline</span> all
-<a name="l00209"></a>00209   endif
-<a name="l00210"></a>00210 <span class="preprocessor">  # openmp</span>
-<a name="l00211"></a>00211 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(OPENMP)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00212"></a>00212     OPTSC := $(OPTSC) -openmp
-<a name="l00213"></a>00213     OPTSL := $(OPTSL) -openmp
-<a name="l00214"></a>00214     PREPROC := $(PREPROC) -DOPENMP
-<a name="l00215"></a>00215   endif
-<a name="l00216"></a>00216   # mpi
-<a name="l00217"></a>00217   ifeq <span class="stringliteral">&quot;$(MPI)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00218"></a>00218     PREPROC := $(PREPROC) -DMPI2
-<a name="l00219"></a>00219     FC = mpif90
-<a name="l00220"></a>00220   <span class="keywordflow">else</span>
-<a name="l00221"></a>00221     FC = ifort
+<a name="l00013"></a>00013 PRESET    = openmp
+<a name="l00014"></a>00014 COMPILER  = intel
+<a name="l00015"></a>00015 DEBUG     = yes
+<a name="l00016"></a>00016 F03STD    = yes
+<a name="l00017"></a>00017 PROFILING = no
+<a name="l00018"></a>00018 OPTIMIZE  = no
+<a name="l00019"></a>00019 OPENMP    = no
+<a name="l00020"></a>00020 MPI       = no
+<a name="l00021"></a>00021 R16P      = no
+<a name="l00022"></a>00022 NULi      = no
+<a name="l00023"></a>00023 NULj      = no
+<a name="l00024"></a>00024 NULk      = no
+<a name="l00025"></a>00025 WENO      = WENO
+<a name="l00026"></a>00026 RECV      = RECVC
+<a name="l00027"></a>00027 RSU       = HLLCp
+<a name="l00028"></a>00028 VACUUM    = no
+<a name="l00029"></a>00029 WS        = WSup
+<a name="l00030"></a>00030 SMSW      = SMSWz
+<a name="l00031"></a>00031 HYBRID    = NOHYBRID
+<a name="l00032"></a>00032 PPL       = no
+<a name="l00033"></a>00033 LMA       = no
+<a name="l00034"></a>00034 TECIO     = no
+<a name="l00035"></a>00035 
+<a name="l00036"></a>00036 .PHONY : DEFAULTRULE
+<a name="l00037"></a>00037 DEFAULTRULE: $(DEXE)<a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>
+<a name="l00038"></a>00038 
+<a name="l00039"></a>00039 .PHONY : help
+<a name="l00040"></a>00040 help:
+<a name="l00041"></a>00041         @echo
+<a name="l00042"></a>00042         @echo -e &#39;\033[1;31m Make options of <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a> codes\033[0m&#39;
+<a name="l00043"></a>00043         @echo
+<a name="l00044"></a>00044         @echo -e &#39;\033[1;31m Preset configurations: PRESET=$(PRESET)\033[0m\033[1m =&gt; default\033[0m&#39;
+<a name="l00045"></a>00045         @echo -e &#39;\033[1;31m  PRESET=debug     \033[0m\033[1m =&gt; debug (no optimized) and serial\033[0m&#39;
+<a name="l00046"></a>00046         @echo -e &#39;\033[1;31m  PRESET=fast      \033[0m\033[1m =&gt; optimized (no debug) and serial\033[0m&#39;
+<a name="l00047"></a>00047         @echo -e &#39;\033[1;31m  PRESET=openmp    \033[0m\033[1m =&gt; optimized (no debug) and openmp enabled\033[0m&#39;
+<a name="l00048"></a>00048         @echo -e &#39;\033[1;31m  PRESET=mpi       \033[0m\033[1m =&gt; optimized (no debug) and mpi enabled\033[0m&#39;
+<a name="l00049"></a>00049         @echo -e &#39;\033[1;31m  PRESET=openmp-mpi\033[0m\033[1m =&gt; optimized (no debug) and openmp-mpi enabled\033[0m&#39;
+<a name="l00050"></a>00050         @echo
+<a name="l00051"></a>00051         @echo -e &#39;\033[1;31m Compiler choice: COMPILER=$(COMPILER)\033[0m\033[1m =&gt; default\033[0m&#39;
+<a name="l00052"></a>00052         @echo -e &#39;\033[1;31m  COMPILER=gnu  \033[0m\033[1m =&gt; GNU gfortran          \033[0m&#39;
+<a name="l00053"></a>00053         @echo -e &#39;\033[1;31m  COMPILER=intel\033[0m\033[1m =&gt; Intel Fortran         \033[0m&#39;
+<a name="l00054"></a>00054         @echo -e &#39;\033[1;31m  COMPILER=pgi  \033[0m\033[1m =&gt; Portland Group Fortran\033[0m&#39;
+<a name="l00055"></a>00055         @echo -e &#39;\033[1;31m  COMPILER=g95  \033[0m\033[1m =&gt; free g95              \033[0m&#39;
+<a name="l00056"></a>00056         @echo
+<a name="l00057"></a>00057         @echo -e &#39;\033[1;31m Compiling options\033[0m&#39;
+<a name="l00058"></a>00058         @echo -e &#39;\033[1;31m  DEBUG=yes(no)    \033[0m\033[1m =&gt; on(off) debug                  (default $(DEBUG))\033[0m&#39;
+<a name="l00059"></a>00059         @echo -e &#39;\033[1;31m  F03STD=yes(no)   \033[0m\033[1m =&gt; on(off) check standard fortran (default $(F03STD))\033[0m&#39;
+<a name="l00060"></a>00060         @echo -e &#39;\033[1;31m  PROFILING=yes(no)\033[0m\033[1m =&gt; on(off) profile the code       (default $(PROFILING))\033[0m&#39;
+<a name="l00061"></a>00061         @echo -e &#39;\033[1;31m  OPTIMIZE=yes(no) \033[0m\033[1m =&gt; on(off) optimization           (default $(OPTIMIZE))\033[0m&#39;
+<a name="l00062"></a>00062         @echo -e &#39;\033[1;31m  OPENMP=yes(no)   \033[0m\033[1m =&gt; on(off) OpenMP directives      (default $(OPENMP))\033[0m&#39;
+<a name="l00063"></a>00063         @echo -e &#39;\033[1;31m  MPI=yes(no)      \033[0m\033[1m =&gt; on(off) MPI    directives      (default $(MPI)) \033[0m&#39;
+<a name="l00064"></a>00064         @echo
+<a name="l00065"></a>00065         @echo -e &#39;\033[1;31m Preprocessing options\033[0m&#39;
+<a name="l00066"></a>00066         @echo -e &#39;\033[1;31m  R16P=yes(no)\033[0m\033[1m =&gt; on(off) definition of real with &quot;128 bit&quot; (default $(R16P))\033[0m&#39;
+<a name="l00067"></a>00067         @echo -e &#39;\033[1;31m  NULi=yes(no)\033[0m\033[1m =&gt; on(off) nullify i direction (1D or 2D)    (default $(NULi))\033[0m&#39;
+<a name="l00068"></a>00068         @echo -e &#39;\033[1;31m  NULj=yes(no)\033[0m\033[1m =&gt; on(off) nullify j direction (1D or 2D)    (default $(NULj))\033[0m&#39;
+<a name="l00069"></a>00069         @echo -e &#39;\033[1;31m  NULk=yes(no)\033[0m\033[1m =&gt; on(off) nullify k direction (1D or 2D)    (default $(NULk))\033[0m&#39;
+<a name="l00070"></a>00070         @echo -e &#39;\033[1;31m  PPL=yes(no) \033[0m\033[1m =&gt; on(off) Positivity Preserving Limiter     (default $(PPL))\033[0m&#39;
+<a name="l00071"></a>00071         @echo -e &#39;\033[1;31m  LMA=yes(no) \033[0m\033[1m =&gt; on(off) Low Mach number Adjsutment        (default $(LMA))\033[0m&#39;
+<a name="l00072"></a>00072         @echo -e &#39;\033[1;31m  WENO=WENO/WENOZ/WENOM\033[0m\033[1m WENO algorithm (default $(WENO))\033[0m&#39;
+<a name="l00073"></a>00073         @echo -e &#39;\033[1m   WENO  =&gt; Original Jiang-Shu\033[0m&#39;
+<a name="l00074"></a>00074         @echo -e &#39;\033[1m   WENOZ =&gt; Improved Borges-Carmona-Costa-Don\033[0m&#39;
+<a name="l00075"></a>00075         @echo -e &#39;\033[1m   WENOM =&gt; Improved Henrick-Aslam-Powers    \033[0m&#39;
+<a name="l00076"></a>00076         @echo -e &#39;\033[1;31m  RECV=RECVC/RECVP\033[0m\033[1m reconstruction variables type (default $(RECV))\033[0m&#39;
+<a name="l00077"></a>00077         @echo -e &#39;\033[1m   RECVC =&gt; reconstruction in (local) characteristic variables\033[0m&#39;
+<a name="l00078"></a>00078         @echo -e &#39;\033[1m   RECVP =&gt; reconstruction in primitive variables             \033[0m&#39;
+<a name="l00079"></a>00079         @echo -e &#39;\033[1;31m  RSU=HLLCb/HLLCc/HLLCp/HLLCt/HLLCz/EXA/PVL/TR/TS/APRS/ALFR/LF/LFz/ROE\033[0m\033[1m Riemann solver algorithm (default $(RSU))\033[0m&#39;
+<a name="l00080"></a>00080         @echo -e &#39;\033[1m   HLLCb =&gt; Approximate HLLC solver using BCLC waves speed estimation         \033[0m&#39;
+<a name="l00081"></a>00081         @echo -e &#39;\033[1m   HLLCc =&gt; Approximate HLLC solver using CVL  waves speed estimation         \033[0m&#39;
+<a name="l00082"></a>00082         @echo -e &#39;\033[1m   HLLCp =&gt; Approximate HLLC solver using PVL  waves speed estimation         \033[0m&#39;
+<a name="l00083"></a>00083         @echo -e &#39;\033[1m   HLLCt =&gt; Approximate HLLC solver using TR   waves speed estimation         \033[0m&#39;
+<a name="l00084"></a>00084         @echo -e &#39;\033[1m   HLLCz =&gt; Approximate HLLC solver using Z    waves speed estimation         \033[0m&#39;
+<a name="l00085"></a>00085         @echo -e &#39;\033[1m   EXA   =&gt; Exact solver                                                      \033[0m&#39;
+<a name="l00086"></a>00086         @echo -e &#39;\033[1m   PVL   =&gt; Approximate PVL solver                                            \033[0m&#39;
+<a name="l00087"></a>00087         @echo -e &#39;\033[1m   TR    =&gt; Approximate TR solver                                             \033[0m&#39;
+<a name="l00088"></a>00088         @echo -e &#39;\033[1m   TS    =&gt; Approximate TS solver                                             \033[0m&#39;
+<a name="l00089"></a>00089         @echo -e &#39;\033[1m   APRS  =&gt; Approximate APRS solver                                           \033[0m&#39;
+<a name="l00090"></a>00090         @echo -e &#39;\033[1m   ALFR  =&gt; Approximate ALFR solver                                           \033[0m&#39;
+<a name="l00091"></a>00091         @echo -e &#39;\033[1m   LFp   =&gt; Approximate Lax-Friedrichs solver using PVL waves speed estimation\033[0m&#39;
+<a name="l00092"></a>00092         @echo -e &#39;\033[1m   LFz   =&gt; Approximate Lax-Friedrichs solver using Z   waves speed estimation\033[0m&#39;
+<a name="l00093"></a>00093         @echo -e &#39;\033[1m   ROE   =&gt; Approximate Roe solver                                            \033[0m&#39;
+<a name="l00094"></a>00094         @echo -e &#39;\033[1;31m  WS=WSu/WSup\033[0m\033[1m Waves Speed estimation algorithm (default $(WS))\033[0m&#39;
+<a name="l00095"></a>00095         @echo -e &#39;\033[1m   WSu  =&gt; WavesSpeed14u  or WavesSpeed1234u  algorithm\033[0m&#39;
+<a name="l00096"></a>00096         @echo -e &#39;\033[1m   WSup =&gt; WavesSpeed14up or WavesSpeed1234up algorithm\033[0m&#39;
+<a name="l00097"></a>00097         @echo -e &#39;\033[1;31m  SMSW=SMSWz/SMSWliu/SMSWvanleer/SMSWvanalbada/SMSWharten\033[0m\033[1m smoothness switchg algorithm (default $(SMSW))\033[0m&#39;
+<a name="l00098"></a>00098         @echo -e &#39;\033[1m   SMSWz         =&gt; Riemann-solver-like algorithm      \033[0m&#39;
+<a name="l00099"></a>00099         @echo -e &#39;\033[1m   SMSWliu       =&gt; Liu algorithm                      \033[0m&#39;
+<a name="l00100"></a>00100         @echo -e &#39;\033[1m   SMSWvanleer   =&gt; van Leer slope limiter algorithm   \033[0m&#39;
+<a name="l00101"></a>00101         @echo -e &#39;\033[1m   SMSWvanAlbada =&gt; van Albada slope limiter  algorithm\033[0m&#39;
+<a name="l00102"></a>00102         @echo -e &#39;\033[1m   SMSWharten    =&gt; Harten slope limiter algorithm     \033[0m&#39;
+<a name="l00103"></a>00103         @echo -e &#39;\033[1;31m  HYBRID=NOHYBRID/HYBRID/HYBRIDC\033[0m\033[1m hybrid scheme (default $(HYBRID))\033[0m&#39;
+<a name="l00104"></a>00104         @echo -e &#39;\033[1m   NOHYBRID =&gt; no hybrid scheme                 \033[0m&#39;
+<a name="l00105"></a>00105         @echo -e &#39;\033[1m   HYBRID   =&gt; hybrid weno/weno_optimal scheme  \033[0m&#39;
+<a name="l00106"></a>00106         @echo -e &#39;\033[1m   HYBRIDC  =&gt; hybrid weno/noweno_central scheme\033[0m&#39;
+<a name="l00107"></a>00107         @echo
+<a name="l00108"></a>00108         @echo -e &#39;\033[1;31m External libraries\033[0m&#39;
+<a name="l00109"></a>00109         @echo -e &#39;\033[1;31m  TECIO=yes(no)\033[0m\033[1m =&gt; on(off) Tecplot IO library linking (default $(TECIO))\033[0m&#39;
+<a name="l00110"></a>00110         @echo
+<a name="l00111"></a>00111         @echo -e &#39;\033[1;31m Provided Rules\033[0m&#39;
+<a name="l00112"></a>00112         @echo -e &#39;\033[1;31m  Defualt rule =&gt;\033[0m\033[1m <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>\033[0m&#39;
+<a name="l00113"></a>00113         @echo -e &#39;\033[1;31m  help         =&gt;\033[0m\033[1m printing this help message\033[0m&#39;
+<a name="l00114"></a>00114         @echo -e &#39;\033[1;31m  <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>          =&gt;\033[0m\033[1m building <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a> code\033[0m&#39;
+<a name="l00115"></a>00115         @echo -e &#39;\033[1;31m  <a class="code" href="../../db/db0/group__Program.html#gab26dc33da06d747e4982826462b7d43a" title="IBM, Initial and Boundary conditions, Mesh generator for OFF (Open Finite volume Fluid dynamics code)...">IBM</a>          =&gt;\033[0m\033[1m building <a class="code" href="../../db/db0/group__Program.html#gab26dc33da06d747e4982826462b7d43a" title="IBM, Initial and Boundary conditions, Mesh generator for OFF (Open Finite volume Fluid dynamics code)...">IBM</a> code\033[0m&#39;
+<a name="l00116"></a>00116         @echo -e &#39;\033[1;31m  <a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a" title="POG, Post-processor Output Generator for OFF (Open Finite volume Fluid dynamics code).">POG</a>          =&gt;\033[0m\033[1m building <a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a" title="POG, Post-processor Output Generator for OFF (Open Finite volume Fluid dynamics code).">POG</a> code\033[0m&#39;
+<a name="l00117"></a>00117         @echo -e &#39;\033[1;31m  cleanobj     =&gt;\033[0m\033[1m cleaning compiled <span class="keywordtype">object</span>\033[0m&#39;
+<a name="l00118"></a>00118         @echo -e &#39;\033[1;31m  cleanmod     =&gt;\033[0m\033[1m cleaning .mod files\033[0m&#39;
+<a name="l00119"></a>00119         @echo -e &#39;\033[1;31m  cleanmsg     =&gt;\033[0m\033[1m cleaning make-log massage files\033[0m&#39;
+<a name="l00120"></a>00120         @echo -e &#39;\033[1;31m  cleanexe     =&gt;\033[0m\033[1m cleaning executable files\033[0m&#39;
+<a name="l00121"></a>00121         @echo -e &#39;\033[1;31m  clean        =&gt;\033[0m\033[1m running cleanobj, cleanmod and cleanmsg\033[0m&#39;
+<a name="l00122"></a>00122         @echo -e &#39;\033[1;31m  cleanall     =&gt;\033[0m\033[1m running clean and cleanexe\033[0m&#39;
+<a name="l00123"></a>00123         @echo -e &#39;\033[1;31m  tar          =&gt;\033[0m\033[1m creating a tar archive of the project\033[0m&#39;
+<a name="l00124"></a>00124         @echo -e &#39;\033[1;31m  doc          =&gt;\033[0m\033[1m building the documentation\033[0m&#39;
+<a name="l00125"></a>00125         @echo
+<a name="l00126"></a>00126 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00127"></a>00127 <span class="preprocessor"></span>
+<a name="l00128"></a>00128 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00129"></a>00129 <span class="preprocessor"></span><span class="preprocessor"># directory &amp; file</span>
+<a name="l00130"></a>00130 <span class="preprocessor"></span>DSRC  = ./src/
+<a name="l00131"></a>00131 DOBJ  = ./obj/
+<a name="l00132"></a>00132 DMOD  = ./mod/
+<a name="l00133"></a>00133 DLIB  = ./lib/
+<a name="l00134"></a>00134 DEXE  = ./
+<a name="l00135"></a>00135 VPATH = $(DSRC) $(DOBJ) $(DMOD) $(DLIB)
+<a name="l00136"></a>00136 
+<a name="l00137"></a>00137 MKDIRS = $(DOBJ) $(DMOD) $(DEXE)
+<a name="l00138"></a>00138 LBITS := $(shell getconf LONG_BIT)
+<a name="l00139"></a>00139 ifeq <span class="stringliteral">&quot;$(TECIO)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00140"></a>00140   PREPROC = -DTECIO
+<a name="l00141"></a>00141         ifeq ($(LBITS),64)
+<a name="l00142"></a>00142   LIBS = $(DLIB)64bit/tecio64.a $(DLIB)64bit/libstdc++64.5.0.7.so
+<a name="l00143"></a>00143         else
+<a name="l00144"></a>00144                 LIBS = $(DLIB)32bit/tecio.a $(DLIB)32bit/libstdc++.5.0.7.so
+<a name="l00145"></a>00145         endif
+<a name="l00146"></a>00146 else
+<a name="l00147"></a>00147   PREPROC =
+<a name="l00148"></a>00148   LIBS =
+<a name="l00149"></a>00149 endif
+<a name="l00150"></a>00150 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00151"></a>00151 <span class="preprocessor"></span>
+<a name="l00152"></a>00152 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00153"></a>00153 <span class="preprocessor"></span><span class="preprocessor"># compiling and linking options</span>
+<a name="l00154"></a>00154 <span class="preprocessor"></span>ifeq <span class="stringliteral">&quot;$(PRESET)&quot;</span> <span class="stringliteral">&quot;debug&quot;</span>
+<a name="l00155"></a>00155   DEBUG     = yes
+<a name="l00156"></a>00156   F03STD    = yes
+<a name="l00157"></a>00157   PROFILING = yes
+<a name="l00158"></a>00158   OPTIMIZE  = no
+<a name="l00159"></a>00159   OPENMP    = no
+<a name="l00160"></a>00160   MPI       = no
+<a name="l00161"></a>00161 endif
+<a name="l00162"></a>00162 ifeq <span class="stringliteral">&quot;$(PRESET)&quot;</span> <span class="stringliteral">&quot;fast&quot;</span>
+<a name="l00163"></a>00163   DEBUG     = no
+<a name="l00164"></a>00164   F03STD    = no
+<a name="l00165"></a>00165   PROFILING = no
+<a name="l00166"></a>00166   OPTIMIZE  = yes
+<a name="l00167"></a>00167   OPENMP    = no
+<a name="l00168"></a>00168   MPI       = no
+<a name="l00169"></a>00169 endif
+<a name="l00170"></a>00170 ifeq <span class="stringliteral">&quot;$(PRESET)&quot;</span> <span class="stringliteral">&quot;openmp&quot;</span>
+<a name="l00171"></a>00171   DEBUG     = no
+<a name="l00172"></a>00172   F03STD    = no
+<a name="l00173"></a>00173   PROFILING = no
+<a name="l00174"></a>00174   OPTIMIZE  = yes
+<a name="l00175"></a>00175   OPENMP    = yes
+<a name="l00176"></a>00176   MPI       = no
+<a name="l00177"></a>00177 endif
+<a name="l00178"></a>00178 ifeq <span class="stringliteral">&quot;$(PRESET)&quot;</span> <span class="stringliteral">&quot;mpi&quot;</span>
+<a name="l00179"></a>00179   DEBUG     = no
+<a name="l00180"></a>00180   F03STD    = no
+<a name="l00181"></a>00181   PROFILING = no
+<a name="l00182"></a>00182   OPTIMIZE  = yes
+<a name="l00183"></a>00183   OPENMP    = no
+<a name="l00184"></a>00184   MPI       = yes
+<a name="l00185"></a>00185 endif
+<a name="l00186"></a>00186 ifeq <span class="stringliteral">&quot;$(PRESET)&quot;</span> <span class="stringliteral">&quot;openmp-mpi&quot;</span>
+<a name="l00187"></a>00187   DEBUG     = no
+<a name="l00188"></a>00188   F03STD    = no
+<a name="l00189"></a>00189   PROFILING = no
+<a name="l00190"></a>00190   OPTIMIZE  = yes
+<a name="l00191"></a>00191   OPENMP    = yes
+<a name="l00192"></a>00192   MPI       = yes
+<a name="l00193"></a>00193 endif
+<a name="l00194"></a>00194 ifeq <span class="stringliteral">&quot;$(COMPILER)&quot;</span> <span class="stringliteral">&quot;gnu&quot;</span>
+<a name="l00195"></a>00195   OPTSC   = -cpp -c -J$(DMOD)
+<a name="l00196"></a>00196   OPTSL   =
+<a name="l00197"></a>00197   # debug
+<a name="l00198"></a>00198   ifeq <span class="stringliteral">&quot;$(DEBUG)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00199"></a>00199     PREPROC := $(PREPROC) -DDEBUG
+<a name="l00200"></a>00200     OPTSC := $(OPTSC) -O0 -Wall -Warray-temporaries -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow
+<a name="l00201"></a>00201     OPTSL := $(OPTSL) -O0 -Wall -Warray-temporaries -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow
+<a name="l00202"></a>00202   endif
+<a name="l00203"></a>00203 <span class="preprocessor">  # standard</span>
+<a name="l00204"></a>00204 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(F03STD)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00205"></a>00205     OPTSC := $(OPTSC) -std=f2008 -fall-intrinsics
+<a name="l00206"></a>00206     OPTSL := $(OPTSL) -std=f2008 -fall-intrinsics
+<a name="l00207"></a>00207   endif
+<a name="l00208"></a>00208 <span class="preprocessor">  # profiling</span>
+<a name="l00209"></a>00209 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(PROFILING)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00210"></a>00210     PREPROC := $(PREPROC) -DPROFILING
+<a name="l00211"></a>00211   endif
+<a name="l00212"></a>00212   # optimization
+<a name="l00213"></a>00213   ifeq <span class="stringliteral">&quot;$(OPTIMIZE)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00214"></a>00214     OPTSC := $(OPTSC) -O3
+<a name="l00215"></a>00215     OPTSL := $(OPTSL) -O3
+<a name="l00216"></a>00216   endif
+<a name="l00217"></a>00217   # openmp
+<a name="l00218"></a>00218   ifeq <span class="stringliteral">&quot;$(OPENMP)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00219"></a>00219     OPTSC := $(OPTSC) -fopenmp
+<a name="l00220"></a>00220     OPTSL := $(OPTSL) -fopenmp
+<a name="l00221"></a>00221     PREPROC := $(PREPROC) -DOPENMP
 <a name="l00222"></a>00222   endif
-<a name="l00223"></a>00223 endif
-<a name="l00224"></a>00224 ifeq <span class="stringliteral">&quot;$(COMPILER)&quot;</span> <span class="stringliteral">&quot;pgi&quot;</span>
-<a name="l00225"></a>00225   OPTSC   = -Mpreprocess -c -module $(DMOD)
-<a name="l00226"></a>00226   OPTSL   =
-<a name="l00227"></a>00227         PREPROC := $(PREPROC) -Dpgf95
-<a name="l00228"></a>00228 <span class="preprocessor">  # debug</span>
-<a name="l00229"></a>00229 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(DEBUG)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00230"></a>00230     PREPROC := $(PREPROC) -DDEBUG
-<a name="l00231"></a>00231     OPTSC := $(OPTSC) -C -g -Mbounds -Mchkstk
-<a name="l00232"></a>00232     OPTSL := $(OPTSL) -C -g -Mbounds -Mchkstk
-<a name="l00233"></a>00233   endif
-<a name="l00234"></a>00234   # standard
-<a name="l00235"></a>00235   ifeq <span class="stringliteral">&quot;$(F03STD)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00236"></a>00236     OPTSC := $(OPTSC) -Mstandard
-<a name="l00237"></a>00237     OPTSL := $(OPTSL) -Mstandard
-<a name="l00238"></a>00238   endif
-<a name="l00239"></a>00239   # profiling
-<a name="l00240"></a>00240   ifeq <span class="stringliteral">&quot;$(PROFILING)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00241"></a>00241     PREPROC := $(PREPROC) -DPROFILING
+<a name="l00223"></a>00223 <span class="preprocessor">  # mpi</span>
+<a name="l00224"></a>00224 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(MPI)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00225"></a>00225     PREPROC := $(PREPROC) -DMPI2
+<a name="l00226"></a>00226     FC = mpif90
+<a name="l00227"></a>00227   <span class="keywordflow">else</span>
+<a name="l00228"></a>00228     FC = gfortran
+<a name="l00229"></a>00229   endif
+<a name="l00230"></a>00230 endif
+<a name="l00231"></a>00231 ifeq <span class="stringliteral">&quot;$(COMPILER)&quot;</span> <span class="stringliteral">&quot;intel&quot;</span>
+<a name="l00232"></a>00232   OPTSC   = -cpp -c -module $(DMOD)
+<a name="l00233"></a>00233   OPTSL   =
+<a name="l00234"></a>00234 <span class="preprocessor">  # debug</span>
+<a name="l00235"></a>00235 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(DEBUG)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00236"></a>00236     PREPROC := $(PREPROC) -DDEBUG
+<a name="l00237"></a>00237     CHK = -check all
+<a name="l00238"></a>00238     DEB = -debug all
+<a name="l00239"></a>00239     WRN = -warn all
+<a name="l00240"></a>00240     OPTSC := $(OPTSC) -O0 -fpe-all=0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
+<a name="l00241"></a>00241     OPTSL := $(OPTSL) -O0 -fpe-all=0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
 <a name="l00242"></a>00242   endif
-<a name="l00243"></a>00243 <span class="preprocessor">  # optimization</span>
-<a name="l00244"></a>00244 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(OPTIMIZE)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00245"></a>00245     OPTSC := $(OPTSC) -O1
-<a name="l00246"></a>00246     OPTSL := $(OPTSL) -O1
+<a name="l00243"></a>00243   # standard
+<a name="l00244"></a>00244   ifeq <span class="stringliteral">&quot;$(F03STD)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00245"></a>00245     OPTSC := $(OPTSC) -std03
+<a name="l00246"></a>00246     OPTSL := $(OPTSL) -std03
 <a name="l00247"></a>00247   endif
-<a name="l00248"></a>00248 <span class="preprocessor">  # openmp</span>
-<a name="l00249"></a>00249 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(OPENMP)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00250"></a>00250     OPTSC := $(OPTSC) -mp
-<a name="l00251"></a>00251     OPTSL := $(OPTSL) -mp
-<a name="l00252"></a>00252     PREPROC := $(PREPROC) -DOPENMP
-<a name="l00253"></a>00253   endif
-<a name="l00254"></a>00254   # mpi
-<a name="l00255"></a>00255   ifeq <span class="stringliteral">&quot;$(MPI)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00256"></a>00256     PREPROC := $(PREPROC) -DMPI2
-<a name="l00257"></a>00257     FC = mpif90
-<a name="l00258"></a>00258   <span class="keywordflow">else</span>
-<a name="l00259"></a>00259     FC = pgf95
-<a name="l00260"></a>00260   endif
-<a name="l00261"></a>00261 endif
-<a name="l00262"></a>00262 ifeq <span class="stringliteral">&quot;$(COMPILER)&quot;</span> <span class="stringliteral">&quot;g95&quot;</span>
-<a name="l00263"></a>00263   OPTSC   = -cpp -c -fmod=$(DMOD)
-<a name="l00264"></a>00264   OPTSL   =
-<a name="l00265"></a>00265   # debug
-<a name="l00266"></a>00266   ifeq <span class="stringliteral">&quot;$(DEBUG)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00267"></a>00267     PREPROC := $(PREPROC) -DDEBUG
-<a name="l00268"></a>00268     OPTSC := $(OPTSC) -O0 -g
-<a name="l00269"></a>00269     OPTSL := $(OPTSL) -O0 -g
-<a name="l00270"></a>00270   endif
-<a name="l00271"></a>00271 <span class="preprocessor">  # standard</span>
-<a name="l00272"></a>00272 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(F03STD)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00273"></a>00273     OPTSC := $(OPTSC) -std=f2003 -fintrinsic-extensions
-<a name="l00274"></a>00274     OPTSL := $(OPTSL) -std=f2003 -fintrinsic-extensions
-<a name="l00275"></a>00275   endif
-<a name="l00276"></a>00276 <span class="preprocessor">  # profiling</span>
-<a name="l00277"></a>00277 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(PROFILING)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00278"></a>00278     PREPROC := $(PREPROC) -DPROFILING
-<a name="l00279"></a>00279   endif
-<a name="l00280"></a>00280   # optimization
-<a name="l00281"></a>00281   ifeq <span class="stringliteral">&quot;$(OPTIMIZE)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00282"></a>00282     OPTSC := $(OPTSC) -O3
-<a name="l00283"></a>00283     OPTSL := $(OPTSL) -O3
-<a name="l00284"></a>00284   endif
-<a name="l00285"></a>00285   FC = g95
-<a name="l00286"></a>00286 endif
-<a name="l00287"></a>00287 # pre-processing options
-<a name="l00288"></a>00288 # R16 precision
-<a name="l00289"></a>00289 R16PCHK = (Unknown R16P <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> R16P=no
-<a name="l00290"></a>00290 ifeq <span class="stringliteral">&quot;$(R16P)&quot;</span> <span class="stringliteral">&quot;no&quot;</span>
-<a name="l00291"></a>00291   R16PCHK = (Known R16P <span class="keywordflow">switch</span>) Used R16P=$(R16P)
-<a name="l00292"></a>00292 endif
-<a name="l00293"></a>00293 ifeq <span class="stringliteral">&quot;$(R16P)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00294"></a>00294   R16PCHK = (Known R16P <span class="keywordflow">switch</span>) Used R16P=$(R16P)
-<a name="l00295"></a>00295   PREPROC := $(PREPROC) -Dr16p
-<a name="l00296"></a>00296 endif
-<a name="l00297"></a>00297 # 1D or 2D solver
-<a name="l00298"></a>00298 NULiCHK = (Unknown NULi <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> NULi=no
-<a name="l00299"></a>00299 ifeq <span class="stringliteral">&quot;$(NULi)&quot;</span> <span class="stringliteral">&quot;no&quot;</span>
-<a name="l00300"></a>00300   NULiCHK = (Known NULi <span class="keywordflow">switch</span>) Used NULi=$(NULi)
-<a name="l00301"></a>00301 endif
-<a name="l00302"></a>00302 ifeq <span class="stringliteral">&quot;$(NULi)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00303"></a>00303   NULiCHK = (Known NULi <span class="keywordflow">switch</span>) Used NULi=$(NULi)
-<a name="l00304"></a>00304   PREPROC := $(PREPROC) -DNULi
-<a name="l00305"></a>00305 endif
-<a name="l00306"></a>00306 NULjCHK = (Unknown NULj <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> NULj=no
-<a name="l00307"></a>00307 ifeq <span class="stringliteral">&quot;$(NULj)&quot;</span> <span class="stringliteral">&quot;no&quot;</span>
-<a name="l00308"></a>00308   NULjCHK = (Known NULj <span class="keywordflow">switch</span>) Used NULj=$(NULj)
-<a name="l00309"></a>00309 endif
-<a name="l00310"></a>00310 ifeq <span class="stringliteral">&quot;$(NULj)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00311"></a>00311   NULjCHK = (Known NULj <span class="keywordflow">switch</span>) Used NULj=$(NULj)
-<a name="l00312"></a>00312   PREPROC := $(PREPROC) -DNULj
-<a name="l00313"></a>00313 endif
-<a name="l00314"></a>00314 NULkCHK = (Unknown NULk <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> NULk=no
-<a name="l00315"></a>00315 ifeq <span class="stringliteral">&quot;$(NULk)&quot;</span> <span class="stringliteral">&quot;no&quot;</span>
-<a name="l00316"></a>00316   NULkCHK = (Known NULk <span class="keywordflow">switch</span>) Used NULk=$(NULk)
-<a name="l00317"></a>00317 endif
-<a name="l00318"></a>00318 ifeq <span class="stringliteral">&quot;$(NULk)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00319"></a>00319   NULkCHK = (Known NULk <span class="keywordflow">switch</span>) Used NULk=$(NULk)
-<a name="l00320"></a>00320   PREPROC := $(PREPROC) -DNULk
-<a name="l00321"></a>00321 endif
-<a name="l00322"></a>00322 # Positivity-Preserving-Limiter
-<a name="l00323"></a>00323 PPLCHK = (Unknown PPL <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> PPL=no
-<a name="l00324"></a>00324 ifeq <span class="stringliteral">&quot;$(PPL)&quot;</span> <span class="stringliteral">&quot;no&quot;</span>
-<a name="l00325"></a>00325   PPLCHK = (Known PPL <span class="keywordflow">switch</span>) Used PPL=$(PPL)
-<a name="l00326"></a>00326 endif
-<a name="l00327"></a>00327 ifeq <span class="stringliteral">&quot;$(PPL)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00328"></a>00328   PPLCHK = (Known PPL <span class="keywordflow">switch</span>) Used PPL=$(PPL)
-<a name="l00329"></a>00329   PREPROC := $(PREPROC) -DPPL
-<a name="l00330"></a>00330 endif
-<a name="l00331"></a>00331 # Low Mach number Adjustment
-<a name="l00332"></a>00332 LMACHK = (Unknown LMA <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> LMA=no
-<a name="l00333"></a>00333 ifeq <span class="stringliteral">&quot;$(LMA)&quot;</span> <span class="stringliteral">&quot;no&quot;</span>
-<a name="l00334"></a>00334   LMACHK = (Known LMA <span class="keywordflow">switch</span>) Used LMA=$(LMA)
-<a name="l00335"></a>00335 endif
-<a name="l00336"></a>00336 ifeq <span class="stringliteral">&quot;$(LMA)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
-<a name="l00337"></a>00337   LMACHK = (Known LMA <span class="keywordflow">switch</span>) Used LMA=$(LMA)
-<a name="l00338"></a>00338   PREPROC := $(PREPROC) -DLMA
+<a name="l00248"></a>00248   # profiling
+<a name="l00249"></a>00249   ifeq <span class="stringliteral">&quot;$(PROFILING)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00250"></a>00250     PREPROC := $(PREPROC) -DPROFILING
+<a name="l00251"></a>00251   endif
+<a name="l00252"></a>00252 <span class="preprocessor">  # optimization</span>
+<a name="l00253"></a>00253 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(OPTIMIZE)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00254"></a>00254     OPTSC := $(OPTSC) -O3 -ipo -<span class="keyword">inline</span> all
+<a name="l00255"></a>00255     OPTSL := $(OPTSL) -O3 -ipo -<span class="keyword">inline</span> all
+<a name="l00256"></a>00256   endif
+<a name="l00257"></a>00257 <span class="preprocessor">  # openmp</span>
+<a name="l00258"></a>00258 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(OPENMP)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00259"></a>00259     OPTSC := $(OPTSC) -openmp
+<a name="l00260"></a>00260     OPTSL := $(OPTSL) -openmp
+<a name="l00261"></a>00261     PREPROC := $(PREPROC) -DOPENMP
+<a name="l00262"></a>00262   endif
+<a name="l00263"></a>00263   # mpi
+<a name="l00264"></a>00264   ifeq <span class="stringliteral">&quot;$(MPI)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00265"></a>00265     PREPROC := $(PREPROC) -DMPI2
+<a name="l00266"></a>00266     FC = mpif90
+<a name="l00267"></a>00267   <span class="keywordflow">else</span>
+<a name="l00268"></a>00268     FC = ifort
+<a name="l00269"></a>00269   endif
+<a name="l00270"></a>00270 endif
+<a name="l00271"></a>00271 ifeq <span class="stringliteral">&quot;$(COMPILER)&quot;</span> <span class="stringliteral">&quot;pgi&quot;</span>
+<a name="l00272"></a>00272   OPTSC   = -Mpreprocess -c -module $(DMOD)
+<a name="l00273"></a>00273   OPTSL   =
+<a name="l00274"></a>00274         PREPROC := $(PREPROC) -Dpgf95
+<a name="l00275"></a>00275 <span class="preprocessor">  # debug</span>
+<a name="l00276"></a>00276 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(DEBUG)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00277"></a>00277     PREPROC := $(PREPROC) -DDEBUG
+<a name="l00278"></a>00278     OPTSC := $(OPTSC) -C -g -Mbounds -Mchkstk
+<a name="l00279"></a>00279     OPTSL := $(OPTSL) -C -g -Mbounds -Mchkstk
+<a name="l00280"></a>00280   endif
+<a name="l00281"></a>00281   # standard
+<a name="l00282"></a>00282   ifeq <span class="stringliteral">&quot;$(F03STD)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00283"></a>00283     OPTSC := $(OPTSC) -Mstandard
+<a name="l00284"></a>00284     OPTSL := $(OPTSL) -Mstandard
+<a name="l00285"></a>00285   endif
+<a name="l00286"></a>00286   # profiling
+<a name="l00287"></a>00287   ifeq <span class="stringliteral">&quot;$(PROFILING)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00288"></a>00288     PREPROC := $(PREPROC) -DPROFILING
+<a name="l00289"></a>00289   endif
+<a name="l00290"></a>00290 <span class="preprocessor">  # optimization</span>
+<a name="l00291"></a>00291 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(OPTIMIZE)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00292"></a>00292     OPTSC := $(OPTSC) -O1
+<a name="l00293"></a>00293     OPTSL := $(OPTSL) -O1
+<a name="l00294"></a>00294   endif
+<a name="l00295"></a>00295 <span class="preprocessor">  # openmp</span>
+<a name="l00296"></a>00296 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(OPENMP)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00297"></a>00297     OPTSC := $(OPTSC) -mp
+<a name="l00298"></a>00298     OPTSL := $(OPTSL) -mp
+<a name="l00299"></a>00299     PREPROC := $(PREPROC) -DOPENMP
+<a name="l00300"></a>00300   endif
+<a name="l00301"></a>00301   # mpi
+<a name="l00302"></a>00302   ifeq <span class="stringliteral">&quot;$(MPI)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00303"></a>00303     PREPROC := $(PREPROC) -DMPI2
+<a name="l00304"></a>00304     FC = mpif90
+<a name="l00305"></a>00305   <span class="keywordflow">else</span>
+<a name="l00306"></a>00306     FC = pgf95
+<a name="l00307"></a>00307   endif
+<a name="l00308"></a>00308 endif
+<a name="l00309"></a>00309 ifeq <span class="stringliteral">&quot;$(COMPILER)&quot;</span> <span class="stringliteral">&quot;g95&quot;</span>
+<a name="l00310"></a>00310   OPTSC   = -cpp -c -fmod=$(DMOD)
+<a name="l00311"></a>00311   OPTSL   =
+<a name="l00312"></a>00312   # debug
+<a name="l00313"></a>00313   ifeq <span class="stringliteral">&quot;$(DEBUG)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00314"></a>00314     PREPROC := $(PREPROC) -DDEBUG
+<a name="l00315"></a>00315     OPTSC := $(OPTSC) -O0 -g
+<a name="l00316"></a>00316     OPTSL := $(OPTSL) -O0 -g
+<a name="l00317"></a>00317   endif
+<a name="l00318"></a>00318 <span class="preprocessor">  # standard</span>
+<a name="l00319"></a>00319 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(F03STD)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00320"></a>00320     OPTSC := $(OPTSC) -std=f2003 -fintrinsic-extensions
+<a name="l00321"></a>00321     OPTSL := $(OPTSL) -std=f2003 -fintrinsic-extensions
+<a name="l00322"></a>00322   endif
+<a name="l00323"></a>00323 <span class="preprocessor">  # profiling</span>
+<a name="l00324"></a>00324 <span class="preprocessor"></span>  ifeq <span class="stringliteral">&quot;$(PROFILING)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00325"></a>00325     PREPROC := $(PREPROC) -DPROFILING
+<a name="l00326"></a>00326   endif
+<a name="l00327"></a>00327   # optimization
+<a name="l00328"></a>00328   ifeq <span class="stringliteral">&quot;$(OPTIMIZE)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00329"></a>00329     OPTSC := $(OPTSC) -O3
+<a name="l00330"></a>00330     OPTSL := $(OPTSL) -O3
+<a name="l00331"></a>00331   endif
+<a name="l00332"></a>00332   FC = g95
+<a name="l00333"></a>00333 endif
+<a name="l00334"></a>00334 # pre-processing options
+<a name="l00335"></a>00335 # R16 precision
+<a name="l00336"></a>00336 R16PCHK = (Unknown R16P <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> R16P=no
+<a name="l00337"></a>00337 ifeq <span class="stringliteral">&quot;$(R16P)&quot;</span> <span class="stringliteral">&quot;no&quot;</span>
+<a name="l00338"></a>00338   R16PCHK = (Known R16P <span class="keywordflow">switch</span>) Used R16P=$(R16P)
 <a name="l00339"></a>00339 endif
-<a name="l00340"></a>00340 # WENO algorithms
-<a name="l00341"></a>00341 WENOCHK = (Unknown WENO <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> WENO=WENO
-<a name="l00342"></a>00342 ifeq <span class="stringliteral">&quot;$(WENO)&quot;</span> <span class="stringliteral">&quot;WENO&quot;</span>
-<a name="l00343"></a>00343   WENOCHK = (Known WENO <span class="keywordflow">switch</span>) Used WENO=$(WENO)
-<a name="l00344"></a>00344 endif
-<a name="l00345"></a>00345 ifeq <span class="stringliteral">&quot;$(WENO)&quot;</span> <span class="stringliteral">&quot;WENOZ&quot;</span>
-<a name="l00346"></a>00346   WENOCHK = (Known WENO <span class="keywordflow">switch</span>) Used WENO=$(WENO)
-<a name="l00347"></a>00347   PREPROC := $(PREPROC) -D$(WENO)
+<a name="l00340"></a>00340 ifeq <span class="stringliteral">&quot;$(R16P)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00341"></a>00341   R16PCHK = (Known R16P <span class="keywordflow">switch</span>) Used R16P=$(R16P)
+<a name="l00342"></a>00342   PREPROC := $(PREPROC) -Dr16p
+<a name="l00343"></a>00343 endif
+<a name="l00344"></a>00344 # 1D or 2D solver
+<a name="l00345"></a>00345 NULiCHK = (Unknown NULi <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> NULi=no
+<a name="l00346"></a>00346 ifeq <span class="stringliteral">&quot;$(NULi)&quot;</span> <span class="stringliteral">&quot;no&quot;</span>
+<a name="l00347"></a>00347   NULiCHK = (Known NULi <span class="keywordflow">switch</span>) Used NULi=$(NULi)
 <a name="l00348"></a>00348 endif
-<a name="l00349"></a>00349 ifeq <span class="stringliteral">&quot;$(WENO)&quot;</span> <span class="stringliteral">&quot;WENOM&quot;</span>
-<a name="l00350"></a>00350   WENOCHK = (Known WENO <span class="keywordflow">switch</span>) Used WENO=$(WENO)
-<a name="l00351"></a>00351   PREPROC := $(PREPROC) -D$(WENO)
+<a name="l00349"></a>00349 ifeq <span class="stringliteral">&quot;$(NULi)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00350"></a>00350   NULiCHK = (Known NULi <span class="keywordflow">switch</span>) Used NULi=$(NULi)
+<a name="l00351"></a>00351   PREPROC := $(PREPROC) -DNULi
 <a name="l00352"></a>00352 endif
-<a name="l00353"></a>00353 <span class="preprocessor"># reconstruction variables type</span>
-<a name="l00354"></a>00354 <span class="preprocessor"></span>ifeq <span class="stringliteral">&quot;$(RECV)&quot;</span> <span class="stringliteral">&quot;RECVC&quot;</span>
-<a name="l00355"></a>00355   RECVCHK = (Known RECV <span class="keywordflow">switch</span>) Used RECV=$(RECV)
-<a name="l00356"></a>00356   PREPROC := $(PREPROC) -D$(RECV)
-<a name="l00357"></a>00357 <span class="keywordflow">else</span>
-<a name="l00358"></a>00358   ifeq <span class="stringliteral">&quot;$(RECV)&quot;</span> <span class="stringliteral">&quot;RECVP&quot;</span>
-<a name="l00359"></a>00359     RECVCHK = (Known RECV <span class="keywordflow">switch</span>) Used RECV=$(RECV)
-<a name="l00360"></a>00360     PREPROC := $(PREPROC) -D$(RECV)
-<a name="l00361"></a>00361   <span class="keywordflow">else</span>
-<a name="l00362"></a>00362     RECVCHK = (Unknown RECV <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> RECV=RECVC
-<a name="l00363"></a>00363     PREPROC := $(PREPROC) -DRECVC
-<a name="l00364"></a>00364   endif
-<a name="l00365"></a>00365 endif
-<a name="l00366"></a>00366 <span class="preprocessor"># Riemann solver</span>
-<a name="l00367"></a>00367 <span class="preprocessor"></span>RSUCHK = (Unknown RSU <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> RSU=HLLCp
-<a name="l00368"></a>00368 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;HLLCb&quot;</span>
-<a name="l00369"></a>00369   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00370"></a>00370   RS = -DRS$(RSU)
-<a name="l00371"></a>00371 endif
-<a name="l00372"></a>00372 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;HLLCc&quot;</span>
-<a name="l00373"></a>00373   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00374"></a>00374   RS = -DRS$(RSU)
-<a name="l00375"></a>00375 endif
-<a name="l00376"></a>00376 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;HLLCp&quot;</span>
-<a name="l00377"></a>00377   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00378"></a>00378   RS = -DRS$(RSU)
-<a name="l00379"></a>00379 endif
-<a name="l00380"></a>00380 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;HLLCt&quot;</span>
-<a name="l00381"></a>00381   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00382"></a>00382   RS = -DRS$(RSU)
-<a name="l00383"></a>00383 endif
-<a name="l00384"></a>00384 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;HLLCz&quot;</span>
-<a name="l00385"></a>00385   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00386"></a>00386   RS = -DRS$(RSU)
-<a name="l00387"></a>00387 endif
-<a name="l00388"></a>00388 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;EXA&quot;</span>
-<a name="l00389"></a>00389   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00390"></a>00390   RS = -DRS$(RSU)
+<a name="l00353"></a>00353 NULjCHK = (Unknown NULj <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> NULj=no
+<a name="l00354"></a>00354 ifeq <span class="stringliteral">&quot;$(NULj)&quot;</span> <span class="stringliteral">&quot;no&quot;</span>
+<a name="l00355"></a>00355   NULjCHK = (Known NULj <span class="keywordflow">switch</span>) Used NULj=$(NULj)
+<a name="l00356"></a>00356 endif
+<a name="l00357"></a>00357 ifeq <span class="stringliteral">&quot;$(NULj)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00358"></a>00358   NULjCHK = (Known NULj <span class="keywordflow">switch</span>) Used NULj=$(NULj)
+<a name="l00359"></a>00359   PREPROC := $(PREPROC) -DNULj
+<a name="l00360"></a>00360 endif
+<a name="l00361"></a>00361 NULkCHK = (Unknown NULk <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> NULk=no
+<a name="l00362"></a>00362 ifeq <span class="stringliteral">&quot;$(NULk)&quot;</span> <span class="stringliteral">&quot;no&quot;</span>
+<a name="l00363"></a>00363   NULkCHK = (Known NULk <span class="keywordflow">switch</span>) Used NULk=$(NULk)
+<a name="l00364"></a>00364 endif
+<a name="l00365"></a>00365 ifeq <span class="stringliteral">&quot;$(NULk)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00366"></a>00366   NULkCHK = (Known NULk <span class="keywordflow">switch</span>) Used NULk=$(NULk)
+<a name="l00367"></a>00367   PREPROC := $(PREPROC) -DNULk
+<a name="l00368"></a>00368 endif
+<a name="l00369"></a>00369 # Positivity-Preserving-Limiter
+<a name="l00370"></a>00370 PPLCHK = (Unknown PPL <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> PPL=no
+<a name="l00371"></a>00371 ifeq <span class="stringliteral">&quot;$(PPL)&quot;</span> <span class="stringliteral">&quot;no&quot;</span>
+<a name="l00372"></a>00372   PPLCHK = (Known PPL <span class="keywordflow">switch</span>) Used PPL=$(PPL)
+<a name="l00373"></a>00373 endif
+<a name="l00374"></a>00374 ifeq <span class="stringliteral">&quot;$(PPL)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00375"></a>00375   PPLCHK = (Known PPL <span class="keywordflow">switch</span>) Used PPL=$(PPL)
+<a name="l00376"></a>00376   PREPROC := $(PREPROC) -DPPL
+<a name="l00377"></a>00377 endif
+<a name="l00378"></a>00378 # Low Mach number Adjustment
+<a name="l00379"></a>00379 LMACHK = (Unknown LMA <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> LMA=no
+<a name="l00380"></a>00380 ifeq <span class="stringliteral">&quot;$(LMA)&quot;</span> <span class="stringliteral">&quot;no&quot;</span>
+<a name="l00381"></a>00381   LMACHK = (Known LMA <span class="keywordflow">switch</span>) Used LMA=$(LMA)
+<a name="l00382"></a>00382 endif
+<a name="l00383"></a>00383 ifeq <span class="stringliteral">&quot;$(LMA)&quot;</span> <span class="stringliteral">&quot;yes&quot;</span>
+<a name="l00384"></a>00384   LMACHK = (Known LMA <span class="keywordflow">switch</span>) Used LMA=$(LMA)
+<a name="l00385"></a>00385   PREPROC := $(PREPROC) -DLMA
+<a name="l00386"></a>00386 endif
+<a name="l00387"></a>00387 # WENO algorithms
+<a name="l00388"></a>00388 WENOCHK = (Unknown WENO <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> WENO=WENO
+<a name="l00389"></a>00389 ifeq <span class="stringliteral">&quot;$(WENO)&quot;</span> <span class="stringliteral">&quot;WENO&quot;</span>
+<a name="l00390"></a>00390   WENOCHK = (Known WENO <span class="keywordflow">switch</span>) Used WENO=$(WENO)
 <a name="l00391"></a>00391 endif
-<a name="l00392"></a>00392 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;PVL&quot;</span>
-<a name="l00393"></a>00393   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00394"></a>00394   RS = -DRS$(RSU)
+<a name="l00392"></a>00392 ifeq <span class="stringliteral">&quot;$(WENO)&quot;</span> <span class="stringliteral">&quot;WENOZ&quot;</span>
+<a name="l00393"></a>00393   WENOCHK = (Known WENO <span class="keywordflow">switch</span>) Used WENO=$(WENO)
+<a name="l00394"></a>00394   PREPROC := $(PREPROC) -D$(WENO)
 <a name="l00395"></a>00395 endif
-<a name="l00396"></a>00396 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;TR&quot;</span>
-<a name="l00397"></a>00397   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00398"></a>00398   RS = -DRS$(RSU)
+<a name="l00396"></a>00396 ifeq <span class="stringliteral">&quot;$(WENO)&quot;</span> <span class="stringliteral">&quot;WENOM&quot;</span>
+<a name="l00397"></a>00397   WENOCHK = (Known WENO <span class="keywordflow">switch</span>) Used WENO=$(WENO)
+<a name="l00398"></a>00398   PREPROC := $(PREPROC) -D$(WENO)
 <a name="l00399"></a>00399 endif
-<a name="l00400"></a>00400 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;TS&quot;</span>
-<a name="l00401"></a>00401   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00402"></a>00402   RS = -DRS$(RSU)
-<a name="l00403"></a>00403 endif
-<a name="l00404"></a>00404 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;APRS&quot;</span>
-<a name="l00405"></a>00405   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00406"></a>00406   RS = -DRS$(RSU)
-<a name="l00407"></a>00407 endif
-<a name="l00408"></a>00408 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;ALFR&quot;</span>
-<a name="l00409"></a>00409   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00410"></a>00410   RS = -DRS$(RSU)
-<a name="l00411"></a>00411 endif
-<a name="l00412"></a>00412 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;ROE&quot;</span>
-<a name="l00413"></a>00413   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00414"></a>00414   RS = -DRS$(RSU)
-<a name="l00415"></a>00415 endif
-<a name="l00416"></a>00416 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;LFp&quot;</span>
-<a name="l00417"></a>00417   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00418"></a>00418   RS = -DRS$(RSU)
-<a name="l00419"></a>00419 endif
-<a name="l00420"></a>00420 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;LFz&quot;</span>
-<a name="l00421"></a>00421   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
-<a name="l00422"></a>00422   RS = -DRS$(RSU)
-<a name="l00423"></a>00423 endif
-<a name="l00424"></a>00424 PREPROC := $(PREPROC) $(RS)
-<a name="l00425"></a>00425 # Waves Speed estimation algorithm
-<a name="l00426"></a>00426 WSCHK = (Unknown WS <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> WS=WSup
-<a name="l00427"></a>00427 ifeq <span class="stringliteral">&quot;$(WS)&quot;</span> <span class="stringliteral">&quot;WSu&quot;</span>
-<a name="l00428"></a>00428   WSCHK = (Known WS <span class="keywordflow">switch</span>) Used WS=$(WS)
-<a name="l00429"></a>00429   PREPROC := $(PREPROC) -D$(WS)
+<a name="l00400"></a>00400 <span class="preprocessor"># reconstruction variables type</span>
+<a name="l00401"></a>00401 <span class="preprocessor"></span>ifeq <span class="stringliteral">&quot;$(RECV)&quot;</span> <span class="stringliteral">&quot;RECVC&quot;</span>
+<a name="l00402"></a>00402   RECVCHK = (Known RECV <span class="keywordflow">switch</span>) Used RECV=$(RECV)
+<a name="l00403"></a>00403   PREPROC := $(PREPROC) -D$(RECV)
+<a name="l00404"></a>00404 <span class="keywordflow">else</span>
+<a name="l00405"></a>00405   ifeq <span class="stringliteral">&quot;$(RECV)&quot;</span> <span class="stringliteral">&quot;RECVP&quot;</span>
+<a name="l00406"></a>00406     RECVCHK = (Known RECV <span class="keywordflow">switch</span>) Used RECV=$(RECV)
+<a name="l00407"></a>00407     PREPROC := $(PREPROC) -D$(RECV)
+<a name="l00408"></a>00408   <span class="keywordflow">else</span>
+<a name="l00409"></a>00409     RECVCHK = (Unknown RECV <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> RECV=RECVC
+<a name="l00410"></a>00410     PREPROC := $(PREPROC) -DRECVC
+<a name="l00411"></a>00411   endif
+<a name="l00412"></a>00412 endif
+<a name="l00413"></a>00413 <span class="preprocessor"># Riemann solver</span>
+<a name="l00414"></a>00414 <span class="preprocessor"></span>RSUCHK = (Unknown RSU <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> RSU=HLLCp
+<a name="l00415"></a>00415 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;HLLCb&quot;</span>
+<a name="l00416"></a>00416   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00417"></a>00417   RS = -DRS$(RSU)
+<a name="l00418"></a>00418 endif
+<a name="l00419"></a>00419 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;HLLCc&quot;</span>
+<a name="l00420"></a>00420   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00421"></a>00421   RS = -DRS$(RSU)
+<a name="l00422"></a>00422 endif
+<a name="l00423"></a>00423 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;HLLCp&quot;</span>
+<a name="l00424"></a>00424   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00425"></a>00425   RS = -DRS$(RSU)
+<a name="l00426"></a>00426 endif
+<a name="l00427"></a>00427 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;HLLCt&quot;</span>
+<a name="l00428"></a>00428   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00429"></a>00429   RS = -DRS$(RSU)
 <a name="l00430"></a>00430 endif
-<a name="l00431"></a>00431 ifeq <span class="stringliteral">&quot;$(WS)&quot;</span> <span class="stringliteral">&quot;WSup&quot;</span>
-<a name="l00432"></a>00432   WSCHK = (Known WS <span class="keywordflow">switch</span>) Used WS=$(WS)
-<a name="l00433"></a>00433   PREPROC := $(PREPROC) -D$(WS)
+<a name="l00431"></a>00431 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;HLLCz&quot;</span>
+<a name="l00432"></a>00432   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00433"></a>00433   RS = -DRS$(RSU)
 <a name="l00434"></a>00434 endif
-<a name="l00435"></a>00435 <span class="preprocessor"># Smoothness switch algorithm</span>
-<a name="l00436"></a>00436 <span class="preprocessor"></span>SMSWCHK = (Unknown SMSW <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> SMSW=SMSWz
-<a name="l00437"></a>00437 ifeq <span class="stringliteral">&quot;$(SMSW)&quot;</span> <span class="stringliteral">&quot;SMSWz&quot;</span>
-<a name="l00438"></a>00438   SMSWCHK = (Known SMSW <span class="keywordflow">switch</span>) Used SMSW=$(SMSW)
-<a name="l00439"></a>00439   PREPROC := $(PREPROC) -D$(SMSW)
-<a name="l00440"></a>00440 endif
-<a name="l00441"></a>00441 ifeq <span class="stringliteral">&quot;$(SMSW)&quot;</span> <span class="stringliteral">&quot;SMSWliu&quot;</span>
-<a name="l00442"></a>00442   SMSWCHK = (Known SMSW <span class="keywordflow">switch</span>) Used SMSW=$(SMSW)
-<a name="l00443"></a>00443   PREPROC := $(PREPROC) -D$(SMSW)
-<a name="l00444"></a>00444 endif
-<a name="l00445"></a>00445 ifeq <span class="stringliteral">&quot;$(SMSW)&quot;</span> <span class="stringliteral">&quot;SMSWvanleer&quot;</span>
-<a name="l00446"></a>00446   SMSWCHK = (Known SMSW <span class="keywordflow">switch</span>) Used SMSW=$(SMSW)
-<a name="l00447"></a>00447   PREPROC := $(PREPROC) -D$(SMSW)
-<a name="l00448"></a>00448 endif
-<a name="l00449"></a>00449 ifeq <span class="stringliteral">&quot;$(SMSW)&quot;</span> <span class="stringliteral">&quot;SMSWvanalbada&quot;</span>
-<a name="l00450"></a>00450   SMSWCHK = (Known SMSW <span class="keywordflow">switch</span>) Used SMSW=$(SMSW)
-<a name="l00451"></a>00451   PREPROC := $(PREPROC) -D$(SMSW)
-<a name="l00452"></a>00452 endif
-<a name="l00453"></a>00453 ifeq <span class="stringliteral">&quot;$(SMSW)&quot;</span> <span class="stringliteral">&quot;SMSWharten&quot;</span>
-<a name="l00454"></a>00454   SMSWCHK = (Known SMSW <span class="keywordflow">switch</span>) Used SMSW=$(SMSW)
-<a name="l00455"></a>00455   PREPROC := $(PREPROC) -D$(SMSW)
-<a name="l00456"></a>00456 endif
-<a name="l00457"></a>00457 # Hybrid scheme
-<a name="l00458"></a>00458 HYBRIDCHK = (Unknown HYBRID <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> HYBRID=NOHYBRID
-<a name="l00459"></a>00459 ifeq <span class="stringliteral">&quot;$(HYBRID)&quot;</span> <span class="stringliteral">&quot;NOHYBRID&quot;</span>
-<a name="l00460"></a>00460   HYBRIDCHK = (Known HYBRID <span class="keywordflow">switch</span>) Used HYBRID=$(HYBRID)
-<a name="l00461"></a>00461 endif
-<a name="l00462"></a>00462 ifeq <span class="stringliteral">&quot;$(HYBRID)&quot;</span> <span class="stringliteral">&quot;HYBRID&quot;</span>
-<a name="l00463"></a>00463   HYBRIDCHK = (Known HYBRID <span class="keywordflow">switch</span>) Used HYBRID=$(HYBRID)
-<a name="l00464"></a>00464   PREPROC := $(PREPROC) -D$(HYBRID)
-<a name="l00465"></a>00465 endif
-<a name="l00466"></a>00466 ifeq <span class="stringliteral">&quot;$(HYBRID)&quot;</span> <span class="stringliteral">&quot;HYBRIDC&quot;</span>
-<a name="l00467"></a>00467   HYBRIDCHK = (Known HYBRID <span class="keywordflow">switch</span>) Used HYBRID=$(HYBRID)
-<a name="l00468"></a>00468   PREPROC := $(PREPROC) -D$(HYBRID)
-<a name="l00469"></a>00469 endif
-<a name="l00470"></a>00470 OPTSC := $(OPTSC) $(PREPROC)
-<a name="l00471"></a>00471 OPTSL := $(OPTSL) $(PREPROC)
-<a name="l00472"></a>00472 
-<a name="l00473"></a>00473 WHICHFC = $(shell which $(FC))
-<a name="l00474"></a>00474 
-<a name="l00475"></a>00475 PRINTCHK = <span class="stringliteral">&quot;\\033[1;31m Compiler used \\033[0m\\033[1m $(COMPILER) =&gt; $(WHICHFC)\\033[0m \n\</span>
-<a name="l00476"></a>00476 <span class="stringliteral">            \\033[1;31mSource dir    \\033[0m\\033[1m $(DSRC)\\033[0m \n\</span>
-<a name="l00477"></a>00477 <span class="stringliteral">            \\033[1;31mLibraries     \\033[0m\\033[1m $(LIBS)\\033[0m \n \n\</span>
-<a name="l00478"></a>00478 <span class="stringliteral">            \\033[1;31m Debug         \\033[0m\\033[1m $(DEBUG)\\033[0m \n\</span>
-<a name="l00479"></a>00479 <span class="stringliteral">            \\033[1;31m F-standard    \\033[0m\\033[1m $(F03STD)\\033[0m \n\</span>
-<a name="l00480"></a>00480 <span class="stringliteral">            \\033[1;31m Profiling     \\033[0m\\033[1m $(PROFILING)\\033[0m \n\</span>
-<a name="l00481"></a>00481 <span class="stringliteral">            \\033[1;31m Optimize      \\033[0m\\033[1m $(OPTIMIZE)\\033[0m \n\</span>
-<a name="l00482"></a>00482 <span class="stringliteral">            \\033[1;31m OpenMP        \\033[0m\\033[1m $(OPENMP)\\033[0m \n\</span>
-<a name="l00483"></a>00483 <span class="stringliteral">            \\033[1;31m MPI           \\033[0m\\033[1m $(MPI)\\033[0m \n\</span>
-<a name="l00484"></a>00484 <span class="stringliteral">            \\033[1;31m R16P          \\033[0m\\033[1m $(R16PCHK)\\033[0m \n\</span>
-<a name="l00485"></a>00485 <span class="stringliteral">            \\033[1;31m Nullify i     \\033[0m\\033[1m $(NULiCHK)\\033[0m \n\</span>
-<a name="l00486"></a>00486 <span class="stringliteral">            \\033[1;31m Nullify j     \\033[0m\\033[1m $(NULjCHK)\\033[0m \n\</span>
-<a name="l00487"></a>00487 <span class="stringliteral">            \\033[1;31m Nullify k     \\033[0m\\033[1m $(NULkCHK)\\033[0m \n\</span>
-<a name="l00488"></a>00488 <span class="stringliteral">            \\033[1;31m PP Limiter    \\033[0m\\033[1m $(PPLCHK)\\033[0m \n\</span>
-<a name="l00489"></a>00489 <span class="stringliteral">            \\033[1;31m LMA Limiter   \\033[0m\\033[1m $(LMACHK)\\033[0m \n\</span>
-<a name="l00490"></a>00490 <span class="stringliteral">            \\033[1;31m WENO          \\033[0m\\033[1m $(WENOCHK)\\033[0m \n\</span>
-<a name="l00491"></a>00491 <span class="stringliteral">            \\033[1;31m RECV type     \\033[0m\\033[1m $(RECVCHK)\\033[0m \n\</span>
-<a name="l00492"></a>00492 <span class="stringliteral">            \\033[1;31m Riemann Solver\\033[0m\\033[1m $(RSUCHK)\\033[0m \n\</span>
-<a name="l00493"></a>00493 <span class="stringliteral">            \\033[1;31m WS Algorithm  \\033[0m\\033[1m $(WSCHK)\\033[0m \n\</span>
-<a name="l00494"></a>00494 <span class="stringliteral">            \\033[1;31m Smooth switch \\033[0m\\033[1m $(SMSWCHK)\\033[0m \n\</span>
-<a name="l00495"></a>00495 <span class="stringliteral">            \\033[1;31m Hybrid scheme \\033[0m\\033[1m $(HYBRIDCHK)\\033[0m \n\</span>
-<a name="l00496"></a>00496 <span class="stringliteral">            \\033[1;31m TECIO         \\033[0m\\033[1m $(TECIO)\\033[0m&quot;</span>
-<a name="l00497"></a>00497 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00498"></a>00498 <span class="preprocessor"></span>
-<a name="l00499"></a>00499 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00500"></a>00500 <span class="preprocessor"></span>.PHONY : PRINTINFO
-<a name="l00501"></a>00501 .NOTPARALLEL : PRINTINFO
-<a name="l00502"></a>00502 PRINTINFO:
-<a name="l00503"></a>00503         @echo | tee make.log
-<a name="l00504"></a>00504         @echo -e $(PRINTCHK) | tee -a make.log
-<a name="l00505"></a>00505         @echo | tee -a make.log
-<a name="l00506"></a>00506         @echo -e <span class="stringliteral">&#39;\033[1;31m Compiling options\033[0m&#39;</span> | tee -a make.log
-<a name="l00507"></a>00507         @echo -e <span class="stringliteral">&#39;\033[1m [$(OPTSC)]\033[0m&#39;</span> | tee -a make.log
-<a name="l00508"></a>00508         @echo | tee -a make.log
-<a name="l00509"></a>00509         @echo -e <span class="stringliteral">&#39;\033[1;31m Linking options \033[0m&#39;</span> | tee -a make.log
-<a name="l00510"></a>00510         @echo -e <span class="stringliteral">&#39;\033[1m [$(OPTSL)]\033[0m&#39;</span> | tee -a make.log
-<a name="l00511"></a>00511         @echo | tee -a make.log
-<a name="l00512"></a>00512 
-<a name="l00513"></a>00513 .PHONY : cleanobj
-<a name="l00514"></a>00514 cleanobj:
-<a name="l00515"></a>00515         @echo -e <span class="stringliteral">&quot;\033[1;31m deleting objects \033[0m&quot;</span> | tee make.log
-<a name="l00516"></a>00516         @rm -fr $(DOBJ)
-<a name="l00517"></a>00517 
-<a name="l00518"></a>00518 .PHONY : cleanmod
-<a name="l00519"></a>00519 cleanmod:
-<a name="l00520"></a>00520         @echo -e <span class="stringliteral">&quot;\033[1;31m deleting mods \033[0m&quot;</span> | tee -a make.log
-<a name="l00521"></a>00521         @rm -fr $(DMOD)
-<a name="l00522"></a>00522 
-<a name="l00523"></a>00523 .PHONY : cleanexe
-<a name="l00524"></a>00524 cleanexe:
-<a name="l00525"></a>00525         @echo -e <span class="stringliteral">&quot;\033[1;31m deleting exes \033[0m&quot;</span> | tee -a make.log
-<a name="l00526"></a>00526         @rm -f $(addprefix $(DEXE),$(EXES))
-<a name="l00527"></a>00527 
-<a name="l00528"></a>00528 .PHONY : cleanmsg
-<a name="l00529"></a>00529 cleanmsg:
-<a name="l00530"></a>00530         @rm -f diagnostic_messages
-<a name="l00531"></a>00531         @rm -f error_messages
-<a name="l00532"></a>00532 
-<a name="l00533"></a>00533 .PHONY : clean
-<a name="l00534"></a>00534 clean: cleanobj cleanmod cleanmsg
-<a name="l00535"></a>00535 
-<a name="l00536"></a>00536 .PHONY : cleanall
-<a name="l00537"></a>00537 cleanall: clean cleanexe
-<a name="l00538"></a>00538 
-<a name="l00539"></a>00539 .PHONY : tar
-<a name="l00540"></a>00540 tar: cleanall
-<a name="l00541"></a>00541         @echo -e <span class="stringliteral">&quot;\033[1;31m Creating tar archive of the code \033[0m&quot;</span> | tee make.log
-<a name="l00542"></a>00542         @mkdir -p <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>
-<a name="l00543"></a>00543         @cp -rL input lib util src makefile <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>/
-<a name="l00544"></a>00544         @tar czf <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>.tgz <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>
-<a name="l00545"></a>00545         @rm -rf <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>
-<a name="l00546"></a>00546 
-<a name="l00547"></a>00547 .PHONY : doc
-<a name="l00548"></a>00548 doc:
-<a name="l00549"></a>00549         @echo -e <span class="stringliteral">&quot;\033[1;31m Building documentation\033[0m&quot;</span> | tee make.log
-<a name="l00550"></a>00550         @doxygen .doxygenconfig
-<a name="l00551"></a>00551 
-<a name="l00552"></a>00552 .PHONY : $(MKDIRS)
-<a name="l00553"></a>00553 $(MKDIRS):
-<a name="l00554"></a>00554         @mkdir -p $@
-<a name="l00555"></a>00555 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00556"></a>00556 <span class="preprocessor"></span>
-<a name="l00557"></a>00557 <span class="preprocessor">#-----------------------------------------------------------------------------------------------------------------------------------</span>
-<a name="l00558"></a>00558 <span class="preprocessor"></span><span class="preprocessor"># rules of linking and compiling</span>
-<a name="l00559"></a>00559 <span class="preprocessor"></span>COTEXT  = -e <span class="stringliteral">&quot;\033[1;31m Compiling\033[0m\033[1m $(&lt;F)\033[0m&quot;</span>
-<a name="l00560"></a>00560 LITEXT  = -e <span class="stringliteral">&quot;\033[1;31m Assembling\033[0m\033[1m $@\033[0m&quot;</span>
-<a name="l00561"></a>00561 LCEXES  = $(shell echo $(EXES) | tr <span class="stringliteral">&#39;[:upper:]&#39;</span> <span class="stringliteral">&#39;[:lower:]&#39;</span>)
-<a name="l00562"></a>00562 EXESPO  = $(addsuffix .o,$(LCEXES))
-<a name="l00563"></a>00563 EXESOBJ = $(addprefix $(DOBJ),$(EXESPO))
+<a name="l00435"></a>00435 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;EXA&quot;</span>
+<a name="l00436"></a>00436   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00437"></a>00437   RS = -DRS$(RSU)
+<a name="l00438"></a>00438 endif
+<a name="l00439"></a>00439 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;PVL&quot;</span>
+<a name="l00440"></a>00440   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00441"></a>00441   RS = -DRS$(RSU)
+<a name="l00442"></a>00442 endif
+<a name="l00443"></a>00443 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;TR&quot;</span>
+<a name="l00444"></a>00444   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00445"></a>00445   RS = -DRS$(RSU)
+<a name="l00446"></a>00446 endif
+<a name="l00447"></a>00447 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;TS&quot;</span>
+<a name="l00448"></a>00448   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00449"></a>00449   RS = -DRS$(RSU)
+<a name="l00450"></a>00450 endif
+<a name="l00451"></a>00451 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;APRS&quot;</span>
+<a name="l00452"></a>00452   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00453"></a>00453   RS = -DRS$(RSU)
+<a name="l00454"></a>00454 endif
+<a name="l00455"></a>00455 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;ALFR&quot;</span>
+<a name="l00456"></a>00456   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00457"></a>00457   RS = -DRS$(RSU)
+<a name="l00458"></a>00458 endif
+<a name="l00459"></a>00459 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;ROE&quot;</span>
+<a name="l00460"></a>00460   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00461"></a>00461   RS = -DRS$(RSU)
+<a name="l00462"></a>00462 endif
+<a name="l00463"></a>00463 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;LFp&quot;</span>
+<a name="l00464"></a>00464   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00465"></a>00465   RS = -DRS$(RSU)
+<a name="l00466"></a>00466 endif
+<a name="l00467"></a>00467 ifeq <span class="stringliteral">&quot;$(RSU)&quot;</span> <span class="stringliteral">&quot;LFz&quot;</span>
+<a name="l00468"></a>00468   RSUCHK = (Known RSU <span class="keywordflow">switch</span>) Used RSU=$(RSU)
+<a name="l00469"></a>00469   RS = -DRS$(RSU)
+<a name="l00470"></a>00470 endif
+<a name="l00471"></a>00471 PREPROC := $(PREPROC) $(RS)
+<a name="l00472"></a>00472 # Waves Speed estimation algorithm
+<a name="l00473"></a>00473 WSCHK = (Unknown WS <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> WS=WSup
+<a name="l00474"></a>00474 ifeq <span class="stringliteral">&quot;$(WS)&quot;</span> <span class="stringliteral">&quot;WSu&quot;</span>
+<a name="l00475"></a>00475   WSCHK = (Known WS <span class="keywordflow">switch</span>) Used WS=$(WS)
+<a name="l00476"></a>00476   PREPROC := $(PREPROC) -D$(WS)
+<a name="l00477"></a>00477 endif
+<a name="l00478"></a>00478 ifeq <span class="stringliteral">&quot;$(WS)&quot;</span> <span class="stringliteral">&quot;WSup&quot;</span>
+<a name="l00479"></a>00479   WSCHK = (Known WS <span class="keywordflow">switch</span>) Used WS=$(WS)
+<a name="l00480"></a>00480   PREPROC := $(PREPROC) -D$(WS)
+<a name="l00481"></a>00481 endif
+<a name="l00482"></a>00482 <span class="preprocessor"># Smoothness switch algorithm</span>
+<a name="l00483"></a>00483 <span class="preprocessor"></span>SMSWCHK = (Unknown SMSW <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> SMSW=SMSWz
+<a name="l00484"></a>00484 ifeq <span class="stringliteral">&quot;$(SMSW)&quot;</span> <span class="stringliteral">&quot;SMSWz&quot;</span>
+<a name="l00485"></a>00485   SMSWCHK = (Known SMSW <span class="keywordflow">switch</span>) Used SMSW=$(SMSW)
+<a name="l00486"></a>00486   PREPROC := $(PREPROC) -D$(SMSW)
+<a name="l00487"></a>00487 endif
+<a name="l00488"></a>00488 ifeq <span class="stringliteral">&quot;$(SMSW)&quot;</span> <span class="stringliteral">&quot;SMSWliu&quot;</span>
+<a name="l00489"></a>00489   SMSWCHK = (Known SMSW <span class="keywordflow">switch</span>) Used SMSW=$(SMSW)
+<a name="l00490"></a>00490   PREPROC := $(PREPROC) -D$(SMSW)
+<a name="l00491"></a>00491 endif
+<a name="l00492"></a>00492 ifeq <span class="stringliteral">&quot;$(SMSW)&quot;</span> <span class="stringliteral">&quot;SMSWvanleer&quot;</span>
+<a name="l00493"></a>00493   SMSWCHK = (Known SMSW <span class="keywordflow">switch</span>) Used SMSW=$(SMSW)
+<a name="l00494"></a>00494   PREPROC := $(PREPROC) -D$(SMSW)
+<a name="l00495"></a>00495 endif
+<a name="l00496"></a>00496 ifeq <span class="stringliteral">&quot;$(SMSW)&quot;</span> <span class="stringliteral">&quot;SMSWvanalbada&quot;</span>
+<a name="l00497"></a>00497   SMSWCHK = (Known SMSW <span class="keywordflow">switch</span>) Used SMSW=$(SMSW)
+<a name="l00498"></a>00498   PREPROC := $(PREPROC) -D$(SMSW)
+<a name="l00499"></a>00499 endif
+<a name="l00500"></a>00500 ifeq <span class="stringliteral">&quot;$(SMSW)&quot;</span> <span class="stringliteral">&quot;SMSWharten&quot;</span>
+<a name="l00501"></a>00501   SMSWCHK = (Known SMSW <span class="keywordflow">switch</span>) Used SMSW=$(SMSW)
+<a name="l00502"></a>00502   PREPROC := $(PREPROC) -D$(SMSW)
+<a name="l00503"></a>00503 endif
+<a name="l00504"></a>00504 # Hybrid scheme
+<a name="l00505"></a>00505 HYBRIDCHK = (Unknown HYBRID <span class="keywordflow">switch</span>) Used <span class="keywordflow">default</span> HYBRID=NOHYBRID
+<a name="l00506"></a>00506 ifeq <span class="stringliteral">&quot;$(HYBRID)&quot;</span> <span class="stringliteral">&quot;NOHYBRID&quot;</span>
+<a name="l00507"></a>00507   HYBRIDCHK = (Known HYBRID <span class="keywordflow">switch</span>) Used HYBRID=$(HYBRID)
+<a name="l00508"></a>00508 endif
+<a name="l00509"></a>00509 ifeq <span class="stringliteral">&quot;$(HYBRID)&quot;</span> <span class="stringliteral">&quot;HYBRID&quot;</span>
+<a name="l00510"></a>00510   HYBRIDCHK = (Known HYBRID <span class="keywordflow">switch</span>) Used HYBRID=$(HYBRID)
+<a name="l00511"></a>00511   PREPROC := $(PREPROC) -D$(HYBRID)
+<a name="l00512"></a>00512 endif
+<a name="l00513"></a>00513 ifeq <span class="stringliteral">&quot;$(HYBRID)&quot;</span> <span class="stringliteral">&quot;HYBRIDC&quot;</span>
+<a name="l00514"></a>00514   HYBRIDCHK = (Known HYBRID <span class="keywordflow">switch</span>) Used HYBRID=$(HYBRID)
+<a name="l00515"></a>00515   PREPROC := $(PREPROC) -D$(HYBRID)
+<a name="l00516"></a>00516 endif
+<a name="l00517"></a>00517 OPTSC := $(OPTSC) $(PREPROC)
+<a name="l00518"></a>00518 OPTSL := $(OPTSL) $(PREPROC)
+<a name="l00519"></a>00519 
+<a name="l00520"></a>00520 WHICHFC = $(shell which $(FC))
+<a name="l00521"></a>00521 
+<a name="l00522"></a>00522 PRINTCHK = <span class="stringliteral">&quot;\\033[1;31m Compiler used \\033[0m\\033[1m $(COMPILER) =&gt; $(WHICHFC)\\033[0m \n\</span>
+<a name="l00523"></a>00523 <span class="stringliteral">            \\033[1;31mSource dir    \\033[0m\\033[1m $(DSRC)\\033[0m \n\</span>
+<a name="l00524"></a>00524 <span class="stringliteral">            \\033[1;31mLibraries     \\033[0m\\033[1m $(LIBS)\\033[0m \n \n\</span>
+<a name="l00525"></a>00525 <span class="stringliteral">            \\033[1;31m Debug         \\033[0m\\033[1m $(DEBUG)\\033[0m \n\</span>
+<a name="l00526"></a>00526 <span class="stringliteral">            \\033[1;31m F-standard    \\033[0m\\033[1m $(F03STD)\\033[0m \n\</span>
+<a name="l00527"></a>00527 <span class="stringliteral">            \\033[1;31m Profiling     \\033[0m\\033[1m $(PROFILING)\\033[0m \n\</span>
+<a name="l00528"></a>00528 <span class="stringliteral">            \\033[1;31m Optimize      \\033[0m\\033[1m $(OPTIMIZE)\\033[0m \n\</span>
+<a name="l00529"></a>00529 <span class="stringliteral">            \\033[1;31m OpenMP        \\033[0m\\033[1m $(OPENMP)\\033[0m \n\</span>
+<a name="l00530"></a>00530 <span class="stringliteral">            \\033[1;31m MPI           \\033[0m\\033[1m $(MPI)\\033[0m \n\</span>
+<a name="l00531"></a>00531 <span class="stringliteral">            \\033[1;31m R16P          \\033[0m\\033[1m $(R16PCHK)\\033[0m \n\</span>
+<a name="l00532"></a>00532 <span class="stringliteral">            \\033[1;31m Nullify i     \\033[0m\\033[1m $(NULiCHK)\\033[0m \n\</span>
+<a name="l00533"></a>00533 <span class="stringliteral">            \\033[1;31m Nullify j     \\033[0m\\033[1m $(NULjCHK)\\033[0m \n\</span>
+<a name="l00534"></a>00534 <span class="stringliteral">            \\033[1;31m Nullify k     \\033[0m\\033[1m $(NULkCHK)\\033[0m \n\</span>
+<a name="l00535"></a>00535 <span class="stringliteral">            \\033[1;31m PP Limiter    \\033[0m\\033[1m $(PPLCHK)\\033[0m \n\</span>
+<a name="l00536"></a>00536 <span class="stringliteral">            \\033[1;31m LMA Limiter   \\033[0m\\033[1m $(LMACHK)\\033[0m \n\</span>
+<a name="l00537"></a>00537 <span class="stringliteral">            \\033[1;31m WENO          \\033[0m\\033[1m $(WENOCHK)\\033[0m \n\</span>
+<a name="l00538"></a>00538 <span class="stringliteral">            \\033[1;31m RECV type     \\033[0m\\033[1m $(RECVCHK)\\033[0m \n\</span>
+<a name="l00539"></a>00539 <span class="stringliteral">            \\033[1;31m Riemann Solver\\033[0m\\033[1m $(RSUCHK)\\033[0m \n\</span>
+<a name="l00540"></a>00540 <span class="stringliteral">            \\033[1;31m WS Algorithm  \\033[0m\\033[1m $(WSCHK)\\033[0m \n\</span>
+<a name="l00541"></a>00541 <span class="stringliteral">            \\033[1;31m Smooth switch \\033[0m\\033[1m $(SMSWCHK)\\033[0m \n\</span>
+<a name="l00542"></a>00542 <span class="stringliteral">            \\033[1;31m Hybrid scheme \\033[0m\\033[1m $(HYBRIDCHK)\\033[0m \n\</span>
+<a name="l00543"></a>00543 <span class="stringliteral">            \\033[1;31m TECIO         \\033[0m\\033[1m $(TECIO)\\033[0m&quot;</span>
+<a name="l00544"></a>00544 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00545"></a>00545 <span class="preprocessor"></span>
+<a name="l00546"></a>00546 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00547"></a>00547 <span class="preprocessor"></span>.PHONY : PRINTINFO
+<a name="l00548"></a>00548 .NOTPARALLEL : PRINTINFO
+<a name="l00549"></a>00549 PRINTINFO:
+<a name="l00550"></a>00550         @echo | tee make.log
+<a name="l00551"></a>00551         @echo -e $(PRINTCHK) | tee -a make.log
+<a name="l00552"></a>00552         @echo | tee -a make.log
+<a name="l00553"></a>00553         @echo -e <span class="stringliteral">&#39;\033[1;31m Compiling options\033[0m&#39;</span> | tee -a make.log
+<a name="l00554"></a>00554         @echo -e <span class="stringliteral">&#39;\033[1m [$(OPTSC)]\033[0m&#39;</span> | tee -a make.log
+<a name="l00555"></a>00555         @echo | tee -a make.log
+<a name="l00556"></a>00556         @echo -e <span class="stringliteral">&#39;\033[1;31m Linking options \033[0m&#39;</span> | tee -a make.log
+<a name="l00557"></a>00557         @echo -e <span class="stringliteral">&#39;\033[1m [$(OPTSL)]\033[0m&#39;</span> | tee -a make.log
+<a name="l00558"></a>00558         @echo | tee -a make.log
+<a name="l00559"></a>00559 
+<a name="l00560"></a>00560 .PHONY : cleanobj
+<a name="l00561"></a>00561 cleanobj:
+<a name="l00562"></a>00562         @echo -e <span class="stringliteral">&quot;\033[1;31m deleting objects \033[0m&quot;</span> | tee make.log
+<a name="l00563"></a>00563         @rm -fr $(DOBJ)
 <a name="l00564"></a>00564 
-<a name="l00565"></a>00565 $(DEXE)<a class="code" href="../../db/db0/group__Program.html#gab26dc33da06d747e4982826462b7d43a" title="IBM, Initial and Boundary conditions, Mesh generator for OFF (Open Finite volume Fluid dynamics code)...">IBM</a> : PRINTINFO $(MKDIRS) $(DOBJ)ibm.o
-<a name="l00566"></a>00566         @rm -f $(filter-out $(DOBJ)ibm.o,$(EXESOBJ))
-<a name="l00567"></a>00567         @echo | tee -a make.log
-<a name="l00568"></a>00568         @echo $(LITEXT) | tee -a make.log
-<a name="l00569"></a>00569         @$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00570"></a>00570 EXES := $(EXES) <a class="code" href="../../db/db0/group__Program.html#gab26dc33da06d747e4982826462b7d43a" title="IBM, Initial and Boundary conditions, Mesh generator for OFF (Open Finite volume Fluid dynamics code)...">IBM</a>
-<a name="l00571"></a>00571 
-<a name="l00572"></a>00572 $(DEXE)<a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a> : PRINTINFO $(MKDIRS) $(DOBJ)off.o
-<a name="l00573"></a>00573         @rm -f $(filter-out $(DOBJ)off.o,$(EXESOBJ))
-<a name="l00574"></a>00574         @echo | tee -a make.log
-<a name="l00575"></a>00575         @echo $(LITEXT) | tee -a make.log
-<a name="l00576"></a>00576         @$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00577"></a>00577 EXES := $(EXES) <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>
-<a name="l00578"></a>00578 
-<a name="l00579"></a>00579 $(DEXE)<a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a" title="POG, Post-processor Output Generator for OFF (Open Finite volume Fluid dynamics code).">POG</a> : PRINTINFO $(MKDIRS) $(DOBJ)pog.o
-<a name="l00580"></a>00580         @rm -f $(filter-out $(DOBJ)pog.o,$(EXESOBJ))
-<a name="l00581"></a>00581         @echo | tee -a make.log
-<a name="l00582"></a>00582         @echo $(LITEXT) | tee -a make.log
-<a name="l00583"></a>00583         @$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00584"></a>00584 EXES := $(EXES) <a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a" title="POG, Post-processor Output Generator for OFF (Open Finite volume Fluid dynamics code).">POG</a>
+<a name="l00565"></a>00565 .PHONY : cleanmod
+<a name="l00566"></a>00566 cleanmod:
+<a name="l00567"></a>00567         @echo -e <span class="stringliteral">&quot;\033[1;31m deleting mods \033[0m&quot;</span> | tee -a make.log
+<a name="l00568"></a>00568         @rm -fr $(DMOD)
+<a name="l00569"></a>00569 
+<a name="l00570"></a>00570 .PHONY : cleanexe
+<a name="l00571"></a>00571 cleanexe:
+<a name="l00572"></a>00572         @echo -e <span class="stringliteral">&quot;\033[1;31m deleting exes \033[0m&quot;</span> | tee -a make.log
+<a name="l00573"></a>00573         @rm -f $(addprefix $(DEXE),$(EXES))
+<a name="l00574"></a>00574 
+<a name="l00575"></a>00575 .PHONY : cleanmsg
+<a name="l00576"></a>00576 cleanmsg:
+<a name="l00577"></a>00577         @rm -f diagnostic_messages
+<a name="l00578"></a>00578         @rm -f error_messages
+<a name="l00579"></a>00579 
+<a name="l00580"></a>00580 .PHONY : clean
+<a name="l00581"></a>00581 clean: cleanobj cleanmod cleanmsg
+<a name="l00582"></a>00582 
+<a name="l00583"></a>00583 .PHONY : cleanall
+<a name="l00584"></a>00584 cleanall: clean cleanexe
 <a name="l00585"></a>00585 
-<a name="l00586"></a>00586 $(DOBJ)data_type_bc.o : <a class="code" href="../../d3/d18/classData__Type__BC.html" title="This module contains the definition of Type_BC and its procedures.">Data_Type_BC</a>.f90 \
-<a name="l00587"></a>00587         $(DOBJ)ir_precision.o
-<a name="l00588"></a>00588         @echo $(COTEXT) | tee -a make.log
-<a name="l00589"></a>00589         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00590"></a>00590 
-<a name="l00591"></a>00591 $(DOBJ)data_type_cell.o : <a class="code" href="../../d6/d5e/classData__Type__Cell.html" title="This module contains the definition of Type_Cell and its procedures.">Data_Type_Cell</a>.f90 \
-<a name="l00592"></a>00592         $(DOBJ)ir_precision.o
-<a name="l00593"></a>00593         @echo $(COTEXT) | tee -a make.log
-<a name="l00594"></a>00594         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00595"></a>00595 
-<a name="l00596"></a>00596 $(DOBJ)data_type_conservative.o : <a class="code" href="../../d7/d2e/classData__Type__Conservative.html" title="This module contains the definition of Type_Conservative and its procedures.">Data_Type_Conservative</a>.f90 \
-<a name="l00597"></a>00597         $(DOBJ)ir_precision.o \
-<a name="l00598"></a>00598         $(DOBJ)data_type_vector.o
-<a name="l00599"></a>00599         @echo $(COTEXT) | tee -a make.log
-<a name="l00600"></a>00600         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00601"></a>00601 
-<a name="l00602"></a>00602 $(DOBJ)data_type_globals.o : <a class="code" href="../../d4/da2/classData__Type__Globals.html" title="Module Data_Type_Globals contains the definition of global types variables and useful procedures for ...">Data_Type_Globals</a>.f90 \
-<a name="l00603"></a>00603         $(DOBJ)ir_precision.o \
-<a name="l00604"></a>00604         $(DOBJ)data_type_bc.o \
-<a name="l00605"></a>00605         $(DOBJ)data_type_cell.o \
-<a name="l00606"></a>00606         $(DOBJ)data_type_conservative.o \
-<a name="l00607"></a>00607         $(DOBJ)data_type_primitive.o \
-<a name="l00608"></a>00608         $(DOBJ)data_type_vector.o \
-<a name="l00609"></a>00609         $(DOBJ)lib_io_misc.o
-<a name="l00610"></a>00610         @echo $(COTEXT) | tee -a make.log
-<a name="l00611"></a>00611         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00612"></a>00612 
-<a name="l00613"></a>00613 $(DOBJ)data_type_os.o : <a class="code" href="../../de/d8b/classData__Type__OS.html" title="This module contains the definition of Type_OS and its procedures.">Data_Type_OS</a>.f90 \
-<a name="l00614"></a>00614         $(DOBJ)ir_precision.o
-<a name="l00615"></a>00615         @echo $(COTEXT) | tee -a make.log
-<a name="l00616"></a>00616         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00617"></a>00617 
-<a name="l00618"></a>00618 $(DOBJ)data_type_primitive.o : <a class="code" href="../../d1/d46/classData__Type__Primitive.html" title="This module contains the definition of Type_Primitive and its procedures.">Data_Type_Primitive</a>.f90 \
-<a name="l00619"></a>00619         $(DOBJ)ir_precision.o \
-<a name="l00620"></a>00620         $(DOBJ)data_type_vector.o
-<a name="l00621"></a>00621         @echo $(COTEXT) | tee -a make.log
-<a name="l00622"></a>00622         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00623"></a>00623 
-<a name="l00624"></a>00624 $(DOBJ)data_type_probe.o : <a class="code" href="../../df/d77/classData__Type__Probe.html" title="This module contains the definition of Type_Probe and its procedures.">Data_Type_Probe</a>.f90 \
-<a name="l00625"></a>00625         $(DOBJ)ir_precision.o
-<a name="l00626"></a>00626         @echo $(COTEXT) | tee -a make.log
-<a name="l00627"></a>00627         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00628"></a>00628 
-<a name="l00629"></a>00629 $(DOBJ)data_type_tensor.o : <a class="code" href="../../d9/d2f/classData__Type__Tensor.html" title="This module contains the definition of Type_Tensor and its procedures.">Data_Type_Tensor</a>.f90 \
-<a name="l00630"></a>00630         $(DOBJ)ir_precision.o \
-<a name="l00631"></a>00631         $(DOBJ)data_type_vector.o
-<a name="l00632"></a>00632         @echo $(COTEXT) | tee -a make.log
-<a name="l00633"></a>00633         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00634"></a>00634 
-<a name="l00635"></a>00635 $(DOBJ)data_type_time.o : <a class="code" href="../../dd/d0e/classData__Type__Time.html" title="This module contains the definition of Type_Time and its procedures.">Data_Type_Time</a>.f90 \
-<a name="l00636"></a>00636         $(DOBJ)ir_precision.o
-<a name="l00637"></a>00637         @echo $(COTEXT) | tee -a make.log
-<a name="l00638"></a>00638         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00639"></a>00639 
-<a name="l00640"></a>00640 $(DOBJ)data_type_vector.o : <a class="code" href="../../da/def/classData__Type__Vector.html" title="This module contains the definition of Type_Vector and its procedures.">Data_Type_Vector</a>.f90 \
-<a name="l00641"></a>00641         $(DOBJ)ir_precision.o
-<a name="l00642"></a>00642         @echo $(COTEXT) | tee -a make.log
-<a name="l00643"></a>00643         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00644"></a>00644 
-<a name="l00645"></a>00645 $(DOBJ)ibm.o : <a class="code" href="../../db/db0/group__Program.html#gab26dc33da06d747e4982826462b7d43a" title="IBM, Initial and Boundary conditions, Mesh generator for OFF (Open Finite volume Fluid dynamics code)...">IBM</a>.f90 \
-<a name="l00646"></a>00646         $(DOBJ)ir_precision.o \
-<a name="l00647"></a>00647         $(DOBJ)data_type_bc.o \
-<a name="l00648"></a>00648         $(DOBJ)data_type_cell.o \
-<a name="l00649"></a>00649         $(DOBJ)data_type_conservative.o \
-<a name="l00650"></a>00650         $(DOBJ)data_type_globals.o \
-<a name="l00651"></a>00651         $(DOBJ)data_type_os.o \
-<a name="l00652"></a>00652         $(DOBJ)data_type_primitive.o \
-<a name="l00653"></a>00653         $(DOBJ)data_type_time.o \
-<a name="l00654"></a>00654         $(DOBJ)data_type_vector.o \
-<a name="l00655"></a>00655         $(DOBJ)lib_io_misc.o
-<a name="l00656"></a>00656         @echo $(COTEXT) | tee -a make.log
-<a name="l00657"></a>00657         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00658"></a>00658 
-<a name="l00659"></a>00659 $(DOBJ)ir_precision.o : <a class="code" href="../../d6/dec/group__Library.html#d7/dc8/classIR__Precision" title="Module IR_Precision makes available some portable kind-parameters and some useful procedures to deal ...">IR_Precision</a>.f90
-<a name="l00660"></a>00660         @echo $(COTEXT) | tee -a make.log
-<a name="l00661"></a>00661         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00662"></a>00662 
-<a name="l00663"></a>00663 $(DOBJ)lib_fluidynamic.o : <a class="code" href="../../d6/dec/group__Library.html#dc/d22/classLib__Fluidynamic" title="This module contains the definition of fluid dynamic procedures.">Lib_Fluidynamic</a>.f90 \
-<a name="l00664"></a>00664         $(DOBJ)ir_precision.o \
-<a name="l00665"></a>00665         $(DOBJ)data_type_bc.o \
-<a name="l00666"></a>00666         $(DOBJ)data_type_conservative.o \
-<a name="l00667"></a>00667         $(DOBJ)data_type_globals.o \
-<a name="l00668"></a>00668         $(DOBJ)data_type_primitive.o \
-<a name="l00669"></a>00669         $(DOBJ)data_type_time.o \
-<a name="l00670"></a>00670         $(DOBJ)data_type_vector.o \
-<a name="l00671"></a>00671         $(DOBJ)lib_fluxes_convective.o \
-<a name="l00672"></a>00672         $(DOBJ)lib_fluxes_diffusive.o \
-<a name="l00673"></a>00673         $(DOBJ)lib_io_misc.o \
-<a name="l00674"></a>00674         $(DOBJ)lib_math.o \
-<a name="l00675"></a>00675         $(DOBJ)lib_parallel.o \
-<a name="l00676"></a>00676         $(DOBJ)lib_profiling.o \
-<a name="l00677"></a>00677         $(DOBJ)lib_runge_kutta.o \
-<a name="l00678"></a>00678         $(DOBJ)lib_thermodynamic_laws_ideal.o \
-<a name="l00679"></a>00679         $(DOBJ)lib_parallel.o
-<a name="l00680"></a>00680         @echo $(COTEXT) | tee -a make.log
-<a name="l00681"></a>00681         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00682"></a>00682 
-<a name="l00683"></a>00683 $(DOBJ)lib_fluxes_convective.o : <a class="code" href="../../d6/dec/group__Library.html#de/d96/classLib__Fluxes__Convective" title="This module contains the definition of procedures for computing convective fluxes (hyperbolic operato...">Lib_Fluxes_Convective</a>.f90 \
-<a name="l00684"></a>00684         $(DOBJ)ir_precision.o \
-<a name="l00685"></a>00685         $(DOBJ)data_type_conservative.o \
-<a name="l00686"></a>00686         $(DOBJ)data_type_primitive.o \
-<a name="l00687"></a>00687         $(DOBJ)data_type_vector.o \
-<a name="l00688"></a>00688         $(DOBJ)lib_riemann.o \
-<a name="l00689"></a>00689         $(DOBJ)lib_weno.o \
-<a name="l00690"></a>00690         $(DOBJ)lib_thermodynamic_laws_ideal.o
-<a name="l00691"></a>00691         @echo $(COTEXT) | tee -a make.log
-<a name="l00692"></a>00692         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00693"></a>00693 
-<a name="l00694"></a>00694 $(DOBJ)lib_fluxes_diffusive.o : <a class="code" href="../../d6/dec/group__Library.html#d6/d4e/classLib__Fluxes__Diffusive" title="This module contains the definition of procedures for computing diffusive fluxes (parabolic operator)...">Lib_Fluxes_Diffusive</a>.f90 \
-<a name="l00695"></a>00695         $(DOBJ)ir_precision.o \
-<a name="l00696"></a>00696         $(DOBJ)data_type_conservative.o \
-<a name="l00697"></a>00697         $(DOBJ)data_type_globals.o \
-<a name="l00698"></a>00698         $(DOBJ)data_type_primitive.o \
-<a name="l00699"></a>00699         $(DOBJ)data_type_tensor.o \
-<a name="l00700"></a>00700         $(DOBJ)data_type_vector.o
-<a name="l00701"></a>00701         @echo $(COTEXT) | tee -a make.log
-<a name="l00702"></a>00702         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00703"></a>00703 
-<a name="l00704"></a>00704 $(DOBJ)lib_io_misc.o : <a class="code" href="../../d6/dec/group__Library.html#dc/d09/classLib__IO__Misc" title="This module contains miscellanea procedures for input/output and strings operations.">Lib_IO_Misc</a>.f90 \
-<a name="l00705"></a>00705         $(DOBJ)ir_precision.o \
-<a name="l00706"></a>00706         $(DOBJ)data_type_os.o
-<a name="l00707"></a>00707         @echo $(COTEXT) | tee -a make.log
-<a name="l00708"></a>00708         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00709"></a>00709 
-<a name="l00710"></a>00710 $(DOBJ)lib_math.o : <a class="code" href="../../d6/dec/group__Library.html#d6/d18/classLib__Math" title="This module contains mathematical procedures.">Lib_Math</a>.f90 \
-<a name="l00711"></a>00711         $(DOBJ)ir_precision.o \
-<a name="l00712"></a>00712         $(DOBJ)data_type_vector.o
-<a name="l00713"></a>00713         @echo $(COTEXT) | tee -a make.log
-<a name="l00714"></a>00714         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00715"></a>00715 
-<a name="l00716"></a>00716 $(DOBJ)lib_mesh.o : <a class="code" href="../../d6/dec/group__Library.html#d5/d31/classLib__Mesh" title="This module contains mesh procedures.">Lib_Mesh</a>.f90 \
-<a name="l00717"></a>00717         $(DOBJ)ir_precision.o \
-<a name="l00718"></a>00718         $(DOBJ)data_type_bc.o \
-<a name="l00719"></a>00719         $(DOBJ)data_type_globals.o \
-<a name="l00720"></a>00720         $(DOBJ)data_type_vector.o
-<a name="l00721"></a>00721         @echo $(COTEXT) | tee -a make.log
-<a name="l00722"></a>00722         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00723"></a>00723 
-<a name="l00724"></a>00724 $(DOBJ)lib_multigrid.o : <a class="code" href="../../d6/dec/group__Library.html#dd/d89/classLib__Multigrid" title="This module contains the definition of multigrid procedures.">Lib_Multigrid</a>.f90 \
-<a name="l00725"></a>00725         $(DOBJ)ir_precision.o \
-<a name="l00726"></a>00726         $(DOBJ)data_type_bc.o \
+<a name="l00586"></a>00586 .PHONY : tar
+<a name="l00587"></a>00587 tar: cleanall
+<a name="l00588"></a>00588         @echo -e <span class="stringliteral">&quot;\033[1;31m Creating tar archive of the code \033[0m&quot;</span> | tee make.log
+<a name="l00589"></a>00589         @mkdir -p <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>
+<a name="l00590"></a>00590         @cp -rL input lib util src makefile <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>/
+<a name="l00591"></a>00591         @tar czf <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>.tgz <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>
+<a name="l00592"></a>00592         @rm -rf <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>
+<a name="l00593"></a>00593 
+<a name="l00594"></a>00594 .PHONY : doc
+<a name="l00595"></a>00595 doc:
+<a name="l00596"></a>00596         @echo -e <span class="stringliteral">&quot;\033[1;31m Building documentation\033[0m&quot;</span> | tee make.log
+<a name="l00597"></a>00597         @doxygen .doxygenconfig
+<a name="l00598"></a>00598 
+<a name="l00599"></a>00599 .PHONY : $(MKDIRS)
+<a name="l00600"></a>00600 $(MKDIRS):
+<a name="l00601"></a>00601         @mkdir -p $@
+<a name="l00602"></a>00602 <span class="preprocessor">#----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00603"></a>00603 <span class="preprocessor"></span>
+<a name="l00604"></a>00604 <span class="preprocessor">#-----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00605"></a>00605 <span class="preprocessor"></span><span class="preprocessor"># rules of linking and compiling</span>
+<a name="l00606"></a>00606 <span class="preprocessor"></span>COTEXT  = -e <span class="stringliteral">&quot;\033[1;31m Compiling\033[0m\033[1m $(&lt;F)\033[0m&quot;</span>
+<a name="l00607"></a>00607 LITEXT  = -e <span class="stringliteral">&quot;\033[1;31m Assembling\033[0m\033[1m $@\033[0m&quot;</span>
+<a name="l00608"></a>00608 LCEXES  = $(shell echo $(EXES) | tr <span class="stringliteral">&#39;[:upper:]&#39;</span> <span class="stringliteral">&#39;[:lower:]&#39;</span>)
+<a name="l00609"></a>00609 EXESPO  = $(addsuffix .o,$(LCEXES))
+<a name="l00610"></a>00610 EXESOBJ = $(addprefix $(DOBJ),$(EXESPO))
+<a name="l00611"></a>00611 
+<a name="l00612"></a>00612 $(DEXE)<a class="code" href="../../db/db0/group__Program.html#gab26dc33da06d747e4982826462b7d43a" title="IBM, Initial and Boundary conditions, Mesh generator for OFF (Open Finite volume Fluid dynamics code)...">IBM</a> : PRINTINFO $(MKDIRS) $(DOBJ)ibm.o
+<a name="l00613"></a>00613         @rm -f $(filter-out $(DOBJ)ibm.o,$(EXESOBJ))
+<a name="l00614"></a>00614         @echo | tee -a make.log
+<a name="l00615"></a>00615         @echo $(LITEXT) | tee -a make.log
+<a name="l00616"></a>00616         @$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00617"></a>00617 EXES := $(EXES) <a class="code" href="../../db/db0/group__Program.html#gab26dc33da06d747e4982826462b7d43a" title="IBM, Initial and Boundary conditions, Mesh generator for OFF (Open Finite volume Fluid dynamics code)...">IBM</a>
+<a name="l00618"></a>00618 
+<a name="l00619"></a>00619 $(DEXE)<a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a> : PRINTINFO $(MKDIRS) $(DOBJ)off.o
+<a name="l00620"></a>00620         @rm -f $(filter-out $(DOBJ)off.o,$(EXESOBJ))
+<a name="l00621"></a>00621         @echo | tee -a make.log
+<a name="l00622"></a>00622         @echo $(LITEXT) | tee -a make.log
+<a name="l00623"></a>00623         @$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00624"></a>00624 EXES := $(EXES) <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>
+<a name="l00625"></a>00625 
+<a name="l00626"></a>00626 $(DEXE)<a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a" title="POG, Post-processor Output Generator for OFF (Open Finite volume Fluid dynamics code).">POG</a> : PRINTINFO $(MKDIRS) $(DOBJ)pog.o
+<a name="l00627"></a>00627         @rm -f $(filter-out $(DOBJ)pog.o,$(EXESOBJ))
+<a name="l00628"></a>00628         @echo | tee -a make.log
+<a name="l00629"></a>00629         @echo $(LITEXT) | tee -a make.log
+<a name="l00630"></a>00630         @$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00631"></a>00631 EXES := $(EXES) <a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a" title="POG, Post-processor Output Generator for OFF (Open Finite volume Fluid dynamics code).">POG</a>
+<a name="l00632"></a>00632 
+<a name="l00633"></a>00633 $(DOBJ)data_type_bc.o : <a class="code" href="../../d3/d18/classData__Type__BC.html" title="This module contains the definition of Type_BC and its procedures.">Data_Type_BC</a>.f90 \
+<a name="l00634"></a>00634         $(DOBJ)ir_precision.o
+<a name="l00635"></a>00635         @echo $(COTEXT) | tee -a make.log
+<a name="l00636"></a>00636         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00637"></a>00637 
+<a name="l00638"></a>00638 $(DOBJ)data_type_cell.o : <a class="code" href="../../d6/d5e/classData__Type__Cell.html" title="This module contains the definition of Type_Cell and its procedures.">Data_Type_Cell</a>.f90 \
+<a name="l00639"></a>00639         $(DOBJ)ir_precision.o
+<a name="l00640"></a>00640         @echo $(COTEXT) | tee -a make.log
+<a name="l00641"></a>00641         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00642"></a>00642 
+<a name="l00643"></a>00643 $(DOBJ)data_type_conservative.o : <a class="code" href="../../d7/d2e/classData__Type__Conservative.html" title="This module contains the definition of Type_Conservative and its procedures.">Data_Type_Conservative</a>.f90 \
+<a name="l00644"></a>00644         $(DOBJ)ir_precision.o \
+<a name="l00645"></a>00645         $(DOBJ)data_type_vector.o
+<a name="l00646"></a>00646         @echo $(COTEXT) | tee -a make.log
+<a name="l00647"></a>00647         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00648"></a>00648 
+<a name="l00649"></a>00649 $(DOBJ)data_type_global.o : <a class="code" href="../../de/d60/classData__Type__Global.html" title="Module Data_Type_Global contains the definition of Type_Global and useful procedures for its handling...">Data_Type_Global</a>.f90 \
+<a name="l00650"></a>00650         $(DOBJ)ir_precision.o \
+<a name="l00651"></a>00651         $(DOBJ)data_type_primitive.o \
+<a name="l00652"></a>00652         $(DOBJ)lib_io_misc.o
+<a name="l00653"></a>00653         @echo $(COTEXT) | tee -a make.log
+<a name="l00654"></a>00654         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00655"></a>00655 
+<a name="l00656"></a>00656 $(DOBJ)data_type_os.o : <a class="code" href="../../de/d8b/classData__Type__OS.html" title="This module contains the definition of Type_OS and its procedures.">Data_Type_OS</a>.f90 \
+<a name="l00657"></a>00657         $(DOBJ)ir_precision.o
+<a name="l00658"></a>00658         @echo $(COTEXT) | tee -a make.log
+<a name="l00659"></a>00659         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00660"></a>00660 
+<a name="l00661"></a>00661 $(DOBJ)data_type_primitive.o : <a class="code" href="../../d1/d46/classData__Type__Primitive.html" title="This module contains the definition of Type_Primitive and its procedures.">Data_Type_Primitive</a>.f90 \
+<a name="l00662"></a>00662         $(DOBJ)ir_precision.o \
+<a name="l00663"></a>00663         $(DOBJ)data_type_vector.o
+<a name="l00664"></a>00664         @echo $(COTEXT) | tee -a make.log
+<a name="l00665"></a>00665         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00666"></a>00666 
+<a name="l00667"></a>00667 $(DOBJ)data_type_probe.o : <a class="code" href="../../df/d77/classData__Type__Probe.html" title="This module contains the definition of Type_Probe and its procedures.">Data_Type_Probe</a>.f90 \
+<a name="l00668"></a>00668         $(DOBJ)ir_precision.o
+<a name="l00669"></a>00669         @echo $(COTEXT) | tee -a make.log
+<a name="l00670"></a>00670         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00671"></a>00671 
+<a name="l00672"></a>00672 $(DOBJ)data_type_sblock.o : <a class="code" href="../../d7/d65/classData__Type__SBlock.html" title="Module Data_Type_SBlock contains the definition of Type_SBlock (structured block) type and useful pro...">Data_Type_SBlock</a>.f90 \
+<a name="l00673"></a>00673         $(DOBJ)ir_precision.o \
+<a name="l00674"></a>00674         $(DOBJ)data_type_bc.o \
+<a name="l00675"></a>00675         $(DOBJ)data_type_cell.o \
+<a name="l00676"></a>00676         $(DOBJ)data_type_conservative.o \
+<a name="l00677"></a>00677         $(DOBJ)data_type_global.o \
+<a name="l00678"></a>00678         $(DOBJ)data_type_primitive.o \
+<a name="l00679"></a>00679         $(DOBJ)data_type_vector.o \
+<a name="l00680"></a>00680         $(DOBJ)lib_io_misc.o
+<a name="l00681"></a>00681         @echo $(COTEXT) | tee -a make.log
+<a name="l00682"></a>00682         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00683"></a>00683 
+<a name="l00684"></a>00684 $(DOBJ)data_type_tensor.o : <a class="code" href="../../d9/d2f/classData__Type__Tensor.html" title="This module contains the definition of Type_Tensor and its procedures.">Data_Type_Tensor</a>.f90 \
+<a name="l00685"></a>00685         $(DOBJ)ir_precision.o \
+<a name="l00686"></a>00686         $(DOBJ)data_type_vector.o
+<a name="l00687"></a>00687         @echo $(COTEXT) | tee -a make.log
+<a name="l00688"></a>00688         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00689"></a>00689 
+<a name="l00690"></a>00690 $(DOBJ)data_type_time.o : <a class="code" href="../../dd/d0e/classData__Type__Time.html" title="This module contains the definition of Type_Time and its procedures.">Data_Type_Time</a>.f90 \
+<a name="l00691"></a>00691         $(DOBJ)ir_precision.o
+<a name="l00692"></a>00692         @echo $(COTEXT) | tee -a make.log
+<a name="l00693"></a>00693         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00694"></a>00694 
+<a name="l00695"></a>00695 $(DOBJ)data_type_vector.o : <a class="code" href="../../da/def/classData__Type__Vector.html" title="This module contains the definition of Type_Vector and its procedures.">Data_Type_Vector</a>.f90 \
+<a name="l00696"></a>00696         $(DOBJ)ir_precision.o
+<a name="l00697"></a>00697         @echo $(COTEXT) | tee -a make.log
+<a name="l00698"></a>00698         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00699"></a>00699 
+<a name="l00700"></a>00700 $(DOBJ)ibm.o : <a class="code" href="../../db/db0/group__Program.html#gab26dc33da06d747e4982826462b7d43a" title="IBM, Initial and Boundary conditions, Mesh generator for OFF (Open Finite volume Fluid dynamics code)...">IBM</a>.f90 \
+<a name="l00701"></a>00701         $(DOBJ)ir_precision.o \
+<a name="l00702"></a>00702         $(DOBJ)data_type_bc.o \
+<a name="l00703"></a>00703         $(DOBJ)data_type_cell.o \
+<a name="l00704"></a>00704         $(DOBJ)data_type_conservative.o \
+<a name="l00705"></a>00705         $(DOBJ)data_type_global.o \
+<a name="l00706"></a>00706         $(DOBJ)data_type_os.o \
+<a name="l00707"></a>00707         $(DOBJ)data_type_primitive.o \
+<a name="l00708"></a>00708         $(DOBJ)data_type_sblock.o \
+<a name="l00709"></a>00709         $(DOBJ)data_type_time.o \
+<a name="l00710"></a>00710         $(DOBJ)data_type_vector.o \
+<a name="l00711"></a>00711         $(DOBJ)lib_io_misc.o
+<a name="l00712"></a>00712         @echo $(COTEXT) | tee -a make.log
+<a name="l00713"></a>00713         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00714"></a>00714 
+<a name="l00715"></a>00715 $(DOBJ)ir_precision.o : <a class="code" href="../../d6/dec/group__Library.html#d7/dc8/classIR__Precision" title="Module IR_Precision makes available some portable kind-parameters and some useful procedures to deal ...">IR_Precision</a>.f90
+<a name="l00716"></a>00716         @echo $(COTEXT) | tee -a make.log
+<a name="l00717"></a>00717         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00718"></a>00718 
+<a name="l00719"></a>00719 $(DOBJ)lib_fluidynamic.o : <a class="code" href="../../d6/dec/group__Library.html#dc/d22/classLib__Fluidynamic" title="This module contains the definition of fluid dynamic procedures.">Lib_Fluidynamic</a>.f90 \
+<a name="l00720"></a>00720         $(DOBJ)ir_precision.o \
+<a name="l00721"></a>00721         $(DOBJ)data_type_bc.o \
+<a name="l00722"></a>00722         $(DOBJ)data_type_conservative.o \
+<a name="l00723"></a>00723         $(DOBJ)data_type_global.o \
+<a name="l00724"></a>00724         $(DOBJ)data_type_primitive.o \
+<a name="l00725"></a>00725         $(DOBJ)data_type_sblock.o \
+<a name="l00726"></a>00726         $(DOBJ)data_type_time.o \
 <a name="l00727"></a>00727         $(DOBJ)data_type_vector.o \
-<a name="l00728"></a>00728         $(DOBJ)lib_fluidynamic.o
-<a name="l00729"></a>00729         @echo $(COTEXT) | tee -a make.log
-<a name="l00730"></a>00730         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00731"></a>00731 
-<a name="l00732"></a>00732 $(DOBJ)lib_parallel.o : <a class="code" href="../../d6/dec/group__Library.html#d1/d0f/classLib__Parallel" title="This module contains the definition of procedures for send/receive data among processes for parallel ...">Lib_Parallel</a>.f90 \
-<a name="l00733"></a>00733         $(DOBJ)ir_precision.o \
-<a name="l00734"></a>00734         $(DOBJ)data_type_bc.o \
-<a name="l00735"></a>00735         $(DOBJ)data_type_globals.o \
-<a name="l00736"></a>00736         $(DOBJ)data_type_primitive.o \
-<a name="l00737"></a>00737         $(DOBJ)lib_io_misc.o
-<a name="l00738"></a>00738         @echo $(COTEXT) | tee -a make.log
-<a name="l00739"></a>00739         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00740"></a>00740 
-<a name="l00741"></a>00741 $(DOBJ)lib_postprocessing.o : <a class="code" href="../../d6/dec/group__Library.html#d1/dce/classLib__PostProcessing" title="This module contains the definition of procedures and variables useful for post-process the OFF data...">Lib_PostProcessing</a>.f90 \
-<a name="l00742"></a>00742         $(DOBJ)ir_precision.o \
-<a name="l00743"></a>00743         $(DOBJ)data_type_globals.o \
-<a name="l00744"></a>00744         $(DOBJ)data_type_primitive.o \
-<a name="l00745"></a>00745         $(DOBJ)lib_io_misc.o \
-<a name="l00746"></a>00746         $(DOBJ)lib_vtk_io.o
-<a name="l00747"></a>00747         @echo $(COTEXT) | tee -a make.log
-<a name="l00748"></a>00748         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00749"></a>00749 
-<a name="l00750"></a>00750 $(DOBJ)lib_profiling.o : <a class="code" href="../../d6/dec/group__Library.html#de/dec/classLib__Profiling" title="This module contains procedures and data for profiling parts of the code.">Lib_Profiling</a>.f90 \
-<a name="l00751"></a>00751         $(DOBJ)ir_precision.o \
-<a name="l00752"></a>00752         $(DOBJ)data_type_time.o \
-<a name="l00753"></a>00753         $(DOBJ)lib_io_misc.o
-<a name="l00754"></a>00754         @echo $(COTEXT) | tee -a make.log
-<a name="l00755"></a>00755         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00756"></a>00756 
-<a name="l00757"></a>00757 $(DOBJ)lib_riemann.o : <a class="code" href="../../d6/dec/group__Library.html#d8/d76/classLib__Riemann" title="This module contains procedures for computing the solution of the Riemann Problem for the Euler&#39;s con...">Lib_Riemann</a>.f90 \
-<a name="l00758"></a>00758         $(DOBJ)ir_precision.o \
-<a name="l00759"></a>00759         $(DOBJ)lib_thermodynamic_laws_ideal.o
-<a name="l00760"></a>00760         @echo $(COTEXT) | tee -a make.log
-<a name="l00761"></a>00761         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00762"></a>00762 
-<a name="l00763"></a>00763 $(DOBJ)lib_runge_kutta.o : <a class="code" href="../../d6/dec/group__Library.html#d6/dc1/classLib__Runge__Kutta" title="This module contains the definition of Runge-Kutta procedures for time integration.">Lib_Runge_Kutta</a>.f90 \
-<a name="l00764"></a>00764         $(DOBJ)ir_precision.o \
-<a name="l00765"></a>00765         $(DOBJ)data_type_conservative.o
-<a name="l00766"></a>00766         @echo $(COTEXT) | tee -a make.log
-<a name="l00767"></a>00767         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00768"></a>00768 
-<a name="l00769"></a>00769 $(DOBJ)lib_thermodynamic_laws_ideal.o : <a class="code" href="../../d6/dec/group__Library.html#d0/d11/classLib__Thermodynamic__Laws__Ideal" title="This module contains the definition of Thermodynamic Laws for ideal calorically perfect gas...">Lib_Thermodynamic_Laws_Ideal</a>.f90 \
-<a name="l00770"></a>00770         $(DOBJ)ir_precision.o
+<a name="l00728"></a>00728         $(DOBJ)lib_fluxes_convective.o \
+<a name="l00729"></a>00729         $(DOBJ)lib_fluxes_diffusive.o \
+<a name="l00730"></a>00730         $(DOBJ)lib_io_misc.o \
+<a name="l00731"></a>00731         $(DOBJ)lib_math.o \
+<a name="l00732"></a>00732         $(DOBJ)lib_parallel.o \
+<a name="l00733"></a>00733         $(DOBJ)lib_profiling.o \
+<a name="l00734"></a>00734         $(DOBJ)lib_runge_kutta.o \
+<a name="l00735"></a>00735         $(DOBJ)lib_thermodynamic_laws_ideal.o \
+<a name="l00736"></a>00736         $(DOBJ)lib_parallel.o
+<a name="l00737"></a>00737         @echo $(COTEXT) | tee -a make.log
+<a name="l00738"></a>00738         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00739"></a>00739 
+<a name="l00740"></a>00740 $(DOBJ)lib_fluxes_convective.o : <a class="code" href="../../d6/dec/group__Library.html#de/d96/classLib__Fluxes__Convective" title="This module contains the definition of procedures for computing convective fluxes (hyperbolic operato...">Lib_Fluxes_Convective</a>.f90 \
+<a name="l00741"></a>00741         $(DOBJ)ir_precision.o \
+<a name="l00742"></a>00742         $(DOBJ)data_type_conservative.o \
+<a name="l00743"></a>00743         $(DOBJ)data_type_primitive.o \
+<a name="l00744"></a>00744         $(DOBJ)data_type_vector.o \
+<a name="l00745"></a>00745         $(DOBJ)lib_riemann.o \
+<a name="l00746"></a>00746         $(DOBJ)lib_weno.o \
+<a name="l00747"></a>00747         $(DOBJ)lib_thermodynamic_laws_ideal.o
+<a name="l00748"></a>00748         @echo $(COTEXT) | tee -a make.log
+<a name="l00749"></a>00749         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00750"></a>00750 
+<a name="l00751"></a>00751 $(DOBJ)lib_fluxes_diffusive.o : <a class="code" href="../../d6/dec/group__Library.html#d6/d4e/classLib__Fluxes__Diffusive" title="This module contains the definition of procedures for computing diffusive fluxes (parabolic operator)...">Lib_Fluxes_Diffusive</a>.f90 \
+<a name="l00752"></a>00752         $(DOBJ)ir_precision.o \
+<a name="l00753"></a>00753         $(DOBJ)data_type_conservative.o \
+<a name="l00754"></a>00754         $(DOBJ)data_type_global.o \
+<a name="l00755"></a>00755         $(DOBJ)data_type_primitive.o \
+<a name="l00756"></a>00756         $(DOBJ)data_type_sblock.o \
+<a name="l00757"></a>00757         $(DOBJ)data_type_tensor.o \
+<a name="l00758"></a>00758         $(DOBJ)data_type_vector.o
+<a name="l00759"></a>00759         @echo $(COTEXT) | tee -a make.log
+<a name="l00760"></a>00760         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00761"></a>00761 
+<a name="l00762"></a>00762 $(DOBJ)lib_io_misc.o : <a class="code" href="../../d6/dec/group__Library.html#dc/d09/classLib__IO__Misc" title="This module contains miscellanea procedures for input/output and strings operations.">Lib_IO_Misc</a>.f90 \
+<a name="l00763"></a>00763         $(DOBJ)ir_precision.o \
+<a name="l00764"></a>00764         $(DOBJ)data_type_os.o
+<a name="l00765"></a>00765         @echo $(COTEXT) | tee -a make.log
+<a name="l00766"></a>00766         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00767"></a>00767 
+<a name="l00768"></a>00768 $(DOBJ)lib_math.o : <a class="code" href="../../d6/dec/group__Library.html#d6/d18/classLib__Math" title="This module contains mathematical procedures.">Lib_Math</a>.f90 \
+<a name="l00769"></a>00769         $(DOBJ)ir_precision.o \
+<a name="l00770"></a>00770         $(DOBJ)data_type_vector.o
 <a name="l00771"></a>00771         @echo $(COTEXT) | tee -a make.log
 <a name="l00772"></a>00772         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
 <a name="l00773"></a>00773 
-<a name="l00774"></a>00774 $(DOBJ)lib_vtk_io.o : <a class="code" href="../../d6/dec/group__Library.html#d6/d5b/classLib__VTK__IO" title="This is a library of functions for Input and Output pure Fortran data in VTK format.">Lib_VTK_IO</a>.f90 \
-<a name="l00775"></a>00775         $(DOBJ)ir_precision.o
-<a name="l00776"></a>00776         @echo $(COTEXT) | tee -a make.log
-<a name="l00777"></a>00777         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00778"></a>00778 
-<a name="l00779"></a>00779 $(DOBJ)lib_weno.o : <a class="code" href="../../d6/dec/group__Library.html#d7/d0a/classLib__WENO" title="This module contains the definition of procedures for computing WENO reconstruction with a user-defin...">Lib_WENO</a>.f90 \
-<a name="l00780"></a>00780         $(DOBJ)ir_precision.o \
-<a name="l00781"></a>00781         $(DOBJ)data_type_globals.o
-<a name="l00782"></a>00782         @echo $(COTEXT) | tee -a make.log
-<a name="l00783"></a>00783         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00784"></a>00784 
-<a name="l00785"></a>00785 $(DOBJ)off.o : <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>.f90 \
-<a name="l00786"></a>00786         $(DOBJ)ir_precision.o \
-<a name="l00787"></a>00787         $(DOBJ)data_type_bc.o \
-<a name="l00788"></a>00788         $(DOBJ)data_type_globals.o \
-<a name="l00789"></a>00789         $(DOBJ)data_type_os.o \
-<a name="l00790"></a>00790         $(DOBJ)data_type_primitive.o \
-<a name="l00791"></a>00791         $(DOBJ)data_type_probe.o \
-<a name="l00792"></a>00792         $(DOBJ)data_type_tensor.o \
-<a name="l00793"></a>00793         $(DOBJ)data_type_time.o \
-<a name="l00794"></a>00794         $(DOBJ)lib_fluidynamic.o \
-<a name="l00795"></a>00795         $(DOBJ)lib_runge_kutta.o \
-<a name="l00796"></a>00796         $(DOBJ)lib_math.o \
-<a name="l00797"></a>00797         $(DOBJ)lib_mesh.o \
-<a name="l00798"></a>00798         $(DOBJ)lib_io_misc.o \
-<a name="l00799"></a>00799         $(DOBJ)lib_profiling.o \
-<a name="l00800"></a>00800         $(DOBJ)lib_weno.o \
-<a name="l00801"></a>00801         $(DOBJ)lib_parallel.o \
-<a name="l00802"></a>00802         $(DOBJ)lib_parallel.o
-<a name="l00803"></a>00803         @echo $(COTEXT) | tee -a make.log
-<a name="l00804"></a>00804         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00805"></a>00805 
-<a name="l00806"></a>00806 $(DOBJ)pog.o : <a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a" title="POG, Post-processor Output Generator for OFF (Open Finite volume Fluid dynamics code).">POG</a>.f90 \
-<a name="l00807"></a>00807         $(DOBJ)ir_precision.o \
-<a name="l00808"></a>00808         $(DOBJ)data_type_globals.o \
-<a name="l00809"></a>00809         $(DOBJ)data_type_os.o \
-<a name="l00810"></a>00810         $(DOBJ)data_type_time.o \
-<a name="l00811"></a>00811         $(DOBJ)data_type_vector.o \
-<a name="l00812"></a>00812         $(DOBJ)lib_io_misc.o \
-<a name="l00813"></a>00813         $(DOBJ)lib_mesh.o \
-<a name="l00814"></a>00814         $(DOBJ)lib_postprocessing.o
-<a name="l00815"></a>00815         @echo $(COTEXT) | tee -a make.log
-<a name="l00816"></a>00816         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
-<a name="l00817"></a>00817 
-<a name="l00818"></a>00818 <span class="preprocessor">#-----------------------------------------------------------------------------------------------------------------------------------</span>
+<a name="l00774"></a>00774 $(DOBJ)lib_mesh.o : <a class="code" href="../../d6/dec/group__Library.html#d5/d31/classLib__Mesh" title="This module contains mesh procedures.">Lib_Mesh</a>.f90 \
+<a name="l00775"></a>00775         $(DOBJ)ir_precision.o \
+<a name="l00776"></a>00776         $(DOBJ)data_type_bc.o \
+<a name="l00777"></a>00777         $(DOBJ)data_type_sblock.o \
+<a name="l00778"></a>00778         $(DOBJ)data_type_vector.o
+<a name="l00779"></a>00779         @echo $(COTEXT) | tee -a make.log
+<a name="l00780"></a>00780         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00781"></a>00781 
+<a name="l00782"></a>00782 $(DOBJ)lib_multigrid.o : <a class="code" href="../../d6/dec/group__Library.html#dd/d89/classLib__Multigrid" title="This module contains the definition of multigrid procedures.">Lib_Multigrid</a>.f90 \
+<a name="l00783"></a>00783         $(DOBJ)ir_precision.o \
+<a name="l00784"></a>00784         $(DOBJ)data_type_bc.o \
+<a name="l00785"></a>00785         $(DOBJ)data_type_vector.o \
+<a name="l00786"></a>00786         $(DOBJ)lib_fluidynamic.o
+<a name="l00787"></a>00787         @echo $(COTEXT) | tee -a make.log
+<a name="l00788"></a>00788         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00789"></a>00789 
+<a name="l00790"></a>00790 $(DOBJ)lib_parallel.o : <a class="code" href="../../d6/dec/group__Library.html#d1/d0f/classLib__Parallel" title="This module contains the definition of procedures for send/receive data among processes for parallel ...">Lib_Parallel</a>.f90 \
+<a name="l00791"></a>00791         $(DOBJ)ir_precision.o \
+<a name="l00792"></a>00792         $(DOBJ)data_type_bc.o \
+<a name="l00793"></a>00793         $(DOBJ)data_type_global.o \
+<a name="l00794"></a>00794         $(DOBJ)data_type_primitive.o \
+<a name="l00795"></a>00795         $(DOBJ)data_type_sblock.o \
+<a name="l00796"></a>00796         $(DOBJ)lib_io_misc.o
+<a name="l00797"></a>00797         @echo $(COTEXT) | tee -a make.log
+<a name="l00798"></a>00798         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00799"></a>00799 
+<a name="l00800"></a>00800 $(DOBJ)lib_postprocessing.o : <a class="code" href="../../d6/dec/group__Library.html#d1/dce/classLib__PostProcessing" title="This module contains the definition of procedures and variables useful for post-process the OFF data...">Lib_PostProcessing</a>.f90 \
+<a name="l00801"></a>00801         $(DOBJ)ir_precision.o \
+<a name="l00802"></a>00802         $(DOBJ)data_type_global.o \
+<a name="l00803"></a>00803         $(DOBJ)data_type_primitive.o \
+<a name="l00804"></a>00804         $(DOBJ)data_type_sblock.o \
+<a name="l00805"></a>00805         $(DOBJ)lib_io_misc.o \
+<a name="l00806"></a>00806         $(DOBJ)lib_vtk_io.o
+<a name="l00807"></a>00807         @echo $(COTEXT) | tee -a make.log
+<a name="l00808"></a>00808         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00809"></a>00809 
+<a name="l00810"></a>00810 $(DOBJ)lib_profiling.o : <a class="code" href="../../d6/dec/group__Library.html#de/dec/classLib__Profiling" title="This module contains procedures and data for profiling parts of the code.">Lib_Profiling</a>.f90 \
+<a name="l00811"></a>00811         $(DOBJ)ir_precision.o \
+<a name="l00812"></a>00812         $(DOBJ)data_type_time.o \
+<a name="l00813"></a>00813         $(DOBJ)lib_io_misc.o
+<a name="l00814"></a>00814         @echo $(COTEXT) | tee -a make.log
+<a name="l00815"></a>00815         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00816"></a>00816 
+<a name="l00817"></a>00817 $(DOBJ)lib_riemann.o : <a class="code" href="../../d6/dec/group__Library.html#d8/d76/classLib__Riemann" title="This module contains procedures for computing the solution of the Riemann Problem for the Euler&#39;s con...">Lib_Riemann</a>.f90 \
+<a name="l00818"></a>00818         $(DOBJ)ir_precision.o \
+<a name="l00819"></a>00819         $(DOBJ)lib_thermodynamic_laws_ideal.o
+<a name="l00820"></a>00820         @echo $(COTEXT) | tee -a make.log
+<a name="l00821"></a>00821         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00822"></a>00822 
+<a name="l00823"></a>00823 $(DOBJ)lib_runge_kutta.o : <a class="code" href="../../d6/dec/group__Library.html#d6/dc1/classLib__Runge__Kutta" title="This module contains the definition of Runge-Kutta procedures for time integration.">Lib_Runge_Kutta</a>.f90 \
+<a name="l00824"></a>00824         $(DOBJ)ir_precision.o \
+<a name="l00825"></a>00825         $(DOBJ)data_type_conservative.o
+<a name="l00826"></a>00826         @echo $(COTEXT) | tee -a make.log
+<a name="l00827"></a>00827         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00828"></a>00828 
+<a name="l00829"></a>00829 $(DOBJ)lib_thermodynamic_laws_ideal.o : <a class="code" href="../../d6/dec/group__Library.html#d0/d11/classLib__Thermodynamic__Laws__Ideal" title="This module contains the definition of Thermodynamic Laws for ideal calorically perfect gas...">Lib_Thermodynamic_Laws_Ideal</a>.f90 \
+<a name="l00830"></a>00830         $(DOBJ)ir_precision.o
+<a name="l00831"></a>00831         @echo $(COTEXT) | tee -a make.log
+<a name="l00832"></a>00832         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00833"></a>00833 
+<a name="l00834"></a>00834 $(DOBJ)lib_vtk_io.o : <a class="code" href="../../d6/dec/group__Library.html#d6/d5b/classLib__VTK__IO" title="This is a library of functions for Input and Output pure Fortran data in VTK format.">Lib_VTK_IO</a>.f90 \
+<a name="l00835"></a>00835         $(DOBJ)ir_precision.o
+<a name="l00836"></a>00836         @echo $(COTEXT) | tee -a make.log
+<a name="l00837"></a>00837         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00838"></a>00838 
+<a name="l00839"></a>00839 $(DOBJ)lib_weno.o : <a class="code" href="../../d6/dec/group__Library.html#d7/d0a/classLib__WENO" title="This module contains the definition of procedures for computing WENO reconstruction with a user-defin...">Lib_WENO</a>.f90 \
+<a name="l00840"></a>00840         $(DOBJ)ir_precision.o \
+<a name="l00841"></a>00841         $(DOBJ)data_type_global.o \
+<a name="l00842"></a>00842         $(DOBJ)data_type_sblock.o
+<a name="l00843"></a>00843         @echo $(COTEXT) | tee -a make.log
+<a name="l00844"></a>00844         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00845"></a>00845 
+<a name="l00846"></a>00846 $(DOBJ)off.o : <a class="code" href="../../db/db0/group__Program.html#ga2b9da2f4af39abe63547f8240c6e2648" title="OFF is an Open source Finite volumes Fluid dynamics code.">OFF</a>.f90 \
+<a name="l00847"></a>00847         $(DOBJ)ir_precision.o \
+<a name="l00848"></a>00848         $(DOBJ)data_type_bc.o \
+<a name="l00849"></a>00849         $(DOBJ)data_type_global.o \
+<a name="l00850"></a>00850         $(DOBJ)data_type_os.o \
+<a name="l00851"></a>00851         $(DOBJ)data_type_primitive.o \
+<a name="l00852"></a>00852         $(DOBJ)data_type_probe.o \
+<a name="l00853"></a>00853         $(DOBJ)data_type_sblock.o \
+<a name="l00854"></a>00854         $(DOBJ)data_type_tensor.o \
+<a name="l00855"></a>00855         $(DOBJ)data_type_time.o \
+<a name="l00856"></a>00856         $(DOBJ)lib_fluidynamic.o \
+<a name="l00857"></a>00857         $(DOBJ)lib_runge_kutta.o \
+<a name="l00858"></a>00858         $(DOBJ)lib_math.o \
+<a name="l00859"></a>00859         $(DOBJ)lib_mesh.o \
+<a name="l00860"></a>00860         $(DOBJ)lib_io_misc.o \
+<a name="l00861"></a>00861         $(DOBJ)lib_profiling.o \
+<a name="l00862"></a>00862         $(DOBJ)lib_weno.o \
+<a name="l00863"></a>00863         $(DOBJ)lib_parallel.o \
+<a name="l00864"></a>00864         $(DOBJ)lib_parallel.o
+<a name="l00865"></a>00865         @echo $(COTEXT) | tee -a make.log
+<a name="l00866"></a>00866         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00867"></a>00867 
+<a name="l00868"></a>00868 $(DOBJ)pog.o : <a class="code" href="../../db/db0/group__Program.html#ga5025084443394bb3b6df20e67d964d9a" title="POG, Post-processor Output Generator for OFF (Open Finite volume Fluid dynamics code).">POG</a>.f90 \
+<a name="l00869"></a>00869         $(DOBJ)ir_precision.o \
+<a name="l00870"></a>00870         $(DOBJ)data_type_global.o \
+<a name="l00871"></a>00871         $(DOBJ)data_type_os.o \
+<a name="l00872"></a>00872         $(DOBJ)data_type_sblock.o \
+<a name="l00873"></a>00873         $(DOBJ)data_type_time.o \
+<a name="l00874"></a>00874         $(DOBJ)data_type_vector.o \
+<a name="l00875"></a>00875         $(DOBJ)lib_io_misc.o \
+<a name="l00876"></a>00876         $(DOBJ)lib_mesh.o \
+<a name="l00877"></a>00877         $(DOBJ)lib_postprocessing.o
+<a name="l00878"></a>00878         @echo $(COTEXT) | tee -a make.log
+<a name="l00879"></a>00879         @$(FC) $(OPTSC) $&lt; -o $@ 1&gt;&gt; diagnostic_messages 2&gt;&gt; error_messages
+<a name="l00880"></a>00880 
+<a name="l00881"></a>00881 <span class="preprocessor">#-----------------------------------------------------------------------------------------------------------------------------------</span>
 </pre></div></div><!-- contents -->
 </div>
 <!-- window showing the filter options -->
@@ -937,7 +1000,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
     <ul>
       <li class="navelem"><a class="el" href="../../d8/d16/makefile.html">makefile</a>      </li>
 
-    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
+    <li class="footer">Generated on Wed Nov 7 2012 14:31:45 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

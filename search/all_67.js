@@ -1,8 +1,8 @@
 var searchData=
 [
   ['g',['g',['../dd/dfd/group__DerivedType.html#a3595e3d9ce0cdf5bde13641aee1da3d1',1,'Data_Type_Primitive::Type_Primitive']]],
-  ['gc',['gc',['../d4/da2/classData__Type__Globals.html#a3aafb84aef4a49e27b7d901d26187b51',1,'Data_Type_Globals::Type_Mesh_Block::gc()'],['../d3/dc5/IBM_8f90.html#a7125e8cfe1602e8b35be5e35cf8f541a',1,'Type_Blocks::gc()']]],
-  ['gco',['gco',['../dd/dfd/group__DerivedType.html#ae154d94ef3ae70efb807443d2b194503',1,'Data_Type_Globals::Type_Mesh_Global']]],
+  ['gc',['gc',['../dd/dfd/group__DerivedType.html#a319fd6e5e62c8f22003db9436413a568',1,'Data_Type_SBlock::Type_SBlock::gc()'],['../d3/dc5/IBM_8f90.html#a7125e8cfe1602e8b35be5e35cf8f541a',1,'Type_Blocks::gc()']]],
+  ['gco',['gco',['../dd/dfd/group__DerivedType.html#a5692054d3d6333b68ee8eea84f168755',1,'Data_Type_Global::Type_Global']]],
   ['get_5fcorrection',['get_correction',['../dc/dba/Lib__Multigrid_8f90.html#a3d1b7c94ef0761749cc7da8a85d3060e',1,'Lib_Multigrid.f90']]],
   ['get_5fdate_5fstring',['Get_Date_String',['../d1/d7b/group__Data__Type__TimePublicProcedure.html#ga9519e07de1e824a495921ecc964542ca',1,'Data_Type_Time']]],
   ['get_5fmin_5fsstep',['get_min_sstep',['../d3/d4e/Lib__WENO_8f90.html#a1e29c2f4423bbe764fb4bf42c431cec8',1,'Lib_WENO.f90']]],

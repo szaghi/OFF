@@ -106,27 +106,10 @@ Data Structures Hierarchy</h2>
 <li>Global level data: are data related to all grid blocks; this kind of data has <em>global</em> pertinence; there is only one global level allocated variable (instance in OOP view);</li>
 <li>Block level data: are data related to only one block; this kind of data has <em>block</em> pertinence; each block has its own block level data (many instances how are the blocks).</li>
 </ul>
-<p>The two above data structures are defined by two derived types contained into the library <a class="el" href="../../d4/da2/classData__Type__Globals.html">Data_Type_Globals</a>. The two derived types are:</p>
+<p>The two above data structures are defined by two derived types contained into the libraries <a class="el" href="../../de/d60/classData__Type__Global.html">Data_Type_Global</a> and <a class="el" href="../../d7/d65/classData__Type__SBlock.html">Data_Type_SBlock</a>. The two derived types are:</p>
 <ul>
-<li><a class="el" href="../../dd/dfd/group__DerivedType.html#d3/dce/structData__Type__Globals_1_1Type__Block">Data_Type_Globals::Type_Block</a>;</li>
-<li><a class="el" href="../../dd/dfd/group__DerivedType.html#dd/d0c/structData__Type__Globals_1_1Type__Global">Data_Type_Globals::Type_Global</a>.</li>
-</ul>
-<p>Nested to these two derived types are many different kinds of data that are themselves represented by a specific derived type:</p>
-<ul>
-<li>Global data:<ul>
-<li><a class="el" href="../../dd/dfd/group__DerivedType.html#df/df8/structData__Type__Globals_1_1Type__File__Global">Global Files data</a>: these are data related to files handling;</li>
-<li><a class="el" href="../../dd/dfd/group__DerivedType.html#d4/dbd/structData__Type__Globals_1_1Type__Mesh__Global">Global Mesh data</a>: these are data related to the mesh;</li>
-<li><a class="el" href="../../dd/dfd/group__DerivedType.html#db/dda/structData__Type__Globals_1_1Type__BC__Global">Global Boundary Conditions data</a>: these are data related to the boundary conditions;</li>
-<li><a class="el" href="../../dd/dfd/group__DerivedType.html#d5/d53/structData__Type__Globals_1_1Type__Fluid__Global">Global Fluid Dynamics data</a>: these are data related to the fluid dynamics;</li>
-<li><a class="el" href="../../dd/dfd/group__DerivedType.html#d4/d39/structData__Type__Globals_1_1Type__Adimensional__Global">Global Non dimensional data</a>: these are data related to the non-dimensionalization reference values and numbers;</li>
-</ul>
-</li>
-<li>Block data:<ul>
-<li><a class="el" href="../../d4/da2/classData__Type__Globals.html#d9/ddc/structData__Type__Globals_1_1Type__Mesh__Block">Block Mesh data</a>: these are data related to the mesh;</li>
-<li><a class="el" href="../../dd/dfd/group__DerivedType.html#d2/deb/structData__Type__Globals_1_1Type__BC__Block">Block Boundary Conditions data</a>: these are data related to the boundary conditions;</li>
-<li><a class="el" href="../../dd/dfd/group__DerivedType.html#db/df1/structData__Type__Globals_1_1Type__Fluid__Block">Block Fluid Dynamics data</a>: these are data related to the fluid dynamics.</li>
-</ul>
-</li>
+<li><a class="el" href="../../dd/dfd/group__DerivedType.html#d9/dc6/structData__Type__Global_1_1Type__Global">Data_Type_Global::Type_Global</a>;</li>
+<li><a class="el" href="../../dd/dfd/group__DerivedType.html#d7/d65/structData__Type__SBlock_1_1Type__SBlock">Data_Type_SBlock::Type_SBlock</a>. Nested to these two derived types are many different kinds of data.</li>
 </ul>
 <p>Details of the above types can be found in the <em>Application Program Interface</em> (API) documentation pages.</p>
 <p>The block level data instance is allocated as a double indexed array: </p>
@@ -153,7 +136,7 @@ Data Structures Hierarchy</h2>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
+    <li class="footer">Generated on Wed Nov 7 2012 14:31:45 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

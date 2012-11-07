@@ -1,7 +1,7 @@
 var searchData=
 [
   ['b',['b',['../dd/dfd/group__DerivedType.html#a6ea8b8b12b9331c3d5d1004072883dc9',1,'Data_Type_BC::Type_Adj::b()'],['../dd/dfd/group__DerivedType.html#ab2808cce4b998ad76168bebd24fc82a9',1,'Data_Type_Probe::Type_Probe::b()']]],
-  ['bc',['bc',['../dd/dfd/group__DerivedType.html#a26e89f14c2bc1b8acaf95dfb828d0c81',1,'Data_Type_Globals::Type_Global::bc()'],['../dd/dfd/group__DerivedType.html#afe8d4b4d240ab2884ada05ff7a9cc2d6',1,'Data_Type_Globals::Type_Block::bc()'],['../d3/dc5/IBM_8f90.html#a083525622f062cf3d5d0d0dec9372076',1,'Type_Blocks::bc()'],['../dd/dfd/group__DerivedType.html#a2e3b4499fc40021a5218b37344a96f0e',1,'Lib_PostProcessing::Type_PP_Format::bc()']]],
+  ['bc',['bc',['../d3/dc5/IBM_8f90.html#a083525622f062cf3d5d0d0dec9372076',1,'Type_Blocks::bc()'],['../dd/dfd/group__DerivedType.html#a2e3b4499fc40021a5218b37344a96f0e',1,'Lib_PostProcessing::Type_PP_Format::bc()']]],
   ['bc_5fadj',['bc_adj',['../d1/dd7/group__Data__Type__BC.html#gaf08bc0938997e15ec00462eef940b6be',1,'Data_Type_BC']]],
   ['bc_5fadj_5fstr',['bc_adj_str',['../d1/dd7/group__Data__Type__BC.html#gae5aaa28987e425cf32dceea7fdd1eb60',1,'Data_Type_BC']]],
   ['bc_5fext',['bc_ext',['../d1/dd7/group__Data__Type__BC.html#ga49fc7fabeb39c0fe1290823c5c377d52',1,'Data_Type_BC']]],
@@ -18,9 +18,9 @@ var searchData=
   ['bc_5fper_5fstr',['bc_per_str',['../d1/dd7/group__Data__Type__BC.html#ga7689b9f99c19032da0b435e68971cb5d',1,'Data_Type_BC']]],
   ['bc_5fref',['bc_ref',['../d1/dd7/group__Data__Type__BC.html#ga6e9571d7808fa4f959c685aa97a7193e',1,'Data_Type_BC']]],
   ['bc_5fref_5fstr',['bc_ref_str',['../d1/dd7/group__Data__Type__BC.html#ga45f56899faf88976562f3cf270109df3',1,'Data_Type_BC']]],
-  ['bci',['BCi',['../dd/dfd/group__DerivedType.html#a3000bf8abc90147f3b573116c116e0d2',1,'Data_Type_Globals::Type_BC_Block']]],
-  ['bcj',['BCj',['../dd/dfd/group__DerivedType.html#aadb98a6253b6f6c797142ecb097d471b',1,'Data_Type_Globals::Type_BC_Block']]],
-  ['bck',['BCk',['../dd/dfd/group__DerivedType.html#a188a99b862705ceaa5e7a873007f3f15',1,'Data_Type_Globals::Type_BC_Block']]],
+  ['bci',['BCi',['../dd/dfd/group__DerivedType.html#a0d5cdfd56b27b4630d6984d37ea65b8b',1,'Data_Type_SBlock::Type_SBlock']]],
+  ['bcj',['BCj',['../dd/dfd/group__DerivedType.html#aa693f539a8bc87117e35bc6371a57d13',1,'Data_Type_SBlock::Type_SBlock']]],
+  ['bck',['BCk',['../dd/dfd/group__DerivedType.html#a99fba99926bf1cc50320db3d71a36287',1,'Data_Type_SBlock::Type_SBlock']]],
   ['binary',['binary',['../dd/dfd/group__DerivedType.html#af6b6309ff9dd5d078773b25cce51ac39',1,'Lib_PostProcessing::Type_PP_Format']]],
   ['blk',['blk',['../dc/dc7/group__Lib__VTK__IOPrivateVarPar.html#ga47c449c72a6a087497bbcd596952fd11',1,'Lib_VTK_IO']]],
   ['blockmap',['blockmap',['../df/d8c/group__Lib__Parallel.html#gad28dd5718d7ebb88d67db5150a9dc9e8',1,'Lib_Parallel']]]

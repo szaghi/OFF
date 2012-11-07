@@ -1,12 +1,12 @@
 var searchData=
 [
-  ['c0',['c0',['../dd/dfd/group__DerivedType.html#a9724221623ad6952048f948bf4faf5d9',1,'Data_Type_Globals::Type_Adimensional_Global']]],
+  ['c0',['c0',['../dd/dfd/group__DerivedType.html#a515fbaa235e1be94a157cc402a693eee',1,'Data_Type_Global::Type_Adimensional']]],
   ['c1',['c1',['../d7/d8b/group__GvarLib__Runge__Kutta.html#ga59182d1971ab70076973c7a0ff247a84',1,'Lib_Runge_Kutta']]],
   ['c2',['c2',['../d7/d8b/group__GvarLib__Runge__Kutta.html#ga543f5e1c1048421c5d43640981f756e1',1,'Lib_Runge_Kutta']]],
   ['c3',['c3',['../d7/d8b/group__GvarLib__Runge__Kutta.html#ga0a4c13dc6a084c1e9e972ad930985ebe',1,'Lib_Runge_Kutta']]],
   ['c_5fuix_5fid',['c_uix_id',['../d5/dee/group__Data__Type__OS.html#ga41dd9bb3cd1c1aa204ef3e4430a114df',1,'Data_Type_OS']]],
   ['c_5fwin_5fid',['c_win_id',['../d5/dee/group__Data__Type__OS.html#gadfc6d77765e41a8acf590669435cb0a8',1,'Data_Type_OS']]],
-  ['cell',['cell',['../d4/da2/classData__Type__Globals.html#aeb3ad9efa372b4e344df8ccf14c0cc97',1,'Data_Type_Globals::Type_Mesh_Block']]],
+  ['cell',['cell',['../dd/dfd/group__DerivedType.html#a9724043cae3fd7db02baa60d08c597f9',1,'Data_Type_SBlock::Type_SBlock']]],
   ['cell_5factive',['cell_active',['../d7/da6/group__Data__Type__Cell.html#ga8fe5fd8cd2d0dc7de08aaac1b7fbdb67',1,'Data_Type_Cell']]],
   ['cell_5factive_5fstr',['cell_active_str',['../d7/da6/group__Data__Type__Cell.html#gab0d3f7dbdb45cb6b0098ebbe30f8e831',1,'Data_Type_Cell']]],
   ['cell_5fisoss',['cell_isoss',['../d7/da6/group__Data__Type__Cell.html#ga2cb393667d80ea07e92329e18ef43d17',1,'Data_Type_Cell']]],
@@ -19,9 +19,9 @@ var searchData=
   ['cell_5fprobe_5fstr',['cell_probe_str',['../d7/da6/group__Data__Type__Cell.html#gad39c903b36fbc30acee4dc40177dde9b',1,'Data_Type_Cell']]],
   ['cell_5funset',['cell_unset',['../d7/da6/group__Data__Type__Cell.html#gae221144f05126ac63dcf3866a82cc0f0',1,'Data_Type_Cell']]],
   ['cell_5funset_5fstr',['cell_unset_str',['../d7/da6/group__Data__Type__Cell.html#gadd401e6c2cd27ca2ab1a3e2ff2bd6473',1,'Data_Type_Cell']]],
-  ['cent',['cent',['../d4/da2/classData__Type__Globals.html#a4005b84b2abff39378371a2a89b57362',1,'Data_Type_Globals::Type_Mesh_Block']]],
-  ['cfl',['CFL',['../dd/dfd/group__DerivedType.html#ac72cc60c6abab605563ce4aa0c6bec1d',1,'Data_Type_Globals::Type_Fluid_Global']]],
+  ['cent',['cent',['../dd/dfd/group__DerivedType.html#a23b96cfff28b5e18b99313ebe77d7a74',1,'Data_Type_SBlock::Type_SBlock']]],
+  ['cfl',['CFL',['../dd/dfd/group__DerivedType.html#af549b0dac13c43841889fc436b57f89c',1,'Data_Type_Global::Type_Global']]],
   ['copy',['copy',['../dd/dfd/group__DerivedType.html#a96107ec93acd9ddccca0e48bf57b1cb9',1,'Data_Type_OS::Type_OS']]],
-  ['cp0',['cp0',['../dd/dfd/group__DerivedType.html#aecdec22b3e38b7bc405993d212f6f4c4',1,'Data_Type_Globals::Type_Fluid_Global']]],
-  ['cv0',['cv0',['../dd/dfd/group__DerivedType.html#a589a108190d4574a01a00d86ffe0b0f8',1,'Data_Type_Globals::Type_Fluid_Global']]]
+  ['cp0',['cp0',['../dd/dfd/group__DerivedType.html#a8f1c30bc269463b6876ca487b5a2b649',1,'Data_Type_Global::Type_Global']]],
+  ['cv0',['cv0',['../dd/dfd/group__DerivedType.html#a2bc25f35f9beb0bd51d5e5fd989fdd8a',1,'Data_Type_Global::Type_Global']]]
 ];

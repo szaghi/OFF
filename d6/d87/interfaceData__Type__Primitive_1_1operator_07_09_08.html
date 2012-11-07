@@ -129,25 +129,25 @@ Private Member Functions</h2></td></tr>
 <div class="textblock"><p>Sum operator (+) overloading. </p>
 <dl class="note"><dt><b>Note:</b></dt><dd>The admissible summations are:<ul>
 <li><a class="el" href="../../dd/dfd/group__DerivedType.html#d2/d5e/structData__Type__Primitive_1_1Type__Primitive" title="Derived type containing primitive variables.">Type_Primitive</a> + <a class="el" href="../../dd/dfd/group__DerivedType.html#d2/d5e/structData__Type__Primitive_1_1Type__Primitive" title="Derived type containing primitive variables.">Type_Primitive</a>: each component of first primitive variable (prim1) is summed with the corresponding component of the second one (prim2), i.e. <br/>
- <img class="formulaInl" alt="$ {\rm result\%r = prim1\%r+prim2\%r} $" src="../../form_49.png"/> <br/>
- <img class="formulaInl" alt="$ {\rm result\%v = prim1\%v+prim2\%v} $" src="../../form_50.png"/> <br/>
- <img class="formulaInl" alt="$ {\rm result\%p = prim1\%p+prim2\%p} $" src="../../form_51.png"/> <br/>
- <img class="formulaInl" alt="$ {\rm result\%d = prim1\%d+prim2\%d} $" src="../../form_52.png"/> <br/>
- <img class="formulaInl" alt="$ {\rm result\%g = prim1\%g+prim2\%g} $" src="../../form_53.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%r = prim1\%r+prim2\%r} $" src="../../form_65.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%v = prim1\%v+prim2\%v} $" src="../../form_66.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%p = prim1\%p+prim2\%p} $" src="../../form_67.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%d = prim1\%d+prim2\%d} $" src="../../form_68.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%g = prim1\%g+prim2\%g} $" src="../../form_69.png"/> <br/>
 </li>
 <li>scalar number (real or integer of any kinds defined in <a class="el" href="../../d6/dec/group__Library.html#d7/dc8/classIR__Precision" title="Module IR_Precision makes available some portable kind-parameters and some useful procedures to deal ...">IR_Precision</a> module) + <a class="el" href="../../dd/dfd/group__DerivedType.html#d2/d5e/structData__Type__Primitive_1_1Type__Primitive" title="Derived type containing primitive variables.">Type_Primitive</a>: each component of <a class="el" href="../../dd/dfd/group__DerivedType.html#d2/d5e/structData__Type__Primitive_1_1Type__Primitive" title="Derived type containing primitive variables.">Type_Primitive</a> is summed with the scalar, i.e. <br/>
- <img class="formulaInl" alt="$ {\rm result\%r = prim\%r+scalar} $" src="../../form_54.png"/> <br/>
- <img class="formulaInl" alt="$ {\rm result\%v = prim\%v+scalar} $" src="../../form_55.png"/> <br/>
- <img class="formulaInl" alt="$ {\rm result\%p = prim\%p+scalar} $" src="../../form_56.png"/> <br/>
- <img class="formulaInl" alt="$ {\rm result\%d = prim\%d+scalar} $" src="../../form_57.png"/> <br/>
- <img class="formulaInl" alt="$ {\rm result\%g = prim\%g+scalar} $" src="../../form_58.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%r = prim\%r+scalar} $" src="../../form_70.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%v = prim\%v+scalar} $" src="../../form_71.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%p = prim\%p+scalar} $" src="../../form_72.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%d = prim\%d+scalar} $" src="../../form_73.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%g = prim\%g+scalar} $" src="../../form_74.png"/> <br/>
 </li>
 <li><a class="el" href="../../dd/dfd/group__DerivedType.html#d2/d5e/structData__Type__Primitive_1_1Type__Primitive" title="Derived type containing primitive variables.">Type_Primitive</a> + scalar number (real or integer of any kinds defined in <a class="el" href="../../d6/dec/group__Library.html#d7/dc8/classIR__Precision" title="Module IR_Precision makes available some portable kind-parameters and some useful procedures to deal ...">IR_Precision</a> module): each component of <a class="el" href="../../dd/dfd/group__DerivedType.html#d2/d5e/structData__Type__Primitive_1_1Type__Primitive" title="Derived type containing primitive variables.">Type_Primitive</a> is summed with the scalar, i.e. <br/>
- <img class="formulaInl" alt="$ {\rm result\%r = prim\%r+scalar} $" src="../../form_54.png"/> <br/>
- <img class="formulaInl" alt="$ {\rm result\%v = prim\%v+scalar} $" src="../../form_55.png"/> <br/>
- <img class="formulaInl" alt="$ {\rm result\%p = prim\%p+scalar} $" src="../../form_56.png"/> <br/>
- <img class="formulaInl" alt="$ {\rm result\%d = prim\%d+scalar} $" src="../../form_57.png"/> <br/>
- <img class="formulaInl" alt="$ {\rm result\%g = prim\%g+scalar} $" src="../../form_58.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%r = prim\%r+scalar} $" src="../../form_70.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%v = prim\%v+scalar} $" src="../../form_71.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%p = prim\%p+scalar} $" src="../../form_72.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%d = prim\%d+scalar} $" src="../../form_73.png"/> <br/>
+ <img class="formulaInl" alt="$ {\rm result\%g = prim\%g+scalar} $" src="../../form_74.png"/> <br/>
  </li>
 </ul>
 </dd></dl>
@@ -574,7 +574,7 @@ Private Member Functions</h2></td></tr>
       <li class="navelem"><a class="el" href="../../d1/d46/classData__Type__Primitive.html">Data_Type_Primitive</a>      </li>
       <li class="navelem"><a class="el" href="../../d6/d87/interfaceData__Type__Primitive_1_1operator_07_09_08.html">operator(+)</a>      </li>
 
-    <li class="footer">Generated on Fri Oct 26 2012 13:08:34 for OFF by
+    <li class="footer">Generated on Wed Nov 7 2012 14:31:46 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

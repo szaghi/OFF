@@ -114,7 +114,7 @@ Functions/Subroutines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gabc9e93106542597ca7c9f624e849e93f">Lib_Fluidynamic::residuals</a> (s1, global, block)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing the residuals.  <a href="#gabc9e93106542597ca7c9f624e849e93f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gafcd52f4802d17f33ededcaf21feffd2f">Lib_Fluidynamic::rk_stages_sum</a> (s1, global, block)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for summing Runge-Kutta stages for updating primitive variables (block%fluid%P).  <a href="#gafcd52f4802d17f33ededcaf21feffd2f"></a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for summing Runge-Kutta stages for updating primitive variables (blockP).  <a href="#gafcd52f4802d17f33ededcaf21feffd2f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d35/group__Lib__FluidynamicPrivateProcedure.html#gae27a81762853e919a50a580cf5626590">Lib_Fluidynamic::rk_time_integration</a> (global, block, RU)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing Runge-Kutta one time step integration.  <a href="#gae27a81762853e919a50a580cf5626590"></a><br/></td></tr>
 </table>
@@ -160,7 +160,7 @@ Functions/Subroutines</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00175">175</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00176">176</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
 
 </div>
 </div>
@@ -183,7 +183,7 @@ Functions/Subroutines</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">type(Type_Block), intent(inout)&#160;</td>
+          <td class="paramtype">integer(I_P), intent(inout)&#160;</td>
           <td class="paramname"><em>block</em>&#160;</td>
         </tr>
         <tr>
@@ -196,7 +196,7 @@ Functions/Subroutines</h2></td></tr>
 <div class="memdoc">
 
 <p>Subroutine for computing the residuals. </p>
-<p>This the space operator. The residuals are stored in blockfluidKS(s1) conservative variables.</p>
+<p>This the space operator. The residuals are stored in blockKS(s1) conservative variables.</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">s1</td><td>Current Runge-kutta stage. </td></tr>
@@ -206,7 +206,7 @@ Functions/Subroutines</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00302">302</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00303">303</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
 
 </div>
 </div>
@@ -229,7 +229,7 @@ Functions/Subroutines</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">type(Type_Block), intent(inout)&#160;</td>
+          <td class="paramtype">type(Type_SBlock), intent(inout)&#160;</td>
           <td class="paramname"><em>block</em>&#160;</td>
         </tr>
         <tr>
@@ -241,7 +241,7 @@ Functions/Subroutines</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Subroutine for summing Runge-Kutta stages for updating primitive variables (block%fluid%P). </p>
+<p>Subroutine for summing Runge-Kutta stages for updating primitive variables (blockP). </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">s1</td><td>Current Runge-Kutta stage. </td></tr>
@@ -251,7 +251,7 @@ Functions/Subroutines</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00848">848</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00849">849</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
 
 </div>
 </div>
@@ -268,13 +268,13 @@ Functions/Subroutines</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">type(Type_Block), intent(inout)&#160;</td>
+          <td class="paramtype">type(Type_SBlock), intent(inout)&#160;</td>
           <td class="paramname"><em>block</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(R_P), dimension(1:global%fluid%nc), intent(out)&#160;</td>
+          <td class="paramtype">real(R_P), dimension(1:global%nc), intent(out)&#160;</td>
           <td class="paramname"><em>RU</em>&#160;</td>
         </tr>
         <tr>
@@ -296,7 +296,7 @@ Functions/Subroutines</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00879">879</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html#l00880">880</a> of file <a class="el" href="../../d7/d68/Lib__Fluidynamic_8f90_source.html">Lib_Fluidynamic.f90</a>.</p>
 
 </div>
 </div>
@@ -319,7 +319,7 @@ Functions/Subroutines</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Fri Oct 26 2012 13:08:33 for OFF by
+    <li class="footer">Generated on Wed Nov 7 2012 14:31:45 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

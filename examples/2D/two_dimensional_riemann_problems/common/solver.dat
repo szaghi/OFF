@@ -1,0 +1,19 @@
+------------------------------------------------------------------------------------------------------------------------------------
+                                  SOLVER OPTIONS
+'unsteady'                                                   Timing  = 'unsteady' simulation or steady one otherwise
+0                                                            Nmax    = max number of iterations
+5.d0                                                         Tmax    = max time, ignored if Nmax>0
+7                                                            sp_ord  = order of space convergence (order of state reconstruction)
+5                                                            rk_ord  = order of time convergence (Runge-Kutta stages)
+0.475d0                                                      CFL     = stability costant
+0.01d0                                                       Res_Tol = residuals tollerance
+                                  NON DIMENSIONAL NUMBERS
+1.d0                                                         Re = Reynolds number
+1.d0                                                         Fr = Froude   number
+1.d0                                                         Pr = Prandtl  number
+                                  REFERENCE VALUES
+1.d0                                                         L0 = reference length
+1.d0                                                         r0 = reference density
+1.d0                                                         v0 = reference velocity
+1.d0                                                         c0 = reference specific heat
+------------------------------------------------------------------------------------------------------------------------------------

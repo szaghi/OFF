@@ -89,7 +89,7 @@ contains
   integer(I_P),            intent(IN)::    Ns                         !< Number of species.
   real(R_P),               intent(IN)::    cp0(1:Ns)                  !< Initial specific heat cp.
   real(R_P),               intent(IN)::    cv0(1:Ns)                  !< Initial specific heat cv.
-  type(Type_Vector),       intent(IN)::    NF (           0-gc:     ) !< Interface normal                [0-gc:N+gc].
+  type(Type_Vector),       intent(IN)::    NF (           0-gc:     ) !< Interface normal versor         [0-gc:N+gc].
   type(Type_Primitive),    intent(IN)::    P  (           1-gc:     ) !< Primitive variables (3D format) [1-gc:N+gc].
   type(Type_Conservative), intent(INOUT):: F  (              0:     ) !< Convective fluxes (3D format)   [   0:N   ].
   type(Type_Vector)::                      ut (       1:2,1-gc:N+gc ) !< Tangential velocity: left (1) and right (2) interfaces.

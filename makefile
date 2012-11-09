@@ -10,7 +10,8 @@ $(VERBOSE).SILENT:
 
 #----------------------------------------------------------------------------------------------------------------------------------
 # User options
-COMPILER  = gnu
+PRESET    = no
+COMPILER  = intel
 DEBUG     = yes
 F03STD    = yes
 PROFILING = no
@@ -40,12 +41,18 @@ help:
 	@echo
 	@echo -e '\033[1;31m Make options of OFF codes\033[0m'
 	@echo
-	@echo -e '\033[1;31m Compiler choice\033[0m'
+	@echo -e '\033[1;31m Preset configurations: PRESET=$(PRESET)\033[0m\033[1m => default\033[0m'
+	@echo -e '\033[1;31m  PRESET=debug     \033[0m\033[1m => debug (no optimized) and serial\033[0m'
+	@echo -e '\033[1;31m  PRESET=fast      \033[0m\033[1m => optimized (no debug) and serial\033[0m'
+	@echo -e '\033[1;31m  PRESET=openmp    \033[0m\033[1m => optimized (no debug) and openmp enabled\033[0m'
+	@echo -e '\033[1;31m  PRESET=mpi       \033[0m\033[1m => optimized (no debug) and mpi enabled\033[0m'
+	@echo -e '\033[1;31m  PRESET=openmp-mpi\033[0m\033[1m => optimized (no debug) and openmp-mpi enabled\033[0m'
+	@echo
+	@echo -e '\033[1;31m Compiler choice: COMPILER=$(COMPILER)\033[0m\033[1m => default\033[0m'
 	@echo -e '\033[1;31m  COMPILER=gnu  \033[0m\033[1m => GNU gfortran          \033[0m'
 	@echo -e '\033[1;31m  COMPILER=intel\033[0m\033[1m => Intel Fortran         \033[0m'
 	@echo -e '\033[1;31m  COMPILER=pgi  \033[0m\033[1m => Portland Group Fortran\033[0m'
 	@echo -e '\033[1;31m  COMPILER=g95  \033[0m\033[1m => free g95              \033[0m'
-	@echo -e '\033[1;31m  COMPILER=$(COMPILER)  \033[0m\033[1m => default         \033[0m'
 	@echo
 	@echo -e '\033[1;31m Compiling options\033[0m'
 	@echo -e '\033[1;31m  DEBUG=yes(no)    \033[0m\033[1m => on(off) debug                  (default $(DEBUG))\033[0m'
@@ -144,6 +151,46 @@ endif
 
 #----------------------------------------------------------------------------------------------------------------------------------
 # compiling and linking options
+ifeq "$(PRESET)" "debug"
+  DEBUG     = yes
+  F03STD    = yes
+  PROFILING = no
+  OPTIMIZE  = no
+  OPENMP    = no
+  MPI       = no
+endif
+ifeq "$(PRESET)" "fast"
+  DEBUG     = no
+  F03STD    = no
+  PROFILING = no
+  OPTIMIZE  = yes
+  OPENMP    = no
+  MPI       = no
+endif
+ifeq "$(PRESET)" "openmp"
+  DEBUG     = no
+  F03STD    = no
+  PROFILING = no
+  OPTIMIZE  = yes
+  OPENMP    = yes
+  MPI       = no
+endif
+ifeq "$(PRESET)" "mpi"
+  DEBUG     = no
+  F03STD    = no
+  PROFILING = no
+  OPTIMIZE  = yes
+  OPENMP    = no
+  MPI       = yes
+endif
+ifeq "$(PRESET)" "openmp-mpi"
+  DEBUG     = no
+  F03STD    = no
+  PROFILING = no
+  OPTIMIZE  = yes
+  OPENMP    = yes
+  MPI       = yes
+endif
 ifeq "$(COMPILER)" "gnu"
   OPTSC   = -cpp -c -J$(DMOD)
   OPTSL   =
@@ -178,7 +225,7 @@ ifeq "$(COMPILER)" "gnu"
     PREPROC := $(PREPROC) -DMPI2
     FC = mpif90
   else
-    FC = gfortran
+    FC = gfortran-4.7
   endif
 endif
 ifeq "$(COMPILER)" "intel"
@@ -190,8 +237,8 @@ ifeq "$(COMPILER)" "intel"
     CHK = -check all
     DEB = -debug all
     WRN = -warn all
-    OPTSC := $(OPTSC) -O0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
-    OPTSL := $(OPTSL) -O0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
+    OPTSC := $(OPTSC) -O0 -fpe-all=0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
+    OPTSL := $(OPTSL) -O0 -fpe-all=0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
   endif
   # standard
   ifeq "$(F03STD)" "yes"
@@ -200,7 +247,7 @@ ifeq "$(COMPILER)" "intel"
   endif
   # profiling
   ifeq "$(PROFILING)" "yes"
-    PREPROC := $(PREPROC) -DPROFILING
+    PREPROC := $(PREPROC) -pg -DPROFILING
   endif
   # optimization
   ifeq "$(OPTIMIZE)" "yes"
@@ -583,6 +630,14 @@ $(DEXE)POG : PRINTINFO $(MKDIRS) $(DOBJ)pog.o
 	@$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1>> diagnostic_messages 2>> error_messages
 EXES := $(EXES) POG
 
+$(DOBJ)data_type_amrblock.o : Data_Type_AMRBlock.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_global.o \
+	$(DOBJ)data_type_octant.o \
+	$(DOBJ)data_type_sblock.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
 $(DOBJ)data_type_bc.o : Data_Type_BC.f90 \
 	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
@@ -599,14 +654,17 @@ $(DOBJ)data_type_conservative.o : Data_Type_Conservative.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-$(DOBJ)data_type_globals.o : Data_Type_Globals.f90 \
+$(DOBJ)data_type_global.o : Data_Type_Global.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_bc.o \
-	$(DOBJ)data_type_cell.o \
-	$(DOBJ)data_type_conservative.o \
 	$(DOBJ)data_type_primitive.o \
-	$(DOBJ)data_type_vector.o \
 	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_octant.o : Data_Type_Octant.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_global.o \
+	$(DOBJ)data_type_sblock.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
@@ -623,6 +681,18 @@ $(DOBJ)data_type_primitive.o : Data_Type_Primitive.f90 \
 
 $(DOBJ)data_type_probe.o : Data_Type_Probe.f90 \
 	$(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_sblock.o : Data_Type_SBlock.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_bc.o \
+	$(DOBJ)data_type_cell.o \
+	$(DOBJ)data_type_conservative.o \
+	$(DOBJ)data_type_global.o \
+	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_vector.o \
+	$(DOBJ)lib_io_misc.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
@@ -647,9 +717,10 @@ $(DOBJ)ibm.o : IBM.f90 \
 	$(DOBJ)data_type_bc.o \
 	$(DOBJ)data_type_cell.o \
 	$(DOBJ)data_type_conservative.o \
-	$(DOBJ)data_type_globals.o \
+	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_os.o \
 	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_sblock.o \
 	$(DOBJ)data_type_time.o \
 	$(DOBJ)data_type_vector.o \
 	$(DOBJ)lib_io_misc.o
@@ -662,10 +733,12 @@ $(DOBJ)ir_precision.o : IR_Precision.f90
 
 $(DOBJ)lib_fluidynamic.o : Lib_Fluidynamic.f90 \
 	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_amrblock.o \
 	$(DOBJ)data_type_bc.o \
 	$(DOBJ)data_type_conservative.o \
-	$(DOBJ)data_type_globals.o \
+	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_sblock.o \
 	$(DOBJ)data_type_time.o \
 	$(DOBJ)data_type_vector.o \
 	$(DOBJ)lib_fluxes_convective.o \
@@ -693,9 +766,11 @@ $(DOBJ)lib_fluxes_convective.o : Lib_Fluxes_Convective.f90 \
 
 $(DOBJ)lib_fluxes_diffusive.o : Lib_Fluxes_Diffusive.f90 \
 	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_amrblock.o \
 	$(DOBJ)data_type_conservative.o \
-	$(DOBJ)data_type_globals.o \
+	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_sblock.o \
 	$(DOBJ)data_type_tensor.o \
 	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
@@ -715,8 +790,9 @@ $(DOBJ)lib_math.o : Lib_Math.f90 \
 
 $(DOBJ)lib_mesh.o : Lib_Mesh.f90 \
 	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_amrblock.o \
 	$(DOBJ)data_type_bc.o \
-	$(DOBJ)data_type_globals.o \
+	$(DOBJ)data_type_sblock.o \
 	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
@@ -732,16 +808,18 @@ $(DOBJ)lib_multigrid.o : Lib_Multigrid.f90 \
 $(DOBJ)lib_parallel.o : Lib_Parallel.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_bc.o \
-	$(DOBJ)data_type_globals.o \
+	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_sblock.o \
 	$(DOBJ)lib_io_misc.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_postprocessing.o : Lib_PostProcessing.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_globals.o \
+	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_sblock.o \
 	$(DOBJ)lib_io_misc.o \
 	$(DOBJ)lib_vtk_io.o
 	@echo $(COTEXT) | tee -a make.log
@@ -778,17 +856,21 @@ $(DOBJ)lib_vtk_io.o : Lib_VTK_IO.f90 \
 
 $(DOBJ)lib_weno.o : Lib_WENO.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_globals.o
+	$(DOBJ)data_type_amrblock.o \
+	$(DOBJ)data_type_global.o \
+	$(DOBJ)data_type_sblock.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)off.o : OFF.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_bc.o \
-	$(DOBJ)data_type_globals.o \
+	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_os.o \
 	$(DOBJ)data_type_primitive.o \
 	$(DOBJ)data_type_probe.o \
+	$(DOBJ)data_type_amrblock.o \
+	$(DOBJ)data_type_sblock.o \
 	$(DOBJ)data_type_tensor.o \
 	$(DOBJ)data_type_time.o \
 	$(DOBJ)lib_fluidynamic.o \
@@ -805,8 +887,9 @@ $(DOBJ)off.o : OFF.f90 \
 
 $(DOBJ)pog.o : POG.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_globals.o \
+	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_os.o \
+	$(DOBJ)data_type_sblock.o \
 	$(DOBJ)data_type_time.o \
 	$(DOBJ)data_type_vector.o \
 	$(DOBJ)lib_io_misc.o \

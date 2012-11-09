@@ -648,7 +648,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                 = ./src/ ./ ./doc/ ./examples/1D/shock_tube/SOD/
+INPUT                 = ./src/ ./ ./doc/ ./examples/1D/shock_tube/SOD/ ./examples/2D/two_dimensional_riemann_problems/
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -728,8 +728,7 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             =
-
+IMAGE_PATH             = examples/2D/two_dimensional_riemann_problems/kt-c03/pog/ examples/2D/two_dimensional_riemann_problems/kt-c04/pog/ examples/2D/two_dimensional_riemann_problems/kt-c05/pog/ examples/2D/two_dimensional_riemann_problems/kt-c06/pog/ examples/2D/two_dimensional_riemann_problems/kt-c12/pog/ examples/2D/two_dimensional_riemann_problems/kt-c17/pog/
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
 # by executing (via popen()) the command <filter> <input-file>, where <filter>

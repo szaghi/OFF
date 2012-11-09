@@ -17,8 +17,9 @@
 program POG
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                            ! Integers and reals precision definition.
-USE Data_Type_Globals                       ! Definition of Type_Global and Type_Block.
+USE Data_Type_Global                        ! Definition of Type_Global.
 USE Data_Type_OS                            ! Definition of Type_OS.
+USE Data_Type_SBlock                        ! Definition of Type_SBlock.
 USE Data_Type_Time                          ! Definition of Type_Time.
 USE Data_Type_Vector                        ! Definition of Type_Vector.
 USE Lib_IO_Misc                             ! Procedures for IO and strings operations.
@@ -30,10 +31,10 @@ USE Lib_PostProcessing, only: pp_format,  & ! Post-processing data format.
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
-type(Type_Global)::             global            ! Global-level data.
-type(Type_Block), allocatable:: block(:)          ! Block-level data.
-logical::                       meshonly = .true. ! Flag for post-process only mesh.
-integer(I_P)::                  err               ! Error trapping flag: 0 no errors, >0 error occurs.
+type(Type_Global)::              global            ! Global-level data.
+type(Type_SBlock), allocatable:: block(:)          ! Block-level data.
+logical::                        meshonly = .true. ! Flag for post-process only mesh.
+integer(I_P)::                   err               ! Error trapping flag: 0 no errors, >0 error occurs.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -41,7 +42,7 @@ integer(I_P)::                  err               ! Error trapping flag: 0 no er
 call parsing_command_line
 
 ! the number of grid levels/blocks are artificially set to 1: the post processor convert one level/block at time
-global%mesh%Nl = 1 ; global%mesh%Nb = 1
+global%Nl = 1 ; global%Nb = 1
 ! allocating block-level data
 if (allocated(block)) then
   call block(1)%free ; deallocate(block)
@@ -68,7 +69,7 @@ write(stdout,*)
 write(stdout,'(A)',IOSTAT=err)' Computing the mesh variables that are not loaded from input files'
 ! computing the cell-center coordinates
 write(stdout,'(A)',IOSTAT=err)'   Computing cells centers coordinates'
-call node2center(mesh = block(1)%mesh)
+call node2center(block = block(1))
 
 write(stdout,'(A)',IOSTAT=err)'----------------------------------------------------------------------'
 write(stdout,'(A)',IOSTAT=err)' Processing data'

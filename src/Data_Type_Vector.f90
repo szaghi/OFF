@@ -3616,7 +3616,7 @@ contains
   implicit none
   type(Type_Vector), intent(IN):: vec1  ! First vector.
   type(Type_Vector), intent(IN):: vec2  ! Second vector.
-  type(Type_Vector)::             paral ! Vector parallel to vec2 with the module of vec1.
+  type(Type_Vector)::             paral ! Component of of vec1 parallel to vec2.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3627,14 +3627,14 @@ contains
 
   elemental function orthogonal(vec1,vec2) result(ortho)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!This function calculates the vector orthogonal to vec2 with the module of vec1.
+  !!This function calculates the component of vec1 orthogonal to vec2.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Vector), intent(IN):: vec1  ! First vector.
   type(Type_Vector), intent(IN):: vec2  ! Second vector.
-  type(Type_Vector)::             ortho ! Vector orthogonal to vec2 with the module of vec1.
+  type(Type_Vector)::             ortho ! Component of of vec1 orthogonal to vec2.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

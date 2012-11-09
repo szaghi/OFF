@@ -10,7 +10,8 @@ $(VERBOSE).SILENT:
 
 #----------------------------------------------------------------------------------------------------------------------------------
 # User options
-COMPILER  = gnu
+PRESET    = no
+COMPILER  = intel
 DEBUG     = yes
 F03STD    = yes
 PROFILING = no
@@ -40,12 +41,18 @@ help:
 	@echo
 	@echo -e '\033[1;31m Make options of OFF codes\033[0m'
 	@echo
-	@echo -e '\033[1;31m Compiler choice\033[0m'
+	@echo -e '\033[1;31m Preset configurations: PRESET=$(PRESET)\033[0m\033[1m => default\033[0m'
+	@echo -e '\033[1;31m  PRESET=debug     \033[0m\033[1m => debug (no optimized) and serial\033[0m'
+	@echo -e '\033[1;31m  PRESET=fast      \033[0m\033[1m => optimized (no debug) and serial\033[0m'
+	@echo -e '\033[1;31m  PRESET=openmp    \033[0m\033[1m => optimized (no debug) and openmp enabled\033[0m'
+	@echo -e '\033[1;31m  PRESET=mpi       \033[0m\033[1m => optimized (no debug) and mpi enabled\033[0m'
+	@echo -e '\033[1;31m  PRESET=openmp-mpi\033[0m\033[1m => optimized (no debug) and openmp-mpi enabled\033[0m'
+	@echo
+	@echo -e '\033[1;31m Compiler choice: COMPILER=$(COMPILER)\033[0m\033[1m => default\033[0m'
 	@echo -e '\033[1;31m  COMPILER=gnu  \033[0m\033[1m => GNU gfortran          \033[0m'
 	@echo -e '\033[1;31m  COMPILER=intel\033[0m\033[1m => Intel Fortran         \033[0m'
 	@echo -e '\033[1;31m  COMPILER=pgi  \033[0m\033[1m => Portland Group Fortran\033[0m'
 	@echo -e '\033[1;31m  COMPILER=g95  \033[0m\033[1m => free g95              \033[0m'
-	@echo -e '\033[1;31m  COMPILER=$(COMPILER)  \033[0m\033[1m => default         \033[0m'
 	@echo
 	@echo -e '\033[1;31m Compiling options\033[0m'
 	@echo -e '\033[1;31m  DEBUG=yes(no)    \033[0m\033[1m => on(off) debug                  (default $(DEBUG))\033[0m'
@@ -144,6 +151,46 @@ endif
 
 #----------------------------------------------------------------------------------------------------------------------------------
 # compiling and linking options
+ifeq "$(PRESET)" "debug"
+  DEBUG     = yes
+  F03STD    = yes
+  PROFILING = no
+  OPTIMIZE  = no
+  OPENMP    = no
+  MPI       = no
+endif
+ifeq "$(PRESET)" "fast"
+  DEBUG     = no
+  F03STD    = no
+  PROFILING = no
+  OPTIMIZE  = yes
+  OPENMP    = no
+  MPI       = no
+endif
+ifeq "$(PRESET)" "openmp"
+  DEBUG     = no
+  F03STD    = no
+  PROFILING = no
+  OPTIMIZE  = yes
+  OPENMP    = yes
+  MPI       = no
+endif
+ifeq "$(PRESET)" "mpi"
+  DEBUG     = no
+  F03STD    = no
+  PROFILING = no
+  OPTIMIZE  = yes
+  OPENMP    = no
+  MPI       = yes
+endif
+ifeq "$(PRESET)" "openmp-mpi"
+  DEBUG     = no
+  F03STD    = no
+  PROFILING = no
+  OPTIMIZE  = yes
+  OPENMP    = yes
+  MPI       = yes
+endif
 ifeq "$(COMPILER)" "gnu"
   OPTSC   = -cpp -c -J$(DMOD)
   OPTSL   =
@@ -178,7 +225,7 @@ ifeq "$(COMPILER)" "gnu"
     PREPROC := $(PREPROC) -DMPI2
     FC = mpif90
   else
-    FC = gfortran
+    FC = gfortran-4.7
   endif
 endif
 ifeq "$(COMPILER)" "intel"
@@ -200,7 +247,7 @@ ifeq "$(COMPILER)" "intel"
   endif
   # profiling
   ifeq "$(PROFILING)" "yes"
-    PREPROC := $(PREPROC) -DPROFILING
+    PREPROC := $(PREPROC) -pg -DPROFILING
   endif
   # optimization
   ifeq "$(OPTIMIZE)" "yes"

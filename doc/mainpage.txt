@@ -269,21 +269,10 @@ The underling numerical mesh adopted is a multi-blocks (presently without overla
 - Global level data: are data related to all grid blocks; this kind of data has \em global pertinence; there is only one global level allocated variable (instance in OOP view);
 - Block level data: are data related to only one block; this kind of data has \em block pertinence; each block has its own block level data (many instances how are the blocks).
 
-The two above data structures are defined by two derived types contained into the library \ref Data_Type_Globals "Data_Type_Globals". The two derived types are:
-- \ref Data_Type_Globals::Type_Block;
-- \ref Data_Type_Globals::Type_Global.
-
-Nested to these two derived types are many different kinds of data that are themselves represented by a specific derived type:
-- Global data:
-  - \ref Data_Type_Globals::Type_File_Global "Global Files data": these are data related to files handling;
-  - \ref Data_Type_Globals::Type_Mesh_Global "Global Mesh data": these are data related to the mesh;
-  - \ref Data_Type_Globals::Type_BC_Global "Global Boundary Conditions data": these are data related to the boundary conditions;
-  - \ref Data_Type_Globals::Type_Fluid_Global "Global Fluid Dynamics data": these are data related to the fluid dynamics;
-  - \ref Data_Type_Globals::Type_Adimensional_Global "Global Non dimensional data": these are data related to the non-dimensionalization reference values and numbers;
-- Block data:
-  - \ref Data_Type_Globals::Type_Mesh_Block "Block Mesh data": these are data related to the mesh;
-  - \ref Data_Type_Globals::Type_BC_Block "Block Boundary Conditions data": these are data related to the boundary conditions;
-  - \ref Data_Type_Globals::Type_Fluid_Block "Block Fluid Dynamics data": these are data related to the fluid dynamics.
+The two above data structures are defined by two derived types contained into the libraries \ref Data_Type_Global "Data_Type_Global" and \ref Data_Type_SBlock "Data_Type_SBlock". The two derived types are:
+- \ref Data_Type_Global::Type_Global;
+- \ref Data_Type_SBlock::Type_SBlock.
+Nested to these two derived types are many different kinds of data.
 
 Details of the above types can be found in the <em>Application Program Interface</em> (API) documentation pages.
 
@@ -377,25 +366,25 @@ The options are self explained.
 Among the possible choices it has been chosen to don't use multi-blocks file: each data file contains only one block data. The author thinks that this one-block file template provides more flexibility and an easier file handling with MPI multi-processes simulations.
 
 @subsection MeshFiles Mesh File
-The data contained into mesh files and the format used are defined by \ref Data_Type_Globals::load_bmesh "loading" and \ref Data_Type_Globals::save_bmesh "saving" procedures. The mesh files are binary (unformatted) files with the following naming convention:
+The data contained into mesh files and the format used are defined by \ref Data_Type_SBlock::load_bmesh "loading" and \ref Data_Type_SBlock::save_bmesh "saving" procedures. The mesh files are binary (unformatted) files with the following naming convention:
 @code
 mesh_base_name.g##.b###.geo
 @endcode
-where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific \ref Data_Type_Globals::file_name "procedure".
+where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific \ref Data_Type_Global::file_name "procedure".
 
 @subsection BCFiles Boundary Conditions File
-The data contained into boundary conditions files and the format used are defined by \ref Data_Type_Globals::load_bbc "loading" and \ref Data_Type_Globals::save_bbc "saving" procedures. The boundary conditions files are binary (unformatted) files with the following naming convention:
+The data contained into boundary conditions files and the format used are defined by \ref Data_Type_SBlock::load_bbc "loading" and \ref Data_Type_SBlock::save_bbc "saving" procedures. The boundary conditions files are binary (unformatted) files with the following naming convention:
 @code
 bc_base_name.g##.b###.bco
 @endcode
-where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific \ref Data_Type_Globals::file_name "procedure".
+where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific \ref Data_Type_Global::file_name "procedure".
 
 @subsection SolFiles Solution File
-The data contained into solution files and the format used are defined by \ref Data_Type_Globals::load_bfluid "loading" and \ref Data_Type_Globals::save_bfluid "saving" procedures. The solution files are binary (unformatted) files with the following naming convention:
+The data contained into solution files and the format used are defined by \ref Data_Type_SBlock::load_bfluid "loading" and \ref Data_Type_SBlock::save_bfluid "saving" procedures. The solution files are binary (unformatted) files with the following naming convention:
 @code
 sol_base_name.g##.b###.geo
 @endcode
-where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific \ref Data_Type_Globals::file_name "procedure".
+where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific \ref Data_Type_Global::file_name "procedure".
 
 @page Compiling Compiling Instruction
 @off has been developed on GNU/Linux architectures. Other OS are not supported (and in general there is no best alternative to
@@ -620,7 +609,7 @@ The provided examples are contained into directory "examples". There are three t
    - \subpage SOD "SOD" shock tube;
    - LAX shock tube.
  - \b 2D One dimensional test cases:
-   - Two dimensional Riemann Problems;
+   - \subpage TWOD-RP "Two dimensional Riemann Problems";
    - Under expanded supersonic jet transient;
    - Double Mach reflections;
    - Shock corner diffraction.

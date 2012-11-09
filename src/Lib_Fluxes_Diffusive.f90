@@ -15,9 +15,11 @@
 module Lib_Fluxes_Diffusive
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision           ! Integers and reals precision definition.
+USE Data_Type_AMRBlock     ! Definition of Type_AMRBlock.
 USE Data_Type_Conservative ! Definition of Type_Conservative.
-USE Data_Type_Globals      ! Definition of Type_Global and Type_Block.
+USE Data_Type_Global       ! Definition of Type_Global.
 USE Data_Type_Primitive    ! Definition of Type_Primitive.
+USE Data_Type_SBlock       ! Definition of Type_SBlock.
 USE Data_Type_Tensor       ! Definition of Type_Tensor.
 USE Data_Type_Vector       ! Definition of Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -34,7 +36,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Global),       intent(IN)::    global !< Global-level data.
-  type(Type_Block),        intent(IN)::    block  !< Block-level data.
+  class(Type_SBlock),      intent(IN)::    block  !< Block-level data.
   integer(I_P),            intent(IN)::    i      !< Interface i indexe.
   integer(I_P),            intent(IN)::    j      !< Interface j indexe.
   integer(I_P),            intent(IN)::    k      !< Interface k indexe.
@@ -48,25 +50,25 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! computing metrics of finite volume centered at interface i,j,k
-  call fv_interface_metrics(mesh=block%mesh)
+  call fv_interface_metrics(block=block)
   ! computing velocity vector at the interfaces of the finite volume centered at interface i,j,k
-  call fv_interface_velocity(fluid=block%fluid)
+  call fv_interface_velocity(block=block)
   ! computing the shear stress tensor at interface i,j,k
   call shear_stress()
   ! computing the diffusive fluxes
   select case(dir)
   case('i')
     F%rs = 0._R_P
-    F%rv = -(tau.dot.block%mesh%NFi(i,j,k))
-    F%re = -((tau.dot.(0.5_R_P*(block%fluid%P(i,j,k)%v+block%fluid%P(i+1,j,k)%v))).dot.block%mesh%NFi(i,j,k))
+    F%rv = -(tau.dot.block%NFi(i,j,k))
+    F%re = -((tau.dot.(0.5_R_P*(block%P(i,j,k)%v+block%P(i+1,j,k)%v))).dot.block%NFi(i,j,k))
   case('j')
     F%rs = 0._R_P
-    F%rv = -(tau.dot.block%mesh%NFj(i,j,k))
-    F%re = -((tau.dot.(0.5_R_P*(block%fluid%P(i,j,k)%v+block%fluid%P(i,j+1,k)%v))).dot.block%mesh%NFj(i,j,k))
+    F%rv = -(tau.dot.block%NFj(i,j,k))
+    F%re = -((tau.dot.(0.5_R_P*(block%P(i,j,k)%v+block%P(i,j+1,k)%v))).dot.block%NFj(i,j,k))
   case('k')
     F%rs = 0._R_P
-    F%rv = -(tau.dot.block%mesh%NFk(i,j,k))
-    F%re = -((tau.dot.(0.5_R_P*(block%fluid%P(i,j,k)%v+block%fluid%P(i,j,k+1)%v))).dot.block%mesh%NFk(i,j,k))
+    F%rv = -(tau.dot.block%NFk(i,j,k))
+    F%re = -((tau.dot.(0.5_R_P*(block%P(i,j,k)%v+block%P(i,j,k+1)%v))).dot.block%NFk(i,j,k))
   endselect
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -77,35 +79,35 @@ contains
     !> @note The computed metrics is stored as normals to the 6 hexahedron faces of the shifted finite volume. Each normal has
     !> module equal to its face area.
     !> @return \b NFS(1:6) Type_Vector array.
-    subroutine fv_interface_metrics(mesh)
+    subroutine fv_interface_metrics(block)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    type(Type_Mesh_Block), intent(IN):: mesh !< Block-level mesh data.
+    class(Type_SBlock), intent(IN):: block !< Block-level data.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
     select case(dir)
     case('i')
-      NFS(1) = 0.5_R_P*(mesh%Si(i,j  ,k  )*mesh%NFi(i,j  ,k  ) + mesh%Si(i-1,j  ,k  )*mesh%NFi(i-1,j  ,k  ))
-      NFS(2) = 0.5_R_P*(mesh%Si(i,j  ,k  )*mesh%NFi(i,j  ,k  ) + mesh%Si(i+1,j  ,k  )*mesh%NFi(i+1,j  ,k  ))
-      NFS(3) = 0.5_R_P*(mesh%Sj(i,j-1,k  )*mesh%NFj(i,j-1,k  ) + mesh%Sj(i+1,j-1,k  )*mesh%NFj(i+1,j-1,k  ))
-      NFS(4) = 0.5_R_P*(mesh%Sj(i,j  ,k  )*mesh%NFj(i,j  ,k  ) + mesh%Sj(i+1,j  ,k  )*mesh%NFj(i+1,j  ,k  ))
-      NFS(5) = 0.5_R_P*(mesh%Sk(i,j  ,k-1)*mesh%NFk(i,j  ,k-1) + mesh%Sk(i+1,j  ,k-1)*mesh%NFk(i+1,j  ,k-1))
-      NFS(6) = 0.5_R_P*(mesh%Sk(i,j  ,k  )*mesh%NFk(i,j  ,k  ) + mesh%Sk(i+1,j  ,k  )*mesh%NFk(i+1,j  ,k  ))
+      NFS(1) = 0.5_R_P*(block%Si(i,j  ,k  )*block%NFi(i,j  ,k  ) + block%Si(i-1,j  ,k  )*block%NFi(i-1,j  ,k  ))
+      NFS(2) = 0.5_R_P*(block%Si(i,j  ,k  )*block%NFi(i,j  ,k  ) + block%Si(i+1,j  ,k  )*block%NFi(i+1,j  ,k  ))
+      NFS(3) = 0.5_R_P*(block%Sj(i,j-1,k  )*block%NFj(i,j-1,k  ) + block%Sj(i+1,j-1,k  )*block%NFj(i+1,j-1,k  ))
+      NFS(4) = 0.5_R_P*(block%Sj(i,j  ,k  )*block%NFj(i,j  ,k  ) + block%Sj(i+1,j  ,k  )*block%NFj(i+1,j  ,k  ))
+      NFS(5) = 0.5_R_P*(block%Sk(i,j  ,k-1)*block%NFk(i,j  ,k-1) + block%Sk(i+1,j  ,k-1)*block%NFk(i+1,j  ,k-1))
+      NFS(6) = 0.5_R_P*(block%Sk(i,j  ,k  )*block%NFk(i,j  ,k  ) + block%Sk(i+1,j  ,k  )*block%NFk(i+1,j  ,k  ))
     case('j')
-      NFS(1) = 0.5_R_P*(mesh%Sj(i  ,j,k  )*mesh%NFj(i  ,j,k  ) + mesh%Sj(i  ,j-1,k  )*mesh%NFj(i  ,j-1,k  ))
-      NFS(2) = 0.5_R_P*(mesh%Sj(i  ,j,k  )*mesh%NFj(i  ,j,k  ) + mesh%Sj(i  ,j+1,k  )*mesh%NFj(i  ,j+1,k  ))
-      NFS(3) = 0.5_R_P*(mesh%Sk(i  ,j,k-1)*mesh%NFk(i  ,j,k-1) + mesh%Sk(i  ,j+1,k-1)*mesh%NFk(i  ,j+1,k-1))
-      NFS(4) = 0.5_R_P*(mesh%Sk(i  ,j,k  )*mesh%NFk(i  ,j,k  ) + mesh%Sk(i  ,j+1,k  )*mesh%NFk(i  ,j+1,k  ))
-      NFS(5) = 0.5_R_P*(mesh%Si(i-1,j,k  )*mesh%NFi(i-1,j,k  ) + mesh%Si(i-1,j+1,k  )*mesh%NFi(i-1,j+1,k  ))
-      NFS(6) = 0.5_R_P*(mesh%Si(i  ,j,k  )*mesh%NFi(i  ,j,k  ) + mesh%Si(i  ,j+1,k  )*mesh%NFi(i  ,j+1,k  ))
+      NFS(1) = 0.5_R_P*(block%Sj(i  ,j,k  )*block%NFj(i  ,j,k  ) + block%Sj(i  ,j-1,k  )*block%NFj(i  ,j-1,k  ))
+      NFS(2) = 0.5_R_P*(block%Sj(i  ,j,k  )*block%NFj(i  ,j,k  ) + block%Sj(i  ,j+1,k  )*block%NFj(i  ,j+1,k  ))
+      NFS(3) = 0.5_R_P*(block%Sk(i  ,j,k-1)*block%NFk(i  ,j,k-1) + block%Sk(i  ,j+1,k-1)*block%NFk(i  ,j+1,k-1))
+      NFS(4) = 0.5_R_P*(block%Sk(i  ,j,k  )*block%NFk(i  ,j,k  ) + block%Sk(i  ,j+1,k  )*block%NFk(i  ,j+1,k  ))
+      NFS(5) = 0.5_R_P*(block%Si(i-1,j,k  )*block%NFi(i-1,j,k  ) + block%Si(i-1,j+1,k  )*block%NFi(i-1,j+1,k  ))
+      NFS(6) = 0.5_R_P*(block%Si(i  ,j,k  )*block%NFi(i  ,j,k  ) + block%Si(i  ,j+1,k  )*block%NFi(i  ,j+1,k  ))
     case('k')
-      NFS(1) = 0.5_R_P*(mesh%Sk(i  ,j  ,k)*mesh%NFk(i  ,j  ,k) + mesh%Sk(i  ,j  ,k-1)*mesh%NFk(i  ,j  ,k-1))
-      NFS(2) = 0.5_R_P*(mesh%Sk(i  ,j  ,k)*mesh%NFk(i  ,j  ,k) + mesh%Sk(i  ,j  ,k+1)*mesh%NFk(i  ,j  ,k+1))
-      NFS(3) = 0.5_R_P*(mesh%Si(i-1,j  ,k)*mesh%NFi(i-1,j  ,k) + mesh%Si(i-1,j  ,k+1)*mesh%NFi(i-1,j  ,k+1))
-      NFS(4) = 0.5_R_P*(mesh%Si(i  ,j  ,k)*mesh%NFi(i  ,j  ,k) + mesh%Si(i  ,j  ,k+1)*mesh%NFi(i  ,j  ,k+1))
-      NFS(5) = 0.5_R_P*(mesh%Sj(i  ,j-1,k)*mesh%NFj(i  ,j-1,k) + mesh%Sj(i  ,j-1,k+1)*mesh%NFj(i  ,j-1,k+1))
-      NFS(6) = 0.5_R_P*(mesh%Sj(i  ,j  ,k)*mesh%NFj(i  ,j  ,k) + mesh%Sj(i  ,j  ,k+1)*mesh%NFj(i  ,j  ,k+1))
+      NFS(1) = 0.5_R_P*(block%Sk(i  ,j  ,k)*block%NFk(i  ,j  ,k) + block%Sk(i  ,j  ,k-1)*block%NFk(i  ,j  ,k-1))
+      NFS(2) = 0.5_R_P*(block%Sk(i  ,j  ,k)*block%NFk(i  ,j  ,k) + block%Sk(i  ,j  ,k+1)*block%NFk(i  ,j  ,k+1))
+      NFS(3) = 0.5_R_P*(block%Si(i-1,j  ,k)*block%NFi(i-1,j  ,k) + block%Si(i-1,j  ,k+1)*block%NFi(i-1,j  ,k+1))
+      NFS(4) = 0.5_R_P*(block%Si(i  ,j  ,k)*block%NFi(i  ,j  ,k) + block%Si(i  ,j  ,k+1)*block%NFi(i  ,j  ,k+1))
+      NFS(5) = 0.5_R_P*(block%Sj(i  ,j-1,k)*block%NFj(i  ,j-1,k) + block%Sj(i  ,j-1,k+1)*block%NFj(i  ,j-1,k+1))
+      NFS(6) = 0.5_R_P*(block%Sj(i  ,j  ,k)*block%NFj(i  ,j  ,k) + block%Sj(i  ,j  ,k+1)*block%NFj(i  ,j  ,k+1))
     endselect
     return
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -113,42 +115,42 @@ contains
 
     !> Subroutine for computing the velocity vector at interfaces of finite volume centered at interface i,j,k.
     !> @return \b vel(1:6) Type_Vector array.
-    subroutine fv_interface_velocity(fluid)
+    subroutine fv_interface_velocity(block)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    type(Type_Fluid_Block), intent(IN):: fluid !< Block-level fluidynamic variables.
-    type(Type_Vector)::                  mean  !< Mean velocity vector across the interface.
+    class(Type_SBlock), intent(IN):: block !< Block-level data.
+    type(Type_Vector)::              mean  !< Mean velocity vector across the interface.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
     select case(dir)
     case('i')
-      mean = fluid%P(i,j,k)%v + fluid%P(i+1,j,k)%v
+      mean = block%P(i,j,k)%v + block%P(i+1,j,k)%v
 
-      vel(1) = fluid%P(i  ,j,k)%v
-      vel(2) = fluid%P(i+1,j,k)%v
-      vel(3) = 0.25_R_P*(mean + fluid%P(i,j-1,k  )%v + fluid%P(i+1,j-1,k  )%v)
-      vel(4) = 0.25_R_P*(mean + fluid%P(i,j+1,k  )%v + fluid%P(i+1,j+1,k  )%v)
-      vel(5) = 0.25_R_P*(mean + fluid%P(i,j  ,k-1)%v + fluid%P(i+1,j  ,k-1)%v)
-      vel(6) = 0.25_R_P*(mean + fluid%P(i,j  ,k+1)%v + fluid%P(i+1,j  ,k+1)%v)
+      vel(1) = block%P(i  ,j,k)%v
+      vel(2) = block%P(i+1,j,k)%v
+      vel(3) = 0.25_R_P*(mean + block%P(i,j-1,k  )%v + block%P(i+1,j-1,k  )%v)
+      vel(4) = 0.25_R_P*(mean + block%P(i,j+1,k  )%v + block%P(i+1,j+1,k  )%v)
+      vel(5) = 0.25_R_P*(mean + block%P(i,j  ,k-1)%v + block%P(i+1,j  ,k-1)%v)
+      vel(6) = 0.25_R_P*(mean + block%P(i,j  ,k+1)%v + block%P(i+1,j  ,k+1)%v)
     case('j')
-      mean = fluid%P(i,j,k)%v + fluid%P(i,j+1,k)%v
+      mean = block%P(i,j,k)%v + block%P(i,j+1,k)%v
 
-      vel(1) = fluid%P(i,j  ,k)%v
-      vel(2) = fluid%P(i,j+1,k)%v
-      vel(3) = 0.25_R_P*(mean + fluid%P(i  ,j,k-1)%v + fluid%P(i  ,j+1,k-1)%v)
-      vel(4) = 0.25_R_P*(mean + fluid%P(i  ,j,k+1)%v + fluid%P(i  ,j+1,k+1)%v)
-      vel(5) = 0.25_R_P*(mean + fluid%P(i-1,j,k  )%v + fluid%P(i-1,j+1,k  )%v)
-      vel(6) = 0.25_R_P*(mean + fluid%P(i+1,j,k  )%v + fluid%P(i+1,j+1,k  )%v)
+      vel(1) = block%P(i,j  ,k)%v
+      vel(2) = block%P(i,j+1,k)%v
+      vel(3) = 0.25_R_P*(mean + block%P(i  ,j,k-1)%v + block%P(i  ,j+1,k-1)%v)
+      vel(4) = 0.25_R_P*(mean + block%P(i  ,j,k+1)%v + block%P(i  ,j+1,k+1)%v)
+      vel(5) = 0.25_R_P*(mean + block%P(i-1,j,k  )%v + block%P(i-1,j+1,k  )%v)
+      vel(6) = 0.25_R_P*(mean + block%P(i+1,j,k  )%v + block%P(i+1,j+1,k  )%v)
     case('k')
-      mean = fluid%P(i,j,k)%v + fluid%P(i,j,k+1)%v
+      mean = block%P(i,j,k)%v + block%P(i,j,k+1)%v
 
-      vel(1) = fluid%P(i,j,k  )%v
-      vel(2) = fluid%P(i,j,k+1)%v
-      vel(3) = 0.25_R_P*(mean + fluid%P(i-1,j  ,k)%v + fluid%P(i-1,j  ,k+1)%v)
-      vel(4) = 0.25_R_P*(mean + fluid%P(i+1,j  ,k)%v + fluid%P(i+1,j  ,k+1)%v)
-      vel(5) = 0.25_R_P*(mean + fluid%P(i  ,j-1,k)%v + fluid%P(i  ,j-1,k+1)%v)
-      vel(6) = 0.25_R_P*(mean + fluid%P(i  ,j+1,k)%v + fluid%P(i  ,j+1,k+1)%v)
+      vel(1) = block%P(i,j,k  )%v
+      vel(2) = block%P(i,j,k+1)%v
+      vel(3) = 0.25_R_P*(mean + block%P(i-1,j  ,k)%v + block%P(i-1,j  ,k+1)%v)
+      vel(4) = 0.25_R_P*(mean + block%P(i+1,j  ,k)%v + block%P(i+1,j  ,k+1)%v)
+      vel(5) = 0.25_R_P*(mean + block%P(i  ,j-1,k)%v + block%P(i  ,j-1,k+1)%v)
+      vel(6) = 0.25_R_P*(mean + block%P(i  ,j+1,k)%v + block%P(i  ,j+1,k+1)%v)
     endselect
     return
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -188,11 +190,11 @@ contains
     ! computing the value of the finite volume
     select case(dir)
     case('i')
-      vol=0.5_R_P*(block%mesh%V(i,j,k) + block%mesh%V(i+1,j,k))
+      vol=0.5_R_P*(block%V(i,j,k) + block%V(i+1,j,k))
     case('j')
-      vol=0.5_R_P*(block%mesh%V(i,j,k) + block%mesh%V(i,j+1,k))
+      vol=0.5_R_P*(block%V(i,j,k) + block%V(i,j+1,k))
     case('k')
-      vol=0.5_R_P*(block%mesh%V(i,j,k) + block%mesh%V(i,j,k+1))
+      vol=0.5_R_P*(block%V(i,j,k) + block%V(i,j,k+1))
     endselect
     ! computing the gradient of velocity vector
     rst%x%x = dudi_FV(u=vel%x,nsi=NFS%x,v=vol)

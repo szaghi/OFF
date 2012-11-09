@@ -13,8 +13,9 @@ module Lib_Parallel
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision        ! Integers and reals precision definition.
 USE Data_Type_BC        ! Definition of Type_BC.
-USE Data_Type_Globals   ! Definition of Type_Global and Type_Block.
+USE Data_Type_Global    ! Definition of Type_Global.
 USE Data_Type_Primitive ! Definition of Type_Primitive.
+USE Data_Type_SBlock    ! Definition of Type_SBlock.
 USE Lib_IO_Misc         ! Procedures for IO and strings operations.
 #ifdef MPI2
 USE MPI                 ! MPI runtime library.
@@ -73,95 +74,94 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(NcR)) deallocate(NcR) ; allocate(NcR(    0:Nproc,1:global%mesh%Nl)) ; NcR = 0_I_P
-  if (allocated(NcS)) deallocate(NcS) ; allocate(NcS(    0:Nproc,1:global%mesh%Nl)) ; NcS = 0_I_P
-  if (allocated(bbR)) deallocate(bbR) ; allocate(bbR(1:2,0:Nproc,1:global%mesh%Nl)) ; bbR = 0_I_P
-  if (allocated(bbS)) deallocate(bbS) ; allocate(bbS(1:2,0:Nproc,1:global%mesh%Nl)) ; bbS = 0_I_P
+  if (allocated(NcR)) deallocate(NcR) ; allocate(NcR(    0:Nproc,1:global%Nl)) ; NcR = 0_I_P
+  if (allocated(NcS)) deallocate(NcS) ; allocate(NcS(    0:Nproc,1:global%Nl)) ; NcS = 0_I_P
+  if (allocated(bbR)) deallocate(bbR) ; allocate(bbR(1:2,0:Nproc,1:global%Nl)) ; bbR = 0_I_P
+  if (allocated(bbS)) deallocate(bbS) ; allocate(bbS(1:2,0:Nproc,1:global%Nl)) ; bbS = 0_I_P
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine alloc_SR
 
-  subroutine compute_NcR(myrank,global,block)
+  subroutine compute_NcR(global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   ! Function for computing the number of cells that must be received from other processes than myrank.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN):: myrank                                   ! Actual rank process.
-  type(Type_Global), intent(IN):: global                                   ! Global-level data.
-  type(Type_Block),  intent(IN):: block(1:global%mesh%Nb,1:global%mesh%Nl) ! Block-level data.
-  integer(I_P)::                  l                                        ! Grid levels counter.
-  integer(I_P)::                  proc                                     ! Processes counter.
-  integer(I_P)::                  c                                        ! Cells counter.
-  integer(I_P)::                  b                                        ! Blocks counter.
-  integer(I_P)::                  i,j,k                                    ! Space counters.
+  type(Type_Global), intent(IN):: global                         ! Global-level data.
+  type(Type_SBlock), intent(IN):: block(1:global%Nb,1:global%Nl) ! Block-level data.
+  integer(I_P)::                  l                              ! Grid levels counter.
+  integer(I_P)::                  proc                           ! Processes counter.
+  integer(I_P)::                  c                              ! Cells counter.
+  integer(I_P)::                  b                              ! Blocks counter.
+  integer(I_P)::                  i,j,k                          ! Space counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! computing the number of receive cells of myrank for other processes; checking the equivalence of proc and myrank:
   !  if proc=myrank => NcR=0 => myrank doesn't communicate with itself
-  do l=1,global%mesh%Nl
-    do b=1,global%mesh%Nb
+  do l=1,global%Nl
+    do b=1,global%Nb
       ! i interfaces
-      do k=1,block(b,l)%mesh%Nk
-        do j=1,block(b,l)%mesh%Nj
+      do k=1,block(b,l)%Nk
+        do j=1,block(b,l)%Nj
           ! left i
-          do i=0-block(b,l)%mesh%gc(1),0
-            if (block(b,l)%bc%BCi(i,j,k)%tp==bc_adj) then
-              if (procmap(block(b,l)%bc%BCi(i,j,k)%adj%b)/=myrank) &
-              NcR(procmap(block(b,l)%bc%BCi(i,j,k)%adj%b),l) = NcR(procmap(block(b,l)%bc%BCi(i,j,k)%adj%b),l) + 1
+          do i=0-block(b,l)%gc(1),0
+            if (block(b,l)%BCi(i,j,k)%tp==bc_adj) then
+              if (procmap(block(b,l)%BCi(i,j,k)%adj%b)/=global%myrank) &
+              NcR(procmap(block(b,l)%BCi(i,j,k)%adj%b),l) = NcR(procmap(block(b,l)%BCi(i,j,k)%adj%b),l) + 1
             endif
           enddo
           ! right i
-          do i=block(b,l)%mesh%Ni,block(b,l)%mesh%Ni+block(b,l)%mesh%gc(2)
-            if (block(b,l)%bc%BCi(i,j,k)%tp==bc_adj) then
-              if (procmap(block(b,l)%bc%BCi(i,j,k)%adj%b)/=myrank) &
-              NcR(procmap(block(b,l)%bc%BCi(i,j,k)%adj%b),l) = NcR(procmap(block(b,l)%bc%BCi(i,j,k)%adj%b),l) + 1
+          do i=block(b,l)%Ni,block(b,l)%Ni+block(b,l)%gc(2)
+            if (block(b,l)%BCi(i,j,k)%tp==bc_adj) then
+              if (procmap(block(b,l)%BCi(i,j,k)%adj%b)/=global%myrank) &
+              NcR(procmap(block(b,l)%BCi(i,j,k)%adj%b),l) = NcR(procmap(block(b,l)%BCi(i,j,k)%adj%b),l) + 1
             endif
           enddo
         enddo
       enddo
       ! j interfaces
-      do k=1,block(b,l)%mesh%Nk
+      do k=1,block(b,l)%Nk
         ! left j
-        do j=0-block(b,l)%mesh%gc(3),0
-          do i=1,block(b,l)%mesh%Ni
-            if (block(b,l)%bc%BCj(i,j,k)%tp==bc_adj) then
-              if (procmap(block(b,l)%bc%BCj(i,j,k)%adj%b)/=myrank) &
-              NcR(procmap(block(b,l)%bc%BCj(i,j,k)%adj%b),l) = NcR(procmap(block(b,l)%bc%BCj(i,j,k)%adj%b),l) + 1
+        do j=0-block(b,l)%gc(3),0
+          do i=1,block(b,l)%Ni
+            if (block(b,l)%BCj(i,j,k)%tp==bc_adj) then
+              if (procmap(block(b,l)%BCj(i,j,k)%adj%b)/=global%myrank) &
+              NcR(procmap(block(b,l)%BCj(i,j,k)%adj%b),l) = NcR(procmap(block(b,l)%BCj(i,j,k)%adj%b),l) + 1
             endif
           enddo
         enddo
         ! right j
-        do j=block(b,l)%mesh%Nj,block(b,l)%mesh%Nj+block(b,l)%mesh%gc(4)
-          do i=1,block(b,l)%mesh%Ni
-            if (block(b,l)%bc%BCj(i,j,k)%tp==bc_adj) then
-              if (procmap(block(b,l)%bc%BCj(i,j,k)%adj%b)/=myrank) &
-              NcR(procmap(block(b,l)%bc%BCj(i,j,k)%adj%b),l) = NcR(procmap(block(b,l)%bc%BCj(i,j,k)%adj%b),l) + 1
+        do j=block(b,l)%Nj,block(b,l)%Nj+block(b,l)%gc(4)
+          do i=1,block(b,l)%Ni
+            if (block(b,l)%BCj(i,j,k)%tp==bc_adj) then
+              if (procmap(block(b,l)%BCj(i,j,k)%adj%b)/=global%myrank) &
+              NcR(procmap(block(b,l)%BCj(i,j,k)%adj%b),l) = NcR(procmap(block(b,l)%BCj(i,j,k)%adj%b),l) + 1
             endif
           enddo
         enddo
       enddo
       ! k interfaces
       ! left k
-      do k=0-block(b,l)%mesh%gc(5),0
-        do j=1,block(b,l)%mesh%Nj
-          do i=1,block(b,l)%mesh%Ni
-            if (block(b,l)%bc%BCk(i,j,k)%tp==bc_adj) then
-              if (procmap(block(b,l)%bc%BCk(i,j,k)%adj%b)/=myrank) &
-              NcR(procmap(block(b,l)%bc%BCk(i,j,k)%adj%b),l) = NcR(procmap(block(b,l)%bc%BCk(i,j,k)%adj%b),l) + 1
+      do k=0-block(b,l)%gc(5),0
+        do j=1,block(b,l)%Nj
+          do i=1,block(b,l)%Ni
+            if (block(b,l)%BCk(i,j,k)%tp==bc_adj) then
+              if (procmap(block(b,l)%BCk(i,j,k)%adj%b)/=global%myrank) &
+              NcR(procmap(block(b,l)%BCk(i,j,k)%adj%b),l) = NcR(procmap(block(b,l)%BCk(i,j,k)%adj%b),l) + 1
             endif
           enddo
         enddo
       enddo
       ! right k
-      do k=block(b,l)%mesh%Nk,block(b,l)%mesh%Nk+block(b,l)%mesh%gc(6)
-        do j=1,block(b,l)%mesh%Nj
-          do i=1,block(b,l)%mesh%Ni
-            if (block(b,l)%bc%BCk(i,j,k)%tp==bc_adj) then
-              if (procmap(block(b,l)%bc%BCk(i,j,k)%adj%b)/=myrank) &
-              NcR(procmap(block(b,l)%bc%BCk(i,j,k)%adj%b),l) = NcR(procmap(block(b,l)%bc%BCk(i,j,k)%adj%b),l) + 1
+      do k=block(b,l)%Nk,block(b,l)%Nk+block(b,l)%gc(6)
+        do j=1,block(b,l)%Nj
+          do i=1,block(b,l)%Ni
+            if (block(b,l)%BCk(i,j,k)%tp==bc_adj) then
+              if (procmap(block(b,l)%BCk(i,j,k)%adj%b)/=global%myrank) &
+              NcR(procmap(block(b,l)%BCk(i,j,k)%adj%b),l) = NcR(procmap(block(b,l)%BCk(i,j,k)%adj%b),l) + 1
             endif
           enddo
         enddo
@@ -170,7 +170,7 @@ contains
   enddo
   gNcR = sum(NcR)
   c = 0
-  do l=1,global%mesh%Nl
+  do l=1,global%Nl
     do proc=0,Nproc-1
       if (NcR(proc,l)>0) then
         c             = c + NcR(proc,l)
@@ -199,7 +199,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   gNcS = sum(NcS)
   c = 0
-  do l=1,global%mesh%Nl
+  do l=1,global%Nl
     do proc=0,Nproc-1
       if (NcS(proc,l)>0) then
         c             = c + NcS(proc,l)
@@ -223,33 +223,32 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(recvmap)) deallocate(recvmap) ; allocate(recvmap(1:4, 1:gNcR))              ; recvmap = 0_I_P
-  if (allocated(reqsmap)) deallocate(reqsmap) ; allocate(reqsmap(1:4, 1:gNcR))              ; reqsmap = 0_I_P
-  if (allocated(sendmap)) deallocate(sendmap) ; allocate(sendmap(1:4, 1:gNcS))              ; sendmap = 0_I_P
-  if (allocated(Precv  )) deallocate(Precv  ) ; allocate(Precv  (1:global%fluid%Np,1:gNcR)) ; Precv   = 0._R_P
-  if (allocated(Psend  )) deallocate(Psend  ) ; allocate(Psend  (1:global%fluid%Np,1:gNcS)) ; Psend   = 0._R_P
+  if (allocated(recvmap)) deallocate(recvmap) ; allocate(recvmap(1:4, 1:gNcR))        ; recvmap = 0_I_P
+  if (allocated(reqsmap)) deallocate(reqsmap) ; allocate(reqsmap(1:4, 1:gNcR))        ; reqsmap = 0_I_P
+  if (allocated(sendmap)) deallocate(sendmap) ; allocate(sendmap(1:4, 1:gNcS))        ; sendmap = 0_I_P
+  if (allocated(Precv  )) deallocate(Precv  ) ; allocate(Precv  (1:global%Np,1:gNcR)) ; Precv   = 0._R_P
+  if (allocated(Psend  )) deallocate(Psend  ) ; allocate(Psend  (1:global%Np,1:gNcS)) ; Psend   = 0._R_P
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine alloc_sendrecv
 
-  subroutine compute_recv_maps(myrank,global,block)
+  subroutine compute_recv_maps(global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   ! Subroutine for computing querying and receiving maps of actual process.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN):: myrank                                   ! Actual rank process.
-  type(Type_Global), intent(IN):: global                                   ! Global-level data.
-  type(Type_Block),  intent(IN):: block(1:global%mesh%Nb,1:global%mesh%Nl) ! Block-level data.
-  integer(I_P)::                  l                                        ! Grid levels counter.
-  integer(I_P)::                  proc                                     ! Processes counter.
+  type(Type_Global), intent(IN):: global                         ! Global-level data.
+  type(Type_SBlock), intent(IN):: block(1:global%Nb,1:global%Nl) ! Block-level data.
+  integer(I_P)::                  l                              ! Grid levels counter.
+  integer(I_P)::                  proc                           ! Processes counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  do l=1,global%mesh%Nl ! loop pver grid levels
+  do l=1,global%Nl ! loop pver grid levels
     do proc=0,Nproc-1 ! the communications is organized by processes sequence
-      if (proc==myrank) cycle ! myrank doesn't communicate with itself
+      if (proc==global%myrank) cycle ! myrank doesn't communicate with itself
       if (NcR(proc,l)==0) cycle ! there are no data to communicate to process proc
       call scan_proc(NcR     = NcR(proc,l),                              &
                      proc    = proc,                                     &
@@ -269,19 +268,19 @@ contains
 
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),      intent(IN)::  NcR                     ! Number of send/receive cells.
-    integer(I_P),      intent(IN)::  proc                    ! Other process than myrank to send/receive cells.
-    type(Type_Global), intent(IN)::  global                  ! Global-level data.
-    type(Type_Block),  intent(IN)::  block(1:global%mesh%Nb) ! Block-level data.
-    integer(I_P),      intent(OUT):: reqsmap(1:4,1:NcR)      ! Querying cells map.
-    integer(I_P),      intent(OUT):: recvmap(1:4,1:NcR)      ! Receiving cells map.
-    integer(I_P)::                   c                       ! Cells counter.
-    integer(I_P)::                   b                       ! Blocks counter.
+    integer(I_P),      intent(IN)::  NcR                ! Number of send/receive cells.
+    integer(I_P),      intent(IN)::  proc               ! Other process than myrank to send/receive cells.
+    type(Type_Global), intent(IN)::  global             ! Global-level data.
+    type(Type_SBlock), intent(IN)::  block(1:global%Nb) ! Block-level data.
+    integer(I_P),      intent(OUT):: reqsmap(1:4,1:NcR) ! Querying cells map.
+    integer(I_P),      intent(OUT):: recvmap(1:4,1:NcR) ! Receiving cells map.
+    integer(I_P)::                   c                  ! Cells counter.
+    integer(I_P)::                   b                  ! Blocks counter.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
     c = 0_I_P ! initialize cells counter
-    do b=1,global%mesh%Nb ! loop over blocks
+    do b=1,global%Nb ! loop over blocks
       call scan_block(NcR     = NcR,                &
                       block   = block(b),           &
                       proc    = proc,               &
@@ -302,7 +301,7 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
     integer(I_P),      intent(IN)::    NcR                ! Number of send/receive cells.
-    type(Type_Block),  intent(IN)::    block              ! Block-level data.
+    type(Type_SBlock), intent(IN)::    block              ! Block-level data.
     integer(I_P),      intent(IN)::    proc               ! Other process than myrank to s/r cells.
     integer(I_P),      intent(IN)::    b                  ! Actual block number.
     integer(I_P),      intent(INOUT):: c                  ! Actual cell counter.
@@ -313,33 +312,33 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
-    Ni = block%mesh%Ni
-    Nj = block%mesh%Nj
-    Nk = block%mesh%Nk
-    gc = block%mesh%gc
+    gc = block%gc
+    Ni = block%Ni
+    Nj = block%Nj
+    Nk = block%Nk
     do k=1,Nk
       do j=1,Nj
         ! left i
-        if (block%bc%BCi(0,j,k)%tp==bc_adj) then
-          if (procmap(block%bc%BCi(0,j,k)%adj%b)==proc) then
+        if (block%BCi(0,j,k)%tp==bc_adj) then
+          if (procmap(block%BCi(0,j,k)%adj%b)==proc) then
             do i=1-gc(1),0
               c = c + 1
-              reqsmap(1,c) = block%bc%BCi(i,j,k)%adj%b ; recvmap(1,c) = b
-              reqsmap(2,c) = block%bc%BCi(i,j,k)%adj%i ; recvmap(2,c) = i
-              reqsmap(3,c) = block%bc%BCi(i,j,k)%adj%j ; recvmap(3,c) = j
-              reqsmap(4,c) = block%bc%BCi(i,j,k)%adj%k ; recvmap(4,c) = k
+              reqsmap(1,c) = block%BCi(i,j,k)%adj%b ; recvmap(1,c) = b
+              reqsmap(2,c) = block%BCi(i,j,k)%adj%i ; recvmap(2,c) = i
+              reqsmap(3,c) = block%BCi(i,j,k)%adj%j ; recvmap(3,c) = j
+              reqsmap(4,c) = block%BCi(i,j,k)%adj%k ; recvmap(4,c) = k
             enddo
           endif
         endif
         ! right i
-        if (block%bc%BCi(Ni,j,k)%tp==bc_adj) then
-          if (procmap(block%bc%BCi(Ni,j,k)%adj%b)==proc) then
+        if (block%BCi(Ni,j,k)%tp==bc_adj) then
+          if (procmap(block%BCi(Ni,j,k)%adj%b)==proc) then
             do i=Ni,Ni+gc(2)-1
               c = c + 1
-              reqsmap(1,c) = block%bc%BCi(i,j,k)%adj%b ; recvmap(1,c) = b
-              reqsmap(2,c) = block%bc%BCi(i,j,k)%adj%i ; recvmap(2,c) = i+1
-              reqsmap(3,c) = block%bc%BCi(i,j,k)%adj%j ; recvmap(3,c) = j
-              reqsmap(4,c) = block%bc%BCi(i,j,k)%adj%k ; recvmap(4,c) = k
+              reqsmap(1,c) = block%BCi(i,j,k)%adj%b ; recvmap(1,c) = b
+              reqsmap(2,c) = block%BCi(i,j,k)%adj%i ; recvmap(2,c) = i+1
+              reqsmap(3,c) = block%BCi(i,j,k)%adj%j ; recvmap(3,c) = j
+              reqsmap(4,c) = block%BCi(i,j,k)%adj%k ; recvmap(4,c) = k
             enddo
           endif
         endif
@@ -348,26 +347,26 @@ contains
     do k=1,Nk
       do i=1,Ni
         ! left j
-        if (block%bc%BCj(i,0,k)%tp==bc_adj) then
-          if (procmap(block%bc%BCj(i,0,k)%adj%b)==proc) then
+        if (block%BCj(i,0,k)%tp==bc_adj) then
+          if (procmap(block%BCj(i,0,k)%adj%b)==proc) then
             do j=1-gc(3),0
               c = c + 1
-              reqsmap(1,c) = block%bc%BCj(i,j,k)%adj%b ; recvmap(1,c) = b
-              reqsmap(2,c) = block%bc%BCj(i,j,k)%adj%i ; recvmap(2,c) = i
-              reqsmap(3,c) = block%bc%BCj(i,j,k)%adj%j ; recvmap(3,c) = j
-              reqsmap(4,c) = block%bc%BCj(i,j,k)%adj%k ; recvmap(4,c) = k
+              reqsmap(1,c) = block%BCj(i,j,k)%adj%b ; recvmap(1,c) = b
+              reqsmap(2,c) = block%BCj(i,j,k)%adj%i ; recvmap(2,c) = i
+              reqsmap(3,c) = block%BCj(i,j,k)%adj%j ; recvmap(3,c) = j
+              reqsmap(4,c) = block%BCj(i,j,k)%adj%k ; recvmap(4,c) = k
             enddo
           endif
         endif
         ! right j
-        if (block%bc%BCj(i,Nj,k)%tp==bc_adj) then
-          if (procmap(block%bc%BCj(i,Nj,k)%adj%b)==proc) then
+        if (block%BCj(i,Nj,k)%tp==bc_adj) then
+          if (procmap(block%BCj(i,Nj,k)%adj%b)==proc) then
             do j=Nj,Nj+gc(4)-1
               c = c + 1
-              reqsmap(1,c) = block%bc%BCj(i,j,k)%adj%b ; recvmap(1,c) = b
-              reqsmap(2,c) = block%bc%BCj(i,j,k)%adj%i ; recvmap(2,c) = i
-              reqsmap(3,c) = block%bc%BCj(i,j,k)%adj%j ; recvmap(3,c) = j+1
-              reqsmap(4,c) = block%bc%BCj(i,j,k)%adj%k ; recvmap(4,c) = k
+              reqsmap(1,c) = block%BCj(i,j,k)%adj%b ; recvmap(1,c) = b
+              reqsmap(2,c) = block%BCj(i,j,k)%adj%i ; recvmap(2,c) = i
+              reqsmap(3,c) = block%BCj(i,j,k)%adj%j ; recvmap(3,c) = j+1
+              reqsmap(4,c) = block%BCj(i,j,k)%adj%k ; recvmap(4,c) = k
             enddo
           endif
         endif
@@ -376,26 +375,26 @@ contains
     do j=1,Nj
       do i=1,Ni
         ! left k
-        if (block%bc%BCk(i,j,0)%tp==bc_adj) then
-          if (procmap(block%bc%BCk(i,j,0)%adj%b)==proc) then
+        if (block%BCk(i,j,0)%tp==bc_adj) then
+          if (procmap(block%BCk(i,j,0)%adj%b)==proc) then
             do k=1-gc(5),0
               c = c + 1
-              reqsmap(1,c) = block%bc%BCk(i,j,k)%adj%b ; recvmap(1,c) = b
-              reqsmap(2,c) = block%bc%BCk(i,j,k)%adj%i ; recvmap(2,c) = i
-              reqsmap(3,c) = block%bc%BCk(i,j,k)%adj%j ; recvmap(3,c) = j
-              reqsmap(4,c) = block%bc%BCk(i,j,k)%adj%k ; recvmap(4,c) = k
+              reqsmap(1,c) = block%BCk(i,j,k)%adj%b ; recvmap(1,c) = b
+              reqsmap(2,c) = block%BCk(i,j,k)%adj%i ; recvmap(2,c) = i
+              reqsmap(3,c) = block%BCk(i,j,k)%adj%j ; recvmap(3,c) = j
+              reqsmap(4,c) = block%BCk(i,j,k)%adj%k ; recvmap(4,c) = k
             enddo
           endif
         endif
         ! right k
-        if (block%bc%BCk(i,j,Nk)%tp==bc_adj) then
-          if (procmap(block%bc%BCk(i,j,Nk)%adj%b)==proc) then
+        if (block%BCk(i,j,Nk)%tp==bc_adj) then
+          if (procmap(block%BCk(i,j,Nk)%adj%b)==proc) then
             do k=Nk,Nk+gc(6)-1
               c = c + 1
-              reqsmap(1,c) = block%bc%BCk(i,j,k)%adj%b ; recvmap(1,c) = b
-              reqsmap(2,c) = block%bc%BCk(i,j,k)%adj%i ; recvmap(2,c) = i
-              reqsmap(3,c) = block%bc%BCk(i,j,k)%adj%j ; recvmap(3,c) = j
-              reqsmap(4,c) = block%bc%BCk(i,j,k)%adj%k ; recvmap(4,c) = k+1
+              reqsmap(1,c) = block%BCk(i,j,k)%adj%b ; recvmap(1,c) = b
+              reqsmap(2,c) = block%BCk(i,j,k)%adj%i ; recvmap(2,c) = i
+              reqsmap(3,c) = block%BCk(i,j,k)%adj%j ; recvmap(3,c) = j
+              reqsmap(4,c) = block%BCk(i,j,k)%adj%k ; recvmap(4,c) = k+1
             enddo
           endif
         endif
@@ -406,14 +405,13 @@ contains
     endsubroutine scan_block
   endsubroutine compute_recv_maps
 
-  subroutine NcRsendrecv(myrank,global)
+  subroutine NcRsendrecv(global)
   !---------------------------------------------------------------------------------------------------------------------------------
   ! Function for communicate the number of cells that myrank must receive from other processes.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN):: myrank                     ! Actual rank process.
   type(Type_Global), intent(IN):: global                     ! Global-level data.
   integer(I_P)::                  l                          ! Grid levels counter.
   integer(I_P)::                  proc                       ! Processes counters.
@@ -422,12 +420,12 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  do l=1,global%mesh%Nl ! loop over grid levels
+  do l=1,global%Nl ! loop over grid levels
     do proc=0,Nproc-1 ! the communications is organized by processes sequence
       ! sending querying (receiving) cells number of myrank to proc and
       ! using the querying number cells of proc for building the sending number of cells of myrank
-      call MPI_SENDRECV(NcR(proc,l),1,MPI_INTEGER,proc,tagshift+Nproc*(myrank+1), &
-                        NcS(proc,l),1,MPI_INTEGER,proc,tagshift+Nproc*(proc  +1), &
+      call MPI_SENDRECV(NcR(proc,l),1,MPI_INTEGER,proc,tagshift+Nproc*(global%myrank+1), &
+                        NcS(proc,l),1,MPI_INTEGER,proc,tagshift+Nproc*(proc         +1), &
                         MPI_COMM_WORLD,stat,ierr)
     enddo
   enddo
@@ -435,7 +433,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine NcRsendrecv
 
-  subroutine mapsendrecv(myrank,global)
+  subroutine mapsendrecv(global)
   !---------------------------------------------------------------------------------------------------------------------------------
   ! Subroutine for communicate the querying cells map of myrank to other processes and for building the sending cells maps of myrank
   ! for other processes (the building is done by receiving the querying cells map of other processes).
@@ -443,7 +441,6 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN):: myrank                     ! Actual rank process.
   type(Type_Global), intent(IN):: global                     ! Global-level data.
   integer(I_P)::                  l                          ! Grid levels counter.
   integer(I_P)::                  proc                       ! Processes counter.
@@ -452,14 +449,14 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  do l=1,global%mesh%Nl ! loop over grid levels
+  do l=1,global%Nl ! loop over grid levels
     do proc=0,Nproc-1 ! the communications is organized by processes sequence
       if ((NcR(proc,l)==0).AND.(NcS(proc,l)==0)) cycle ! there are no data to communicate to process proc
 #ifdef MPI2
       ! sending querying (reqsmap) cells map of myrank to proc and
       ! using the querying cells map of proc for building the sending (sendmap) cells map of myrank
-      call MPI_SENDRECV(reqsmap(1,bbR(1,proc,l)),4*NcR(proc,l),MPI_INTEGER,proc,tagshift+Nproc*(myrank+1), &
-                        sendmap(1,bbS(1,proc,l)),4*NcS(proc,l),MPI_INTEGER,proc,tagshift+Nproc*(proc  +1), &
+      call MPI_SENDRECV(reqsmap(1,bbR(1,proc,l)),4*NcR(proc,l),MPI_INTEGER,proc,tagshift+Nproc*(global%myrank+1), &
+                        sendmap(1,bbS(1,proc,l)),4*NcS(proc,l),MPI_INTEGER,proc,tagshift+Nproc*(proc         +1), &
                         MPI_COMM_WORLD,stat,ierr)
 #endif
     enddo
@@ -469,36 +466,34 @@ contains
   endsubroutine mapsendrecv
 
   !> Subroutine for initializing the send/receive communications data.
-  subroutine Init_sendrecv(myrank,global,block)
+  subroutine Init_sendrecv(global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN):: myrank                                   !< Actual rank process.
-  type(Type_Global), intent(IN):: global                                   !< Global-level data.
-  type(Type_Block),  intent(IN):: block(1:global%mesh%Nb,1:global%mesh%Nl) !< Block-level data.
-  integer(I_P)::                  err                                      !< Error trapping flag: 0 no errors, >0 error occurs.
+  type(Type_Global), intent(IN):: global                         !< Global-level data.
+  type(Type_SBlock), intent(IN):: block(1:global%Nb,1:global%Nl) !< Block-level data.
+  integer(I_P)::                  err                            !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   call alloc_SR(global=global)
-  call compute_NcR(myrank=myrank,global=global,block=block)
-  call NcRsendrecv(myrank=myrank,global=global)
+  call compute_NcR(global=global,block=block)
+  call NcRsendrecv(global=global)
   call compute_bbS(global=global)
   call alloc_sendrecv(global=global)
-  call compute_recv_maps(myrank=myrank,global=global,block=block)
-  call mapsendrecv(myrank=myrank,global=global)
-  err = Printsendrecvmaps(myrank)
+  call compute_recv_maps(global=global,block=block)
+  call mapsendrecv(global=global)
+  err = Printsendrecvmaps(global%myrank)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Init_sendrecv
 
   !> Subroutine for performing send/receive of primitive variables of myrank to other processes.
-  subroutine Psendrecv(myrank,l,global,block)
+  subroutine Psendrecv(l,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank                     !< Actual rank process.
   integer(I_P),      intent(IN)::    l                          !< Grid level.
   type(Type_Global), intent(IN)::    global                     !< Global-level data.
-  type(Type_Block),  intent(INOUT):: block(1:global%mesh%Nb)    !< Block-level data.
+  type(Type_SBlock), intent(INOUT):: block(1:global%Nb)         !< Block-level data.
   integer(I_P)::                     proc                       !< Processes counter.
   integer(I_P)::                     c                          !< Cells counter.
   integer(I_P)::                     b                          !< Blocks counter.
@@ -512,15 +507,15 @@ contains
     ! building the send buffer (Psend) of myrank for proc using local var P
     do c=bbS(1,proc,l),bbS(2,proc,l)
       b = minloc(array=blockmap,dim=1,mask=blockmap==sendmap(1,c))
-      Psend(:,c) = block(b)%fluid%P(sendmap(2,c),sendmap(3,c),sendmap(4,c))%prim2array()
+      Psend(:,c) = block(b)%P(sendmap(2,c),sendmap(3,c),sendmap(4,c))%prim2array()
     enddo
     ! sending Psend of myrank to proc and storing in Precv of proc
-    call MPI_SENDRECV(Psend(1,bbS(1,proc,l)),global%fluid%Np*NcS(proc,l),MPI_REAL8,proc,tagshift+Nproc*(myrank+1), &
-                      Precv(1,bbR(1,proc,l)),global%fluid%Np*NcR(proc,l),MPI_REAL8,proc,tagshift+Nproc*(proc  +1), &
+    call MPI_SENDRECV(Psend(1,bbS(1,proc,l)),global%Np*NcS(proc,l),MPI_REAL8,proc,tagshift+Nproc*(global%myrank+1), &
+                      Precv(1,bbR(1,proc,l)),global%Np*NcR(proc,l),MPI_REAL8,proc,tagshift+Nproc*(proc         +1), &
                       MPI_COMM_WORLD,stat,ierr)
     ! coping the receive buffer (Precv) of myrank from proc in the local var P
     do c=bbR(1,proc,l),bbR(2,proc,l)
-       call block(recvmap(1,c))%fluid%P(recvmap(2,c),recvmap(3,c),recvmap(4,c))%array2prim(Precv(:,c))
+       call block(recvmap(1,c))%P(recvmap(2,c),recvmap(3,c),recvmap(4,c))%array2prim(Precv(:,c))
     enddo
   enddo
   return
@@ -559,10 +554,9 @@ contains
 
   !> Function for loading the processes/blocks map and local/global blocks map.
   !> @return \b err integer(I4P) variable.
-  function procmap_load(myrank,filename,global) result(err)
+  function procmap_load(filename,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN)::    myrank   !< Actual rank process.
   character(*),      intent(IN)::    filename !< File name processes/blocks map.
   type(Type_Global), intent(INOUT):: global   !< Global-level data.
   integer(I_P)::                     err      !< Error trapping flag: 0 no errors, >0 error occurs.
@@ -573,33 +567,33 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   inquire(file=trim(filename),exist=is_file,iostat=err)
-  if (.NOT.is_file) call File_Not_Found(myrank,filename,'procmap_load')
+  if (.NOT.is_file) call File_Not_Found(global%myrank,filename,'procmap_load')
   open(unit = Get_Unit(UnitFree), file = trim(filename), status = 'OLD', action = 'READ', form = 'FORMATTED')
-  read(UnitFree,*,iostat=err) global%mesh%Nb_tot
-  if (allocated(procmap)) deallocate(procmap) ; allocate(procmap(1:global%mesh%Nb_tot)) ; procmap  = 0_I_P
+  read(UnitFree,*,iostat=err) global%Nb_tot
+  if (allocated(procmap)) deallocate(procmap) ; allocate(procmap(1:global%Nb_tot)) ; procmap  = 0_I_P
   read(UnitFree,*,iostat=err)
-  do b=1,global%mesh%Nb_tot
+  do b=1,global%Nb_tot
     read(UnitFree,*,iostat=err) procmap(b) ! reading the process number of bth block
   enddo
   close(UnitFree)
   ! computing the local/global blocks map
   if (Nproc==1_I_P) then
     ! there is no MPI environment thus all blocks are loaded by process 0
-    global%mesh%Nb = global%mesh%Nb_tot
-    if (allocated(blockmap)) deallocate(blockmap) ; allocate(blockmap(1:global%mesh%Nb)) ; blockmap = 0_I_P
-    do b=1,global%mesh%Nb_tot
+    global%Nb = global%Nb_tot
+    if (allocated(blockmap)) deallocate(blockmap) ; allocate(blockmap(1:global%Nb)) ; blockmap = 0_I_P
+    do b=1,global%Nb_tot
       blockmap(b) = b  ! the blocks map is identity
     enddo
   else
     ! computing the local (of myrank) number of blocks
-    global%mesh%Nb = 0
-    do b=1,global%mesh%Nb_tot
-      if (procmap(b)==myrank) global%mesh%Nb = global%mesh%Nb + 1
+    global%Nb = 0
+    do b=1,global%Nb_tot
+      if (procmap(b)==global%myrank) global%Nb = global%Nb + 1
     enddo
-    if (allocated(blockmap)) deallocate(blockmap) ; allocate(blockmap(1:global%mesh%Nb )) ; blockmap = 0_I_P
+    if (allocated(blockmap)) deallocate(blockmap) ; allocate(blockmap(1:global%Nb )) ; blockmap = 0_I_P
     bb = 0
-    do b=1,global%mesh%Nb_tot
-      if (procmap(b)==myrank) then
+    do b=1,global%Nb_tot
+      if (procmap(b)==global%myrank) then
         bb = bb + 1
         blockmap(bb) = b
       endif
@@ -624,9 +618,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   ! saving the map
   open(unit = Get_Unit(UnitFree), file = trim(filename), form = 'FORMATTED')
-  write(UnitFree,'(A)',iostat=err) str(.true.,global%mesh%Nb_tot)//' Nb_tot = number of total blocks'
+  write(UnitFree,'(A)',iostat=err) str(.true.,global%Nb_tot)//' Nb_tot = number of total blocks'
   write(UnitFree,*,iostat=err)
-  do b=1,global%mesh%Nb_tot
+  do b=1,global%Nb_tot
     write(UnitFree,'(A)',iostat=err) str(.true.,procmap(b))//' proc(bth) = rank of process where bth block is loaded'
   enddo
   close(UnitFree)

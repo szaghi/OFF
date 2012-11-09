@@ -18,8 +18,10 @@
 !> @ingroup Library
 module Lib_WENO
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision      ! Integers and reals precision definition.
-USE Data_Type_Globals ! Definition of Type_Global and Type_Block.
+USE IR_Precision       ! Integers and reals precision definition.
+USE Data_Type_AMRBlock ! Definition of Type_AMRBlock.
+USE Data_Type_Global   ! Definition of Type_Global.
+USE Data_Type_SBlock   ! Definition of Type_SBlock.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -49,14 +51,13 @@ contains
   !> @ingroup Lib_WENOPublicProcedure
   !> @{
   !> @brief Subroutine for initialization of WENO coefficients.
-  subroutine weno_init(myrank,global,block,S)
+  subroutine weno_init(global,block,S)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),      intent(IN):: myrank                  !< Actual rank process.
-  type(Type_Global), intent(IN):: global                  !< Global-level data.
-  type(Type_Block),  intent(IN):: block(1:global%mesh%Nb) !< Block-level data.
-  integer(I1P),      intent(IN):: S                       !< Number of stencils used.
-  integer(I_P)::                  b                       !< Blocks counter.
+  type(Type_Global),  intent(IN):: global             !< Global-level data.
+  class(Type_SBlock), intent(IN):: block(1:global%Nb) !< Block-level data.
+  integer(I1P),       intent(IN):: S                  !< Number of stencils used.
+  integer(I_P)::                   b                  !< Blocks counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -67,11 +68,11 @@ contains
   weno_odd = mod(S,2_I1P)
   ! computing a reasonable value of weno_eps according to the (finest) grid spacing
   weno_eps = MaxR_P
-  do b=1,global%mesh%Nb
+  do b=1,global%Nb
     call get_min_sstep(block = block(b), ss = weno_eps)
   enddo
   weno_eps = weno_eps**(3_I1P*S-4_I1P)
-  if (myrank==0) then
+  if (global%myrank==0) then
     write(*,'(A)')           '----------------------------------------------------------------------'
     write(*,'(A,'//FR_P//')')' The "eps" WENO parameter used is: ',weno_eps
     write(*,'(A,'//FI_P//')')' The "exp" WENO parameter used is: ',weno_exp
@@ -264,28 +265,28 @@ contains
 
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    type(Type_Block), intent(IN)::    block ! Block-level data.
-    real(R_P),        intent(INOUT):: ss    ! Minimum space step.
-    integer(I_P)::                    i,j,k ! Counters.
+    class(Type_SBlock), intent(IN)::    block ! Block-level data.
+    real(R_P),          intent(INOUT):: ss    ! Minimum space step.
+    integer(I_P)::                      i,j,k ! Counters.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
-    do k=1,block%mesh%Nk
-      do j=1,block%mesh%Nj
-        do i=1,block%mesh%Ni
-          ss = min(ss,                                                                           &
-                   (0.25_R_P*(block%mesh%node(i  ,j  ,k  )%x + block%mesh%node(i  ,j-1,k  )%x +  &
-                              block%mesh%node(i  ,j-1,k-1)%x + block%mesh%node(i  ,j  ,k-1)%x)-  &
-                    0.25_R_P*(block%mesh%node(i-1,j  ,k  )%x + block%mesh%node(i-1,j-1,k  )%x +  &
-                              block%mesh%node(i-1,j-1,k-1)%x + block%mesh%node(i-1,j  ,k-1)%x)), &
-                   (0.25_R_P*(block%mesh%node(i  ,j  ,k  )%y + block%mesh%node(i-1,j  ,k  )%y +  &
-                              block%mesh%node(i-1,j  ,k-1)%y + block%mesh%node(i  ,j  ,k-1)%y)-  &
-                    0.25_R_P*(block%mesh%node(i  ,j-1,k  )%y + block%mesh%node(i-1,j-1,k  )%y +  &
-                              block%mesh%node(i-1,j-1,k-1)%y + block%mesh%node(i  ,j-1,k-1)%y)), &
-                   (0.25_R_P*(block%mesh%node(i  ,j  ,k  )%z + block%mesh%node(i-1,j-1,k  )%z +  &
-                              block%mesh%node(i-1,j  ,k  )%z + block%mesh%node(i  ,j-1,k  )%z)-  &
-                    0.25_R_P*(block%mesh%node(i  ,j  ,k-1)%z + block%mesh%node(i-1,j-1,k-1)%z +  &
-                              block%mesh%node(i-1,j  ,k-1)%z + block%mesh%node(i  ,j-1,k-1)%z)))
+    do k=1,block%Nk
+      do j=1,block%Nj
+        do i=1,block%Ni
+          ss = min(ss,                                                                 &
+                   (0.25_R_P*(block%node(i  ,j  ,k  )%x + block%node(i  ,j-1,k  )%x +  &
+                              block%node(i  ,j-1,k-1)%x + block%node(i  ,j  ,k-1)%x)-  &
+                    0.25_R_P*(block%node(i-1,j  ,k  )%x + block%node(i-1,j-1,k  )%x +  &
+                              block%node(i-1,j-1,k-1)%x + block%node(i-1,j  ,k-1)%x)), &
+                   (0.25_R_P*(block%node(i  ,j  ,k  )%y + block%node(i-1,j  ,k  )%y +  &
+                              block%node(i-1,j  ,k-1)%y + block%node(i  ,j  ,k-1)%y)-  &
+                    0.25_R_P*(block%node(i  ,j-1,k  )%y + block%node(i-1,j-1,k  )%y +  &
+                              block%node(i-1,j-1,k-1)%y + block%node(i  ,j-1,k-1)%y)), &
+                   (0.25_R_P*(block%node(i  ,j  ,k  )%z + block%node(i-1,j-1,k  )%z +  &
+                              block%node(i-1,j  ,k  )%z + block%node(i  ,j-1,k  )%z)-  &
+                    0.25_R_P*(block%node(i  ,j  ,k-1)%z + block%node(i-1,j-1,k-1)%z +  &
+                              block%node(i-1,j  ,k-1)%z + block%node(i  ,j-1,k-1)%z)))
 
         enddo
       enddo

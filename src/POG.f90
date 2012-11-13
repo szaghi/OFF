@@ -23,7 +23,6 @@ USE Data_Type_SBlock                        ! Definition of Type_SBlock.
 USE Data_Type_Time                          ! Definition of Type_Time.
 USE Data_Type_Vector                        ! Definition of Type_Vector.
 USE Lib_IO_Misc                             ! Procedures for IO and strings operations.
-USE Lib_Mesh,           only: node2center   ! Subroutine for computing cell center cell nodes ones.
 USE Lib_PostProcessing, only: pp_format,  & ! Post-processing data format.
                               tec_output, & ! Function for writing Tecplot file.
                               vtk_output    ! Function for writing VTK file.
@@ -69,7 +68,7 @@ write(stdout,*)
 write(stdout,'(A)',IOSTAT=err)' Computing the mesh variables that are not loaded from input files'
 ! computing the cell-center coordinates
 write(stdout,'(A)',IOSTAT=err)'   Computing cells centers coordinates'
-call node2center(block = block(1))
+call block(1)%node2center
 
 write(stdout,'(A)',IOSTAT=err)'----------------------------------------------------------------------'
 write(stdout,'(A)',IOSTAT=err)' Processing data'

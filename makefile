@@ -630,14 +630,6 @@ $(DEXE)POG : PRINTINFO $(MKDIRS) $(DOBJ)pog.o
 	@$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1>> diagnostic_messages 2>> error_messages
 EXES := $(EXES) POG
 
-$(DOBJ)data_type_amrblock.o : Data_Type_AMRBlock.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_global.o \
-	$(DOBJ)data_type_octant.o \
-	$(DOBJ)data_type_sblock.o
-	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
-
 $(DOBJ)data_type_bc.o : Data_Type_BC.f90 \
 	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
@@ -663,6 +655,7 @@ $(DOBJ)data_type_global.o : Data_Type_Global.f90 \
 
 $(DOBJ)data_type_octant.o : Data_Type_Octant.f90 \
 	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_bc.o \
 	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_sblock.o
 	@echo $(COTEXT) | tee -a make.log
@@ -733,7 +726,6 @@ $(DOBJ)ir_precision.o : IR_Precision.f90
 
 $(DOBJ)lib_fluidynamic.o : Lib_Fluidynamic.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_amrblock.o \
 	$(DOBJ)data_type_bc.o \
 	$(DOBJ)data_type_conservative.o \
 	$(DOBJ)data_type_global.o \
@@ -766,7 +758,6 @@ $(DOBJ)lib_fluxes_convective.o : Lib_Fluxes_Convective.f90 \
 
 $(DOBJ)lib_fluxes_diffusive.o : Lib_Fluxes_Diffusive.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_amrblock.o \
 	$(DOBJ)data_type_conservative.o \
 	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_primitive.o \
@@ -784,15 +775,6 @@ $(DOBJ)lib_io_misc.o : Lib_IO_Misc.f90 \
 
 $(DOBJ)lib_math.o : Lib_Math.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_vector.o
-	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
-
-$(DOBJ)lib_mesh.o : Lib_Mesh.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_amrblock.o \
-	$(DOBJ)data_type_bc.o \
-	$(DOBJ)data_type_sblock.o \
 	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
@@ -856,7 +838,6 @@ $(DOBJ)lib_vtk_io.o : Lib_VTK_IO.f90 \
 
 $(DOBJ)lib_weno.o : Lib_WENO.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_amrblock.o \
 	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_sblock.o
 	@echo $(COTEXT) | tee -a make.log
@@ -869,14 +850,12 @@ $(DOBJ)off.o : OFF.f90 \
 	$(DOBJ)data_type_os.o \
 	$(DOBJ)data_type_primitive.o \
 	$(DOBJ)data_type_probe.o \
-	$(DOBJ)data_type_amrblock.o \
 	$(DOBJ)data_type_sblock.o \
 	$(DOBJ)data_type_tensor.o \
 	$(DOBJ)data_type_time.o \
 	$(DOBJ)lib_fluidynamic.o \
 	$(DOBJ)lib_runge_kutta.o \
 	$(DOBJ)lib_math.o \
-	$(DOBJ)lib_mesh.o \
 	$(DOBJ)lib_io_misc.o \
 	$(DOBJ)lib_profiling.o \
 	$(DOBJ)lib_weno.o \
@@ -893,7 +872,6 @@ $(DOBJ)pog.o : POG.f90 \
 	$(DOBJ)data_type_time.o \
 	$(DOBJ)data_type_vector.o \
 	$(DOBJ)lib_io_misc.o \
-	$(DOBJ)lib_mesh.o \
 	$(DOBJ)lib_postprocessing.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages

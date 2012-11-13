@@ -19,7 +19,6 @@
 module Lib_WENO
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision       ! Integers and reals precision definition.
-USE Data_Type_AMRBlock ! Definition of Type_AMRBlock.
 USE Data_Type_Global   ! Definition of Type_Global.
 USE Data_Type_SBlock   ! Definition of Type_SBlock.
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -54,10 +53,10 @@ contains
   subroutine weno_init(global,block,S)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global),  intent(IN):: global             !< Global-level data.
-  class(Type_SBlock), intent(IN):: block(1:global%Nb) !< Block-level data.
-  integer(I1P),       intent(IN):: S                  !< Number of stencils used.
-  integer(I_P)::                   b                  !< Blocks counter.
+  type(Type_Global), intent(IN):: global             !< Global-level data.
+  type(Type_SBlock), intent(IN):: block(1:global%Nb) !< Block-level data.
+  integer(I1P),      intent(IN):: S                  !< Number of stencils used.
+  integer(I_P)::                  b                  !< Blocks counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -265,9 +264,9 @@ contains
 
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    class(Type_SBlock), intent(IN)::    block ! Block-level data.
-    real(R_P),          intent(INOUT):: ss    ! Minimum space step.
-    integer(I_P)::                      i,j,k ! Counters.
+    type(Type_SBlock), intent(IN)::    block ! Block-level data.
+    real(R_P),         intent(INOUT):: ss    ! Minimum space step.
+    integer(I_P)::                     i,j,k ! Counters.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------

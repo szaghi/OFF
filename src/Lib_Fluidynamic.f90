@@ -15,7 +15,6 @@
 module Lib_Fluidynamic
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                   ! Integers and reals precision definition.
-USE Data_Type_AMRBlock                             ! Definition of Type_AMRBlock.
 USE Data_Type_BC                                   ! Definition of Type_BC.
 USE Data_Type_Conservative                         ! Definition of Type_Conservative.
 USE Data_Type_Global                               ! Definition of Type_Global.
@@ -119,15 +118,14 @@ contains
   subroutine primitive2conservative(block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_SBlock), intent(INOUT):: block !< Block-level data (see \ref Data_Type_SBlock::Type_SBlock "Type_SBlock" definition).
-  integer(I_P)::                      i,j,k !< Counters.
+  type(Type_SBlock), intent(INOUT):: block !< Block-level data (see \ref Data_Type_SBlock::Type_SBlock "Type_SBlock" definition).
+  integer(I_P)::                     i,j,k !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!$OMP PARALLEL DEFAULT(NONE) &
-  !!$OMP PRIVATE(i,j,k)         &
-  !!$OMP SHARED(block)
-  !!$OMP DO
+#ifdef OPENMP
+  call p2c_openmp(gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,P=block%P,U=block%U)
+#else
   do k=1,block%Nk
     do j=1,block%Nj
       do i=1,block%Ni
@@ -135,9 +133,41 @@ contains
       enddo
     enddo
   enddo
-  !!$OMP END PARALLEL
+#endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> Subroutine for converting primitive variables to conservative variables of all cells of a block with OpenMP parallelization.
+    !> @note Only the inner cells of the block are converted.
+    !> @ingroup Lib_FluidynamicPrivateProcedure
+    subroutine p2c_openmp(gc,Ni,Nj,Nk,P,U)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I1P),            intent(IN)::    gc(1:6)                       !< Number of ghost cells in each direction.
+    integer(I_P),            intent(IN)::    Ni                            !< Number of cells in i direction.
+    integer(I_P),            intent(IN)::    Nj                            !< Number of cells in j direction.
+    integer(I_P),            intent(IN)::    Nk                            !< Number of cells in k direction.
+    type(Type_Primitive),    intent(IN)::    P(1-gc(1):,1-gc(3):,1-gc(5):) !< Primitive variables.
+    type(Type_Conservative), intent(INOUT):: U(1-gc(1):,1-gc(3):,1-gc(5):) !< Conservative variables.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    !$OMP PARALLEL DEFAULT(NONE) &
+    !$OMP FIRSTPRIVATE(U)        &
+    !$OMP PRIVATE(i,j,k)         &
+    !$OMP SHARED(Ni,Nj,Nk,P)
+    !$OMP DO
+    do k=1,Nk
+      do j=1,Nj
+        do i=1,Ni
+          call prim2cons(prim = P(i,j,k), cons = U(i,j,k))
+        enddo
+      enddo
+    enddo
+    !$OMP END PARALLEL
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine p2c_openmp
   endsubroutine primitive2conservative
 
   !> Subroutine for converting conservative variables to primitive variables of all cells of a block.
@@ -146,16 +176,15 @@ contains
   subroutine conservative2primitive(global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global),  intent(IN)::    global !< Global-level data (see \ref Data_Type_Global::Type_Global "Type_Global" definition).
-  class(Type_SBlock), intent(INOUT):: block  !< Block-level data (see \ref Data_Type_SBlock::Type_SBlock "Type_SBlock" definition).
-  integer(I_P)::                      i,j,k  !< Counters.
+  type(Type_Global), intent(IN)::    global !< Global-level data (see \ref Data_Type_Global::Type_Global "Type_Global" definition).
+  type(Type_SBlock), intent(INOUT):: block  !< Block-level data (see \ref Data_Type_SBlock::Type_SBlock "Type_SBlock" definition).
+  integer(I_P)::                     i,j,k  !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!$OMP PARALLEL DEFAULT(NONE) &
-  !!$OMP PRIVATE(i,j,k)         &
-  !!$OMP SHARED(global,block)
-  !!$OMP DO
+#ifdef OPENMP
+  call c2p_openmp(gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,cp0=global%cp0,cv0=global%cv0,U=block%U,P=block%P)
+#else
   do k=1,block%Nk
     do j=1,block%Nj
       do i=1,block%Ni
@@ -163,9 +192,43 @@ contains
       enddo
     enddo
   enddo
-  !!$OMP END PARALLEL
+#endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> Subroutine for converting conservative variables to primitive variables of all cells of a block with OpenMP parallelization.
+    !> @note Only the inner cells of the block are converted.
+    !> @ingroup Lib_FluidynamicPrivateProcedure
+    subroutine c2p_openmp(gc,Ni,Nj,Nk,cp0,cv0,U,P)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I1P),            intent(IN)::    gc(1:6)                       !< Number of ghost cells in each direction.
+    integer(I_P),            intent(IN)::    Ni                            !< Number of cells in i direction.
+    integer(I_P),            intent(IN)::    Nj                            !< Number of cells in j direction.
+    integer(I_P),            intent(IN)::    Nk                            !< Number of cells in k direction.
+    real(R_P),               intent(IN)::    cp0(:)                        !< Specific heat at constant p of initial species.
+    real(R_P),               intent(IN)::    cv0(:)                        !< Specific heat at constant v of initial species.
+    type(Type_Conservative), intent(IN)::    U(1-gc(1):,1-gc(3):,1-gc(5):) !< Conservative variables.
+    type(Type_Primitive),    intent(INOUT):: P(1-gc(1):,1-gc(3):,1-gc(5):) !< Primitive variables.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    !$OMP PARALLEL DEFAULT(NONE) &
+    !$OMP FIRSTPRIVATE(P)        &
+    !$OMP PRIVATE(i,j,k)         &
+    !$OMP SHARED(Ni,Nj,Nk,cp0,cv0,U)
+    !$OMP DO
+    do k=1,Nk
+      do j=1,Nj
+        do i=1,Ni
+          call cons2prim(cp0 = cp0, cv0 = cv0, cons = U(i,j,k), prim = P(i,j,k))
+        enddo
+      enddo
+    enddo
+    !$OMP END PARALLEL
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine c2p_openmp
   endsubroutine conservative2primitive
 
   !> Function for evaluating the local and global time step value by CFL condition.
@@ -173,30 +236,25 @@ contains
   subroutine compute_time(global,block,Dtmin)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global),  intent(IN)::    global                        !< Global-level data.
-  class(Type_SBlock), intent(INOUT):: block                         !< Block-level data.
-  real(R_P),          intent(OUT)::   Dtmin                         !< Minimum Dt.
-  real(R_P)::                         vmax                          !< Maximum speed of waves.
-  real(R_P)::                         ss                            !< Speed of sound.
-  real(R_P)::                         vmiL,vmiR,vmjL,vmjR,vmkL,vmkR !< Dummy velocities.
-  type(Type_Vector)::                 vm                            !< Dummy vectorial velocities.
-  integer(I_P)::                      Ni,Nj,Nk,gc(1:6)              !< Temp var for storing block dimensions.
-  integer(I_P)::                      i,j,k                         !< Space counters.
+  type(Type_Global), intent(IN)::    global                        !< Global-level data.
+  type(Type_SBlock), intent(INOUT):: block                         !< Block-level data.
+  real(R_P),         intent(OUT)::   Dtmin                         !< Minimum Dt.
+  real(R_P)::                        vmax                          !< Maximum speed of waves.
+  real(R_P)::                        ss                            !< Speed of sound.
+  real(R_P)::                        vmiL,vmiR,vmjL,vmjR,vmkL,vmkR !< Dummy velocities.
+  type(Type_Vector)::                vm                            !< Dummy vectorial velocities.
+  integer(I_P)::                     i,j,k                         !< Space counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  gc = block%gc
-  Ni = block%Ni
-  Nj = block%Nj
-  Nk = block%Nk
+#ifdef OPENMP
+  call Dt_openmp(gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,CFL=global%CFL, &
+                 NFi=block%NFi,NFj=block%NFj,NFk=block%NFk,Si=block%Si,Sj=block%Sj,Sk=block%Sk,V=block%V,P=block%P,Dt=block%Dt)
+#else
   ! computing the minimum Dt into the inner cells
-  !!$OMP PARALLEL DEFAULT(NONE)                                   &
-  !!$OMP PRIVATE(i,j,k,vmax,ss,vmiL,vmiR,vmjL,vmjR,vmkL,vmkR,vm)  &
-  !!$OMP SHARED(gc,Ni,Nj,Nk,global,block,Dtmin)
-  !!$OMP DO
-  do k=1,Nk
-    do j=1,Nj
-      do i=1,Ni
+  do k=1,block%Nk
+    do j=1,block%Nj
+      do i=1,block%Ni
         ! computing the local speed of sound
         ss = a(p=block%P(i,j,k)%p,r=block%P(i,j,k)%d,g=block%P(i,j,k)%g)
         ! evaluating the maximum propagation speed of acoustic segnals multiplied for face area
@@ -231,67 +289,184 @@ contains
     enddo
   enddo
   ! computing minimum Dt
-  !!$OMP SINGLE
-  Dtmin = minval(block%Dt(1:Ni,1:Nj,1:Nk))
-  !!$OMP END SINGLE
+  Dtmin = minval(block%Dt(1:block%Ni,1:block%Nj,1:block%Nk))
   ! ghost cells estrapolation: imposing the minum value of Dt
   ! left i frame
-  !!$OMP DO
-  do k=1-gc(5),Nk+gc(6)
-    do j=1-gc(3),Nj+gc(4)
-      do i=1-gc(1),0
+  do k=1-block%gc(5),block%Nk+block%gc(6)
+    do j=1-block%gc(3),block%Nj+block%gc(4)
+      do i=1-block%gc(1),0
         block%Dt(i,j,k) = Dtmin
       enddo
     enddo
   enddo
   ! right i frame
-  !!$OMP DO
-  do k=1-gc(5),Nk+gc(6)
-    do j=1-gc(3),Nj+gc(4)
-      do i=Ni+1,Ni+gc(2)
+  do k=1-block%gc(5),block%Nk+block%gc(6)
+    do j=1-block%gc(3),block%Nj+block%gc(4)
+      do i=block%Ni+1,block%Ni+block%gc(2)
         block%Dt(i,j,k) = Dtmin
       enddo
     enddo
   enddo
   ! left j frame
-  !!$OMP DO
-  do k=1-gc(5),Nk+gc(6)
-    do j=1-gc(3),0
-      do i=1-gc(1),Ni+gc(2)
+  do k=1-block%gc(5),block%Nk+block%gc(6)
+    do j=1-block%gc(3),0
+      do i=1-block%gc(1),block%Ni+block%gc(2)
         block%Dt(i,j,k) = Dtmin
       enddo
     enddo
   enddo
   ! right j frame
-  !!$OMP DO
-  do k=1-gc(5),Nk+gc(6)
-    do j=Nj+1,Nj+gc(4)
-      do i=1-gc(1),Ni+gc(2)
+  do k=1-block%gc(5),block%Nk+block%gc(6)
+    do j=block%Nj+1,block%Nj+block%gc(4)
+      do i=1-block%gc(1),block%Ni+block%gc(2)
         block%Dt(i,j,k) = Dtmin
       enddo
     enddo
   enddo
   ! left k frame
-  !!$OMP DO
-  do k=1-gc(5),0
-    do j=1-gc(3),Nj+gc(4)
-      do i=1-gc(1),Ni+gc(2)
+  do k=1-block%gc(5),0
+    do j=1-block%gc(3),block%Nj+block%gc(4)
+      do i=1-block%gc(1),block%Ni+block%gc(2)
         block%Dt(i,j,k) = Dtmin
       enddo
     enddo
   enddo
   ! right k frame
-  !!$OMP DO
-  do k=Nk+1,Nk+gc(6)
-    do j=1-gc(3),Nj+gc(4)
-      do i=1-gc(1),Ni+gc(2)
+  do k=block%Nk+1,block%Nk+block%gc(6)
+    do j=1-block%gc(3),block%Nj+block%gc(4)
+      do i=1-block%gc(1),block%Ni+block%gc(2)
         block%Dt(i,j,k) = Dtmin
       enddo
     enddo
   enddo
-  !!$OMP END PARALLEL
+#endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    subroutine Dt_openmp(gc,Ni,Nj,Nk,CFL,NFi,NFj,NFk,Si,Sj,Sk,V,P,Dt)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I1P),         intent(IN)::    gc(1:6)                         !< Number of ghost cells in each direction.
+    integer(I_P),         intent(IN)::    Ni                              !< Number of cells in i direction.
+    integer(I_P),         intent(IN)::    Nj                              !< Number of cells in j direction.
+    integer(I_P),         intent(IN)::    Nk                              !< Number of cells in k direction.
+    real(R_P),            intent(IN)::    CFL                             !< CFL value.
+    type(Type_Vector),    intent(IN)::    NFi(0-gc(1):,1-gc(3):,1-gc(5):) !< Face i normals, versor.
+    type(Type_Vector),    intent(IN)::    NFj(1-gc(1):,0-gc(3):,1-gc(5):) !< Face j normals, versor.
+    type(Type_Vector),    intent(IN)::    NFk(1-gc(1):,1-gc(3):,0-gc(5):) !< Face k normals, versor.
+    real(R_P),            intent(IN)::    Si( 0-gc(1):,1-gc(3):,1-gc(5):) !< Face i area.
+    real(R_P),            intent(IN)::    Sj( 1-gc(1):,0-gc(3):,1-gc(5):) !< Face j area.
+    real(R_P),            intent(IN)::    Sk( 1-gc(1):,1-gc(3):,0-gc(5):) !< Face k area.
+    real(R_P),            intent(IN)::    V(  1-gc(1):,1-gc(3):,1-gc(5):) !< Cell volume.
+    type(Type_Primitive), intent(IN)::    P ( 1-gc(1):,1-gc(3):,1-gc(5):) !< Primitive variables.
+    real(R_P),            intent(INOUT):: Dt( 1-gc(1):,1-gc(3):,1-gc(5):) !< Local time step.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    !$OMP PARALLEL DEFAULT(NONE)                                   &
+    !$OMP FIRSTPRIVATE(Dt)                                         &
+    !$OMP PRIVATE(i,j,k,vmax,ss,vmiL,vmiR,vmjL,vmjR,vmkL,vmkR,vm)  &
+    !$OMP SHARED(gc,Ni,Nj,Nk,CFL,NFi,NFj,NFk,Si,Sj,Sk,V,P,Dtmin)
+    !$OMP DO
+    do k=1,Nk
+      do j=1,Nj
+        do i=1,Ni
+          ! computing the local speed of sound
+          ss = a(p=P(i,j,k)%p,r=P(i,j,k)%d,g=P(i,j,k)%g)
+          ! evaluating the maximum propagation speed of acoustic segnals multiplied for face area
+          ! left i
+          vm   = 0.5_R_P*(P(i-1,j,k)%v+P(i,j,k)%v)
+          vmiL = (vm.dot.NFi(i-1,j,k))*Si(i-1,j,k)
+          vmiL = abs(vmiL) + ss
+          ! right i
+          vm   = 0.5_R_P*(P(i,j,k)%v+P(i+1,j,k)%v)
+          vmiR = (vm.dot.NFi(i,j,k))*Si(i,j,k)
+          vmiR = abs(vmiR) + ss
+          ! left j
+          vm   = 0.5_R_P*(P(i,j-1,k)%v+P(i,j,k)%v)
+          vmjL = (vm.dot.NFj(i,j-1,k))*Sj(i,j-1,k)
+          vmjL = abs(vmjL) + ss
+          ! right j
+          vm   = 0.5_R_P*(P(i,j,k)%v+P(i,j+1,k)%v)
+          vmjR = (vm.dot.NFj(i,j,k))*Sj(i,j,k)
+          vmjR = abs(vmjR) + ss
+          ! left k
+          vm   = 0.5_R_P*(P(i,j,k-1)%v+P(i,j,k)%v)
+          vmkL = (vm.dot.NFk(i,j,k-1))*Sk(i,j,k-1)
+          vmkL = abs(vmkL) + ss
+          ! right k
+          vm   = 0.5_R_P*(P(i,j,k)%v+P(i,j,k+1)%v)
+          vmkR = (vm.dot.NFk(i,j,k))*Sk(i,j,k)
+          vmkR = abs(vmkR) + ss
+          ! vmax
+          vmax = max(vmiL,vmiR,vmjL,vmjR,vmkL,vmkR)
+          Dt(i,j,k) = V(i,j,k)/vmax*CFL
+        enddo
+      enddo
+    enddo
+    ! computing minimum Dt
+    !$OMP SINGLE
+    Dtmin = minval(Dt(1:Ni,1:Nj,1:Nk))
+    !$OMP END SINGLE
+    ! ghost cells estrapolation: imposing the minum value of Dt
+    ! left i frame
+    !$OMP DO
+    do k=1-gc(5),Nk+gc(6)
+      do j=1-gc(3),Nj+gc(4)
+        do i=1-gc(1),0
+          Dt(i,j,k) = Dtmin
+        enddo
+      enddo
+    enddo
+    ! right i frame
+    !$OMP DO
+    do k=1-gc(5),Nk+gc(6)
+      do j=1-gc(3),Nj+gc(4)
+        do i=Ni+1,Ni+gc(2)
+          Dt(i,j,k) = Dtmin
+        enddo
+      enddo
+    enddo
+    ! left j frame
+    !$OMP DO
+    do k=1-gc(5),Nk+gc(6)
+      do j=1-gc(3),0
+        do i=1-gc(1),Ni+gc(2)
+          Dt(i,j,k) = Dtmin
+        enddo
+      enddo
+    enddo
+    ! right j frame
+    !$OMP DO
+    do k=1-gc(5),Nk+gc(6)
+      do j=Nj+1,Nj+gc(4)
+        do i=1-gc(1),Ni+gc(2)
+          Dt(i,j,k) = Dtmin
+        enddo
+      enddo
+    enddo
+    ! left k frame
+    !$OMP DO
+    do k=1-gc(5),0
+      do j=1-gc(3),Nj+gc(4)
+        do i=1-gc(1),Ni+gc(2)
+          Dt(i,j,k) = Dtmin
+        enddo
+      enddo
+    enddo
+    ! right k frame
+    !$OMP DO
+    do k=Nk+1,Nk+gc(6)
+      do j=1-gc(3),Nj+gc(4)
+        do i=1-gc(1),Ni+gc(2)
+          Dt(i,j,k) = Dtmin
+        enddo
+      enddo
+    enddo
+    !$OMP END PARALLEL
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine Dt_openmp
   endsubroutine compute_time
 
   !> Subroutine for computing the residuals. This the space operator. The residuals are stored in block%KS(s1) conservative
@@ -300,19 +475,19 @@ contains
   subroutine residuals(s1,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),       intent(IN)::    s1                                    !< Current Runge-kutta stage.
-  type(Type_Global),  intent(IN)::    global                                !< Global-level data.
-  class(Type_SBlock), intent(INOUT):: block                                 !< Block-level data.
-  type(Type_Conservative)::           Fic(0:block%Ni,1:block%Nj,1:block%Nk) !< I convective fluxes.
-  type(Type_Conservative)::           Fjc(1:block%Ni,0:block%Nj,1:block%Nk) !< J convective fluxes.
-  type(Type_Conservative)::           Fkc(1:block%Ni,1:block%Nj,0:block%Nk) !< K convective fluxes.
-  type(Type_Conservative)::           Fid(0:block%Ni,1:block%Nj,1:block%Nk) !< I diffusive fluxes.
-  type(Type_Conservative)::           Fjd(1:block%Ni,0:block%Nj,1:block%Nk) !< J diffusive fluxes.
-  type(Type_Conservative)::           Fkd(1:block%Ni,1:block%Nj,0:block%Nk) !< K diffusive fluxes.
-  integer(I1P)::                      gcu                                   !< Number of ghost cells used.
-  integer(I_P)::                      Ni,Nj,Nk,Ns                           !< Temp var for storing block dims.
-  integer(I1P)::                      gc(1:6)                               !< Temp var for storing ghost cells number.
-  integer(I_P)::                      i,j,k,s                               !< Counters.
+  integer(I_P),       intent(IN)::   s1                                    !< Current Runge-kutta stage.
+  type(Type_Global),  intent(IN)::   global                                !< Global-level data.
+  type(Type_SBlock), intent(INOUT):: block                                 !< Block-level data.
+  type(Type_Conservative)::          Fic(0:block%Ni,1:block%Nj,1:block%Nk) !< I convective fluxes.
+  type(Type_Conservative)::          Fjc(1:block%Ni,0:block%Nj,1:block%Nk) !< J convective fluxes.
+  type(Type_Conservative)::          Fkc(1:block%Ni,1:block%Nj,0:block%Nk) !< K convective fluxes.
+  type(Type_Conservative)::          Fid(0:block%Ni,1:block%Nj,1:block%Nk) !< I diffusive fluxes.
+  type(Type_Conservative)::          Fjd(1:block%Ni,0:block%Nj,1:block%Nk) !< J diffusive fluxes.
+  type(Type_Conservative)::          Fkd(1:block%Ni,1:block%Nj,0:block%Nk) !< K diffusive fluxes.
+  integer(I1P)::                     gcu                                   !< Number of ghost cells used.
+  integer(I_P)::                     Ni,Nj,Nk,Ns                           !< Temp var for storing block dims.
+  integer(I1P)::                     gc(1:6)                               !< Temp var for storing ghost cells number.
+  integer(I_P)::                     i,j,k,s                               !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -328,15 +503,15 @@ contains
   call Fkc%init(Ns=Ns)
   call Fkd%init(Ns=Ns)
   ! computing convective fluxes
-  !!$OMP PARALLEL DEFAULT(NONE) &
-  !!$OMP PRIVATE(i,j,k,s)       &
-  !!$OMP SHARED(s1,gc,gcu,Ni,Nj,Nk,Ns,global,block,Fic,Fjc,Fkc,Fid,Fjd,Fkd)
+  !$OMP PARALLEL DEFAULT(NONE) &
+  !$OMP PRIVATE(i,j,k,s)       &
+  !$OMP SHARED(s1,gc,gcu,Ni,Nj,Nk,Ns,global,block,Fic,Fjc,Fkc,Fid,Fjd,Fkd)
 #ifndef NULi
   ! i direction
-  !!$OMP SINGLE
+  !$OMP SINGLE
   gcu = min(global%gco,gc(1),gc(2))
-  !!$OMP END SINGLE
-  !!$OMP DO
+  !$OMP END SINGLE
+  !$OMP DO
   do k=1,Nk
     do j=1,Nj
       call fluxes_convective(gc  = gcu,                         &
@@ -352,10 +527,10 @@ contains
 #endif
 #ifndef NULj
   ! j direction
-  !!$OMP SINGLE
+  !$OMP SINGLE
   gcu = min(global%gco,gc(3),gc(4))
-  !!$OMP END SINGLE
-  !!$OMP DO
+  !$OMP END SINGLE
+  !$OMP DO
   do k=1,Nk
     do i=1,Ni
       call fluxes_convective(gc  = gcu,                         &
@@ -371,10 +546,10 @@ contains
 #endif
 #ifndef NULk
   ! k direction
-  !!$OMP SINGLE
+  !$OMP SINGLE
   gcu = min(global%gco,gc(5),gc(6))
-  !!$OMP END SINGLE
-  !!$OMP DO
+  !$OMP END SINGLE
+  !$OMP DO
   do j=1,Nj
     do i=1,Ni
       call fluxes_convective(gc  = gcu,                         &
@@ -392,7 +567,7 @@ contains
   if (.not.global%inviscid) then
 #ifndef NULi
     ! i direction
-    !!$OMP DO
+    !$OMP DO
     do k=1,Nk
       do j=1,Nj
         do i=0,Ni
@@ -403,7 +578,7 @@ contains
 #endif
 #ifndef NULj
     ! j direction
-    !!$OMP DO
+    !$OMP DO
     do k=1,Nk
       do j=0,Nj
         do i=1,Ni
@@ -414,7 +589,7 @@ contains
 #endif
 #ifndef NULk
     ! k direction
-    !!$OMP DO
+    !$OMP DO
     do k=0,Nk
       do j=1,Nj
         do i=1,Ni
@@ -426,7 +601,7 @@ contains
   endif
 
   ! computing the residuals
-  !!$OMP DO
+  !$OMP DO
   do k=1,Nk
     do j=1,Nj
       do i=1,Ni
@@ -460,7 +635,7 @@ contains
     enddo
   enddo
 #ifdef NULi
-  !!$OMP DO
+  !$OMP DO
   do k=1,Nk
     do j=1,Nj
       do i=1,Ni
@@ -470,7 +645,7 @@ contains
   enddo
 #endif
 #ifdef NULj
-  !!$OMP DO
+  !$OMP DO
   do k=1,Nk
     do j=1,Nj
       do i=1,Ni
@@ -480,7 +655,7 @@ contains
   enddo
 #endif
 #ifdef NULk
-  !!$OMP DO
+  !$OMP DO
   do k=1,Nk
     do j=1,Nj
       do i=1,Ni
@@ -489,7 +664,7 @@ contains
     enddo
   enddo
 #endif
-  !!$OMP END PARALLEL
+  !$OMP END PARALLEL
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine residuals
@@ -509,11 +684,11 @@ contains
   subroutine boundary_conditions(l,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),       intent(IN)::    l                  !< Current grid level.
-  type(Type_Global),  intent(IN)::    global             !< Global-level data.
-  class(Type_SBlock), intent(INOUT):: block(1:global%Nb) !< Block-level data.
-  integer(I_P)::                      Ni,Nj,Nk,gc(1:6)   !< Temporary var for storing block dimensions.
-  integer(I_P)::                      b,i,j,k            !< Counters.
+  integer(I_P),       intent(IN)::   l                  !< Current grid level.
+  type(Type_Global),  intent(IN)::   global             !< Global-level data.
+  type(Type_SBlock), intent(INOUT):: block(1:global%Nb) !< Block-level data.
+  integer(I_P)::                     Ni,Nj,Nk,gc(1:6)   !< Temporary var for storing block dimensions.
+  integer(I_P)::                     b,i,j,k            !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -526,10 +701,10 @@ contains
     Ni = block(b)%Ni
     Nj = block(b)%Nj
     Nk = block(b)%Nk
-    !!$OMP PARALLEL DEFAULT(NONE) &
-    !!$OMP PRIVATE(i,j,k)         &
-    !!$OMP SHARED(b,l,Ni,Nj,Nk,gc,global,block)
-    !!$OMP DO
+    !$OMP PARALLEL DEFAULT(NONE) &
+    !$OMP PRIVATE(i,j,k)         &
+    !$OMP SHARED(b,l,Ni,Nj,Nk,gc,global,block)
+    !$OMP DO
     do k=1,Nk
       do j=1,Nj
         ! left i
@@ -560,7 +735,7 @@ contains
         endselect
       enddo
     enddo
-    !!$OMP DO
+    !$OMP DO
     do k=1,Nk
       do i=1,Ni
         ! left j
@@ -591,7 +766,7 @@ contains
         endselect
       enddo
     enddo
-    !!$OMP DO
+    !$OMP DO
     do j=1,Nj
       do i=1,Ni
         ! left k
@@ -622,7 +797,7 @@ contains
         endselect
       enddo
     enddo
-    !!$OMP END PARALLEL
+    !$OMP END PARALLEL
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -874,19 +1049,19 @@ contains
   subroutine rk_stages_sum(s1,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),       intent(IN)::    s1     !< Current Runge-Kutta stage.
-  type(Type_Global),  intent(IN)::    global !< Global-level data.
-  class(Type_SBlock), intent(INOUT):: block  !< Block-level data.
-  type(Type_Conservative)::           Ud     !< Dummy conservative variables.
-  integer(I8P)::                      i,j,k  !< Counters.
+  integer(I_P),       intent(IN)::   s1     !< Current Runge-Kutta stage.
+  type(Type_Global),  intent(IN)::   global !< Global-level data.
+  type(Type_SBlock), intent(INOUT):: block  !< Block-level data.
+  type(Type_Conservative)::          Ud     !< Dummy conservative variables.
+  integer(I8P)::                     i,j,k  !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!$OMP PARALLEL DEFAULT(NONE) &
-  !!$OMP PRIVATE(i,j,k,Ud)      &
-  !!$OMP SHARED(global,block,s1)
+#ifdef OPENMP
+  call rk_stages_sum_openmp(s1=s1,gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,Ns=global%Ns, &
+                            cp0=global%cp0,cv0=global%cv0,Dt=block%Dt,U=block%U,KS=block%KS,P=block%P)
+#else
   call Ud%init(Ns = global%Ns)
-  !!$OMP DO
   do k=1,block%Nk
     do j=1,block%Nj
       do i=1,block%Ni
@@ -895,9 +1070,46 @@ contains
       enddo
     enddo
   enddo
-  !!$OMP END PARALLEL
+#endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    subroutine rk_stages_sum_openmp(s1,gc,Ni,Nj,Nk,Ns,cp0,cv0,Dt,U,KS,P)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I_P),            intent(IN)::    s1                                !< Current Runge-Kutta stage.
+    integer(I1P),            intent(IN)::    gc(1:6)                           !< Number of ghost cells in each direction.
+    integer(I_P),            intent(IN)::    Ni                                !< Number of cells in i direction.
+    integer(I_P),            intent(IN)::    Nj                                !< Number of cells in j direction.
+    integer(I_P),            intent(IN)::    Nk                                !< Number of cells in k direction.
+    integer(I_P),            intent(IN)::    Ns                                !< Number of species.
+    real(R_P),               intent(IN)::    cp0(:)                            !< Specific heat at constant p of initial species.
+    real(R_P),               intent(IN)::    cv0(:)                            !< Specific heat at constant v of initial species.
+    real(R_P),               intent(IN)::    Dt(1-gc(1):,1-gc(3):,1-gc(5):)    !< Local time step.
+    type(Type_Conservative), intent(IN)::    U (1-gc(1):,1-gc(3):,1-gc(5):)    !< Conservative variables.
+    type(Type_Conservative), intent(IN)::    KS(1-gc(1):,1-gc(3):,1-gc(5):,1:) !< Runge-Kutta stages of Conservative variables.
+    type(Type_Primitive),    intent(INOUT):: P (1-gc(1):,1-gc(3):,1-gc(5):)    !< Primitive variables.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    !$OMP PARALLEL DEFAULT(NONE) &
+    !$OMP FIRSTPRIVATE(P)        &
+    !$OMP PRIVATE(i,j,k,Ud)      &
+    !$OMP SHARED(s1,Ni,Nj,Nk,Ns,cp0,cv0,Dt,U,KS)
+    call Ud%init(Ns = Ns)
+    !$OMP DO
+    do k=1,Nk
+      do j=1,Nj
+        do i=1,Ni
+          call rk_stage(s1=s1,Dt=Dt(i,j,k),Un=U(i,j,k),KS=KS(i,j,k,1:s1-1),KS1=Ud)
+          call cons2prim(cp0 = cp0, cv0 = cv0, cons = Ud, prim = P(i,j,k))
+        enddo
+      enddo
+    enddo
+    !$OMP END PARALLEL
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine rk_stages_sum_openmp
   endsubroutine rk_stages_sum
 
   !> Subroutine for computing Runge-Kutta one time step integration.
@@ -905,22 +1117,21 @@ contains
   subroutine rk_time_integration(global,block,RU)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global),  intent(IN)::    global          !< Global-level data.
-  class(Type_SBlock), intent(INOUT):: block           !< Block-level data.
-  real(R_P),          intent(OUT)::   RU(1:global%Nc) !< NormL2 of residuals of conservative variables.
-  type(Type_Conservative)::           Ud,R            !< Dummy conservative variables.
-  integer(I8P)::                      i,j,k           !< counters.
+  type(Type_Global), intent(IN)::    global          !< Global-level data.
+  type(Type_SBlock), intent(INOUT):: block           !< Block-level data.
+  real(R_P),         intent(OUT)::   RU(1:global%Nc) !< NormL2 of residuals of conservative variables.
+  type(Type_Conservative)::          Ud,R            !< Dummy conservative variables.
+  integer(I8P)::                     i,j,k           !< counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
+#ifdef OPENMP
+  call rk_time_integration_openmp(gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,Ns=global%Ns,Nc=global%Nc, &
+                                  Dt=block%Dt,KS=block%KS,U=block%U)
+#else
   RU = 0._R_P
-  !!$OMP PARALLEL DEFAULT(NONE) &
-  !!$OMP PRIVATE(i,j,k,Ud,R)    &
-  !!$OMP SHARED(global,block)   &
-  !!$OMP REDUCTION(+: RU)
   call Ud%init(Ns = global%Ns)
   call R%init( Ns = global%Ns)
-  !!$OMP DO
   do k=1,block%Nk
     do j=1,block%Nj
       do i=1,block%Ni
@@ -933,13 +1144,55 @@ contains
       enddo
     enddo
   enddo
-  !!$OMP DO
-  do i=1,global%Nc
-   RU(i) = sqrt(RU(i))
-  enddo
-  !!$OMP END PARALLEL
+  RU = sqrt(RU)
+#endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    subroutine rk_time_integration_openmp(gc,Ni,Nj,Nk,Ns,Nc,Dt,KS,U)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I1P),            intent(IN)::    gc(1:6)                           !< Number of ghost cells in each direction.
+    integer(I_P),            intent(IN)::    Ni                                !< Number of cells in i direction.
+    integer(I_P),            intent(IN)::    Nj                                !< Number of cells in j direction.
+    integer(I_P),            intent(IN)::    Nk                                !< Number of cells in k direction.
+    integer(I_P),            intent(IN)::    Ns                                !< Number of species.
+    integer(I_P),            intent(IN)::    Nc                                !< Number of conservative variables.
+    real(R_P),               intent(IN)::    Dt(1-gc(1):,1-gc(3):,1-gc(5):)    !< Local time step.
+    type(Type_Conservative), intent(IN)::    KS(1-gc(1):,1-gc(3):,1-gc(5):,1:) !< Runge-Kutta stages of Conservative variables.
+    type(Type_Conservative), intent(INOUT):: U (1-gc(1):,1-gc(3):,1-gc(5):)    !< Conservative variables.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    RU = 0._R_P
+    !$OMP PARALLEL DEFAULT(NONE)       &
+    !$OMP FIRSTPRIVATE(U)              &
+    !$OMP PRIVATE(i,j,k,Ud,R)          &
+    !$OMP SHARED(Ni,Nj,Nk,Ns,Nc,Dt,KS) &
+    !$OMP REDUCTION(+: RU)
+    call Ud%init(Ns = Ns)
+    call R%init( Ns = Ns)
+    !$OMP DO
+    do k=1,Nk
+      do j=1,Nj
+        do i=1,Ni
+          call rk_time_integ(Dt=Dt(i,j,k),Un=U(i,j,k),KS=KS(i,j,k,:),Unp1=Ud)
+          R%rs = (Ud%rs - U(i,j,k)%rs)/Dt(i,j,k) ; R%rs = R%rs*R%rs
+          R%rv = (Ud%rv - U(i,j,k)%rv)/Dt(i,j,k) ; R%rv = R%rv*R%rv
+          R%re = (Ud%re - U(i,j,k)%re)/Dt(i,j,k) ; R%re = R%re*R%re
+          RU = RU + R%cons2array()
+          U(i,j,k) = Ud
+        enddo
+      enddo
+    enddo
+    !$OMP DO
+    do i=1,Nc
+     RU(i) = sqrt(RU(i))
+    enddo
+    !$OMP END PARALLEL
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine rk_time_integration_openmp
   endsubroutine rk_time_integration
 
   !> @ingroup Lib_FluidynamicPublicProcedure
@@ -947,25 +1200,25 @@ contains
   subroutine solve_grl(l,global,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),       intent(IN)::    l                  !< Current grid level.
-  type(Type_Global),  intent(INOUT):: global             !< Global-level data (see \ref Data_Type_Global::Type_Global
-                                                         !< "Type_Global" definition).
-  class(Type_SBlock), intent(INOUT):: block(1:global%Nb) !< Block-level data (see \ref Data_Type_SBlock::Type_SBlock
-                                                         !< "Type_SBlock" definition).
-  real(R_P)::       Dtmin(1:global%Nb)                   !< Min t step of actual process for each blk.
-  real(R_P)::       DtminL                               !< Min t step of actual process over all blks.
-  real(R_P)::       gDtmin                               !< Global (all processes/all blks) min t step.
-  real(R_P)::       RU  (1:global%Nc,1:global%Nb)        !< NormL2 of conservartive residuals.
-  real(R_P)::       mRU (1:global%Nc)                    !< Maximum of RU of actual process.
-  real(R_P)::       gmRU(1:global%Nc)                    !< Global (all processes) maximum of RU.
-  integer(I_P)::    err                                  !< Error trapping flag: 0 no errors, >0 errors.
-  integer(I_P)::    b                                    !< Blocks counter.
-  integer(I_P)::    s1                                   !< Runge-Kutta stages counters.
-  real(R_P)::       sec_elp                              !< Seconds elapsed from the simulation start.
-  real(R_P)::       sec_res                              !< Seconds residual from the simulation end.
-  type(Type_Time):: time_elp                             !< Time elapsed (in days,hours,min... format).
-  type(Type_Time):: time_res                             !< Time residual (in days,hours,min... format).
-  real(R_P)::       progress                             !< Status (%) of simulation progress.
+  integer(I_P),       intent(IN)::    l                 !< Current grid level.
+  type(Type_Global),  intent(INOUT):: global            !< Global-level data (see \ref Data_Type_Global::Type_Global
+                                                        !< "Type_Global" definition).
+  type(Type_SBlock), intent(INOUT):: block(1:global%Nb) !< Block-level data (see \ref Data_Type_SBlock::Type_SBlock
+                                                        !< "Type_SBlock" definition).
+  real(R_P)::       Dtmin(1:global%Nb)                  !< Min t step of actual process for each blk.
+  real(R_P)::       DtminL                              !< Min t step of actual process over all blks.
+  real(R_P)::       gDtmin                              !< Global (all processes/all blks) min t step.
+  real(R_P)::       RU  (1:global%Nc,1:global%Nb)       !< NormL2 of conservartive residuals.
+  real(R_P)::       mRU (1:global%Nc)                   !< Maximum of RU of actual process.
+  real(R_P)::       gmRU(1:global%Nc)                   !< Global (all processes) maximum of RU.
+  integer(I_P)::    err                                 !< Error trapping flag: 0 no errors, >0 errors.
+  integer(I_P)::    b                                   !< Blocks counter.
+  integer(I_P)::    s1                                  !< Runge-Kutta stages counters.
+  real(R_P)::       sec_elp                             !< Seconds elapsed from the simulation start.
+  real(R_P)::       sec_res                             !< Seconds residual from the simulation end.
+  type(Type_Time):: time_elp                            !< Time elapsed (in days,hours,min... format).
+  type(Type_Time):: time_res                            !< Time residual (in days,hours,min... format).
+  real(R_P)::       progress                            !< Status (%) of simulation progress.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

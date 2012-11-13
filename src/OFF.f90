@@ -94,7 +94,6 @@ USE Data_Type_Global                                    ! Definition of Type_Glo
 USE Data_Type_OS                                        ! Definition of Type_OS.
 USE Data_Type_Primitive                                 ! Definition of Type_Primitive.
 USE Data_Type_Probe                                     ! Definition of Type_Probe.
-USE Data_Type_AMRBlock                                  ! Definition of Type_AMRBlock.
 USE Data_Type_SBlock                                    ! Definition of Type_SBlock.
 USE Data_Type_Tensor                                    ! Definition of Type_Tensor.
 USE Data_Type_Time                                      ! Definition of Type_Time.
@@ -104,8 +103,6 @@ USE Lib_Fluidynamic, only: primitive2conservative, &    ! Function for convertin
                            solve_grl                    ! Subroutine for solving conservation eq. for a given grid level.
 USE Lib_Runge_Kutta, only: rk_init                      ! Subroutine for initializing Runge-Kutta coefficients.
 USE Lib_Math,        only: digit                        ! Function for computing the number of digits of an integer.
-USE Lib_Mesh,        only: mesh_metrics, &              ! Subroutine for computing metrics of the mesh.
-                           mesh_metrics_correction      ! Subroutine for correcting metrics of the mesh according to bc.
 USE Lib_IO_Misc                                         ! Procedures for IO and strings operations.
 #ifdef PROFILING
 USE Lib_Profiling                                       ! Procedures for profiling the code.
@@ -128,16 +125,16 @@ USE Lib_Parallel,    only: Init_sendrecv                ! Subroutine for initial
 implicit none
 !> @ingroup OFFPrivateVarPar
 !> @{
-type(Type_Global)::                global        !< Global-level data.
-type(Type_AMRBlock), allocatable:: block(:,:)    !< Block-level data [1:Nb,1:Nl].
-integer(I_P)::                     b             !< Blocks counter.
-integer(I_P)::                     l             !< Grid levels counter.
-integer(I_P)::                     err           !< Error trapping flag: 0 no errors, >0 error occurs.
-integer(I_P)::                     lockfile      !< Locking unit file.
-character(20)::                    date          !< Actual date.
-integer(I_P)::                     Nprb = 0_I_P  !< Number of probes.
-type(Type_Probe), allocatable::    probes(:)     !< Probes [1:Nprb].
-integer(I_P)::                     unitprobe     !< Probes unit file.
+type(Type_Global)::              global        !< Global-level data.
+type(Type_SBlock), allocatable:: block(:,:)    !< Block-level data [1:Nb,1:Nl].
+integer(I_P)::                   b             !< Blocks counter.
+integer(I_P)::                   l             !< Grid levels counter.
+integer(I_P)::                   err           !< Error trapping flag: 0 no errors, >0 error occurs.
+integer(I_P)::                   lockfile      !< Locking unit file.
+character(20)::                  date          !< Actual date.
+integer(I_P)::                   Nprb = 0_I_P  !< Number of probes.
+type(Type_Probe), allocatable::  probes(:)     !< Probes [1:Nprb].
+integer(I_P)::                   unitprobe     !< Probes unit file.
 !> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -145,26 +142,6 @@ integer(I_P)::                     unitprobe     !< Probes unit file.
 call off_init ! initializing the simulation
 
 l = 1  ! grid level initializing: using only the finest grid for unsteady simulation
-
-!! cazzo
-!! test amr data
-!amrblock%sblock%gc = block(1,1)%gc
-!amrblock%sblock%Ni = block(1,1)%Ni
-!amrblock%sblock%Nj = block(1,1)%Nj
-!amrblock%sblock%Nk = block(1,1)%Nk
-!write(*,*)' cazzo 1'
-!call amrblock%alloc(global=global)
-!write(*,*)' cazzo 2'
-!call amrblock%octant(10,1,1)%create(level=1_I1P,ipr=10,jpr=1,kpr=1,pblock=amrblock%sblock,global=global)
-!write(*,*)' cazzo 3'
-!call amrblock%octant(12,1,1)%create(level=1_I1P,ipr=12,jpr=1,kpr=1,pblock=amrblock%sblock,global=global)
-!write(*,*)' cazzo 4'
-!call amrblock%octant(10,1,1)%refine(i=1,j=1,k=2,global=global)
-!write(*,*)' cazzo 5'
-!call amrblock%octant(10,1,1)%destroy
-!write(*,*)' cazzo 6'
-!stop
-!! cazzo
 
 #ifdef PROFILING
 call profile(p=7,pstart=.true.,myrank=global%myrank)
@@ -496,8 +473,8 @@ contains
   ! computing the mesh variables that are not loaded from input files
   do l=1,global%Nl
     do b=1,global%Nb
-      call mesh_metrics(           block = block(b,l))
-      call mesh_metrics_correction(block = block(b,l))
+      call block(b,l)%metrics
+      call block(b,l)%metrics_correction
       ! print some informations of the mesh data loaded
       err = block(b,l)%print_info_mesh(blk=b,grl=l,global=global)
     enddo

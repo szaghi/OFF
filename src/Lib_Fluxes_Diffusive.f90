@@ -15,7 +15,6 @@
 module Lib_Fluxes_Diffusive
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision           ! Integers and reals precision definition.
-USE Data_Type_AMRBlock     ! Definition of Type_AMRBlock.
 USE Data_Type_Conservative ! Definition of Type_Conservative.
 USE Data_Type_Global       ! Definition of Type_Global.
 USE Data_Type_Primitive    ! Definition of Type_Primitive.
@@ -36,7 +35,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Global),       intent(IN)::    global !< Global-level data.
-  class(Type_SBlock),      intent(IN)::    block  !< Block-level data.
+  type(Type_SBlock),       intent(IN)::    block  !< Block-level data.
   integer(I_P),            intent(IN)::    i      !< Interface i indexe.
   integer(I_P),            intent(IN)::    j      !< Interface j indexe.
   integer(I_P),            intent(IN)::    k      !< Interface k indexe.
@@ -82,7 +81,7 @@ contains
     subroutine fv_interface_metrics(block)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    class(Type_SBlock), intent(IN):: block !< Block-level data.
+    type(Type_SBlock), intent(IN):: block !< Block-level data.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -118,8 +117,8 @@ contains
     subroutine fv_interface_velocity(block)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    class(Type_SBlock), intent(IN):: block !< Block-level data.
-    type(Type_Vector)::              mean  !< Mean velocity vector across the interface.
+    type(Type_SBlock), intent(IN):: block !< Block-level data.
+    type(Type_Vector)::             mean  !< Mean velocity vector across the interface.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------

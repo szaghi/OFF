@@ -42,6 +42,8 @@ integer(I_P)::                   err               ! Error trapping flag: 0 no e
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
+! initializing IR_Precision module's variables
+call IR_Init
 ! parsing command line for getting options
 call parsing_command_line
 

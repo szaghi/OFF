@@ -604,6 +604,11 @@ contains
                         ny1 = nj1, ny2 = nj2,             &
                         nz1 = nk1, nz2 = nk2)
     endif
+    ! saving auxiliary data (time and time step)
+    err = VTK_FLD_XML(fld_action='open')
+    err = VTK_FLD_XML(fld=block%global%t,fname='TIME')
+    err = VTK_FLD_XML(fld=block%global%n,fname='CYCLE')
+    err = VTK_FLD_XML(fld_action='close')
     ! saving the geometry
     err = VTK_GEO_XML(nx1 = ni1, nx2 = ni2,                                            &
                       ny1 = nj1, ny2 = nj2,                                            &

@@ -287,21 +287,21 @@ contains
     write(stdout,'(A)',   iostat=err)' Some information about the precision of runnig machine'
     call IR_Print()
     ! cazzo
-    allocate(amrblock(1))
-    amrblock(1)%gc = 0
-    amrblock(1)%Ni = 4
-    amrblock(1)%Nj = 4
-    amrblock(1)%Nk = 4
-    call amrblock(1)%init(1_I2P)
-    do k=1,amrblock(1)%Nk
-      do j=1,amrblock(1)%Nj
-        do i=1,amrblock(1)%Ni
-          call ID%build(b=1_I2P,i=i,j=j,k=k,l=0_I1P,p=0_I8P)
-          call demorton3(ID%bcl,i2,j2,k2)
-          write(stdout,'(4I10)')ID%bcl,i2,j2,k2
-        enddo
-      enddo
-    enddo
+    !allocate(amrblock(1))
+    !amrblock(1)%gc = 0
+    !amrblock(1)%Ni = 4
+    !amrblock(1)%Nj = 4
+    !amrblock(1)%Nk = 4
+    !call amrblock(1)%init(1_I2P)
+    !do k=1,amrblock(1)%Nk
+    !  do j=1,amrblock(1)%Nj
+    !    do i=1,amrblock(1)%Ni
+    !      call ID%build(b=1_I2P,i=i,j=j,k=k,l=0_I1P,p=0_I8P)
+    !      call demorton3(ID%bcl,i2,j2,k2)
+    !      write(stdout,'(4I10)')ID%bcl,i2,j2,k2
+    !    enddo
+    !  enddo
+    !enddo
     !read(stdout,'(B8.8)') i4
     !write(stdout,'(I10)') i4
     !!read(stdout,'(B64.64)') i64
@@ -324,7 +324,7 @@ contains
     !write(stdout,'(4I10,1X)') i4,j4,k4
     !i64 = treedim(3,5)*100/10**6
     !write(stdout,'(I10)') i64
-    stop 'cazzo'
+    !stop 'cazzo'
     write(stdout,'(A)',   iostat=err)'----------------------------------------------------------------------'
     write(stdout,*)
     write(stdout,'(A)',   iostat=err)'----------------------------------------------------------------------'

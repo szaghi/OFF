@@ -18,7 +18,7 @@ program IBM
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                          ! Integers and reals precision definition.
 USE Data_Type_BC                          ! Definition of Type_BC.
-USE Data_Type_Cell                        ! Definition of Type_Cell.
+!USE Data_Type_Cell                        ! Definition of Type_Cell.
 USE Data_Type_Conservative                ! Definition of Type_Conservative.
 USE Data_Type_Global                      ! Definition of Type_Global.
 USE Data_Type_OS                          ! Definition of Type_OS.
@@ -31,7 +31,7 @@ USE Lib_IO_Misc                           ! Procedures for IO and strings operat
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
-type(Type_Global)::              global     ! Global-level data.
+type(Type_Global), target::      global     ! Global-level data.
 type(Type_SBlock), allocatable:: block(:,:) ! Block-level data [1:Nb,1:Nl].
 !> Derived type containing blocks informations.
 type:: Type_Blocks
@@ -75,7 +75,7 @@ call icg_init(global)
 ! loading initial species
 write(stdout,'(A)',iostat=err)'----------------------------------------------------------------------'
 write(stdout,'(A)',iostat=err)' Loading '//adjustl(trim(global%file%Path_InPut))//trim(global%file%File_Spec)
-err = global%load_fluid_0species(myrank=myrank,filename=adjustl(trim(global%file%Path_InPut))//trim(global%file%File_Spec))
+err = global%load_fluid_0species(filename=adjustl(trim(global%file%Path_InPut))//trim(global%file%File_Spec))
 
 ! computing the mesh, boundary and initial conditions and storing in scratch files
 select case(trim(In_type))
@@ -101,6 +101,11 @@ if (allocated(block)) then
   deallocate(block)
 endif
 allocate(block(1:global%Nb,1:global%Nl))
+do l=1,global%Nl
+  do b=1,global%Nb
+    block(b,l)%global => global
+  enddo
+enddo
 do b=1,global%Nb_tot
   write(stdout,'(A)',iostat=err)' Saving output files of block '//str(.true.,b)
   ! setting mesh dimensions for grid level 1
@@ -140,15 +145,15 @@ do b=1,global%Nb_tot
       block(1,l)%Nk = block(1,l-1)%Nk/2
     enddo
   endif
-    ! allocating block
+  ! allocating block
   do l=1,global%Nl
-    call block(1,l)%alloc(global=global)
+    call block(1,l)%alloc
   enddo
   do l=1,global%Nl
     write(stdout,'(A,I3)',iostat=err)'   Grid level ',l
     ! mesh files
     err = read_vector(array3D=block(1,l)%node,unit=UnitScratch(1,b,l))
-    err = read_cell(  array3D=block(1,l)%cell,unit=UnitScratch(1,b,l))
+    !err = read_cell(  array3D=block(1,l)%cell,unit=UnitScratch(1,b,l))
     close(UnitScratch(1,b,l))
     err = block(1,l)%save_mesh(filename=file_name(basename = trim(global%file%Path_OutPut)//trim(global%file%File_Mesh), &
                                                   suffix   = '.geo',                                                     &
@@ -156,9 +161,9 @@ do b=1,global%Nb_tot
                                                   grl      = l))
 
     ! boundary condition files
-    err = read_bc(array3D=block(1,l)%BCi,unit=UnitScratch(2,b,l))
-    err = read_bc(array3D=block(1,l)%BCj,unit=UnitScratch(2,b,l))
-    err = read_bc(array3D=block(1,l)%BCk,unit=UnitScratch(2,b,l))
+    err = read_bc(array3D=block(1,l)%Fi%BC,unit=UnitScratch(2,b,l))
+    err = read_bc(array3D=block(1,l)%Fj%BC,unit=UnitScratch(2,b,l))
+    err = read_bc(array3D=block(1,l)%Fk%BC,unit=UnitScratch(2,b,l))
     close(UnitScratch(2,b,l))
     err = block(1,l)%save_bc(filename=file_name(basename = trim(global%file%Path_OutPut)//trim(global%file%File_BC), &
                                                 suffix   = '.bco',                                                   &
@@ -166,14 +171,13 @@ do b=1,global%Nb_tot
                                                 grl      = l))
 
     ! initial condition files
-    read(UnitScratch(3,b,l),iostat=err)block(1,l)%Dt
-    err = read_primitive(array3D=block(1,l)%P,unit=UnitScratch(3,b,l))
+    read(UnitScratch(3,b,l),iostat=err)block(1,l)%C%Dt
+    err = read_primitive(array3D=block(1,l)%C%P,unit=UnitScratch(3,b,l))
     close(UnitScratch(3,b,l))
     err = block(1,l)%save_fluid(filename=file_name(basename = trim(global%file%Path_OutPut)//trim(global%file%File_Mesh), &
                                                    suffix   = '.itc',                                                     &
                                                    blk      = b,                                                          &
-                                                   grl      = l),                                                         &
-                                global=global)
+                                                   grl      = l))
 
   enddo
   write(stdout,*)
@@ -354,7 +358,7 @@ contains
   ! reading informations of each block
   do b=1,global%Nb_tot
     read(UnitFree,*)
-    read(UnitFree,*) (blocks(b)%gc(f),f=1,6)
+    read(UnitFree,*)(blocks(b)%gc(f),f=1,6)
     read(UnitFree,*) blocks(b)%Ni,blocks(b)%Nj,blocks(b)%Nk
     read(UnitFree,*) blocks(b)%xmin,blocks(b)%ymin,blocks(b)%zmin
     read(UnitFree,*) blocks(b)%xmax,blocks(b)%ymax,blocks(b)%zmax
@@ -399,6 +403,11 @@ contains
     deallocate(block)
   endif
   allocate(block(1:global%Nb,1:global%Nl))
+  do l=1,global%Nl
+    do b=1,global%Nb
+      block(b,l)%global => global
+    enddo
+  enddo
   ! generating mesh, boundary and initial conditions of each block and storing in scratch files
   do b=1,global%Nb_tot
     ! setting mesh dimensions for grid level 1
@@ -440,7 +449,7 @@ contains
     endif
       ! allocating block
     do l=1,global%Nl
-      call block(1,l)%alloc(global=global)
+      call block(1,l)%alloc
     enddo
     ! node coordinates computing
     write(stdout,'(A)')'  Computing the nodes coordinates'
@@ -537,15 +546,15 @@ contains
       do k=1,block(1,l)%Nk
         do j=1,block(1,l)%Nj
           do i=1-block(1,l)%gc(1),0
-            block(1,l)%BCi(i,j,k)%tp = blocks(b)%bc(1)%tp ; call block(1,l)%BCi(i,j,k)%init
+            block(1,l)%Fi(i,j,k)%BC%tp = blocks(b)%bc(1)%tp ; call block(1,l)%Fi(i,j,k)%BC%init
             select case(blocks(b)%bc(1)%tp)
             case(bc_adj)
-              call block(1,l)%BCi(i,j,k)%set(adj=Type_Adj(b = blocks(b)%bc(1)%adj%b,                           &
-                                                             i = blocks(blocks(b)%bc(1)%adj%b)%Ni/(2**(l-1)) + i, &
-                                                             j = j,                                               &
-                                                             k = k))
+              call block(1,l)%Fi(i,j,k)%BC%set(adj=Type_Adj(b = blocks(b)%bc(1)%adj%b,                           &
+                                                            i = blocks(blocks(b)%bc(1)%adj%b)%Ni/(2**(l-1)) + i, &
+                                                            j = j,                                               &
+                                                            k = k))
             case(bc_in1)
-              call block(1,l)%BCi(i,j,k)%set(inf=blocks(b)%bc(1)%inf)
+              call block(1,l)%Fi(i,j,k)%BC%set(inf=blocks(b)%bc(1)%inf)
             endselect
           enddo
         enddo
@@ -554,15 +563,15 @@ contains
       do k=1,block(1,l)%Nk
         do j=1,block(1,l)%Nj
           do i=block(1,l)%Ni+1,block(1,l)%Ni+block(1,l)%gc(2)
-            block(1,l)%BCi(i-1,j,k)%tp = blocks(b)%bc(2)%tp ; call block(1,l)%BCi(i-1,j,k)%init
+            block(1,l)%Fi(i-1,j,k)%BC%tp = blocks(b)%bc(2)%tp ; call block(1,l)%Fi(i-1,j,k)%BC%init
             select case(blocks(b)%bc(2)%tp)
             case(bc_adj)
-              call block(1,l)%BCi(i-1,j,k)%set(adj=Type_Adj(b = blocks(b)%bc(2)%adj%b,             &
-                                                               i = i - block(1,l)%Ni/(2**(l-1)), &
-                                                               j = j,                                 &
-                                                               k = k))
+              call block(1,l)%Fi(i-1,j,k)%BC%set(adj=Type_Adj(b = blocks(b)%bc(2)%adj%b,        &
+                                                              i = i - block(1,l)%Ni/(2**(l-1)), &
+                                                              j = j,                            &
+                                                              k = k))
             case(bc_in1)
-              call block(1,l)%BCi(i-1,j,k)%set(inf=blocks(b)%bc(2)%inf)
+              call block(1,l)%Fi(i-1,j,k)%BC%set(inf=blocks(b)%bc(2)%inf)
             endselect
           enddo
         enddo
@@ -571,15 +580,15 @@ contains
       do k=1,block(1,l)%Nk
         do i=1,block(1,l)%Ni
           do j=1-block(1,l)%gc(3),0
-            block(1,l)%BCj(i,j,k)%tp = blocks(b)%bc(3)%tp ; call block(1,l)%BCj(i,j,k)%init
+            block(1,l)%Fj(i,j,k)%BC%tp = blocks(b)%bc(3)%tp ; call block(1,l)%Fj(i,j,k)%BC%init
             select case(blocks(b)%bc(3)%tp)
             case(bc_adj)
-              call block(1,l)%BCj(i,j,k)%set(adj=Type_Adj(b = blocks(b)%bc(3)%adj%b,                           &
-                                                             i = i,                                               &
-                                                             j = blocks(blocks(b)%bc(3)%adj%b)%Nj/(2**(l-1)) + j, &
-                                                             k = k))
+              call block(1,l)%Fj(i,j,k)%BC%set(adj=Type_Adj(b = blocks(b)%bc(3)%adj%b,                           &
+                                                            i = i,                                               &
+                                                            j = blocks(blocks(b)%bc(3)%adj%b)%Nj/(2**(l-1)) + j, &
+                                                            k = k))
             case(bc_in1)
-              call block(1,l)%BCj(i,j,k)%set(inf=blocks(b)%bc(3)%inf)
+              call block(1,l)%Fj(i,j,k)%BC%set(inf=blocks(b)%bc(3)%inf)
             endselect
           enddo
         enddo
@@ -588,15 +597,15 @@ contains
       do k=1,block(1,l)%Nk
         do i=1,block(1,l)%Ni
           do j=block(1,l)%Nj+1,block(1,l)%Nj+block(1,l)%gc(4)
-            block(1,l)%BCj(i,j-1,k)%tp = blocks(b)%bc(4)%tp ; call block(1,l)%BCj(i,j-1,k)%init
+            block(1,l)%Fj(i,j-1,k)%BC%tp = blocks(b)%bc(4)%tp ; call block(1,l)%Fj(i,j-1,k)%BC%init
             select case(blocks(b)%bc(4)%tp)
             case(bc_adj)
-              call block(1,l)%BCj(i,j-1,k)%set(adj=Type_Adj(b = blocks(b)%bc(4)%adj%b,             &
-                                                               i = i,                                 &
-                                                               j = j - block(1,l)%Nj/(2**(l-1)), &
-                                                               k = k))
+              call block(1,l)%Fj(i,j-1,k)%BC%set(adj=Type_Adj(b = blocks(b)%bc(4)%adj%b,        &
+                                                              i = i,                            &
+                                                              j = j - block(1,l)%Nj/(2**(l-1)), &
+                                                              k = k))
             case(bc_in1)
-              call block(1,l)%BCj(i,j-1,k)%set(inf=blocks(b)%bc(4)%inf)
+              call block(1,l)%Fj(i,j-1,k)%BC%set(inf=blocks(b)%bc(4)%inf)
             endselect
           enddo
         enddo
@@ -605,15 +614,15 @@ contains
       do j=1,block(1,l)%Nj
         do i=1,block(1,l)%Ni
           do k=1-block(1,l)%gc(5),0
-            block(1,l)%BCk(i,j,k)%tp = blocks(b)%bc(5)%tp ; call block(1,l)%BCk(i,j,k)%init
+            block(1,l)%Fk(i,j,k)%BC%tp = blocks(b)%bc(5)%tp ; call block(1,l)%Fk(i,j,k)%BC%init
             select case(blocks(b)%bc(5)%tp)
             case(bc_adj)
-              call block(1,l)%BCk(i,j,k)%set(adj=Type_Adj(b = blocks(b)%bc(5)%adj%b, &
-                                                             i = i,                     &
-                                                             j = j,                     &
-                                                             k = blocks(blocks(b)%bc(5)%adj%b)%Nk/(2**(l-1)) + k))
+              call block(1,l)%Fk(i,j,k)%BC%set(adj=Type_Adj(b = blocks(b)%bc(5)%adj%b, &
+                                                            i = i,                     &
+                                                            j = j,                     &
+                                                            k = blocks(blocks(b)%bc(5)%adj%b)%Nk/(2**(l-1)) + k))
             case(bc_in1)
-              call block(1,l)%BCk(i,j,k)%set(inf=blocks(b)%bc(5)%inf)
+              call block(1,l)%Fk(i,j,k)%BC%set(inf=blocks(b)%bc(5)%inf)
             endselect
           enddo
         enddo
@@ -622,15 +631,15 @@ contains
       do j=1,block(1,l)%Nj
         do i=1,block(1,l)%Ni
           do k=block(1,l)%Nk+1,block(1,l)%Nk+block(1,l)%gc(6)
-            block(1,l)%BCk(i,j,k-1)%tp = blocks(b)%bc(6)%tp ; call block(1,l)%BCk(i,j,k-1)%init
+            block(1,l)%Fk(i,j,k-1)%BC%tp = blocks(b)%bc(6)%tp ; call block(1,l)%Fk(i,j,k-1)%BC%init
             select case(blocks(b)%bc(6)%tp)
             case(bc_adj)
-              call block(1,l)%BCk(i,j,k-1)%set(adj=Type_Adj(b = blocks(b)%bc(6)%adj%b            , &
+              call block(1,l)%Fk(i,j,k-1)%BC%set(adj=Type_Adj(b = blocks(b)%bc(6)%adj%b            , &
                                                                i = i                                , &
                                                                j = j                                , &
                                                                k = k - block(1,l)%Nk/(2**(l-1))))
             case(bc_in1)
-              call block(1,l)%BCk(i,j,k-1)%set(inf=blocks(b)%bc(6)%inf)
+              call block(1,l)%Fk(i,j,k-1)%BC%set(inf=blocks(b)%bc(6)%inf)
             endselect
           enddo
         enddo
@@ -639,21 +648,21 @@ contains
     ! initial conditions setting
     write(stdout,'(A)')'  Setting initial conditions'//str(.true.,b)
     do l=1,global%Nl
-      block(1,l)%P = blocks(b)%P
+      block(1,l)%C%P = blocks(b)%P
     enddo
 
     ! storing the mesh, boundary and initial conditions in the scratch files
     do l=1,global%Nl
       ! mesh data
       err = write_vector(array3D=block(1,l)%node,unit=UnitScratch(1,b,l))
-      err = write_cell(  array3D=block(1,l)%cell,unit=UnitScratch(1,b,l))
+      !err = write_cell(  array3D=block(1,l)%cell,unit=UnitScratch(1,b,l))
       ! boundary conditions data
-      err = write_bc(array3D=block(1,l)%BCi,unit=UnitScratch(2,b,l))
-      err = write_bc(array3D=block(1,l)%BCj,unit=UnitScratch(2,b,l))
-      err = write_bc(array3D=block(1,l)%BCk,unit=UnitScratch(2,b,l))
+      err = write_bc(array3D=block(1,l)%Fi%BC,unit=UnitScratch(2,b,l))
+      err = write_bc(array3D=block(1,l)%Fj%BC,unit=UnitScratch(2,b,l))
+      err = write_bc(array3D=block(1,l)%Fk%BC,unit=UnitScratch(2,b,l))
       ! initial conditions data
-      write(UnitScratch(3,b,l),iostat=err)block(1,l)%Dt
-      err = write_primitive(array3D=block(1,l)%P,unit=UnitScratch(3,b,l))
+      write(UnitScratch(3,b,l),iostat=err)block(1,l)%C%Dt
+      err = write_primitive(array3D=block(1,l)%C%P,unit=UnitScratch(3,b,l))
       ! rewinding scratch files
       rewind(UnitScratch(1,b,l))
       rewind(UnitScratch(2,b,l))
@@ -785,6 +794,11 @@ contains
     deallocate(block)
   endif
   allocate(block(1:global%Nb,1:global%Nl))
+  do l=1,global%Nl
+    do b=1,global%Nb
+      block(b,l)%global => global
+    enddo
+  enddo
   ! reading mesh, boundary and initial conditions of each block and storing in scratch files
   write(stdout,'(A)')'  Reading nodes coordinates from icemcfd files'
   b = 0
@@ -835,7 +849,7 @@ contains
         endif
           ! allocating block
         do l=1,global%Nl
-          call block(1,l)%alloc(global=global)
+          call block(1,l)%alloc
         enddo
         ! reading node coordinates
         do k=0,block(1,1)%Nk
@@ -860,7 +874,7 @@ contains
         ! storing the mesh in the scratch files
         do l=1,global%Nl
           err = write_vector(array3D=block(1,l)%node,unit=UnitScratch(1,b,l))
-          err = write_cell(  array3D=block(1,l)%cell,unit=UnitScratch(1,b,l))
+          !err = write_cell(  array3D=block(1,l)%cell,unit=UnitScratch(1,b,l))
           ! rewinding scratch file
           rewind(UnitScratch(1,b,l))
         enddo
@@ -971,7 +985,7 @@ contains
     endif
       ! allocating block
     do l=1,global%Nl
-      call block(1,l)%alloc(global=global)
+      call block(1,l)%alloc
     enddo
     do
       read(UnitScratch(0,b,1),'(A)',iostat=err) line
@@ -1167,50 +1181,50 @@ contains
                 do k=k1_min/2**(l-1)+1,k1_max/2**(l-1)
                   do j=j1_min/2**(l-1)+1,j1_max/2**(l-1)
                     do i=i1_min,i1_max
-                      block(1,l)%BCi(i,j,k)%tp    = bc_adj ; call block(1,l)%BCi(i,j,k)%init
-                      block(1,l)%BCi(i,j,k)%adj%b = b2
+                      block(1,l)%Fi(i,j,k)%BC%tp    = bc_adj ; call block(1,l)%Fi(i,j,k)%BC%init
+                      block(1,l)%Fi(i,j,k)%BC%adj%b = b2
                       do o=2,4,2
                         select case(orientation(o1)(o:o))
                         case('j')
                           select case(orientation(o2)(o:o))
                           case('i')
                             if (j1_sgn*i2_sgn<0) then
-                              block(1,l)%BCi(i,j,k)%adj%i = j1_max/2**(l-1) - j
+                              block(1,l)%Fi(i,j,k)%BC%adj%i = j1_max/2**(l-1) - j
                             else
-                              block(1,l)%BCi(i,j,k)%adj%i = j
+                              block(1,l)%Fi(i,j,k)%BC%adj%i = j
                             endif
                           case('j')
                             if (j1_sgn*j2_sgn<0) then
-                              block(1,l)%BCi(i,j,k)%adj%j = j1_max/2**(l-1) - j
+                              block(1,l)%Fi(i,j,k)%BC%adj%j = j1_max/2**(l-1) - j
                             else
-                              block(1,l)%BCi(i,j,k)%adj%j = j
+                              block(1,l)%Fi(i,j,k)%BC%adj%j = j
                             endif
                           case('k')
                             if (j1_sgn*k2_sgn<0) then
-                              block(1,l)%BCi(i,j,k)%adj%k = j1_max/2**(l-1) - j
+                              block(1,l)%Fi(i,j,k)%BC%adj%k = j1_max/2**(l-1) - j
                             else
-                              block(1,l)%BCi(i,j,k)%adj%k = j
+                              block(1,l)%Fi(i,j,k)%BC%adj%k = j
                             endif
                           endselect
                         case('k')
                           select case(orientation(o2)(o:o))
                           case('i')
                             if (k1_sgn*i2_sgn<0) then
-                              block(1,l)%BCi(i,j,k)%adj%i = k1_max/2**(l-1) - k
+                              block(1,l)%Fi(i,j,k)%BC%adj%i = k1_max/2**(l-1) - k
                             else
-                              block(1,l)%BCi(i,j,k)%adj%i = k
+                              block(1,l)%Fi(i,j,k)%BC%adj%i = k
                             endif
                           case('j')
                             if (k1_sgn*j2_sgn<0) then
-                              block(1,l)%BCi(i,j,k)%adj%j = k1_max/2**(l-1) - k
+                              block(1,l)%Fi(i,j,k)%BC%adj%j = k1_max/2**(l-1) - k
                             else
-                              block(1,l)%BCi(i,j,k)%adj%j = k
+                              block(1,l)%Fi(i,j,k)%BC%adj%j = k
                             endif
                           case('k')
                             if (k1_sgn*k2_sgn<0) then
-                              block(1,l)%BCi(i,j,k)%adj%k = k1_max/2**(l-1) - k
+                              block(1,l)%Fi(i,j,k)%BC%adj%k = k1_max/2**(l-1) - k
                             else
-                              block(1,l)%BCi(i,j,k)%adj%k = k
+                              block(1,l)%Fi(i,j,k)%BC%adj%k = k
                             endif
                           endselect
                         endselect
@@ -1218,28 +1232,28 @@ contains
                       select case(orientation(o2)(6:6))
                       case('i')
                         if (i1_max==0) then
-                          block(1,l)%BCi(i,j,k)%adj%i = (blocks(b2)%Ni/(2**(l-1))+i)*(1-i1_sgn*i2_sgn)/2 + &
-                                                           (-i+1                      )*(1+i1_sgn*i2_sgn)/2
+                          block(1,l)%Fi(i,j,k)%BC%adj%i = (blocks(b2)%Ni/(2**(l-1))+i)*(1-i1_sgn*i2_sgn)/2 + &
+                                                          (-i+1                      )*(1+i1_sgn*i2_sgn)/2
                         else
-                          block(1,l)%BCi(i,j,k)%adj%i =                                                  &
+                          block(1,l)%Fi(i,j,k)%BC%adj%i =                                                   &
                             (i-blocks(b1)%Ni/(2**(l-1))+1                           )*(1-i1_sgn*i2_sgn)/2 + &
                             (  blocks(b2)%Ni/(2**(l-1))-(i-blocks(b1)%Ni/(2**(l-1))))*(1+i1_sgn*i2_sgn)/2
                         endif
                       case('j')
                         if (i1_max==0) then
-                          block(1,l)%BCi(i,j,k)%adj%j = (blocks(b2)%Nj/(2**(l-1))+i)*(1-i1_sgn*j2_sgn)/2 + &
-                                                           (-i+1                      )*(1+i1_sgn*j2_sgn)/2
+                          block(1,l)%Fi(i,j,k)%BC%adj%j = (blocks(b2)%Nj/(2**(l-1))+i)*(1-i1_sgn*j2_sgn)/2 + &
+                                                          (-i+1                      )*(1+i1_sgn*j2_sgn)/2
                         else
-                          block(1,l)%BCi(i,j,k)%adj%j =                                                  &
+                          block(1,l)%Fi(i,j,k)%BC%adj%j =                                                   &
                             (i-blocks(b1)%Ni/(2**(l-1))+1                           )*(1-i1_sgn*j2_sgn)/2 + &
                             (  blocks(b2)%Nj/(2**(l-1))-(i-blocks(b1)%Ni/(2**(l-1))))*(1+i1_sgn*j2_sgn)/2
                         endif
                       case('k')
                         if (i1_max==0) then
-                          block(1,l)%BCi(i,j,k)%adj%k = (blocks(b2)%Nk/(2**(l-1))+i)*(1-i1_sgn*k2_sgn)/2 + &
-                                                           (-i+1                      )*(1+i1_sgn*k2_sgn)/2
+                          block(1,l)%Fi(i,j,k)%BC%adj%k = (blocks(b2)%Nk/(2**(l-1))+i)*(1-i1_sgn*k2_sgn)/2 + &
+                                                          (-i+1                      )*(1+i1_sgn*k2_sgn)/2
                         else
-                          block(1,l)%BCi(i,j,k)%adj%k =                                                  &
+                          block(1,l)%Fi(i,j,k)%BC%adj%k =                                                   &
                             (i-blocks(b1)%Ni/(2**(l-1))+1                           )*(1-i1_sgn*k2_sgn)/2 + &
                             (  blocks(b2)%Nk/(2**(l-1))-(i-blocks(b1)%Ni/(2**(l-1))))*(1+i1_sgn*k2_sgn)/2
                         endif
@@ -1259,50 +1273,50 @@ contains
                 do k=k1_min/2**(l-1)+1,k1_max/2**(l-1)
                   do j=j1_min,j1_max
                     do i=i1_min/2**(l-1)+1,i1_max/2**(l-1)
-                      block(1,l)%BCj(i,j,k)%tp    = bc_adj ; call block(1,l)%BCj(i,j,k)%init
-                      block(1,l)%BCj(i,j,k)%adj%b = b2
+                      block(1,l)%Fj(i,j,k)%BC%tp    = bc_adj ; call block(1,l)%Fj(i,j,k)%BC%init
+                      block(1,l)%Fj(i,j,k)%BC%adj%b = b2
                       do o=2,4,2
                         select case(orientation(o1)(o:o))
                         case('i')
                           select case(orientation(o2)(o:o))
                           case('i')
                             if (i1_sgn*i2_sgn<0) then
-                              block(1,l)%BCj(i,j,k)%adj%i = i1_max/2**(l-1) - i
+                              block(1,l)%Fj(i,j,k)%BC%adj%i = i1_max/2**(l-1) - i
                             else
-                              block(1,l)%BCj(i,j,k)%adj%i = i
+                              block(1,l)%Fj(i,j,k)%BC%adj%i = i
                             endif
                           case('j')
                             if (i1_sgn*j2_sgn<0) then
-                              block(1,l)%BCj(i,j,k)%adj%j = i1_max/2**(l-1) - i
+                              block(1,l)%Fj(i,j,k)%BC%adj%j = i1_max/2**(l-1) - i
                             else
-                              block(1,l)%BCj(i,j,k)%adj%j = i
+                              block(1,l)%Fj(i,j,k)%BC%adj%j = i
                             endif
                           case('k')
                             if (i1_sgn*k2_sgn<0) then
-                              block(1,l)%BCj(i,j,k)%adj%k = i1_max/2**(l-1) - i
+                              block(1,l)%Fj(i,j,k)%BC%adj%k = i1_max/2**(l-1) - i
                             else
-                              block(1,l)%BCj(i,j,k)%adj%k = i
+                              block(1,l)%Fj(i,j,k)%BC%adj%k = i
                             endif
                           endselect
                         case('k')
                           select case(orientation(o2)(o:o))
                           case('i')
                             if (k1_sgn*i2_sgn<0) then
-                              block(1,l)%BCj(i,j,k)%adj%i = k1_max/2**(l-1) - k
+                              block(1,l)%Fj(i,j,k)%BC%adj%i = k1_max/2**(l-1) - k
                             else
-                              block(1,l)%BCj(i,j,k)%adj%i = k
+                              block(1,l)%Fj(i,j,k)%BC%adj%i = k
                             endif
                           case('j')
                             if (k1_sgn*j2_sgn<0) then
-                              block(1,l)%BCj(i,j,k)%adj%j = k1_max/2**(l-1) - k
+                              block(1,l)%Fj(i,j,k)%BC%adj%j = k1_max/2**(l-1) - k
                             else
-                              block(1,l)%BCj(i,j,k)%adj%j = k
+                              block(1,l)%Fj(i,j,k)%BC%adj%j = k
                             endif
                           case('k')
                             if (k1_sgn*k2_sgn<0) then
-                              block(1,l)%BCj(i,j,k)%adj%k = k1_max/2**(l-1) - k
+                              block(1,l)%Fj(i,j,k)%BC%adj%k = k1_max/2**(l-1) - k
                             else
-                              block(1,l)%BCj(i,j,k)%adj%k = k
+                              block(1,l)%Fj(i,j,k)%BC%adj%k = k
                             endif
                           endselect
                         endselect
@@ -1310,28 +1324,28 @@ contains
                       select case(orientation(o2)(6:6))
                       case('i')
                         if (j1_max==0) then
-                          block(1,l)%BCj(i,j,k)%adj%i = (blocks(b2)%Ni/(2**(l-1))+j)*(1-j1_sgn*i2_sgn)/2 + &
-                                                           (-j+1                      )*(1+j1_sgn*i2_sgn)/2
+                          block(1,l)%Fj(i,j,k)%BC%adj%i = (blocks(b2)%Ni/(2**(l-1))+j)*(1-j1_sgn*i2_sgn)/2 + &
+                                                          (-j+1                      )*(1+j1_sgn*i2_sgn)/2
                         else
-                          block(1,l)%BCj(i,j,k)%adj%i =                                                  &
+                          block(1,l)%Fj(i,j,k)%BC%adj%i =                                                   &
                             (j-blocks(b1)%Nj/(2**(l-1))+1                           )*(1-j1_sgn*i2_sgn)/2 + &
                             (  blocks(b2)%Ni/(2**(l-1))-(j-blocks(b1)%Nj/(2**(l-1))))*(1+j1_sgn*i2_sgn)/2
                         endif
                       case('j')
                         if (j1_max==0) then
-                          block(1,l)%BCj(i,j,k)%adj%j = (blocks(b2)%Nj/(2**(l-1))+j)*(1-j1_sgn*j2_sgn)/2 + &
-                                                           (-j+1                      )*(1+j1_sgn*j2_sgn)/2
+                          block(1,l)%Fj(i,j,k)%BC%adj%j = (blocks(b2)%Nj/(2**(l-1))+j)*(1-j1_sgn*j2_sgn)/2 + &
+                                                          (-j+1                      )*(1+j1_sgn*j2_sgn)/2
                         else
-                          block(1,l)%BCj(i,j,k)%adj%j =                                                  &
+                          block(1,l)%Fj(i,j,k)%BC%adj%j =                                                   &
                             (j-blocks(b1)%Nj/(2**(l-1))+1                           )*(1-j1_sgn*j2_sgn)/2 + &
                             (  blocks(b2)%Nj/(2**(l-1))-(j-blocks(b1)%Nj/(2**(l-1))))*(1+j1_sgn*j2_sgn)/2
                         endif
                       case('k')
                         if (j1_max==0) then
-                          block(1,l)%BCj(i,j,k)%adj%k = (blocks(b2)%Nk/(2**(l-1))+j)*(1-j1_sgn*k2_sgn)/2 + &
-                                                           (-j+1                      )*(1+j1_sgn*k2_sgn)/2
+                          block(1,l)%Fj(i,j,k)%BC%adj%k = (blocks(b2)%Nk/(2**(l-1))+j)*(1-j1_sgn*k2_sgn)/2 + &
+                                                          (-j+1                      )*(1+j1_sgn*k2_sgn)/2
                         else
-                          block(1,l)%BCj(i,j,k)%adj%k =                                                  &
+                          block(1,l)%Fj(i,j,k)%BC%adj%k =                                                   &
                             (j-blocks(b1)%Nj/(2**(l-1))+1                           )*(1-j1_sgn*k2_sgn)/2 + &
                             (  blocks(b2)%Nk/(2**(l-1))-(j-blocks(b1)%Nj/(2**(l-1))))*(1+j1_sgn*k2_sgn)/2
                         endif
@@ -1351,50 +1365,50 @@ contains
                 do k=k1_min,k1_max
                   do j=j1_min/2**(l-1)+1,j1_max/2**(l-1)
                     do i=i1_min/2**(l-1)+1,i1_max/2**(l-1)
-                      block(1,l)%BCk(i,j,k)%tp    = bc_adj ; call block(1,l)%BCk(i,j,k)%init
-                      block(1,l)%BCk(i,j,k)%adj%b = b2
+                      block(1,l)%Fk(i,j,k)%BC%tp    = bc_adj ; call block(1,l)%Fk(i,j,k)%BC%init
+                      block(1,l)%Fk(i,j,k)%BC%adj%b = b2
                       do o=2,4,2
                         select case(orientation(o1)(o:o))
                         case('i')
                           select case(orientation(o2)(o:o))
                           case('i')
                             if (i1_sgn*i2_sgn<0) then
-                              block(1,l)%BCk(i,j,k)%adj%i = i1_max/2**(l-1) - i
+                              block(1,l)%Fk(i,j,k)%BC%adj%i = i1_max/2**(l-1) - i
                             else
-                              block(1,l)%BCk(i,j,k)%adj%i = i
+                              block(1,l)%Fk(i,j,k)%BC%adj%i = i
                             endif
                           case('j')
                             if (i1_sgn*j2_sgn<0) then
-                              block(1,l)%BCk(i,j,k)%adj%j = i1_max/2**(l-1) - i
+                              block(1,l)%Fk(i,j,k)%BC%adj%j = i1_max/2**(l-1) - i
                             else
-                              block(1,l)%BCk(i,j,k)%adj%j = i
+                              block(1,l)%Fk(i,j,k)%BC%adj%j = i
                             endif
                           case('k')
                             if (i1_sgn*k2_sgn<0) then
-                              block(1,l)%BCk(i,j,k)%adj%k = i1_max/2**(l-1) - i
+                              block(1,l)%Fk(i,j,k)%BC%adj%k = i1_max/2**(l-1) - i
                             else
-                              block(1,l)%BCk(i,j,k)%adj%k = i
+                              block(1,l)%Fk(i,j,k)%BC%adj%k = i
                             endif
                           endselect
                         case('j')
                           select case(orientation(o2)(o:o))
                           case('i')
                             if (j1_sgn*i2_sgn<0) then
-                              block(1,l)%BCk(i,j,k)%adj%i = j1_max/2**(l-1) - j
+                              block(1,l)%Fk(i,j,k)%BC%adj%i = j1_max/2**(l-1) - j
                             else
-                              block(1,l)%BCk(i,j,k)%adj%i = j
+                              block(1,l)%Fk(i,j,k)%BC%adj%i = j
                             endif
                           case('j')
                             if (j1_sgn*j2_sgn<0) then
-                              block(1,l)%BCk(i,j,k)%adj%j = j1_max/2**(l-1) - j
+                              block(1,l)%Fk(i,j,k)%BC%adj%j = j1_max/2**(l-1) - j
                             else
-                              block(1,l)%BCk(i,j,k)%adj%j = j
+                              block(1,l)%Fk(i,j,k)%BC%adj%j = j
                             endif
                           case('k')
                             if (j1_sgn*k2_sgn<0) then
-                              block(1,l)%BCk(i,j,k)%adj%k = j1_max/2**(l-1) - j
+                              block(1,l)%Fk(i,j,k)%BC%adj%k = j1_max/2**(l-1) - j
                             else
-                              block(1,l)%BCk(i,j,k)%adj%k = j
+                              block(1,l)%Fk(i,j,k)%BC%adj%k = j
                             endif
                           endselect
                         endselect
@@ -1402,28 +1416,28 @@ contains
                       select case(orientation(o2)(6:6))
                       case('i')
                         if (k1_max==0) then
-                          block(1,l)%BCk(i,j,k)%adj%i = (blocks(b2)%Ni/(2**(l-1))+k)*(1-k1_sgn*i2_sgn)/2 + &
-                                                           (-k+1                      )*(1+k1_sgn*i2_sgn)/2
+                          block(1,l)%Fk(i,j,k)%BC%adj%i = (blocks(b2)%Ni/(2**(l-1))+k)*(1-k1_sgn*i2_sgn)/2 + &
+                                                          (-k+1                      )*(1+k1_sgn*i2_sgn)/2
                         else
-                          block(1,l)%BCk(i,j,k)%adj%i =                                                  &
+                          block(1,l)%Fk(i,j,k)%BC%adj%i =                                                   &
                             (k-blocks(b1)%Nk/(2**(l-1))+1                           )*(1-k1_sgn*i2_sgn)/2 + &
                             (  blocks(b2)%Nk/(2**(l-1))-(k-blocks(b1)%Ni/(2**(l-1))))*(1+k1_sgn*i2_sgn)/2
                         endif
                       case('j')
                         if (k1_max==0) then
-                          block(1,l)%BCk(i,j,k)%adj%j = (blocks(b2)%Nj/(2**(l-1))+k)*(1-k1_sgn*j2_sgn)/2 + &
-                                                           (-k+1                      )*(1+k1_sgn*j2_sgn)/2
+                          block(1,l)%Fk(i,j,k)%BC%adj%j = (blocks(b2)%Nj/(2**(l-1))+k)*(1-k1_sgn*j2_sgn)/2 + &
+                                                          (-k+1                      )*(1+k1_sgn*j2_sgn)/2
                         else
-                          block(1,l)%BCk(i,j,k)%adj%j =                                                  &
+                          block(1,l)%Fk(i,j,k)%BC%adj%j =                                                   &
                             (k-blocks(b1)%Nk/(2**(l-1))+1                           )*(1-k1_sgn*j2_sgn)/2 + &
                             (  blocks(b2)%Nj/(2**(l-1))-(k-blocks(b1)%Nk/(2**(l-1))))*(1+k1_sgn*j2_sgn)/2
                         endif
                       case('k')
                         if (k1_max==0) then
-                          block(1,l)%BCk(i,j,k)%adj%k = (blocks(b2)%Nk/(2**(l-1))+k)*(1-k1_sgn*k2_sgn)/2 + &
-                                                           (-k+1                      )*(1+k1_sgn*k2_sgn)/2
+                          block(1,l)%Fk(i,j,k)%BC%adj%k = (blocks(b2)%Nk/(2**(l-1))+k)*(1-k1_sgn*k2_sgn)/2 + &
+                                                          (-k+1                      )*(1+k1_sgn*k2_sgn)/2
                         else
-                          block(1,l)%BCk(i,j,k)%adj%k =                                                  &
+                          block(1,l)%Fk(i,j,k)%BC%adj%k =                                                   &
                             (k-blocks(b1)%Nk/(2**(l-1))+1                           )*(1-k1_sgn*k2_sgn)/2 + &
                             (  blocks(b2)%Nk/(2**(l-1))-(k-blocks(b1)%Nk/(2**(l-1))))*(1+k1_sgn*k2_sgn)/2
                         endif
@@ -1462,10 +1476,10 @@ contains
                       do k=k1_min/2**(l-1)+1,k1_max/2**(l-1)
                         do j=j1_min/2**(l-1)+1,j1_max/2**(l-1)
                           do i=1-block(1,l)%gc(1),0
-                            block(1,l)%BCi(i,j,k)%tp = bc_list(bc) ; call block(1,l)%BCi(i,j,k)%init
+                            block(1,l)%Fi(i,j,k)%BC%tp = bc_list(bc) ; call block(1,l)%Fi(i,j,k)%BC%init
                             if (bc_list(bc)==bc_in1.OR.bc_list(bc)==bc_in2) then
-                              block(1,l)%BCi(i,j,k)%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
-                                                                        index(line1,tab//'f')-1),1_I_P)
+                              block(1,l)%Fi(i,j,k)%BC%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
+                                                                       index(line1,tab//'f')-1),1_I_P)
                             endif
                           enddo
                         enddo
@@ -1474,10 +1488,10 @@ contains
                       do k=k1_min/2**(l-1)+1,k1_max/2**(l-1)
                         do j=j1_min/2**(l-1)+1,j1_max/2**(l-1)
                           do i=i1_max/2**(l-1)+1,i1_max/2**(l-1)+block(1,l)%gc(2)
-                            block(1,l)%BCi(i-1,j,k)%tp = bc_list(bc) ; call block(1,l)%BCi(i-1,j,k)%init
+                            block(1,l)%Fi(i-1,j,k)%BC%tp = bc_list(bc) ; call block(1,l)%Fi(i-1,j,k)%BC%init
                             if (bc_list(bc)==bc_in1.OR.bc_list(bc)==bc_in2) then
-                              block(1,l)%BCi(i-1,j,k)%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
-                                                                          index(line1,tab//'f')-1),1_I_P)
+                              block(1,l)%Fi(i-1,j,k)%BC%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
+                                                                         index(line1,tab//'f')-1),1_I_P)
                             endif
                           enddo
                         enddo
@@ -1489,10 +1503,10 @@ contains
                       do k=k1_min/2**(l-1)+1,k1_max/2**(l-1)
                         do j=1-block(1,l)%gc(3),0
                           do i=i1_min/2**(l-1)+1,i1_max/2**(l-1)
-                            block(1,l)%BCj(i,j,k)%tp = bc_list(bc) ; call block(1,l)%BCj(i,j,k)%init
+                            block(1,l)%Fj(i,j,k)%BC%tp = bc_list(bc) ; call block(1,l)%Fj(i,j,k)%BC%init
                             if (bc_list(bc)==bc_in1.OR.bc_list(bc)==bc_in2) then
-                              block(1,l)%BCj(i,j,k)%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
-                                                                        index(line1,tab//'f')-1),1_I_P)
+                              block(1,l)%Fj(i,j,k)%BC%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
+                                                                       index(line1,tab//'f')-1),1_I_P)
                             endif
                           enddo
                         enddo
@@ -1501,10 +1515,10 @@ contains
                       do k=k1_min/2**(l-1)+1,k1_max/2**(l-1)
                         do j=j1_max/2**(l-1)+1,j1_max/2**(l-1)+block(1,l)%gc(4)
                           do i=i1_min/2**(l-1)+1,i1_max/2**(l-1)
-                            block(1,l)%BCj(i,j-1,k)%tp = bc_list(bc) ; call block(1,l)%BCj(i,j-1,k)%init
+                            block(1,l)%Fj(i,j-1,k)%BC%tp = bc_list(bc) ; call block(1,l)%Fj(i,j-1,k)%BC%init
                             if (bc_list(bc)==bc_in1.OR.bc_list(bc)==bc_in2) then
-                              block(1,l)%BCj(i,j-1,k)%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
-                                                                          index(line1,tab//'f')-1),1_I_P)
+                              block(1,l)%Fj(i,j-1,k)%BC%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
+                                                                         index(line1,tab//'f')-1),1_I_P)
                             endif
                           enddo
                         enddo
@@ -1516,10 +1530,10 @@ contains
                       do k=1-block(1,l)%gc(5),0
                         do j=j1_min/2**(l-1)+1,j1_max/2**(l-1)
                           do i=i1_min/2**(l-1)+1,i1_max/2**(l-1)
-                            block(1,l)%BCk(i,j,k)%tp = bc_list(bc) ; call block(1,l)%BCk(i,j,k)%init
+                            block(1,l)%Fk(i,j,k)%BC%tp = bc_list(bc) ; call block(1,l)%Fk(i,j,k)%BC%init
                             if (bc_list(bc)==bc_in1.OR.bc_list(bc)==bc_in2) then
-                              block(1,l)%BCk(i,j,k)%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
-                                                                        index(line1,tab//'f')-1),1_I_P)
+                              block(1,l)%Fk(i,j,k)%BC%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
+                                                                       index(line1,tab//'f')-1),1_I_P)
                             endif
                           enddo
                         enddo
@@ -1528,10 +1542,10 @@ contains
                       do k=k1_max/2**(l-1)+1,k1_max/2**(l-1)+block(1,l)%gc(6)
                         do j=j1_min/2**(l-1)+1,j1_max/2**(l-1)
                           do i=i1_min/2**(l-1)+1,i1_max/2**(l-1)
-                            block(1,l)%BCk(i,j,k-1)%tp = bc_list(bc) ; call block(1,l)%BCk(i,j,k-1)%init
+                            block(1,l)%Fk(i,j,k-1)%BC%tp = bc_list(bc) ; call block(1,l)%Fk(i,j,k-1)%BC%init
                             if (bc_list(bc)==bc_in1.OR.bc_list(bc)==bc_in2) then
-                              block(1,l)%BCk(i,j,k-1)%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
-                                                                          index(line1,tab//'f')-1),1_I_P)
+                              block(1,l)%Fk(i,j,k-1)%BC%inf = cton(line1(index(line1,bc_list_str(bc))+3: &
+                                                                         index(line1,tab//'f')-1),1_I_P)
                             endif
                           enddo
                         enddo
@@ -1562,7 +1576,7 @@ contains
               read(Unit_itc,*) blocks(b)%P%g
               close(Unit_itc)
               do l=1,global%Nl
-                block(1,l)%P = blocks(b)%P
+                block(1,l)%C%P = blocks(b)%P
               enddo
             endif
           elseif (index(line1,tab//'e')>0) then
@@ -1579,12 +1593,12 @@ contains
     ! storing the boundary and initial conditions in the scratch files
     do l=1,global%Nl
       ! boundary conditions data
-      err = write_bc(array3D=block(1,l)%BCi,unit=UnitScratch(2,b,l))
-      err = write_bc(array3D=block(1,l)%BCj,unit=UnitScratch(2,b,l))
-      err = write_bc(array3D=block(1,l)%BCk,unit=UnitScratch(2,b,l))
+      err = write_bc(array3D=block(1,l)%Fi%BC,unit=UnitScratch(2,b,l))
+      err = write_bc(array3D=block(1,l)%Fj%BC,unit=UnitScratch(2,b,l))
+      err = write_bc(array3D=block(1,l)%Fk%BC,unit=UnitScratch(2,b,l))
       ! initial conditions data
-      write(UnitScratch(3,b,l),iostat=err)block(1,l)%Dt
-      err = write_primitive(array3D=block(1,l)%P,unit=UnitScratch(3,b,l))
+      write(UnitScratch(3,b,l),iostat=err)block(1,l)%C%Dt
+      err = write_primitive(array3D=block(1,l)%C%P,unit=UnitScratch(3,b,l))
       ! rewinding scratch files
       rewind(UnitScratch(2,b,l))
       rewind(UnitScratch(3,b,l))

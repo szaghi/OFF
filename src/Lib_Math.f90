@@ -77,8 +77,8 @@ interface digit
   module procedure digit_I8,digit_I4,digit_I2,digit_I1
 endinterface
 !>Div2 overloading
-interface digit
-  module procedure div_I8,div_I4,div_I2,div_I1
+interface div2
+  module procedure div2_I8,div2_I4,div2_I2,div2_I1
 endinterface
 !>Linear interpolate overloading
 interface interpolate1

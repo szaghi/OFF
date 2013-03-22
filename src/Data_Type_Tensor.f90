@@ -1,6 +1,16 @@
+!> @ingroup DerivedType
+!> @{
+!> @defgroup Data_Type_TensorDerivedType Data_Type_Tensor
+!> @}
+
+!> @ingroup Interface
+!> @{
+!> @defgroup Data_Type_TensorInterface Data_Type_Tensor
+!> @}
+
 !> @ingroup GlobalVarPar
 !> @{
-!> @defgroup Data_Type_Tensor Data_Type_Tensor
+!> @defgroup Data_Type_TensorGlobalVarPar Data_Type_Tensor
 !> @}
 
 !> @ingroup PublicProcedure
@@ -24,8 +34,8 @@
 !> @todo \b DocComplete: Complete the documentation of internal procedures
 module Data_Type_Tensor
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision     ! Integers and reals precision definition.
-USE Data_Type_Vector ! Definition of type Type_Vector.
+USE IR_Precision                             ! Integers and reals precision definition.
+USE Data_Type_Vector, sq_norm_vec => sq_norm ! Definition of type Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -54,7 +64,7 @@ public:: operator (.diad.)
 !> @note The components of the tensor are 3 vectors arranged as following: \n
 !> \f$ T_{ij}=\left[{\begin{array}{*{20}{c}}t_{11}&t_{12}&t_{13}\\ t_{21}&t_{22}&t_{23}\\ t_{31}&t_{32}&t_{33}\end{array}}\right]
 !> =\left[{\begin{array}{*{20}{c}} {x\% x}&{x\% y}&{x\% z}\\ {y\% x}&{y\% y}&{y\% z}\\ {z\% x}&{z\% y}&{z\% z}\end{array}}\right]\f$
-!> @ingroup DerivedType
+!> @ingroup Data_Type_TensorDerivedType
 type, public:: Type_Tensor
   type(Type_Vector):: x !< Cartesian vector component in x direction.
   type(Type_Vector):: y !< Cartesian vector component in y direction.
@@ -73,7 +83,7 @@ type, public:: Type_Tensor
     procedure, non_overridable:: rotoz                       ! Procedure for computing the rotation tensor along z axis.
     procedure, non_overridable:: rotou                       ! Procedure for computing the rotation tensor along a vector axis.
 endtype Type_Tensor
-!> @ingroup Data_Type_Tensor
+!> @ingroup Data_Type_TensorGlobalVarPar
 !> @{
 type(Type_Tensor), parameter:: unity = Type_Tensor(ex,ey,ez) !< Unity (identity) tensor
                                                              !< (see \ref Data_Type_Tensor::Type_Tensor "definition").
@@ -83,30 +93,30 @@ type(Type_Tensor), parameter:: unity = Type_Tensor(ex,ey,ez) !< Unity (identity)
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @brief Square norm function \em sq_norm overloading.
 !> The function \em sq_norm defined for Type_Vector is overloaded for handling also Type_Tensor.
-!> @ingroup Interface
+!> @ingroup Data_Type_TensorInterface
 interface sq_norm
-  module procedure sq_norm,sq_norm_ten
+  module procedure sq_norm_ten
 endinterface
 !> @brief L2 norm function \em normL2 overloading.
 !> The function \em normL2 defined for Type_Vector is overloaded for handling also Type_Tensor.
-!> @ingroup Interface
+!> @ingroup Data_Type_TensorInterface
 interface normL2
   module procedure normL2,normL2_ten
 endinterface
 !> @brief Normalize function \em normalize overloading.
 !> The function \em normalize defined for Type_Vector is overloaded for handling also Type_Tensor.
-!> @ingroup Interface
+!> @ingroup Data_Type_TensorInterface
 interface normalize
   module procedure normalize,normalize_ten
 endinterface
 !> @brief Transpose function \em transpose overloading.
 !> The built in function \em transpose defined for rank 2 arrays is overloaded for handling also Type_Tensor.
-!> @ingroup Interface
+!> @ingroup Data_Type_TensorInterface
 interface transpose
   module procedure transpose_ten
 endinterface
 !> @brief Assignment operator (=) overloading.
-!> @ingroup Interface
+!> @ingroup Data_Type_TensorInterface
 interface assignment (=)
   module procedure assign_Vec
 #ifdef r16p
@@ -136,7 +146,7 @@ end interface
 !>         \f$ {\rm result\%x = ten\%x*scalar} \f$ \n
 !>         \f$ {\rm result\%y = ten\%y*scalar} \f$ \n
 !>         \f$ {\rm result\%z = ten\%z*scalar} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_TensorInterface
 interface operator (*)
   module procedure ten_mul_ten
 #ifdef r16p
@@ -170,7 +180,7 @@ endinterface
 !>         \f$ {\rm result\%x = \frac{ten\%x}{scalar}} \f$ \n
 !>         \f$ {\rm result\%y = \frac{ten\%y}{scalar}} \f$ \n
 !>         \f$ {\rm result\%z = \frac{ten\%z}{scalar}} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_TensorInterface
 interface operator (/)
   module procedure ten_div_ten
 #ifdef r16p
@@ -200,7 +210,7 @@ endinterface
 !>         \f$ {\rm result\%x = ten\%x+scalar} \f$ \n
 !>         \f$ {\rm result\%y = ten\%y+scalar} \f$ \n
 !>         \f$ {\rm result\%z = ten\%z+scalar} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_TensorInterface
 interface operator (+)
   module procedure positive_ten
   module procedure ten_sum_ten
@@ -240,7 +250,7 @@ endinterface
 !>         \f$ {\rm result\%x = ten\%x-scalar} \f$ \n
 !>         \f$ {\rm result\%y = ten\%y-scalar} \f$ \n
 !>         \f$ {\rm result\%z = ten\%z-scalar} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_TensorInterface
 interface operator (-)
   module procedure negative_ten
   module procedure ten_sub_ten
@@ -264,27 +274,26 @@ interface operator (-)
   module procedure ten_sub_ScalI1P
 endinterface
 !> @brief Double dot product operator (.ddot.) definition.
-!> @ingroup Interface
+!> @ingroup Data_Type_TensorInterface
 interface operator (.ddot.)
   module procedure ddotproduct
 endinterface
 !> @brief Dot product operator (.dot.) definition.
-!> @ingroup Interface
+!> @ingroup Data_Type_TensorInterface
 interface operator (.dot.)
   module procedure ten_dot_vec,vec_dot_ten
 endinterface
 !> @brief Diadic product operator (.diad.) definition.
-!> @ingroup Interface
+!> @ingroup Data_Type_TensorInterface
 interface operator (.diad.)
   module procedure diadicproduct
 endinterface
-
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @ingroup Data_Type_TensorPublicProcedure
   !> @{
   !> @brief Function for computing the determinant of a tensor.
-  !> @return \b det real(R_P) variable
+  !> @return \b det real(R8P) variable
   !> @note The determinant is computed according the following equation: \n
   !> \f$ \det  = \left| {\begin{array}{*{20}{c}} {x\% x}&{x\% y}&{x\% z}\\ {y\% x}&{y\% y}&{y\% z}\\ {z\% x}&{z\% y}&{z\% z}
   !> \end{array}} \right| = \f$ \n
@@ -295,7 +304,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tensor), intent(IN):: ten !< Tensor.
-  real(R_P)::                      det !< Determinant.
+  real(R8P)::                      det !< Determinant.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -318,20 +327,20 @@ contains
   implicit none
   type(Type_Tensor), intent(IN):: ten !< Tensor to be inverted.
   type(Type_Tensor)::             inv !< Tensor inverted.
-  real(R_P)::                     det !< Determinant and 1/Determinant.
+  real(R8P)::                     det !< Determinant and 1/Determinant.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   det = determinant(ten)
-  if (det/=0._R_P) then
-    det = 1._R_P/det
+  if (det/=0._R8P) then
+    det = 1._R8P/det
    inv%x=det*( (ten%z%z*ten%y%y-ten%z%y*ten%y%z)*ex - (ten%z%z*ten%x%y-ten%z%y*ten%x%z)*ey + (ten%y%z*ten%x%y-ten%y%y*ten%x%z)*ez)
    inv%y=det*(-(ten%z%z*ten%y%x-ten%z%x*ten%y%z)*ex + (ten%z%z*ten%x%x-ten%z%x*ten%x%z)*ey - (ten%y%z*ten%x%x-ten%y%x*ten%x%z)*ez)
    inv%z=det*( (ten%z%y*ten%y%x-ten%z%x*ten%y%y)*ex - (ten%z%y*ten%x%x-ten%z%x*ten%x%y)*ey + (ten%y%y*ten%x%x-ten%y%x*ten%x%y)*ez)
   else
-    inv%x=0._R_P
-    inv%y=0._R_P
-    inv%z=0._R_P
+    inv%x=0._R8P
+    inv%y=0._R8P
+    inv%z=0._R8P
   endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -344,11 +353,11 @@ contains
   implicit none
   class(Type_Tensor), intent(IN):: ten !< Tensor to be inverted.
   logical::                        inv !< True if the tensor is not singular.
-  real(R_P)::                      det !< Determinant.
+  real(R8P)::                      det !< Determinant.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  det = determinant(ten) ; inv = (det/=0._R_P)
+  det = determinant(ten) ; inv = (det/=0._R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction invertible
@@ -489,11 +498,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tensor), intent(IN):: ten ! Tensor.
-  real(R_P)::                      sq  ! Square of the Norm.
+  real(R8P)::                      sq  ! Square of the Norm.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sq = sq_norm(ten%x) + sq_norm(ten%y) + sq_norm(ten%z)
+  sq = sq_norm_vec(ten%x) + sq_norm_vec(ten%y) + sq_norm_vec(ten%z)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction sq_norm_ten
@@ -505,29 +514,29 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tensor), intent(IN):: ten  ! Tensor.
-  real(R_P)::                      norm ! Norm L2.
+  real(R8P)::                      norm ! Norm L2.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  norm = sqrt(sq_norm(ten%x) + sq_norm(ten%y) + sq_norm(ten%z))
+  norm = sqrt(sq_norm_vec(ten%x) + sq_norm_vec(ten%y) + sq_norm_vec(ten%z))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction normL2_ten
 
   !> @brief Subroutine for normalizing a tensor.
-  !> The normalization is made by means of norm L2. If the norm L2 of the tensor is less than the parameter smallR_P the
-  !> normalization value is set to normL2(ten)+smallR_P.
+  !> The normalization is made by means of norm L2. If the norm L2 of the tensor is less than the parameter smallR8P the
+  !> normalization value is set to normL2(ten)+smallR8P.
   elemental subroutine normalize_self(ten)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tensor), intent(INOUT):: ten ! Tensor to be normalized.
-  real(R_P)::                         nm  ! Norm L2 of tensor.
+  real(R8P)::                         nm  ! Norm L2 of tensor.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   nm = normL2_ten(ten)
-  if (nm < smallR_P) then
-    nm = nm + smallR_P
+  if (nm < smallR8P) then
+    nm = nm + smallR8P
   endif
   ten%x = ten%x/nm
   ten%y = ten%y/nm
@@ -537,21 +546,21 @@ contains
   endsubroutine normalize_self
 
   !> @brief Function for normalizing a tensor.
-  !> The normalization is made by means of norm L2. If the norm L2 of the tensor is less than the parameter smallR_P the
-  !> normalization value is set to normL2(ten)+smallR_P.
+  !> The normalization is made by means of norm L2. If the norm L2 of the tensor is less than the parameter smallR8P the
+  !> normalization value is set to normL2(ten)+smallR8P.
   !> @return \b norm normalized tensor
   elemental function normalize_ten(ten) result(norm)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Tensor), intent(IN):: ten  ! Tensor to be normalized.
   type(Type_Tensor)::             norm ! Tensor normalized.
-  real(R_P)::                     nm   ! Norm L2 of tensor.
+  real(R8P)::                     nm   ! Norm L2 of tensor.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   nm = normL2_ten(ten)
-  if (nm < smallR_P) then
-    nm = nm + smallR_P
+  if (nm < smallR8P) then
+    nm = nm + smallR8P
   endif
   norm%x = ten%x/nm
   norm%y = ten%y/nm
@@ -621,20 +630,20 @@ contains
   implicit none
   class(Type_Tensor), intent(INOUT):: ten !< Tensor to be inverted.
   type(Type_Tensor)::                 inv !< Temporary tensor inverted.
-  real(R_P)::                         det !< Determinant and 1/Determinant.
+  real(R8P)::                         det !< Determinant and 1/Determinant.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   det = determinant(ten)
-  if (det/=0._R_P) then
-   det = 1._R_P/det
+  if (det/=0._R8P) then
+   det = 1._R8P/det
    inv%x=det*( (ten%z%z*ten%y%y-ten%z%y*ten%y%z)*ex - (ten%z%z*ten%x%y-ten%z%y*ten%x%z)*ey + (ten%y%z*ten%x%y-ten%y%y*ten%x%z)*ez)
    inv%y=det*(-(ten%z%z*ten%y%x-ten%z%x*ten%y%z)*ex + (ten%z%z*ten%x%x-ten%z%x*ten%x%z)*ey - (ten%y%z*ten%x%x-ten%y%x*ten%x%z)*ez)
    inv%z=det*( (ten%z%y*ten%y%x-ten%z%x*ten%y%y)*ex - (ten%z%y*ten%x%x-ten%z%x*ten%x%y)*ey + (ten%y%y*ten%x%x-ten%y%x*ten%x%y)*ez)
   else
-    inv%x=0._R_P
-    inv%y=0._R_P
-    inv%z=0._R_P
+    inv%x=0._R8P
+    inv%y=0._R8P
+    inv%z=0._R8P
   endif
   ten%x = inv%x
   ten%y = inv%y
@@ -648,13 +657,13 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tensor), intent(INOUT):: ten !< Rotating tensor.
-  real(R_P),          intent(IN)::    ang !< Angle (radians) of rotation.
+  real(R8P),          intent(IN)::    ang !< Angle (radians) of rotation.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call ten%x%set(x = 1._R_P,y = 0._R_P  ,z =  0._R_P  )
-  call ten%y%set(x = 0._R_P,y = cos(ang),z = -sin(ang))
-  call ten%z%set(x = 0._R_P,y = sin(ang),z =  cos(ang))
+  call ten%x%set(x = 1._R8P,y = 0._R8P  ,z =  0._R8P  )
+  call ten%y%set(x = 0._R8P,y = cos(ang),z = -sin(ang))
+  call ten%z%set(x = 0._R8P,y = sin(ang),z =  cos(ang))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine rotox
@@ -664,13 +673,13 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tensor), intent(INOUT):: ten !< Rotating tensor.
-  real(R_P),          intent(IN)::    ang !< Angle (radians) of rotation.
+  real(R8P),          intent(IN)::    ang !< Angle (radians) of rotation.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call ten%x%set(x =  cos(ang),y = 0._R_P,z = sin(ang))
-  call ten%y%set(x =  0._R_P  ,y = 1._R_P,z = 0._R_P  )
-  call ten%z%set(x = -sin(ang),y = 0._R_P,z = cos(ang))
+  call ten%x%set(x =  cos(ang),y = 0._R8P,z = sin(ang))
+  call ten%y%set(x =  0._R8P  ,y = 1._R8P,z = 0._R8P  )
+  call ten%z%set(x = -sin(ang),y = 0._R8P,z = cos(ang))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine rotoy
@@ -680,13 +689,13 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tensor), intent(INOUT):: ten !< Rotating tensor.
-  real(R_P),          intent(IN)::    ang !< Angle (radians) of rotation.
+  real(R8P),          intent(IN)::    ang !< Angle (radians) of rotation.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call ten%x%set(x = cos(ang),y = -sin(ang),z = 0._R_P)
-  call ten%y%set(x = sin(ang),y =  cos(ang),z = 0._R_P)
-  call ten%z%set(x = 0._R_P  ,y =  0._R_P  ,z = 1._R_P)
+  call ten%x%set(x = cos(ang),y = -sin(ang),z = 0._R8P)
+  call ten%y%set(x = sin(ang),y =  cos(ang),z = 0._R8P)
+  call ten%z%set(x = 0._R8P  ,y =  0._R8P  ,z = 1._R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine rotoz
@@ -697,7 +706,7 @@ contains
   implicit none
   class(Type_Tensor), intent(INOUT):: ten !< Rotating tensor.
   type(Type_Vector),  intent(IN)::    u   !< Vector axis.
-  real(R_P),          intent(IN)::    ang !< Angle (radians) of rotation.
+  real(R8P),          intent(IN)::    ang !< Angle (radians) of rotation.
   type(Type_Vector)::                 n   !< Normalized vector axis.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -744,9 +753,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  ten%x = real(scal,R_P)
-  ten%y = real(scal,R_P)
-  ten%z = real(scal,R_P)
+  ten%x = real(scal,R8P)
+  ten%y = real(scal,R8P)
+  ten%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR16P
@@ -764,9 +773,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  ten%x = real(scal,R_P)
-  ten%y = real(scal,R_P)
-  ten%z = real(scal,R_P)
+  ten%x = real(scal,R8P)
+  ten%y = real(scal,R8P)
+  ten%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR8P
@@ -783,9 +792,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  ten%x = real(scal,R_P)
-  ten%y = real(scal,R_P)
-  ten%z = real(scal,R_P)
+  ten%x = real(scal,R8P)
+  ten%y = real(scal,R8P)
+  ten%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR4P
@@ -802,9 +811,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  ten%x = real(scal,R_P)
-  ten%y = real(scal,R_P)
-  ten%z = real(scal,R_P)
+  ten%x = real(scal,R8P)
+  ten%y = real(scal,R8P)
+  ten%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI8P
@@ -821,9 +830,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  ten%x = real(scal,R_P)
-  ten%y = real(scal,R_P)
-  ten%z = real(scal,R_P)
+  ten%x = real(scal,R8P)
+  ten%y = real(scal,R8P)
+  ten%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI4P
@@ -840,9 +849,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  ten%x = real(scal,R_P)
-  ten%y = real(scal,R_P)
-  ten%z = real(scal,R_P)
+  ten%x = real(scal,R8P)
+  ten%y = real(scal,R8P)
+  ten%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI2P
@@ -859,9 +868,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  ten%x = real(scal,R_P)
-  ten%y = real(scal,R_P)
-  ten%z = real(scal,R_P)
+  ten%x = real(scal,R8P)
+  ten%y = real(scal,R8P)
+  ten%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI1P
@@ -901,9 +910,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR16P_mul_ten
@@ -921,9 +930,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_mul_ScalR16P
@@ -942,9 +951,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR8P_mul_ten
@@ -962,9 +971,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_mul_ScalR8P
@@ -982,9 +991,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR4P_mul_ten
@@ -1002,9 +1011,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_mul_ScalR4P
@@ -1022,9 +1031,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI8P_mul_ten
@@ -1042,9 +1051,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_mul_ScalI8P
@@ -1062,9 +1071,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI4P_mul_ten
@@ -1082,9 +1091,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_mul_ScalI4P
@@ -1102,9 +1111,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI2P_mul_ten
@@ -1122,9 +1131,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_mul_ScalI2P
@@ -1142,9 +1151,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI1P_mul_ten
@@ -1162,9 +1171,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * ten%x
-  mul%y = real(scal,R_P) * ten%y
-  mul%z = real(scal,R_P) * ten%z
+  mul%x = real(scal,R8P) * ten%x
+  mul%y = real(scal,R8P) * ten%y
+  mul%z = real(scal,R8P) * ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_mul_ScalI1P
@@ -1204,9 +1213,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = ten%x / real(scal,R_P)
-  div%y = ten%y / real(scal,R_P)
-  div%z = ten%z / real(scal,R_P)
+  div%x = ten%x / real(scal,R8P)
+  div%y = ten%y / real(scal,R8P)
+  div%z = ten%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_div_ScalR16P
@@ -1225,9 +1234,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = ten%x / real(scal,R_P)
-  div%y = ten%y / real(scal,R_P)
-  div%z = ten%z / real(scal,R_P)
+  div%x = ten%x / real(scal,R8P)
+  div%y = ten%y / real(scal,R8P)
+  div%z = ten%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_div_ScalR8P
@@ -1245,9 +1254,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = ten%x / real(scal,R_P)
-  div%y = ten%y / real(scal,R_P)
-  div%z = ten%z / real(scal,R_P)
+  div%x = ten%x / real(scal,R8P)
+  div%y = ten%y / real(scal,R8P)
+  div%z = ten%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_div_ScalR4P
@@ -1265,9 +1274,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = ten%x / real(scal,R_P)
-  div%y = ten%y / real(scal,R_P)
-  div%z = ten%z / real(scal,R_P)
+  div%x = ten%x / real(scal,R8P)
+  div%y = ten%y / real(scal,R8P)
+  div%z = ten%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_div_ScalI8P
@@ -1285,9 +1294,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = ten%x / real(scal,R_P)
-  div%y = ten%y / real(scal,R_P)
-  div%z = ten%z / real(scal,R_P)
+  div%x = ten%x / real(scal,R8P)
+  div%y = ten%y / real(scal,R8P)
+  div%z = ten%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_div_ScalI4P
@@ -1305,9 +1314,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = ten%x / real(scal,R_P)
-  div%y = ten%y / real(scal,R_P)
-  div%z = ten%z / real(scal,R_P)
+  div%x = ten%x / real(scal,R8P)
+  div%y = ten%y / real(scal,R8P)
+  div%z = ten%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_div_ScalI2P
@@ -1325,9 +1334,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = ten%x / real(scal,R_P)
-  div%y = ten%y / real(scal,R_P)
-  div%z = ten%z / real(scal,R_P)
+  div%x = ten%x / real(scal,R8P)
+  div%y = ten%y / real(scal,R8P)
+  div%z = ten%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_div_ScalI1P
@@ -1386,9 +1395,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR16P_sum_ten
@@ -1406,9 +1415,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sum_ScalR16P
@@ -1427,9 +1436,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR8P_sum_ten
@@ -1447,9 +1456,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sum_ScalR8P
@@ -1467,9 +1476,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR4P_sum_ten
@@ -1487,9 +1496,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sum_ScalR4P
@@ -1507,9 +1516,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI8P_sum_ten
@@ -1527,9 +1536,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sum_ScalI8P
@@ -1547,9 +1556,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI4P_sum_ten
@@ -1567,9 +1576,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sum_ScalI4P
@@ -1587,9 +1596,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI2P_sum_ten
@@ -1607,9 +1616,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sum_ScalI2P
@@ -1627,9 +1636,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI1P_sum_ten
@@ -1647,9 +1656,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + ten%x
-  summ%y = real(scal,R_P) + ten%y
-  summ%z = real(scal,R_P) + ten%z
+  summ%x = real(scal,R8P) + ten%x
+  summ%y = real(scal,R8P) + ten%y
+  summ%z = real(scal,R8P) + ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sum_ScalI1P
@@ -1708,9 +1717,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - ten%x
-  sub%y = real(scal,R_P) - ten%y
-  sub%z = real(scal,R_P) - ten%z
+  sub%x = real(scal,R8P) - ten%x
+  sub%y = real(scal,R8P) - ten%y
+  sub%z = real(scal,R8P) - ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR16P_sub_ten
@@ -1728,9 +1737,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = ten%x - real(scal,R_P)
-  sub%y = ten%y - real(scal,R_P)
-  sub%z = ten%z - real(scal,R_P)
+  sub%x = ten%x - real(scal,R8P)
+  sub%y = ten%y - real(scal,R8P)
+  sub%z = ten%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sub_ScalR16P
@@ -1749,9 +1758,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - ten%x
-  sub%y = real(scal,R_P) - ten%y
-  sub%z = real(scal,R_P) - ten%z
+  sub%x = real(scal,R8P) - ten%x
+  sub%y = real(scal,R8P) - ten%y
+  sub%z = real(scal,R8P) - ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR8P_sub_ten
@@ -1769,9 +1778,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = ten%x - real(scal,R_P)
-  sub%y = ten%y - real(scal,R_P)
-  sub%z = ten%z - real(scal,R_P)
+  sub%x = ten%x - real(scal,R8P)
+  sub%y = ten%y - real(scal,R8P)
+  sub%z = ten%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sub_ScalR8P
@@ -1789,9 +1798,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - ten%x
-  sub%y = real(scal,R_P) - ten%y
-  sub%z = real(scal,R_P) - ten%z
+  sub%x = real(scal,R8P) - ten%x
+  sub%y = real(scal,R8P) - ten%y
+  sub%z = real(scal,R8P) - ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR4P_sub_ten
@@ -1809,9 +1818,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = ten%x - real(scal,R_P)
-  sub%y = ten%y - real(scal,R_P)
-  sub%z = ten%z - real(scal,R_P)
+  sub%x = ten%x - real(scal,R8P)
+  sub%y = ten%y - real(scal,R8P)
+  sub%z = ten%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sub_ScalR4P
@@ -1829,9 +1838,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - ten%x
-  sub%y = real(scal,R_P) - ten%y
-  sub%z = real(scal,R_P) - ten%z
+  sub%x = real(scal,R8P) - ten%x
+  sub%y = real(scal,R8P) - ten%y
+  sub%z = real(scal,R8P) - ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI8P_sub_ten
@@ -1849,9 +1858,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = ten%x - real(scal,R_P)
-  sub%y = ten%y - real(scal,R_P)
-  sub%z = ten%z - real(scal,R_P)
+  sub%x = ten%x - real(scal,R8P)
+  sub%y = ten%y - real(scal,R8P)
+  sub%z = ten%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sub_ScalI8P
@@ -1869,9 +1878,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - ten%x
-  sub%y = real(scal,R_P) - ten%y
-  sub%z = real(scal,R_P) - ten%z
+  sub%x = real(scal,R8P) - ten%x
+  sub%y = real(scal,R8P) - ten%y
+  sub%z = real(scal,R8P) - ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI4P_sub_ten
@@ -1889,9 +1898,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = ten%x - real(scal,R_P)
-  sub%y = ten%y - real(scal,R_P)
-  sub%z = ten%z - real(scal,R_P)
+  sub%x = ten%x - real(scal,R8P)
+  sub%y = ten%y - real(scal,R8P)
+  sub%z = ten%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sub_ScalI4P
@@ -1909,9 +1918,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - ten%x
-  sub%y = real(scal,R_P) - ten%y
-  sub%z = real(scal,R_P) - ten%z
+  sub%x = real(scal,R8P) - ten%x
+  sub%y = real(scal,R8P) - ten%y
+  sub%z = real(scal,R8P) - ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI2P_sub_ten
@@ -1929,9 +1938,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = ten%x - real(scal,R_P)
-  sub%y = ten%y - real(scal,R_P)
-  sub%z = ten%z - real(scal,R_P)
+  sub%x = ten%x - real(scal,R8P)
+  sub%y = ten%y - real(scal,R8P)
+  sub%z = ten%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sub_ScalI2P
@@ -1949,9 +1958,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - ten%x
-  sub%y = real(scal,R_P) - ten%y
-  sub%z = real(scal,R_P) - ten%z
+  sub%x = real(scal,R8P) - ten%x
+  sub%y = real(scal,R8P) - ten%y
+  sub%z = real(scal,R8P) - ten%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI1P_sub_ten
@@ -1969,9 +1978,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = ten%x - real(scal,R_P)
-  sub%y = ten%y - real(scal,R_P)
-  sub%z = ten%z - real(scal,R_P)
+  sub%x = ten%x - real(scal,R8P)
+  sub%y = ten%y - real(scal,R8P)
+  sub%z = ten%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sub_ScalI1P
@@ -2023,7 +2032,7 @@ contains
   implicit none
   type(Type_Tensor), intent(IN):: ten1 ! First tensor.
   type(Type_Tensor), intent(IN):: ten2 ! Second tensor.
-  real(R_P)::                     ddot ! Double dot product.
+  real(R8P)::                     ddot ! Double dot product.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

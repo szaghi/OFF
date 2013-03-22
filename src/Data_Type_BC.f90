@@ -1,6 +1,11 @@
+!> @ingroup DerivedType
+!> @{
+!> @defgroup Data_Type_BCDerivedType Data_Type_BC
+!> @}
+
 !> @ingroup GlobalVarPar
 !> @{
-!> @defgroup Data_Type_BC Data_Type_BC
+!> @defgroup Data_Type_BCGlobalVarPar Data_Type_BC
 !> @}
 
 !> @ingroup PublicProcedure
@@ -36,23 +41,23 @@ public:: write_bc,read_bc
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!> @ingroup Data_Type_BC
+!> @ingroup Data_Type_BCGlobalVarPar
 !> @{
 character(3), parameter:: bc_nan_str = 'NAN' !< Definition of non-assigned boundary condition parameter string.
-integer(I_P), parameter:: bc_nan     =-1_I_P !< Definition of non-assigned boundary condition parameter id.
+integer(I1P), parameter:: bc_nan     =-1_I1P !< Definition of non-assigned boundary condition parameter id.
 character(3), parameter:: bc_ref_str = 'REF' !< Definition of reflective boundary condition parameter string.
-integer(I_P), parameter:: bc_ref     = 1_I_P !< Definition of reflective boundary condition parameter id.
+integer(I1P), parameter:: bc_ref     = 1_I1P !< Definition of reflective boundary condition parameter id.
 character(3), parameter:: bc_ext_str = 'EXT' !< Definition of extrapolation boundary condition parameter string.
-integer(I_P), parameter:: bc_ext     = 2_I_P !< Definition of extrapolation boundary condition parameter id.
+integer(I1P), parameter:: bc_ext     = 2_I1P !< Definition of extrapolation boundary condition parameter id.
 character(3), parameter:: bc_per_str = 'PER' !< Definition of periodic boundary condition parameter string.
-integer(I_P), parameter:: bc_per     = 3_I_P !< Definition of periodic boundary condition parameter id.
+integer(I1P), parameter:: bc_per     = 3_I1P !< Definition of periodic boundary condition parameter id.
 character(3), parameter:: bc_adj_str = 'ADJ' !< Definition of adjacent boundary condition parameter string.
-integer(I_P), parameter:: bc_adj     = 4_I_P !< Definition of adjacent boundary condition parameter id.
+integer(I1P), parameter:: bc_adj     = 4_I1P !< Definition of adjacent boundary condition parameter id.
 character(3), parameter:: bc_in1_str = 'IN1' !< Definition of inflow 1 boundary condition parameter string.
-integer(I_P), parameter:: bc_in1     = 5_I_P !< Definition of inflow 1 boundary condition parameter id.
+integer(I1P), parameter:: bc_in1     = 5_I1P !< Definition of inflow 1 boundary condition parameter id.
 character(3), parameter:: bc_in2_str = 'IN2' !< Definition of inflow 2 boundary condition parameter string.
-integer(I_P), parameter:: bc_in2     = 6_I_P !< Definition of inflow 2 boundary condition parameter id.
-integer(I_P), parameter:: Nbc = 7            !< Number of possible boundary conditions.
+integer(I1P), parameter:: bc_in2     = 6_I1P !< Definition of inflow 2 boundary condition parameter id.
+integer(I1P), parameter:: Nbc = 7            !< Number of possible boundary conditions.
 character(3), parameter:: bc_list_str(1:Nbc) = &
                                              (/ bc_nan_str, &
                                                 bc_ref_str, &
@@ -62,7 +67,7 @@ character(3), parameter:: bc_list_str(1:Nbc) = &
                                                 bc_in1_str, &
                                                 bc_in2_str  &
                                               /) !< Boundary conditions string list.
-integer(I_P), parameter:: bc_list    (1:Nbc) = &
+integer(I1P), parameter:: bc_list    (1:Nbc) = &
                                              (/ bc_nan, &
                                                 bc_ref, &
                                                 bc_ext, &
@@ -73,12 +78,12 @@ integer(I_P), parameter:: bc_list    (1:Nbc) = &
                                               /) !< Boundary conditions list.
 !> @}
 !> Derived type containing adjacent boundary condition.
-!> @ingroup DerivedType
+!> @ingroup Data_Type_BCDerivedType
 type, public:: Type_Adj
-  integer(I_P):: b = 0_I_P !< b index of adjacent block.
-  integer(I_P):: i = 0_I_P !< i index of adjacent block.
-  integer(I_P):: j = 0_I_P !< j index of adjacent block.
-  integer(I_P):: k = 0_I_P !< k index of adjacent block.
+  integer(I4P):: b = 0_I4P !< b index of adjacent block.
+  integer(I4P):: i = 0_I4P !< i index of adjacent cell in the b block.
+  integer(I4P):: j = 0_I4P !< j index of adjacent cell in the b block.
+  integer(I4P):: k = 0_I4P !< k index of adjacent cell in the b block.
 endtype Type_Adj
 !> Derived type containing boundary conditions informations.
 !> @note
@@ -90,10 +95,10 @@ endtype Type_Adj
 !>     the component \b inf is the index array of inflow boundary conditions; inflow 2 conditions (primitive variables) are stored
 !>     in array "in2" so the boundary conditions can be accessed by: @code in2(1:Np,n,inf) @endcode
 !>     where n is the time step counter.
-!> @ingroup DerivedType
+!> @ingroup Data_Type_BCDerivedType
 type, public:: Type_BC
-  integer(I_P)::                tp = bc_ext !< Type of boundary condition (bc_nan,bc_ref,bc_ext...).
-  integer(I_P),   allocatable:: inf         !< Auxiliary informations for inflow-type boundary condition.
+  integer(I1P)::                tp = bc_ext !< Type of boundary condition (bc_nan,bc_ref,bc_ext...).
+  integer(I4P),   allocatable:: inf         !< Auxiliary informations for inflow-type boundary condition.
   type(Type_Adj), allocatable:: adj         !< Connection indexes for adjacent boundary condition.
   contains
     procedure, non_overridable:: init   ! Procedure for initilizing allocatable variables.
@@ -119,7 +124,7 @@ contains
   character(*),  intent(IN), optional:: format         !< Format specifier.
   integer(I4P),  intent(IN)::           unit           !< Logic unit.
   integer(I_P)::                        err            !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I_P)::                        i1,i2,i3       !< Counters.
+  integer(I4P)::                        i1,i2,i3       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -282,7 +287,7 @@ contains
   character(*),  intent(IN),    optional:: format         !< Format specifier.
   integer(I4P),  intent(IN)::              unit           !< Logic unit.
   integer(I_P)::                           err            !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I_P)::                           i1,i2,i3       !< Counters.
+  integer(I4P)::                           i1,i2,i3       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -436,19 +441,34 @@ contains
   !> @ingroup Data_Type_BCPrivateProcedure
   !> @{
   !> @brief Subroutine for initializing Type_BC allocatable variables.
-  elemental subroutine init(bc)
+  elemental subroutine init(bc,bc0)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_BC), intent(INOUT):: bc !< Boundary conditions data.
+  class(Type_BC), intent(INOUT)::        bc  !< Boundary conditions data.
+  type(Type_BC),  intent(IN), optional:: bc0 !< Optional initialization data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  select case(bc%tp)
-  case(bc_in1,bc_in2)
-   if (allocated(bc%inf)) deallocate(bc%inf) ; allocate(bc%inf) ; bc%inf = 0_I_P
-  case(bc_adj)
-   if (allocated(bc%adj)) deallocate(bc%adj) ; allocate(bc%adj)
-  endselect
+  if (present(bc0)) then
+    bc%tp = bc0%tp
+    select case(bc%tp)
+    case(bc_in1,bc_in2)
+      if (.not.allocated(bc%inf)) allocate(bc%inf) ; bc%inf = bc0%inf
+      if (     allocated(bc%adj)) deallocate(bc%adj)
+    case(bc_adj)
+      if (.not.allocated(bc%adj)) allocate(bc%adj) ; bc%adj = bc0%adj
+      if (     allocated(bc%inf)) deallocate(bc%inf)
+    endselect
+  else
+    select case(bc%tp)
+    case(bc_in1,bc_in2)
+      if (.not.allocated(bc%inf)) allocate(bc%inf) ; bc%inf = 0_I4P
+      if (     allocated(bc%adj)) deallocate(bc%adj)
+    case(bc_adj)
+      if (.not.allocated(bc%adj)) allocate(bc%adj)
+      if (     allocated(bc%inf)) deallocate(bc%inf)
+    endselect
+  endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine init
@@ -472,8 +492,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_BC), intent(INOUT)::        bc  !< Vector.
-  integer(I_P),   intent(IN), optional:: tp  !< Type of boundary condition (bc_nan,bc_ref,bc_ext...).
-  integer(I_P),   intent(IN), optional:: inf !< Auxiliary informations for inflow-type boundary condition.
+  integer(I1P),   intent(IN), optional:: tp  !< Type of boundary condition (bc_nan,bc_ref,bc_ext...).
+  integer(I4P),   intent(IN), optional:: inf !< Auxiliary informations for inflow-type boundary condition.
   type(Type_Adj), intent(IN), optional:: adj !< Connection indexes for adjacent boundary condition.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -491,7 +511,7 @@ contains
   implicit none
   class(Type_BC), intent(INOUT):: bc     !< BC data.
   character(3),   intent(IN)::    bc_str !< String of boundary condition.
-  integer(I_P)::                  b      !< Boundary conditions counter.
+  integer(I1P)::                  b      !< Boundary conditions counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -512,7 +532,7 @@ contains
   implicit none
   class(Type_BC), intent(IN):: bc     !< BC data.
   character(3)::               bc_str !< String of boundary condition.
-  integer(I_P)::               b      !< Boundary conditions counter.
+  integer(I1P)::               b      !< Boundary conditions counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

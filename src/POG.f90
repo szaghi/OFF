@@ -1,3 +1,8 @@
+!> @ingroup Program
+!> @{
+!> @defgroup POGProgram POG
+!> @}
+
 !> @brief POG, Post-processor Output Generator for @off (Open Finite volume Fluid dynamics code).
 !> This is an auxiliary tool useful for post-processing @off simulations outputs. It can manipulate @off outputs and it can produce
 !> files ready to be visualized. Two different visualization standards are supported:
@@ -13,7 +18,7 @@
 !>       Edit the makefile to point to the correct path where tecio.a (or tecio64.a) is placed. For more details see \ref Compiling
 !>       "Compiling Instructions".
 !> @todo \b DocImprove: Improve the documentation
-!> @ingroup Program
+!> @ingroup POGProgram
 program POG
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                            ! Integers and reals precision definition.
@@ -30,7 +35,7 @@ USE Lib_PostProcessing, only: pp_format,  & ! Post-processing data format.
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
-type(Type_Global)::              global            ! Global-level data.
+type(Type_Global), target::      global            ! Global-level data.
 type(Type_SBlock), allocatable:: block(:)          ! Block-level data.
 logical::                        meshonly = .true. ! Flag for post-process only mesh.
 integer(I_P)::                   err               ! Error trapping flag: 0 no errors, >0 error occurs.
@@ -46,22 +51,22 @@ global%Nl = 1 ; global%Nb = 1
 if (allocated(block)) then
   call block(1)%free ; deallocate(block)
 endif
-allocate(block(1))
+allocate(block(1)) ; block(1)%global => global
 ! getting dimensions of block
-err = block(1)%load_mesh_dims(myrank = 0, filename = global%file%File_Mesh)
+err = block(1)%load_mesh_dims(filename = global%file%File_Mesh)
 ! allocating block
-call block(1)%alloc(global=global)
+call block(1)%alloc
 
 write(stdout,'(A)',IOSTAT=err)'----------------------------------------------------------------------'
 write(stdout,'(A)',IOSTAT=err)' Loading '//trim(global%file%File_Mesh)
 
-err = block(1)%load_mesh(myrank = 0, filename = global%file%File_Mesh)
+err = block(1)%load_mesh(filename = global%file%File_Mesh)
 if (.not.meshonly) then
   write(stdout,'(A)',IOSTAT=err)' Loading '//trim(global%file%File_Sol)
-  err = global%load_fluid_Ns(binary = .true., myrank = 0, filename = global%file%File_Sol)
+  err = global%load_fluid_Ns(binary = .true., filename = global%file%File_Sol)
   ! allocating global fluid dynamic data
   call global%alloc_fluid
-  err = block(1)%load_fluid(myrank = 0, filename = global%file%File_Sol, global = global)
+  err = block(1)%load_fluid(filename = global%file%File_Sol)
 endif
 write(stdout,*)
 
@@ -74,8 +79,8 @@ write(stdout,'(A)',IOSTAT=err)'-------------------------------------------------
 write(stdout,'(A)',IOSTAT=err)' Processing data'
 write(stdout,'(A)',IOSTAT=err)'  Writing Tecplot and/or VTK output data'
 ! writing output
-if (pp_format%tec) err = tec_output(meshonly=meshonly, global=global, block=block(1), filename=trim(global%file%File_Pout))
-if (pp_format%vtk) err = vtk_output(meshonly=meshonly, global=global, block=block(1), filename=trim(global%file%File_Pout))
+if (pp_format%tec) err = tec_output(meshonly=meshonly, block=block(1:), filename=trim(global%file%File_Pout))
+if (pp_format%vtk) err = vtk_output(meshonly=meshonly, block=block(1:), filename=trim(global%file%File_Pout))
 write(stdout,'(A)',IOSTAT=err)' Processing data Complete'
 write(stdout,'(A)',IOSTAT=err)'----------------------------------------------------------------------'
 write(stdout,*)

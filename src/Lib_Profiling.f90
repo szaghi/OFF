@@ -1,11 +1,21 @@
-!> @ingroup GlobalVarPar
+!> @ingroup Library
 !> @{
-!> @defgroup Lib_Profiling Lib_Profiling
+!> @defgroup Lib_ProfilingLibrary Lib_Profiling
+!> @}
+
+!> @ingroup PrivateVarPar
+!> @{
+!> @defgroup Lib_ProfilingPrivateVarPar Lib_Profiling
+!> @}
+
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Lib_ProfilingPublicProcedure Lib_Profiling
 !> @}
 
 !> This module contains procedures and data for profiling parts of the code.
 !> This is a library module.
-!> @ingroup Library
+!> @ingroup Lib_ProfilingLibrary
 module Lib_Profiling
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision   ! Integers and reals precision definition. module Lib_Profiling
@@ -21,13 +31,17 @@ public:: profile
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
+!> @ingroup Lib_ProfilingPrivateVarPar
+!> @{
 real(R8P)::                 instant0 = 0._R8P !< The Crono starting instant used for profing the code.
 integer(I_P)::              Np                !< Number of parts of the code profiled.
 real(R8P),    allocatable:: partial(:,:)      !< Partial times used for profing the code [1:2,1:Np].
 integer(I_P), allocatable:: unitprofile(:)    !< Logic units for profiling files [1:Np].
+!> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @brief Subroutine for profiling the code.
+!> @ingroup Lib_ProfilingPublicProcedure
   subroutine profile(Np,header,p,pstart,pstop,finalize,myrank)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none

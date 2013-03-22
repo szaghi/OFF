@@ -1,3 +1,13 @@
+!> @ingroup DerivedType
+!> @{
+!> @defgroup Data_Type_GlobalDerivedType Data_Type_Global
+!> @}
+
+!> @ingroup Interface
+!> @{
+!> @defgroup Data_Type_GlobalInterface Data_Type_Global
+!> @}
+
 !> @ingroup PublicProcedure
 !> @{
 !> @defgroup Data_Type_GlobalPublicProcedure Data_Type_Global
@@ -24,9 +34,10 @@ public:: file_name
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
+!> @ingroup Data_Type_GlobalDerivedType
+!> @{
 !> @brief Derived type containing the global-level file data.
 !> Global-level file data are referred to those informations concerning with files of global interest.
-!> @ingroup DerivedType
 type, public:: Type_File
   character(60)::  Path_InPut  = ''     !< Path of input files.
   character(60)::  Path_OutPut = ''     !< Path of output files.
@@ -44,9 +55,7 @@ type, public:: Type_File
   integer(I8P)::   probe_out   = 1      !< Probes writing frequency.
   integer(I_P)::   unit_res    = 10     !< Logical unit of gnuplot log file of residuals.
 endtype Type_File
-
 !> Derived type containing global-level non-dimensional numbers and reference values.
-!> @ingroup DerivedType
 type, public:: Type_Adimensional
   ! non dimensional numbers loaded from input file
   real(R_P):: Re = 1._R_P !< \f$\rm{Re}=\frac{\rho_0 v_0 L_0}{\mu_0}\f$ Reynolds number.
@@ -72,9 +81,7 @@ type, public:: Type_Adimensional
   real(R_P):: Fr2_inv  = 1._R_P !< \f$\frac{1}{\rm{Fr}^2}\f$ Inverse of square of Froude number (coefficient of volume forces).
   real(R_P):: PrRe_inv = 1._R_P !< \f$\frac{1}{\rm{Pr Re}}\f$ Inverse of Prandtl and Reynolds numbers (coef. of condution terms).
 endtype Type_Adimensional
-
 !> @brief Derived type containing the global-level data.
-!> @ingroup DerivedType
 type, public:: Type_Global
   integer(I_P):: myrank = 0_I_P !< Rank of the process which data belongs to.
   type(Type_File):: file !< File data.
@@ -107,11 +114,12 @@ type, public:: Type_Global
   contains
     procedure, non_overridable:: alloc_bc => alloc_gbc                       ! Procedure for allocating bc memory.
     procedure, non_overridable:: load_bc_in1 => load_gbc_in1                 ! Procedure for loading the inflow1 bc data.
-    procedure, non_overridable:: load_fluid_soption => load_gfluid_soption   ! Procedure for loading the fuidynamic solver options.
+    procedure, non_overridable:: load_fluid_soption => load_gfluid_soption   ! Procedure for loading the fluidynamic solver options.
     procedure, non_overridable:: load_fluid_Ns => load_gfluid_Ns             ! Procedure for loading the number of species.
     procedure, non_overridable:: load_fluid_0species => load_gfluid_0species ! Procedure for loading the initial species.
     procedure, non_overridable:: alloc_fluid => alloc_gfluid                 ! Procedure for allocating the fluidynamic data.
 endtype Type_Global
+!> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -126,7 +134,7 @@ endtype Type_Global
 !> - File name of \b block-flip_flop data; this type of file name is referred to those files containing block-level data stored as
 !>   backup flip/flop file; calling signature is of the type:
 !>   @code fname = file_name(basename,suffix,blk,grl,flip) @endcode
-!> @ingroup Interface,Data_Type_GlobalPublicProcedure
+!> @ingroup Data_Type_GlobalInterface
 interface file_name
   module procedure Block_File_Name,Block_Step_File_Name,Block_Flip_File_Name
 endinterface

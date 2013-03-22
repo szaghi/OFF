@@ -1,3 +1,13 @@
+!> @ingroup DerivedType
+!> @{
+!> @defgroup Data_Type_PrimitiveDerivedType Data_Type_Primitive
+!> @}
+
+!> @ingroup Interface
+!> @{
+!> @defgroup Data_Type_PrimitiveInterface Data_Type_Primitive
+!> @}
+
 !> @ingroup PublicProcedure
 !> @{
 !> @defgroup Data_Type_PrimitivePublicProcedure Data_Type_Primitive
@@ -37,13 +47,13 @@ public:: operator (-)
 !> as an allocatable 1D array. \b r is allocated at runtime with the number of initial species that constitute the initial fluid
 !> mixture. Due to the presence of a dynamic component a freeing memory "method" for this component is necessary. Before deallocate
 !> a variable defined as Type_Primitive the free function must be invoked to free the memory of the dynamic component.
-!> @ingroup DerivedType
+!> @ingroup Data_Type_PrimitiveDerivedType
 type, public:: Type_Primitive
-  real(R_P), allocatable:: r(:)       !< Density of single species [1:Ns].
+  real(R8P), allocatable:: r(:)       !< Density of single species [1:Ns].
   type(Type_Vector)::      v          !< Velocity vector.
-  real(R_P)::              p = 0._R_P !< Pressure.
-  real(R_P)::              d = 0._R_P !< Density = sum(r(1:Ns)).
-  real(R_P)::              g = 0._R_P !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
+  real(R8P)::              p = 0._R8P !< Pressure.
+  real(R8P)::              d = 0._R8P !< Density = sum(r(1:Ns)).
+  real(R8P)::              g = 0._R8P !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
   contains
     procedure, non_overridable:: init       ! Procedure for initilizing allocatable variables.
     procedure, non_overridable:: free       ! Procedure for freeing the memory of allocatable variables.
@@ -55,7 +65,7 @@ endtype Type_Primitive
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @brief Assignment operator (=) overloading.
-!> @ingroup Interface
+!> @ingroup Data_Type_PrimitiveInterface
 interface assignment (=)
   module procedure assign_prim
 #ifdef r16p
@@ -91,7 +101,7 @@ endinterface
 !>         \f$ {\rm result\%p = prim\%p*scalar} \f$ \n
 !>         \f$ {\rm result\%d = prim\%d*scalar} \f$ \n
 !>         \f$ {\rm result\%g = prim\%g*scalar} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_PrimitiveInterface
 interface operator (*)
   module procedure prim_mul_prim
 #ifdef r16p
@@ -129,7 +139,7 @@ endinterface
 !>         \f$ {\rm result\%p = \frac{prim\%p}{scalar}} \f$ \n
 !>         \f$ {\rm result\%d = \frac{prim\%d}{scalar}} \f$ \n
 !>         \f$ {\rm result\%g = \frac{prim\%g}{scalar}} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_PrimitiveInterface
 interface operator (/)
   module procedure prim_div_prim
 #ifdef r16p
@@ -165,7 +175,7 @@ endinterface
 !>         \f$ {\rm result\%p = prim\%p+scalar} \f$ \n
 !>         \f$ {\rm result\%d = prim\%d+scalar} \f$ \n
 !>         \f$ {\rm result\%g = prim\%g+scalar} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_PrimitiveInterface
 interface operator (+)
   module procedure positive_prim
   module procedure prim_sum_prim
@@ -211,7 +221,7 @@ endinterface
 !>         \f$ {\rm result\%p = prim\%p-scalar} \f$ \n
 !>         \f$ {\rm result\%d = prim\%d-scalar} \f$ \n
 !>         \f$ {\rm result\%g = prim\%g-scalar} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_PrimitiveInterface
 interface operator (-)
   module procedure negative_prim
   module procedure prim_sub_prim
@@ -520,15 +530,20 @@ contains
   !> @ingroup Data_Type_PrimitivePrivateProcedure
   !> @{
   !> @brief Subroutine for initializing Type_Primitive allocatable variables.
-  elemental subroutine init(prim,Ns)
+  elemental subroutine init(prim,Ns,prim0)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Primitive), intent(INOUT):: prim !< Primitive initialized data.
-  integer(I_P),          intent(IN)::    Ns   !< Number of species.
+  class(Type_Primitive), intent(INOUT)::        prim  !< Primitive initialized data.
+  integer(I_P),          intent(IN), optional:: Ns    !< Number of species.
+  type(Type_Primitive),  intent(IN), optional:: prim0 !< Primitive initialization data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(prim%r)) deallocate(prim%r) ; allocate(prim%r(1:Ns)) ; prim%r = 0._R_P
+  if (present(Ns)) then
+    if (allocated(prim%r)) deallocate(prim%r) ; allocate(prim%r(1:Ns)) ; prim%r = 0._R8P
+  elseif (present(prim0)) then
+    if (allocated(prim%r)) deallocate(prim%r) ; allocate(prim%r(1:size(prim0%r))) ; prim = prim0
+  endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine init
@@ -547,12 +562,12 @@ contains
   endsubroutine free
 
   !> @brief Function for converting derived type Type_Primitive to array.
-  !> @return \b array real(R_P), dimension(1:size(prim\%r)+6) variable.
+  !> @return \b array real(R8P), dimension(1:size(prim\%r)+6) variable.
   pure function prim2array(prim) result(array)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Primitive), intent(IN):: prim                    !< Derived type primitive data.
-  real(R_P)::                         array(1:size(prim%r)+6) !< Primitive data in the form of array.
+  real(R8P)::                         array(1:size(prim%r)+6) !< Primitive data in the form of array.
   integer(I_P)::                      Ns                      !< Number of species.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -575,7 +590,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Primitive), intent(INOUT):: prim     !< Derived type primitive data.
-  real(R_P),             intent(IN)::    array(:) !< Primitive data in the form of array.
+  real(R8P),             intent(IN)::    array(:) !< Primitive data in the form of array.
   integer(I_P)::                         Ns       !< Number of species.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -658,11 +673,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  prim%r = real(scal,R_P)
-  prim%v = real(scal,R_P)
-  prim%p = real(scal,R_P)
-  prim%d = real(scal,R_P)
-  prim%g = real(scal,R_P)
+  prim%r = real(scal,R8P)
+  prim%v = real(scal,R8P)
+  prim%p = real(scal,R8P)
+  prim%d = real(scal,R8P)
+  prim%g = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR16P
@@ -680,11 +695,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  prim%r = real(scal,R_P)
-  prim%v = real(scal,R_P)
-  prim%p = real(scal,R_P)
-  prim%d = real(scal,R_P)
-  prim%g = real(scal,R_P)
+  prim%r = real(scal,R8P)
+  prim%v = real(scal,R8P)
+  prim%p = real(scal,R8P)
+  prim%d = real(scal,R8P)
+  prim%g = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR8P
@@ -701,11 +716,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  prim%r = real(scal,R_P)
-  prim%v = real(scal,R_P)
-  prim%p = real(scal,R_P)
-  prim%d = real(scal,R_P)
-  prim%g = real(scal,R_P)
+  prim%r = real(scal,R8P)
+  prim%v = real(scal,R8P)
+  prim%p = real(scal,R8P)
+  prim%d = real(scal,R8P)
+  prim%g = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR4P
@@ -722,11 +737,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  prim%r = real(scal,R_P)
-  prim%v = real(scal,R_P)
-  prim%p = real(scal,R_P)
-  prim%d = real(scal,R_P)
-  prim%g = real(scal,R_P)
+  prim%r = real(scal,R8P)
+  prim%v = real(scal,R8P)
+  prim%p = real(scal,R8P)
+  prim%d = real(scal,R8P)
+  prim%g = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI8P
@@ -743,11 +758,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  prim%r = real(scal,R_P)
-  prim%v = real(scal,R_P)
-  prim%p = real(scal,R_P)
-  prim%d = real(scal,R_P)
-  prim%g = real(scal,R_P)
+  prim%r = real(scal,R8P)
+  prim%v = real(scal,R8P)
+  prim%p = real(scal,R8P)
+  prim%d = real(scal,R8P)
+  prim%g = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI4P
@@ -764,11 +779,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  prim%r = real(scal,R_P)
-  prim%v = real(scal,R_P)
-  prim%p = real(scal,R_P)
-  prim%d = real(scal,R_P)
-  prim%g = real(scal,R_P)
+  prim%r = real(scal,R8P)
+  prim%v = real(scal,R8P)
+  prim%p = real(scal,R8P)
+  prim%d = real(scal,R8P)
+  prim%g = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI2P
@@ -785,11 +800,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  prim%r = real(scal,R_P)
-  prim%v = real(scal,R_P)
-  prim%p = real(scal,R_P)
-  prim%d = real(scal,R_P)
-  prim%g = real(scal,R_P)
+  prim%r = real(scal,R8P)
+  prim%v = real(scal,R8P)
+  prim%p = real(scal,R8P)
+  prim%d = real(scal,R8P)
+  prim%g = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI1P
@@ -833,11 +848,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR16P_mul_prim
@@ -856,11 +871,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_mul_ScalR16P
@@ -880,11 +895,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR8P_mul_prim
@@ -903,11 +918,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_mul_ScalR8P
@@ -926,11 +941,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR4P_mul_prim
@@ -949,11 +964,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_mul_ScalR4P
@@ -972,11 +987,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI8P_mul_prim
@@ -995,11 +1010,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_mul_ScalI8P
@@ -1018,11 +1033,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI4P_mul_prim
@@ -1041,11 +1056,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_mul_ScalI4P
@@ -1064,11 +1079,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI2P_mul_prim
@@ -1087,11 +1102,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_mul_ScalI2P
@@ -1110,11 +1125,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI1P_mul_prim
@@ -1133,11 +1148,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%r(1:size(prim%r)))
-  mul%r = real(scal,R_P) * prim%r
-  mul%v = real(scal,R_P) * prim%v
-  mul%p = real(scal,R_P) * prim%p
-  mul%d = real(scal,R_P) * prim%d
-  mul%g = real(scal,R_P) * prim%g
+  mul%r = real(scal,R8P) * prim%r
+  mul%v = real(scal,R8P) * prim%v
+  mul%p = real(scal,R8P) * prim%p
+  mul%d = real(scal,R8P) * prim%d
+  mul%g = real(scal,R8P) * prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_mul_ScalI1P
@@ -1181,11 +1196,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%r(1:size(prim1%r)))
-  div%r = prim%r / real(scal,R_P)
-  div%v = prim%v / real(scal,R_P)
-  div%p = prim%p / real(scal,R_P)
-  div%d = prim%d / real(scal,R_P)
-  div%g = prim%g / real(scal,R_P)
+  div%r = prim%r / real(scal,R8P)
+  div%v = prim%v / real(scal,R8P)
+  div%p = prim%p / real(scal,R8P)
+  div%d = prim%d / real(scal,R8P)
+  div%g = prim%g / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_div_ScalR16P
@@ -1205,11 +1220,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%r(1:size(prim%r)))
-  div%r = prim%r / real(scal,R_P)
-  div%v = prim%v / real(scal,R_P)
-  div%p = prim%p / real(scal,R_P)
-  div%d = prim%d / real(scal,R_P)
-  div%g = prim%g / real(scal,R_P)
+  div%r = prim%r / real(scal,R8P)
+  div%v = prim%v / real(scal,R8P)
+  div%p = prim%p / real(scal,R8P)
+  div%d = prim%d / real(scal,R8P)
+  div%g = prim%g / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_div_ScalR8P
@@ -1228,11 +1243,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%r(1:size(prim%r)))
-  div%r = prim%r / real(scal,R_P)
-  div%v = prim%v / real(scal,R_P)
-  div%p = prim%p / real(scal,R_P)
-  div%d = prim%d / real(scal,R_P)
-  div%g = prim%g / real(scal,R_P)
+  div%r = prim%r / real(scal,R8P)
+  div%v = prim%v / real(scal,R8P)
+  div%p = prim%p / real(scal,R8P)
+  div%d = prim%d / real(scal,R8P)
+  div%g = prim%g / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_div_ScalR4P
@@ -1251,11 +1266,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%r(1:size(prim%r)))
-  div%r = prim%r / real(scal,R_P)
-  div%v = prim%v / real(scal,R_P)
-  div%p = prim%p / real(scal,R_P)
-  div%d = prim%d / real(scal,R_P)
-  div%g = prim%g / real(scal,R_P)
+  div%r = prim%r / real(scal,R8P)
+  div%v = prim%v / real(scal,R8P)
+  div%p = prim%p / real(scal,R8P)
+  div%d = prim%d / real(scal,R8P)
+  div%g = prim%g / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_div_ScalI8P
@@ -1274,11 +1289,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%r(1:size(prim%r)))
-  div%r = prim%r / real(scal,R_P)
-  div%v = prim%v / real(scal,R_P)
-  div%p = prim%p / real(scal,R_P)
-  div%d = prim%d / real(scal,R_P)
-  div%g = prim%g / real(scal,R_P)
+  div%r = prim%r / real(scal,R8P)
+  div%v = prim%v / real(scal,R8P)
+  div%p = prim%p / real(scal,R8P)
+  div%d = prim%d / real(scal,R8P)
+  div%g = prim%g / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_div_ScalI4P
@@ -1297,11 +1312,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%r(1:size(prim%r)))
-  div%r = prim%r / real(scal,R_P)
-  div%v = prim%v / real(scal,R_P)
-  div%p = prim%p / real(scal,R_P)
-  div%d = prim%d / real(scal,R_P)
-  div%g = prim%g / real(scal,R_P)
+  div%r = prim%r / real(scal,R8P)
+  div%v = prim%v / real(scal,R8P)
+  div%p = prim%p / real(scal,R8P)
+  div%d = prim%d / real(scal,R8P)
+  div%g = prim%g / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_div_ScalI2P
@@ -1320,11 +1335,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%r(1:size(prim%r)))
-  div%r = prim%r / real(scal,R_P)
-  div%v = prim%v / real(scal,R_P)
-  div%p = prim%p / real(scal,R_P)
-  div%d = prim%d / real(scal,R_P)
-  div%g = prim%g / real(scal,R_P)
+  div%r = prim%r / real(scal,R8P)
+  div%v = prim%v / real(scal,R8P)
+  div%p = prim%p / real(scal,R8P)
+  div%d = prim%d / real(scal,R8P)
+  div%g = prim%g / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_div_ScalI1P
@@ -1390,11 +1405,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR16P_sum_prim
@@ -1413,11 +1428,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sum_ScalR16P
@@ -1437,11 +1452,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR8P_sum_prim
@@ -1460,11 +1475,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sum_ScalR8P
@@ -1483,11 +1498,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR4P_sum_prim
@@ -1506,11 +1521,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sum_ScalR4P
@@ -1529,11 +1544,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI8P_sum_prim
@@ -1552,11 +1567,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sum_ScalI8P
@@ -1575,11 +1590,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI4P_sum_prim
@@ -1598,11 +1613,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sum_ScalI4P
@@ -1621,11 +1636,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI2P_sum_prim
@@ -1644,11 +1659,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sum_ScalI2P
@@ -1667,11 +1682,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI1P_sum_prim
@@ -1690,11 +1705,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%r(1:size(prim%r)))
-  summ%r = real(scal,R_P) + prim%r
-  summ%v = real(scal,R_P) + prim%v
-  summ%p = real(scal,R_P) + prim%p
-  summ%d = real(scal,R_P) + prim%d
-  summ%g = real(scal,R_P) + prim%g
+  summ%r = real(scal,R8P) + prim%r
+  summ%v = real(scal,R8P) + prim%v
+  summ%p = real(scal,R8P) + prim%p
+  summ%d = real(scal,R8P) + prim%d
+  summ%g = real(scal,R8P) + prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sum_ScalI1P
@@ -1760,11 +1775,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = real(scal,R_P) - prim%r
-  sub%v = real(scal,R_P) - prim%v
-  sub%p = real(scal,R_P) - prim%p
-  sub%d = real(scal,R_P) - prim%d
-  sub%g = real(scal,R_P) - prim%g
+  sub%r = real(scal,R8P) - prim%r
+  sub%v = real(scal,R8P) - prim%v
+  sub%p = real(scal,R8P) - prim%p
+  sub%d = real(scal,R8P) - prim%d
+  sub%g = real(scal,R8P) - prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR16P_sub_prim
@@ -1783,11 +1798,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = prim%r - real(scal,R_P)
-  sub%v = prim%v - real(scal,R_P)
-  sub%p = prim%p - real(scal,R_P)
-  sub%d = prim%d - real(scal,R_P)
-  sub%g = prim%g - real(scal,R_P)
+  sub%r = prim%r - real(scal,R8P)
+  sub%v = prim%v - real(scal,R8P)
+  sub%p = prim%p - real(scal,R8P)
+  sub%d = prim%d - real(scal,R8P)
+  sub%g = prim%g - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sub_ScalR16P
@@ -1807,11 +1822,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = real(scal,R_P) - prim%r
-  sub%v = real(scal,R_P) - prim%v
-  sub%p = real(scal,R_P) - prim%p
-  sub%d = real(scal,R_P) - prim%d
-  sub%g = real(scal,R_P) - prim%g
+  sub%r = real(scal,R8P) - prim%r
+  sub%v = real(scal,R8P) - prim%v
+  sub%p = real(scal,R8P) - prim%p
+  sub%d = real(scal,R8P) - prim%d
+  sub%g = real(scal,R8P) - prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR8P_sub_prim
@@ -1830,11 +1845,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = prim%r - real(scal,R_P)
-  sub%v = prim%v - real(scal,R_P)
-  sub%p = prim%p - real(scal,R_P)
-  sub%d = prim%d - real(scal,R_P)
-  sub%g = prim%g - real(scal,R_P)
+  sub%r = prim%r - real(scal,R8P)
+  sub%v = prim%v - real(scal,R8P)
+  sub%p = prim%p - real(scal,R8P)
+  sub%d = prim%d - real(scal,R8P)
+  sub%g = prim%g - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sub_ScalR8P
@@ -1853,11 +1868,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = real(scal,R_P) - prim%r
-  sub%v = real(scal,R_P) - prim%v
-  sub%p = real(scal,R_P) - prim%p
-  sub%d = real(scal,R_P) - prim%d
-  sub%g = real(scal,R_P) - prim%g
+  sub%r = real(scal,R8P) - prim%r
+  sub%v = real(scal,R8P) - prim%v
+  sub%p = real(scal,R8P) - prim%p
+  sub%d = real(scal,R8P) - prim%d
+  sub%g = real(scal,R8P) - prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR4P_sub_prim
@@ -1876,11 +1891,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = prim%r - real(scal,R_P)
-  sub%v = prim%v - real(scal,R_P)
-  sub%p = prim%p - real(scal,R_P)
-  sub%d = prim%d - real(scal,R_P)
-  sub%g = prim%g - real(scal,R_P)
+  sub%r = prim%r - real(scal,R8P)
+  sub%v = prim%v - real(scal,R8P)
+  sub%p = prim%p - real(scal,R8P)
+  sub%d = prim%d - real(scal,R8P)
+  sub%g = prim%g - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sub_ScalR4P
@@ -1899,11 +1914,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = real(scal,R_P) - prim%r
-  sub%v = real(scal,R_P) - prim%v
-  sub%p = real(scal,R_P) - prim%p
-  sub%d = real(scal,R_P) - prim%d
-  sub%g = real(scal,R_P) - prim%g
+  sub%r = real(scal,R8P) - prim%r
+  sub%v = real(scal,R8P) - prim%v
+  sub%p = real(scal,R8P) - prim%p
+  sub%d = real(scal,R8P) - prim%d
+  sub%g = real(scal,R8P) - prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI8P_sub_prim
@@ -1922,11 +1937,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = prim%r - real(scal,R_P)
-  sub%v = prim%v - real(scal,R_P)
-  sub%p = prim%p - real(scal,R_P)
-  sub%d = prim%d - real(scal,R_P)
-  sub%g = prim%g - real(scal,R_P)
+  sub%r = prim%r - real(scal,R8P)
+  sub%v = prim%v - real(scal,R8P)
+  sub%p = prim%p - real(scal,R8P)
+  sub%d = prim%d - real(scal,R8P)
+  sub%g = prim%g - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sub_ScalI8P
@@ -1945,11 +1960,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = real(scal,R_P) - prim%r
-  sub%v = real(scal,R_P) - prim%v
-  sub%p = real(scal,R_P) - prim%p
-  sub%d = real(scal,R_P) - prim%d
-  sub%g = real(scal,R_P) - prim%g
+  sub%r = real(scal,R8P) - prim%r
+  sub%v = real(scal,R8P) - prim%v
+  sub%p = real(scal,R8P) - prim%p
+  sub%d = real(scal,R8P) - prim%d
+  sub%g = real(scal,R8P) - prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI4P_sub_prim
@@ -1968,11 +1983,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = prim%r - real(scal,R_P)
-  sub%v = prim%v - real(scal,R_P)
-  sub%p = prim%p - real(scal,R_P)
-  sub%d = prim%d - real(scal,R_P)
-  sub%g = prim%g - real(scal,R_P)
+  sub%r = prim%r - real(scal,R8P)
+  sub%v = prim%v - real(scal,R8P)
+  sub%p = prim%p - real(scal,R8P)
+  sub%d = prim%d - real(scal,R8P)
+  sub%g = prim%g - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sub_ScalI4P
@@ -1991,11 +2006,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = real(scal,R_P) - prim%r
-  sub%v = real(scal,R_P) - prim%v
-  sub%p = real(scal,R_P) - prim%p
-  sub%d = real(scal,R_P) - prim%d
-  sub%g = real(scal,R_P) - prim%g
+  sub%r = real(scal,R8P) - prim%r
+  sub%v = real(scal,R8P) - prim%v
+  sub%p = real(scal,R8P) - prim%p
+  sub%d = real(scal,R8P) - prim%d
+  sub%g = real(scal,R8P) - prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI2P_sub_prim
@@ -2014,11 +2029,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = prim%r - real(scal,R_P)
-  sub%v = prim%v - real(scal,R_P)
-  sub%p = prim%p - real(scal,R_P)
-  sub%d = prim%d - real(scal,R_P)
-  sub%g = prim%g - real(scal,R_P)
+  sub%r = prim%r - real(scal,R8P)
+  sub%v = prim%v - real(scal,R8P)
+  sub%p = prim%p - real(scal,R8P)
+  sub%d = prim%d - real(scal,R8P)
+  sub%g = prim%g - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sub_ScalI2P
@@ -2037,11 +2052,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = real(scal,R_P) - prim%r
-  sub%v = real(scal,R_P) - prim%v
-  sub%p = real(scal,R_P) - prim%p
-  sub%d = real(scal,R_P) - prim%d
-  sub%g = real(scal,R_P) - prim%g
+  sub%r = real(scal,R8P) - prim%r
+  sub%v = real(scal,R8P) - prim%v
+  sub%p = real(scal,R8P) - prim%p
+  sub%d = real(scal,R8P) - prim%d
+  sub%g = real(scal,R8P) - prim%g
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI1P_sub_prim
@@ -2060,11 +2075,11 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%r(1:size(prim%r)))
-  sub%r = prim%r - real(scal,R_P)
-  sub%v = prim%v - real(scal,R_P)
-  sub%p = prim%p - real(scal,R_P)
-  sub%d = prim%d - real(scal,R_P)
-  sub%g = prim%g - real(scal,R_P)
+  sub%r = prim%r - real(scal,R8P)
+  sub%v = prim%v - real(scal,R8P)
+  sub%p = prim%p - real(scal,R8P)
+  sub%d = prim%d - real(scal,R8P)
+  sub%g = prim%g - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction prim_sub_ScalI1P

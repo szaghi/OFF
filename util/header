@@ -587,7 +587,7 @@ cleanall: clean cleanexe
 tar: cleanall
 	@echo -e "\033[1;31m Creating tar archive of the code \033[0m" | tee make.log
 	@mkdir -p OFF
-	@cp -rL input lib util src makefile OFF/
+	@cp -rL inputs-template lib util src makefile OFF/
 	@tar czf OFF.tgz OFF
 	@rm -rf OFF
 

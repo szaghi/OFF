@@ -1,3 +1,8 @@
+!> @ingroup Program
+!> @{
+!> @defgroup IBMProgram IBM
+!> @}
+
 !> @brief IBM, Initial and Boundary conditions, Mesh generator for @off (Open Finite volume Fluid dynamics code).
 !> This is an auxiliary tool useful for building proper inputs for @off code. ICG can build Initial Conditions files, Mesh files and
 !> Boundary Conditions files. It accepts two kinds of inputs: \n
@@ -8,7 +13,7 @@
 !>   conditions and the geometry are loaded by Ansys IcemCFD Multiblock INFO files. These files can describe more complex scenario
 !>   with general curvilinear grids.
 !> @todo \b DocImprove: Improve the documentation
-!> @ingroup Program
+!> @ingroup IBMProgram
 program IBM
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                          ! Integers and reals precision definition.

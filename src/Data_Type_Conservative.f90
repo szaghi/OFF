@@ -1,3 +1,13 @@
+!> @ingroup DerivedType
+!> @{
+!> @defgroup Data_Type_ConservativeDerivedType Data_Type_Conservative
+!> @}
+
+!> @ingroup Interface
+!> @{
+!> @defgroup Data_Type_ConservativeInterface Data_Type_Conservative
+!> @}
+
 !> @ingroup PublicProcedure
 !> @{
 !> @defgroup Data_Type_ConservativePublicProcedure Data_Type_Conservative
@@ -38,13 +48,13 @@ public:: operator (.dot.)
 !> as an allocatable 1D array. \b rs is allocated at runtime with the number of initial species that constitute the initial fluid
 !> mixture. Due to the presence of a dynamic component a freeing memory "method" for this component is necessary. Before deallocate
 !> a variable defined as Type_Conservative the free function must be invoked to free the memory of the dynamic component.
-!> @ingroup DerivedType
+!> @ingroup Data_Type_ConservativeDerivedType
 type, public:: Type_Conservative
-  real(R_P), allocatable:: rs(:)       !< Density of single species [1:Ns].
+  real(R8P), allocatable:: rs(:)       !< Density of single species [1:Ns].
   type(Type_Vector)::      rv          !< Momentum vector.
-  real(R_P)::              re = 0._R_P !< Product of density for specific total internal energy (sum(r)*E).
+  real(R8P)::              re = 0._R8P !< Product of density for specific total internal energy (sum(r)*E).
   contains
-    procedure, non_overridable:: init       ! Procedure for initilizing allocatable variables.
+    procedure, non_overridable:: init       ! Procedure for initializing allocatable variables.
     procedure, non_overridable:: free       ! Procedure for freeing the memory of allocatable variables.
     procedure, non_overridable:: cons2array ! Procedure for converting derived type Type_Conservative to array.
     procedure, non_overridable:: array2cons ! Procedure for converting array to derived type Type_Conservative.
@@ -54,7 +64,7 @@ endtype Type_Conservative
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @brief Assignment operator (=) overloading.
-!> @ingroup Interface
+!> @ingroup Data_Type_ConservativeInterface
 interface assignment (=)
   module procedure assign_cons
 #ifdef r16p
@@ -84,7 +94,7 @@ end interface
 !>         \f$ {\rm result\%rs = cons\%rs*scalar} \f$ \n
 !>         \f$ {\rm result\%rv = cons\%rv*scalar} \f$ \n
 !>         \f$ {\rm result\%re = cons\%re*scalar} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_ConservativeInterface
 interface operator (*)
   module procedure cons_mul_cons
 #ifdef r16p
@@ -118,7 +128,7 @@ endinterface
 !>         \f$ {\rm result\%rs = \frac{cons\%rs}{scalar}} \f$ \n
 !>         \f$ {\rm result\%rv = \frac{cons\%rv}{scalar}} \f$ \n
 !>         \f$ {\rm result\%re = \frac{cons\%re}{scalar}} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_ConservativeInterface
 interface operator (/)
   module procedure cons_div_cons
 #ifdef r16p
@@ -148,7 +158,7 @@ endinterface
 !>         \f$ {\rm result\%rs = cons\%rs+scalar} \f$ \n
 !>         \f$ {\rm result\%rv = cons\%rv+scalar} \f$ \n
 !>         \f$ {\rm result\%re = cons\%re+scalar} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_ConservativeInterface
 interface operator (+)
   module procedure positive_cons
   module procedure cons_sum_cons
@@ -188,7 +198,7 @@ endinterface
 !>         \f$ {\rm result\%rs = cons\%rs-scalar} \f$ \n
 !>         \f$ {\rm result\%rv = cons\%rv-scalar} \f$ \n
 !>         \f$ {\rm result\%re = cons\%re-scalar} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_ConservativeInterface
 interface operator (-)
   module procedure negative_cons
   module procedure cons_sub_cons
@@ -214,7 +224,7 @@ endinterface
 !> @brief Dot product operator (.dot.) definition.
 !> This operator is defined as:
 !> \f$ {\rm D}= x_1 \cdot x_2 + y_1 \cdot y_2 + z_1 \cdot z_2 \f$
-!> @ingroup Interface
+!> @ingroup Data_Type_ConservativeInterface
 interface operator (.dot.)
   module procedure cons_dot_cons
   module procedure scalR8_dot_cons,scalR4_dot_cons,scalI8_dot_cons,scalI4_dot_cons,scalI2_dot_cons,scalI1_dot_cons
@@ -458,15 +468,20 @@ contains
   !> @ingroup Data_Type_ConservativePrivateProcedure
   !> @{
   !> @brief Subroutine for initializing Type_Conservative allocatable variables.
-  elemental subroutine init(cons,Ns)
+  elemental subroutine init(cons,Ns,cons0)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Conservative), intent(INOUT):: cons !< Conservative initialized data.
-  integer(I_P),             intent(IN)::    Ns   !< Number of species.
+  class(Type_Conservative), intent(INOUT)::        cons  !< Conservative initialized data.
+  integer(I_P),             intent(IN), optional:: Ns    !< Number of species.
+  type(Type_Conservative),  intent(IN), optional:: cons0 !< Conservative inizialization data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(cons%rs)) deallocate(cons%rs) ; allocate(cons%rs(1:Ns)) ; cons%rs = 0._R_P
+  if (present(Ns)) then
+    if (allocated(cons%rs)) deallocate(cons%rs) ; allocate(cons%rs(1:Ns)) ; cons%rs = 0._R8P
+  elseif (present(cons0)) then
+    if (allocated(cons%rs)) deallocate(cons%rs) ; allocate(cons%rs(1:size(cons0%rs))) ; cons = cons0
+  endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine init
@@ -485,12 +500,12 @@ contains
   endsubroutine free
 
   !> @brief Function for converting derived type Type_Conservative to array.
-  !> @return \b array real(R_P), dimension(1:size(cons\%rs)+4) variable.
+  !> @return \b array real(R8P), dimension(1:size(cons\%rs)+4) variable.
   pure function cons2array(cons) result(array)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Conservative), intent(IN):: cons                     !< Derived type conservative data.
-  real(R_P)::                            array(1:size(cons%rs)+4) !< Conservative data in the form of array.
+  real(R8P)::                            array(1:size(cons%rs)+4) !< Conservative data in the form of array.
   integer(I_P)::                         Ns                       !< Number of species.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -510,7 +525,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Conservative), intent(INOUT):: cons     !< Derived type conservative data.
-  real(R_P),                intent(IN)::    array(:) !< Conservative data in the form of array.
+  real(R8P),                intent(IN)::    array(:) !< Conservative data in the form of array.
   integer(I_P)::                            Ns       !< Number of species.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -587,9 +602,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  cons%rs = real(scal,R_P)
-  cons%rv = real(scal,R_P)
-  cons%re = real(scal,R_P)
+  cons%rs = real(scal,R8P)
+  cons%rv = real(scal,R8P)
+  cons%re = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR16P
@@ -607,9 +622,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  cons%rs = real(scal,R_P)
-  cons%rv = real(scal,R_P)
-  cons%re = real(scal,R_P)
+  cons%rs = real(scal,R8P)
+  cons%rv = real(scal,R8P)
+  cons%re = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR8P
@@ -626,9 +641,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  cons%rs = real(scal,R_P)
-  cons%rv = real(scal,R_P)
-  cons%re = real(scal,R_P)
+  cons%rs = real(scal,R8P)
+  cons%rv = real(scal,R8P)
+  cons%re = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR4P
@@ -645,9 +660,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  cons%rs = real(scal,R_P)
-  cons%rv = real(scal,R_P)
-  cons%re = real(scal,R_P)
+  cons%rs = real(scal,R8P)
+  cons%rv = real(scal,R8P)
+  cons%re = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI8P
@@ -664,9 +679,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  cons%rs = real(scal,R_P)
-  cons%rv = real(scal,R_P)
-  cons%re = real(scal,R_P)
+  cons%rs = real(scal,R8P)
+  cons%rv = real(scal,R8P)
+  cons%re = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI4P
@@ -683,9 +698,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  cons%rs = real(scal,R_P)
-  cons%rv = real(scal,R_P)
-  cons%re = real(scal,R_P)
+  cons%rs = real(scal,R8P)
+  cons%rv = real(scal,R8P)
+  cons%re = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI2P
@@ -702,9 +717,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  cons%rs = real(scal,R_P)
-  cons%rv = real(scal,R_P)
-  cons%re = real(scal,R_P)
+  cons%rs = real(scal,R8P)
+  cons%rv = real(scal,R8P)
+  cons%re = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI1P
@@ -746,9 +761,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR16P_mul_cons
@@ -767,9 +782,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_mul_ScalR16P
@@ -789,9 +804,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR8P_mul_cons
@@ -810,9 +825,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_mul_ScalR8P
@@ -831,9 +846,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR4P_mul_cons
@@ -852,9 +867,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_mul_ScalR4P
@@ -873,9 +888,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI8P_mul_cons
@@ -894,9 +909,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_mul_ScalI8P
@@ -915,9 +930,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI4P_mul_cons
@@ -936,9 +951,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_mul_ScalI4P
@@ -957,9 +972,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI2P_mul_cons
@@ -978,9 +993,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_mul_ScalI2P
@@ -999,9 +1014,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI1P_mul_cons
@@ -1020,9 +1035,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(mul%rs(1:size(cons%rs)))
-  mul%rs = real(scal,R_P) * cons%rs
-  mul%rv = real(scal,R_P) * cons%rv
-  mul%re = real(scal,R_P) * cons%re
+  mul%rs = real(scal,R8P) * cons%rs
+  mul%rv = real(scal,R8P) * cons%rv
+  mul%re = real(scal,R8P) * cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_mul_ScalI1P
@@ -1064,9 +1079,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%rs(1:size(cons%rs)))
-  div%rs = cons%rs / real(scal,R_P)
-  div%rv = cons%rv / real(scal,R_P)
-  div%re = cons%re / real(scal,R_P)
+  div%rs = cons%rs / real(scal,R8P)
+  div%rv = cons%rv / real(scal,R8P)
+  div%re = cons%re / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_div_ScalR16P
@@ -1086,9 +1101,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%rs(1:size(cons%rs)))
-  div%rs = cons%rs / real(scal,R_P)
-  div%rv = cons%rv / real(scal,R_P)
-  div%re = cons%re / real(scal,R_P)
+  div%rs = cons%rs / real(scal,R8P)
+  div%rv = cons%rv / real(scal,R8P)
+  div%re = cons%re / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_div_ScalR8P
@@ -1107,9 +1122,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%rs(1:size(cons%rs)))
-  div%rs = cons%rs / real(scal,R_P)
-  div%rv = cons%rv / real(scal,R_P)
-  div%re = cons%re / real(scal,R_P)
+  div%rs = cons%rs / real(scal,R8P)
+  div%rv = cons%rv / real(scal,R8P)
+  div%re = cons%re / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_div_ScalR4P
@@ -1128,9 +1143,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%rs(1:size(cons%rs)))
-  div%rs = cons%rs / real(scal,R_P)
-  div%rv = cons%rv / real(scal,R_P)
-  div%re = cons%re / real(scal,R_P)
+  div%rs = cons%rs / real(scal,R8P)
+  div%rv = cons%rv / real(scal,R8P)
+  div%re = cons%re / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_div_ScalI8P
@@ -1149,9 +1164,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%rs(1:size(cons%rs)))
-  div%rs = cons%rs / real(scal,R_P)
-  div%rv = cons%rv / real(scal,R_P)
-  div%re = cons%re / real(scal,R_P)
+  div%rs = cons%rs / real(scal,R8P)
+  div%rv = cons%rv / real(scal,R8P)
+  div%re = cons%re / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_div_ScalI4P
@@ -1170,9 +1185,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%rs(1:size(cons%rs)))
-  div%rs = cons%rs / real(scal,R_P)
-  div%rv = cons%rv / real(scal,R_P)
-  div%re = cons%re / real(scal,R_P)
+  div%rs = cons%rs / real(scal,R8P)
+  div%rv = cons%rv / real(scal,R8P)
+  div%re = cons%re / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_div_ScalI2P
@@ -1191,9 +1206,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(div%rs(1:size(cons%rs)))
-  div%rs = cons%rs / real(scal,R_P)
-  div%rv = cons%rv / real(scal,R_P)
-  div%re = cons%re / real(scal,R_P)
+  div%rs = cons%rs / real(scal,R8P)
+  div%rv = cons%rv / real(scal,R8P)
+  div%re = cons%re / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_div_ScalI1P
@@ -1255,9 +1270,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR16P_sum_cons
@@ -1276,9 +1291,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sum_ScalR16P
@@ -1298,9 +1313,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR8P_sum_cons
@@ -1319,9 +1334,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sum_ScalR8P
@@ -1340,9 +1355,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR4P_sum_cons
@@ -1361,9 +1376,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sum_ScalR4P
@@ -1382,9 +1397,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI8P_sum_cons
@@ -1403,9 +1418,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sum_ScalI8P
@@ -1424,9 +1439,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI4P_sum_cons
@@ -1445,9 +1460,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sum_ScalI4P
@@ -1466,9 +1481,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI2P_sum_cons
@@ -1487,9 +1502,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sum_ScalI2P
@@ -1508,9 +1523,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI1P_sum_cons
@@ -1529,9 +1544,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(summ%rs(1:size(cons%rs)))
-  summ%rs = real(scal,R_P) + cons%rs
-  summ%rv = real(scal,R_P) + cons%rv
-  summ%re = real(scal,R_P) + cons%re
+  summ%rs = real(scal,R8P) + cons%rs
+  summ%rv = real(scal,R8P) + cons%rv
+  summ%re = real(scal,R8P) + cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sum_ScalI1P
@@ -1593,9 +1608,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = real(scal,R_P) - cons%rs
-  sub%rv = real(scal,R_P) - cons%rv
-  sub%re = real(scal,R_P) - cons%re
+  sub%rs = real(scal,R8P) - cons%rs
+  sub%rv = real(scal,R8P) - cons%rv
+  sub%re = real(scal,R8P) - cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR16P_sub_cons
@@ -1614,9 +1629,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = cons%rs - real(scal,R_P)
-  sub%rv = cons%rv - real(scal,R_P)
-  sub%re = cons%re - real(scal,R_P)
+  sub%rs = cons%rs - real(scal,R8P)
+  sub%rv = cons%rv - real(scal,R8P)
+  sub%re = cons%re - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sub_ScalR16P
@@ -1636,9 +1651,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = real(scal,R_P) - cons%rs
-  sub%rv = real(scal,R_P) - cons%rv
-  sub%re = real(scal,R_P) - cons%re
+  sub%rs = real(scal,R8P) - cons%rs
+  sub%rv = real(scal,R8P) - cons%rv
+  sub%re = real(scal,R8P) - cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR8P_sub_cons
@@ -1657,9 +1672,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = cons%rs - real(scal,R_P)
-  sub%rv = cons%rv - real(scal,R_P)
-  sub%re = cons%re - real(scal,R_P)
+  sub%rs = cons%rs - real(scal,R8P)
+  sub%rv = cons%rv - real(scal,R8P)
+  sub%re = cons%re - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sub_ScalR8P
@@ -1678,9 +1693,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = real(scal,R_P) - cons%rs
-  sub%rv = real(scal,R_P) - cons%rv
-  sub%re = real(scal,R_P) - cons%re
+  sub%rs = real(scal,R8P) - cons%rs
+  sub%rv = real(scal,R8P) - cons%rv
+  sub%re = real(scal,R8P) - cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR4P_sub_cons
@@ -1699,9 +1714,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = cons%rs - real(scal,R_P)
-  sub%rv = cons%rv - real(scal,R_P)
-  sub%re = cons%re - real(scal,R_P)
+  sub%rs = cons%rs - real(scal,R8P)
+  sub%rv = cons%rv - real(scal,R8P)
+  sub%re = cons%re - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sub_ScalR4P
@@ -1720,9 +1735,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = real(scal,R_P) - cons%rs
-  sub%rv = real(scal,R_P) - cons%rv
-  sub%re = real(scal,R_P) - cons%re
+  sub%rs = real(scal,R8P) - cons%rs
+  sub%rv = real(scal,R8P) - cons%rv
+  sub%re = real(scal,R8P) - cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI8P_sub_cons
@@ -1741,9 +1756,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = cons%rs - real(scal,R_P)
-  sub%rv = cons%rv - real(scal,R_P)
-  sub%re = cons%re - real(scal,R_P)
+  sub%rs = cons%rs - real(scal,R8P)
+  sub%rv = cons%rv - real(scal,R8P)
+  sub%re = cons%re - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sub_ScalI8P
@@ -1762,9 +1777,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = real(scal,R_P) - cons%rs
-  sub%rv = real(scal,R_P) - cons%rv
-  sub%re = real(scal,R_P) - cons%re
+  sub%rs = real(scal,R8P) - cons%rs
+  sub%rv = real(scal,R8P) - cons%rv
+  sub%re = real(scal,R8P) - cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI4P_sub_cons
@@ -1783,9 +1798,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = cons%rs - real(scal,R_P)
-  sub%rv = cons%rv - real(scal,R_P)
-  sub%re = cons%re - real(scal,R_P)
+  sub%rs = cons%rs - real(scal,R8P)
+  sub%rv = cons%rv - real(scal,R8P)
+  sub%re = cons%re - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sub_ScalI4P
@@ -1804,9 +1819,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = real(scal,R_P) - cons%rs
-  sub%rv = real(scal,R_P) - cons%rv
-  sub%re = real(scal,R_P) - cons%re
+  sub%rs = real(scal,R8P) - cons%rs
+  sub%rv = real(scal,R8P) - cons%rv
+  sub%re = real(scal,R8P) - cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI2P_sub_cons
@@ -1825,9 +1840,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = cons%rs - real(scal,R_P)
-  sub%rv = cons%rv - real(scal,R_P)
-  sub%re = cons%re - real(scal,R_P)
+  sub%rs = cons%rs - real(scal,R8P)
+  sub%rv = cons%rv - real(scal,R8P)
+  sub%re = cons%re - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sub_ScalI2P
@@ -1846,9 +1861,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = real(scal,R_P) - cons%rs
-  sub%rv = real(scal,R_P) - cons%rv
-  sub%re = real(scal,R_P) - cons%re
+  sub%rs = real(scal,R8P) - cons%rs
+  sub%rv = real(scal,R8P) - cons%rv
+  sub%re = real(scal,R8P) - cons%re
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI1P_sub_cons
@@ -1867,9 +1882,9 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(sub%rs(1:size(cons%rs)))
-  sub%rs = cons%rs - real(scal,R_P)
-  sub%rv = cons%rv - real(scal,R_P)
-  sub%re = cons%re - real(scal,R_P)
+  sub%rs = cons%rs - real(scal,R8P)
+  sub%rv = cons%rv - real(scal,R8P)
+  sub%re = cons%re - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction cons_sub_ScalI1P
@@ -1886,7 +1901,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(dot%rs(1:size(cons1(1)%rs)))
-  dot = 0._R_P
+  dot = 0._R8P
   do i=1,min(size(cons1),size(cons2))
     dot = dot + cons1(i)*cons2(i)
   enddo
@@ -1906,7 +1921,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(dot%rs(1:size(cons(1)%rs)))
-  dot = 0._R_P
+  dot = 0._R8P
   do i=1,min(size(scal),size(cons))
     dot = dot + scal(i)*cons(i)
   enddo
@@ -1926,7 +1941,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(dot%rs(1:size(cons(1)%rs)))
-  dot = 0._R_P
+  dot = 0._R8P
   do i=1,min(size(scal),size(cons))
     dot = dot + scal(i)*cons(i)
   enddo
@@ -1946,7 +1961,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(dot%rs(1:size(cons(1)%rs)))
-  dot = 0._R_P
+  dot = 0._R8P
   do i=1,min(size(scal),size(cons))
     dot = dot + scal(i)*cons(i)
   enddo
@@ -1966,7 +1981,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(dot%rs(1:size(cons(1)%rs)))
-  dot = 0._R_P
+  dot = 0._R8P
   do i=1,min(size(scal),size(cons))
     dot = dot + scal(i)*cons(i)
   enddo
@@ -1986,7 +2001,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(dot%rs(1:size(cons(1)%rs)))
-  dot = 0._R_P
+  dot = 0._R8P
   do i=1,min(size(scal),size(cons))
     dot = dot + scal(i)*cons(i)
   enddo
@@ -2006,7 +2021,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(dot%rs(1:size(cons(1)%rs)))
-  dot = 0._R_P
+  dot = 0._R8P
   do i=1,min(size(scal),size(cons))
     dot = dot + scal(i)*cons(i)
   enddo
@@ -2026,7 +2041,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(dot%rs(1:size(cons(1)%rs)))
-  dot = 0._R_P
+  dot = 0._R8P
   do i=1,min(size(scal),size(cons))
     dot = dot + scal(i)*cons(i)
   enddo
@@ -2046,7 +2061,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(dot%rs(1:size(cons(1)%rs)))
-  dot = 0._R_P
+  dot = 0._R8P
   do i=1,min(size(scal),size(cons))
     dot = dot + scal(i)*cons(i)
   enddo
@@ -2066,7 +2081,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(dot%rs(1:size(cons(1)%rs)))
-  dot = 0._R_P
+  dot = 0._R8P
   do i=1,min(size(scal),size(cons))
     dot = dot + scal(i)*cons(i)
   enddo
@@ -2086,7 +2101,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(dot%rs(1:size(cons(1)%rs)))
-  dot = 0._R_P
+  dot = 0._R8P
   do i=1,min(size(scal),size(cons))
     dot = dot + scal(i)*cons(i)
   enddo
@@ -2106,7 +2121,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(dot%rs(1:size(cons(1)%rs)))
-  dot = 0._R_P
+  dot = 0._R8P
   do i=1,min(size(scal),size(cons))
     dot = dot + scal(i)*cons(i)
   enddo
@@ -2126,7 +2141,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   allocate(dot%rs(1:size(cons(1)%rs)))
-  dot = 0._R_P
+  dot = 0._R8P
   do i=1,min(size(scal),size(cons))
     dot = dot + scal(i)*cons(i)
   enddo

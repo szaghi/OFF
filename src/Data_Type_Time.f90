@@ -1,3 +1,18 @@
+!> @ingroup DerivedType
+!> @{
+!> @defgroup Data_Type_TimeDerivedType Data_Type_Time
+!> @}
+
+!> @ingroup Interface
+!> @{
+!> @defgroup Data_Type_TimeInterface Data_Type_Time
+!> @}
+
+!> @ingroup PrivateVarPar
+!> @{
+!> @defgroup Data_Type_TimePrivateVarPar Data_Type_Time
+!> @}
+
 !> @ingroup PublicProcedure
 !> @{
 !> @defgroup Data_Type_TimePublicProcedure Data_Type_Time
@@ -36,46 +51,47 @@ public:: Crono
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> Derived type containing time variables.
-!> @ingroup DerivedType
+!> @ingroup Data_Type_TimeDerivedType
 type, public:: Type_Time
-  integer(I_P) Days    !< Number of days.
-  integer(I_P) Hours   !< Number of hours.
-  integer(I_P) Minutes !< Number of minutes.
-  real(R_P)    Seconds !< Number of seconds.
+  integer(I4P) Days    !< Number of days.
+  integer(I4P) Hours   !< Number of hours.
+  integer(I4P) Minutes !< Number of minutes.
+  real(R8P)    Seconds !< Number of seconds.
   contains
     procedure, non_overridable:: sec2time ! Procedure for converting seconds to Type_Time format.
 endtype Type_Time
+!> @ingroup Data_Type_TimePrivateVarPar
 real(R8P):: inst0 = 0._R8P !< The Crono starting instant used for profing the code.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @brief Not-equal-to boolean operator (/=) overloading.
-!> @ingroup Interface
+!> @ingroup Data_Type_TimeInterface
 interface operator (/=)
   module procedure not_eq
 endinterface
 !> @brief Lower-than boolean operator (<) overloading.
-!> @ingroup Interface
+!> @ingroup Data_Type_TimeInterface
 interface operator (<)
   module procedure low
 endinterface
 !> @brief Lower-equal-than boolean operator (<=) overloading.
-!> @ingroup Interface
+!> @ingroup Data_Type_TimeInterface
 interface operator (<=)
   module procedure low_eq
 endinterface
 !> @brief Equal-to boolean operator (==) overloading.
-!> @ingroup Interface
+!> @ingroup Data_Type_TimeInterface
 interface operator (==)
   module procedure eq
 endinterface
 !> @brief Higher-equal-than boolean operator (>=) overloading.
-!> @ingroup Interface
+!> @ingroup Data_Type_TimeInterface
 interface operator (>=)
   module procedure great_eq
 endinterface
 !> @brief Higher-than boolean operator (>) overloading.
-!> @ingroup Interface
+!> @ingroup Data_Type_TimeInterface
 interface operator (>)
   module procedure great
 endinterface
@@ -88,7 +104,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Time), intent(INOUT):: Time    !< Time in days,hours,minutes,seconds format.
-  real(R_P),        intent(IN)::    seconds !< Number of seconds.
+  real(R8P),        intent(IN)::    seconds !< Number of seconds.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -299,7 +315,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   character(20):: Date_String                  !< String with actual date.
-  integer(I_P)::  Date_Integer(1:8)            !< Integer array for handling the date.
+  integer(I4P)::  Date_Integer(1:8)            !< Integer array for handling the date.
   character(4)::  Year                         !< Dummy variable for year string.
   character(2)::  Day,Month,Hour,Minute,Second !< Dummies variables for day, month, hour, minute and second strings.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -325,7 +341,7 @@ contains
   elemental function Seconds_To_Time(seconds) result(Time)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R_P), intent(IN):: seconds !< Number of seconds.
+  real(R8P), intent(IN):: seconds !< Number of seconds.
   type(Type_Time)::       Time    !< Time in days,hours,minutes,seconds format.
   !---------------------------------------------------------------------------------------------------------------------------------
 

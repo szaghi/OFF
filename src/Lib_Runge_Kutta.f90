@@ -1,3 +1,8 @@
+!> @ingroup Library
+!> @{
+!> @defgroup Lib_Runge_KuttaLibrary Lib_Runge_Kutta
+!> @}
+
 !> @ingroup GlobalVarPar
 !> @{
 !> @defgroup GvarLib_Runge_Kutta Lib_Runge_Kutta
@@ -38,7 +43,7 @@
 !> details.
 !>
 !> @todo \b RK-implicit: Implement (semi)-implicit schemes.
-!> @ingroup Library
+!> @ingroup Lib_Runge_KuttaLibrary
 module Lib_Runge_Kutta
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision           ! Integers and reals precision definition.

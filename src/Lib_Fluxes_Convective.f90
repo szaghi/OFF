@@ -1,3 +1,8 @@
+!> @ingroup Library
+!> @{
+!> @defgroup Lib_Fluxes_ConvectiveLibrary Lib_Fluxes_Convective
+!> @}
+
 !> @ingroup PublicProcedure
 !> @{
 !> @defgroup Lib_Fluxes_ConvectivePublicProcedure Lib_Fluxes_Convective
@@ -12,11 +17,13 @@
 !> This is a library module.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
 !> @todo \b RotatedRieman: Implement Rotated Rieman Solver technique
-!> @ingroup Library
+!> @ingroup Lib_Fluxes_ConvectiveLibrary
 module Lib_Fluxes_Convective
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                              ! Integers and reals precision definition.
+USE Data_Type_Cell                                            ! Definition of Type_Cell.
 USE Data_Type_Conservative                                    ! Definition of Type_Conservative.
+USE Data_Type_Face                                            ! Definition of Type_Face.
 USE Data_Type_Primitive                                       ! Definition of Type_Primitive.
 USE Data_Type_Vector                                          ! Definition of Type_Vector.
 USE Lib_Riemann, only: &
@@ -81,7 +88,7 @@ contains
   !>  - Ns+3) density                 (r=sum(rs))
   !>  - Ns+4) specific heats ratio    (g)
   !> @ingroup Lib_Fluxes_ConvectivePublicProcedure
-  subroutine fluxes_convective(gc,N,Ns,cp0,cv0,NF,P,F)
+  subroutine fluxes_convective(gc,N,Ns,cp0,cv0,F,C,Fl)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I1P),            intent(IN)::    gc                         !< Number of ghost cells used.
@@ -89,9 +96,9 @@ contains
   integer(I_P),            intent(IN)::    Ns                         !< Number of species.
   real(R_P),               intent(IN)::    cp0(1:Ns)                  !< Initial specific heat cp.
   real(R_P),               intent(IN)::    cv0(1:Ns)                  !< Initial specific heat cv.
-  type(Type_Vector),       intent(IN)::    NF (           0-gc:     ) !< Interface normal versor         [0-gc:N+gc].
-  type(Type_Primitive),    intent(IN)::    P  (           1-gc:     ) !< Primitive variables (3D format) [1-gc:N+gc].
-  type(Type_Conservative), intent(INOUT):: F  (              0:     ) !< Convective fluxes (3D format)   [   0:N   ].
+  type(Type_Face),         intent(IN)::    F  (           0-gc:     ) !< Faces data [0-gc:N+gc].
+  type(Type_Cell),         intent(IN)::    C  (           1-gc:     ) !< Cells data [1-gc:N+gc].
+  type(Type_Conservative), intent(INOUT):: Fl (              0:     ) !< Convective fluxes (3D format)   [   0:N   ].
   type(Type_Vector)::                      ut (       1:2,1-gc:N+gc ) !< Tangential velocity: left (1) and right (2) interfaces.
 #ifdef LMA
   real(R_P)::                              ulma(1:2)                  !< Left (1) and right (2) reconstructed normal speed adjusted
@@ -112,24 +119,24 @@ contains
     do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
       if (i==1-gc.AND.j==1) cycle
       if (i==N+gc.AND.j==2) cycle
-      ut(j,i) = P(i)%v - (P(i)%v.paral.NF(i+j-2)) ! ut
+      ut(j,i) = C(i)%P%v - (C(i)%P%v.paral.F(i+j-2)%N) ! ut
     enddo
   enddo
   ! computing the left and right states or Riemann Problems
   select case(gc)
   case(2_I1P,3_I1P,4_I1P) ! 3rd, 5th or 7th order WENO reconstruction
     ! computing the reconstruction
-    call preconstruct_n(gc=gc,N=N,Ns=Ns,cp0=cp0,cv0=cv0,NF=NF,P=P,PR=PR)
+    call preconstruct_n(gc=gc,N=N,Ns=Ns,cp0=cp0,cv0=cv0,F=F,C=C,PR=PR)
   case(1_I1P) ! 1st order piecewise constant reconstruction
     do i=0,N+1
       do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
         if (i==0  .AND.j==1) cycle
         if (i==N+1.AND.j==2) cycle
-        PR(1:Ns,j,i) =  P(i)%r(1:Ns)          ! rs
-        PR(Ns+1,j,i) = (P(i)%v.dot.NF(i+j-2)) ! un
-        PR(Ns+2,j,i) =  P(i)%p                ! p
-        PR(Ns+3,j,i) =  P(i)%d                ! r
-        PR(Ns+4,j,i) =  P(i)%g                ! g
+        PR(1:Ns,j,i) =  C(i)%P%r(1:Ns)           ! rs
+        PR(Ns+1,j,i) = (C(i)%P%v.dot.F(i+j-2)%N) ! un
+        PR(Ns+2,j,i) =  C(i)%P%p                 ! p
+        PR(Ns+3,j,i) =  C(i)%P%d                 ! r
+        PR(Ns+4,j,i) =  C(i)%P%g                 ! g
       enddo
     enddo
   endselect
@@ -168,13 +175,13 @@ contains
                      F_E = F_E)
     ! uptdating fluxes with tangential components
     if (F_r>0._R_P) then
-      F(i)%rs = F_r*PR(1:Ns,2,i  )/PR(Ns+3,2,i  )
-      F(i)%rv = F_u*NF(i) + F_r*ut(2,i)
-      F(i)%re = F_E + F_r*sq_norm(ut(2,i))*0.5_R_P
+      Fl(i)%rs = F_r*PR(1:Ns,2,i  )/PR(Ns+3,2,i  )
+      Fl(i)%rv = F_u*F(i)%N + F_r*ut(2,i)
+      Fl(i)%re = F_E + F_r*sq_norm(ut(2,i))*0.5_R_P
     else
-      F(i)%rs = F_r*PR(1:Ns,1,i+1)/PR(Ns+3,1,i+1)
-      F(i)%rv = F_u*NF(i) + F_r*ut(1,i+1)
-      F(i)%re = F_E + F_r*sq_norm(ut(1,i+1))*0.5_R_P
+      Fl(i)%rs = F_r*PR(1:Ns,1,i+1)/PR(Ns+3,1,i+1)
+      Fl(i)%rv = F_u*F(i)%N + F_r*ut(1,i+1)
+      Fl(i)%re = F_E + F_r*sq_norm(ut(1,i+1))*0.5_R_P
     endif
   enddo
   return
@@ -182,28 +189,28 @@ contains
   contains
     !> Subroutine for reconstructing primitive variables along direction "NF".
     !> @ingroup Lib_Fluxes_ConvectivePrivateProcedure
-    pure subroutine preconstruct_n(gc,N,Ns,cp0,cv0,NF,P,PR)
+    pure subroutine preconstruct_n(gc,N,Ns,cp0,cv0,F,C,PR)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I1P),         intent(IN)::  gc                                !< Number of ghost cells used.
-    integer(I_P),         intent(IN)::  N                                 !< Number of cells.
-    integer(I_P),         intent(IN)::  Ns                                !< Number of species.
-    real(R_P),            intent(IN)::  cp0(1:Ns)                         !< Initial specific heat cp.
-    real(R_P),            intent(IN)::  cv0(1:Ns)                         !< Initial specific heat cv.
-    type(Type_Vector),    intent(IN)::  NF (                  0-gc: N+gc) !< Interface normal       [0-gc:N+gc].
-    type(Type_Primitive), intent(IN)::  P  (                  1-gc: N+gc) !< 3D primitive variables [1-gc:N+gc].
-    real(R_P),            intent(OUT):: PR (1:Ns+4,       1:2,   0: N+1 ) !< Reconstructed interface values 1D primitive variables.
-    real(R_P)::                         P1D(1:Ns+2,       1:2,1-gc:-1+gc) !< 1D primitive variables at interfaces.
+    integer(I1P),    intent(IN)::  gc                                !< Number of ghost cells used.
+    integer(I_P),    intent(IN)::  N                                 !< Number of cells.
+    integer(I_P),    intent(IN)::  Ns                                !< Number of species.
+    real(R_P),       intent(IN)::  cp0(1:Ns)                         !< Initial specific heat cp.
+    real(R_P),       intent(IN)::  cv0(1:Ns)                         !< Initial specific heat cv.
+    type(Type_Face), intent(IN)::  F  (                  0-gc: N+gc) !< Faces data [0-gc:N+gc].
+    type(Type_Cell), intent(IN)::  C  (                  1-gc: N+gc) !< Cells data [1-gc:N+gc].
+    real(R_P),       intent(OUT):: PR (1:Ns+4,       1:2,   0: N+1 ) !< Reconstructed interface values 1D primitive variables.
+    real(R_P)::                    P1D(1:Ns+2,       1:2,1-gc:-1+gc) !< 1D primitive variables at interfaces.
 #ifdef RECVC
-    real(R_P)::                         Pm (1:Ns+4                      ) !< Mean of primitive variables across interfaces.
-    real(R_P)::                         LPm(1:Ns+2,1:Ns+2,1:2           ) !< Mean left eigenvectors matrix.
-    real(R_P)::                         RPm(1:Ns+2,1:Ns+2,1:2           ) !< Mean right eigenvectors matrix.
-    real(R_P)::                         C  (1:Ns+2,       1:2,1-gc:-1+gc) !< Interface value of characteristic variables.
-    real(R_P)::                         CR (1:Ns+2,       1:2           ) !< Reconstructed interface value of charac. variables.
+    real(R_P)::                    Pm (1:Ns+4                      ) !< Mean of primitive variables across interfaces.
+    real(R_P)::                    LPm(1:Ns+2,1:Ns+2,1:2           ) !< Mean left eigenvectors matrix.
+    real(R_P)::                    RPm(1:Ns+2,1:Ns+2,1:2           ) !< Mean right eigenvectors matrix.
+    real(R_P)::                    CA (1:Ns+2,       1:2,1-gc:-1+gc) !< Interface value of characteristic variables.
+    real(R_P)::                    CR (1:Ns+2,       1:2           ) !< Reconstructed interface value of charac. variables.
 #endif
-    logical::                           ROR(1:2)                          !< Logical flag for testing the result of WENO reconst.
-    integer(I_P)::                      or                                !< Counter of order for ROR algorithm.
-    integer(I_P)::                      i,j,k,v                           !< Counters.
+    logical::                      ROR(1:2)                          !< Logical flag for testing the result of WENO reconst.
+    integer(I_P)::                 or                                !< Counter of order for ROR algorithm.
+    integer(I_P)::                 i,j,k,v                           !< Counters.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -213,9 +220,9 @@ contains
         do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
           if (i==0  .AND.j==1) cycle
           if (i==N+1.AND.j==2) cycle
-          P1D(1:Ns,j,k-i) =  P(k)%r(1:Ns)
-          P1D(Ns+1,j,k-i) = (P(k)%v.dot.NF(i+j-2))
-          P1D(Ns+2,j,k-i) =  P(k)%p
+          P1D(1:Ns,j,k-i) =  C(k)%P%r(1:Ns)
+          P1D(Ns+1,j,k-i) = (C(k)%P%v.dot.F(i+j-2)%N)
+          P1D(Ns+2,j,k-i) =  C(k)%P%p
         enddo
       enddo
 #ifdef RECVC
@@ -224,11 +231,11 @@ contains
         if (i==0  .AND.j==1) cycle
         if (i==N+1.AND.j==2) cycle
         ! computing mean of primitive variables across the interface
-        Pm(1:Ns) = 0.5_R_P*( P(i+j-1)%r(1:NS)          +  P(i+j-2)%r(1:NS)         ) ! rs
-        Pm(Ns+1) = 0.5_R_P*((P(i+j-1)%v.dot.NF(i+j-2)) + (P(i+j-2)%v.dot.NF(i+j-2))) ! un
-        Pm(Ns+2) = 0.5_R_P*( P(i+j-1)%p                +  P(i+j-2)%p               ) ! p
-        Pm(Ns+3) = 0.5_R_P*( P(i+j-1)%d                +  P(i+j-2)%d               ) ! r
-        Pm(Ns+4) = 0.5_R_P*( P(i+j-1)%g                +  P(i+j-2)%g               ) ! g
+        Pm(1:Ns) = 0.5_R_P*( C(i+j-1)%P%r(1:NS)           +  C(i+j-2)%P%r(1:NS)          ) ! rs
+        Pm(Ns+1) = 0.5_R_P*((C(i+j-1)%P%v.dot.F(i+j-2)%N) + (C(i+j-2)%P%v.dot.F(i+j-2)%N)) ! un
+        Pm(Ns+2) = 0.5_R_P*( C(i+j-1)%P%p                 +  C(i+j-2)%P%p                ) ! p
+        Pm(Ns+3) = 0.5_R_P*( C(i+j-1)%P%d                 +  C(i+j-2)%P%d                ) ! r
+        Pm(Ns+4) = 0.5_R_P*( C(i+j-1)%P%g                 +  C(i+j-2)%P%g                ) ! g
         ! computing mean left and right eigenvectors matrix across the interface
         LPm(1:Ns+2,1:Ns+2,j) = LP(Ns,Pm(1:Ns+4))
         RPm(1:Ns+2,1:Ns+2,j) = RP(Ns,Pm(1:Ns+4))
@@ -239,7 +246,7 @@ contains
           if (i==0  .AND.j==1) cycle
           if (i==N+1.AND.j==2) cycle
           do v=1,Ns+2
-            C(v,j,k-i) = dot_product(LPm(v,1:Ns+2,j),P1D(1:Ns+2,j,k-i))
+            CA(v,j,k-i) = dot_product(LPm(v,1:Ns+2,j),P1D(1:Ns+2,j,k-i))
           enddo
         enddo
       enddo
@@ -250,7 +257,7 @@ contains
 #ifdef RECVC
         do v=1,Ns+2
           !CR(v,1:2) = weno(S=or,V=C(v,1:2,1-or:-1+or))
-          call weno(S=or,V=C(v,1:2,1-or:-1+or),VR=CR(v,1:2))
+          call weno(S=or,V=CA(v,1:2,1-or:-1+or),VR=CR(v,1:2))
         enddo
         ! trasforming local reconstructed characteristic variables to primitive ones
         do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
@@ -272,9 +279,9 @@ contains
 #ifdef PPL
         ! applaying the maximum-principle-satisfying limiter to the reconstructed densities and pressure
         do v=1,Ns
-          call positivity_preserving_limiter(o = or, vmean = P(i)%r(v), vr = PR(v,1:2,i)) ! densities
+          call positivity_preserving_limiter(o = or, vmean = C(i)%P%r(v), vr = PR(v,1:2,i)) ! densities
         enddo
-        call positivity_preserving_limiter(o = or, vmean = P(i)%p, vr = PR(Ns+2,1:2,i))   ! pressure
+        call positivity_preserving_limiter(o = or, vmean = C(i)%P%p, vr = PR(Ns+2,1:2,i))   ! pressure
 #endif
         ! computing the reconstructed variables of total density and specific heats ratio
         do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
@@ -296,11 +303,11 @@ contains
           do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
             if (i==0  .AND.j==1) cycle
             if (i==N+1.AND.j==2) cycle
-            PR(1:Ns,j,i) =  P(i)%r(1:Ns)          ! rs
-            PR(Ns+1,j,i) = (P(i)%v.dot.NF(i+j-2)) ! un
-            PR(Ns+2,j,i) =  P(i)%p                ! p
-            PR(Ns+3,j,i) =  P(i)%d                ! r
-            PR(Ns+4,j,i) =  P(i)%g                ! g
+            PR(1:Ns,j,i) =  C(i)%P%r(1:Ns)           ! rs
+            PR(Ns+1,j,i) = (C(i)%P%v.dot.F(i+j-2)%N) ! un
+            PR(Ns+2,j,i) =  C(i)%P%p                 ! p
+            PR(Ns+3,j,i) =  C(i)%P%d                 ! r
+            PR(Ns+4,j,i) =  C(i)%P%g                 ! g
           enddo
         endif
       enddo ROR_check

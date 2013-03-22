@@ -1,5 +1,15 @@
-!> This module contains the definition of Thermodynamic Laws for ideal calorically perfect gas.
 !> @ingroup Library
+!> @{
+!> @defgroup Lib_Thermodynamic_Laws_IdealLibrary Lib_Thermodynamic_Laws_Ideal
+!> @}
+
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Lib_Thermodynamic_Laws_IdealPublicProcedure Lib_Thermodynamic_Laws_Ideal
+!> @}
+
+!> This module contains the definition of Thermodynamic Laws for ideal calorically perfect gas.
+!> @ingroup Lib_Thermodynamic_Laws_IdealLibrary
 module Lib_Thermodynamic_Laws_Ideal
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision ! Definition of integers and reals precision.
@@ -15,6 +25,8 @@ public:: E
 public:: H
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @ingroup Lib_Thermodynamic_Laws_IdealPublicProcedure
+  !> @{
   !> Function for computing the pressure for an ideal calorically perfect gas.
   elemental function p(r,a,g) result(pressure)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -100,4 +112,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction H
+  !> @}
 endmodule Lib_Thermodynamic_Laws_Ideal

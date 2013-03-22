@@ -1,3 +1,18 @@
+!> @ingroup Library
+!> @{
+!> @defgroup Lib_RiemannLibrary Lib_Riemann
+!> @}
+
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Lib_RiemannPublicProcedure Lib_Riemann
+!> @}
+
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Lib_RiemannPrivateProcedure Lib_Riemann
+!> @}
+
 !> This module contains procedures for computing the solution of the Riemann Problem for the Euler's conservation laws.
 !> This is a library module.
 !> The Riemann Problem solvers provide as solution the convective fluxes
@@ -12,7 +27,7 @@
 !> where \f$p_1,\rho_1,u_1,\gamma_1\f$ define the left state, \f$p_4,\rho_4,u_4,\gamma_4\f$ define the right state and \f$F_r\f$,
 !> \f$F_u\f$ and \f$F_E\f$ are the convective fluxes of mass, momentum and energy conservation, respectively.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
-!> @ingroup Library
+!> @ingroup Lib_RiemannLibrary
 module Lib_Riemann
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                             ! precision of integers and reals
@@ -43,6 +58,8 @@ public:: Riem_Solver_Exact_U
 real(R_P), parameter:: toll = 1.D-10 ! Tollerance.
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @ingroup Lib_RiemannPrivateProcedure
+  !> @{
   ! auxiliary subroutines
   elemental subroutine fluxes(p,r,u,g,F_r,F_u,F_E)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -770,7 +787,10 @@ contains
   return
   !--------------------------------------------------------------------------------------------------------------------------------
   endfunction Harten_limiter
+  !> @}
 
+  !> @ingroup Lib_RiemannPublicProcedure
+  !> @{
   ! subroutines for evaluating the smoothness of cell or interface
   !> Function for evaluating the smoothness of an interface using a Riemann solver-like algorithm.
   function chk_smooth_z(p1,r1,u1,g1,p4,r4,u4,g4) result(smooth)
@@ -912,7 +932,10 @@ contains
   return
   !-------------------------------------------------------------------------------------------------------------------------------
   endfunction chk_smooth_liu
+  !> @}
 
+  !> @ingroup Lib_RiemannPrivateProcedure
+  !> @{
   ! subroutines for evaluating intermediate states
   elemental subroutine PVL_u23(p1,r1,u1,a1,p4,r4,u4,a4,u23)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1777,7 +1800,10 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Z_WavesSpeed14
+  !> @}
 
+  !> @ingroup Lib_RiemannPublicProcedure
+  !> @{
   ! Riemann Solvers
   !> Approximate Riemann solver based on (local) Lax-Friedrichs (known also as Rusanov) algorithm.
   elemental subroutine Riem_Solver_LaxFriedrichs(p1,r1,u1,g1,p4,r4,u4,g4,F_r,F_u,F_E)
@@ -2409,4 +2435,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine Riem_Solver_Exact_U
+  !> @}
 endmodule Lib_Riemann

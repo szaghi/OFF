@@ -550,12 +550,16 @@ PRINTINFO:
 	@echo | tee make.log
 	@echo -e $(PRINTCHK) | tee -a make.log
 	@echo | tee -a make.log
-	@echo -e '\033[1;31m Compiling options\033[0m' | tee -a make.log
-	@echo -e '\033[1m [$(OPTSC)]\033[0m' | tee -a make.log
+	@echo -e "\033[1;31m Compiling options\033[0m" | tee -a make.log
+	@echo -e "\033[1m [$(OPTSC)]\033[0m" | tee -a make.log
 	@echo | tee -a make.log
-	@echo -e '\033[1;31m Linking options \033[0m' | tee -a make.log
-	@echo -e '\033[1m [$(OPTSL)]\033[0m' | tee -a make.log
+	@echo -e "\033[1;31m Linking options \033[0m" | tee -a make.log
+	@echo -e "\033[1m [$(OPTSL)]\033[0m" | tee -a make.log
 	@echo | tee -a make.log
+
+.PHONY : $(MKDIRS)
+$(MKDIRS):
+	@mkdir -p $@
 
 .PHONY : cleanobj
 cleanobj:
@@ -587,7 +591,7 @@ cleanall: clean cleanexe
 tar: cleanall
 	@echo -e "\033[1;31m Creating tar archive of the code \033[0m" | tee make.log
 	@mkdir -p OFF
-	@cp -rL input lib util src makefile OFF/
+	@cp -rL inputs-template lib util src makefile OFF/
 	@tar czf OFF.tgz OFF
 	@rm -rf OFF
 
@@ -595,10 +599,6 @@ tar: cleanall
 doc:
 	@echo -e "\033[1;31m Building documentation\033[0m" | tee make.log
 	@doxygen .doxygenconfig
-
-.PHONY : $(MKDIRS)
-$(MKDIRS):
-	@mkdir -p $@
 #----------------------------------------------------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------------------------------------------------
@@ -630,18 +630,41 @@ $(DEXE)POG : PRINTINFO $(MKDIRS) $(DOBJ)pog.o
 	@$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1>> diagnostic_messages 2>> error_messages
 EXES := $(EXES) POG
 
+$(DOBJ)data_type_amrblock.o : Data_Type_AMRBlock.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_cell.o \
+	$(DOBJ)data_type_global.o \
+	$(DOBJ)data_type_hashid.o \
+	$(DOBJ)data_type_hashtcell.o \
+	$(DOBJ)data_type_hashtface.o \
+	$(DOBJ)data_type_hashtnode.o \
+	$(DOBJ)data_type_vector.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
 $(DOBJ)data_type_bc.o : Data_Type_BC.f90 \
 	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_cell.o : Data_Type_Cell.f90 \
-	$(DOBJ)ir_precision.o
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_conservative.o \
+	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_conservative.o : Data_Type_Conservative.f90 \
 	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_vector.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_face.o : Data_Type_Face.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_bc.o \
 	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
@@ -653,11 +676,30 @@ $(DOBJ)data_type_global.o : Data_Type_Global.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-$(DOBJ)data_type_octant.o : Data_Type_Octant.f90 \
+$(DOBJ)data_type_hashid.o : Data_Type_HashID.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_bc.o \
-	$(DOBJ)data_type_global.o \
-	$(DOBJ)data_type_sblock.o
+	$(DOBJ)lib_morton.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_hashtcell.o : Data_Type_HashTCell.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_cell.o \
+	$(DOBJ)data_type_hashid.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_hashtface.o : Data_Type_HashTFace.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_face.o \
+	$(DOBJ)data_type_hashid.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_hashtnode.o : Data_Type_HashTNode.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_hashid.o \
+	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
@@ -681,7 +723,7 @@ $(DOBJ)data_type_sblock.o : Data_Type_SBlock.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_bc.o \
 	$(DOBJ)data_type_cell.o \
-	$(DOBJ)data_type_conservative.o \
+	$(DOBJ)data_type_face.o \
 	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_primitive.o \
 	$(DOBJ)data_type_vector.o \
@@ -727,7 +769,9 @@ $(DOBJ)ir_precision.o : IR_Precision.f90
 $(DOBJ)lib_fluidynamic.o : Lib_Fluidynamic.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_bc.o \
+	$(DOBJ)data_type_cell.o \
 	$(DOBJ)data_type_conservative.o \
+	$(DOBJ)data_type_face.o \
 	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_primitive.o \
 	$(DOBJ)data_type_sblock.o \
@@ -747,7 +791,9 @@ $(DOBJ)lib_fluidynamic.o : Lib_Fluidynamic.f90 \
 
 $(DOBJ)lib_fluxes_convective.o : Lib_Fluxes_Convective.f90 \
 	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_cell.o \
 	$(DOBJ)data_type_conservative.o \
+	$(DOBJ)data_type_face.o \
 	$(DOBJ)data_type_primitive.o \
 	$(DOBJ)data_type_vector.o \
 	$(DOBJ)lib_riemann.o \
@@ -759,7 +805,6 @@ $(DOBJ)lib_fluxes_convective.o : Lib_Fluxes_Convective.f90 \
 $(DOBJ)lib_fluxes_diffusive.o : Lib_Fluxes_Diffusive.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_conservative.o \
-	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_primitive.o \
 	$(DOBJ)data_type_sblock.o \
 	$(DOBJ)data_type_tensor.o \
@@ -776,6 +821,11 @@ $(DOBJ)lib_io_misc.o : Lib_IO_Misc.f90 \
 $(DOBJ)lib_math.o : Lib_Math.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_vector.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_morton.o : Lib_Morton.f90 \
+	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
@@ -838,13 +888,13 @@ $(DOBJ)lib_vtk_io.o : Lib_VTK_IO.f90 \
 
 $(DOBJ)lib_weno.o : Lib_WENO.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_sblock.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)off.o : OFF.f90 \
 	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_amrblock.o \
 	$(DOBJ)data_type_bc.o \
 	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_os.o \
@@ -854,13 +904,14 @@ $(DOBJ)off.o : OFF.f90 \
 	$(DOBJ)data_type_tensor.o \
 	$(DOBJ)data_type_time.o \
 	$(DOBJ)lib_fluidynamic.o \
-	$(DOBJ)lib_runge_kutta.o \
-	$(DOBJ)lib_math.o \
 	$(DOBJ)lib_io_misc.o \
+	$(DOBJ)lib_math.o \
 	$(DOBJ)lib_profiling.o \
+	$(DOBJ)lib_runge_kutta.o \
 	$(DOBJ)lib_weno.o \
 	$(DOBJ)lib_parallel.o \
-	$(DOBJ)lib_parallel.o
+	$(DOBJ)lib_morton.o \
+	$(DOBJ)data_type_hashid.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 

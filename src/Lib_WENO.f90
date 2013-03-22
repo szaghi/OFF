@@ -1,3 +1,8 @@
+!> @ingroup Library
+!> @{
+!> @defgroup Lib_WENOLibrary Lib_WENO
+!> @}
+
 !> @ingroup PrivateVarPar
 !> @{
 !> @defgroup Lib_WENOPrivateVarPar Lib_WENO
@@ -15,11 +20,10 @@
 
 !> This module contains the definition of procedures for computing WENO reconstruction with a user-defined \f$P^{th}\f$ order.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
-!> @ingroup Library
+!> @ingroup Lib_WENOLibrary
 module Lib_WENO
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision       ! Integers and reals precision definition.
-USE Data_Type_Global   ! Definition of Type_Global.
 USE Data_Type_SBlock   ! Definition of Type_SBlock.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -50,13 +54,12 @@ contains
   !> @ingroup Lib_WENOPublicProcedure
   !> @{
   !> @brief Subroutine for initialization of WENO coefficients.
-  subroutine weno_init(global,block,S)
+  subroutine weno_init(block,S)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global), intent(IN):: global             !< Global-level data.
-  type(Type_SBlock), intent(IN):: block(1:global%Nb) !< Block-level data.
-  integer(I1P),      intent(IN):: S                  !< Number of stencils used.
-  integer(I_P)::                  b                  !< Blocks counter.
+  type(Type_SBlock), intent(IN):: block(1:) !< Block-level data.
+  integer(I1P),      intent(IN):: S         !< Number of stencils used.
+  integer(I_P)::                  b         !< Blocks counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -67,11 +70,11 @@ contains
   weno_odd = mod(S,2_I1P)
   ! computing a reasonable value of weno_eps according to the (finest) grid spacing
   weno_eps = MaxR_P
-  do b=1,global%Nb
+  do b=1,block(1)%global%Nb
     call get_min_sstep(block = block(b), ss = weno_eps)
   enddo
   weno_eps = weno_eps**(3_I1P*S-4_I1P)
-  if (global%myrank==0) then
+  if (block(1)%global%myrank==0) then
     write(*,'(A)')           '----------------------------------------------------------------------'
     write(*,'(A,'//FR_P//')')' The "eps" WENO parameter used is: ',weno_eps
     write(*,'(A,'//FI_P//')')' The "exp" WENO parameter used is: ',weno_exp
@@ -297,7 +300,7 @@ contains
 
   !> @brief Subroutine for computing central difference reconstruction of \f$2S^{th}\f$ order instead of WENO \f$2S^{th}-1\f$ one.
   !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b V and \b VR are declared as
-  !> assumed-shape with only the lower bound defined. Their extentions are: V [1:2,0:2*S], VR [1:2].
+  !> assumed-shape with only the lower bound defined. Their extensions are: V [1:2,0:2*S], VR [1:2].
   pure subroutine noweno_central(S,V,VR)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -322,7 +325,7 @@ contains
   !> @brief Subroutine for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of
   !> \f$2S^{th}-1\f$ order.
   !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b V and \b VR are declared as
-  !> assumed-shape with only the lower bound defined. Their extentions are: V [1:2,1-S:-1+S], VR [1:2].
+  !> assumed-shape with only the lower bound defined. Their extensions are: V [1:2,1-S:-1+S], VR [1:2].
   pure subroutine weno_optimal(S,V,VR)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -346,7 +349,7 @@ contains
 
   !> @brief Subroutine for computing WENO reconstruction of \f$2S^{th}-1\f$ order.
   !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b V and \b VR are declared as
-  !> assumed-shape with only the lower bound defined. Their extentions are: V [1:2,1-S:-1+S], VR [1:2].
+  !> assumed-shape with only the lower bound defined. Their extensions are: V [1:2,1-S:-1+S], VR [1:2].
   pure subroutine weno(S,V,VR)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -373,7 +376,7 @@ contains
   !> @{
   !> @brief Subroutine for computing WENO polynomials.
   !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b V and \b VP are declared as
-  !> assumed-shape with only the lower bound defined. Their extentions are: V [1:2,1-S:-1+S], VP [1:2,0:S-1].
+  !> assumed-shape with only the lower bound defined. Their extensions are: V [1:2,1-S:-1+S], VP [1:2,0:S-1].
   pure subroutine weno_polynomials(S,V,VP)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -399,7 +402,7 @@ contains
 
   !> @brief Subroutine for computing WENO weights of the polynomial reconstructions.
   !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b V and \b w are declared as
-  !> assumed-shape with only the lower bound defined. Their extentions are: V [1:2,1-S:-1+S], w [1:2,0:S-1].
+  !> assumed-shape with only the lower bound defined. Their extensions are: V [1:2,1-S:-1+S], w [1:2,0:S-1].
   pure subroutine weno_weights(S,V,w)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -407,8 +410,8 @@ contains
   real(R_P),    intent(IN)::  V    (1:,1-S:)   !< Variable to be reconstructed [1:2,1-S:-1+S].
   real(R_P),    intent(OUT):: w    (1:,0:)     !< Weights of the stencils      [1:2,  0:S-1 ].
   real(R_P)::                 IS   (1:2,0:S-1) !< Smoothness indicators of the stencils.
-  real(R_P)::                 a    (1:2,0:S-1) !< Alpha coifficients for the weights.
-  real(R_P)::                 a_tot(1:2)       !< Summ of the alpha coefficients.
+  real(R_P)::                 a    (1:2,0:S-1) !< Alpha coefficients for the weights.
+  real(R_P)::                 a_tot(1:2)       !< Sum of the alpha coefficients.
 #ifdef WENOZ
   real(R_P)::                 tao  (1:2)       !< Normalization factor.
 #endif
@@ -482,7 +485,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine weno_weights
 
-  !> @brief Function for computing the WENO convulution of the polynomial recontructions.
+  !> @brief Function for computing the WENO convolution of the polynomial reconstructions.
   !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b VP \b w and \b VR are declared as
   !> assumed-shape with only the lower bound defined. Their extentions are: VP [1:2,0:S-1], w [1:2,0:S-1], V [1:2].
   pure subroutine weno_convolution(S,VP,w,VR)

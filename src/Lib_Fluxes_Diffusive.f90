@@ -1,3 +1,8 @@
+!> @ingroup Library
+!> @{
+!> @defgroup Lib_Fluxes_DiffusiveLibrary Lib_Fluxes_Diffusive
+!> @}
+
 !> @ingroup PublicProcedure
 !> @{
 !> @defgroup Lib_Fluxes_DiffusivePublicProcedure Lib_Fluxes_Diffusive
@@ -11,12 +16,11 @@
 !> This module contains the definition of procedures for computing diffusive fluxes (parabolic operator).
 !> This is a library module.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
-!> @ingroup Library
+!> @ingroup Lib_Fluxes_DiffusiveLibrary
 module Lib_Fluxes_Diffusive
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision           ! Integers and reals precision definition.
 USE Data_Type_Conservative ! Definition of Type_Conservative.
-USE Data_Type_Global       ! Definition of Type_Global.
 USE Data_Type_Primitive    ! Definition of Type_Primitive.
 USE Data_Type_SBlock       ! Definition of Type_SBlock.
 USE Data_Type_Tensor       ! Definition of Type_Tensor.
@@ -31,10 +35,9 @@ public:: fluxes_diffusive
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> Subroutine for computing interfaces diffusive fluxes (parabolic operator).
-  subroutine fluxes_diffusive(global,block,i,j,k,dir,F)
+  subroutine fluxes_diffusive(block,i,j,k,dir,F)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global),       intent(IN)::    global !< Global-level data.
   type(Type_SBlock),       intent(IN)::    block  !< Block-level data.
   integer(I_P),            intent(IN)::    i      !< Interface i indexe.
   integer(I_P),            intent(IN)::    j      !< Interface j indexe.
@@ -58,16 +61,16 @@ contains
   select case(dir)
   case('i')
     F%rs = 0._R_P
-    F%rv = -(tau.dot.block%NFi(i,j,k))
-    F%re = -((tau.dot.(0.5_R_P*(block%P(i,j,k)%v+block%P(i+1,j,k)%v))).dot.block%NFi(i,j,k))
+    F%rv = -(tau.dot.block%Fi(i,j,k)%N)
+    F%re = -((tau.dot.(0.5_R_P*(block%C(i,j,k)%P%v+block%C(i+1,j,k)%P%v))).dot.block%Fi(i,j,k)%N)
   case('j')
     F%rs = 0._R_P
-    F%rv = -(tau.dot.block%NFj(i,j,k))
-    F%re = -((tau.dot.(0.5_R_P*(block%P(i,j,k)%v+block%P(i,j+1,k)%v))).dot.block%NFj(i,j,k))
+    F%rv = -(tau.dot.block%Fj(i,j,k)%N)
+    F%re = -((tau.dot.(0.5_R_P*(block%C(i,j,k)%P%v+block%C(i,j+1,k)%P%v))).dot.block%Fj(i,j,k)%N)
   case('k')
     F%rs = 0._R_P
-    F%rv = -(tau.dot.block%NFk(i,j,k))
-    F%re = -((tau.dot.(0.5_R_P*(block%P(i,j,k)%v+block%P(i,j,k+1)%v))).dot.block%NFk(i,j,k))
+    F%rv = -(tau.dot.block%Fk(i,j,k)%N)
+    F%re = -((tau.dot.(0.5_R_P*(block%C(i,j,k)%P%v+block%C(i,j,k+1)%P%v))).dot.block%Fk(i,j,k)%N)
   endselect
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -87,26 +90,26 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     select case(dir)
     case('i')
-      NFS(1) = 0.5_R_P*(block%Si(i,j  ,k  )*block%NFi(i,j  ,k  ) + block%Si(i-1,j  ,k  )*block%NFi(i-1,j  ,k  ))
-      NFS(2) = 0.5_R_P*(block%Si(i,j  ,k  )*block%NFi(i,j  ,k  ) + block%Si(i+1,j  ,k  )*block%NFi(i+1,j  ,k  ))
-      NFS(3) = 0.5_R_P*(block%Sj(i,j-1,k  )*block%NFj(i,j-1,k  ) + block%Sj(i+1,j-1,k  )*block%NFj(i+1,j-1,k  ))
-      NFS(4) = 0.5_R_P*(block%Sj(i,j  ,k  )*block%NFj(i,j  ,k  ) + block%Sj(i+1,j  ,k  )*block%NFj(i+1,j  ,k  ))
-      NFS(5) = 0.5_R_P*(block%Sk(i,j  ,k-1)*block%NFk(i,j  ,k-1) + block%Sk(i+1,j  ,k-1)*block%NFk(i+1,j  ,k-1))
-      NFS(6) = 0.5_R_P*(block%Sk(i,j  ,k  )*block%NFk(i,j  ,k  ) + block%Sk(i+1,j  ,k  )*block%NFk(i+1,j  ,k  ))
+      NFS(1) = 0.5_R_P*(block%Fi(i,j  ,k  )%S*block%Fi(i,j  ,k  )%N + block%Fi(i-1,j  ,k  )%S*block%Fi(i-1,j  ,k  )%N)
+      NFS(2) = 0.5_R_P*(block%Fi(i,j  ,k  )%S*block%Fi(i,j  ,k  )%N + block%Fi(i+1,j  ,k  )%S*block%Fi(i+1,j  ,k  )%N)
+      NFS(3) = 0.5_R_P*(block%Fj(i,j-1,k  )%S*block%Fj(i,j-1,k  )%N + block%Fj(i+1,j-1,k  )%S*block%Fj(i+1,j-1,k  )%N)
+      NFS(4) = 0.5_R_P*(block%Fj(i,j  ,k  )%S*block%Fj(i,j  ,k  )%N + block%Fj(i+1,j  ,k  )%S*block%Fj(i+1,j  ,k  )%N)
+      NFS(5) = 0.5_R_P*(block%Fk(i,j  ,k-1)%S*block%Fk(i,j  ,k-1)%N + block%Fk(i+1,j  ,k-1)%S*block%Fk(i+1,j  ,k-1)%N)
+      NFS(6) = 0.5_R_P*(block%Fk(i,j  ,k  )%S*block%Fk(i,j  ,k  )%N + block%Fk(i+1,j  ,k  )%S*block%Fk(i+1,j  ,k  )%N)
     case('j')
-      NFS(1) = 0.5_R_P*(block%Sj(i  ,j,k  )*block%NFj(i  ,j,k  ) + block%Sj(i  ,j-1,k  )*block%NFj(i  ,j-1,k  ))
-      NFS(2) = 0.5_R_P*(block%Sj(i  ,j,k  )*block%NFj(i  ,j,k  ) + block%Sj(i  ,j+1,k  )*block%NFj(i  ,j+1,k  ))
-      NFS(3) = 0.5_R_P*(block%Sk(i  ,j,k-1)*block%NFk(i  ,j,k-1) + block%Sk(i  ,j+1,k-1)*block%NFk(i  ,j+1,k-1))
-      NFS(4) = 0.5_R_P*(block%Sk(i  ,j,k  )*block%NFk(i  ,j,k  ) + block%Sk(i  ,j+1,k  )*block%NFk(i  ,j+1,k  ))
-      NFS(5) = 0.5_R_P*(block%Si(i-1,j,k  )*block%NFi(i-1,j,k  ) + block%Si(i-1,j+1,k  )*block%NFi(i-1,j+1,k  ))
-      NFS(6) = 0.5_R_P*(block%Si(i  ,j,k  )*block%NFi(i  ,j,k  ) + block%Si(i  ,j+1,k  )*block%NFi(i  ,j+1,k  ))
+      NFS(1) = 0.5_R_P*(block%Fj(i  ,j,k  )%S*block%Fj(i  ,j,k  )%N + block%Fj(i  ,j-1,k  )%S*block%Fj(i  ,j-1,k  )%N)
+      NFS(2) = 0.5_R_P*(block%Fj(i  ,j,k  )%S*block%Fj(i  ,j,k  )%N + block%Fj(i  ,j+1,k  )%S*block%Fj(i  ,j+1,k  )%N)
+      NFS(3) = 0.5_R_P*(block%Fk(i  ,j,k-1)%S*block%Fk(i  ,j,k-1)%N + block%Fk(i  ,j+1,k-1)%S*block%Fk(i  ,j+1,k-1)%N)
+      NFS(4) = 0.5_R_P*(block%Fk(i  ,j,k  )%S*block%Fk(i  ,j,k  )%N + block%Fk(i  ,j+1,k  )%S*block%Fk(i  ,j+1,k  )%N)
+      NFS(5) = 0.5_R_P*(block%Fi(i-1,j,k  )%S*block%Fi(i-1,j,k  )%N + block%Fi(i-1,j+1,k  )%S*block%Fi(i-1,j+1,k  )%N)
+      NFS(6) = 0.5_R_P*(block%Fi(i  ,j,k  )%S*block%Fi(i  ,j,k  )%N + block%Fi(i  ,j+1,k  )%S*block%Fi(i  ,j+1,k  )%N)
     case('k')
-      NFS(1) = 0.5_R_P*(block%Sk(i  ,j  ,k)*block%NFk(i  ,j  ,k) + block%Sk(i  ,j  ,k-1)*block%NFk(i  ,j  ,k-1))
-      NFS(2) = 0.5_R_P*(block%Sk(i  ,j  ,k)*block%NFk(i  ,j  ,k) + block%Sk(i  ,j  ,k+1)*block%NFk(i  ,j  ,k+1))
-      NFS(3) = 0.5_R_P*(block%Si(i-1,j  ,k)*block%NFi(i-1,j  ,k) + block%Si(i-1,j  ,k+1)*block%NFi(i-1,j  ,k+1))
-      NFS(4) = 0.5_R_P*(block%Si(i  ,j  ,k)*block%NFi(i  ,j  ,k) + block%Si(i  ,j  ,k+1)*block%NFi(i  ,j  ,k+1))
-      NFS(5) = 0.5_R_P*(block%Sj(i  ,j-1,k)*block%NFj(i  ,j-1,k) + block%Sj(i  ,j-1,k+1)*block%NFj(i  ,j-1,k+1))
-      NFS(6) = 0.5_R_P*(block%Sj(i  ,j  ,k)*block%NFj(i  ,j  ,k) + block%Sj(i  ,j  ,k+1)*block%NFj(i  ,j  ,k+1))
+      NFS(1) = 0.5_R_P*(block%Fk(i  ,j  ,k)%S*block%Fk(i  ,j  ,k)%N + block%Fk(i  ,j  ,k-1)%S*block%Fk(i  ,j  ,k-1)%N)
+      NFS(2) = 0.5_R_P*(block%Fk(i  ,j  ,k)%S*block%Fk(i  ,j  ,k)%N + block%Fk(i  ,j  ,k+1)%S*block%Fk(i  ,j  ,k+1)%N)
+      NFS(3) = 0.5_R_P*(block%Fi(i-1,j  ,k)%S*block%Fi(i-1,j  ,k)%N + block%Fi(i-1,j  ,k+1)%S*block%Fi(i-1,j  ,k+1)%N)
+      NFS(4) = 0.5_R_P*(block%Fi(i  ,j  ,k)%S*block%Fi(i  ,j  ,k)%N + block%Fi(i  ,j  ,k+1)%S*block%Fi(i  ,j  ,k+1)%N)
+      NFS(5) = 0.5_R_P*(block%Fj(i  ,j-1,k)%S*block%Fj(i  ,j-1,k)%N + block%Fj(i  ,j-1,k+1)%S*block%Fj(i  ,j-1,k+1)%N)
+      NFS(6) = 0.5_R_P*(block%Fj(i  ,j  ,k)%S*block%Fj(i  ,j  ,k)%N + block%Fj(i  ,j  ,k+1)%S*block%Fj(i  ,j  ,k+1)%N)
     endselect
     return
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -124,32 +127,32 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     select case(dir)
     case('i')
-      mean = block%P(i,j,k)%v + block%P(i+1,j,k)%v
+      mean = block%C(i,j,k)%P%v + block%C(i+1,j,k)%P%v
 
-      vel(1) = block%P(i  ,j,k)%v
-      vel(2) = block%P(i+1,j,k)%v
-      vel(3) = 0.25_R_P*(mean + block%P(i,j-1,k  )%v + block%P(i+1,j-1,k  )%v)
-      vel(4) = 0.25_R_P*(mean + block%P(i,j+1,k  )%v + block%P(i+1,j+1,k  )%v)
-      vel(5) = 0.25_R_P*(mean + block%P(i,j  ,k-1)%v + block%P(i+1,j  ,k-1)%v)
-      vel(6) = 0.25_R_P*(mean + block%P(i,j  ,k+1)%v + block%P(i+1,j  ,k+1)%v)
+      vel(1) = block%C(i  ,j,k)%P%v
+      vel(2) = block%C(i+1,j,k)%P%v
+      vel(3) = 0.25_R_P*(mean + block%C(i,j-1,k  )%P%v + block%C(i+1,j-1,k  )%P%v)
+      vel(4) = 0.25_R_P*(mean + block%C(i,j+1,k  )%P%v + block%C(i+1,j+1,k  )%P%v)
+      vel(5) = 0.25_R_P*(mean + block%C(i,j  ,k-1)%P%v + block%C(i+1,j  ,k-1)%P%v)
+      vel(6) = 0.25_R_P*(mean + block%C(i,j  ,k+1)%P%v + block%C(i+1,j  ,k+1)%P%v)
     case('j')
-      mean = block%P(i,j,k)%v + block%P(i,j+1,k)%v
+      mean = block%C(i,j,k)%P%v + block%C(i,j+1,k)%P%v
 
-      vel(1) = block%P(i,j  ,k)%v
-      vel(2) = block%P(i,j+1,k)%v
-      vel(3) = 0.25_R_P*(mean + block%P(i  ,j,k-1)%v + block%P(i  ,j+1,k-1)%v)
-      vel(4) = 0.25_R_P*(mean + block%P(i  ,j,k+1)%v + block%P(i  ,j+1,k+1)%v)
-      vel(5) = 0.25_R_P*(mean + block%P(i-1,j,k  )%v + block%P(i-1,j+1,k  )%v)
-      vel(6) = 0.25_R_P*(mean + block%P(i+1,j,k  )%v + block%P(i+1,j+1,k  )%v)
+      vel(1) = block%C(i,j  ,k)%P%v
+      vel(2) = block%C(i,j+1,k)%P%v
+      vel(3) = 0.25_R_P*(mean + block%C(i  ,j,k-1)%P%v + block%C(i  ,j+1,k-1)%P%v)
+      vel(4) = 0.25_R_P*(mean + block%C(i  ,j,k+1)%P%v + block%C(i  ,j+1,k+1)%P%v)
+      vel(5) = 0.25_R_P*(mean + block%C(i-1,j,k  )%P%v + block%C(i-1,j+1,k  )%P%v)
+      vel(6) = 0.25_R_P*(mean + block%C(i+1,j,k  )%P%v + block%C(i+1,j+1,k  )%P%v)
     case('k')
-      mean = block%P(i,j,k)%v + block%P(i,j,k+1)%v
+      mean = block%C(i,j,k)%P%v + block%C(i,j,k+1)%P%v
 
-      vel(1) = block%P(i,j,k  )%v
-      vel(2) = block%P(i,j,k+1)%v
-      vel(3) = 0.25_R_P*(mean + block%P(i-1,j  ,k)%v + block%P(i-1,j  ,k+1)%v)
-      vel(4) = 0.25_R_P*(mean + block%P(i+1,j  ,k)%v + block%P(i+1,j  ,k+1)%v)
-      vel(5) = 0.25_R_P*(mean + block%P(i  ,j-1,k)%v + block%P(i  ,j-1,k+1)%v)
-      vel(6) = 0.25_R_P*(mean + block%P(i  ,j+1,k)%v + block%P(i  ,j+1,k+1)%v)
+      vel(1) = block%C(i,j,k  )%P%v
+      vel(2) = block%C(i,j,k+1)%P%v
+      vel(3) = 0.25_R_P*(mean + block%C(i-1,j  ,k)%P%v + block%C(i-1,j  ,k+1)%P%v)
+      vel(4) = 0.25_R_P*(mean + block%C(i+1,j  ,k)%P%v + block%C(i+1,j  ,k+1)%P%v)
+      vel(5) = 0.25_R_P*(mean + block%C(i  ,j-1,k)%P%v + block%C(i  ,j-1,k+1)%P%v)
+      vel(6) = 0.25_R_P*(mean + block%C(i  ,j+1,k)%P%v + block%C(i  ,j+1,k+1)%P%v)
     endselect
     return
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -189,11 +192,11 @@ contains
     ! computing the value of the finite volume
     select case(dir)
     case('i')
-      vol=0.5_R_P*(block%V(i,j,k) + block%V(i+1,j,k))
+      vol=0.5_R_P*(block%C(i,j,k)%V + block%C(i+1,j,k)%V)
     case('j')
-      vol=0.5_R_P*(block%V(i,j,k) + block%V(i,j+1,k))
+      vol=0.5_R_P*(block%C(i,j,k)%V + block%C(i,j+1,k)%V)
     case('k')
-      vol=0.5_R_P*(block%V(i,j,k) + block%V(i,j,k+1))
+      vol=0.5_R_P*(block%C(i,j,k)%V + block%C(i,j,k+1)%V)
     endselect
     ! computing the gradient of velocity vector
     rst%x%x = dudi_FV(u=vel%x,nsi=NFS%x,v=vol)
@@ -206,15 +209,15 @@ contains
     rst%z%y = dudi_FV(u=vel%z,nsi=NFS%y,v=vol)
     rst%z%z = dudi_FV(u=vel%z,nsi=NFS%z,v=vol)
     ! computing the shear stress tensor
-    tau%x%x = global%adim%Re_inv*rst%x%x*4._R_P/3._R_P
-    tau%x%y = global%adim%Re_inv*(rst%x%y+rst%y%x)
-    tau%x%z = global%adim%Re_inv*(rst%x%z+rst%z%x)
+    tau%x%x = block%global%adim%Re_inv*rst%x%x*4._R_P/3._R_P
+    tau%x%y = block%global%adim%Re_inv*(rst%x%y+rst%y%x)
+    tau%x%z = block%global%adim%Re_inv*(rst%x%z+rst%z%x)
     tau%y%x = tau%x%y
-    tau%y%y = global%adim%Re_inv*rst%y%y*4._R_P/3._R_P
-    tau%y%z = global%adim%Re_inv*(rst%y%z+rst%z%y)
+    tau%y%y = block%global%adim%Re_inv*rst%y%y*4._R_P/3._R_P
+    tau%y%z = block%global%adim%Re_inv*(rst%y%z+rst%z%y)
     tau%z%x = tau%x%z
     tau%z%y = tau%y%z
-    tau%z%z = global%adim%Re_inv*rst%z%z*4._R_P/3._R_P
+    tau%z%z = block%global%adim%Re_inv*rst%z%z*4._R_P/3._R_P
     return
     !-------------------------------------------------------------------------------------------------------------------------------
     endsubroutine shear_stress

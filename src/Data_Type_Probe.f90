@@ -1,3 +1,8 @@
+!> @ingroup DerivedType
+!> @{
+!> @defgroup Data_Type_ProbeDerivedType Data_Type_Probe
+!> @}
+
 !> @ingroup PublicProcedure
 !> @{
 !> @defgroup Data_Type_ProbePublicProcedure Data_Type_Probe
@@ -22,12 +27,12 @@ public:: write_probe,read_probe
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> Derived type containing probe informations.
-!> @ingroup DerivedType
+!> @ingroup Data_Type_ProbeDerivedType
 type, public:: Type_Probe
-  integer(I_P):: b = 1_I_P !< Block (global map) index.
-  integer(I_P):: i = 0_I_P !< I direction index.
-  integer(I_P):: j = 0_I_P !< J direction index.
-  integer(I_P):: k = 0_I_P !< K direction index.
+  integer(I4P):: b = 1_I4P !< Block (global map) index.
+  integer(I4P):: i = 0_I4P !< I direction index.
+  integer(I4P):: j = 0_I4P !< J direction index.
+  integer(I4P):: k = 0_I4P !< K direction index.
   contains
     procedure, non_overridable:: set ! Procedure for setting members of Type_Probe.
 endtype Type_Probe
@@ -151,10 +156,10 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Probe), intent(INOUT)::        probe !< Probe data.
-  integer(I_P),      intent(IN), optional:: b     !< Block (global map) index.
-  integer(I_P),      intent(IN), optional:: i     !< I direction index.
-  integer(I_P),      intent(IN), optional:: j     !< J direction index.
-  integer(I_P),      intent(IN), optional:: k     !< K direction index.
+  integer(I4P),      intent(IN), optional:: b     !< Block (global map) index.
+  integer(I4P),      intent(IN), optional:: i     !< I direction index.
+  integer(I4P),      intent(IN), optional:: j     !< J direction index.
+  integer(I4P),      intent(IN), optional:: k     !< K direction index.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

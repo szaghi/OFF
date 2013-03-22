@@ -1,3 +1,8 @@
+!> @ingroup Library
+!> @{
+!> @defgroup Lib_FluidynamicLibrary Lib_Fluidynamic
+!> @}
+
 !> @ingroup PublicProcedure
 !> @{
 !> @defgroup Lib_FluidynamicPublicProcedure Lib_Fluidynamic
@@ -11,12 +16,14 @@
 !> This module contains the definition of fluid dynamic procedures.
 !> This is a library module.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
-!> @ingroup Library
+!> @ingroup Lib_FluidynamicLibrary
 module Lib_Fluidynamic
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                   ! Integers and reals precision definition.
 USE Data_Type_BC                                   ! Definition of Type_BC.
+USE Data_Type_Cell                                 ! Definition of Type_Cell.
 USE Data_Type_Conservative                         ! Definition of Type_Conservative.
+USE Data_Type_Face                                 ! Definition of Type_Face.
 USE Data_Type_Global                               ! Definition of Type_Global.
 USE Data_Type_Primitive                            ! Definition of Type_Primitive.
 USE Data_Type_SBlock                               ! Definition of Type_SBlock.
@@ -124,12 +131,12 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
 #ifdef OPENMP
-  call p2c_openmp(gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,P=block%P,U=block%U)
+  call p2c_openmp(gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,P=block%C%P,U=block%C%U)
 #else
   do k=1,block%Nk
     do j=1,block%Nj
       do i=1,block%Ni
-        call prim2cons(prim = block%P(i,j,k), cons = block%U(i,j,k))
+        call prim2cons(prim = block%C(i,j,k)%P, cons = block%C(i,j,k)%U)
       enddo
     enddo
   enddo
@@ -173,22 +180,21 @@ contains
   !> Subroutine for converting conservative variables to primitive variables of all cells of a block.
   !> @note Only the inner cells of the block are converted.
   !> @ingroup Lib_FluidynamicPublicProcedure
-  subroutine conservative2primitive(global,block)
+  subroutine conservative2primitive(block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global), intent(IN)::    global !< Global-level data (see \ref Data_Type_Global::Type_Global "Type_Global" definition).
   type(Type_SBlock), intent(INOUT):: block  !< Block-level data (see \ref Data_Type_SBlock::Type_SBlock "Type_SBlock" definition).
   integer(I_P)::                     i,j,k  !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
 #ifdef OPENMP
-  call c2p_openmp(gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,cp0=global%cp0,cv0=global%cv0,U=block%U,P=block%P)
+  call c2p_openmp(gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,cp0=block%global%cp0,cv0=block%global%cv0,U=block%C%U,P=block%C%P)
 #else
   do k=1,block%Nk
     do j=1,block%Nj
       do i=1,block%Ni
-        call cons2prim(cp0 = global%cp0, cv0 = global%cv0, cons = block%U(i,j,k), prim = block%P(i,j,k))
+        call cons2prim(cp0 = block%global%cp0, cv0 = block%global%cv0, cons = block%C(i,j,k)%U, prim = block%C(i,j,k)%P)
       enddo
     enddo
   enddo
@@ -233,10 +239,9 @@ contains
 
   !> Function for evaluating the local and global time step value by CFL condition.
   !> @ingroup Lib_FluidynamicPrivateProcedure
-  subroutine compute_time(global,block,Dtmin)
+  subroutine compute_time(block,Dtmin)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global), intent(IN)::    global                        !< Global-level data.
   type(Type_SBlock), intent(INOUT):: block                         !< Block-level data.
   real(R_P),         intent(OUT)::   Dtmin                         !< Minimum Dt.
   real(R_P)::                        vmax                          !< Maximum speed of waves.
@@ -248,54 +253,55 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
 #ifdef OPENMP
-  call Dt_openmp(gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,CFL=global%CFL, &
-                 NFi=block%NFi,NFj=block%NFj,NFk=block%NFk,Si=block%Si,Sj=block%Sj,Sk=block%Sk,V=block%V,P=block%P,Dt=block%Dt)
+  call Dt_openmp(gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,CFL=block%global%CFL,                   &
+                 NFi=block%Fi%N,NFj=block%Fj%N,NFk=block%Fk%N,Si=block%Fi%S,Sj=block%Fj%S,Sk=block%Fk%S, &
+                 V=block%C%V,P=block%C%P,Dt=block%C%Dt)
 #else
   ! computing the minimum Dt into the inner cells
   do k=1,block%Nk
     do j=1,block%Nj
       do i=1,block%Ni
         ! computing the local speed of sound
-        ss = a(p=block%P(i,j,k)%p,r=block%P(i,j,k)%d,g=block%P(i,j,k)%g)
+        ss = a(p=block%C(i,j,k)%P%p,r=block%C(i,j,k)%P%d,g=block%C(i,j,k)%P%g)
         ! evaluating the maximum propagation speed of acoustic segnals multiplied for face area
         ! left i
-        vm   = 0.5_R_P*(block%P(i-1,j,k)%v+block%P(i,j,k)%v)
-        vmiL = (vm.dot.block%NFi(i-1,j,k))*block%Si(i-1,j,k)
+        vm   = 0.5_R_P*(block%C(i-1,j,k)%P%v+block%C(i,j,k)%P%v)
+        vmiL = (vm.dot.block%Fi(i-1,j,k)%N)*block%Fi(i-1,j,k)%S
         vmiL = abs(vmiL) + ss
         ! right i
-        vm   = 0.5_R_P*(block%P(i,j,k)%v+block%P(i+1,j,k)%v)
-        vmiR = (vm.dot.block%NFi(i,j,k))*block%Si(i,j,k)
+        vm   = 0.5_R_P*(block%C(i,j,k)%P%v+block%C(i+1,j,k)%P%v)
+        vmiR = (vm.dot.block%Fi(i,j,k)%N)*block%Fi(i,j,k)%S
         vmiR = abs(vmiR) + ss
         ! left j
-        vm   = 0.5_R_P*(block%P(i,j-1,k)%v+block%P(i,j,k)%v)
-        vmjL = (vm.dot.block%NFj(i,j-1,k))*block%Sj(i,j-1,k)
+        vm   = 0.5_R_P*(block%C(i,j-1,k)%P%v+block%C(i,j,k)%P%v)
+        vmjL = (vm.dot.block%Fj(i,j-1,k)%N)*block%Fj(i,j-1,k)%S
         vmjL = abs(vmjL) + ss
         ! right j
-        vm   = 0.5_R_P*(block%P(i,j,k)%v+block%P(i,j+1,k)%v)
-        vmjR = (vm.dot.block%NFj(i,j,k))*block%Sj(i,j,k)
+        vm   = 0.5_R_P*(block%C(i,j,k)%P%v+block%C(i,j+1,k)%P%v)
+        vmjR = (vm.dot.block%Fj(i,j,k)%N)*block%Fj(i,j,k)%S
         vmjR = abs(vmjR) + ss
         ! left k
-        vm   = 0.5_R_P*(block%P(i,j,k-1)%v+block%P(i,j,k)%v)
-        vmkL = (vm.dot.block%NFk(i,j,k-1))*block%Sk(i,j,k-1)
+        vm   = 0.5_R_P*(block%C(i,j,k-1)%P%v+block%C(i,j,k)%P%v)
+        vmkL = (vm.dot.block%Fk(i,j,k-1)%N)*block%Fk(i,j,k-1)%S
         vmkL = abs(vmkL) + ss
         ! right k
-        vm   = 0.5_R_P*(block%P(i,j,k)%v+block%P(i,j,k+1)%v)
-        vmkR = (vm.dot.block%NFk(i,j,k))*block%Sk(i,j,k)
+        vm   = 0.5_R_P*(block%C(i,j,k)%P%v+block%C(i,j,k+1)%P%v)
+        vmkR = (vm.dot.block%Fk(i,j,k)%N)*block%Fk(i,j,k)%S
         vmkR = abs(vmkR) + ss
         ! vmax
         vmax = max(vmiL,vmiR,vmjL,vmjR,vmkL,vmkR)
-        block%Dt(i,j,k) = block%V(i,j,k)/vmax*global%CFL
+        block%C(i,j,k)%Dt = block%C(i,j,k)%V/vmax*block%global%CFL
       enddo
     enddo
   enddo
   ! computing minimum Dt
-  Dtmin = minval(block%Dt(1:block%Ni,1:block%Nj,1:block%Nk))
+  Dtmin = minval(block%C(1:block%Ni,1:block%Nj,1:block%Nk)%Dt)
   ! ghost cells estrapolation: imposing the minum value of Dt
   ! left i frame
   do k=1-block%gc(5),block%Nk+block%gc(6)
     do j=1-block%gc(3),block%Nj+block%gc(4)
       do i=1-block%gc(1),0
-        block%Dt(i,j,k) = Dtmin
+        block%C(i,j,k)%Dt = Dtmin
       enddo
     enddo
   enddo
@@ -303,7 +309,7 @@ contains
   do k=1-block%gc(5),block%Nk+block%gc(6)
     do j=1-block%gc(3),block%Nj+block%gc(4)
       do i=block%Ni+1,block%Ni+block%gc(2)
-        block%Dt(i,j,k) = Dtmin
+        block%C(i,j,k)%Dt = Dtmin
       enddo
     enddo
   enddo
@@ -311,7 +317,7 @@ contains
   do k=1-block%gc(5),block%Nk+block%gc(6)
     do j=1-block%gc(3),0
       do i=1-block%gc(1),block%Ni+block%gc(2)
-        block%Dt(i,j,k) = Dtmin
+        block%C(i,j,k)%Dt = Dtmin
       enddo
     enddo
   enddo
@@ -319,7 +325,7 @@ contains
   do k=1-block%gc(5),block%Nk+block%gc(6)
     do j=block%Nj+1,block%Nj+block%gc(4)
       do i=1-block%gc(1),block%Ni+block%gc(2)
-        block%Dt(i,j,k) = Dtmin
+        block%C(i,j,k)%Dt = Dtmin
       enddo
     enddo
   enddo
@@ -327,7 +333,7 @@ contains
   do k=1-block%gc(5),0
     do j=1-block%gc(3),block%Nj+block%gc(4)
       do i=1-block%gc(1),block%Ni+block%gc(2)
-        block%Dt(i,j,k) = Dtmin
+        block%C(i,j,k)%Dt = Dtmin
       enddo
     enddo
   enddo
@@ -335,7 +341,7 @@ contains
   do k=block%Nk+1,block%Nk+block%gc(6)
     do j=1-block%gc(3),block%Nj+block%gc(4)
       do i=1-block%gc(1),block%Ni+block%gc(2)
-        block%Dt(i,j,k) = Dtmin
+        block%C(i,j,k)%Dt = Dtmin
       enddo
     enddo
   enddo
@@ -472,11 +478,10 @@ contains
   !> Subroutine for computing the residuals. This the space operator. The residuals are stored in block%KS(s1) conservative
   !> variables.
   !> @ingroup Lib_FluidynamicPrivateProcedure
-  subroutine residuals(s1,global,block)
+  subroutine residuals(s1,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),       intent(IN)::   s1                                    !< Current Runge-kutta stage.
-  type(Type_Global),  intent(IN)::   global                                !< Global-level data.
+  integer(I_P),      intent(IN)::    s1                                    !< Current Runge-kutta stage.
   type(Type_SBlock), intent(INOUT):: block                                 !< Block-level data.
   type(Type_Conservative)::          Fic(0:block%Ni,1:block%Nj,1:block%Nk) !< I convective fluxes.
   type(Type_Conservative)::          Fjc(1:block%Ni,0:block%Nj,1:block%Nk) !< J convective fluxes.
@@ -495,7 +500,7 @@ contains
   Ni = block%Ni
   Nj = block%Nj
   Nk = block%Nk
-  Ns = global%Ns
+  Ns = block%global%Ns
   call Fic%init(Ns=Ns)
   call Fid%init(Ns=Ns)
   call Fjc%init(Ns=Ns)
@@ -505,73 +510,73 @@ contains
   ! computing convective fluxes
   !$OMP PARALLEL DEFAULT(NONE) &
   !$OMP PRIVATE(i,j,k,s)       &
-  !$OMP SHARED(s1,gc,gcu,Ni,Nj,Nk,Ns,global,block,Fic,Fjc,Fkc,Fid,Fjd,Fkd)
+  !$OMP SHARED(s1,gc,gcu,Ni,Nj,Nk,Ns,block,Fic,Fjc,Fkc,Fid,Fjd,Fkd)
 #ifndef NULi
   ! i direction
   !$OMP SINGLE
-  gcu = min(global%gco,gc(1),gc(2))
+  gcu = min(block%global%gco,gc(1),gc(2))
   !$OMP END SINGLE
   !$OMP DO
   do k=1,Nk
     do j=1,Nj
-      call fluxes_convective(gc  = gcu,                         &
-                             N   = Ni,                          &
-                             Ns  = Ns,                          &
-                             cp0 = global%cp0,                  &
-                             cv0 = global%cv0,                  &
-                             NF  = block%NFi(0-gcu:Ni+gcu,j,k), &
-                             P   = block%P  (1-gcu:Ni+gcu,j,k), &
-                             F   = Fic      (    0:Ni    ,j,k))
+      call fluxes_convective(gc  = gcu,                        &
+                             N   = Ni,                         &
+                             Ns  = Ns,                         &
+                             cp0 = block%global%cp0,           &
+                             cv0 = block%global%cv0,           &
+                             F   = block%Fi(0-gcu:Ni+gcu,j,k), &
+                             C   = block%C (1-gcu:Ni+gcu,j,k), &
+                             Fl  = Fic     (    0:Ni    ,j,k))
     enddo
   enddo
 #endif
 #ifndef NULj
   ! j direction
   !$OMP SINGLE
-  gcu = min(global%gco,gc(3),gc(4))
+  gcu = min(block%global%gco,gc(3),gc(4))
   !$OMP END SINGLE
   !$OMP DO
   do k=1,Nk
     do i=1,Ni
-      call fluxes_convective(gc  = gcu,                         &
-                             N   = Nj,                          &
-                             Ns  = Ns,                          &
-                             cp0 = global%cp0,                  &
-                             cv0 = global%cv0,                  &
-                             NF  = block%NFj(i,0-gcu:Nj+gcu,k), &
-                             P   = block%P  (i,1-gcu:Nj+gcu,k), &
-                             F   = Fjc      (i,    0:Nj    ,k))
+      call fluxes_convective(gc  = gcu,                        &
+                             N   = Nj,                         &
+                             Ns  = Ns,                         &
+                             cp0 = block%global%cp0,           &
+                             cv0 = block%global%cv0,           &
+                             F   = block%Fj(i,0-gcu:Nj+gcu,k), &
+                             C   = block%C (i,1-gcu:Nj+gcu,k), &
+                             Fl  = Fjc     (i,    0:Nj    ,k))
     enddo
   enddo
 #endif
 #ifndef NULk
   ! k direction
   !$OMP SINGLE
-  gcu = min(global%gco,gc(5),gc(6))
+  gcu = min(block%global%gco,gc(5),gc(6))
   !$OMP END SINGLE
   !$OMP DO
   do j=1,Nj
     do i=1,Ni
-      call fluxes_convective(gc  = gcu,                         &
-                             N   = Nk,                          &
-                             Ns  = Ns,                          &
-                             cp0 = global%cp0,                  &
-                             cv0 = global%cv0,                  &
-                             NF  = block%NFk(i,j,0-gcu:Nk+gcu), &
-                             P   = block%P  (i,j,1-gcu:Nk+gcu), &
-                             F   = Fkc      (i,j,    0:Nk    ))
+      call fluxes_convective(gc  = gcu,                        &
+                             N   = Nk,                         &
+                             Ns  = Ns,                         &
+                             cp0 = block%global%cp0,           &
+                             cv0 = block%global%cv0,           &
+                             F   = block%Fk(i,j,0-gcu:Nk+gcu), &
+                             C   = block%C (i,j,1-gcu:Nk+gcu), &
+                             Fl  = Fkc     (i,j,    0:Nk    ))
     enddo
   enddo
 #endif
   ! computing diffusive fluxes
-  if (.not.global%inviscid) then
+  if (.not.block%global%inviscid) then
 #ifndef NULi
     ! i direction
     !$OMP DO
     do k=1,Nk
       do j=1,Nj
         do i=0,Ni
-          call fluxes_diffusive(global=global,block=block,i=i,j=j,k=k,dir='i',F=Fid(i,j,k))
+          call fluxes_diffusive(block=block,i=i,j=j,k=k,dir='i',F=Fid(i,j,k))
         enddo
       enddo
     enddo
@@ -582,7 +587,7 @@ contains
     do k=1,Nk
       do j=0,Nj
         do i=1,Ni
-          call fluxes_diffusive(global=global,block=block,i=i,j=j,k=k,dir='j',F=Fjd(i,j,k))
+          call fluxes_diffusive(block=block,i=i,j=j,k=k,dir='j',F=Fjd(i,j,k))
         enddo
       enddo
     enddo
@@ -593,7 +598,7 @@ contains
     do k=0,Nk
       do j=1,Nj
         do i=1,Ni
-          call fluxes_diffusive(global=global,block=block,i=i,j=j,k=k,dir='k',F=Fkd(i,j,k))
+          call fluxes_diffusive(block=block,i=i,j=j,k=k,dir='k',F=Fkd(i,j,k))
         enddo
       enddo
     enddo
@@ -612,25 +617,25 @@ contains
         !   block%Sk(i,  j,  k-1)*(Fkc(i,  j,  k-1)+Fkd(i,  j,  k-1)) - block%Sk(i,j,k)*(Fkc(i,j,k)+Fkd(i,j,k))   &
         !  )/block%V(i,j,k)
         do s=1,Ns
-          block%KS(i,j,k,s1)%rs(s) =                                             &
-          (block%Si(i-1,j,  k  )*(Fic(i-1,j,  k  )%rs(s)+Fid(i-1,j,  k  )%rs(s))-&
-           block%Si(i,  j,  k  )*(Fic(i,  j,  k  )%rs(s)+Fid(i,  j,  k  )%rs(s))+&
-           block%Sj(i,  j-1,k  )*(Fjc(i,  j-1,k  )%rs(s)+Fjd(i,  j-1,k  )%rs(s))-&
-           block%Sj(i,  j,  k  )*(Fjc(i,  j,  k  )%rs(s)+Fjd(i,  j,  k  )%rs(s))+&
-           block%Sk(i,  j,  k-1)*(Fkc(i,  j,  k-1)%rs(s)+Fkd(i,  j,  k-1)%rs(s))-&
-           block%Sk(i,  j,  k  )*(Fkc(i,  j,  k  )%rs(s)+Fkd(i,  j,  k  )%rs(s)) &
-          )/block%V(i,j,k)
+          block%C(i,j,k)%KS(s1)%rs(s) =                                            &
+          (block%Fi(i-1,j,  k  )%S*(Fic(i-1,j,  k  )%rs(s)+Fid(i-1,j,  k  )%rs(s))-&
+           block%Fi(i,  j,  k  )%S*(Fic(i,  j,  k  )%rs(s)+Fid(i,  j,  k  )%rs(s))+&
+           block%Fj(i,  j-1,k  )%S*(Fjc(i,  j-1,k  )%rs(s)+Fjd(i,  j-1,k  )%rs(s))-&
+           block%Fj(i,  j,  k  )%S*(Fjc(i,  j,  k  )%rs(s)+Fjd(i,  j,  k  )%rs(s))+&
+           block%Fk(i,  j,  k-1)%S*(Fkc(i,  j,  k-1)%rs(s)+Fkd(i,  j,  k-1)%rs(s))-&
+           block%Fk(i,  j,  k  )%S*(Fkc(i,  j,  k  )%rs(s)+Fkd(i,  j,  k  )%rs(s)) &
+          )/block%C(i,j,k)%V
         enddo
-        block%KS(i,j,k,s1)%rv =                                                                                        &
-        (block%Si(i-1,j,  k  )*(Fic(i-1,j,  k  )%rv+Fid(i-1,j,  k  )%rv)-block%Si(i,j,k)*(Fic(i,j,k)%rv+Fid(i,j,k)%rv)+&
-         block%Sj(i,  j-1,k  )*(Fjc(i,  j-1,k  )%rv+Fjd(i,  j-1,k  )%rv)-block%Sj(i,j,k)*(Fjc(i,j,k)%rv+Fjd(i,j,k)%rv)+&
-         block%Sk(i,  j,  k-1)*(Fkc(i,  j,  k-1)%rv+Fkd(i,  j,  k-1)%rv)-block%Sk(i,j,k)*(Fkc(i,j,k)%rv+Fkd(i,j,k)%rv) &
-        )/block%V(i,j,k)
-        block%KS(i,j,k,s1)%re =                                                                                        &
-        (block%Si(i-1,j,  k  )*(Fic(i-1,j,  k  )%re+Fid(i-1,j,  k  )%re)-block%Si(i,j,k)*(Fic(i,j,k)%re+Fid(i,j,k)%re)+&
-         block%Sj(i,  j-1,k  )*(Fjc(i,  j-1,k  )%re+Fjd(i,  j-1,k  )%re)-block%Sj(i,j,k)*(Fjc(i,j,k)%re+Fjd(i,j,k)%re)+&
-         block%Sk(i,  j,  k-1)*(Fkc(i,  j,  k-1)%re+Fkd(i,  j,  k-1)%re)-block%Sk(i,j,k)*(Fkc(i,j,k)%re+Fkd(i,j,k)%re) &
-        )/block%V(i,j,k)
+        block%C(i,j,k)%KS(s1)%rv =                                                                                         &
+        (block%Fi(i-1,j,  k  )%S*(Fic(i-1,j,  k  )%rv+Fid(i-1,j,  k  )%rv)-block%Fi(i,j,k)%S*(Fic(i,j,k)%rv+Fid(i,j,k)%rv)+&
+         block%Fj(i,  j-1,k  )%S*(Fjc(i,  j-1,k  )%rv+Fjd(i,  j-1,k  )%rv)-block%Fj(i,j,k)%S*(Fjc(i,j,k)%rv+Fjd(i,j,k)%rv)+&
+         block%Fk(i,  j,  k-1)%S*(Fkc(i,  j,  k-1)%rv+Fkd(i,  j,  k-1)%rv)-block%Fk(i,j,k)%S*(Fkc(i,j,k)%rv+Fkd(i,j,k)%rv) &
+        )/block%C(i,j,k)%V
+        block%C(i,j,k)%KS(s1)%re =                                                                                     &
+        (block%Fi(i-1,j,  k  )%S*(Fic(i-1,j,  k  )%re+Fid(i-1,j,  k  )%re)-block%Fi(i,j,k)%S*(Fic(i,j,k)%re+Fid(i,j,k)%re)+&
+         block%Fj(i,  j-1,k  )%S*(Fjc(i,  j-1,k  )%re+Fjd(i,  j-1,k  )%re)-block%Fj(i,j,k)%S*(Fjc(i,j,k)%re+Fjd(i,j,k)%re)+&
+         block%Fk(i,  j,  k-1)%S*(Fkc(i,  j,  k-1)%re+Fkd(i,  j,  k-1)%re)-block%Fk(i,j,k)%S*(Fkc(i,j,k)%re+Fkd(i,j,k)%re) &
+        )/block%C(i,j,k)%V
       enddo
     enddo
   enddo
@@ -639,7 +644,7 @@ contains
   do k=1,Nk
     do j=1,Nj
       do i=1,Ni
-        block%KS(i,j,k,s1)%rv%x = 0._R_P
+        block%C(i,j,k)%KS(s1)%rv%x = 0._R_P
       enddo
     enddo
   enddo
@@ -649,7 +654,7 @@ contains
   do k=1,Nk
     do j=1,Nj
       do i=1,Ni
-        block%KS(i,j,k,s1)%rv%y = 0._R_P
+        block%C(i,j,k)%KS(s1)%rv%y = 0._R_P
       enddo
     enddo
   enddo
@@ -659,7 +664,7 @@ contains
   do k=1,Nk
     do j=1,Nj
       do i=1,Ni
-        block%KS(i,j,k,s1)%rv%z = 0._R_P
+        block%C(i,j,k)%KS(s1)%rv%z = 0._R_P
       enddo
     enddo
   enddo
@@ -681,20 +686,21 @@ contains
   !> - \b IN1: supersonic inflow steady boundary condition \f$ P^0 = P^{in1} \f$. \n
   !> where \f$P\f$ are the primitive variables.
   !> @ingroup Lib_FluidynamicPublicProcedure
-  subroutine boundary_conditions(l,global,block)
+  subroutine boundary_conditions(l,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),       intent(IN)::   l                  !< Current grid level.
-  type(Type_Global),  intent(IN)::   global             !< Global-level data.
-  type(Type_SBlock), intent(INOUT):: block(1:global%Nb) !< Block-level data.
-  integer(I_P)::                     Ni,Nj,Nk,gc(1:6)   !< Temporary var for storing block dimensions.
-  integer(I_P)::                     b,i,j,k            !< Counters.
+  integer(I_P),      intent(IN)::    l                !< Current grid level.
+  type(Type_SBlock), intent(INOUT):: block(1:)        !< Block-level data.
+  type(Type_Global), pointer::       global           !< Global-level data.
+  integer(I_P)::                     Ni,Nj,Nk,gc(1:6) !< Temporary var for storing block dimensions.
+  integer(I_P)::                     b,i,j,k          !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
+  global => block(1)%global
 #ifdef MPI2
   ! doing the multi-processes communications if necessary
-  call Psendrecv(l=l,global=global,block=block)
+  call Psendrecv(l=l,block=block)
 #endif
   do b=1,global%Nb
     gc = block(b)%gc
@@ -703,98 +709,29 @@ contains
     Nk = block(b)%Nk
     !$OMP PARALLEL DEFAULT(NONE) &
     !$OMP PRIVATE(i,j,k)         &
-    !$OMP SHARED(b,l,Ni,Nj,Nk,gc,global,block)
+    !$OMP SHARED(b,l,Ni,Nj,Nk,gc,block)
     !$OMP DO
     do k=1,Nk
       do j=1,Nj
-        ! left i
-        select case(block(b)%BCi(0,j,k)%tp)
-        case(bc_ext)
-          call set_ext_l(gc=gc(1),ic=0,N=Ni,P=block(b)%P(1-gc(1):0+gc(1),j,k))
-        case(bc_ref)
-          call set_ref_l(gc=gc(1),ic=0,N=Ni,NF=block(b)%NFi(0,j,k),P=block(b)%P(1-gc(1):0+gc(1),j,k))
-        case(bc_per)
-          call set_per(gc=gc(1),ic=0,N=Ni,boundary='l',P=block(b)%P(1-gc(1):Ni+gc(1),j,k))
-        case(bc_adj)
-          call set_adj(gc=gc(1),bc=block(b)%BCi(1-gc(1):0,j,k),P=block(b)%P(1-gc(1):0,j,k))
-        case(bc_in1)
-          call set_in1(gc=gc(1),bc=block(b)%BCi(1-gc(1):0,j,k),P=block(b)%P(1-gc(1):0,j,k))
-        endselect
-        ! right i
-        select case(block(b)%BCi(Ni,j,k)%tp)
-        case(bc_ext)
-          call set_ext_r(gc=gc(2),ic=0,N=Ni,P=block(b)%P(Ni-gc(2):Ni+gc(2),j,k))
-        case(bc_ref)
-          call set_ref_r(gc=gc(2),ic=0,N=Ni,NF=block(b)%NFi(Ni,j,k),P=block(b)%P(Ni-gc(2):Ni+gc(2),j,k))
-        case(bc_per)
-          call set_per(gc=gc(2),ic=0,N=Ni,boundary='r',P=block(b)%P(1-gc(2):Ni+gc(2),j,k))
-        case(bc_adj)
-          call set_adj(gc=gc(2),bc=block(b)%BCi(Ni:Ni+gc(2)-1,j,k),P=block(b)%P(Ni+1:Ni+gc(2),j,k))
-        case(bc_in1)
-          call set_in1(gc=gc(2),bc=block(b)%BCi(Ni:Ni+gc(2)-1,j,k),P=block(b)%P(Ni+1:Ni+gc(2),j,k))
-        endselect
+        call set_bc(gc=gc(1:2),ic=0,N=Ni,                &
+                    F=block(b)%Fi(0-gc(1):Ni+gc(2),j,k), &
+                    C=block(b)%C( 1-gc(1):Ni+gc(2),j,k))
       enddo
     enddo
     !$OMP DO
     do k=1,Nk
       do i=1,Ni
-        ! left j
-        select case(block(b)%BCj(i,0,k)%tp)
-        case(bc_ext)
-          call set_ext_l(gc=gc(3),ic=0,N=Nj,P=block(b)%P(i,1-gc(3):0+gc(3),k))
-        case(bc_ref)
-          call set_ref_l(gc=gc(3),ic=0,N=Nj,NF=block(b)%NFj(i,0,k),P=block(b)%P(i,1-gc(3):0+gc(3),k))
-        case(bc_per)
-          call set_per(gc=gc(3),ic=0,N=Nj,boundary='l',P=block(b)%P(i,1-gc(3):Nj+gc(3),k))
-        case(bc_adj)
-          call set_adj(gc=gc(3),bc=block(b)%BCj(i,1-gc(3):0,k),P=block(b)%P(i,1-gc(3):0,k))
-        case(bc_in1)
-          call set_in1(gc=gc(3),bc=block(b)%BCj(i,1-gc(3):0,k),P=block(b)%P(i,1-gc(3):0,k))
-        endselect
-        ! right j
-        select case(block(b)%BCj(i,Nj,k)%tp)
-        case(bc_ext)
-          call set_ext_r(gc=gc(4),ic=0,N=Nj,P=block(b)%P(i,Nj-gc(4):Nj+gc(4),k))
-        case(bc_ref)
-          call set_ref_r(gc=gc(4),ic=0,N=Nj,NF=block(b)%NFj(i,Nj,k),P=block(b)%P(i,Nj-gc(4):Nj+gc(4),k))
-        case(bc_per)
-          call set_per(gc=gc(4),ic=0,N=Nj,boundary='r',P=block(b)%P(i,1-gc(4):Nj+gc(4),k))
-        case(bc_adj)
-          call set_adj(gc=gc(4),bc=block(b)%BCj(i,Nj:Nj+gc(4)-1,k),P=block(b)%P(i,Nj+1:Nj+gc(4),k))
-        case(bc_in1)
-          call set_in1(gc=gc(4),bc=block(b)%BCj(i,Nj:Nj+gc(4)-1,k),P=block(b)%P(i,Nj+1:Nj+gc(4),k))
-        endselect
+        call set_bc(gc=gc(3:4),ic=0,N=Nj,                &
+                    F=block(b)%Fj(i,0-gc(3):Nj+gc(4),k), &
+                    C=block(b)%C( i,1-gc(3):Nj+gc(4),k))
       enddo
     enddo
     !$OMP DO
     do j=1,Nj
       do i=1,Ni
-        ! left k
-        select case(block(b)%BCk(i,j,0)%tp)
-        case(bc_ext)
-          call set_ext_l(gc=gc(5),ic=0,N=Nk,P=block(b)%P(i,j,1-gc(5):0+gc(5)))
-        case(bc_ref)
-          call set_ref_l(gc=gc(5),ic=0,N=Nk,NF=block(b)%NFk(i,j,0),P=block(b)%P(i,j,1-gc(5):0+gc(5)))
-        case(bc_per)
-          call set_per(gc=gc(5),ic=0,N=Nk,boundary='l',P=block(b)%P(i,j,1-gc(5):Nk+gc(5)))
-        case(bc_adj)
-          call set_adj(gc=gc(5),bc=block(b)%BCk(i,j,1-gc(5):0),P=block(b)%P(i,j,1-gc(5):0))
-        case(bc_in1)
-          call set_in1(gc=gc(5),bc=block(b)%BCk(i,j,1-gc(5):0),P=block(b)%P(i,j,1-gc(5):0))
-        endselect
-        ! right k
-        select case(block(b)%BCk(i,j,Nk)%tp)
-        case(bc_ext)
-          call set_ext_r(gc=gc(6),ic=0,N=Nk,P=block(b)%P(i,j,Nk-gc(6):Nk+gc(6)))
-        case(bc_ref)
-          call set_ref_r(gc=gc(6),ic=0,N=Nk,NF=block(b)%NFk(i,j,Nk),P=block(b)%P(i,j,Nk-gc(6):Nk+gc(6)))
-        case(bc_per)
-          call set_per(gc=gc(6),ic=0,N=Nk,boundary='r',P=block(b)%P(i,j,1-gc(6):Nk+gc(6)))
-        case(bc_adj)
-          call set_adj(gc=gc(6),bc=block(b)%BCk(i,j,Nk:Nk+gc(6)-1),P=block(b)%P(i,j,Nk+1:Nk+gc(6)))
-        case(bc_in1)
-          call set_in1(gc=gc(6),bc=block(b)%BCk(i,j,Nk:Nk+gc(6)-1),P=block(b)%P(i,j,Nk+1:Nk+gc(6)))
-        endselect
+        call set_bc(gc=gc(5:6),ic=0,N=Nk,                &
+                    F=block(b)%Fk(i,j,0-gc(5):Nk+gc(6)), &
+                    C=block(b)%C( i,j,1-gc(5):Nk+gc(6)))
       enddo
     enddo
     !$OMP END PARALLEL
@@ -802,29 +739,72 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   contains
+    !> @brief Subroutine for imposing bc over a generic direction.
+    !> @note For avoiding the creation of temporary arrays (improving the efficiency) arrays are declared as assumed-shape ones.
+    pure subroutine set_bc(gc,ic,N,F,C)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I_P),    intent(IN)::    gc(1: )     !< Number of ghost cells [1:2].
+    integer(I_P),    intent(IN)::    ic          !< Number of internal cells used for extrapolation (1 or gc).
+    integer(I_P),    intent(IN)::    N           !< Number of internal cells.
+    type(Type_Face), intent(IN)::    F(0-gc(1):) !< Faces data [0-gc(1):N+gc(2)].
+    type(Type_Cell), intent(INOUT):: C(1-gc(1):) !< Cells data [1-gc(1):N+gc(2)].
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    ! left
+    select case(F(0)%BC%tp)
+    case(bc_ext)
+      call set_ext_l(gc=gc(1),ic=ic,N=N,C=C(1-gc(1):0+gc(1)))
+    case(bc_ref)
+      call set_ref_l(gc=gc(1),ic=ic,N=N,NF=F(0)%N,C=C(1-gc(1):0+gc(1)))
+    case(bc_per)
+      call set_per(gc=gc(1),ic=ic,N=N,boundary='l',C=C(1-gc(1):N+gc(1)))
+    case(bc_adj)
+      call set_adj(gc=gc(1),F=F(1-gc(1):0),C=C(1-gc(1):0))
+    case(bc_in1)
+      call set_in1(gc=gc(1),F=F(1-gc(1):0),C=C(1-gc(1):0))
+    endselect
+    ! right
+    select case(F(N)%BC%tp)
+    case(bc_ext)
+      call set_ext_r(gc=gc(2),ic=ic,N=N,C=C(N-gc(2):N+gc(2)))
+    case(bc_ref)
+      call set_ref_r(gc=gc(2),ic=ic,N=N,NF=F(N)%N,C=C(N-gc(2):N+gc(2)))
+    case(bc_per)
+      call set_per(gc=gc(2),ic=ic,N=N,boundary='r',C=C(1-gc(2):N+gc(2)))
+    case(bc_adj)
+      call set_adj(gc=gc(2),F=F(N:N+gc(2)-1),C=C(N+1:N+gc(2)))
+    case(bc_in1)
+      call set_in1(gc=gc(2),F=F(N:N+gc(2)-1),C=C(N+1:N+gc(2)))
+    endselect
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine set_bc
+
     !> @brief Subroutine for imposing extrapolation of ghost cells from internal ones (left boundary).
     !> @note For avoiding the creation of temporary arrays (improving the efficiency) the array \b P is declared as assumed-shape
     !> with only the lower bound defined. Its extentions is: P [1-gc:0+gc].
-    pure subroutine set_ext_l(gc,ic,N,P)
+    pure subroutine set_ext_l(gc,ic,N,C)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc       !< Number of ghost cells.
-    integer(I_P),         intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
-    integer(I_P),         intent(IN)::    N        !< Number of internal cells.
-    type(Type_Primitive), intent(INOUT):: P(1-gc:) !< Primitive variables [1-gc:0+gc].
-    integer(I_P)::                        i        !< Cell counter.
+    integer(I_P),    intent(IN)::    gc       !< Number of ghost cells.
+    integer(I_P),    intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
+    integer(I_P),    intent(IN)::    N        !< Number of internal cells.
+    type(Type_Cell), intent(INOUT):: C(1-gc:) !< Cells data [1-gc:0+gc].
+    integer(I_P)::                   i        !< Cell counter.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
     if (ic==1.OR.N<gc) then
       ! extrapolation using only the cell 1
       do i=1-gc,0
-        P(i) = P(1)
+        C(i)%P = C(1)%P
       enddo
     else
       ! extrapolation using the cells 1,2,...,gc
       do i=1-gc,0
-        P(i) = P(-i+1)
+        C(i)%P = C(-i+1)%P
       enddo
     endif
     return
@@ -834,26 +814,26 @@ contains
     !> @brief Subroutine for imposing extrapolation of ghost cells from internal ones (right boundary).
     !> @note For avoiding the creation of temporary arrays (improving the efficiency) the array \b P is declared as assumed-shape
     !> with only the lower bound defined. Its extentions is: P [N-gc:N+gc].
-    pure subroutine set_ext_r(gc,ic,N,P)
+    pure subroutine set_ext_r(gc,ic,N,C)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc       !< Number of ghost cells.
-    integer(I_P),         intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
-    integer(I_P),         intent(IN)::    N        !< Number of internal cells.
-    type(Type_Primitive), intent(INOUT):: P(N-gc:) !< Primitive variables [N-gc:N+gc].
-    integer(I_P)::                        i        !< Cell counter.
+    integer(I_P),    intent(IN)::    gc       !< Number of ghost cells.
+    integer(I_P),    intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
+    integer(I_P),    intent(IN)::    N        !< Number of internal cells.
+    type(Type_Cell), intent(INOUT):: C(N-gc:) !< Cells data [N-gc:N+gc].
+    integer(I_P)::                   i        !< Cell counter.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
     if (ic==1.OR.N<gc) then
       ! extrapolation using only the cell N
       do i=N+1,N+gc
-        P(i) = P(N)
+        C(i)%P = C(N)%P
       enddo
     else
       ! extrapolation using the cells N-gc,N-gc+1,N-gc+2,...,N
       do i=N+1,N+gc
-        P(i) = P(N+1-(i-N))
+        C(i)%P = C(N+1-(i-N))%P
       enddo
     endif
     return
@@ -863,38 +843,38 @@ contains
     !> @brief Subroutine for imposing reflective boundary conditions (left boundary).
     !> @note For avoiding the creation of temporary arrays (improving the efficiency) the array \b P is declared as assumed-shape
     !> with only the lower bound defined. Its extentions is: P [1-gc:0+gc].
-    pure subroutine set_ref_l(gc,ic,N,NF,P)
+    pure subroutine set_ref_l(gc,ic,N,NF,C)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc       !< Number of ghost cells.
-    integer(I_P),         intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
-    integer(I_P),         intent(IN)::    N        !< Number of internal cells.
-    type(Type_Vector),    intent(IN)::    NF       !< Left face normal.
-    type(Type_Primitive), intent(INOUT):: P(1-gc:) !< Left section of primitive variables [1-gc:0+gc].
-    integer(I_P)::                        i        !< Cell counter.
-    type(Type_Vector)::                   vr       !< Reflected velocity vector.
+    integer(I_P),      intent(IN)::    gc       !< Number of ghost cells.
+    integer(I_P),      intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
+    integer(I_P),      intent(IN)::    N        !< Number of internal cells.
+    type(Type_Vector), intent(IN)::    NF       !< Left face normal.
+    type(Type_Cell),   intent(INOUT):: C(1-gc:) !< Cells data [1-gc:0+gc].
+    integer(I_P)::                     i        !< Cell counter.
+    type(Type_Vector)::                vr       !< Reflected velocity vector.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
     if (ic==1.OR.N<gc) then
       ! reflection using only the cell 1
-      vr = P(1)%v - (2._R_P*(P(1)%v.paral.NF)) ! reflected velocity
+      vr = C(1)%P%v - (2._R_P*(C(1)%P%v.paral.NF)) ! reflected velocity
       do i=1-gc,0
-        P(i)%r = P(1)%r
-        P(i)%v = vr
-        P(i)%p = P(1)%p
-        P(i)%d = P(1)%d
-        P(i)%g = P(1)%g
+        C(i)%P%r = C(1)%P%r
+        C(i)%P%v = vr
+        C(i)%P%p = C(1)%P%p
+        C(i)%P%d = C(1)%P%d
+        C(i)%P%g = C(1)%P%g
       enddo
     else
       ! reflection using the cells 1,2,...,gc
       do i=1-gc,0
-        vr = P(-i+1)%v - (2._R_P*(P(-i+1)%v.paral.NF)) ! reflected velocity
-        P(i)%r = P(-i+1)%r
-        P(i)%v = vr
-        P(i)%p = P(-i+1)%p
-        P(i)%d = P(-i+1)%d
-        P(i)%g = P(-i+1)%g
+        vr = C(-i+1)%P%v - (2._R_P*(C(-i+1)%P%v.paral.NF)) ! reflected velocity
+        C(i)%P%r = C(-i+1)%P%r
+        C(i)%P%v = vr
+        C(i)%P%p = C(-i+1)%P%p
+        C(i)%P%d = C(-i+1)%P%d
+        C(i)%P%g = C(-i+1)%P%g
       enddo
     endif
     return
@@ -904,38 +884,38 @@ contains
     !> @brief Subroutine for imposing reflective boundary conditions (right boundary).
     !> @note For avoiding the creation of temporary arrays (improving the efficiency) the array \b P is declared as assumed-shape
     !> with only the lower bound defined. Its extentions is: P [N-gc:N+gc].
-    pure subroutine set_ref_r(gc,ic,N,NF,P)
+    pure subroutine set_ref_r(gc,ic,N,NF,C)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc       !< Number of ghost cells.
-    integer(I_P),         intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
-    integer(I_P),         intent(IN)::    N        !< Number of internal cells.
-    type(Type_Vector),    intent(IN)::    NF       !< Right face normal.
-    type(Type_Primitive), intent(INOUT):: P(N-gc:) !< Right section of primitive variables [N-gc:N+gc].
-    integer(I_P)::                        i        !< Cell counter.
-    type(Type_Vector)::                   vr       !< Reflected velocity vector.
+    integer(I_P),      intent(IN)::    gc       !< Number of ghost cells.
+    integer(I_P),      intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
+    integer(I_P),      intent(IN)::    N        !< Number of internal cells.
+    type(Type_Vector), intent(IN)::    NF       !< Right face normal.
+    type(Type_Cell),   intent(INOUT):: C(N-gc:) !< Cells data [N-gc:N+gc].
+    integer(I_P)::                     i        !< Cell counter.
+    type(Type_Vector)::                vr       !< Reflected velocity vector.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
     if (ic==1.OR.N<gc) then
       ! reflection using only the cell N
-      vr = P(N)%v - (2._R_P*(P(N)%v.paral.NF)) ! reflected velocity
+      vr = C(N)%P%v - (2._R_P*(C(N)%P%v.paral.NF)) ! reflected velocity
       do i=N+1,N+gc
-        P(i)%r = P(N)%r
-        P(i)%v = vr
-        P(i)%p = P(N)%p
-        P(i)%d = P(N)%d
-        P(i)%g = P(N)%g
+        C(i)%P%r = C(N)%P%r
+        C(i)%P%v = vr
+        C(i)%P%p = C(N)%P%p
+        C(i)%P%d = C(N)%P%d
+        C(i)%P%g = C(N)%P%g
       enddo
     else
       ! reflection using the cells N-gc,N-gc+1,N-gc+2,...,N
       do i=N+1,N+gc
-        vr = P(N+1-(i-N))%v - (2._R_P*(P(N+1-(i-N))%v.paral.NF)) ! reflected velocity
-        P(i)%r = P(N+1-(i-N))%r
-        P(i)%v = vr
-        P(i)%p = P(N+1-(i-N))%p
-        P(i)%d = P(N+1-(i-N))%d
-        P(i)%g = P(N+1-(i-N))%g
+        vr = C(N+1-(i-N))%P%v - (2._R_P*(C(N+1-(i-N))%P%v.paral.NF)) ! reflected velocity
+        C(i)%P%r = C(N+1-(i-N))%P%r
+        C(i)%P%v = vr
+        C(i)%P%p = C(N+1-(i-N))%P%p
+        C(i)%P%d = C(N+1-(i-N))%P%d
+        C(i)%P%g = C(N+1-(i-N))%P%g
       enddo
     endif
     return
@@ -945,15 +925,15 @@ contains
     !> @brief Subroutine for imposing periodic boundary conditions.
     !> @note For avoiding the creation of temporary arrays (improving the efficiency) the array \b P is declared as assumed-shape
     !> with only the lower bound defined. Its extentions is: P [1-gc:N+gc].
-    pure subroutine set_per(gc,ic,N,boundary,P)
+    pure subroutine set_per(gc,ic,N,boundary,C)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc       !< Number of ghost cells.
-    integer(I_P),         intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
-    integer(I_P),         intent(IN)::    N        !< Number of internal cells.
-    character(1),         intent(IN)::    boundary !< Boundary left ('l') or right ('r').
-    type(Type_Primitive), intent(INOUT):: P(1-gc:) !< Left section of primitive variables [1-gc:N+gc].
-    integer(I_P)::                        i        !< Cell counter.
+    integer(I_P),    intent(IN)::    gc       !< Number of ghost cells.
+    integer(I_P),    intent(IN)::    ic       !< Number of internal cells used for extrapolation (1 or gc).
+    integer(I_P),    intent(IN)::    N        !< Number of internal cells.
+    character(1),    intent(IN)::    boundary !< Boundary left ('l') or right ('r').
+    type(Type_Cell), intent(INOUT):: C(1-gc:) !< Cells data [1-gc:N+gc].
+    integer(I_P)::                   i        !< Cell counter.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -961,12 +941,12 @@ contains
       if (ic==1.OR.N<gc) then
         ! extrapolation using only the cell N
         do i=1-gc,0
-          P(i) = P(N)
+          C(i)%P = C(N)%P
         enddo
       else
         ! extrapolation using the cells N-gc,N-gc+1,N-gc+2,...,N
         do i=1-gc,0
-          P(i) = P(i+N)
+          C(i)%P = C(i+N)%P
         enddo
       endif
     endif
@@ -974,12 +954,12 @@ contains
       if (ic==1.OR.N<gc) then
         ! extrapolation using only the cell 1
         do i=N+1,N+gc
-          P(i) = P(1)
+          C(i)%P = C(1)%P
         enddo
       else
         ! extrapolation using the cells 1,2,...,gc
         do i=N+1,N+gc
-          P(i) = P(i-N)
+          C(i)%P = C(i-N)%P
         enddo
       endif
     endif
@@ -992,30 +972,24 @@ contains
     !> assumed-shape with only the lower bound defined. Their extentions are: bc [1-gc:0], P [1-gc:0].
     !> @note When this subroutine is called for a 'right' (Ni,Nj,Nk) boundary the section of arrays BC and P must be
     !> properly remapped: in the section [1-gc:0] must be passed the actual section [N:N+gc-1] for BC and [N+1:N+gc] for P.
-    pure subroutine set_adj(gc,bc,P)
+    pure subroutine set_adj(gc,F,C)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc        !< Number of ghost cells.
-    type(Type_BC),        intent(IN)::    bc(1-gc:) !< Boundary conditions infos           [1-gc:0].
-    type(Type_Primitive), intent(INOUT):: P (1-gc:) !< Left section of primitive variables [1-gc:0].
-    integer(I_P)::                        i,b       !< Counters.
+    integer(I_P),    intent(IN)::    gc       !< Number of ghost cells.
+    type(Type_Face), intent(IN)::    F(1-gc:) !< Faces data [1-gc:0].
+    type(Type_Cell), intent(INOUT):: C(1-gc:) !< Cells data [1-gc:0].
+    integer(I_P)::                   i,b      !< Counters.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
 #ifdef MPI2
     ! for multi-processes simulation it is possible that the adjacent cell is in other processes than the actual and in case the
     ! data have been already exchanged by the MPI subroutine Psendrecv
-    if (procmap(bc(0)%adj%b)/=global%myrank) return
+    if (procmap(F(0)%BC%adj%b)/=global%myrank) return
 #endif
     do i=1-gc,0
-      b = minloc(array=blockmap,dim=1,mask=blockmap==bc(i)%adj%b)
-      P(i) = block(b)%P(bc(i)%adj%i,bc(i)%adj%j,bc(i)%adj%k)
-      !call get_cell_lbijk(P = P(i),        &
-      !                    l = l,           &
-      !                    b = b,           &
-      !                    i = BC(i)%adj%i, &
-      !                    j = BC(i)%adj%j, &
-      !                    k = BC(i)%adj%k)
+      b = minloc(array=blockmap,dim=1,mask=blockmap==F(i)%BC%adj%b)
+      C(i)%P = block(b)%C(F(i)%BC%adj%i,F(i)%BC%adj%j,F(i)%BC%adj%k)%P
     enddo
     return
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -1026,18 +1000,18 @@ contains
     !> assumed-shape with only the lower bound defined. Their extentions are: bc [1-gc:0], P [1-gc:0].
     !> @note When this subroutine is called for a 'right' (Ni,Nj,Nk) boundary the section of arrays BC and P must be
     !> properly remapped: in the section [1-gc:0] must be passed the actual section [N:N+gc-1] for BC and [N+1:N+gc] for P.
-    pure subroutine set_in1(gc,bc,P)
+    pure subroutine set_in1(gc,F,C)
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    integer(I_P),         intent(IN)::    gc        !< Number of ghost cells.
-    type(Type_BC),        intent(IN)::    bc(1-gc:) !< Boundary conditions                 [1-gc:0].
-    type(Type_Primitive), intent(INOUT):: P (1-gc:) !< Left section of primitive variables [1-gc:0].
-    integer(I_P)::                        i         !< Cell counter.
+    integer(I_P),    intent(IN)::    gc       !< Number of ghost cells.
+    type(Type_Face), intent(IN)::    F(1-gc:) !< Faces data [1-gc:0].
+    type(Type_Cell), intent(INOUT):: C(1-gc:) !< Cells data [1-gc:0].
+    integer(I_P)::                   i        !< Cell counter.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
     do i=1-gc,0
-      P(i) = global%in1(bc(i)%inf)
+      C(i)%P = global%in1(F(i)%BC%inf)
     enddo
     return
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -1046,11 +1020,10 @@ contains
 
   !> Subroutine for summing Runge-Kutta stages for updating primitive variables (block%P).
   !> @ingroup Lib_FluidynamicPrivateProcedure
-  subroutine rk_stages_sum(s1,global,block)
+  subroutine rk_stages_sum(s1,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),       intent(IN)::   s1     !< Current Runge-Kutta stage.
-  type(Type_Global),  intent(IN)::   global !< Global-level data.
+  integer(I_P),      intent(IN)::    s1     !< Current Runge-Kutta stage.
   type(Type_SBlock), intent(INOUT):: block  !< Block-level data.
   type(Type_Conservative)::          Ud     !< Dummy conservative variables.
   integer(I8P)::                     i,j,k  !< Counters.
@@ -1058,15 +1031,15 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
 #ifdef OPENMP
-  call rk_stages_sum_openmp(s1=s1,gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,Ns=global%Ns, &
-                            cp0=global%cp0,cv0=global%cv0,Dt=block%Dt,U=block%U,KS=block%KS,P=block%P)
+  call rk_stages_sum_openmp(s1=s1,gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,Ns=block%global%Ns, &
+                            cp0=block%global%cp0,cv0=block%global%cv0,Dt=block%C%Dt,U=block%C%U,KS=block%C%KS,P=block%C%P)
 #else
-  call Ud%init(Ns = global%Ns)
+  call Ud%init(Ns = block%global%Ns)
   do k=1,block%Nk
     do j=1,block%Nj
       do i=1,block%Ni
-        call rk_stage(s1=s1,Dt=block%Dt(i,j,k),Un=block%U(i,j,k),KS=block%KS(i,j,k,1:s1-1),KS1=Ud)
-        call cons2prim(cp0 = global%cp0, cv0 = global%cv0, cons = Ud, prim = block%P(i,j,k))
+        call rk_stage(s1=s1,Dt=block%C(i,j,k)%Dt,Un=block%C(i,j,k)%U,KS=block%C(i,j,k)%KS(1:s1-1),KS1=Ud)
+        call cons2prim(cp0 = block%global%cp0, cv0 = block%global%cv0, cons = Ud, prim = block%C(i,j,k)%P)
       enddo
     enddo
   enddo
@@ -1114,33 +1087,32 @@ contains
 
   !> Subroutine for computing Runge-Kutta one time step integration.
   !> @ingroup Lib_FluidynamicPrivateProcedure
-  subroutine rk_time_integration(global,block,RU)
+  subroutine rk_time_integration(block,RU)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global), intent(IN)::    global          !< Global-level data.
-  type(Type_SBlock), intent(INOUT):: block           !< Block-level data.
-  real(R_P),         intent(OUT)::   RU(1:global%Nc) !< NormL2 of residuals of conservative variables.
-  type(Type_Conservative)::          Ud,R            !< Dummy conservative variables.
-  integer(I8P)::                     i,j,k           !< counters.
+  type(Type_SBlock), intent(INOUT):: block  !< Block-level data.
+  real(R_P),         intent(OUT)::   RU(1:) !< NormL2 of residuals of conservative variables.
+  type(Type_Conservative)::          Ud,R   !< Dummy conservative variables.
+  integer(I8P)::                     i,j,k  !< counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
 #ifdef OPENMP
-  call rk_time_integration_openmp(gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,Ns=global%Ns,Nc=global%Nc, &
-                                  Dt=block%Dt,KS=block%KS,U=block%U)
+  call rk_time_integration_openmp(gc=block%gc,Ni=block%Ni,Nj=block%Nj,Nk=block%Nk,Ns=block%global%Ns,Nc=block%global%Nc, &
+                                  Dt=block%C%Dt,KS=block%C%KS,U=block%C%U)
 #else
   RU = 0._R_P
-  call Ud%init(Ns = global%Ns)
-  call R%init( Ns = global%Ns)
+  call Ud%init(Ns = block%global%Ns)
+  call R%init( Ns = block%global%Ns)
   do k=1,block%Nk
     do j=1,block%Nj
       do i=1,block%Ni
-        call rk_time_integ(Dt=block%Dt(i,j,k),Un=block%U(i,j,k),KS=block%KS(i,j,k,1:global%rk_ord),Unp1=Ud)
-        R%rs = (Ud%rs - block%U(i,j,k)%rs)/block%Dt(i,j,k) ; R%rs = R%rs*R%rs
-        R%rv = (Ud%rv - block%U(i,j,k)%rv)/block%Dt(i,j,k) ; R%rv = R%rv*R%rv
-        R%re = (Ud%re - block%U(i,j,k)%re)/block%Dt(i,j,k) ; R%re = R%re*R%re
+        call rk_time_integ(Dt=block%C(i,j,k)%Dt,Un=block%C(i,j,k)%U,KS=block%C(i,j,k)%KS(1:block%global%rk_ord),Unp1=Ud)
+        R%rs = (Ud%rs - block%C(i,j,k)%U%rs)/block%C(i,j,k)%Dt ; R%rs = R%rs*R%rs
+        R%rv = (Ud%rv - block%C(i,j,k)%U%rv)/block%C(i,j,k)%Dt ; R%rv = R%rv*R%rv
+        R%re = (Ud%re - block%C(i,j,k)%U%re)/block%C(i,j,k)%Dt ; R%re = R%re*R%re
         RU = RU + R%cons2array()
-        block%U(i,j,k) = Ud
+        block%C(i,j,k)%U = Ud
       enddo
     enddo
   enddo
@@ -1197,37 +1169,42 @@ contains
 
   !> @ingroup Lib_FluidynamicPublicProcedure
   !> Subroutine for solving (performing one time step integration) the conservation equations for grid level "l".
-  subroutine solve_grl(l,global,block)
+  subroutine solve_grl(l,block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P),       intent(IN)::    l                 !< Current grid level.
-  type(Type_Global),  intent(INOUT):: global            !< Global-level data (see \ref Data_Type_Global::Type_Global
-                                                        !< "Type_Global" definition).
-  type(Type_SBlock), intent(INOUT):: block(1:global%Nb) !< Block-level data (see \ref Data_Type_SBlock::Type_SBlock
-                                                        !< "Type_SBlock" definition).
-  real(R_P)::       Dtmin(1:global%Nb)                  !< Min t step of actual process for each blk.
-  real(R_P)::       DtminL                              !< Min t step of actual process over all blks.
-  real(R_P)::       gDtmin                              !< Global (all processes/all blks) min t step.
-  real(R_P)::       RU  (1:global%Nc,1:global%Nb)       !< NormL2 of conservartive residuals.
-  real(R_P)::       mRU (1:global%Nc)                   !< Maximum of RU of actual process.
-  real(R_P)::       gmRU(1:global%Nc)                   !< Global (all processes) maximum of RU.
-  integer(I_P)::    err                                 !< Error trapping flag: 0 no errors, >0 errors.
-  integer(I_P)::    b                                   !< Blocks counter.
-  integer(I_P)::    s1                                  !< Runge-Kutta stages counters.
-  real(R_P)::       sec_elp                             !< Seconds elapsed from the simulation start.
-  real(R_P)::       sec_res                             !< Seconds residual from the simulation end.
-  type(Type_Time):: time_elp                            !< Time elapsed (in days,hours,min... format).
-  type(Type_Time):: time_res                            !< Time residual (in days,hours,min... format).
-  real(R_P)::       progress                            !< Status (%) of simulation progress.
+  integer(I_P),      intent(IN)::    l         !< Current grid level.
+  type(Type_SBlock), intent(INOUT):: block(1:) !< Block-level data(see \ref Data_Type_SBlock::Type_SBlock "Type_SBlock" definition).
+  type(Type_Global), pointer::       global    !< Global-level data.
+  real(R_P), allocatable::           Dtmin(:)  !< Min t step of actual process for each blk.
+  real(R_P)::                        DtminL    !< Min t step of actual process over all blks.
+  real(R_P)::                        gDtmin    !< Global (all processes/all blks) min t step.
+  real(R_P), allocatable::           RU  (:,:) !< NormL2 of conservartive residuals.
+  real(R_P), allocatable::           mRU (:)   !< Maximum of RU of actual process.
+  real(R_P), allocatable::           gmRU(:)   !< Global (all processes) maximum of RU.
+  integer(I_P)::                     err       !< Error trapping flag: 0 no errors, >0 errors.
+  integer(I_P)::                     b         !< Blocks counter.
+  integer(I_P)::                     s1        !< Runge-Kutta stages counters.
+  real(R_P)::                        sec_elp   !< Seconds elapsed from the simulation start.
+  real(R_P)::                        sec_res   !< Seconds residual from the simulation end.
+  type(Type_Time)::                  time_elp  !< Time elapsed (in days,hours,min... format).
+  type(Type_Time)::                  time_res  !< Time residual (in days,hours,min... format).
+  real(R_P)::                        progress  !< Status (%) of simulation progress.
+  integer(I_P)::                     i,j,k     !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
+  global => block(1)%global
+  ! allocating dynamic arrays
+  allocate(Dtmin(1:global%Nb))
+  allocate(RU(1:global%Nc,1:global%Nb))
+  allocate(mRU(1:global%Nc))
+  allocate(gmRU(1:global%Nc))
   ! converting conservative variables to primitive ones
 #ifdef PROFILING
   call profile(p=2,pstart=.true.,myrank=global%myrank)
 #endif
   do b=1,global%Nb
-    call conservative2primitive(global = global, block = block(b))
+    call conservative2primitive(block = block(b))
   enddo
 #ifdef PROFILING
   call profile(p=2,pstop=.true.,myrank=global%myrank)
@@ -1237,7 +1214,7 @@ contains
 #ifdef PROFILING
   call profile(p=3,pstart=.true.,myrank=global%myrank)
 #endif
-  call boundary_conditions(l = l, global = global, block = block)
+  call boundary_conditions(l = l, block = block)
 #ifdef PROFILING
   call profile(p=3,pstop=.true.,myrank=global%myrank)
 #endif
@@ -1247,8 +1224,7 @@ contains
     if ((mod(global%n,global%file%sol_out)==0).OR.(global%t==global%Tmax).OR.(global%n==global%Nmax)) then
       do b=1,global%Nb
         err= block(b)%save_fluid(filename=file_name(basename=trim(global%file%Path_OutPut)//global%file%File_Sol,&
-                                                    suffix='.sol',blk=blockmap(b),grl=l,n=global%n),             &
-                                 global=global)
+                                                    suffix='.sol',blk=blockmap(b),grl=l,n=global%n))
       enddo
     endif
   endif
@@ -1258,8 +1234,7 @@ contains
     flip = 1_I1P - flip
     do b=1,global%Nb
       err= block(b)%save_fluid(filename=file_name(basename=trim(global%file%Path_OutPut)//global%file%File_Sol,&
-                                                  suffix='.sol',blk=blockmap(b),grl=l,flip=flip),              &
-                                                  global=global)
+                                                  suffix='.sol',blk=blockmap(b),grl=l,flip=flip))
     enddo
   endif
 
@@ -1269,7 +1244,7 @@ contains
   call profile(p=4,pstart=.true.,myrank=global%myrank)
 #endif
   do b=1,global%Nb
-    call compute_time(global=global,block=block(b),Dtmin=Dtmin(b))
+    call compute_time(block=block(b),Dtmin=Dtmin(b))
   enddo
 #ifdef PROFILING
   call profile(p=4,pstop=.true.,myrank=global%myrank)
@@ -1293,7 +1268,7 @@ contains
     endif
     global%t = global%t + gDtmin
     do b=1,global%Nb
-      block(b)%Dt = gDtmin
+      block(b)%C%Dt = gDtmin
     enddo
   endif
 
@@ -1333,23 +1308,32 @@ contains
   ! evaluating the Runge-Kutta stages
   ! Runge-Kutta stages initialization
   do b=1,global%Nb
-    block(b)%KS = 0._R_P
+    do k=1-block(b)%gc(5),block(b)%Nk+block(b)%gc(6)
+      do j=1-block(b)%gc(3),block(b)%Nj+block(b)%gc(4)
+        do i=1-block(b)%gc(1),block(b)%Ni+block(b)%gc(2)
+          do s1=1,global%rk_ord
+            block(b)%C(i,j,k)%KS(s1) = 0._R_P
+          enddo
+        enddo
+      enddo
+    enddo
   enddo
   do s1=1,global%rk_ord
     if (s1>1) then
-      ! summing the stages up to s1-1 for update P
+      ! summing the stages up to s1-1: $K_{s1}=R\left(U^n+\sum_{s2=1}^{s1-1}{Dt \cdot rk_{c2}(s1,s2) \cdot K_{s2}}\right)$
+      ! updating primitive variables: $P=conservative2primitive(K_{s1})$
       do b=1,global%Nb
-          call rk_stages_sum(s1=s1,global=global,block=block(b))
+          call rk_stages_sum(s1=s1,block=block(b))
       enddo
       ! imposing the boundary conditions
-      call boundary_conditions(l = l, global = global, block = block)
+      call boundary_conditions(l = l, block = block)
     endif
-    ! computing the s1-th Runge-Kutta stage: K_s1=R(Un+sum_s2=1^s1-1(Dt*rk_c2(s1,s2)*K_s2))
+    ! computing the s1-th Runge-Kutta stage
 #ifdef PROFILING
     call profile(p=5,pstart=.true.,myrank=global%myrank)
 #endif
     do b=1,global%Nb
-      call residuals(s1=s1,global=global,block=block(b))
+      call residuals(s1=s1,block=block(b))
     enddo
 #ifdef PROFILING
     call profile(p=5,pstop=.true.,myrank=global%myrank)
@@ -1360,7 +1344,7 @@ contains
     call profile(p=6,pstart=.true.,myrank=global%myrank)
 #endif
   do b=1,global%Nb
-    call rk_time_integration(global=global,block=block(b),RU=RU(:,b))
+    call rk_time_integration(block=block(b),RU=RU(:,b))
   enddo
 #ifdef PROFILING
     call profile(p=6,pstop=.true.,myrank=global%myrank)
@@ -1381,6 +1365,11 @@ contains
       write(global%file%unit_res,trim(global%file%varform_res))global%n,global%t,(gmRU(b),b=1,global%Nc)
     endif
   endif
+  ! deallocating dynamic arrays
+  deallocate(Dtmin)
+  deallocate(RU)
+  deallocate(mRU)
+  deallocate(gmRU)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine solve_grl

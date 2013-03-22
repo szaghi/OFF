@@ -1,6 +1,16 @@
+!> @ingroup DerivedType
+!> @{
+!> @defgroup Data_Type_VectorDerivedType Data_Type_Vector
+!> @}
+
 !> @ingroup GlobalVarPar
 !> @{
-!> @defgroup Data_Type_Vector Data_Type_Vector
+!> @defgroup Data_Type_VectorGlobalVarPar Data_Type_Vector
+!> @}
+
+!> @ingroup Interface
+!> @{
+!> @defgroup Data_Type_VectorInterface Data_Type_Vector
 !> @}
 
 !> @ingroup PublicProcedure
@@ -54,12 +64,13 @@ public:: operator (.ortho.)
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
+!> @ingroup Data_Type_VectorDerivedType
+!> @{
 !> Derived type defining vectors.
-!> @ingroup DerivedType
 type, public:: Type_Vector
-  real(R_P):: x = 0._R_P !< Cartesian component in x direction.
-  real(R_P):: y = 0._R_P !< Cartesian component in y direction.
-  real(R_P):: z = 0._R_P !< Cartesian component in z direction.
+  real(R8P):: x = 0._R8P !< Cartesian component in x direction.
+  real(R8P):: y = 0._R8P !< Cartesian component in y direction.
+  real(R8P):: z = 0._R8P !< Cartesian component in z direction.
   contains
     procedure, non_overridable:: set                         ! Procedure for setting vector components.
     procedure, non_overridable:: pprint                      ! Procedure for printing vector components with a "pretty" format.
@@ -67,20 +78,25 @@ type, public:: Type_Vector
     procedure, non_overridable:: normL2                      ! Procedure for computing the norm L2 of a vector.
     procedure, non_overridable:: normalize => normalize_self ! Procedure for normalizing a vector.
 endtype Type_Vector
-!> @ingroup Data_Type_Vector
+!> Pointer of Type_Vector for creating array of pointers of Type_Vector.
+type, public:: Type_Vector_Ptr
+  type(Type_Vector), pointer:: p => null()
+endtype Type_Vector_Ptr
+!> @}
+!> @ingroup Data_Type_VectorGlobalVarPar
 !> @{
-type(Type_Vector), parameter:: ex = Type_Vector(1._R_P,0._R_P,0._R_P) !< X direction versor
+type(Type_Vector), parameter:: ex = Type_Vector(1._R8P,0._R8P,0._R8P) !< X direction versor
                                                                       !< (see \ref Data_Type_Vector::Type_Vector "definition").
-type(Type_Vector), parameter:: ey = Type_Vector(0._R_P,1._R_P,0._R_P) !< Y direction versor
+type(Type_Vector), parameter:: ey = Type_Vector(0._R8P,1._R8P,0._R8P) !< Y direction versor
                                                                       !< (see \ref Data_Type_Vector::Type_Vector "definition").
-type(Type_Vector), parameter:: ez = Type_Vector(0._R_P,0._R_P,1._R_P) !< Z direction versor
+type(Type_Vector), parameter:: ez = Type_Vector(0._R8P,0._R8P,1._R8P) !< Z direction versor
                                                                       !< (see \ref Data_Type_Vector::Type_Vector "definition").
 !> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @brief Assignment operator (=) overloading.
-!> @ingroup Interface
+!> @ingroup Data_Type_VectorInterface
 interface assignment (=)
 #ifdef r16p
   module procedure assign_ScalR16P
@@ -91,7 +107,7 @@ interface assignment (=)
   module procedure assign_ScalI4P
   module procedure assign_ScalI2P
   module procedure assign_ScalI1P
-end interface
+endinterface
 !> @brief Multiplication operator (*) overloading.
 !> @note The admissible multiplications are:
 !>       - Type_Vector * Type_Vector: each component of first vector variable (vec1) is multiplied for the
@@ -99,17 +115,17 @@ end interface
 !>         \f$ {\rm result\%x = vec1\%x*vec2\%x} \f$ \n
 !>         \f$ {\rm result\%y = vec1\%y*vec2\%y} \f$ \n
 !>         \f$ {\rm result\%z = vec1\%z*vec2\%z} \f$ \n
-!>       - scalar number (real or integer of any kinds defined in IR_Precision module) * Type_Vector: each component of
+!>       - scalar number (real or integer of any kind defined in IR_Precision module) * Type_Vector: each component of
 !>         Type_Vector is multiplied for the scalar, i.e. \n
 !>         \f$ {\rm result\%x = vec\%x*scalar} \f$ \n
 !>         \f$ {\rm result\%y = vec\%y*scalar} \f$ \n
 !>         \f$ {\rm result\%z = vec\%z*scalar} \f$ \n
-!>       - Type_Vector * scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>       - Type_Vector * scalar number (real or integer of any kind defined in IR_Precision module): each component of
 !>         Type_Vector is multiplied for the scalar, i.e. \n
 !>         \f$ {\rm result\%x = vec\%x*scalar} \f$ \n
 !>         \f$ {\rm result\%y = vec\%y*scalar} \f$ \n
 !>         \f$ {\rm result\%z = vec\%z*scalar} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_VectorInterface
 interface operator (*)
   module procedure vec_mul_vec
 #ifdef r16p
@@ -138,12 +154,12 @@ endinterface
 !>         \f$ {\rm result\%x = \frac{vec1\%x}{vec2\%x}} \f$ \n
 !>         \f$ {\rm result\%y = \frac{vec1\%y}{vec2\%y}} \f$ \n
 !>         \f$ {\rm result\%z = \frac{vec1\%z}{vec2\%z}} \f$ \n
-!>       - Type_Vector / scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>       - Type_Vector / scalar number (real or integer of any kind defined in IR_Precision module): each component of
 !>         Type_Vector is divided for the scalar, i.e. \n
 !>         \f$ {\rm result\%x = \frac{vec\%x}{scalar}} \f$ \n
 !>         \f$ {\rm result\%y = \frac{vec\%y}{scalar}} \f$ \n
 !>         \f$ {\rm result\%z = \frac{vec\%z}{scalar}} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_VectorInterface
 interface operator (/)
   module procedure vec_div_vec
 #ifdef r16p
@@ -163,17 +179,17 @@ endinterface
 !>         \f$ {\rm result\%x = vec1\%x+vec2\%x} \f$ \n
 !>         \f$ {\rm result\%y = vec1\%y+vec2\%y} \f$ \n
 !>         \f$ {\rm result\%z = vec1\%z+vec2\%z} \f$ \n
-!>       - scalar number (real or integer of any kinds defined in IR_Precision module) + Type_Vector: each component of
+!>       - scalar number (real or integer of any kind defined in IR_Precision module) + Type_Vector: each component of
 !>         Type_Vector is summed with the scalar, i.e. \n
 !>         \f$ {\rm result\%x = vec\%x+scalar} \f$ \n
 !>         \f$ {\rm result\%y = vec\%y+scalar} \f$ \n
 !>         \f$ {\rm result\%z = vec\%z+scalar} \f$ \n
-!>       - Type_Vector + scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>       - Type_Vector + scalar number (real or integer of any kind defined in IR_Precision module): each component of
 !>         Type_Vector is summed with the scalar, i.e. \n
 !>         \f$ {\rm result\%x = vec\%x+scalar} \f$ \n
 !>         \f$ {\rm result\%y = vec\%y+scalar} \f$ \n
 !>         \f$ {\rm result\%z = vec\%z+scalar} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_VectorInterface
 interface operator (+)
   module procedure positive_vec
   module procedure vec_sum_vec
@@ -203,17 +219,17 @@ endinterface
 !>         \f$ {\rm result\%x = vec1\%x-vec2\%x} \f$ \n
 !>         \f$ {\rm result\%y = vec1\%y-vec2\%y} \f$ \n
 !>         \f$ {\rm result\%z = vec1\%z-vec2\%z} \f$ \n
-!>       - scalar number (real or integer of any kinds defined in IR_Precision module) - Type_Vector: each component of
+!>       - scalar number (real or integer of any kind defined in IR_Precision module) - Type_Vector: each component of
 !>         Type_Vector is subtracted with the scalar, i.e. \n
 !>         \f$ {\rm result\%x = scalar-vec\%x} \f$ \n
 !>         \f$ {\rm result\%y = scalar-vec\%y} \f$ \n
 !>         \f$ {\rm result\%z = scalar-vec\%z} \f$ \n
-!>       - Type_Vector - scalar number (real or integer of any kinds defined in IR_Precision module): each component of
+!>       - Type_Vector - scalar number (real or integer of any kind defined in IR_Precision module): each component of
 !>         Type_Vector is subtracted with the scalar, i.e. \n
 !>         \f$ {\rm result\%x = vec\%x-scalar} \f$ \n
 !>         \f$ {\rm result\%y = vec\%y-scalar} \f$ \n
 !>         \f$ {\rm result\%z = vec\%z-scalar} \f$ \n
-!> @ingroup Interface
+!> @ingroup Data_Type_VectorInterface
 interface operator (-)
   module procedure negative_vec
   module procedure vec_sub_vec
@@ -238,8 +254,8 @@ interface operator (-)
 endinterface
 !> @brief Not-equal-to boolean operator (/=) overloading.
 !> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
-!> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
-!> @ingroup Interface
+!> (real or integer of any kind as defined in IR_Precision module) is made on only normL2 of the vector.
+!> @ingroup Data_Type_VectorInterface
 interface operator (/=)
   module procedure vec_not_eq_vec
 #ifdef r16p
@@ -254,8 +270,8 @@ interface operator (/=)
 endinterface
 !> @brief Lower-than boolean operator (<) overloading.
 !> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
-!> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
-!> @ingroup Interface
+!> (real or integer of any kind as defined in IR_Precision module) is made on only normL2 of the vector.
+!> @ingroup Data_Type_VectorInterface
 interface operator (<)
   module procedure vec_low_vec
 #ifdef r16p
@@ -270,8 +286,8 @@ interface operator (<)
 endinterface
 !> @brief Lower-equal-than boolean operator (<=) overloading.
 !> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
-!> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
-!> @ingroup Interface
+!> (real or integer of any kind as defined in IR_Precision module) is made on only normL2 of the vector.
+!> @ingroup Data_Type_VectorInterface
 interface operator (<=)
   module procedure vec_low_eq_vec
 #ifdef r16p
@@ -286,8 +302,8 @@ interface operator (<=)
 endinterface
 !> @brief Equal-to boolean operator (==) overloading.
 !> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
-!> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
-!> @ingroup Interface
+!> (real or integer of any kind as defined in IR_Precision module) is made on only normL2 of the vector.
+!> @ingroup Data_Type_VectorInterface
 interface operator (==)
   module procedure vec_eq_vec
 #ifdef r16p
@@ -302,8 +318,8 @@ interface operator (==)
 endinterface
 !> @brief Higher-equal-than boolean operator (>=) overloading.
 !> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
-!> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
-!> @ingroup Interface
+!> (real or integer of any kind as defined in IR_Precision module) is made on only normL2 of the vector.
+!> @ingroup Data_Type_VectorInterface
 interface operator (>=)
   module procedure vec_great_eq_vec
 #ifdef r16p
@@ -318,8 +334,8 @@ interface operator (>=)
 endinterface
 !> @brief Higher-than boolean operator (>) overloading.
 !> @note The boolean comparison between two vectors is made on normL2 and direction, while the comparison between scalar number
-!> (real or integer of any kinds as defined in IR_Precision module) is made on only normL2 of the vector.
-!> @ingroup Interface
+!> (real or integer of any kind as defined in IR_Precision module) is made on only normL2 of the vector.
+!> @ingroup Data_Type_VectorInterface
 interface operator (>)
   module procedure vec_great_vec
 #ifdef r16p
@@ -333,24 +349,24 @@ interface operator (>)
   module procedure I1P_great_vec,vec_great_I1P
 endinterface
 !> @brief Cross product operator (.cross.) definition.
-!> @ingroup Interface
+!> @ingroup Data_Type_VectorInterface
 interface operator (.cross.)
   module procedure crossproduct
 endinterface
 !> @brief Dot product operator (.dot.) definition.
-!> @ingroup Interface
+!> @ingroup Data_Type_VectorInterface
 interface operator (.dot.)
   module procedure dotproduct
 endinterface
 !> @brief Parallel product operator (.paral.) definition.
 !> @note This operator produces a vector with the normL2 of first vector and parallel to the second vector.
-!> @ingroup Interface
+!> @ingroup Data_Type_VectorInterface
 interface operator (.paral.)
   module procedure parallel
 endinterface
 !> @brief Orthogonal product operator (.ortho.) definition.
 !> @note This operator produces a vector with the normL2 of first vector and orthogonal to the second vector.
-!> @ingroup Interface
+!> @ingroup Data_Type_VectorInterface
 interface operator (.ortho.)
   module procedure orthogonal
 endinterface
@@ -365,7 +381,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Vector), intent(IN):: vec !< Vector.
-  real(R_P)::                      sq  !< Square of the Norm.
+  real(R8P)::                      sq  !< Square of the Norm.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -381,7 +397,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Vector), intent(IN):: vec  !< Vector.
-  real(R_P)::                      norm !< Norm L2.
+  real(R8P)::                      norm !< Norm L2.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -391,21 +407,21 @@ contains
   endfunction normL2
 
   !> @brief Function for normalizing a vector.
-  !> The normalization is made by means of norm L2. If the norm L2 of the vector is less than the parameter smallR_P the
-  !> normalization value is set to normL2(vec)+smallR_P.
+  !> The normalization is made by means of norm L2. If the norm L2 of the vector is less than the parameter smallR8P the
+  !> normalization value is set to normL2(vec)+smallR8P.
   !> @return \b norm normalized vector
   elemental function normalize(vec) result(norm)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Vector), intent(IN):: vec  !< Vector to be normalized.
   type(Type_Vector)::             norm !< Vector normalized.
-  real(R_P)::                     nm   !< Norm L2 of vector.
+  real(R8P)::                     nm   !< Norm L2 of vector.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   nm = normL2(vec)
-  if (nm < smallR_P) then
-    nm = nm + smallR_P
+  if (nm < smallR8P) then
+    nm = nm + smallR8P
   endif
   norm%x = vec%x/nm
   norm%y = vec%y/nm
@@ -445,7 +461,7 @@ contains
   if (present(norm)) then
     fnormal = normalize(d13.cross.d24)
   else
-    fnormal = 0.5_R_P*(d13.cross.d24)
+    fnormal = 0.5_R8P*(d13.cross.d24)
   endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -481,7 +497,7 @@ contains
   if (present(norm)) then
     fnormal = normalize(s12.cross.s13)
   else
-    fnormal = 0.5_R_P*(s12.cross.s13)
+    fnormal = 0.5_R8P*(s12.cross.s13)
   endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -603,9 +619,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Vector), intent(INOUT)::        vec !< Vector.
-  real(R_P),          intent(IN), optional:: x   !< Cartesian component in x direction.
-  real(R_P),          intent(IN), optional:: y   !< Cartesian component in y direction.
-  real(R_P),          intent(IN), optional:: z   !< Cartesian component in z direction.
+  real(R8P),          intent(IN), optional:: x   !< Cartesian component in x direction.
+  real(R8P),          intent(IN), optional:: y   !< Cartesian component in y direction.
+  real(R8P),          intent(IN), optional:: z   !< Cartesian component in z direction.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -638,19 +654,19 @@ contains
   endfunction pprint
 
   !> @brief Subroutine for normalizing a vector.
-  !> The normalization is made by means of norm L2. If the norm L2 of the vector is less than the parameter smallR_P the
-  !> normalization value is set to normL2(vec)+smallR_P.
+  !> The normalization is made by means of norm L2. If the norm L2 of the vector is less than the parameter smallR8P the
+  !> normalization value is set to normL2(vec)+smallR8P.
   elemental subroutine normalize_self(vec)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Vector), intent(INOUT):: vec !< Vector to be normalized.
-  real(R_P)::                         nm  !< Norm L2 of vector.
+  real(R8P)::                         nm  !< Norm L2 of vector.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   nm = normL2(vec)
-  if (nm < smallR_P) then
-    nm = nm + smallR_P
+  if (nm < smallR8P) then
+    nm = nm + smallR8P
   endif
   vec%x = vec%x/nm
   vec%y = vec%y/nm
@@ -673,9 +689,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  vec%x = real(scal,R_P)
-  vec%y = real(scal,R_P)
-  vec%z = real(scal,R_P)
+  vec%x = real(scal,R8P)
+  vec%y = real(scal,R8P)
+  vec%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR16P
@@ -693,9 +709,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  vec%x = real(scal,R_P)
-  vec%y = real(scal,R_P)
-  vec%z = real(scal,R_P)
+  vec%x = real(scal,R8P)
+  vec%y = real(scal,R8P)
+  vec%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR8P
@@ -712,9 +728,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  vec%x = real(scal,R_P)
-  vec%y = real(scal,R_P)
-  vec%z = real(scal,R_P)
+  vec%x = real(scal,R8P)
+  vec%y = real(scal,R8P)
+  vec%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR4P
@@ -731,9 +747,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  vec%x = real(scal,R_P)
-  vec%y = real(scal,R_P)
-  vec%z = real(scal,R_P)
+  vec%x = real(scal,R8P)
+  vec%y = real(scal,R8P)
+  vec%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI8P
@@ -750,9 +766,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  vec%x = real(scal,R_P)
-  vec%y = real(scal,R_P)
-  vec%z = real(scal,R_P)
+  vec%x = real(scal,R8P)
+  vec%y = real(scal,R8P)
+  vec%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI4P
@@ -769,9 +785,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  vec%x = real(scal,R_P)
-  vec%y = real(scal,R_P)
-  vec%z = real(scal,R_P)
+  vec%x = real(scal,R8P)
+  vec%y = real(scal,R8P)
+  vec%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI2P
@@ -788,9 +804,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  vec%x = real(scal,R_P)
-  vec%y = real(scal,R_P)
-  vec%z = real(scal,R_P)
+  vec%x = real(scal,R8P)
+  vec%y = real(scal,R8P)
+  vec%z = real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI1P
@@ -830,9 +846,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR16P_mul_vec
@@ -850,9 +866,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_mul_ScalR16P
@@ -871,9 +887,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR8P_mul_vec
@@ -891,9 +907,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_mul_ScalR8P
@@ -911,9 +927,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR4P_mul_vec
@@ -931,9 +947,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_mul_ScalR4P
@@ -951,9 +967,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI8P_mul_vec
@@ -971,9 +987,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_mul_ScalI8P
@@ -991,9 +1007,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI4P_mul_vec
@@ -1011,9 +1027,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_mul_ScalI4P
@@ -1031,9 +1047,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI2P_mul_vec
@@ -1051,9 +1067,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_mul_ScalI2P
@@ -1071,9 +1087,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI1P_mul_vec
@@ -1091,9 +1107,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mul%x = real(scal,R_P) * vec%x
-  mul%y = real(scal,R_P) * vec%y
-  mul%z = real(scal,R_P) * vec%z
+  mul%x = real(scal,R8P) * vec%x
+  mul%y = real(scal,R8P) * vec%y
+  mul%z = real(scal,R8P) * vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_mul_ScalI1P
@@ -1133,9 +1149,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = vec%x / real(scal,R_P)
-  div%y = vec%y / real(scal,R_P)
-  div%z = vec%z / real(scal,R_P)
+  div%x = vec%x / real(scal,R8P)
+  div%y = vec%y / real(scal,R8P)
+  div%z = vec%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_div_ScalR16P
@@ -1154,9 +1170,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = vec%x / real(scal,R_P)
-  div%y = vec%y / real(scal,R_P)
-  div%z = vec%z / real(scal,R_P)
+  div%x = vec%x / real(scal,R8P)
+  div%y = vec%y / real(scal,R8P)
+  div%z = vec%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_div_ScalR8P
@@ -1174,9 +1190,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = vec%x / real(scal,R_P)
-  div%y = vec%y / real(scal,R_P)
-  div%z = vec%z / real(scal,R_P)
+  div%x = vec%x / real(scal,R8P)
+  div%y = vec%y / real(scal,R8P)
+  div%z = vec%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_div_ScalR4P
@@ -1194,9 +1210,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = vec%x / real(scal,R_P)
-  div%y = vec%y / real(scal,R_P)
-  div%z = vec%z / real(scal,R_P)
+  div%x = vec%x / real(scal,R8P)
+  div%y = vec%y / real(scal,R8P)
+  div%z = vec%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_div_ScalI8P
@@ -1214,9 +1230,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = vec%x / real(scal,R_P)
-  div%y = vec%y / real(scal,R_P)
-  div%z = vec%z / real(scal,R_P)
+  div%x = vec%x / real(scal,R8P)
+  div%y = vec%y / real(scal,R8P)
+  div%z = vec%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_div_ScalI4P
@@ -1234,9 +1250,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = vec%x / real(scal,R_P)
-  div%y = vec%y / real(scal,R_P)
-  div%z = vec%z / real(scal,R_P)
+  div%x = vec%x / real(scal,R8P)
+  div%y = vec%y / real(scal,R8P)
+  div%z = vec%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_div_ScalI2P
@@ -1254,9 +1270,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  div%x = vec%x / real(scal,R_P)
-  div%y = vec%y / real(scal,R_P)
-  div%z = vec%z / real(scal,R_P)
+  div%x = vec%x / real(scal,R8P)
+  div%y = vec%y / real(scal,R8P)
+  div%z = vec%z / real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_div_ScalI1P
@@ -1315,9 +1331,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR16P_sum_vec
@@ -1335,9 +1351,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sum_ScalR16P
@@ -1356,9 +1372,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR8P_sum_vec
@@ -1376,9 +1392,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sum_ScalR8P
@@ -1396,9 +1412,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR4P_sum_vec
@@ -1416,9 +1432,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sum_ScalR4P
@@ -1436,9 +1452,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI8P_sum_vec
@@ -1456,9 +1472,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sum_ScalI8P
@@ -1476,9 +1492,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI4P_sum_vec
@@ -1496,9 +1512,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sum_ScalI4P
@@ -1516,9 +1532,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI2P_sum_vec
@@ -1536,9 +1552,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sum_ScalI2P
@@ -1556,9 +1572,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI1P_sum_vec
@@ -1576,9 +1592,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  summ%x = real(scal,R_P) + vec%x
-  summ%y = real(scal,R_P) + vec%y
-  summ%z = real(scal,R_P) + vec%z
+  summ%x = real(scal,R8P) + vec%x
+  summ%y = real(scal,R8P) + vec%y
+  summ%z = real(scal,R8P) + vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sum_ScalI1P
@@ -1637,9 +1653,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - vec%x
-  sub%y = real(scal,R_P) - vec%y
-  sub%z = real(scal,R_P) - vec%z
+  sub%x = real(scal,R8P) - vec%x
+  sub%y = real(scal,R8P) - vec%y
+  sub%z = real(scal,R8P) - vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR16P_sub_vec
@@ -1657,9 +1673,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = vec%x - real(scal,R_P)
-  sub%y = vec%y - real(scal,R_P)
-  sub%z = vec%z - real(scal,R_P)
+  sub%x = vec%x - real(scal,R8P)
+  sub%y = vec%y - real(scal,R8P)
+  sub%z = vec%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sub_ScalR16P
@@ -1678,9 +1694,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - vec%x
-  sub%y = real(scal,R_P) - vec%y
-  sub%z = real(scal,R_P) - vec%z
+  sub%x = real(scal,R8P) - vec%x
+  sub%y = real(scal,R8P) - vec%y
+  sub%z = real(scal,R8P) - vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR8P_sub_vec
@@ -1698,9 +1714,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = vec%x - real(scal,R_P)
-  sub%y = vec%y - real(scal,R_P)
-  sub%z = vec%z - real(scal,R_P)
+  sub%x = vec%x - real(scal,R8P)
+  sub%y = vec%y - real(scal,R8P)
+  sub%z = vec%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sub_ScalR8P
@@ -1718,9 +1734,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - vec%x
-  sub%y = real(scal,R_P) - vec%y
-  sub%z = real(scal,R_P) - vec%z
+  sub%x = real(scal,R8P) - vec%x
+  sub%y = real(scal,R8P) - vec%y
+  sub%z = real(scal,R8P) - vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalR4P_sub_vec
@@ -1738,9 +1754,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = vec%x - real(scal,R_P)
-  sub%y = vec%y - real(scal,R_P)
-  sub%z = vec%z - real(scal,R_P)
+  sub%x = vec%x - real(scal,R8P)
+  sub%y = vec%y - real(scal,R8P)
+  sub%z = vec%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sub_ScalR4P
@@ -1758,9 +1774,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - vec%x
-  sub%y = real(scal,R_P) - vec%y
-  sub%z = real(scal,R_P) - vec%z
+  sub%x = real(scal,R8P) - vec%x
+  sub%y = real(scal,R8P) - vec%y
+  sub%z = real(scal,R8P) - vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI8P_sub_vec
@@ -1778,9 +1794,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = vec%x - real(scal,R_P)
-  sub%y = vec%y - real(scal,R_P)
-  sub%z = vec%z - real(scal,R_P)
+  sub%x = vec%x - real(scal,R8P)
+  sub%y = vec%y - real(scal,R8P)
+  sub%z = vec%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sub_ScalI8P
@@ -1798,9 +1814,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - vec%x
-  sub%y = real(scal,R_P) - vec%y
-  sub%z = real(scal,R_P) - vec%z
+  sub%x = real(scal,R8P) - vec%x
+  sub%y = real(scal,R8P) - vec%y
+  sub%z = real(scal,R8P) - vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI4P_sub_vec
@@ -1818,9 +1834,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = vec%x - real(scal,R_P)
-  sub%y = vec%y - real(scal,R_P)
-  sub%z = vec%z - real(scal,R_P)
+  sub%x = vec%x - real(scal,R8P)
+  sub%y = vec%y - real(scal,R8P)
+  sub%z = vec%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sub_ScalI4P
@@ -1838,9 +1854,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - vec%x
-  sub%y = real(scal,R_P) - vec%y
-  sub%z = real(scal,R_P) - vec%z
+  sub%x = real(scal,R8P) - vec%x
+  sub%y = real(scal,R8P) - vec%y
+  sub%z = real(scal,R8P) - vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI2P_sub_vec
@@ -1858,9 +1874,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = vec%x - real(scal,R_P)
-  sub%y = vec%y - real(scal,R_P)
-  sub%z = vec%z - real(scal,R_P)
+  sub%x = vec%x - real(scal,R8P)
+  sub%y = vec%y - real(scal,R8P)
+  sub%z = vec%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sub_ScalI2P
@@ -1878,9 +1894,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = real(scal,R_P) - vec%x
-  sub%y = real(scal,R_P) - vec%y
-  sub%z = real(scal,R_P) - vec%z
+  sub%x = real(scal,R8P) - vec%x
+  sub%y = real(scal,R8P) - vec%y
+  sub%z = real(scal,R8P) - vec%z
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ScalI1P_sub_vec
@@ -1898,9 +1914,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  sub%x = vec%x - real(scal,R_P)
-  sub%y = vec%y - real(scal,R_P)
-  sub%z = vec%z - real(scal,R_P)
+  sub%x = vec%x - real(scal,R8P)
+  sub%y = vec%y - real(scal,R8P)
+  sub%z = vec%z - real(scal,R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sub_ScalI1P
@@ -1946,7 +1962,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)/=normL2(vec))
+  compare = (real(scal,R8P)/=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R16P_not_eq_vec
@@ -1964,7 +1980,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)/=real(scal,R_P))
+  compare = (normL2(vec)/=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_not_eq_R16P
@@ -1983,7 +1999,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)/=normL2(vec))
+  compare = (real(scal,R8P)/=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R8P_not_eq_vec
@@ -2001,7 +2017,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)/=real(scal,R_P))
+  compare = (normL2(vec)/=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_not_eq_R8P
@@ -2019,7 +2035,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)/=normL2(vec))
+  compare = (real(scal,R8P)/=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R4P_not_eq_vec
@@ -2037,7 +2053,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)/=real(scal,R_P))
+  compare = (normL2(vec)/=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_not_eq_R4P
@@ -2055,7 +2071,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)/=normL2(vec))
+  compare = (real(scal,R8P)/=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I8P_not_eq_vec
@@ -2073,7 +2089,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)/=real(scal,R_P))
+  compare = (normL2(vec)/=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_not_eq_I8P
@@ -2091,7 +2107,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)/=normL2(vec))
+  compare = (real(scal,R8P)/=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I4P_not_eq_vec
@@ -2109,7 +2125,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)/=real(scal,R_P))
+  compare = (normL2(vec)/=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_not_eq_I4P
@@ -2127,7 +2143,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)/=normL2(vec))
+  compare = (real(scal,R8P)/=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I2P_not_eq_vec
@@ -2145,7 +2161,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)/=real(scal,R_P))
+  compare = (normL2(vec)/=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_not_eq_I2P
@@ -2163,7 +2179,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)/=normL2(vec))
+  compare = (real(scal,R8P)/=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I1P_not_eq_vec
@@ -2181,7 +2197,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)/=real(scal,R_P))
+  compare = (normL2(vec)/=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_not_eq_I1P
@@ -2219,7 +2235,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<normL2(vec))
+  compare = (real(scal,R8P)<normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R16P_low_vec
@@ -2237,7 +2253,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<real(scal,R_P))
+  compare = (normL2(vec)<real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_R16P
@@ -2256,7 +2272,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<normL2(vec))
+  compare = (real(scal,R8P)<normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R8P_low_vec
@@ -2274,7 +2290,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<real(scal,R_P))
+  compare = (normL2(vec)<real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_R8P
@@ -2292,7 +2308,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<normL2(vec))
+  compare = (real(scal,R8P)<normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R4P_low_vec
@@ -2310,7 +2326,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<real(scal,R_P))
+  compare = (normL2(vec)<real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_R4P
@@ -2328,7 +2344,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<normL2(vec))
+  compare = (real(scal,R8P)<normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I8P_low_vec
@@ -2346,7 +2362,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<real(scal,R_P))
+  compare = (normL2(vec)<real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_I8P
@@ -2364,7 +2380,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<normL2(vec))
+  compare = (real(scal,R8P)<normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I4P_low_vec
@@ -2382,7 +2398,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<real(scal,R_P))
+  compare = (normL2(vec)<real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_I4P
@@ -2400,7 +2416,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<normL2(vec))
+  compare = (real(scal,R8P)<normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I2P_low_vec
@@ -2418,7 +2434,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<real(scal,R_P))
+  compare = (normL2(vec)<real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_I2P
@@ -2436,7 +2452,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<normL2(vec))
+  compare = (real(scal,R8P)<normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I1P_low_vec
@@ -2454,7 +2470,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<real(scal,R_P))
+  compare = (normL2(vec)<real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_I1P
@@ -2492,7 +2508,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<=normL2(vec))
+  compare = (real(scal,R8P)<=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R16P_low_eq_vec
@@ -2510,7 +2526,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<=real(scal,R_P))
+  compare = (normL2(vec)<=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_eq_R16P
@@ -2529,7 +2545,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<=normL2(vec))
+  compare = (real(scal,R8P)<=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R8P_low_eq_vec
@@ -2547,7 +2563,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<=real(scal,R_P))
+  compare = (normL2(vec)<=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_eq_R8P
@@ -2565,7 +2581,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<=normL2(vec))
+  compare = (real(scal,R8P)<=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R4P_low_eq_vec
@@ -2583,7 +2599,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<=real(scal,R_P))
+  compare = (normL2(vec)<=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_eq_R4P
@@ -2601,7 +2617,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<=normL2(vec))
+  compare = (real(scal,R8P)<=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I8P_low_eq_vec
@@ -2619,7 +2635,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<=real(scal,R_P))
+  compare = (normL2(vec)<=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_eq_I8P
@@ -2637,7 +2653,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<=normL2(vec))
+  compare = (real(scal,R8P)<=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I4P_low_eq_vec
@@ -2655,7 +2671,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<=real(scal,R_P))
+  compare = (normL2(vec)<=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_eq_I4P
@@ -2673,7 +2689,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<=normL2(vec))
+  compare = (real(scal,R8P)<=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I2P_low_eq_vec
@@ -2691,7 +2707,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<=real(scal,R_P))
+  compare = (normL2(vec)<=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_eq_I2P
@@ -2709,7 +2725,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)<=normL2(vec))
+  compare = (real(scal,R8P)<=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I1P_low_eq_vec
@@ -2727,7 +2743,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)<=real(scal,R_P))
+  compare = (normL2(vec)<=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_eq_I1P
@@ -2772,7 +2788,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)==normL2(vec))
+  compare = (real(scal,R8P)==normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R16P_eq_vec
@@ -2790,7 +2806,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)==real(scal,R_P))
+  compare = (normL2(vec)==real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_eq_R16P
@@ -2809,7 +2825,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)==normL2(vec))
+  compare = (real(scal,R8P)==normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R8P_eq_vec
@@ -2827,7 +2843,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)==real(scal,R_P))
+  compare = (normL2(vec)==real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_eq_R8P
@@ -2845,7 +2861,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)==normL2(vec))
+  compare = (real(scal,R8P)==normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R4P_eq_vec
@@ -2863,7 +2879,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)==real(scal,R_P))
+  compare = (normL2(vec)==real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_eq_R4P
@@ -2881,7 +2897,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)==normL2(vec))
+  compare = (real(scal,R8P)==normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I8P_eq_vec
@@ -2899,7 +2915,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)==real(scal,R_P))
+  compare = (normL2(vec)==real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_eq_I8P
@@ -2917,7 +2933,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)==normL2(vec))
+  compare = (real(scal,R8P)==normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I4P_eq_vec
@@ -2935,7 +2951,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)==real(scal,R_P))
+  compare = (normL2(vec)==real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_eq_I4P
@@ -2953,7 +2969,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)==normL2(vec))
+  compare = (real(scal,R8P)==normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I2P_eq_vec
@@ -2971,7 +2987,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)==real(scal,R_P))
+  compare = (normL2(vec)==real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_eq_I2P
@@ -2989,7 +3005,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)==normL2(vec))
+  compare = (real(scal,R8P)==normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I1P_eq_vec
@@ -3007,7 +3023,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)==real(scal,R_P))
+  compare = (normL2(vec)==real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_eq_I1P
@@ -3045,7 +3061,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>=normL2(vec))
+  compare = (real(scal,R8P)>=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R16P_great_eq_vec
@@ -3063,7 +3079,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>=real(scal,R_P))
+  compare = (normL2(vec)>=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_eq_R16P
@@ -3082,7 +3098,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>=normL2(vec))
+  compare = (real(scal,R8P)>=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R8P_great_eq_vec
@@ -3100,7 +3116,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>=real(scal,R_P))
+  compare = (normL2(vec)>=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_eq_R8P
@@ -3118,7 +3134,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>=normL2(vec))
+  compare = (real(scal,R8P)>=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R4P_great_eq_vec
@@ -3136,7 +3152,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>=real(scal,R_P))
+  compare = (normL2(vec)>=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_eq_R4P
@@ -3154,7 +3170,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>=normL2(vec))
+  compare = (real(scal,R8P)>=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I8P_great_eq_vec
@@ -3172,7 +3188,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>=real(scal,R_P))
+  compare = (normL2(vec)>=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_eq_I8P
@@ -3190,7 +3206,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>=normL2(vec))
+  compare = (real(scal,R8P)>=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I4P_great_eq_vec
@@ -3208,7 +3224,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>=real(scal,R_P))
+  compare = (normL2(vec)>=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_eq_I4P
@@ -3226,7 +3242,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>=normL2(vec))
+  compare = (real(scal,R8P)>=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I2P_great_eq_vec
@@ -3244,7 +3260,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>=real(scal,R_P))
+  compare = (normL2(vec)>=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_eq_I2P
@@ -3262,7 +3278,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>=normL2(vec))
+  compare = (real(scal,R8P)>=normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I1P_great_eq_vec
@@ -3280,7 +3296,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>=real(scal,R_P))
+  compare = (normL2(vec)>=real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_eq_I1P
@@ -3318,7 +3334,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>normL2(vec))
+  compare = (real(scal,R8P)>normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R16P_great_vec
@@ -3336,7 +3352,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>real(scal,R_P))
+  compare = (normL2(vec)>real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_R16P
@@ -3355,7 +3371,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>normL2(vec))
+  compare = (real(scal,R8P)>normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R8P_great_vec
@@ -3373,7 +3389,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>real(scal,R_P))
+  compare = (normL2(vec)>real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_R8P
@@ -3391,7 +3407,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>normL2(vec))
+  compare = (real(scal,R8P)>normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction R4P_great_vec
@@ -3409,7 +3425,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>real(scal,R_P))
+  compare = (normL2(vec)>real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_R4P
@@ -3427,7 +3443,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>normL2(vec))
+  compare = (real(scal,R8P)>normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I8P_great_vec
@@ -3445,7 +3461,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>real(scal,R_P))
+  compare = (normL2(vec)>real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_I8P
@@ -3463,7 +3479,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>normL2(vec))
+  compare = (real(scal,R8P)>normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I4P_great_vec
@@ -3481,7 +3497,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>real(scal,R_P))
+  compare = (normL2(vec)>real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_I4P
@@ -3499,7 +3515,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>normL2(vec))
+  compare = (real(scal,R8P)>normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I2P_great_vec
@@ -3517,7 +3533,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>real(scal,R_P))
+  compare = (normL2(vec)>real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_I2P
@@ -3535,7 +3551,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (real(scal,R_P)>normL2(vec))
+  compare = (real(scal,R8P)>normL2(vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction I1P_great_vec
@@ -3553,7 +3569,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  compare = (normL2(vec)>real(scal,R_P))
+  compare = (normL2(vec)>real(scal,R8P))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_I1P
@@ -3597,7 +3613,7 @@ contains
   implicit none
   type(Type_Vector), intent(IN):: vec1 ! First vector.
   type(Type_Vector), intent(IN):: vec2 ! Second vector.
-  real(R_P)::                     dot  ! Dot product.
+  real(R8P)::                     dot  ! Dot product.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

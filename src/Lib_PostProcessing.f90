@@ -1,10 +1,30 @@
+!> @ingroup Library
+!> @{
+!> @defgroup Lib_PostProcessingLibrary Lib_PostProcessing
+!> @}
+
+!> @ingroup DerivedType
+!> @{
+!> @defgroup Lib_PostProcessingDerivedType Lib_PostProcessing
+!> @}
+
 !> @ingroup GlobalVarPar
 !> @{
-!> @defgroup Lib_PostProcessing Lib_PostProcessing
+!> @defgroup Lib_PostProcessingGlobalVarPar Lib_PostProcessing
+!> @}
+
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Lib_PostProcessingPublicProcedure Lib_PostProcessing
+!> @}
+
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Lib_PostProcessingPrivateProcedure Lib_PostProcessing
 !> @}
 
 !> This module contains the definition of procedures and variables useful for post-process the OFF data.
-!> @ingroup Library
+!> @ingroup Lib_PostProcessingLibrary
 module Lib_PostProcessing
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision        ! Integers and reals precision definition.
@@ -26,7 +46,7 @@ public:: vtk_output
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> Derived type containing the post-processing options.
-!> @ingroup DerivedType
+!> @ingroup Lib_PostProcessingDerivedType
 type, public:: Type_PP_Format
   logical:: binary = .true.  !< Binary or ascii post-process file.
   logical:: node   = .true.  !< Node or cell data location.
@@ -34,20 +54,21 @@ type, public:: Type_PP_Format
   logical:: tec    = .true.  !< Tecplot file.
   logical:: vtk    = .false. !< VTK file.
 endtype Type_PP_Format
-!> @ingroup Lib_PostProcessing
+!> @ingroup Lib_PostProcessingGlobalVarPar
 !> @{
 type(Type_PP_Format):: pp_format !< Post-processing format options (see \ref Lib_PostProcessing::Type_PP_Format "definition").
 !> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  subroutine interpolate_primitive(global,block,P)
+  !> @ingroup Lib_PostProcessingPrivateProcedure
+  !> @{
+  subroutine interpolate_primitive(block,P)
   !---------------------------------------------------------------------------------------------------------------------------------
   ! Subroutine for interpolating primitive variables at nodes.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Global),    intent(IN)::    global                              ! Global-level data.
   type(Type_SBlock),    intent(INOUT):: block                               ! Block-level data.
   type(Type_Primitive), intent(INOUT):: P(0:block%Ni,0:block%Nj,0:block%Nk) ! Primitive variables intepolated at nodes.
   real(R_P)::                           mf                                  ! Mean factor.
@@ -55,73 +76,73 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call P%init(Ns=global%Ns)
+  call P%init(Ns=block%global%Ns)
 #if !defined NULi && !defined NULj && !defined NULk
   ! 3D data
   mf = 0.125_R_P
 #elif defined NULi
-  block%P(0         ,:,:) = 0._R_P
-  block%P(block%Ni+1,:,:) = 0._R_P
+  block%C(0         ,:,:)%P = 0._R_P
+  block%C(block%Ni+1,:,:)%P = 0._R_P
 #if !defined NULj && !defined NULk
   ! 2D data
   mf = 0.25_R_P
 #elif defined NULj
   ! 1D data
   mf = 0.5_R_P
-  block%P(:,0         ,:) = 0._R_P
-  block%P(:,block%Nj+1,:) = 0._R_P
+  block%C(:,0         ,:)%P = 0._R_P
+  block%C(:,block%Nj+1,:)%P = 0._R_P
 #elif defined NULk
   ! 1D data
   mf = 0.5_R_P
-  block%P(:,:,0         ) = 0._R_P
-  block%P(:,:,block%Nk+1) = 0._R_P
+  block%C(:,:,0         )%P = 0._R_P
+  block%C(:,:,block%Nk+1)%P = 0._R_P
 #endif
 #elif defined NULj
-  block%P(:,0         ,:) = 0._R_P
-  block%P(:,block%Nj+1,:) = 0._R_P
+  block%C(:,0         ,:)%P = 0._R_P
+  block%C(:,block%Nj+1,:)%P = 0._R_P
 #if !defined NULi && !defined NULk
   ! 2D data
   mf = 0.25_R_P
 #elif defined NULi
   ! 1D data
   mf = 0.5_R_P
-  block%P(0         ,:,:) = 0._R_P
-  block%P(block%Ni+1,:,:) = 0._R_P
+  block%C(0         ,:,:)%P = 0._R_P
+  block%C(block%Ni+1,:,:)%P = 0._R_P
 #elif defined NULk
   ! 1D data
   mf = 0.5_R_P
-  block%P(:,:,0         ) = 0._R_P
-  block%P(:,:,block%Nk+1) = 0._R_P
+  block%C(:,:,0         )%P = 0._R_P
+  block%C(:,:,block%Nk+1)%P = 0._R_P
 #endif
 #elif defined NULk
-  block%P(:,:,0         ) = 0._R_P
-  block%P(:,:,block%Nk+1) = 0._R_P
+  block%C(:,:,0         )%P = 0._R_P
+  block%C(:,:,block%Nk+1)%P = 0._R_P
 #if !defined NULi && !defined NULj
   ! 2D data
   mf = 0.25_R_P
 #elif defined NULi
   ! 1D data
   mf = 0.5_R_P
-  block%P(0         ,:,:) = 0._R_P
-  block%P(block%Ni+1,:,:) = 0._R_P
+  block%C(0         ,:,:)%P = 0._R_P
+  block%C(block%Ni+1,:,:)%P = 0._R_P
 #elif defined NULj
   ! 1D data
   mf = 0.5_R_P
-  block%P(:,0         ,:) = 0._R_P
-  block%P(:,block%Nj+1,:) = 0._R_P
+  block%C(:,0         ,:)%P = 0._R_P
+  block%C(:,block%Nj+1,:)%P = 0._R_P
 #endif
 #endif
   !$OMP PARALLEL DEFAULT(NONE) &
   !$OMP PRIVATE(i,j,k)         &
-  !$OMP SHARED(global,block,P,mf)
+  !$OMP SHARED(block,P,mf)
   !$OMP DO
   do k=0,block%Nk
     do j=0,block%Nj
       do i=0,block%Ni
-          P(i,j,k) = block%P(i+1,j+1,k+1) + block%P(i,j+1,k+1) &
-                   + block%P(i+1,j  ,k+1) + block%P(i,j,  k+1) &
-                   + block%P(i+1,j+1,k  ) + block%P(i,j+1,k  ) &
-                   + block%P(i+1,j  ,k  ) + block%P(i,j  ,k  )
+          P(i,j,k) = block%C(i+1,j+1,k+1)%P + block%C(i,j+1,k+1)%P &
+                   + block%C(i+1,j  ,k+1)%P + block%C(i,j,  k+1)%P &
+                   + block%C(i+1,j+1,k  )%P + block%C(i,j+1,k  )%P &
+                   + block%C(i+1,j  ,k  )%P + block%C(i,j  ,k  )%P
           P(i,j,k) = mf*P(i,j,k)
       enddo
     enddo
@@ -174,36 +195,43 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine compute_dimensions
+  !> @}
 
+  !> @ingroup Lib_PostProcessingPublicProcedure
+  !> @{
   !> Function for writing OFF block data to Tecplot file.
-  function tec_output(meshonly,global,block,filename) result(err)
+  function tec_output(meshonly,block,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  logical,           intent(IN)::    meshonly                 !< Flag for post-process only mesh.
-  type(Type_Global), intent(IN)::    global                   !< Global-level data.
-  type(Type_SBlock), intent(INOUT):: block(1:global%Nb)       !< Block-level data.
-  character(*),      intent(IN)::    filename                 !< File name of the output file.
-  integer(I_P)::                     err                      !< Error trapping flag: 0 no errors, >0 error occurs.
+  logical,           intent(IN)::    meshonly            !< Flag for post-process only mesh.
+  type(Type_SBlock), intent(INOUT):: block(1:)           !< Block-level data.
+  character(*),      intent(IN)::    filename            !< File name of the output file.
+  integer(I_P)::                     err                 !< Error trapping flag: 0 no errors, >0 error occurs.
+  type(Type_Global), pointer::       global              !< Global-level data.
 #ifdef TECIO
-  integer(I_P), external::           tecini112,    &          ! |
-                                     tecauxstr112, &          ! |
-                                     teczne112,    &          ! | Tecplot external functions.
-                                     tecdat112,    &          ! |
-                                     tecend112                ! |
+  integer(I_P), external::           tecini112,    &     ! |
+                                     tecauxstr112, &     ! |
+                                     teczne112,    &     ! | Tecplot external functions.
+                                     tecdat112,    &     ! |
+                                     tecend112           ! |
 #endif
-  character(1), parameter::          tecendrec = char(0)      !< End-character for binary-record end.
-  character(500)::                   tecvarname               !< Variables name for tecplot header file.
-  character(500)::                   teczoneheader            !< Tecplot string of zone header.
-  character(500)::                   tecvarform               !< Format for variables for tecplot file.
-  integer(I_P)::                     tecvarloc(1:3+global%Np) !< Tecplot array of variables location.
-  character(500)::                   tecvarlocstr             !< Tecplot string of variables location.
-  integer(I_P)::                     tecnull(1:3+global%Np)   !< Tecplot null array.
-  integer(I_P)::                     tecunit                  !< Free logic unit of tecplot file.
-  integer(I_P)::                     nvar                     !< Number of variables saved.
-  integer(I_P)::                     b                        !< Counter.
+  character(1), parameter::          tecendrec = char(0) !< End-character for binary-record end.
+  character(500)::                   tecvarname          !< Variables name for tecplot header file.
+  character(500)::                   teczoneheader       !< Tecplot string of zone header.
+  character(500)::                   tecvarform          !< Format for variables for tecplot file.
+  integer(I_P), allocatable::        tecvarloc(:)        !< Tecplot array of variables location.
+  character(500)::                   tecvarlocstr        !< Tecplot string of variables location.
+  integer(I_P), allocatable::        tecnull(:)          !< Tecplot null array.
+  integer(I_P)::                     tecunit             !< Free logic unit of tecplot file.
+  integer(I_P)::                     nvar                !< Number of variables saved.
+  integer(I_P)::                     b                   !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
+  global => block(1)%global
+  ! allocating dynamic arrays
+  allocate(tecvarloc(1:3+global%Np))
+  allocate(tecnull(1:3+global%Np))
   ! initializing tecplot variables
   call tec_init()
   ! initializing tecplot file
@@ -242,6 +270,9 @@ contains
   else
     close(tecunit)
   endif
+  ! deallocating dynamic arrays
+  deallocate(tecvarloc)
+  deallocate(tecnull)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   contains
@@ -330,7 +361,7 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     if (pp_format%node) then
       ! tri-linear interpolation of cell-centered values at nodes
-      call interpolate_primitive(global=global,block=block,P=P)
+      call interpolate_primitive(block=block,P=P)
     endif
     ! initialize the zone dimensions
     call compute_dimensions(block=block,                                     &
@@ -354,7 +385,7 @@ contains
         do j=1,block%Nj
           do i=1,block%Ni
             do s=1,global%Ns
-              r(s,i,j,k) = block%P(i,j,k)%r(s)
+              r(s,i,j,k) = block%C(i,j,k)%P%r(s)
             enddo
           enddo
         enddo
@@ -406,12 +437,12 @@ contains
           do s=1,global%Ns
             err=tec_dat(N=ncell,dat=r(s,ci1:ci2,cj1:cj2,ck1:ck2))
           enddo
-          err=tec_dat(N=ncell,dat=block%P(ci1:ci2,cj1:cj2,ck1:ck2)%d  )
-          err=tec_dat(N=ncell,dat=block%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%x)
-          err=tec_dat(N=ncell,dat=block%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%y)
-          err=tec_dat(N=ncell,dat=block%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%z)
-          err=tec_dat(N=ncell,dat=block%P(ci1:ci2,cj1:cj2,ck1:ck2)%p  )
-          err=tec_dat(N=ncell,dat=block%P(ci1:ci2,cj1:cj2,ck1:ck2)%g  )
+          err=tec_dat(N=ncell,dat=block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%d  )
+          err=tec_dat(N=ncell,dat=block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%v%x)
+          err=tec_dat(N=ncell,dat=block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%v%y)
+          err=tec_dat(N=ncell,dat=block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%v%z)
+          err=tec_dat(N=ncell,dat=block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%p  )
+          err=tec_dat(N=ncell,dat=block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%g  )
         endif
       endif
     else
@@ -439,14 +470,14 @@ contains
           write(tecunit,FR_P,iostat=err)(((P(i,j,k)%g  ,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
         else
           do s=1,global%Ns
-            write(tecunit,FR_P,iostat=err)(((block%P(i,j,k)%r(s),i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+            write(tecunit,FR_P,iostat=err)(((block%C(i,j,k)%P%r(s),i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
           enddo
-          write(tecunit,FR_P,iostat=err)(((block%P(i,j,k)%d  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
-          write(tecunit,FR_P,iostat=err)(((block%P(i,j,k)%v%x,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
-          write(tecunit,FR_P,iostat=err)(((block%P(i,j,k)%v%y,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
-          write(tecunit,FR_P,iostat=err)(((block%P(i,j,k)%v%z,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
-          write(tecunit,FR_P,iostat=err)(((block%P(i,j,k)%p  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
-          write(tecunit,FR_P,iostat=err)(((block%P(i,j,k)%g  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+          write(tecunit,FR_P,iostat=err)(((block%C(i,j,k)%P%d  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+          write(tecunit,FR_P,iostat=err)(((block%C(i,j,k)%P%v%x,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+          write(tecunit,FR_P,iostat=err)(((block%C(i,j,k)%P%v%y,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+          write(tecunit,FR_P,iostat=err)(((block%C(i,j,k)%P%v%z,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+          write(tecunit,FR_P,iostat=err)(((block%C(i,j,k)%P%p  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+          write(tecunit,FR_P,iostat=err)(((block%C(i,j,k)%P%g  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
         endif
       endif
     endif
@@ -479,18 +510,19 @@ contains
   endfunction tec_output
 
   !> Function for writing OFF block data to VTK file.
-  function vtk_output(meshonly,global,block,filename) result(err)
+  function vtk_output(meshonly,block,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  logical,           intent(IN)::    meshonly           !< Flag for post-process only mesh.
-  type(Type_Global), intent(IN)::    global             !< Global-level data.
-  type(Type_SBlock), intent(INOUT):: block(1:global%Nb) !< Block-level data.
-  character(*),      intent(IN)::    filename           !< File name of the output file.
-  integer(I_P)::                     err                !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I_P)::                     b                  !< Counter.
+  logical,           intent(IN)::    meshonly  !< Flag for post-process only mesh.
+  type(Type_SBlock), intent(INOUT):: block(1:) !< Block-level data.
+  character(*),      intent(IN)::    filename  !< File name of the output file.
+  integer(I_P)::                     err       !< Error trapping flag: 0 no errors, >0 error occurs.
+  type(Type_Global), pointer::       global    !< Global-level data.
+  integer(I_P)::                     b         !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
+  global => block(1)%global
   ! writing data blocks
   do b=1,global%Nb
     err = vtk_blk_data( global = global, block = block(b), filename = trim(filename)//'_b'//trim(strz(4,b))//'.vts')
@@ -526,7 +558,7 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     if (pp_format%node) then
       ! tri-linear interpolation of cell-centered values at nodes
-      call interpolate_primitive(global=global,block=block,P=P)
+      call interpolate_primitive(block=block,P=P)
     endif
     ! initialize the block dimensions
     call compute_dimensions(block=block,                                     &
@@ -550,7 +582,7 @@ contains
         do j=1,block%Nj
           do i=1,block%Ni
             do s=1,global%Ns
-              r(s,i,j,k) = block%P(i,j,k)%r(s)
+              r(s,i,j,k) = block%C(i,j,k)%P%r(s)
             enddo
           enddo
         enddo
@@ -599,12 +631,12 @@ contains
         do s=1,global%Ns
           err=VTK_VAR_XML(NC_NN=ncell,varname='r('//trim(str(.true.,s))//')',var=reshape(r(s,ci1:ci2,cj1:cj2,ck1:ck2),(/ncell/)))
         enddo
-        err=VTK_VAR_XML(NC_NN=ncell,varname='r',var=reshape(block%P(ci1:ci2,cj1:cj2,ck1:ck2)%d,  (/ncell/)))
-        err=VTK_VAR_XML(NC_NN=ncell,varname='u',var=reshape(block%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%x,(/ncell/)))
-        err=VTK_VAR_XML(NC_NN=ncell,varname='v',var=reshape(block%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%y,(/ncell/)))
-        err=VTK_VAR_XML(NC_NN=ncell,varname='w',var=reshape(block%P(ci1:ci2,cj1:cj2,ck1:ck2)%v%z,(/ncell/)))
-        err=VTK_VAR_XML(NC_NN=ncell,varname='p',var=reshape(block%P(ci1:ci2,cj1:cj2,ck1:ck2)%p,  (/ncell/)))
-        err=VTK_VAR_XML(NC_NN=ncell,varname='g',var=reshape(block%P(ci1:ci2,cj1:cj2,ck1:ck2)%g,  (/ncell/)))
+        err=VTK_VAR_XML(NC_NN=ncell,varname='r',var=reshape(block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%d,  (/ncell/)))
+        err=VTK_VAR_XML(NC_NN=ncell,varname='u',var=reshape(block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%v%x,(/ncell/)))
+        err=VTK_VAR_XML(NC_NN=ncell,varname='v',var=reshape(block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%v%y,(/ncell/)))
+        err=VTK_VAR_XML(NC_NN=ncell,varname='w',var=reshape(block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%v%z,(/ncell/)))
+        err=VTK_VAR_XML(NC_NN=ncell,varname='p',var=reshape(block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%p,  (/ncell/)))
+        err=VTK_VAR_XML(NC_NN=ncell,varname='g',var=reshape(block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%g,  (/ncell/)))
         err=VTK_DAT_XML(var_location ='cell',var_block_action = 'close')
       endif
     endif
@@ -615,4 +647,5 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     endfunction vtk_blk_data
   endfunction vtk_output
+  !> @}
 endmodule Lib_PostProcessing

@@ -1,6 +1,0 @@
-4                                                           Nb_tot = number of total blocks
-
-0                                                           proc(bth) = rank of process where bth block is loaded
-1                                                           proc(bth) = rank of process where bth block is loaded
-2                                                           proc(bth) = rank of process where bth block is loaded
-3                                                           proc(bth) = rank of process where bth block is loaded

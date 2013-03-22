@@ -1,6 +1,16 @@
+!> @ingroup DerivedType
+!> @{
+!> @defgroup Data_Type_OSDerivedType Data_Type_OS
+!> @}
+
 !> @ingroup GlobalVarPar
 !> @{
-!> @defgroup Data_Type_OS Data_Type_OS
+!> @defgroup Data_Type_OSGlobalVarPar Data_Type_OS
+!> @}
+
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Data_Type_OSPrivateProcedure Data_Type_OS
 !> @}
 
 !> This module contains the definition of Type_OS and its procedures.
@@ -25,7 +35,7 @@ public:: win_id, c_win_id, win_sep, win_remove, win_copy, win_mkdir
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!> @ingroup Data_Type_OS
+!> @ingroup Data_Type_OSGlobalVarPar
 !> @{
 character(3), parameter:: c_uix_id   = "UIX"   !< Unix/Linux string identifier.
 integer(I1P), parameter:: uix_id     = 1_I1P   !< Unix/Linux identifier.
@@ -44,7 +54,7 @@ character(5), parameter:: win_mkdir  = "mkdir" !< MS Windows make dir command.
 !> @}
 !> @brief Derived type contains useful parameters for performing portable system calls.
 !> @note By default the Unix/Linux initalization is used.
-!> @ingroup DerivedType
+!> @ingroup Data_Type_OSDerivedType
 type, public:: Type_OS
  integer(I1P):: id     = uix_id     !< OS id.
  character(1):: sep    = uix_sep    !< OS directories separator.
@@ -57,6 +67,7 @@ endtype Type_OS
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @brief Subroutine for initializing Type_OS.
+  !> @ingroup Data_Type_OSPrivateProcedure
   subroutine init(OS,myrank,id,c_id)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none

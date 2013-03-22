@@ -1,11 +1,21 @@
+!> @ingroup Library
+!> @{
+!> @defgroup Lib_MathLibrary Lib_Math
+!> @}
+
+!> @ingroup Interface
+!> @{
+!> @defgroup Lib_MathInterface Lib_Math
+!> @}
+
 !> @ingroup GlobalVarPar
 !> @{
-!> @defgroup Lib_Math Lib_Math
+!> @defgroup Lib_MathGlobalVarPar Lib_Math
 !> @}
 
 !> This module contains mathematical procedures.
 !> @todo \b DocComplete: Complete the documentation of internal procedures
-!> @ingroup Library
+!> @ingroup Lib_MathLibrary
 module Lib_Math
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                        ! Integers and reals precision definition.
@@ -20,6 +30,7 @@ public:: stretchingrside
 public:: stretching2side
 public:: average
 public:: digit
+public:: div2
 public:: interpolate1
 public:: interpolate2
 public:: interpolate3
@@ -39,7 +50,7 @@ public:: laplacian
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! Pi greek definitions with parametric kind precision.
-!> @ingroup Lib_Math
+!> @ingroup Lib_MathGlobalVarPar
 !> @{
 #ifdef r16p
 real(R16P), parameter:: pi_R16 = 2._R16P*asin(1._R16P) !< \f$\pi \f$ with R16P precision.
@@ -51,8 +62,9 @@ real(R_P),  parameter:: pi     = 2._R_P* asin(1._R_P)  !< \f$\pi \f$ with R_P  p
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
+!> @ingroup Lib_MathInterface
+!> @{
 !>Average overloading
-!> @ingroup Interface
 interface average
 #ifdef r16p
   module procedure average_Vectorial1D_R16,average_Vectorial2D_R16,average_Vectorial3D_R16
@@ -61,12 +73,14 @@ interface average
   module procedure average_Vectorial1D_R4,average_Vectorial2D_R4,average_Vectorial3D_R4
 endinterface
 !>Digit overloading
-!> @ingroup Interface
 interface digit
   module procedure digit_I8,digit_I4,digit_I2,digit_I1
 endinterface
+!>Div2 overloading
+interface digit
+  module procedure div_I8,div_I4,div_I2,div_I1
+endinterface
 !>Linear interpolate overloading
-!> @ingroup Interface
 interface interpolate1
 #ifdef r16p
   module procedure interpolate1_R16
@@ -74,7 +88,6 @@ interface interpolate1
   module procedure interpolate1_R8,interpolate1_R4
 endinterface
 !>Bi-linear interpolate overloading
-!> @ingroup Interface
 interface interpolate2
 #ifdef r16p
   module procedure interpolate2_R16
@@ -82,7 +95,6 @@ interface interpolate2
   module procedure interpolate2_R8,interpolate2_R4
 endinterface
 !>Tri-linear interpolate overloading
-!> @ingroup Interface
 interface interpolate3
 #ifdef r16p
   module procedure interpolate3_R16
@@ -90,7 +102,6 @@ interface interpolate3
   module procedure interpolate3_R8,interpolate3_R4
 endinterface
 !>Degree overloading
-!> @ingroup Interface
 interface degree
 #ifdef r16p
   module procedure degree_Scalar_R16,degree_Vectorial1D_R16,degree_Vectorial2D_R16,degree_Vectorial3D_R16
@@ -99,7 +110,6 @@ interface degree
   module procedure degree_Scalar_R4,degree_Vectorial1D_R4,degree_Vectorial2D_R4,degree_Vectorial3D_R4
 endinterface
 !>Radiant overloading
-!> @ingroup Interface
 interface radiant
 #ifdef r16p
   module procedure radiant_Scalar_R16,radiant_Vectorial1D_R16,radiant_Vectorial2D_R16,radiant_Vectorial3D_R16
@@ -108,7 +118,6 @@ interface radiant
   module procedure radiant_Scalar_R4,radiant_Vectorial1D_R4,radiant_Vectorial2D_R4,radiant_Vectorial3D_R4
 endinterface
 !>delta1_2o overloading
-!> @ingroup Interface
 interface delta1_2o
 #ifdef r16p
   module procedure delta1_2o_R16
@@ -116,7 +125,6 @@ interface delta1_2o
   module procedure delta1_2o_R8,delta1_2o_R4
 endinterface
 !>delta2_2o overloading
-!> @ingroup Interface
 interface delta2_2o
 #ifdef r16p
   module procedure delta2_2o_R16
@@ -124,7 +132,6 @@ interface delta2_2o
   module procedure delta2_2o_R8,delta2_2o_R4
 endinterface
 !>abs_grad overloading
-!> @ingroup Interface
 interface abs_grad
 #ifdef r16p
   module procedure abs_grad_R16
@@ -132,13 +139,13 @@ interface abs_grad
   module procedure abs_grad_R8,abs_grad_R4
 endinterface
 !>laplacian overloading
-!> @ingroup Interface
 interface laplacian
 #ifdef r16p
   module procedure laplacian_R16
 #endif
   module procedure laplacian_R8,laplacian_R4
 endinterface
+!> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   ! stretching functions
@@ -525,6 +532,99 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction digit_I1
+
+  ! div2
+  elemental function div2_I1(n) result(d2)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  ! Function for computing how many times an integer is divisible for 2.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I1P), intent(IN):: n  ! Input integer.
+  integer(I4P)::             d2 ! Number of times n is divisible for 2; is -1 for n=0.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (n==0) then
+    d2 = -1
+    return
+  endif
+  do d2 = 0,bit_size(n)-1
+    if (btest(n,d2)) return
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+   endfunction div2_I1
+
+  elemental function div2_I2(n) result(d2)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  ! Function for computing how many times an integer is divisible for 2.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I2P), intent(IN):: n  ! Input integer.
+  integer(I4P)::             d2 ! Number of times n is divisible for 2; is -1 for n=0.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (n==0) then
+    d2 = -1
+    return
+  endif
+  do d2 = 0,bit_size(n)-1
+    if (btest(n,d2)) return
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+   endfunction div2_I2
+
+  elemental function div2_I4(n) result(d2)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  ! Function for computing how many times an integer is divisible for 2.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I4P), intent(IN):: n  ! Input integer.
+  integer(I4P)::             d2 ! Number of times n is divisible for 2; is -1 for n=0.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (n==0) then
+    d2 = -1
+    return
+  endif
+  do d2 = 0,bit_size(n)-1
+    if (btest(n,d2)) return
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+   endfunction div2_I4
+
+  elemental function div2_I8(n) result(d2)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  ! Function for computing how many times an integer is divisible for 2.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I8P), intent(IN):: n  ! Input integer.
+  integer(I4P)::             d2 ! Number of times n is divisible for 2; is -1 for n=0.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (n==0) then
+    d2 = -1
+    return
+  endif
+  do d2 = 0,bit_size(n)-1
+    if (btest(n,d2)) return
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+   endfunction div2_I8
 
   ! interpolate
 #ifdef r16p

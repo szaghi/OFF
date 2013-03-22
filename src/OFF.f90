@@ -1,19 +1,24 @@
-!> @defgroup Program Programs
+!> @addtogroup Program Programs
 !> List of excutable programs.
-!> @defgroup DerivedType Derived Types
+!> @addtogroup DerivedType Derived Types
 !> List of derived data types.
-!> @defgroup GlobalVarPar Global Variables and Parameters
+!> @addtogroup GlobalVarPar Global Variables and Parameters
 !> List of global variables and parameters.
-!> @defgroup PrivateVarPar Private Variables and Parameters
+!> @addtogroup PrivateVarPar Private Variables and Parameters
 !> List of private variables and parameters.
-!> @defgroup Interface Interfaces
+!> @addtogroup Interface Interfaces
 !> List of explicitly defined interface.
-!> @defgroup Library Modules Libraries
+!> @addtogroup Library Modules Libraries
 !> List of modules containing libraries of procedures.
-!> @defgroup PublicProcedure Public Procedures
+!> @addtogroup PublicProcedure Public Procedures
 !> List of public procedures.
-!> @defgroup PrivateProcedure Private Procedures
+!> @addtogroup PrivateProcedure Private Procedures
 !> List of private procedures.
+
+!> @ingroup Program
+!> @{
+!> @defgroup OFFProgram OFF
+!> @}
 
 !> @ingroup PrivateVarPar
 !> @{
@@ -85,10 +90,11 @@
 !> @todo \b Chimera: Introducing blocks overlapping, overset (Chimera) model
 !> @todo \b GPU: Introducing fine, local parallelism by means of GPU programming (e.g. CUDA framework)
 !> @todo \b DocImprove: Improve the documentation
-!> @ingroup Program
+!> @ingroup OFFProgram
 program OFF
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                        ! Integers and reals precision definition.
+USE Data_Type_AMRBlock                                  ! Definition of Type_AMRBlock.
 USE Data_Type_BC                                        ! Definition of Type_BC.
 USE Data_Type_Global                                    ! Definition of Type_Global.
 USE Data_Type_OS                                        ! Definition of Type_OS.
@@ -101,31 +107,33 @@ USE Lib_Fluidynamic, only: primitive2conservative, &    ! Function for convertin
                            conservative2primitive, &    ! Function for converting conservative variables to primitive ones.
                            boundary_conditions,    &    ! Subroutine for imposing the boundary conditions.
                            solve_grl                    ! Subroutine for solving conservation eq. for a given grid level.
-USE Lib_Runge_Kutta, only: rk_init                      ! Subroutine for initializing Runge-Kutta coefficients.
-USE Lib_Math,        only: digit                        ! Function for computing the number of digits of an integer.
 USE Lib_IO_Misc                                         ! Procedures for IO and strings operations.
+USE Lib_Math,        only: digit                        ! Function for computing the number of digits of an integer.
 #ifdef PROFILING
 USE Lib_Profiling                                       ! Procedures for profiling the code.
 #endif
+USE Lib_Runge_Kutta, only: rk_init                      ! Subroutine for initializing Runge-Kutta coefficients.
 USE Lib_WENO,        only: weno_init                    ! Subroutine for initializing WENO coefficients.
-#ifdef OPENMP
-USE OMP_LIB                                             ! OpenMP runtime library.
-#endif
 USE Lib_Parallel,    only: Nthreads, &                  ! Number of threads.
                            Nproc,    &                  ! Number of processes.
                            blockmap, &                  ! Local/global blocks map.
                            procmap_load                 ! Function for loading the proc/blocks and local/global blocks maps.
+#ifdef OPENMP
+USE OMP_LIB                                             ! OpenMP runtime library.
+#endif
 #ifdef MPI2
 USE MPI                                                 ! MPI runtime library.
 USE Lib_Parallel,    only: Init_sendrecv                ! Subroutine for initialize send/receive communications.
 #endif
+USE Lib_Morton   !  Procedure for Morton's encoding.
+USE Data_Type_HashID   !  Procedure for Morton's encoding.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 !> @ingroup OFFPrivateVarPar
 !> @{
-type(Type_Global)::              global        !< Global-level data.
+type(Type_Global), target::      global        !< Global-level data.
 type(Type_SBlock), allocatable:: block(:,:)    !< Block-level data [1:Nb,1:Nl].
 integer(I_P)::                   b             !< Blocks counter.
 integer(I_P)::                   l             !< Grid levels counter.
@@ -135,6 +143,7 @@ character(20)::                  date          !< Actual date.
 integer(I_P)::                   Nprb = 0_I_P  !< Number of probes.
 type(Type_Probe), allocatable::  probes(:)     !< Probes [1:Nprb].
 integer(I_P)::                   unitprobe     !< Probes unit file.
+type(Type_AMRBlock), allocatable:: amrblock(:) !< AMR grids [1:Nb].
 !> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -152,7 +161,7 @@ Temporal_Loop: do
 #ifdef PROFILING
   call profile(p=1,pstart=.true.,myrank=global%myrank)
 #endif
-  call solve_grl(l = l, global = global, block= block(:,l))
+  call solve_grl(l = l, block= block(:,l))
 #ifdef PROFILING
   call profile(p=1,pstop=.true.,myrank=global%myrank)
 #endif
@@ -165,7 +174,7 @@ Temporal_Loop: do
         open(unit=Get_Unit(unitprobe),&
              file=trim(global%file%Path_OutPut)//'probe'//trim(strz(4,b))//'-N_'//trim(strz(10,global%n))//'.dat')
         write(unitprobe,FR_P,iostat=err)global%t
-        err = write_primitive(scalar=block(blockmap(probes(b)%b),l)%P(probes(b)%i,probes(b)%j,probes(b)%k), &
+        err = write_primitive(scalar=block(blockmap(probes(b)%b),l)%C(probes(b)%i,probes(b)%j,probes(b)%k)%P, &
                               unit=unitprobe,format=FR_P)
         close(unitprobe)
       enddo
@@ -180,15 +189,14 @@ enddo Temporal_Loop
 do l=1,global%Nl
   ! converting conservative variables to primitive ones
   do b=1,global%Nb
-    call conservative2primitive(global = global, block = block(b,l))
+    call conservative2primitive(block = block(b,l))
   enddo
   ! imposing the boundary conditions
-  call boundary_conditions(l = l, global = global, block = block(:,l))
+  call boundary_conditions(l = l, block = block(:,l))
   ! saving the output file
   do b=1,global%Nb
     err = block(b,l)%save_fluid(filename=file_name(basename=trim(global%file%Path_OutPut)//global%file%File_Sol,&
-                                                   suffix='.sol',blk=blockmap(b),grl=l,n=global%n),       &
-                                global=global)
+                                                   suffix='.sol',blk=blockmap(b),grl=l,n=global%n))
   enddo
 enddo
 
@@ -209,8 +217,9 @@ call profile(finalize=.true.,myrank=global%myrank)
 stop
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  !> @brief Subroutine for initializing the simulation according to the input options.
   !> @ingroup OFFPrivateProcedure
+  !> @{
+  !> @brief Subroutine for initializing the simulation according to the input options.
   subroutine off_init()
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -227,6 +236,13 @@ contains
 #ifndef PROFILING
   real(R8P)::       instant0 = 0._R8P !< The Crono starting instant used for profing the code.
 #endif
+  ! cazzo
+  integer(I8P):: i64 , j64, k64
+  !integer(I4P):: i4  , j4 , k4
+  integer(I2P):: i2  , j2 , k2
+  !integer(I1P):: i1  , j1 , k1
+  type(Type_HashID)::                   ID    !< ID value.
+  ! cazzo
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -270,6 +286,45 @@ contains
     write(stdout,'(A)',   iostat=err)'----------------------------------------------------------------------'
     write(stdout,'(A)',   iostat=err)' Some information about the precision of runnig machine'
     call IR_Print()
+    ! cazzo
+    allocate(amrblock(1))
+    amrblock(1)%gc = 0
+    amrblock(1)%Ni = 4
+    amrblock(1)%Nj = 4
+    amrblock(1)%Nk = 4
+    call amrblock(1)%init(1_I2P)
+    do k=1,amrblock(1)%Nk
+      do j=1,amrblock(1)%Nj
+        do i=1,amrblock(1)%Ni
+          call ID%build(b=1_I2P,i=i,j=j,k=k,l=0_I1P,p=0_I8P)
+          call demorton3(ID%bcl,i2,j2,k2)
+          write(stdout,'(4I10)')ID%bcl,i2,j2,k2
+        enddo
+      enddo
+    enddo
+    !read(stdout,'(B8.8)') i4
+    !write(stdout,'(I10)') i4
+    !!read(stdout,'(B64.64)') i64
+    !!write(stdout,'(Z64.64)') i64
+    !!write(stdout,'(I10)') int(log10(4._R_P)/log10(2._R_P),I1P)
+    !i1 = 6 ; j1 = 11 ; k1 = 30
+    !i64 = morton2(i=i1,j=j1)
+    !write(stdout,'(4I10,1X)') i1,j1,k1,i64
+    !call demorton2(key=i64,i=i1,j=j1)
+    !write(stdout,'(4I10,1X)') i1,j1,k1
+    !i2 = 16 ; j2 = 101 ; k2 = 300
+    !i64 = morton2(i=i2,j=j2)
+    !write(stdout,'(4I10,1X)') i2,j2,k2,i64
+    !call demorton2(key=i64,i=i2,j=j2)
+    !write(stdout,'(4I10,1X)') i2,j2,k2
+    !i4 = 600 ; j4 = 1001 ; k4 = 3000
+    !i64 = morton2(i=i4,j=j4)
+    !write(stdout,'(4I10,1X)') i4,j4,k4,i64
+    !call demorton2(key=i64,i=i4,j=j4)
+    !write(stdout,'(4I10,1X)') i4,j4,k4
+    !i64 = treedim(3,5)*100/10**6
+    !write(stdout,'(I10)') i64
+    stop 'cazzo'
     write(stdout,'(A)',   iostat=err)'----------------------------------------------------------------------'
     write(stdout,*)
     write(stdout,'(A)',   iostat=err)'----------------------------------------------------------------------'
@@ -337,16 +392,18 @@ contains
     enddo
     deallocate(block)
   endif
-  allocate(block(1:global%Nb,1:global%Nl)) ; block%myrank = global%myrank
+  allocate(block(1:global%Nb,1:global%Nl))
   do l=1,global%Nl
     do b=1,global%Nb
+      ! updating block pointer to global-level data
+      block(b,l)%global => global
       ! getting dimensions of block
       err = block(b,l)%load_mesh_dims(filename = file_name(basename = trim(global%file%Path_InPut)//trim(global%file%File_Mesh), &
                                                            suffix   = '.geo',                                                    &
                                                            blk      = blockmap(b),                                               &
                                                            grl      = l))
       ! allocating block
-      call block(b,l)%alloc(global=global)
+      call block(b,l)%alloc
     enddo
   enddo
 
@@ -367,12 +424,11 @@ contains
       err = block(b,l)%load_fluid(filename = file_name(basename = trim(global%file%Path_InPut)//trim(global%file%File_Init), &
                                                        suffix   = '.itc',                                                    &
                                                        blk      = blockmap(b),                                               &
-                                                       grl      = l),                                                        &
-                                  global   = global)
+                                                       grl      = l))
       ! converting primitive variables to conservative ones
       call primitive2conservative(block=block(b,l))
       ! print some informations of the fluid data loaded
-      err = block(b,l)%print_info_fluid(blk=b,grl=l,global=global)
+      err = block(b,l)%print_info_fluid(blk=b,grl=l)
     enddo
   enddo
 
@@ -382,8 +438,8 @@ contains
     do k=1-block(b,l)%gc(5),block(b,l)%Nk+block(b,l)%gc(6)
       do j=1-block(b,l)%gc(3),block(b,l)%Nj+block(b,l)%gc(4)
         do i=0-block(b,l)%gc(1),block(b,l)%Ni+block(b,l)%gc(2)
-          if (block(b,l)%BCi(i,j,k)%tp==bc_in1) then
-            global%Nin1 = max(global%Nin1,block(b,l)%BCi(i,j,k)%inf)
+          if (block(b,l)%Fi(i,j,k)%BC%tp==bc_in1) then
+            global%Nin1 = max(global%Nin1,block(b,l)%Fi(i,j,k)%BC%inf)
           endif
         enddo
       enddo
@@ -391,8 +447,8 @@ contains
     do k=1-block(b,l)%gc(5),block(b,l)%Nk+block(b,l)%gc(6)
       do j=0-block(b,l)%gc(3),block(b,l)%Nj+block(b,l)%gc(4)
         do i=1-block(b,l)%gc(1),block(b,l)%Ni+block(b,l)%gc(2)
-          if (block(b,l)%BCj(i,j,k)%tp==bc_in1) then
-            global%Nin1 = max(global%Nin1,block(b,l)%BCj(i,j,k)%inf)
+          if (block(b,l)%Fj(i,j,k)%BC%tp==bc_in1) then
+            global%Nin1 = max(global%Nin1,block(b,l)%Fj(i,j,k)%BC%inf)
           endif
         enddo
       enddo
@@ -400,8 +456,8 @@ contains
     do k=0-block(b,l)%gc(5),block(b,l)%Nk+block(b,l)%gc(6)
       do j=1-block(b,l)%gc(3),block(b,l)%Nj+block(b,l)%gc(4)
         do i=1-block(b,l)%gc(1),block(b,l)%Ni+block(b,l)%gc(2)
-          if (block(b,l)%BCk(i,j,k)%tp==bc_in1) then
-            global%Nin1 = max(global%Nin1,block(b,l)%BCk(i,j,k)%inf)
+          if (block(b,l)%Fk(i,j,k)%BC%tp==bc_in1) then
+            global%Nin1 = max(global%Nin1,block(b,l)%Fk(i,j,k)%BC%inf)
           endif
         enddo
       enddo
@@ -447,10 +503,8 @@ contains
                     target_file = trim(global%file%Path_OutPut)//File_Option)
     err = copy_file(source_file = trim(global%file%Path_InPut)//global%file%File_Solver, &
                     target_file = trim(global%file%Path_OutPut)//global%file%File_Solver)
-#ifdef MPI2
     err = copy_file(source_file = trim(global%file%Path_InPut)//'procmap.dat', &
                     target_file = trim(global%file%Path_OutPut)//'procmap.dat')
-#endif
   endif
   do l=1,global%Nl ; do b=1,global%Nb
     err = copy_file(source_file = file_name(basename=trim(global%file%Path_InPut)//trim(global%file%File_Mesh),suffix='.geo', &
@@ -476,12 +530,12 @@ contains
       call block(b,l)%metrics
       call block(b,l)%metrics_correction
       ! print some informations of the mesh data loaded
-      err = block(b,l)%print_info_mesh(blk=b,grl=l,global=global)
+      err = block(b,l)%print_info_mesh(blk=b,grl=l)
     enddo
   enddo
 
   ! initializing WENO coefficients
-  call weno_init(global=global,block=block(:,1),S=global%gco)
+  call weno_init(block=block(:,1),S=global%gco)
 
   ! initializing the log file of residuals
   if (global%myrank==0) then
@@ -519,7 +573,7 @@ contains
 
   ! initialize the multi-processes send/recive comunications and doing the first comunication if necessary
 #ifdef MPI2
-  call Init_sendrecv(global=global,block=block)
+  call Init_sendrecv(block=block)
 #endif
 
   ! allocate multigrid variables if necessary
@@ -556,7 +610,6 @@ contains
   endsubroutine off_init
 
   !> @brief Function for loading global file options.
-  !> @ingroup OFFPrivateProcedure
   function load_off_option_file(filename,global) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -604,4 +657,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction load_off_option_file
+  !> @}
 endprogram OFF

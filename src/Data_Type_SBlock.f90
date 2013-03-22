@@ -1,6 +1,6 @@
-!> @ingroup PublicProcedure
+!> @ingroup DerivedType
 !> @{
-!> @defgroup Data_Type_SBlockPublicProcedure Data_Type_SBlock
+!> @defgroup Data_Type_SBlockDerivedType Data_Type_SBlock
 !> @}
 
 !> @ingroup PrivateProcedure
@@ -15,7 +15,8 @@ module Data_Type_SBlock
 USE IR_Precision           !< Integers and reals precision definition.
 USE Data_Type_BC           !< Definition of Type_BC.
 USE Data_Type_Cell         !< Definition of Type_Cell.
-USE Data_Type_Conservative !< Definition of Type_Conservative.
+!USE Data_Type_Conservative !< Definition of Type_Conservative.
+USE Data_Type_Face         !< Definition of Type_Face.
 USE Data_Type_Global       !< Definition of Type_Global.
 USE Data_Type_Primitive    !< Definition of Type_Primitive.
 USE Data_Type_Vector       !< Definition of Type_Vector.
@@ -28,114 +29,52 @@ private
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!> @brief Derived type containing the structured block-level data.
+
+!> @brief Derived type containing structured block-level data.
 !> Structured block-level type contains data (mesh, boundary conditions and fluid dynamic data) of structured (implicit
 !> connectivity) numerical grid.
-!> @ingroup DerivedType
+!> @ingroup Data_Type_SBlockDerivedType
 type, public:: Type_SBlock
-  integer(I_P):: myrank = 0_I_P !< Rank of the process which block belongs to.
-  ! mesh data
+  type(Type_Global), pointer::     global          !< Pointer to global-level data.
   integer(I1P)::                   gc(1:6)=&
-                                          (/1_I1P, & ! gc(1) => left  i.
-                                            1_I1P, & ! gc(2) => right i.
-                                            1_I1P, & ! gc(3) => left  j.
-                                            1_I1P, & ! gc(4) => right j.
-                                            1_I1P, & ! gc(5) => left  k.
-                                            1_I1P  & ! gc(6) => right k.
-                                            /)       !< Number of ghost cells for the 6 faces of the block.
-  integer(I_P)::                   Ni     = 0_I_P    !< Number of cells in i direction.
-  integer(I_P)::                   Nj     = 0_I_P    !< Number of cells in j direction.
-  integer(I_P)::                   Nk     = 0_I_P    !< Number of cells in k direction.
-  type(Type_Vector), allocatable:: node(:,:,:)       !< Cell nodes coordinates [0-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
-  type(Type_Vector), allocatable:: NFi(:,:,:)        !< Face i normals, versor [0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  type(Type_Vector), allocatable:: NFj(:,:,:)        !< Face j normals, versor [1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  type(Type_Vector), allocatable:: NFk(:,:,:)        !< Face k normals, versor [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
-  real(R_P),         allocatable:: Si(:,:,:)         !< Face i area            [0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  real(R_P),         allocatable:: Sj(:,:,:)         !< Face j area            [1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  real(R_P),         allocatable:: Sk(:,:,:)         !< Face k area            [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
-  real(R_P),         allocatable:: V(:,:,:)          !< Cell volume            [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  type(Type_Cell),   allocatable:: cell(:,:,:)       !< Cell data informations [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  type(Type_Vector), allocatable:: cent(:,:,:)       !< Cell center coordinates[1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  ! boundary conditions data
-  type(Type_BC), allocatable:: BCi(:,:,:) !< Boundary conditions of i faces [0-gc(1):1+gc(2),1-gc(3):1+gc(4),1-gc(5):1+gc(6)].
-  type(Type_BC), allocatable:: BCj(:,:,:) !< Boundary conditions of j faces [1-gc(1):1+gc(2),0-gc(3):1+gc(4),1-gc(5):1+gc(6)].
-  type(Type_BC), allocatable:: BCk(:,:,:) !< Boundary conditions of k faces [1-gc(1):1+gc(2),1-gc(3):1+gc(4),0-gc(5):1+gc(6)].
-  ! fluid dynamic data
-  real(R_P),               allocatable:: Dt(:,:,:)   !< Local time step.
-  type(Type_Primitive),    allocatable:: P (:,:,:)   !< Primitive variables.
-  type(Type_Conservative), allocatable:: U (:,:,:)   !< Conservative variables.
-  type(Type_Conservative), allocatable:: KS(:,:,:,:) !< Runge-Kutta stages of conservative variables [1:rk_ord].
+                                          (/1,1, & ! gc(1) => left i, gc(2) => right i.
+                                            1,1, & ! gc(3) => left j, gc(4) => right j.
+                                            1,1  & ! gc(5) => left k, gc(6) => right k.
+                                            /)     !< Number of ghost cells for the 6 faces of the block.
+  integer(I4P)::                   Ni     = 0      !< Number of cells in i direction.
+  integer(I4P)::                   Nj     = 0      !< Number of cells in j direction.
+  integer(I4P)::                   Nk     = 0      !< Number of cells in k direction.
+  type(Type_Vector), allocatable:: node(:,:,:)     !< Nodes coord.  [0-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
+  type(Type_Face),   allocatable:: Fi(:,:,:)       !< Faces i data  [0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+  type(Type_Face),   allocatable:: Fj(:,:,:)       !< Faces j data  [1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+  type(Type_Face),   allocatable:: Fk(:,:,:)       !< Faces k data  [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
+  type(Type_Cell),   allocatable:: C(:,:,:)        !< Cells data    [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
   contains
-    procedure                 :: free => free_block                    ! Procedure for freeing memory.
-    procedure                 :: alloc => alloc_block                  ! Procedure for allocating memory.
+    procedure, non_overridable:: alloc => alloc_block                  ! Procedure for allocating memory.
+    procedure, non_overridable:: free => free_block                    ! Procedure for freeing memory.
     procedure, non_overridable:: save_mesh => save_bmesh               ! Procedure for saving the mesh data.
     procedure, non_overridable:: load_mesh_dims => load_bmesh_dims     ! Procedure for loading the mesh data dimensions.
     procedure, non_overridable:: load_mesh => load_bmesh               ! Procedure for loading the mesh data.
-    procedure, non_overridable:: print_info_mesh => print_info_bmesh   ! Procedure for printing of the mesh data.
+    procedure, non_overridable:: print_info_mesh => print_info_bmesh   ! Procedure for printing mesh data.
     procedure, non_overridable:: save_bc => save_bbc                   ! Procedure for saving the bc data.
     procedure, non_overridable:: load_bc => load_bbc                   ! Procedure for loading the bc data.
-    procedure, non_overridable:: save_fluid => save_bfluid             ! Procedure for saving the fluidynamic data.
-    procedure, non_overridable:: load_fluid => load_bfluid             ! Procedure for loading the fluidynamic data.
-    procedure, non_overridable:: print_info_fluid => print_info_bfluid ! Procedure for printing of the mesh data.
+    procedure, non_overridable:: save_fluid => save_bfluid             ! Procedure for saving the fluid dynamic data.
+    procedure, non_overridable:: load_fluid => load_bfluid             ! Procedure for loading the fluid dynamic data.
+    procedure, non_overridable:: print_info_fluid => print_info_bfluid ! Procedure for printing fluid dynamic data.
     procedure, non_overridable:: metrics                               ! Procedure for computing block metrics.
-    procedure, non_overridable:: metrics_correction                    ! Procedure for correcting block metrics of bc.
-    procedure, non_overridable:: node2center                           ! Procedure for computing cell center from cell nodes.
+    procedure, non_overridable:: metrics_correction                    ! Procedure for correcting block metrics of bc cells.
+    procedure, non_overridable:: node2center                           ! Procedure for computing cell center coo from cell nodes.
 endtype Type_SBlock
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @ingroup Data_Type_SBlockPrivateProcedure
   !> @{
-  !> Subroutine for freeing dynamic data of Type_SBlock variables.
-  subroutine free_block(block)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_SBlock), intent(INOUT):: block !< Block data.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  ! mesh data
-  if (allocated(block%node)) deallocate(block%node)
-  if (allocated(block%NFi )) deallocate(block%NFi )
-  if (allocated(block%NFj )) deallocate(block%NFj )
-  if (allocated(block%NFk )) deallocate(block%NFk )
-  if (allocated(block%Si  )) deallocate(block%Si  )
-  if (allocated(block%Sj  )) deallocate(block%Sj  )
-  if (allocated(block%Sk  )) deallocate(block%Sk  )
-  if (allocated(block%V   )) deallocate(block%V   )
-  if (allocated(block%cent)) deallocate(block%cent)
-  if (allocated(block%cell)) deallocate(block%cell)
-  ! boundary conditions data
-  if (allocated(block%BCi)) then
-    call block%BCi%free ; deallocate(block%BCi)
-  endif
-  if (allocated(block%BCj)) then
-    call block%BCj%free ; deallocate(block%BCj)
-  endif
-  if (allocated(block%BCk)) then
-    call block%BCk%free ; deallocate(block%BCk)
-  endif
-  ! fluid dynamic data
-  if (allocated(block%Dt)) deallocate(block%Dt)
-  if (allocated(block%P)) then
-    call block%P%free ; deallocate(block%P)
-  endif
-  if (allocated(block%U)) then
-    call block%U%free ; deallocate(block%U)
-  endif
-  if (allocated(block%KS)) then
-    call block%KS%free ; deallocate(block%KS)
-  endif
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine free_block
-
   !> Subroutine for allocating dynamic data of Type_SBlock variables.
-  subroutine alloc_block(block,global)
+  subroutine alloc_block(block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_SBlock), intent(INOUT):: block    !< Block data.
-  type(Type_Global),  intent(IN)::    global   !< Global data.
-  integer(I_P)::                      gc(1:6)  !< Temporary variable  for storing block ghost cells number.
+  integer(I1P)::                      gc(1:6)  !< Temporary variable  for storing block ghost cells number.
   integer(I_P)::                      Ni,Nj,Nk !< Temporary variables for storing block dimensions.
   integer(I_P)::                      Ns       !< Temporary variable  for storing number of species.
   integer(I_P)::                      rk_ord   !< Temporary variable  for storing rk_ord.
@@ -149,34 +88,36 @@ contains
   Ni      = block%Ni
   Nj      = block%Nj
   Nk      = block%Nk
-  Ns      = global%Ns
-  rk_ord  = global%rk_ord
-  ! mesh data
+  Ns      = block%global%Ns
+  rk_ord  = block%global%rk_ord
   allocate(block%node(0-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)))
-  allocate(block%NFi (0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
-  allocate(block%NFj (1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
-  allocate(block%NFk (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)))
-  allocate(block%Si  (0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%Si = 0._R_P
-  allocate(block%Sj  (1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%Sj = 0._R_P
-  allocate(block%Sk  (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6))) ; block%Sk = 0._R_P
-  allocate(block%V   (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; block%V  = 0._R_P
-  allocate(block%cell(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
-  allocate(block%cent(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
-  ! boundary conditions data
-  allocate(block%BCi(0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
-  allocate(block%BCj(1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
-  allocate(block%BCk(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)))
-  ! fluid dynamic data
-  allocate(block%Dt(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))          ; block%Dt = 0._R_P
-  allocate(block%P (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))          ; call block%P%init(Ns=Ns)
-  allocate(block%U (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))          ; call block%U%init(Ns=Ns)
-  allocate(block%KS(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6),1:rk_ord)) ; call block%KS%init(Ns=Ns)
+  allocate(block%Fi  (0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; call block%Fi%init
+  allocate(block%Fj  (1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; call block%Fj%init
+  allocate(block%Fk  (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6))) ; call block%Fk%init
+  allocate(block%C   (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6))) ; call block%C%init(Ns=Ns,rk_ord=rk_ord)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine alloc_block
 
+  !> Subroutine for freeing dynamic data of Type_SBlock variables.
+  subroutine free_block(block)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SBlock), intent(INOUT):: block !< Block data.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (allocated(block%node)) deallocate(block%node)
+  if (allocated(block%Fi)) deallocate(block%Fi)
+  if (allocated(block%Fj)) deallocate(block%Fj)
+  if (allocated(block%Fk)) deallocate(block%Fk)
+  if (allocated(block%C)) deallocate(block%C)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine free_block
+
   !> Function for saving block mesh file.
-  !> @return \b err integer(I4P) variable.
+  !> @return \b err integer(I_P) variable.
   function save_bmesh(block,ascii,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -193,14 +134,14 @@ contains
     write(UnitFree,'(6('//FI1P//',1X))',iostat=err)block%gc
     write(UnitFree,'(3('//FI_P//',1X))',iostat=err)block%Ni,block%Nj,block%Nk
     err = write_vector(array3D=block%node,format='*',unit=UnitFree)
-    err = write_cell(array3D=block%cell,format='*',unit=UnitFree)
+    !err = write_cell(array3D=block%C%cell,format='*',unit=UnitFree)
     close(UnitFree)
   else
     open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), action = 'WRITE', form = 'UNFORMATTED')
     write(UnitFree,iostat=err)block%gc
     write(UnitFree,iostat=err)block%Ni,block%Nj,block%Nk
     err = write_vector(array3D=block%node,unit=UnitFree)
-    err = write_cell(array3D=block%cell,unit=UnitFree)
+    !err = write_cell(array3D=block%C%cell,unit=UnitFree)
     close(UnitFree)
   endif
   return
@@ -208,7 +149,7 @@ contains
   endfunction save_bmesh
 
   !> Function for loading the mesh data dimensions of block from the mesh file "filename".
-  !> @return \b err integer(I4P) variable.
+  !> @return \b err integer(I_P) variable.
   function load_bmesh_dims(block,ascii,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -222,7 +163,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   inquire(file=trim(filename),exist=is_file,iostat=err)
-  if (.NOT.is_file) call File_Not_Found(block%myrank,filename,'load_bmesh_dims')
+  if (.NOT.is_file) call File_Not_Found(block%global%myrank,filename,'load_bmesh_dims')
   if (present(ascii)) then
     open(unit = Get_Unit(UnitFree), file = trim(filename), status = 'OLD', action = 'READ', form = 'FORMATTED')
     read(UnitFree,*,iostat=err)block%gc
@@ -239,7 +180,7 @@ contains
   endfunction load_bmesh_dims
 
   !> Function for loading block mesh file.
-  !> @return \b err integer(I4P) variable.
+  !> @return \b err integer(I_P) variable.
   function load_bmesh(block,ascii,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -253,20 +194,20 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
-  if (.NOT.is_file) call File_Not_Found(block%myrank,filename,'load_bmesh')
+  if (.NOT.is_file) call File_Not_Found(block%global%myrank,filename,'load_bmesh')
   if (present(ascii)) then
     open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
     read(UnitFree,*,iostat=err)block%gc
     read(UnitFree,*,iostat=err)block%Ni,block%Nj,block%Nk
     err = read_vector(array3D=block%node,format='*',unit=UnitFree)
-    err = read_cell(array3D=block%cell,format='*',unit=UnitFree)
+    !err = read_cell(array3D=block%C%cell,format='*',unit=UnitFree)
     close(UnitFree)
   else
     open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'UNFORMATTED')
     read(UnitFree,iostat=err)block%gc
     read(UnitFree,iostat=err)block%Ni,block%Nj,block%Nk
     err = read_vector(array3D=block%node,unit=UnitFree)
-    err = read_cell(array3D=block%cell,unit=UnitFree)
+    !err = read_cell(array3D=block%C%cell,unit=UnitFree)
     close(UnitFree)
   endif
   return
@@ -274,14 +215,13 @@ contains
   endfunction load_bmesh
 
   !> Function for printing to standard output info of block mesh data.
-  !> @return \b err integer(I4P) variable.
-  function print_info_bmesh(block,blk,grl,global) result(err)
+  !> @return \b err integer(I_P) variable.
+  function print_info_bmesh(block,blk,grl) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_SBlock), intent(IN):: block       !< Block level data.
   integer(I_P),       intent(IN):: blk         !< Actual block number.
   integer(I_P),       intent(IN):: grl         !< Actual grid level number.
-  type(Type_Global),  intent(IN):: global      !< Global level data.
   integer(I_P)::                   err         !< Error trapping flag: 0 no errors, >0 error occurs.
   character(DR_P)::                vmax,vmin   !< String for printing max and min of variables.
   character(DR_P)::                xmm,ymm,zmm !< String for printing max and min of variables.
@@ -297,10 +237,10 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  rks = 'rank'//trim(str(.true.,block%myrank))
+  rks = 'rank'//trim(str(.true.,block%global%myrank))
   write(stdout,'(A)',iostat=err)trim(rks)//'----------------------------------------------------------------------'
   write(stdout,'(A)',iostat=err)trim(rks)//' Mesh infos of myrank '//trim(rks)
-  write(stdout,'(A)',iostat=err)trim(rks)//'  Global number of blocks '//trim(str(.true.,global%Nb_tot))
+  write(stdout,'(A)',iostat=err)trim(rks)//'  Global number of blocks '//trim(str(.true.,block%global%Nb_tot))
   write(stdout,'(A)',iostat=err)trim(rks)//'  Block '//trim(str(.true.,blk))
   write(stdout,'(A)',iostat=err)trim(rks)//'  Grid level '//trim(str(.true.,grl))
   Ni = block%Ni
@@ -315,13 +255,13 @@ contains
   write(stdout,'(A)',iostat=err)trim(rks)//'   Number of cells Ni '//trim(str(.true.,Ni))
   write(stdout,'(A)',iostat=err)trim(rks)//'   Number of cells Nj '//trim(str(.true.,Nj))
   write(stdout,'(A)',iostat=err)trim(rks)//'   Number of cells Nk '//trim(str(.true.,Nk))
-  if (allocated(NFi)) deallocate(NFi) ; allocate(NFi(0:Ni,1:Nj,1:Nk)) ; NFi(0:Ni,1:Nj,1:Nk) = block%NFi(0:Ni,1:Nj,1:Nk)
-  if (allocated(NFj)) deallocate(NFj) ; allocate(NFj(1:Ni,0:Nj,1:Nk)) ; NFj(1:Ni,0:Nj,1:Nk) = block%NFj(1:Ni,0:Nj,1:Nk)
-  if (allocated(NFk)) deallocate(NFk) ; allocate(NFk(1:Ni,1:Nj,0:Nk)) ; NFk(1:Ni,1:Nj,0:Nk) = block%NFk(1:Ni,1:Nj,0:Nk)
-  if (allocated(Si )) deallocate(Si ) ; allocate(Si (0:Ni,1:Nj,1:Nk)) ; Si (0:Ni,1:Nj,1:Nk) = block%Si (0:Ni,1:Nj,1:Nk)
-  if (allocated(Sj )) deallocate(Sj ) ; allocate(Sj (1:Ni,0:Nj,1:Nk)) ; Sj (1:Ni,0:Nj,1:Nk) = block%Sj (1:Ni,0:Nj,1:Nk)
-  if (allocated(Sk )) deallocate(Sk ) ; allocate(Sk (1:Ni,1:Nj,0:Nk)) ; Sk (1:Ni,1:Nj,0:Nk) = block%Sk (1:Ni,1:Nj,0:Nk)
-  if (allocated(V  )) deallocate(V  ) ; allocate(V  (1:Ni,1:Nj,1:Nk)) ; V  (1:Ni,1:Nj,1:Nk) = block%V  (1:Ni,1:Nj,1:Nk)
+  if (allocated(NFi)) deallocate(NFi) ; allocate(NFi(0:Ni,1:Nj,1:Nk)) ; NFi(0:Ni,1:Nj,1:Nk) = block%Fi(0:Ni,1:Nj,1:Nk)%N
+  if (allocated(NFj)) deallocate(NFj) ; allocate(NFj(1:Ni,0:Nj,1:Nk)) ; NFj(1:Ni,0:Nj,1:Nk) = block%Fj(1:Ni,0:Nj,1:Nk)%N
+  if (allocated(NFk)) deallocate(NFk) ; allocate(NFk(1:Ni,1:Nj,0:Nk)) ; NFk(1:Ni,1:Nj,0:Nk) = block%Fk(1:Ni,1:Nj,0:Nk)%N
+  if (allocated(Si )) deallocate(Si ) ; allocate(Si (0:Ni,1:Nj,1:Nk)) ; Si (0:Ni,1:Nj,1:Nk) = block%Fi(0:Ni,1:Nj,1:Nk)%S
+  if (allocated(Sj )) deallocate(Sj ) ; allocate(Sj (1:Ni,0:Nj,1:Nk)) ; Sj (1:Ni,0:Nj,1:Nk) = block%Fj(1:Ni,0:Nj,1:Nk)%S
+  if (allocated(Sk )) deallocate(Sk ) ; allocate(Sk (1:Ni,1:Nj,0:Nk)) ; Sk (1:Ni,1:Nj,0:Nk) = block%Fk(1:Ni,1:Nj,0:Nk)%S
+  if (allocated(V  )) deallocate(V  ) ; allocate(V  (1:Ni,1:Nj,1:Nk)) ; V  (1:Ni,1:Nj,1:Nk) = block%C (1:Ni,1:Nj,1:Nk)%V
   xmm=trim(str(n=maxval(NFi(:,:,:)%x))) ; ymm=trim(str(n=maxval(NFi(:,:,:)%y))) ; zmm=trim(str(n=maxval(NFi(:,:,:)%z)))
   write(stdout,'(A)',iostat=err)trim(rks)//'  NFi-x-max '//trim(xmm)//' NFi-y-max '//trim(ymm)//' NFi-z-max '//trim(zmm)
   xmm=trim(str(n=minval(NFi(:,:,:)%x))) ; ymm=trim(str(n=minval(NFi(:,:,:)%y))) ; zmm=trim(str(n=minval(NFi(:,:,:)%z)))
@@ -349,7 +289,7 @@ contains
   endfunction print_info_bmesh
 
   !> Function for saving block boundary conditions file.
-  !> @return \b err integer(I4P) variable.
+  !> @return \b err integer(I_P) variable.
   function save_bbc(block,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -361,16 +301,16 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   open(unit=Get_Unit(UnitFree), file=adjustl(trim(filename)), action='WRITE', form='UNFORMATTED')
-  err = write_bc(array3D=block%BCi,unit=UnitFree)
-  err = write_bc(array3D=block%BCj,unit=UnitFree)
-  err = write_bc(array3D=block%BCk,unit=UnitFree)
+  err = write_bc(array3D=block%Fi%BC,unit=UnitFree)
+  err = write_bc(array3D=block%Fj%BC,unit=UnitFree)
+  err = write_bc(array3D=block%Fk%BC,unit=UnitFree)
   close(UnitFree)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction save_bbc
 
   !> Function for loading block boundary conditions file.
-  !> @return \b err integer(I4P) variable.
+  !> @return \b err integer(I_P) variable.
   function load_bbc(block,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -383,49 +323,47 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
-  if (.NOT.is_file) call File_Not_Found(block%myrank,filename,'load_bbc')
+  if (.NOT.is_file) call File_Not_Found(block%global%myrank,filename,'load_bbc')
   open(unit=Get_Unit(UnitFree), file=adjustl(trim(filename)), status='OLD', action='READ', form='UNFORMATTED')
-  err = read_bc(array3D=block%BCi,unit=UnitFree)
-  err = read_bc(array3D=block%BCj,unit=UnitFree)
-  err = read_bc(array3D=block%BCk,unit=UnitFree)
+  err = read_bc(array3D=block%Fi%BC,unit=UnitFree)
+  err = read_bc(array3D=block%Fj%BC,unit=UnitFree)
+  err = read_bc(array3D=block%Fk%BC,unit=UnitFree)
   close(UnitFree)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction load_bbc
 
   !> Function for saving fluid dynamic file.
-  !> @return \b err integer(I4P) variable.
-  function save_bfluid(block,filename,global) result(err)
+  !> @return \b err integer(I_P) variable.
+  function save_bfluid(block,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_SBlock), intent(IN):: block    !< Block level data.
   character(*),       intent(IN):: filename !< Name of file where mesh variables are saved.
-  type(Type_Global),  intent(IN):: global   !< Global level data.
   integer(I_P)::                   err      !< Error trapping flag: 0 no errors, >0 error occurs.
   integer(I_P)::                   UnitFree !< Free logic unit.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), action = 'WRITE', form = 'UNFORMATTED')
-  write(UnitFree,iostat=err)global%Ns
-  write(UnitFree,iostat=err)global%cp0,global%cv0
-  write(UnitFree,iostat=err)global%n
-  write(UnitFree,iostat=err)global%t
-  write(UnitFree,iostat=err)block%Dt
-  err = write_primitive(array3D=block%P,unit=UnitFree)
+  write(UnitFree,iostat=err)block%global%Ns
+  write(UnitFree,iostat=err)block%global%cp0,block%global%cv0
+  write(UnitFree,iostat=err)block%global%n
+  write(UnitFree,iostat=err)block%global%t
+  write(UnitFree,iostat=err)block%C%Dt
+  err = write_primitive(array3D=block%C%P,unit=UnitFree)
   close(UnitFree)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction save_bfluid
 
   !> Function for loading fluid dynamic file.
-  !> @return \b err integer(I4P) variable.
-  function load_bfluid(block,filename,global) result(err)
+  !> @return \b err integer(I_P) variable.
+  function load_bfluid(block,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_SBlock), intent(INOUT):: block    !< Block level data.
   character(*),       intent(IN)::    filename !< Name of file where mesh variables are saved.
-  type(Type_Global),  intent(INOUT):: global   !< Global level data.
   integer(I_P)::                      err      !< Error trapping flag: 0 no errors, >0 error occurs.
   integer(I_P)::                      UnitFree !< Free logic unit.
   logical::                           is_file  !< Flag for inquiring the presence of fluid dynamic file.
@@ -433,28 +371,27 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
-  if (.NOT.is_file) call File_Not_Found(block%myrank,filename,'load_bfluid')
+  if (.NOT.is_file) call File_Not_Found(block%global%myrank,filename,'load_bfluid')
   open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'UNFORMATTED')
-  read(UnitFree,iostat=err)global%Ns
-  read(UnitFree,iostat=err)global%cp0,global%cv0
-  read(UnitFree,iostat=err)global%n
-  read(UnitFree,iostat=err)global%t
-  read(UnitFree,iostat=err)block%Dt
-  err = read_primitive(array3D=block%P,unit=UnitFree)
+  read(UnitFree,iostat=err)block%global%Ns
+  read(UnitFree,iostat=err)block%global%cp0,block%global%cv0
+  read(UnitFree,iostat=err)block%global%n
+  read(UnitFree,iostat=err)block%global%t
+  read(UnitFree,iostat=err)block%C%Dt
+  err = read_primitive(array3D=block%C%P,unit=UnitFree)
   close(UnitFree)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction load_bfluid
 
   !> Function for printing to standard output info of block fluid data.
-  !> @return \b err integer(I4P) variable.
-  function print_info_bfluid(block,blk,grl,global) result(err)
+  !> @return \b err integer(I_P) variable.
+  function print_info_bfluid(block,blk,grl) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_SBlock), intent(IN):: block          !< Block level data.
   integer(I_P),       intent(IN):: blk            !< Actual block number.
   integer(I_P),       intent(IN):: grl            !< Actual grid level number.
-  type(Type_Global),  intent(IN):: global         !< Global level data.
   integer(I_P)::                   err            !< Error trapping flag: 0 no errors, >0 error occurs.
   character(DR_P)::                vmax,vmin      !< String for printing max and min of variables.
   real(R_P), allocatable::         dummy(:,:,:,:) !<  Dummy variables for printing only internal cells info.
@@ -464,28 +401,28 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  rks = 'rank'//trim(str(.true.,block%myrank))
+  rks = 'rank'//trim(str(.true.,block%global%myrank))
   write(stdout,'(A)',iostat=err)trim(rks)//'----------------------------------------------------------------------'
   write(stdout,'(A)',iostat=err)trim(rks)//' Fluid infos of myrank '//trim(rks)
-  write(stdout,'(A)',iostat=err)trim(rks)//'  Global number of blocks '//trim(str(.true.,global%Nb_tot))
-  write(stdout,'(A)',iostat=err)trim(rks)//'  Number of initial species '//trim(str(.true.,global%Ns))
+  write(stdout,'(A)',iostat=err)trim(rks)//'  Global number of blocks '//trim(str(.true.,block%global%Nb_tot))
+  write(stdout,'(A)',iostat=err)trim(rks)//'  Number of initial species '//trim(str(.true.,block%global%Ns))
   write(stdout,'(A)',iostat=err)trim(rks)//'  Block '//trim(str(.true.,blk))
   write(stdout,'(A)',iostat=err)trim(rks)//'  Grid level '//trim(str(.true.,grl))
   Ni = block%Ni
   Nj = block%Nj
   Nk = block%Nk
-  Np = global%Np
-  Nc = global%Nc
+  Np = block%global%Np
+  Nc = block%global%Nc
   if (allocated(dummy)) deallocate(dummy) ; allocate(dummy(1:Nc,1:Ni,1:Nj,1:Nk)) ; dummy = 0._R_P
   do k=1,Nk
     do j=1,Nj
       do i=1,Ni
-        dummy(:,i,j,k) = block%U(i,j,k)%cons2array()
+        dummy(:,i,j,k) = block%C(i,j,k)%U%cons2array()
       enddo
     enddo
   enddo
   write(stdout,'(A)',iostat=err)trim(rks)//'  Conservative variables'
-  do s=1,global%Nc
+  do s=1,block%global%Nc
     vmax=trim(str(n=maxval(dummy(s,:,:,:)))) ; vmin=trim(str(n=minval(dummy(s,:,:,:))))
     write(stdout,'(A)',iostat=err)trim(rks)//'  U('//trim(str(.true.,s))//'): max '//trim(vmax)//' min '//trim(vmin)
   enddo
@@ -493,12 +430,12 @@ contains
   do k=1,Nk
     do j=1,Nj
       do i=1,Ni
-        dummy(:,i,j,k) = block%P(i,j,k)%prim2array()
+        dummy(:,i,j,k) = block%C(i,j,k)%P%prim2array()
       enddo
     enddo
   enddo
   write(stdout,'(A)',iostat=err)trim(rks)//'  Primitive variables'
-  do s=1,global%Np
+  do s=1,block%global%Np
     vmax=trim(str(n=maxval(dummy(s,:,:,:)))) ; vmin=trim(str(n=minval(dummy(s,:,:,:))))
     write(stdout,'(A)',iostat=err)trim(rks)//'  P('//trim(str(.true.,s))//'): max '//trim(vmax)//' min '//trim(vmin)
   enddo
@@ -506,7 +443,7 @@ contains
   do k=1,Nk
     do j=1,Nj
       do i=1,Ni
-        dummy(1,i,j,k) = block%Dt(i,j,k)
+        dummy(1,i,j,k) = block%C(i,j,k)%Dt
       enddo
     enddo
   enddo
@@ -573,8 +510,8 @@ contains
                            pt3 = block%node(i,j  ,k  ), &
                            pt4 = block%node(i,j-1,k  ))
         NFS = NFS*signi
-        block%NFi(i,j,k) = normalize(NFS)
-        block%Si (i,j,k) =    normL2(NFS)
+        block%Fi(i,j,k)%N = normalize(NFS)
+        block%Fi(i,j,k)%S =    normL2(NFS)
       enddo
     enddo
   enddo
@@ -587,8 +524,8 @@ contains
                            pt3 = block%node(i  ,j,k  ), &
                            pt4 = block%node(i  ,j,k-1))
         NFS = NFS*signj
-        block%NFj(i,j,k) = normalize(NFS)
-        block%Sj (i,j,k) =    normL2(NFS)
+        block%Fj(i,j,k)%N = normalize(NFS)
+        block%Fj(i,j,k)%S =    normL2(NFS)
       enddo
     enddo
   enddo
@@ -601,8 +538,8 @@ contains
                            pt3 = block%node(i  ,j  ,k), &
                            pt4 = block%node(i-1,j  ,k))
         NFS = NFS*signk
-        block%NFk(i,j,k) = normalize(NFS)
-        block%Sk (i,j,k) =    normL2(NFS)
+        block%Fk(i,j,k)%N = normalize(NFS)
+        block%Fk(i,j,k)%S =    normL2(NFS)
       enddo
     enddo
   enddo
@@ -628,9 +565,9 @@ contains
         zm = 0.25_R_P*(block%node(i-1,j  ,k  )%z + block%node(i-1,j  ,k-1)%z + &
                        block%node(i-1,j-1,k  )%z + block%node(i-1,j-1,k-1)%z)
 
-        Vx = Vx + xp*block%NFi(i,j,k)%x*block%Si(i,j,k) - xm*block%NFi(i-1,j,k)%x*block%Si(i-1,j,k)
-        Vy = Vy + yp*block%NFi(i,j,k)%y*block%Si(i,j,k) - ym*block%NFi(i-1,j,k)%y*block%Si(i-1,j,k)
-        Vz = Vz + zp*block%NFi(i,j,k)%z*block%Si(i,j,k) - zm*block%NFi(i-1,j,k)%z*block%Si(i-1,j,k)
+        Vx = Vx + xp*block%Fi(i,j,k)%N%x*block%Fi(i,j,k)%S - xm*block%Fi(i-1,j,k)%N%x*block%Fi(i-1,j,k)%S
+        Vy = Vy + yp*block%Fi(i,j,k)%N%y*block%Fi(i,j,k)%S - ym*block%Fi(i-1,j,k)%N%y*block%Fi(i-1,j,k)%S
+        Vz = Vz + zp*block%Fi(i,j,k)%N%z*block%Fi(i,j,k)%S - zm*block%Fi(i-1,j,k)%N%z*block%Fi(i-1,j,k)%S
 
         xp = 0.25_R_P*(block%node(i  ,j  ,k  )%x + block%node(i  ,j  ,k-1)%x + &
                        block%node(i-1,j  ,k  )%x + block%node(i-1,j  ,k-1)%x)
@@ -645,9 +582,9 @@ contains
         zm = 0.25_R_P*(block%node(i  ,j-1,k  )%z + block%node(i  ,j-1,k-1)%z + &
                        block%node(i-1,j-1,k  )%z + block%node(i-1,j-1,k-1)%z)
 
-        Vx = Vx + xp*block%NFj(i,j,k)%x*block%Sj(i,j,k) - xm*block%NFj(i,j-1,k)%x*block%Sj(i,j-1,k)
-        Vy = Vy + yp*block%NFj(i,j,k)%y*block%Sj(i,j,k) - ym*block%NFj(i,j-1,k)%y*block%Sj(i,j-1,k)
-        Vz = Vz + zp*block%NFj(i,j,k)%z*block%Sj(i,j,k) - zm*block%NFj(i,j-1,k)%z*block%Sj(i,j-1,k)
+        Vx = Vx + xp*block%Fj(i,j,k)%N%x*block%Fj(i,j,k)%S - xm*block%Fj(i,j-1,k)%N%x*block%Fj(i,j-1,k)%S
+        Vy = Vy + yp*block%Fj(i,j,k)%N%y*block%Fj(i,j,k)%S - ym*block%Fj(i,j-1,k)%N%y*block%Fj(i,j-1,k)%S
+        Vz = Vz + zp*block%Fj(i,j,k)%N%z*block%Fj(i,j,k)%S - zm*block%Fj(i,j-1,k)%N%z*block%Fj(i,j-1,k)%S
 
         xp = 0.25_R_P*(block%node(i  ,j  ,k  )%x + block%node(i  ,j-1,k  )%x + &
                        block%node(i-1,j  ,k  )%x + block%node(i-1,j-1,k  )%x)
@@ -662,32 +599,32 @@ contains
         zm = 0.25_R_P*(block%node(i  ,j  ,k-1)%z + block%node(i  ,j-1,k-1)%z + &
                        block%node(i-1,j  ,k-1)%z + block%node(i-1,j-1,k-1)%z)
 
-        Vx = Vx + xp*block%NFk(i,j,k)%x*block%Sk(i,j,k) - xm*block%NFk(i,j,k-1)%x*block%Sk(i,j,k-1)
-        Vy = Vy + yp*block%NFk(i,j,k)%y*block%Sk(i,j,k) - ym*block%NFk(i,j,k-1)%y*block%Sk(i,j,k-1)
-        Vz = Vz + zp*block%NFk(i,j,k)%z*block%Sk(i,j,k) - zm*block%NFk(i,j,k-1)%z*block%Sk(i,j,k-1)
+        Vx = Vx + xp*block%Fk(i,j,k)%N%x*block%Fk(i,j,k)%S - xm*block%Fk(i,j,k-1)%N%x*block%Fk(i,j,k-1)%S
+        Vy = Vy + yp*block%Fk(i,j,k)%N%y*block%Fk(i,j,k)%S - ym*block%Fk(i,j,k-1)%N%y*block%Fk(i,j,k-1)%S
+        Vz = Vz + zp*block%Fk(i,j,k)%N%z*block%Fk(i,j,k)%S - zm*block%Fk(i,j,k-1)%N%z*block%Fk(i,j,k-1)%S
 
-        block%V(i,j,k) = max(Vx,Vy,Vz)
+        block%C(i,j,k)%V = max(Vx,Vy,Vz)
       enddo
     enddo
   enddo
   !!$OMP END PARALLEL
 #ifdef NULi
-  block%NFj(:,:,:)%x=0._R_P
-  block%NFk(:,:,:)%x=0._R_P
-  block%NFi(:,:,:)%y=0._R_P
-  block%NFi(:,:,:)%z=0._R_P
+  block%Fj(:,:,:)%N%x=0._R_P
+  block%Fk(:,:,:)%N%x=0._R_P
+  block%Fi(:,:,:)%N%y=0._R_P
+  block%Fi(:,:,:)%N%z=0._R_P
 #endif
 #ifdef NULj
-  block%NFi(:,:,:)%y=0._R_P
-  block%NFk(:,:,:)%y=0._R_P
-  block%NFj(:,:,:)%x=0._R_P
-  block%NFj(:,:,:)%z=0._R_P
+  block%Fi(:,:,:)%N%y=0._R_P
+  block%Fk(:,:,:)%N%y=0._R_P
+  block%Fj(:,:,:)%N%x=0._R_P
+  block%Fj(:,:,:)%N%z=0._R_P
 #endif
 #ifdef NULk
-  block%NFi(:,:,:)%z=0._R_P
-  block%NFj(:,:,:)%z=0._R_P
-  block%NFk(:,:,:)%x=0._R_P
-  block%NFk(:,:,:)%y=0._R_P
+  block%Fi(:,:,:)%N%z=0._R_P
+  block%Fj(:,:,:)%N%z=0._R_P
+  block%Fk(:,:,:)%N%x=0._R_P
+  block%Fk(:,:,:)%N%y=0._R_P
 #endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -717,40 +654,40 @@ contains
   !!$OMP DO
   do k=1,Nk
     do j=1,Nj
-      correct = ((block%BCi(0,j,k)%tp==bc_ext).OR. &
-                 (block%BCi(0,j,k)%tp==bc_ref).OR. &
-                 (block%BCi(0,j,k)%tp==bc_in1).OR. &
-                 (block%BCi(0,j,k)%tp==bc_in2).OR. &
-                 (block%V(  0,j,k)<(0.2_R_P*block%V(1,j,k))))
-      wall    = ((block%BCi(0,j,k)%tp==bc_ext).OR.(block%BCi(0,j,k)%tp==bc_ref))
+      correct = ((block%Fi(0,j,k)%BC%tp==bc_ext).OR. &
+                 (block%Fi(0,j,k)%BC%tp==bc_ref).OR. &
+                 (block%Fi(0,j,k)%BC%tp==bc_in1).OR. &
+                 (block%Fi(0,j,k)%BC%tp==bc_in2).OR. &
+                 (block%C(  0,j,k)%V<(0.2_R_P*block%C(1,j,k)%V)))
+      wall    = ((block%Fi(0,j,k)%BC%tp==bc_ext).OR.(block%Fi(0,j,k)%BC%tp==bc_ref))
       tm = 1._R_P
       if (wall) tm = -1._R_P
       if (correct) then
          ! normal metrics
-         sn=2._R_P*((block%NFi(1,j,k)*block%Si(1,j,k)).dot.block%NFi(0,j,k))
-         block%NFi(-1,j,  k  ) = -(block%NFi(1,j,k)*block%Si(1,j,k)) + sn*block%NFi(0,j,k)
-         block%Si (-1,j,  k  ) = normL2(   block%NFi(-1,j,k))
-         block%NFi(-1,j,  k  ) = normalize(block%NFi(-1,j,k))
+         sn=2._R_P*((block%Fi(1,j,k)%N*block%Fi(1,j,k)%S).dot.block%Fi(0,j,k)%N)
+         block%Fi(-1,j,  k  )%N = -(block%Fi(1,j,k)%N*block%Fi(1,j,k)%S) + sn*block%Fi(0,j,k)%N
+         block%Fi(-1,j,  k  )%S = normL2(   block%Fi(-1,j,k)%N)
+         block%Fi(-1,j,  k  )%N = normalize(block%Fi(-1,j,k)%N)
          ! tangential metrics
-         block%NFj( 0,j  ,k  ) = tm*block%NFj(1,j  ,k  )
-         block%NFj( 0,j-1,k  ) = tm*block%NFj(1,j-1,k  )
-         block%NFj( 0,j  ,k-1) = tm*block%NFj(1,j  ,k-1)
-         block%NFj( 0,j-1,k-1) = tm*block%NFj(1,j-1,k-1)
-         block%Sj ( 0,j  ,k  ) = tm*block%Sj (1,j  ,k  )
-         block%Sj ( 0,j-1,k  ) = tm*block%Sj (1,j-1,k  )
-         block%Sj ( 0,j  ,k-1) = tm*block%Sj (1,j  ,k-1)
-         block%Sj ( 0,j-1,k-1) = tm*block%Sj (1,j-1,k-1)
+         block%Fj( 0,j  ,k  )%N = tm*block%Fj(1,j  ,k  )%N
+         block%Fj( 0,j-1,k  )%N = tm*block%Fj(1,j-1,k  )%N
+         block%Fj( 0,j  ,k-1)%N = tm*block%Fj(1,j  ,k-1)%N
+         block%Fj( 0,j-1,k-1)%N = tm*block%Fj(1,j-1,k-1)%N
+         block%Fj( 0,j  ,k  )%S = tm*block%Fj(1,j  ,k  )%S
+         block%Fj( 0,j-1,k  )%S = tm*block%Fj(1,j-1,k  )%S
+         block%Fj( 0,j  ,k-1)%S = tm*block%Fj(1,j  ,k-1)%S
+         block%Fj( 0,j-1,k-1)%S = tm*block%Fj(1,j-1,k-1)%S
 
-         block%NFk( 0,j  ,k  ) = tm*block%NFk(1,j  ,k  )
-         block%NFk( 0,j-1,k  ) = tm*block%NFk(1,j-1,k  )
-         block%NFk( 0,j  ,k-1) = tm*block%NFk(1,j  ,k-1)
-         block%NFk( 0,j-1,k-1) = tm*block%NFk(1,j-1,k-1)
-         block%Sk ( 0,j  ,k  ) = tm*block%Sk (1,j  ,k  )
-         block%Sk ( 0,j-1,k  ) = tm*block%Sk (1,j-1,k  )
-         block%Sk ( 0,j  ,k-1) = tm*block%Sk (1,j  ,k-1)
-         block%Sk ( 0,j-1,k-1) = tm*block%Sk (1,j-1,k-1)
+         block%Fk( 0,j  ,k  )%N = tm*block%Fk(1,j  ,k  )%N
+         block%Fk( 0,j-1,k  )%N = tm*block%Fk(1,j-1,k  )%N
+         block%Fk( 0,j  ,k-1)%N = tm*block%Fk(1,j  ,k-1)%N
+         block%Fk( 0,j-1,k-1)%N = tm*block%Fk(1,j-1,k-1)%N
+         block%Fk( 0,j  ,k  )%S = tm*block%Fk(1,j  ,k  )%S
+         block%Fk( 0,j-1,k  )%S = tm*block%Fk(1,j-1,k  )%S
+         block%Fk( 0,j  ,k-1)%S = tm*block%Fk(1,j  ,k-1)%S
+         block%Fk( 0,j-1,k-1)%S = tm*block%Fk(1,j-1,k-1)%S
          ! volume
-         block%V(   0,j,  k  ) = block%V(     1,j,  k  )
+         block%C(  0,j,  k  )%V = block%C(    1,j,  k  )%V
       end if
     enddo
   enddo
@@ -758,40 +695,40 @@ contains
   !!$OMP DO
   do k=1,Nk
     do j=1,Nj
-      correct = ((block%BCi(Ni+1,j,k)%tp==bc_ext).OR. &
-                 (block%BCi(Ni+1,j,k)%tp==bc_ref).OR. &
-                 (block%BCi(Ni+1,j,k)%tp==bc_in1).OR. &
-                 (block%BCi(Ni+1,j,k)%tp==bc_in2).OR. &
-                 (block%V(Ni+1,j,k)<(0.2_R_P*block%V(Ni,j,k))))
-      wall    = ((block%BCi(Ni+1,j,k)%tp==bc_ext).OR.(block%BCi(Ni+1,j,k)%tp==bc_ref))
+      correct = ((block%Fi(Ni+1,j,k)%BC%tp==bc_ext).OR. &
+                 (block%Fi(Ni+1,j,k)%BC%tp==bc_ref).OR. &
+                 (block%Fi(Ni+1,j,k)%BC%tp==bc_in1).OR. &
+                 (block%Fi(Ni+1,j,k)%BC%tp==bc_in2).OR. &
+                 (block%C(Ni+1,j,k)%V<(0.2_R_P*block%C(Ni,j,k)%V)))
+      wall    = ((block%Fi(Ni+1,j,k)%BC%tp==bc_ext).OR.(block%Fi(Ni+1,j,k)%BC%tp==bc_ref))
       tm = 1._R_P
       if (wall) tm = -1._R_P
       if (correct) then
          ! normal metrics
-         sn=2._R_P*((block%NFi(Ni-1,j,k)*block%Si(Ni-1,j,k)).dot.block%NFi(Ni,j,k))
-         block%NFi(Ni+1,j,  k  ) = -(block%NFi(Ni-1,j,k)*block%Si(Ni-1,j,k)) + sn*block%NFi(Ni,j,k)
-         block%Si (Ni+1,j,  k  ) = normL2(   block%NFi(Ni+1,j,k))
-         block%NFi(Ni+1,j,  k  ) = normalize(block%NFi(Ni+1,j,k))
+         sn=2._R_P*((block%Fi(Ni-1,j,k)%N*block%Fi(Ni-1,j,k)%S).dot.block%Fi(Ni,j,k)%N)
+         block%Fi(Ni+1,j,  k  )%N = -(block%Fi(Ni-1,j,k)%N*block%Fi(Ni-1,j,k)%S) + sn*block%Fi(Ni,j,k)%N
+         block%Fi(Ni+1,j,  k  )%S = normL2(   block%Fi(Ni+1,j,k)%N)
+         block%Fi(Ni+1,j,  k  )%N = normalize(block%Fi(Ni+1,j,k)%N)
          ! tangential metrics
-         block%NFj(Ni+1,j  ,k  ) = tm*block%NFj(Ni,j  ,k  )
-         block%NFj(Ni+1,j-1,k  ) = tm*block%NFj(Ni,j-1,k  )
-         block%NFj(Ni+1,j  ,k-1) = tm*block%NFj(Ni,j  ,k-1)
-         block%NFj(Ni+1,j-1,k-1) = tm*block%NFj(Ni,j-1,k-1)
-         block%Sj (Ni+1,j  ,k  ) = tm*block%Sj (Ni,j  ,k  )
-         block%Sj (Ni+1,j-1,k  ) = tm*block%Sj (Ni,j-1,k  )
-         block%Sj (Ni+1,j  ,k-1) = tm*block%Sj (Ni,j  ,k-1)
-         block%Sj (Ni+1,j-1,k-1) = tm*block%Sj (Ni,j-1,k-1)
+         block%Fj(Ni+1,j  ,k  )%N = tm*block%Fj(Ni,j  ,k  )%N
+         block%Fj(Ni+1,j-1,k  )%N = tm*block%Fj(Ni,j-1,k  )%N
+         block%Fj(Ni+1,j  ,k-1)%N = tm*block%Fj(Ni,j  ,k-1)%N
+         block%Fj(Ni+1,j-1,k-1)%N = tm*block%Fj(Ni,j-1,k-1)%N
+         block%Fj(Ni+1,j  ,k  )%S = tm*block%Fj(Ni,j  ,k  )%S
+         block%Fj(Ni+1,j-1,k  )%S = tm*block%Fj(Ni,j-1,k  )%S
+         block%Fj(Ni+1,j  ,k-1)%S = tm*block%Fj(Ni,j  ,k-1)%S
+         block%Fj(Ni+1,j-1,k-1)%S = tm*block%Fj(Ni,j-1,k-1)%S
 
-         block%NFk(Ni+1,j  ,k  ) = tm*block%NFk(Ni,j  ,k  )
-         block%NFk(Ni+1,j-1,k  ) = tm*block%NFk(Ni,j-1,k  )
-         block%NFk(Ni+1,j  ,k-1) = tm*block%NFk(Ni,j  ,k-1)
-         block%NFk(Ni+1,j-1,k-1) = tm*block%NFk(Ni,j-1,k-1)
-         block%Sk (Ni+1,j  ,k  ) = tm*block%Sk (Ni,j  ,k  )
-         block%Sk (Ni+1,j-1,k  ) = tm*block%Sk (Ni,j-1,k  )
-         block%Sk (Ni+1,j  ,k-1) = tm*block%Sk (Ni,j  ,k-1)
-         block%Sk (Ni+1,j-1,k-1) = tm*block%Sk (Ni,j-1,k-1)
+         block%Fk(Ni+1,j  ,k  )%N = tm*block%Fk(Ni,j  ,k  )%N
+         block%Fk(Ni+1,j-1,k  )%N = tm*block%Fk(Ni,j-1,k  )%N
+         block%Fk(Ni+1,j  ,k-1)%N = tm*block%Fk(Ni,j  ,k-1)%N
+         block%Fk(Ni+1,j-1,k-1)%N = tm*block%Fk(Ni,j-1,k-1)%N
+         block%Fk(Ni+1,j  ,k  )%S = tm*block%Fk(Ni,j  ,k  )%S
+         block%Fk(Ni+1,j-1,k  )%S = tm*block%Fk(Ni,j-1,k  )%S
+         block%Fk(Ni+1,j  ,k-1)%S = tm*block%Fk(Ni,j  ,k-1)%S
+         block%Fk(Ni+1,j-1,k-1)%S = tm*block%Fk(Ni,j-1,k-1)%S
          ! volume
-         block%V(  Ni+1,j,  k  ) = block%V(     Ni,j,  k  )
+         block%C( Ni+1,j,  k  )%V = block%C(    Ni,j,  k  )%V
       end if
     enddo
   enddo
@@ -799,40 +736,40 @@ contains
   !!$OMP DO
   do k=1,Nk
     do i=1,Ni
-      correct = ((block%BCj(i,0,k)%tp==bc_ext).OR. &
-                 (block%BCj(i,0,k)%tp==bc_ref).OR. &
-                 (block%BCj(i,0,k)%tp==bc_in1).OR. &
-                 (block%BCj(i,0,k)%tp==bc_in2).OR. &
-                 (block%V(i,0,k)<(0.2_R_P*block%V(i,1,k))))
-      wall    = ((block%BCj(i,0,k)%tp==bc_ext).OR.(block%BCj(i,0,k)%tp==bc_ref))
+      correct = ((block%Fj(i,0,k)%BC%tp==bc_ext).OR. &
+                 (block%Fj(i,0,k)%BC%tp==bc_ref).OR. &
+                 (block%Fj(i,0,k)%BC%tp==bc_in1).OR. &
+                 (block%Fj(i,0,k)%BC%tp==bc_in2).OR. &
+                 (block%C(i,0,k)%V<(0.2_R_P*block%C(i,1,k)%V)))
+      wall    = ((block%Fj(i,0,k)%BC%tp==bc_ext).OR.(block%Fj(i,0,k)%BC%tp==bc_ref))
       tm = 1._R_P
       if (wall) tm = -1._R_P
       if (correct) then
          ! normal metrics
-         sn=2._R_P*((block%NFj(i,1,k)*block%Sj(i,1,k)).dot.block%NFj(i,0,k))
-         block%NFj(i, -1,k  ) = -(block%NFj(i,1,k)*block%Sj(i,1,k)) + sn*block%NFj(i,0,k)
-         block%Sj (i, -1,k  ) = normL2(   block%NFj(i,-1,k))
-         block%NFj(i, -1,k  ) = normalize(block%NFj(i,-1,k))
+         sn=2._R_P*((block%Fj(i,1,k)%N*block%Fj(i,1,k)%S).dot.block%Fj(i,0,k)%N)
+         block%Fj(i, -1,k  )%N = -(block%Fj(i,1,k)%N*block%Fj(i,1,k)%S) + sn*block%Fj(i,0,k)%N
+         block%Fj(i, -1,k  )%S = normL2(   block%Fj(i,-1,k)%N)
+         block%Fj(i, -1,k  )%N = normalize(block%Fj(i,-1,k)%N)
          ! tangential metrics
-         block%NFi(i  ,0,k  ) = tm*block%NFi(i  ,1,k  )
-         block%NFi(i-1,0,k  ) = tm*block%NFi(i-1,1,k  )
-         block%NFi(i  ,0,k-1) = tm*block%NFi(i  ,1,k-1)
-         block%NFi(i-1,0,k-1) = tm*block%NFi(i-1,1,k-1)
-         block%Si (i  ,0,k  ) = tm*block%Si (i  ,1,k  )
-         block%Si (i-1,0,k  ) = tm*block%Si (i-1,1,k  )
-         block%Si (i  ,0,k-1) = tm*block%Si (i  ,1,k-1)
-         block%Si (i-1,0,k-1) = tm*block%Si (i-1,1,k-1)
+         block%Fi(i  ,0,k  )%N = tm*block%Fi(i  ,1,k  )%N
+         block%Fi(i-1,0,k  )%N = tm*block%Fi(i-1,1,k  )%N
+         block%Fi(i  ,0,k-1)%N = tm*block%Fi(i  ,1,k-1)%N
+         block%Fi(i-1,0,k-1)%N = tm*block%Fi(i-1,1,k-1)%N
+         block%Fi(i  ,0,k  )%S = tm*block%Fi(i  ,1,k  )%S
+         block%Fi(i-1,0,k  )%S = tm*block%Fi(i-1,1,k  )%S
+         block%Fi(i  ,0,k-1)%S = tm*block%Fi(i  ,1,k-1)%S
+         block%Fi(i-1,0,k-1)%S = tm*block%Fi(i-1,1,k-1)%S
 
-         block%NFk(i  ,0,k  ) = tm*block%NFk(i  ,1,k  )
-         block%NFk(i-1,0,k  ) = tm*block%NFk(i-1,1,k  )
-         block%NFk(i  ,0,k-1) = tm*block%NFk(i  ,1,k-1)
-         block%NFk(i-1,0,k-1) = tm*block%NFk(i-1,1,k-1)
-         block%Sk (i  ,0,k  ) = tm*block%Sk (i  ,1,k  )
-         block%Sk (i-1,0,k  ) = tm*block%Sk (i-1,1,k  )
-         block%Sk (i  ,0,k-1) = tm*block%Sk (i  ,1,k-1)
-         block%Sk (i-1,0,k-1) = tm*block%Sk (i-1,1,k-1)
+         block%Fk(i  ,0,k  )%N = tm*block%Fk(i  ,1,k  )%N
+         block%Fk(i-1,0,k  )%N = tm*block%Fk(i-1,1,k  )%N
+         block%Fk(i  ,0,k-1)%N = tm*block%Fk(i  ,1,k-1)%N
+         block%Fk(i-1,0,k-1)%N = tm*block%Fk(i-1,1,k-1)%N
+         block%Fk(i  ,0,k  )%S = tm*block%Fk(i  ,1,k  )%S
+         block%Fk(i-1,0,k  )%S = tm*block%Fk(i-1,1,k  )%S
+         block%Fk(i  ,0,k-1)%S = tm*block%Fk(i  ,1,k-1)%S
+         block%Fk(i-1,0,k-1)%S = tm*block%Fk(i-1,1,k-1)%S
          ! volume
-         block%V(  i,  0,k  ) = block%V(     i,  1,k  )
+         block%C( i,  0,k  )%V = block%C(    i,  1,k  )%V
       end if
     enddo
   enddo
@@ -840,40 +777,40 @@ contains
   !!$OMP DO
   do k=1,Nk
     do i=1,Ni
-      correct = ((block%BCj(i,Nj+1,k)%tp==bc_ext).OR. &
-                 (block%BCj(i,Nj+1,k)%tp==bc_ref).OR. &
-                 (block%BCj(i,Nj+1,k)%tp==bc_in1).OR. &
-                 (block%BCj(i,Nj+1,k)%tp==bc_in2).OR. &
-                 (block%V(i,Nj+1,k)<(0.2_R_P*block%V(i,Nj,k))))
-      wall    = ((block%BCj(i,Nj+1,k)%tp==bc_ext).OR.(block%BCj(i,Nj+1,k)%tp==bc_ref))
+      correct = ((block%Fj(i,Nj+1,k)%BC%tp==bc_ext).OR. &
+                 (block%Fj(i,Nj+1,k)%BC%tp==bc_ref).OR. &
+                 (block%Fj(i,Nj+1,k)%BC%tp==bc_in1).OR. &
+                 (block%Fj(i,Nj+1,k)%BC%tp==bc_in2).OR. &
+                 (block%C(i,Nj+1,k)%V<(0.2_R_P*block%C(i,Nj,k)%V)))
+      wall    = ((block%Fj(i,Nj+1,k)%BC%tp==bc_ext).OR.(block%Fj(i,Nj+1,k)%BC%tp==bc_ref))
       tm = 1._R_P
       if (wall) tm = -1._R_P
       if (correct) then
          ! normal metrics
-         sn=2._R_P*((block%NFj(i,Nj-1,k)*block%Sj(i,Nj-1,k)).dot.block%NFj(i,Nj,k))
-         block%NFj(i,Nj+1,  k  ) = -(block%NFj(i,Nj-1,k)*block%Sj(i,Nj-1,k)) + sn*block%NFj(i,Nj,k)
-         block%Sj (i,Nj+1,  k  ) = normL2(   block%NFj(i,Nj+1,k))
-         block%NFj(i,Nj+1,  k  ) = normalize(block%NFj(i,Nj+1,k))
+         sn=2._R_P*((block%Fj(i,Nj-1,k)%N*block%Fj(i,Nj-1,k)%S).dot.block%Fj(i,Nj,k)%N)
+         block%Fj(i,Nj+1,  k  )%N = -(block%Fj(i,Nj-1,k)%N*block%Fj(i,Nj-1,k)%S) + sn*block%Fj(i,Nj,k)%N
+         block%Fj(i,Nj+1,  k  )%S = normL2(   block%Fj(i,Nj+1,k)%N)
+         block%Fj(i,Nj+1,  k  )%N = normalize(block%Fj(i,Nj+1,k)%N)
          ! tangential metrics
-         block%NFi(i  ,Nj+1,k  ) = tm*block%NFi(i  ,Nj,k  )
-         block%NFi(i-1,Nj+1,k  ) = tm*block%NFi(i-1,Nj,k  )
-         block%NFi(i  ,Nj+1,k-1) = tm*block%NFi(i  ,Nj,k-1)
-         block%NFi(i-1,Nj+1,k-1) = tm*block%NFi(i-1,Nj,k-1)
-         block%Si (i  ,Nj+1,k  ) = tm*block%Si (i  ,Nj,k  )
-         block%Si (i-1,Nj+1,k  ) = tm*block%Si (i-1,Nj,k  )
-         block%Si (i  ,Nj+1,k-1) = tm*block%Si (i  ,Nj,k-1)
-         block%Si (i-1,Nj+1,k-1) = tm*block%Si (i-1,Nj,k-1)
+         block%Fi(i  ,Nj+1,k  )%N = tm*block%Fi(i  ,Nj,k  )%N
+         block%Fi(i-1,Nj+1,k  )%N = tm*block%Fi(i-1,Nj,k  )%N
+         block%Fi(i  ,Nj+1,k-1)%N = tm*block%Fi(i  ,Nj,k-1)%N
+         block%Fi(i-1,Nj+1,k-1)%N = tm*block%Fi(i-1,Nj,k-1)%N
+         block%Fi(i  ,Nj+1,k  )%S = tm*block%Fi(i  ,Nj,k  )%S
+         block%Fi(i-1,Nj+1,k  )%S = tm*block%Fi(i-1,Nj,k  )%S
+         block%Fi(i  ,Nj+1,k-1)%S = tm*block%Fi(i  ,Nj,k-1)%S
+         block%Fi(i-1,Nj+1,k-1)%S = tm*block%Fi(i-1,Nj,k-1)%S
 
-         block%NFk(i  ,Nj+1,k  ) = tm*block%NFk(i  ,Nj,k  )
-         block%NFk(i-1,Nj+1,k  ) = tm*block%NFk(i-1,Nj,k  )
-         block%NFk(i  ,Nj+1,k-1) = tm*block%NFk(i  ,Nj,k-1)
-         block%NFk(i-1,Nj+1,k-1) = tm*block%NFk(i-1,Nj,k-1)
-         block%Sk (i  ,Nj+1,k  ) = tm*block%Sk (i  ,Nj,k  )
-         block%Sk (i-1,Nj+1,k  ) = tm*block%Sk (i-1,Nj,k  )
-         block%Sk (i  ,Nj+1,k-1) = tm*block%Sk (i  ,Nj,k-1)
-         block%Sk (i-1,Nj+1,k-1) = tm*block%Sk (i-1,Nj,k-1)
+         block%Fk(i  ,Nj+1,k  )%N = tm*block%Fk(i  ,Nj,k  )%N
+         block%Fk(i-1,Nj+1,k  )%N = tm*block%Fk(i-1,Nj,k  )%N
+         block%Fk(i  ,Nj+1,k-1)%N = tm*block%Fk(i  ,Nj,k-1)%N
+         block%Fk(i-1,Nj+1,k-1)%N = tm*block%Fk(i-1,Nj,k-1)%N
+         block%Fk(i  ,Nj+1,k  )%S = tm*block%Fk(i  ,Nj,k  )%S
+         block%Fk(i-1,Nj+1,k  )%S = tm*block%Fk(i-1,Nj,k  )%S
+         block%Fk(i  ,Nj+1,k-1)%S = tm*block%Fk(i  ,Nj,k-1)%S
+         block%Fk(i-1,Nj+1,k-1)%S = tm*block%Fk(i-1,Nj,k-1)%S
          ! volume
-         block%V(  i,  Nj+1,k  ) = block%V(     i,  Nj,k  )
+         block%C( i,  Nj+1,k  )%V = block%C(    i,  Nj,k  )%V
       end if
     enddo
   enddo
@@ -881,40 +818,40 @@ contains
   !!$OMP DO
   do j=1,Nj
     do i=1,Ni
-      correct = ((block%BCk(i,j,0)%tp==bc_ext).OR. &
-                 (block%BCk(i,j,0)%tp==bc_ref).OR. &
-                 (block%BCk(i,j,0)%tp==bc_in1).OR. &
-                 (block%BCk(i,j,0)%tp==bc_in2).OR. &
-                 (block%V(i,j,0)<(0.2_R_P*block%V(i,j,1))))
-      wall    = ((block%BCk(i,j,0)%tp==bc_ext).OR.(block%BCk(i,j,0)%tp==bc_ref))
+      correct = ((block%Fk(i,j,0)%BC%tp==bc_ext).OR. &
+                 (block%Fk(i,j,0)%BC%tp==bc_ref).OR. &
+                 (block%Fk(i,j,0)%BC%tp==bc_in1).OR. &
+                 (block%Fk(i,j,0)%BC%tp==bc_in2).OR. &
+                 (block%C(i,j,0)%V<(0.2_R_P*block%C(i,j,1)%V)))
+      wall    = ((block%Fk(i,j,0)%BC%tp==bc_ext).OR.(block%Fk(i,j,0)%BC%tp==bc_ref))
       tm = 1._R_P
       if (wall) tm = -1._R_P
       if (correct) then
          ! normal metrics
-         sn=2._R_P*((block%NFk(i,j,1)*block%Sk(i,j,1)).dot.block%NFk(i,j,0))
-         block%NFk(i,  j, -1) = -(block%NFk(i,j,1)*block%Sk(i,j,1)) + sn*block%NFk(i,j,0)
-         block%Sk (i,  j, -1) = normL2(   block%NFk(i,j,-1))
-         block%NFk(i,  j, -1) = normalize(block%NFk(i,j,-1))
+         sn=2._R_P*((block%Fk(i,j,1)%N*block%Fk(i,j,1)%S).dot.block%Fk(i,j,0)%N)
+         block%Fk(i,  j, -1)%N = -(block%Fk(i,j,1)%N*block%Fk(i,j,1)%S) + sn*block%Fk(i,j,0)%N
+         block%Fk(i,  j, -1)%S = normL2(   block%Fk(i,j,-1)%N)
+         block%Fk(i,  j, -1)%N = normalize(block%Fk(i,j,-1)%N)
          ! tangential metrics
-         block%NFi(i  ,j  ,0) = tm*block%NFi(i  ,j  ,1)
-         block%NFi(i-1,j  ,0) = tm*block%NFi(i-1,j  ,1)
-         block%NFi(i  ,j-1,0) = tm*block%NFi(i  ,j-1,1)
-         block%NFi(i-1,j-1,0) = tm*block%NFi(i-1,j-1,1)
-         block%Si (i  ,j  ,0) = tm*block%Si (i  ,j  ,1)
-         block%Si (i-1,j  ,0) = tm*block%Si (i-1,j  ,1)
-         block%Si (i  ,j-1,0) = tm*block%Si (i  ,j-1,1)
-         block%Si (i-1,j-1,0) = tm*block%Si (i-1,j-1,1)
+         block%Fi(i  ,j  ,0)%N = tm*block%Fi(i  ,j  ,1)%N
+         block%Fi(i-1,j  ,0)%N = tm*block%Fi(i-1,j  ,1)%N
+         block%Fi(i  ,j-1,0)%N = tm*block%Fi(i  ,j-1,1)%N
+         block%Fi(i-1,j-1,0)%N = tm*block%Fi(i-1,j-1,1)%N
+         block%Fi(i  ,j  ,0)%S = tm*block%Fi(i  ,j  ,1)%S
+         block%Fi(i-1,j  ,0)%S = tm*block%Fi(i-1,j  ,1)%S
+         block%Fi(i  ,j-1,0)%S = tm*block%Fi(i  ,j-1,1)%S
+         block%Fi(i-1,j-1,0)%S = tm*block%Fi(i-1,j-1,1)%S
 
-         block%NFj(i  ,j  ,0) = tm*block%NFj(i  ,j  ,1)
-         block%NFj(i-1,j  ,0) = tm*block%NFj(i-1,j  ,1)
-         block%NFj(i  ,j-1,0) = tm*block%NFj(i  ,j-1,1)
-         block%NFj(i-1,j-1,0) = tm*block%NFj(i-1,j-1,1)
-         block%Sj (i  ,j  ,0) = tm*block%Sj (i  ,j  ,1)
-         block%Sj (i-1,j  ,0) = tm*block%Sj (i-1,j  ,1)
-         block%Sj (i  ,j-1,0) = tm*block%Sj (i  ,j-1,1)
-         block%Sj (i-1,j-1,0) = tm*block%Sj (i-1,j-1,1)
+         block%Fj(i  ,j  ,0)%N = tm*block%Fj(i  ,j  ,1)%N
+         block%Fj(i-1,j  ,0)%N = tm*block%Fj(i-1,j  ,1)%N
+         block%Fj(i  ,j-1,0)%N = tm*block%Fj(i  ,j-1,1)%N
+         block%Fj(i-1,j-1,0)%N = tm*block%Fj(i-1,j-1,1)%N
+         block%Fj(i  ,j  ,0)%S = tm*block%Fj(i  ,j  ,1)%S
+         block%Fj(i-1,j  ,0)%S = tm*block%Fj(i-1,j  ,1)%S
+         block%Fj(i  ,j-1,0)%S = tm*block%Fj(i  ,j-1,1)%S
+         block%Fj(i-1,j-1,0)%S = tm*block%Fj(i-1,j-1,1)%S
          ! volume
-         block%V(  i,  j,  0) = block%V(     i,  j,  1)
+         block%C( i,  j,  0)%V = block%C(    i,  j,  1)%V
       end if
     enddo
   enddo
@@ -922,40 +859,40 @@ contains
   !!$OMP DO
   do j=1,Nj
     do i=1,Ni
-      correct = ((block%BCk(i,j,Nk+1)%tp==bc_ext).OR. &
-                 (block%BCk(i,j,Nk+1)%tp==bc_ref).OR. &
-                 (block%BCk(i,j,Nk+1)%tp==bc_in1).OR. &
-                 (block%BCk(i,j,Nk+1)%tp==bc_in2).OR. &
-                 (block%V(i,j,Nk+1)<(0.2_R_P*block%V(i,j,Nk))))
-      wall    = ((block%BCk(i,j,Nk+1)%tp==bc_ext).OR.(block%BCk(i,j,Nk+1)%tp==bc_ref))
+      correct = ((block%Fk(i,j,Nk+1)%BC%tp==bc_ext).OR. &
+                 (block%Fk(i,j,Nk+1)%BC%tp==bc_ref).OR. &
+                 (block%Fk(i,j,Nk+1)%BC%tp==bc_in1).OR. &
+                 (block%Fk(i,j,Nk+1)%BC%tp==bc_in2).OR. &
+                 (block%C(i,j,Nk+1)%V<(0.2_R_P*block%C(i,j,Nk)%V)))
+      wall    = ((block%Fk(i,j,Nk+1)%BC%tp==bc_ext).OR.(block%Fk(i,j,Nk+1)%BC%tp==bc_ref))
       tm = 1._R_P
       if (wall) tm = -1._R_P
       if (correct) then
          ! normal metrics
-         sn=2._R_P*((block%NFk(i,j,Nk-1)*block%Sk(i,j,Nk-1)).dot.block%NFk(i,j,Nk))
-         block%NFk(i,  j,  Nk+1) = -(block%NFk(i,j,Nk-1)*block%Sk(i,j,Nk-1)) + sn*block%NFk(i,j,Nk)
-         block%Sk (i,  j,  Nk+1) = normL2(   block%NFk(i,j,Nk+1))
-         block%NFk(i,  j,  Nk+1) = normalize(block%NFk(i,j,Nk+1))
+         sn=2._R_P*((block%Fk(i,j,Nk-1)%N*block%Fk(i,j,Nk-1)%S).dot.block%Fk(i,j,Nk)%N)
+         block%Fk(i,  j,  Nk+1)%N = -(block%Fk(i,j,Nk-1)%N*block%Fk(i,j,Nk-1)%S) + sn*block%Fk(i,j,Nk)%N
+         block%Fk(i,  j,  Nk+1)%S = normL2(   block%Fk(i,j,Nk+1)%N)
+         block%Fk(i,  j,  Nk+1)%N = normalize(block%Fk(i,j,Nk+1)%N)
          ! tangential metrics
-         block%NFi(i  ,j  ,Nk+1) = tm*block%NFi(i  ,j  ,Nk)
-         block%NFi(i-1,j  ,Nk+1) = tm*block%NFi(i-1,j  ,Nk)
-         block%NFi(i  ,j-1,Nk+1) = tm*block%NFi(i  ,j-1,Nk)
-         block%NFi(i-1,j-1,Nk+1) = tm*block%NFi(i-1,j-1,Nk)
-         block%Si (i  ,j  ,Nk+1) = tm*block%Si (i  ,j  ,Nk)
-         block%Si (i-1,j  ,Nk+1) = tm*block%Si (i-1,j  ,Nk)
-         block%Si (i  ,j-1,Nk+1) = tm*block%Si (i  ,j-1,Nk)
-         block%Si (i-1,j-1,Nk+1) = tm*block%Si (i-1,j-1,Nk)
+         block%Fi(i  ,j  ,Nk+1)%N = tm*block%Fi(i  ,j  ,Nk)%N
+         block%Fi(i-1,j  ,Nk+1)%N = tm*block%Fi(i-1,j  ,Nk)%N
+         block%Fi(i  ,j-1,Nk+1)%N = tm*block%Fi(i  ,j-1,Nk)%N
+         block%Fi(i-1,j-1,Nk+1)%N = tm*block%Fi(i-1,j-1,Nk)%N
+         block%Fi(i  ,j  ,Nk+1)%S = tm*block%Fi(i  ,j  ,Nk)%S
+         block%Fi(i-1,j  ,Nk+1)%S = tm*block%Fi(i-1,j  ,Nk)%S
+         block%Fi(i  ,j-1,Nk+1)%S = tm*block%Fi(i  ,j-1,Nk)%S
+         block%Fi(i-1,j-1,Nk+1)%S = tm*block%Fi(i-1,j-1,Nk)%S
 
-         block%NFj(i  ,j  ,Nk+1) = tm*block%NFj(i  ,j  ,Nk)
-         block%NFj(i-1,j  ,Nk+1) = tm*block%NFj(i-1,j  ,Nk)
-         block%NFj(i  ,j-1,Nk+1) = tm*block%NFj(i  ,j-1,Nk)
-         block%NFj(i-1,j-1,Nk+1) = tm*block%NFj(i-1,j-1,Nk)
-         block%Sj (i  ,j  ,Nk+1) = tm*block%Sj (i  ,j  ,Nk)
-         block%Sj (i-1,j  ,Nk+1) = tm*block%Sj (i-1,j  ,Nk)
-         block%Sj (i  ,j-1,Nk+1) = tm*block%Sj (i  ,j-1,Nk)
-         block%Sj (i-1,j-1,Nk+1) = tm*block%Sj (i-1,j-1,Nk)
+         block%Fj(i  ,j  ,Nk+1)%N = tm*block%Fj(i  ,j  ,Nk)%N
+         block%Fj(i-1,j  ,Nk+1)%N = tm*block%Fj(i-1,j  ,Nk)%N
+         block%Fj(i  ,j-1,Nk+1)%N = tm*block%Fj(i  ,j-1,Nk)%N
+         block%Fj(i-1,j-1,Nk+1)%N = tm*block%Fj(i-1,j-1,Nk)%N
+         block%Fj(i  ,j  ,Nk+1)%S = tm*block%Fj(i  ,j  ,Nk)%S
+         block%Fj(i-1,j  ,Nk+1)%S = tm*block%Fj(i-1,j  ,Nk)%S
+         block%Fj(i  ,j-1,Nk+1)%S = tm*block%Fj(i  ,j-1,Nk)%S
+         block%Fj(i-1,j-1,Nk+1)%S = tm*block%Fj(i-1,j-1,Nk)%S
          ! volume
-         block%V(  i,  j,  Nk+1) = block%V(     i,  j,  Nk)
+         block%C( i,  j,  Nk+1)%V = block%C(    i,  j,  Nk)%V
       end if
     enddo
   enddo
@@ -980,30 +917,30 @@ contains
   do k=1-block%gc(5),block%Nk+block%gc(6)
     do j=1-block%gc(3),block%Nj+block%gc(4)
       do i=1-block%gc(1),block%Ni+block%gc(2)
-        block%cent(i,j,k)%x = (block%node(i,  j,  k  )%x + &
-                               block%node(i-1,j,  k  )%x + &
-                               block%node(i  ,j-1,k  )%x + &
-                               block%node(i  ,j  ,k-1)%x + &
-                               block%node(i-1,j-1,k-1)%x + &
-                               block%node(i  ,j-1,k-1)%x + &
-                               block%node(i-1,j  ,k-1)%x + &
-                               block%node(i-1,j-1,k  )%x)*0.125_R_P
-        block%cent(i,j,k)%y = (block%node(i,  j,  k  )%y + &
-                               block%node(i-1,j,  k  )%y + &
-                               block%node(i  ,j-1,k  )%y + &
-                               block%node(i  ,j  ,k-1)%y + &
-                               block%node(i-1,j-1,k-1)%y + &
-                               block%node(i  ,j-1,k-1)%y + &
-                               block%node(i-1,j  ,k-1)%y + &
-                               block%node(i-1,j-1,k  )%y)*0.125_R_P
-        block%cent(i,j,k)%z = (block%node(i,  j,  k  )%z + &
-                               block%node(i-1,j,  k  )%z + &
-                               block%node(i  ,j-1,k  )%z + &
-                               block%node(i  ,j  ,k-1)%z + &
-                               block%node(i-1,j-1,k-1)%z + &
-                               block%node(i  ,j-1,k-1)%z + &
-                               block%node(i-1,j  ,k-1)%z + &
-                               block%node(i-1,j-1,k  )%z)*0.125_R_P
+        block%C(i,j,k)%cent%x = (block%node(i,  j,  k  )%x + &
+                                 block%node(i-1,j,  k  )%x + &
+                                 block%node(i  ,j-1,k  )%x + &
+                                 block%node(i  ,j  ,k-1)%x + &
+                                 block%node(i-1,j-1,k-1)%x + &
+                                 block%node(i  ,j-1,k-1)%x + &
+                                 block%node(i-1,j  ,k-1)%x + &
+                                 block%node(i-1,j-1,k  )%x)*0.125_R_P
+        block%C(i,j,k)%cent%y = (block%node(i,  j,  k  )%y + &
+                                 block%node(i-1,j,  k  )%y + &
+                                 block%node(i  ,j-1,k  )%y + &
+                                 block%node(i  ,j  ,k-1)%y + &
+                                 block%node(i-1,j-1,k-1)%y + &
+                                 block%node(i  ,j-1,k-1)%y + &
+                                 block%node(i-1,j  ,k-1)%y + &
+                                 block%node(i-1,j-1,k  )%y)*0.125_R_P
+        block%C(i,j,k)%cent%z = (block%node(i,  j,  k  )%z + &
+                                 block%node(i-1,j,  k  )%z + &
+                                 block%node(i  ,j-1,k  )%z + &
+                                 block%node(i  ,j  ,k-1)%z + &
+                                 block%node(i-1,j-1,k-1)%z + &
+                                 block%node(i  ,j-1,k-1)%z + &
+                                 block%node(i-1,j  ,k-1)%z + &
+                                 block%node(i-1,j-1,k  )%z)*0.125_R_P
       enddo
     enddo
   enddo

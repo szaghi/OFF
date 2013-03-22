@@ -1,11 +1,21 @@
+!> @ingroup Library
+!> @{
+!> @defgroup Lib_IO_MiscLibrary Lib_IO_Misc
+!> @}
+
 !> @ingroup GlobalVarPar
 !> @{
-!> @defgroup Lib_IO_Misc Lib_IO_Misc
+!> @defgroup Lib_IO_MiscGlobalVarPar Lib_IO_Misc
+!> @}
+
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Lib_IO_MiscPublicProcedure Lib_IO_Misc
 !> @}
 
 !> This module contains miscellanea procedures for input/output and strings operations.
 !> This is a library module.
-!> @ingroup Library
+!> @ingroup Lib_IO_MiscLibrary
 module Lib_IO_Misc
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                                                    ! Integers and reals precision definition.
@@ -36,10 +46,12 @@ public:: tokenize
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!> @ingroup Lib_IO_Misc
+!> @ingroup Lib_IO_MiscGlobalVarPar
 type(Type_OS):: OS !< OS definition (see \ref Data_Type_OS::Type_OS "definition").
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @ingroup Lib_IO_MiscPublicProcedure
+  !> @{
   !> @brief The Get_Unit function returns a free logic unit for opening a file. The unit value is returned by the function, and also
   !> by the optional argument "Free_Unit". This allows the function to be used directly in an open statement like:
   !> open(unit=Get_Unit(myunit),...) ; read(myunit)...
@@ -378,4 +390,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine File_Not_Found
+  !> @}
 endmodule Lib_IO_Misc

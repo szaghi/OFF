@@ -584,9 +584,17 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  tran%x = ten.dot.ex
-  tran%y = ten.dot.ey
-  tran%z = ten.dot.ez
+  ! the following do not compile with gnu gfortran...
+  !tran%x = ten.dot.ex
+  !tran%y = ten.dot.ey
+  !tran%z = ten.dot.ez
+  ! used for correct compiling with gnu gfortran...
+  select type(ten)
+  type is(Type_Tensor)
+    tran%x = ten_dot_vec(ten,ex)
+    tran%y = ten_dot_vec(ten,ey)
+    tran%z = ten_dot_vec(ten,ez)
+  endselect
   ten%x = tran%x
   ten%y = tran%y
   ten%z = tran%z

@@ -72,13 +72,14 @@ public:: I_P,  FI_P,  DI_P,  MinI_P,  MaxI_P,  BII_P,  BYI_P
 public:: check_endian
 public:: bit_size
 public:: str, strz, cton
-public:: IR_Init
+public:: ir_initialized,IR_Init
 public:: IR_Print
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @ingroup IR_PrecisionGlobalVarPar
 !> @{
+logical:: ir_initialized = .false. !< Flag for chcecking the initialization of some variables that must be initialized by IR_Init.
 ! Bit ordering of the running architecture:
 integer, parameter:: endianL = 1       !< Little endian parameter.
 integer, parameter:: endianB = 0       !< Big endian parameter.
@@ -203,16 +204,16 @@ endinterface
 !> string,  intent(\b OUT)::          <b>\em str</b> output string.
 !> @ingroup IR_PrecisionInterface
 interface str
-  module procedure           &
+  module procedure                    &
 #ifdef r16p
-                   str_R16P, &
+                   str_R16P,strf_R16P,&
 #endif
-                   str_R8P,  &
-                   str_R4P,  &
-                   str_I8P,  &
-                   str_I4P,  &
-                   str_I2P,  &
-                   str_I1P
+                   str_R8P,strf_R8P,  &
+                   str_R4P,strf_R4P,  &
+                   str_I8P,strf_I8P,  &
+                   str_I4P,strf_I4P,  &
+                   str_I2P,strf_I2P,  &
+                   str_I1P,strf_I1P
 endinterface
 !> @brief Function for converting number, integer, to string, prefixing with the right number of zeros (number to string type
 !>        casting with zero padding);
@@ -331,6 +332,113 @@ contains
 
 #ifdef r16p
   !> @brief Function for converting real to string. This function achieves casting of real to string.
+  elemental function strf_R16P(fm,n) result(str)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(*), intent(IN):: fm  !< Format different from the standard for the kind.
+  real(R16P),   intent(IN):: n   !< Real to be converted.
+  character(DR16P)::         str !< Returned string containing input number.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  write(str,trim(fm)) n ! Casting of n to string.
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction strf_R16P
+#endif
+
+  !> @brief Function for converting real to string. This function achieves casting of real to string.
+  elemental function strf_R8P(fm,n) result(str)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(*), intent(IN):: fm  !< Format different from the standard for the kind.
+  real(R8P),    intent(IN):: n   !< Real to be converted.
+  character(DR8P)::          str !< Returned string containing input number.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  write(str,trim(fm)) n ! Casting of n to string.
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction strf_R8P
+
+  !> @brief Function for converting real to string. This function achieves casting of real to string.
+  elemental function strf_R4P(fm,n) result(str)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(*), intent(IN):: fm  !< Format different from the standard for the kind.
+  real(R4P),    intent(IN):: n   !< Real to be converted.
+  character(DR4P)::          str !< Returned string containing input number.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  write(str,trim(fm)) n ! Casting of n to string.
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction strf_R4P
+
+  !> @brief Function for converting integer to string. This function achieves casting of integer to string.
+  elemental function strf_I8P(fm,n) result(str)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(*), intent(IN):: fm  !< Format different from the standard for the kind.
+  integer(I8P), intent(IN):: n   !< Integer to be converted.
+  character(DI8P)::          str !< Returned string containing input number.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  write(str,trim(fm)) n ! Casting of n to string.
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction strf_I8P
+
+  !> @brief Function for converting integer to string. This function achieves casting of integer to string.
+  elemental function strf_I4P(fm,n) result(str)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(*), intent(IN):: fm  !< Format different from the standard for the kind.
+  integer(I4P), intent(IN):: n   !< Integer to be converted.
+  character(DI4P)::          str !< Returned string containing input number.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  write(str,trim(fm)) n ! Casting of n to string.
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction strf_I4P
+
+  !> @brief Function for converting integer to string. This function achieves casting of integer to string.
+  elemental function strf_I2P(fm,n) result(str)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(*), intent(IN):: fm  !< Format different from the standard for the kind.
+  integer(I2P), intent(IN):: n   !< Integer to be converted.
+  character(DI2P)::          str !< Returned string containing input number.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  write(str,trim(fm)) n ! Casting of n to string.
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction strf_I2P
+
+  !> @brief Function for converting integer to string. This function achieves casting of integer to string.
+  elemental function strf_I1P(fm,n) result(str)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(*), intent(IN):: fm  !< Format different from the standard for the kind.
+  integer(I1P), intent(IN):: n   !< Integer to be converted.
+  character(DI1P)::          str !< Returned string containing input number.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  write(str,trim(fm)) n ! Casting of n to string.
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction strf_I1P
+
+#ifdef r16p
+  !> @brief Function for converting real to string. This function achieves casting of real to string.
   elemental function str_R16P(no_sign,n) result(str)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -352,9 +460,9 @@ contains
   elemental function str_R8P(no_sign,n) result(str)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  logical,   intent(IN), optional:: no_sign !< Flag for leaving out the sign.
-  real(R8P), intent(IN)::           n       !< Real to be converted.
-  character(DR8P)::                 str     !< Returned string containing input number.
+  logical,      intent(IN), optional:: no_sign !< Flag for leaving out the sign.
+  real(R8P),    intent(IN)::           n       !< Real to be converted.
+  character(DR8P)::                    str     !< Returned string containing input number.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -693,6 +801,7 @@ contains
   BIR8P = bit_size(i=MaxR8P) ; BYR8P = BIR8P/8_I1P
   BIR4P = bit_size(i=MaxR4P) ; BYR4P = BIR4P/8_I1P
   BIR_P = bit_size(i=MaxR_P) ; BYR_P = BIR_P/8_I1P
+  ir_initialized = .true.
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine IR_init

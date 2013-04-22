@@ -30,7 +30,8 @@ USE Data_Type_Vector                        ! Definition of Type_Vector.
 USE Lib_IO_Misc                             ! Procedures for IO and strings operations.
 USE Lib_PostProcessing, only: pp_format,  & ! Post-processing data format.
                               tec_output, & ! Function for writing Tecplot file.
-                              vtk_output    ! Function for writing VTK file.
+                              vtk_output, & ! Function for writing VTK file.
+                              gnu_output    ! Function for writing Gnuplot file.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -79,10 +80,11 @@ call block(1)%node2center
 
 write(stdout,'(A)',IOSTAT=err)'----------------------------------------------------------------------'
 write(stdout,'(A)',IOSTAT=err)' Processing data'
-write(stdout,'(A)',IOSTAT=err)'  Writing Tecplot and/or VTK output data'
+write(stdout,'(A)',IOSTAT=err)'  Writing Tecplot and/or VTK and/or Gnuplot output data'
 ! writing output
 if (pp_format%tec) err = tec_output(meshonly=meshonly, block=block(1:), filename=trim(global%file%File_Pout))
 if (pp_format%vtk) err = vtk_output(meshonly=meshonly, block=block(1:), filename=trim(global%file%File_Pout))
+if (pp_format%gnu) err = gnu_output(meshonly=meshonly, block=block(1:), filename=trim(global%file%File_Pout))
 write(stdout,'(A)',IOSTAT=err)' Processing data Complete'
 write(stdout,'(A)',IOSTAT=err)'----------------------------------------------------------------------'
 write(stdout,*)
@@ -120,6 +122,7 @@ contains
   write(stdout,'(A)') '  -ascii                => write ascii output file (default no, write binary one)'
   write(stdout,'(A)') '  -tec yes/no           => write (or not) Tecplot file format (default yes)'
   write(stdout,'(A)') '  -vtk yes/no           => write (or not) VTK file format (default no)'
+  write(stdout,'(A)') '  -gnu yes/no           => write (or not) Gnuplot file format (default no)'
   write(stdout,'(A)') '  -os UIX/WIN           => type of Operating System write (default *UIX OS type)'
   write(stdout,*)
   write(stdout,'(A)')' Examples: '
@@ -188,6 +191,9 @@ contains
       case('-vtk') ! VKT file format
         call get_command_argument(c+1,yes) ; c = c + 1 ; yes = Upper_Case(adjustl(trim(yes)))
         pp_format%vtk = (adjustl(trim(yes))=='YES')
+      case('-gnu') ! Gnuplot file format
+        call get_command_argument(c+1,yes) ; c = c + 1 ; yes = Upper_Case(adjustl(trim(yes)))
+        pp_format%gnu = (adjustl(trim(yes))=='YES')
       case('-os') ! OS type
         call get_command_argument(c+1,os_type) ; c = c + 1 ; os_type = Upper_Case(os_type)
       case default

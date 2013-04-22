@@ -42,6 +42,7 @@ private
 public:: pp_format
 public:: tec_output
 public:: vtk_output
+public:: gnu_output
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -53,6 +54,7 @@ type, public:: Type_PP_Format
   logical:: bc     = .false. !< Saving or not boundary conditions cells.
   logical:: tec    = .true.  !< Tecplot file.
   logical:: vtk    = .false. !< VTK file.
+  logical:: gnu    = .false. !< Gnuplot file.
 endtype Type_PP_Format
 !> @ingroup Lib_PostProcessingGlobalVarPar
 !> @{
@@ -652,5 +654,73 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     endfunction vtk_blk_data
   endfunction vtk_output
+
+  !> Function for writing OFF block data to Gnuplot file.
+  function gnu_output(meshonly,block,filename) result(err)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  logical,           intent(IN):: meshonly  !< Flag for post-process only mesh.
+  type(Type_SBlock), intent(IN):: block(1:) !< Block-level data.
+  character(*),      intent(IN):: filename  !< File name of the output file.
+  integer(I_P)::                  err       !< Error trapping flag: 0 no errors, >0 error occurs.
+  type(Type_Global), pointer::    global    !< Global-level data.
+  integer(I_P)::                  b         !< Counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  global => block(1)%global
+  ! writing data blocks
+  do b=1,global%Nb
+    err = gnu_blk_data(block = block(b), filename = trim(filename)//'_b'//trim(strz(4,b))//'.gnu.dat')
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    function gnu_blk_data(block,filename) result(err)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    ! Function for writing block data.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    type(Type_SBlock), intent(IN):: block    ! Block-level data.
+    character(*),      intent(IN):: filename ! File name of the output block file.
+    integer(I_P)::                  err      ! Error trapping flag: 0 no errors, >0 error occurs.
+    integer(I_P)::                  i,j,k    ! Counters.
+    integer(I_P)::                  ugnu     ! Logic unit.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    open(unit=Get_Unit(ugnu),file=trim(filename))
+    if (meshonly) then
+      do k=1,block%Nk
+        do j=1,block%Nj
+          do i=1,block%Ni
+            write(ugnu,'(3('//FR8P//',1X))',iostat=err) block%C(i,j,k)%cent%x,block%C(i,j,k)%cent%y,block%C(i,j,k)%cent%z
+          enddo
+        enddo
+      enddo
+    else
+      do k=1,block%Nk
+        do j=1,block%Nj
+          do i=1,block%Ni
+            write(ugnu,'(9('//FR8P//',1X))',iostat=err) block%C(i,j,k)%cent%x, &
+                                                        block%C(i,j,k)%cent%y, &
+                                                        block%C(i,j,k)%cent%z, &
+                                                        block%C(i,j,k)%P%d,    &
+                                                        block%C(i,j,k)%P%v%x,  &
+                                                        block%C(i,j,k)%P%v%y,  &
+                                                        block%C(i,j,k)%P%v%z,  &
+                                                        block%C(i,j,k)%P%p,    &
+                                                        block%C(i,j,k)%P%g
+          enddo
+        enddo
+      enddo
+    endif
+    close(ugnu)
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endfunction gnu_blk_data
+  endfunction gnu_output
   !> @}
 endmodule Lib_PostProcessing

@@ -12,8 +12,8 @@ $(VERBOSE).SILENT:
 # User options
 PRESET    = no
 COMPILER  = intel
-DEBUG     = yes
-F03STD    = yes
+DEBUG     = no
+F03STD    = no
 PROFILING = no
 OPTIMIZE  = no
 OPENMP    = no
@@ -590,8 +590,10 @@ cleanall: clean cleanexe
 .PHONY : tar
 tar: cleanall
 	@echo -e "\033[1;31m Creating tar archive of the code \033[0m" | tee make.log
+	@rm -rf OFF
 	@mkdir -p OFF
-	@cp -rL inputs-template lib util src makefile OFF/
+	@cp -r examples OFF/
+	@cp -rL inputs-template lib util src makefile README.md .doxygenconfig .gitignore OFF/
 	@tar czf OFF.tgz OFF
 	@rm -rf OFF
 
@@ -599,6 +601,9 @@ tar: cleanall
 doc:
 	@echo -e "\033[1;31m Building documentation\033[0m" | tee make.log
 	@doxygen .doxygenconfig
+
+.PHONY : codes
+codes: $(DEXE)IBM $(DEXE)OFF $(DEXE)POG
 #----------------------------------------------------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------------------------------------------------
@@ -731,6 +736,11 @@ $(DOBJ)data_type_sblock.o : Data_Type_SBlock.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
+$(DOBJ)data_type_sl_list.o : Data_Type_SL_List.f90 \
+	$(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
 $(DOBJ)data_type_tensor.o : Data_Type_Tensor.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_vector.o
@@ -750,7 +760,6 @@ $(DOBJ)data_type_vector.o : Data_Type_Vector.f90 \
 $(DOBJ)ibm.o : IBM.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_bc.o \
-	$(DOBJ)data_type_cell.o \
 	$(DOBJ)data_type_conservative.o \
 	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_os.o \
@@ -820,6 +829,7 @@ $(DOBJ)lib_io_misc.o : Lib_IO_Misc.f90 \
 
 $(DOBJ)lib_math.o : Lib_Math.f90 \
 	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_sl_list.o \
 	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
@@ -924,6 +934,10 @@ $(DOBJ)pog.o : POG.f90 \
 	$(DOBJ)data_type_vector.o \
 	$(DOBJ)lib_io_misc.o \
 	$(DOBJ)lib_postprocessing.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)%.o : %.f90
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 

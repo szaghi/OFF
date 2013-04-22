@@ -8,9 +8,24 @@
 !> @defgroup Lib_MathInterface Lib_Math
 !> @}
 
+!> @ingroup PublicProcedure
+!> @{
+!> @defgroup Lib_MathPublicProcedure Lib_Math
+!> @}
+
+!> @ingroup PrivateProcedure
+!> @{
+!> @defgroup Lib_MathPrivateProcedure Lib_Math
+!> @}
+
 !> @ingroup GlobalVarPar
 !> @{
 !> @defgroup Lib_MathGlobalVarPar Lib_Math
+!> @}
+
+!> @ingroup PrivateVarPar
+!> @{
+!> @defgroup Lib_MathPrivateVarPar Lib_Math
 !> @}
 
 !> This module contains mathematical procedures.
@@ -19,12 +34,18 @@
 module Lib_Math
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                        ! Integers and reals precision definition.
+USE Data_Type_SL_List                   ! Definition of Type_SL_List.
 USE Data_Type_Vector, only: Type_Vector ! Definition of Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 private
+public:: prime
+public:: isort
+public:: qsort
+public:: spline3
+
 public:: stretchinglside
 public:: stretchingrside
 public:: stretching2side
@@ -62,9 +83,77 @@ real(R_P),  parameter:: pi     = 2._R_P* asin(1._R_P)  !< \f$\pi \f$ with R_P  p
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
+!> @brief Subroutine for computing prime factors of input integer number. The results is an array of integers containing the
+!> prime factors list.
+!> Example of usage:
+!> @code
+!> ...
+!> integer(I4P):: n=246
+!> integer(I4P), allocatable:: pf(:)
+!> ...
+!> call prime(n=n,p=pf)
+!> @endcode
+!> The input integer n can have all the kinds defined in IR_Precision module.
+!> @note The output array containing the factors must allocatable of the same kind of input integer.
 !> @ingroup Lib_MathInterface
-!> @{
+interface prime
+  module procedure prime_I8,prime_I4,prime_I2,prime_I1
+endinterface
+!> @brief Subroutine for performing InsertionSort with ascending order.
+!> Example of usage:
+!> @code
+!> ...
+!> integer(I4P):: a(1:100)
+!> ...
+!> call isort(a)
+!> @endcode
+!> The input array can be integer or real with all the kinds defined in IR_Precision module.
+!> @ingroup Lib_MathInterface
+interface isort
+#ifdef r16p
+  module procedure isort_R16
+#endif
+  module procedure isort_R8,isort_R4,isort_I8,isort_I4,isort_I2,isort_I1
+endinterface
+!> @brief Subroutine for performing QuickSort with ascending order.
+!> Example of usage:
+!> @code
+!> ...
+!> integer(I4P):: a(1:100)
+!> ...
+!> call qsort(a)
+!> @endcode
+!> The input array can be integer or real with all the kinds defined in IR_Precision module.
+!> @ingroup Lib_MathInterface
+interface qsort
+#ifdef r16p
+  module procedure qsort_R16
+#endif
+  module procedure qsort_R8,qsort_R4,qsort_I8,qsort_I4,qsort_I2,qsort_I1
+endinterface
+!> @brief Function for computing cubic spline interpolation of an array of values.
+!> This function is an interface to three different functions: there is one function for each of the three real kinds supported
+!> (R16P, R8P and R4P).
+!> @note the input arrays "x", "v" and "vi" must be ordered with increasing values. Details of implementation can be found in
+!> "Numerical recipes: The art of scientific computing", third edition, 2007, ISBN 0521880688.
+!> @ingroup Lib_MathInterface
+interface spline3
+#ifdef r16p
+  module procedure spline3_R16
+#endif
+  module procedure spline3_R8,spline3_R4
+endinterface
+!> Example of usage:
+!> @code
+!> ...
+!> real(R4P):: x(1:100),v(1:100),xi(1:200),vi(1:200)
+!> ...
+!> vi = spline3(x,v,xi)
+!> @endcode
+!> The real input arrays can have all the kinds defined in IR_Precision module.
+
 !>Average overloading
+!> @ingroup Lib_MathInterface
 interface average
 #ifdef r16p
   module procedure average_Vectorial1D_R16,average_Vectorial2D_R16,average_Vectorial3D_R16
@@ -73,14 +162,17 @@ interface average
   module procedure average_Vectorial1D_R4,average_Vectorial2D_R4,average_Vectorial3D_R4
 endinterface
 !>Digit overloading
+!> @ingroup Lib_MathInterface
 interface digit
   module procedure digit_I8,digit_I4,digit_I2,digit_I1
 endinterface
 !>Div2 overloading
+!> @ingroup Lib_MathInterface
 interface div2
   module procedure div2_I8,div2_I4,div2_I2,div2_I1
 endinterface
 !>Linear interpolate overloading
+!> @ingroup Lib_MathInterface
 interface interpolate1
 #ifdef r16p
   module procedure interpolate1_R16
@@ -88,6 +180,7 @@ interface interpolate1
   module procedure interpolate1_R8,interpolate1_R4
 endinterface
 !>Bi-linear interpolate overloading
+!> @ingroup Lib_MathInterface
 interface interpolate2
 #ifdef r16p
   module procedure interpolate2_R16
@@ -95,6 +188,7 @@ interface interpolate2
   module procedure interpolate2_R8,interpolate2_R4
 endinterface
 !>Tri-linear interpolate overloading
+!> @ingroup Lib_MathInterface
 interface interpolate3
 #ifdef r16p
   module procedure interpolate3_R16
@@ -102,6 +196,7 @@ interface interpolate3
   module procedure interpolate3_R8,interpolate3_R4
 endinterface
 !>Degree overloading
+!> @ingroup Lib_MathInterface
 interface degree
 #ifdef r16p
   module procedure degree_Scalar_R16,degree_Vectorial1D_R16,degree_Vectorial2D_R16,degree_Vectorial3D_R16
@@ -110,6 +205,7 @@ interface degree
   module procedure degree_Scalar_R4,degree_Vectorial1D_R4,degree_Vectorial2D_R4,degree_Vectorial3D_R4
 endinterface
 !>Radiant overloading
+!> @ingroup Lib_MathInterface
 interface radiant
 #ifdef r16p
   module procedure radiant_Scalar_R16,radiant_Vectorial1D_R16,radiant_Vectorial2D_R16,radiant_Vectorial3D_R16
@@ -118,6 +214,7 @@ interface radiant
   module procedure radiant_Scalar_R4,radiant_Vectorial1D_R4,radiant_Vectorial2D_R4,radiant_Vectorial3D_R4
 endinterface
 !>delta1_2o overloading
+!> @ingroup Lib_MathInterface
 interface delta1_2o
 #ifdef r16p
   module procedure delta1_2o_R16
@@ -125,6 +222,7 @@ interface delta1_2o
   module procedure delta1_2o_R8,delta1_2o_R4
 endinterface
 !>delta2_2o overloading
+!> @ingroup Lib_MathInterface
 interface delta2_2o
 #ifdef r16p
   module procedure delta2_2o_R16
@@ -132,6 +230,7 @@ interface delta2_2o
   module procedure delta2_2o_R8,delta2_2o_R4
 endinterface
 !>abs_grad overloading
+!> @ingroup Lib_MathInterface
 interface abs_grad
 #ifdef r16p
   module procedure abs_grad_R16
@@ -139,15 +238,1109 @@ interface abs_grad
   module procedure abs_grad_R8,abs_grad_R4
 endinterface
 !>laplacian overloading
+!> @ingroup Lib_MathInterface
 interface laplacian
 #ifdef r16p
   module procedure laplacian_R16
 #endif
   module procedure laplacian_R8,laplacian_R4
 endinterface
-!> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
+  !> @ingroup Lib_MathPrivateProcedure
+  !> @{
+  !> @brief Subroutine for computing prime factors of input integer number (I8P). The results is an array of integers containing the
+  !> prime factors list.
+  subroutine prime_I8(n,p)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I8P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
+  integer(I8P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
+  type(Type_SL_List)::                     pl   !< Prime factors list.
+  integer(I8P)::                           nn   !< Copy of Input number.
+  integer(I8P)::                           d    !< Divisor.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  nn=n
+  do ! removing all factors of 2
+    if (mod(nn,2_I8P)/=0.OR.nn==1) exit
+    nn = nn/2_I8P
+    call pl%putt(d=2_I8P)
+  enddo
+  d=3
+  do ! removing factor 3, 5, 7, ...
+    if (d>nn) exit ! if a factor is too large, exit and done
+    do
+      if (mod(nn,d)/=0.OR.nn==1) exit
+      nn = nn/d ! remove this factor from n
+      call pl%putt(d=d)
+    enddo
+    d = d + 2_I8P ! move to next odd number
+  enddo
+  call pl%array(p)
+  call pl%free()
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine prime_I8
+
+  !> @brief Subroutine for computing prime factors of input integer number (I4P). The results is an array of integers containing the
+  !> prime factors list.
+  subroutine prime_I4(n,p)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I4P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
+  integer(I4P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
+  type(Type_SL_List)::                     pl   !< Prime factors list.
+  integer(I4P)::                           nn   !< Copy of Input number.
+  integer(I4P)::                           d    !< Divisor.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  nn=n
+  do ! removing all factors of 2
+    if (mod(nn,2_I4P)/=0.OR.nn==1) exit
+    nn = nn/2_I4P
+    call pl%putt(d=2_I4P)
+  enddo
+  d=3
+  do ! removing factor 3, 5, 7, ...
+    if (d>nn) exit ! if a factor is too large, exit and done
+    do
+      if (mod(nn,d)/=0.OR.nn==1) exit
+      nn = nn/d ! remove this factor from n
+      call pl%putt(d=d)
+    enddo
+    d = d + 2_I4P ! move to next odd number
+  enddo
+  call pl%array(p)
+  call pl%free()
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine prime_I4
+
+  !> @brief Subroutine for computing prime factors of input integer number (I2P). The results is an array of integers containing the
+  !> prime factors list.
+  subroutine prime_I2(n,p)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I2P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
+  integer(I2P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
+  type(Type_SL_List)::                     pl   !< Prime factors list.
+  integer(I2P)::                           nn   !< Copy of Input number.
+  integer(I2P)::                           d    !< Divisor.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  nn=n
+  do ! removing all factors of 2
+    if (mod(nn,2_I2P)/=0.OR.nn==1) exit
+    nn = nn/2_I2P
+    call pl%putt(d=2_I2P)
+  enddo
+  d=3
+  do ! removing factor 3, 5, 7, ...
+    if (d>nn) exit ! if a factor is too large, exit and done
+    do
+      if (mod(nn,d)/=0.OR.nn==1) exit
+      nn = nn/d ! remove this factor from n
+      call pl%putt(d=d)
+    enddo
+    d = d + 2_I2P ! move to next odd number
+  enddo
+  call pl%array(p)
+  call pl%free()
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine prime_I2
+
+  !> @brief Subroutine for computing prime factors of input integer number (I1P). The results is an array of integers containing the
+  !> prime factors list.
+  subroutine prime_I1(n,p)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I1P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
+  integer(I1P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
+  type(Type_SL_List)::                     pl   !< Prime factors list.
+  integer(I1P)::                           nn   !< Copy of Input number.
+  integer(I1P)::                           d    !< Divisor.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  nn=n
+  do ! removing all factors of 2
+    if (mod(nn,2_I1P)/=0.OR.nn==1) exit
+    nn = nn/2_I1P
+    call pl%putt(d=2_I1P)
+  enddo
+  d=3
+  do ! removing factor 3, 5, 7, ...
+    if (d>nn) exit ! if a factor is too large, exit and done
+    do
+      if (mod(nn,d)/=0.OR.nn==1) exit
+      nn = nn/d ! remove this factor from n
+      call pl%putt(d=d)
+    enddo
+    d = d + 2_I1P ! move to next odd number
+  enddo
+  call pl%array(p)
+  call pl%free()
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine prime_I1
+
+  ! InsertionSort
+#ifdef r16p
+  !> @brief Subroutine for performing InsertionSort with ascending order (R16P).
+  pure subroutine isort_R16(array)
+  !-------------------------------------------------------------------------------------------------------------------------------
+  real(R16P), intent(INOUT):: array(1:) !< Array to be sorted.
+  real(R16P)::                tmp       !< Temporary array value.
+  integer(I4P)::              n,nn      !< Counters.
+  !-------------------------------------------------------------------------------------------------------------------------------
+
+  !-------------------------------------------------------------------------------------------------------------------------------
+  do n=2,size(array)
+     tmp = array(n)
+     if (tmp>=array(n-1)) cycle
+     array(n) = array(n-1)
+     do nn=n - 2,1,-1
+        if (tmp>=array(nn)) exit
+        array(nn+1) = array(nn)
+     enddo
+     array(nn+1) = tmp
+  enddo
+  return
+  !-------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine isort_R16
+#endif
+
+  !> @brief Subroutine for performing InsertionSort with ascending order (R8P).
+  pure subroutine isort_R8(array)
+  !-------------------------------------------------------------------------------------------------------------------------------
+  real(R8P), intent(INOUT):: array(1:) !< Array to be sorted.
+  real(R8P)::                tmp       !< Temporary array value.
+  integer(I4P)::             n,nn      !< Counters.
+  !-------------------------------------------------------------------------------------------------------------------------------
+
+  !-------------------------------------------------------------------------------------------------------------------------------
+  do n=2,size(array)
+     tmp = array(n)
+     if (tmp>=array(n-1)) cycle
+     array(n) = array(n-1)
+     do nn=n - 2,1,-1
+        if (tmp>=array(nn)) exit
+        array(nn+1) = array(nn)
+     enddo
+     array(nn+1) = tmp
+  enddo
+  return
+  !-------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine isort_R8
+
+  !> @brief Subroutine for performing InsertionSort with ascending order (R4P).
+  pure subroutine isort_R4(array)
+  !-------------------------------------------------------------------------------------------------------------------------------
+  real(R4P), intent(INOUT):: array(1:) !< Array to be sorted.
+  real(R4P)::                tmp       !< Temporary array value.
+  integer(I4P)::             n,nn      !< Counters.
+  !-------------------------------------------------------------------------------------------------------------------------------
+
+  !-------------------------------------------------------------------------------------------------------------------------------
+  do n=2,size(array)
+     tmp = array(n)
+     if (tmp>=array(n-1)) cycle
+     array(n) = array(n-1)
+     do nn=n - 2,1,-1
+        if (tmp>=array(nn)) exit
+        array(nn+1) = array(nn)
+     enddo
+     array(nn+1) = tmp
+  enddo
+  return
+  !-------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine isort_R4
+
+  !> @brief Subroutine for performing InsertionSort with ascending order (I8P).
+  pure subroutine isort_I8(array)
+  !-------------------------------------------------------------------------------------------------------------------------------
+  integer(I8P), intent(INOUT):: array(1:) !< Array to be sorted.
+  integer(I8P)::                tmp       !< Temporary array value.
+  integer(I4P)::                n,nn      !< Counters.
+  !-------------------------------------------------------------------------------------------------------------------------------
+
+  !-------------------------------------------------------------------------------------------------------------------------------
+  do n=2,size(array)
+     tmp = array(n)
+     if (tmp>=array(n-1)) cycle
+     array(n) = array(n-1)
+     do nn=n - 2,1,-1
+        if (tmp>=array(nn)) exit
+        array(nn+1) = array(nn)
+     enddo
+     array(nn+1) = tmp
+  enddo
+  return
+  !-------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine isort_I8
+
+  !> @brief Subroutine for performing InsertionSort with ascending order (I4P).
+  pure subroutine isort_I4(array)
+  !-------------------------------------------------------------------------------------------------------------------------------
+  integer(I4P), intent(INOUT):: array(1:) !< Array to be sorted.
+  integer(I4P)::                tmp       !< Temporary array value.
+  integer(I4P)::                n,nn      !< Counters.
+  !-------------------------------------------------------------------------------------------------------------------------------
+
+  !-------------------------------------------------------------------------------------------------------------------------------
+  do n=2,size(array)
+     tmp = array(n)
+     if (tmp>=array(n-1)) cycle
+     array(n) = array(n-1)
+     do nn=n - 2,1,-1
+        if (tmp>=array(nn)) exit
+        array(nn+1) = array(nn)
+     enddo
+     array(nn+1) = tmp
+  enddo
+  return
+  !-------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine isort_I4
+
+  !> @brief Subroutine for performing InsertionSort with ascending order (I2P).
+  pure subroutine isort_I2(array)
+  !-------------------------------------------------------------------------------------------------------------------------------
+  integer(I2P), intent(INOUT):: array(1:) !< Array to be sorted.
+  integer(I2P)::                tmp       !< Temporary array value.
+  integer(I4P)::                n,nn      !< Counters.
+  !-------------------------------------------------------------------------------------------------------------------------------
+
+  !-------------------------------------------------------------------------------------------------------------------------------
+  do n=2,size(array)
+     tmp = array(n)
+     if (tmp>=array(n-1)) cycle
+     array(n) = array(n-1)
+     do nn=n - 2,1,-1
+        if (tmp>=array(nn)) exit
+        array(nn+1) = array(nn)
+     enddo
+     array(nn+1) = tmp
+  enddo
+  return
+  !-------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine isort_I2
+
+  !> @brief Subroutine for performing InsertionSort with ascending order (I1P).
+  pure subroutine isort_I1(array)
+  !-------------------------------------------------------------------------------------------------------------------------------
+  integer(I1P), intent(INOUT):: array(1:) !< Array to be sorted.
+  integer(I1P)::                tmp       !< Temporary array value.
+  integer(I4P)::                n,nn      !< Counters.
+  !-------------------------------------------------------------------------------------------------------------------------------
+
+  !-------------------------------------------------------------------------------------------------------------------------------
+  do n=2,size(array)
+     tmp = array(n)
+     if (tmp>=array(n-1)) cycle
+     array(n) = array(n-1)
+     do nn=n - 2,1,-1
+        if (tmp>=array(nn)) exit
+        array(nn+1) = array(nn)
+     enddo
+     array(nn+1) = tmp
+  enddo
+  return
+  !-------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine isort_I1
+
+  ! QuickSort
+#ifdef r16p
+  !> @brief Subroutine for performing QuickSort with ascending order (R16P).
+  !> @note If the number of array elements is "small" the InsertionSort is directly used.
+  subroutine qsort_R16(array)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  real(R16P), intent(INOUT):: array(1:) !< Array to be sorted.
+  integer(I4P), parameter::   Nin = 16  !< Maximum dimension for insertion sort.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  call subsor(array=array,n1=1,nn=size(array))
+  call isort_R16(array)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> @brief Sorts array from n1 to nn (QuickSort algorithm).
+    recursive subroutine subsor(array,n1,nn)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    real(R16P),   intent (INOUT):: array(:) !< Array to be sorted.
+    integer(I4P), intent (IN)::    n1       !< Initial index of sorting.
+    integer(I4P), intent (IN)::    nn       !< Final index of sorting.
+    real(R16P)::                   tmp      !< Temporary array value.
+    real(R16P)::                   vnM      !< Value of mean (pivot) element.
+    integer(I4P)::                 nM       !< Mean (pivot) index.
+    integer(I4P)::                 ni1,ni2  !< Index of the two subintervals of array.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    if ((nn - n1)>Nin) then ! if there are not enough values for qsort it is left unstorted, using only the final inssor
+      nM = (n1+nn)/2
+      if (array(nM)<array(n1)) then
+        tmp = array(n1)
+        array(n1) = array(nM)
+        array(nM) = tmp
+      endif
+      if (array(nM)>array(nn)) then
+        tmp = array(nn)
+        array(nn) = array(nM)
+        array(nM) = tmp
+        if (array(nM)<array(n1)) then
+          tmp = array(n1)
+          array(n1) = array(nM)
+          array(nM) = tmp
+        endif
+      endif
+      vnM = array(nM)
+      ni1 = n1
+      ni2 = nn
+      ECH2: do
+        do
+          ni1 = ni1 + 1
+          if (ni1>=ni2) exit ECH2 ! the first > pivot is ni2, the last <= pivot is ni1-1
+          if (array(ni1)>vnM) exit
+        enddo
+        do
+          if (array(ni2)<=vnM) exit
+          ni2 = ni2 - 1
+          if (ni1>=ni2) exit ECH2 ! the last < pivot is always ni1-1
+        enddo
+        tmp = array(ni2)
+        array(ni2) = array(ni1)
+        array(ni1) = tmp
+      enddo ECH2
+      ! sort the two subintervals
+      call subsor(array=array,n1=n1, nn=ni1-1)
+      call subsor(array=array,n1=ni2,nn=nn   )
+    endif
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine subsor
+  endsubroutine qsort_R16
+#endif
+
+  !> @brief Subroutine for performing QuickSort with ascending order (R8P).
+  !> @note If the number of array elements is "small" the InsertionSort is directly used.
+  subroutine qsort_R8(array)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  real(R8P), intent(INOUT):: array(1:) !< Array to be sorted.
+  integer(I4P), parameter::  Nin = 16  !< Maximum dimension for insertion sort.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  call subsor(array=array,n1=1,nn=size(array))
+  call isort_R8(array)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> @brief Sorts array from n1 to nn (QuickSort algorithm).
+    recursive subroutine subsor(array,n1,nn)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    real(R8P),    intent (INOUT):: array(:) !< Array to be sorted.
+    integer(I4P), intent (IN)::    n1       !< Initial index of sorting.
+    integer(I4P), intent (IN)::    nn       !< Final index of sorting.
+    real(R8P)::                    tmp      !< Temporary array value.
+    real(R8P)::                    vnM      !< Value of mean (pivot) element.
+    integer(I4P)::                 nM       !< Mean (pivot) index.
+    integer(I4P)::                 ni1,ni2  !< Index of the two subintervals of array.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    if ((nn - n1)>Nin) then ! if there are not enough values for qsort it is left unstorted, using only the final inssor
+      nM = (n1+nn)/2
+      if (array(nM)<array(n1)) then
+        tmp = array(n1)
+        array(n1) = array(nM)
+        array(nM) = tmp
+      endif
+      if (array(nM)>array(nn)) then
+        tmp = array(nn)
+        array(nn) = array(nM)
+        array(nM) = tmp
+        if (array(nM)<array(n1)) then
+          tmp = array(n1)
+          array(n1) = array(nM)
+          array(nM) = tmp
+        endif
+      endif
+      vnM = array(nM)
+      ni1 = n1
+      ni2 = nn
+      ECH2: do
+        do
+          ni1 = ni1 + 1
+          if (ni1>=ni2) exit ECH2 ! the first > pivot is ni2, the last <= pivot is ni1-1
+          if (array(ni1)>vnM) exit
+        enddo
+        do
+          if (array(ni2)<=vnM) exit
+          ni2 = ni2 - 1
+          if (ni1>=ni2) exit ECH2 ! the last < pivot is always ni1-1
+        enddo
+        tmp = array(ni2)
+        array(ni2) = array(ni1)
+        array(ni1) = tmp
+      enddo ECH2
+      ! sort the two subintervals
+      call subsor(array=array,n1=n1, nn=ni1-1)
+      call subsor(array=array,n1=ni2,nn=nn   )
+    endif
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine subsor
+  endsubroutine qsort_R8
+
+  !> @brief Subroutine for performing QuickSort with ascending order (R4P).
+  !> @note If the number of array elements is "small" the InsertionSort is directly used.
+  subroutine qsort_R4(array)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  real(R4P), intent(INOUT):: array(1:) !< Array to be sorted.
+  integer(I4P), parameter::  Nin = 16  !< Maximum dimension for insertion sort.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  call subsor(array=array,n1=1,nn=size(array))
+  call isort_R4(array)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> @brief Sorts array from n1 to nn (QuickSort algorithm).
+    recursive subroutine subsor(array,n1,nn)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    real(R4P),    intent (INOUT):: array(:) !< Array to be sorted.
+    integer(I4P), intent (IN)::    n1       !< Initial index of sorting.
+    integer(I4P), intent (IN)::    nn       !< Final index of sorting.
+    real(R4P)::                    tmp      !< Temporary array value.
+    real(R4P)::                    vnM      !< Value of mean (pivot) element.
+    integer(I4P)::                 nM       !< Mean (pivot) index.
+    integer(I4P)::                 ni1,ni2  !< Index of the two subintervals of array.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    if ((nn - n1)>Nin) then ! if there are not enough values for qsort it is left unstorted, using only the final inssor
+      nM = (n1+nn)/2
+      if (array(nM)<array(n1)) then
+        tmp = array(n1)
+        array(n1) = array(nM)
+        array(nM) = tmp
+      endif
+      if (array(nM)>array(nn)) then
+        tmp = array(nn)
+        array(nn) = array(nM)
+        array(nM) = tmp
+        if (array(nM)<array(n1)) then
+          tmp = array(n1)
+          array(n1) = array(nM)
+          array(nM) = tmp
+        endif
+      endif
+      vnM = array(nM)
+      ni1 = n1
+      ni2 = nn
+      ECH2: do
+        do
+          ni1 = ni1 + 1
+          if (ni1>=ni2) exit ECH2 ! the first > pivot is ni2, the last <= pivot is ni1-1
+          if (array(ni1)>vnM) exit
+        enddo
+        do
+          if (array(ni2)<=vnM) exit
+          ni2 = ni2 - 1
+          if (ni1>=ni2) exit ECH2 ! the last < pivot is always ni1-1
+        enddo
+        tmp = array(ni2)
+        array(ni2) = array(ni1)
+        array(ni1) = tmp
+      enddo ECH2
+      ! sort the two subintervals
+      call subsor(array=array,n1=n1, nn=ni1-1)
+      call subsor(array=array,n1=ni2,nn=nn   )
+    endif
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine subsor
+  endsubroutine qsort_R4
+
+  !> @brief Subroutine for performing QuickSort with ascending order (I8P).
+  !> @note If the number of array elements is "small" the InsertionSort is directly used.
+  subroutine qsort_I8(array)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I8P), intent(INOUT):: array(1:) !< Array to be sorted.
+  integer(I4P), parameter::     Nin = 16  !< Maximum dimension for insertion sort.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  call subsor(array=array,n1=1,nn=size(array))
+  call isort_I8(array)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> @brief Sorts array from n1 to nn (QuickSort algorithm).
+    recursive subroutine subsor(array,n1,nn)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I8P), intent (INOUT):: array(:) !< Array to be sorted.
+    integer(I4P), intent (IN)::    n1       !< Initial index of sorting.
+    integer(I4P), intent (IN)::    nn       !< Final index of sorting.
+    integer(I8P)::                 tmp      !< Temporary array value.
+    integer(I8P)::                 vnM      !< Value of mean (pivot) element.
+    integer(I4P)::                 nM       !< Mean (pivot) index.
+    integer(I4P)::                 ni1,ni2  !< Index of the two subintervals of array.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    if ((nn - n1)>Nin) then ! if there are not enough values for qsort it is left unstorted, using only the final inssor
+      nM = (n1+nn)/2
+      if (array(nM)<array(n1)) then
+        tmp = array(n1)
+        array(n1) = array(nM)
+        array(nM) = tmp
+      endif
+      if (array(nM)>array(nn)) then
+        tmp = array(nn)
+        array(nn) = array(nM)
+        array(nM) = tmp
+        if (array(nM)<array(n1)) then
+          tmp = array(n1)
+          array(n1) = array(nM)
+          array(nM) = tmp
+        endif
+      endif
+      vnM = array(nM)
+      ni1 = n1
+      ni2 = nn
+      ECH2: do
+        do
+          ni1 = ni1 + 1
+          if (ni1>=ni2) exit ECH2 ! the first > pivot is ni2, the last <= pivot is ni1-1
+          if (array(ni1)>vnM) exit
+        enddo
+        do
+          if (array(ni2)<=vnM) exit
+          ni2 = ni2 - 1
+          if (ni1>=ni2) exit ECH2 ! the last < pivot is always ni1-1
+        enddo
+        tmp = array(ni2)
+        array(ni2) = array(ni1)
+        array(ni1) = tmp
+      enddo ECH2
+      ! sort the two subintervals
+      call subsor(array=array,n1=n1, nn=ni1-1)
+      call subsor(array=array,n1=ni2,nn=nn   )
+    endif
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine subsor
+  endsubroutine qsort_I8
+
+  !> @brief Subroutine for performing QuickSort with ascending order (I4P).
+  !> @note If the number of array elements is "small" the InsertionSort is directly used.
+  subroutine qsort_I4(array)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I4P), intent(INOUT):: array(1:) !< Array to be sorted.
+  integer(I4P), parameter::     Nin = 16  !< Maximum dimension for insertion sort.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  call subsor(array=array,n1=1,nn=size(array))
+  call isort_I4(array)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> @brief Sorts array from n1 to nn (QuickSort algorithm).
+    recursive subroutine subsor(array,n1,nn)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I4P), intent (INOUT):: array(:) !< Array to be sorted.
+    integer(I4P), intent (IN)::    n1       !< Initial index of sorting.
+    integer(I4P), intent (IN)::    nn       !< Final index of sorting.
+    integer(I4P)::                 tmp      !< Temporary array value.
+    integer(I4P)::                 vnM      !< Value of mean (pivot) element.
+    integer(I4P)::                 nM       !< Mean (pivot) index.
+    integer(I4P)::                 ni1,ni2  !< Index of the two subintervals of array.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    if ((nn - n1)>Nin) then ! if there are not enough values for qsort it is left unstorted, using only the final inssor
+      nM = (n1+nn)/2
+      if (array(nM)<array(n1)) then
+        tmp = array(n1)
+        array(n1) = array(nM)
+        array(nM) = tmp
+      endif
+      if (array(nM)>array(nn)) then
+        tmp = array(nn)
+        array(nn) = array(nM)
+        array(nM) = tmp
+        if (array(nM)<array(n1)) then
+          tmp = array(n1)
+          array(n1) = array(nM)
+          array(nM) = tmp
+        endif
+      endif
+      vnM = array(nM)
+      ni1 = n1
+      ni2 = nn
+      ECH2: do
+        do
+          ni1 = ni1 + 1
+          if (ni1>=ni2) exit ECH2 ! the first > pivot is ni2, the last <= pivot is ni1-1
+          if (array(ni1)>vnM) exit
+        enddo
+        do
+          if (array(ni2)<=vnM) exit
+          ni2 = ni2 - 1
+          if (ni1>=ni2) exit ECH2 ! the last < pivot is always ni1-1
+        enddo
+        tmp = array(ni2)
+        array(ni2) = array(ni1)
+        array(ni1) = tmp
+      enddo ECH2
+      ! sort the two subintervals
+      call subsor(array=array,n1=n1, nn=ni1-1)
+      call subsor(array=array,n1=ni2,nn=nn   )
+    endif
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine subsor
+  endsubroutine qsort_I4
+
+  !> @brief Subroutine for performing QuickSort with ascending order (I2P).
+  !> @note If the number of array elements is "small" the InsertionSort is directly used.
+  subroutine qsort_I2(array)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I2P), intent(INOUT):: array(1:) !< Array to be sorted.
+  integer(I4P), parameter::     Nin = 16  !< Maximum dimension for insertion sort.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  call subsor(array=array,n1=1,nn=size(array))
+  call isort_I2(array)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> @brief Sorts array from n1 to nn (QuickSort algorithm).
+    recursive subroutine subsor(array,n1,nn)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I2P), intent (INOUT):: array(:) !< Array to be sorted.
+    integer(I4P), intent (IN)::    n1       !< Initial index of sorting.
+    integer(I4P), intent (IN)::    nn       !< Final index of sorting.
+    integer(I2P)::                 tmp      !< Temporary array value.
+    integer(I2P)::                 vnM      !< Value of mean (pivot) element.
+    integer(I4P)::                 nM       !< Mean (pivot) index.
+    integer(I4P)::                 ni1,ni2  !< Index of the two subintervals of array.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    if ((nn - n1)>Nin) then ! if there are not enough values for qsort it is left unstorted, using only the final inssor
+      nM = (n1+nn)/2
+      if (array(nM)<array(n1)) then
+        tmp = array(n1)
+        array(n1) = array(nM)
+        array(nM) = tmp
+      endif
+      if (array(nM)>array(nn)) then
+        tmp = array(nn)
+        array(nn) = array(nM)
+        array(nM) = tmp
+        if (array(nM)<array(n1)) then
+          tmp = array(n1)
+          array(n1) = array(nM)
+          array(nM) = tmp
+        endif
+      endif
+      vnM = array(nM)
+      ni1 = n1
+      ni2 = nn
+      ECH2: do
+        do
+          ni1 = ni1 + 1
+          if (ni1>=ni2) exit ECH2 ! the first > pivot is ni2, the last <= pivot is ni1-1
+          if (array(ni1)>vnM) exit
+        enddo
+        do
+          if (array(ni2)<=vnM) exit
+          ni2 = ni2 - 1
+          if (ni1>=ni2) exit ECH2 ! the last < pivot is always ni1-1
+        enddo
+        tmp = array(ni2)
+        array(ni2) = array(ni1)
+        array(ni1) = tmp
+      enddo ECH2
+      ! sort the two subintervals
+      call subsor(array=array,n1=n1, nn=ni1-1)
+      call subsor(array=array,n1=ni2,nn=nn   )
+    endif
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine subsor
+  endsubroutine qsort_I2
+
+  !> @brief Subroutine for performing QuickSort with ascending order (I1P).
+  !> @note If the number of array elements is "small" the InsertionSort is directly used.
+  subroutine qsort_I1(array)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I1P), intent(INOUT):: array(1:) !< Array to be sorted.
+  integer(I4P), parameter::     Nin = 16  !< Maximum dimension for insertion sort.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  call subsor(array=array,n1=1,nn=size(array))
+  call isort_I1(array)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> @brief Sorts array from n1 to nn (QuickSort algorithm).
+    recursive subroutine subsor(array,n1,nn)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I1P), intent (INOUT):: array(:) !< Array to be sorted.
+    integer(I4P), intent (IN)::    n1       !< Initial index of sorting.
+    integer(I4P), intent (IN)::    nn       !< Final index of sorting.
+    integer(I1P)::                 tmp      !< Temporary array value.
+    integer(I1P)::                 vnM      !< Value of mean (pivot) element.
+    integer(I4P)::                 nM       !< Mean (pivot) index.
+    integer(I4P)::                 ni1,ni2  !< Index of the two subintervals of array.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    if ((nn - n1)>Nin) then ! if there are not enough values for qsort it is left unstorted, using only the final inssor
+      nM = (n1+nn)/2
+      if (array(nM)<array(n1)) then
+        tmp = array(n1)
+        array(n1) = array(nM)
+        array(nM) = tmp
+      endif
+      if (array(nM)>array(nn)) then
+        tmp = array(nn)
+        array(nn) = array(nM)
+        array(nM) = tmp
+        if (array(nM)<array(n1)) then
+          tmp = array(n1)
+          array(n1) = array(nM)
+          array(nM) = tmp
+        endif
+      endif
+      vnM = array(nM)
+      ni1 = n1
+      ni2 = nn
+      ECH2: do
+        do
+          ni1 = ni1 + 1
+          if (ni1>=ni2) exit ECH2 ! the first > pivot is ni2, the last <= pivot is ni1-1
+          if (array(ni1)>vnM) exit
+        enddo
+        do
+          if (array(ni2)<=vnM) exit
+          ni2 = ni2 - 1
+          if (ni1>=ni2) exit ECH2 ! the last < pivot is always ni1-1
+        enddo
+        tmp = array(ni2)
+        array(ni2) = array(ni1)
+        array(ni1) = tmp
+      enddo ECH2
+      ! sort the two subintervals
+      call subsor(array=array,n1=n1, nn=ni1-1)
+      call subsor(array=array,n1=ni2,nn=nn   )
+    endif
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine subsor
+  endsubroutine qsort_I1
+
+  ! cubic spline
+#ifdef r16p
+  !> @brief Function for computing cubic spline interpolation of an array of values (R16P).
+  pure function spline3_R16(bc1,bcn,x,v,xi) result (vi)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  real(R16P), intent(IN), optional:: bc1            !< Boundary conditions of second derivative at first node.
+  real(R16P), intent(IN), optional:: bcn            !< Boundary conditions of second derivative at last node.
+  real(R16P), intent(IN)::           x(1:)          !< Independent variable abscissa of original data.
+  real(R16P), intent(IN)::           v(1:)          !< Dependent variable (to be interpolated) of original data.
+  real(R16P), intent(IN)::           xi(1:)         !< Independent variable abscissa of interpolating points.
+  real(R16P)::                       vi(1:size(xi)) !< Dependent variable interpolated at xi points.
+  real(R16P)::                       cd2(1:size(x)) !< Coefficients of second derivative.
+  integer(I4P)::                     N              !< Number of points of original data.
+  integer(I4P)::                     i              !< Counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  N = size(x)
+  cd2 = compute_cd2(N=N)
+  do i=1,size(xi)
+    vi(i) = cspline(xi(i))
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    pure function compute_cd2(N) result(cd2)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I4P), intent(IN):: N               !< Number of points.
+    real(R16P)::               cd2(1:N)        !< Coefficients of second derivative.
+    real(R16P)::               sig,p,qn,u(1:N) !< Temporary variables.
+    integer(I4P)::             i               !< Counter.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    ! first node boundary condition
+    if (present(bc1)) then
+      cd2(1) = -0.5_R16P
+      u(  1) = (3._R16P/(x(2)-x(1)))*((v(2)-v(1))/(x(2)-x(1))-bc1)
+    else
+      cd2(1) = 0._R16P
+      u(  1) = 0._R16P
+    endif
+
+    do i=2,N-1
+      sig    = (x(i)-x(i-1))/(x(i+1)-x(i-1))
+      p      = sig*cd2(i-1)+2._R16P
+      cd2(i) = (sig-1._R16P)/p
+      u(  i) = (6._R16P*((v(i+1)-v(i))/(x(i+1)-x(i))-(v(i)-v(i-1))/(x(i)-x(i-1)))/(x(i+1)-x(i-1))-sig*u(i-1))/p
+    enddo
+    ! last node boundary condition
+    if (present(bcn)) then
+      qn   = 0.5_R16P
+      u(N) = (3._R16P/(x(N)-x(N-1)))*(bcn-(v(N)-v(N-1))/(x(N)-x(N-1)))
+    else
+      qn   = 0._R16P
+      u(N) = 0._R16P
+    endif
+    ! coefficients of second derivative
+    cd2(N) = (u(N)-qn*u(N-1))/(qn*cd2(N-1)+1._R16P)
+    do i=N-1,1,-1
+      cd2(i) = cd2(i)*cd2(i+1)+u(i)
+    enddo
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endfunction compute_cd2
+
+    pure function cspline(xint) result(vint)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    real(R16P), intent(IN):: xint !< Independent variable abscissa of interpolating point.
+    real(R16P)::             vint !< Dependent variable interpolated at x point.
+    integer(I4P)::           iLo  !< Index of nearest-Low point to xint.
+    integer(I4P)::           iHi  !< Index of nearest-High point to xint.
+    real(R16P)::             h    !< Distance between the two nearest points to xint.
+    real(R16P)::             a    !< Relative distance of nearest-High point to xint.
+    real(R16P)::             b    !< Relative distance of nearest-Low point to xint.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    iLo = maxloc(x,mask=(x<xint),dim=1)
+    iHi = minloc(x,mask=(x>xint),dim=1)
+    h = x(iHi)-x(iLo)
+    a = (x(iHi) - xint  )/h
+    b = (xint   - x(iLo))/h
+    vint = a*v(iLo) + b*v(iHi) + ((a*a*a - a)*cd2(iLo) + (b*b*b - b)*cd2(iHi))*(h*h)/6._R16P
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endfunction cspline
+  endfunction spline3_R16
+#endif
+
+  !> @brief Function for computing cubic spline interpolation of an array of values (R8P).
+  pure function spline3_R8(bc1,bcn,x,v,xi) result (vi)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  real(R8P), intent(IN), optional:: bc1            !< Boundary conditions of second derivative at first node.
+  real(R8P), intent(IN), optional:: bcn            !< Boundary conditions of second derivative at last node.
+  real(R8P), intent(IN)::           x(1:)          !< Independent variable abscissa of original data.
+  real(R8P), intent(IN)::           v(1:)          !< Dependent variable (to be interpolated) of original data.
+  real(R8P), intent(IN)::           xi(1:)         !< Independent variable abscissa of interpolating points.
+  real(R8P)::                       vi(1:size(xi)) !< Dependent variable interpolated at xi points.
+  real(R8P)::                       cd2(1:size(x)) !< Coefficients of second derivative.
+  integer(I4P)::                    N              !< Number of points of original data.
+  integer(I4P)::                    i              !< Counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  N = size(x)
+  cd2 = compute_cd2(N=N)
+  do i=1,size(xi)
+    vi(i) = cspline(xi(i))
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    pure function compute_cd2(N) result(cd2)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I4P), intent(IN):: N               !< Number of points.
+    real(R8P)::                cd2(1:N)        !< Coefficients of second derivative.
+    real(R8P)::                sig,p,qn,u(1:N) !< Temporary variables.
+    integer(I4P)::             i               !< Counter.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    ! first node boundary condition
+    if (present(bc1)) then
+      cd2(1) = -0.5_R8P
+      u(  1) = (3._R8P/(x(2)-x(1)))*((v(2)-v(1))/(x(2)-x(1))-bc1)
+    else
+      cd2(1) = 0._R8P
+      u(  1) = 0._R8P
+    endif
+
+    do i=2,N-1
+      sig    = (x(i)-x(i-1))/(x(i+1)-x(i-1))
+      p      = sig*cd2(i-1)+2._R8P
+      cd2(i) = (sig-1._R8P)/p
+      u(  i) = (6._R8P*((v(i+1)-v(i))/(x(i+1)-x(i))-(v(i)-v(i-1))/(x(i)-x(i-1)))/(x(i+1)-x(i-1))-sig*u(i-1))/p
+    enddo
+    ! last node boundary condition
+    if (present(bcn)) then
+      qn   = 0.5_R8P
+      u(N) = (3._R8P/(x(N)-x(N-1)))*(bcn-(v(N)-v(N-1))/(x(N)-x(N-1)))
+    else
+      qn   = 0._R8P
+      u(N) = 0._R8P
+    endif
+    ! coefficients of second derivative
+    cd2(N) = (u(N)-qn*u(N-1))/(qn*cd2(N-1)+1._R8P)
+    do i=N-1,1,-1
+      cd2(i) = cd2(i)*cd2(i+1)+u(i)
+    enddo
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endfunction compute_cd2
+
+    pure function cspline(xint) result(vint)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    real(R8P), intent(IN):: xint !< Independent variable abscissa of interpolating point.
+    real(R8P)::             vint !< Dependent variable interpolated at x point.
+    integer(I4P)::          iLo  !< Index of nearest-Low point to xint.
+    integer(I4P)::          iHi  !< Index of nearest-High point to xint.
+    real(R8P)::             h    !< Distance between the two nearest points to xint.
+    real(R8P)::             a    !< Relative distance of nearest-High point to xint.
+    real(R8P)::             b    !< Relative distance of nearest-Low point to xint.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    iLo = maxloc(x,mask=(x<xint),dim=1)
+    iHi = minloc(x,mask=(x>xint),dim=1)
+    h = x(iHi)-x(iLo)
+    a = (x(iHi) - xint  )/h
+    b = (xint   - x(iLo))/h
+    vint = a*v(iLo) + b*v(iHi) + ((a*a*a - a)*cd2(iLo) + (b*b*b - b)*cd2(iHi))*(h*h)/6._R8P
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endfunction cspline
+  endfunction spline3_R8
+
+  !> @brief Function for computing cubic spline interpolation of an array of values (R4P).
+  pure function spline3_R4(bc1,bcn,x,v,xi) result (vi)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  real(R4P), intent(IN), optional:: bc1            !< Boundary conditions of second derivative at first node.
+  real(R4P), intent(IN), optional:: bcn            !< Boundary conditions of second derivative at last node.
+  real(R4P), intent(IN)::           x(1:)          !< Independent variable abscissa of original data.
+  real(R4P), intent(IN)::           v(1:)          !< Dependent variable (to be interpolated) of original data.
+  real(R4P), intent(IN)::           xi(1:)         !< Independent variable abscissa of interpolating points.
+  real(R4P)::                       vi(1:size(xi)) !< Dependent variable interpolated at xi points.
+  real(R4P)::                       cd2(1:size(x)) !< Coefficients of second derivative.
+  integer(I4P)::                    N              !< Number of points of original data.
+  integer(I4P)::                    i              !< Counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  N = size(x)
+  cd2 = compute_cd2(N=N)
+  do i=1,size(xi)
+    vi(i) = cspline(xi(i))
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  contains
+    pure function compute_cd2(N) result(cd2)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    integer(I4P), intent(IN):: N               !< Number of points.
+    real(R4P)::                cd2(1:N)        !< Coefficients of second derivative.
+    real(R4P)::                sig,p,qn,u(1:N) !< Temporary variables.
+    integer(I4P)::             i               !< Counter.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    ! first node boundary condition
+    if (present(bc1)) then
+      cd2(1) = -0.5_R4P
+      u(  1) = (3._R4P/(x(2)-x(1)))*((v(2)-v(1))/(x(2)-x(1))-bc1)
+    else
+      cd2(1) = 0._R4P
+      u(  1) = 0._R4P
+    endif
+
+    do i=2,N-1
+      sig    = (x(i)-x(i-1))/(x(i+1)-x(i-1))
+      p      = sig*cd2(i-1)+2._R4P
+      cd2(i) = (sig-1._R4P)/p
+      u(  i) = (6._R4P*((v(i+1)-v(i))/(x(i+1)-x(i))-(v(i)-v(i-1))/(x(i)-x(i-1)))/(x(i+1)-x(i-1))-sig*u(i-1))/p
+    enddo
+    ! last node boundary condition
+    if (present(bcn)) then
+      qn   = 0.5_R4P
+      u(N) = (3._R4P/(x(N)-x(N-1)))*(bcn-(v(N)-v(N-1))/(x(N)-x(N-1)))
+    else
+      qn   = 0._R4P
+      u(N) = 0._R4P
+    endif
+    ! coefficients of second derivative
+    cd2(N) = (u(N)-qn*u(N-1))/(qn*cd2(N-1)+1._R4P)
+    do i=N-1,1,-1
+      cd2(i) = cd2(i)*cd2(i+1)+u(i)
+    enddo
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endfunction compute_cd2
+
+    pure function cspline(xint) result(vint)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    real(R4P), intent(IN):: xint !< Independent variable abscissa of interpolating point.
+    real(R4P)::             vint !< Dependent variable interpolated at x point.
+    integer(I4P)::          iLo  !< Index of nearest-Low point to xint.
+    integer(I4P)::          iHi  !< Index of nearest-High point to xint.
+    real(R4P)::             h    !< Distance between the two nearest points to xint.
+    real(R4P)::             a    !< Relative distance of nearest-High point to xint.
+    real(R4P)::             b    !< Relative distance of nearest-Low point to xint.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    iLo = maxloc(x,mask=(x<xint),dim=1)
+    iHi = minloc(x,mask=(x>xint),dim=1)
+    h = x(iHi)-x(iLo)
+    a = (x(iHi) - xint  )/h
+    b = (xint   - x(iLo))/h
+    vint = a*v(iLo) + b*v(iHi) + ((a*a*a - a)*cd2(iLo) + (b*b*b - b)*cd2(iHi))*(h*h)/6._R4P
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endfunction cspline
+  endfunction spline3_R4
+  !> @}
+
   ! stretching functions
   pure function stretchinglside(Ns,s_uniform,stretch) result(s_stretch)
   !---------------------------------------------------------------------------------------------------------------------------------

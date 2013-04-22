@@ -392,8 +392,8 @@ GNU/Linux :-).
 
 The codes provided (@off, IBM and POG) have been successfully compiled with the following compilers:
 
-- GNU gfortran (from version 4.6.3)
-- Intel Fortran Compiler ifort (from version 11.0)
+- GNU gfortran (from version 4.7.0)
+- Intel Fortran Compiler ifort (from version 12.0)
 
 Other compilers are not supported. For the Portland Group Compiler pgf it is known the presence of problems (and lack of performance due to the dynamic data nested into derived types).
 
@@ -596,7 +596,6 @@ In order to build the documentation the following dependences must be satisfied:
 - .doxigenconfig file must be in project main directory;
 - doc directory with doc/fpp.sh, doc/mainpage.txt and doc/off-layout.xml files must be in project main directory;
 - doxygen program must be installed (http://www.stack.nl/~dimitri/doxygen/).
-@note
 All of the above pre-requisites are satisfied if the GitHub repository (https://github.com/szaghi/OFF) is cloned. \n
 \n
 @note

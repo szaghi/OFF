@@ -550,12 +550,16 @@ PRINTINFO:
 	@echo | tee make.log
 	@echo -e $(PRINTCHK) | tee -a make.log
 	@echo | tee -a make.log
-	@echo -e '\033[1;31m Compiling options\033[0m' | tee -a make.log
-	@echo -e '\033[1m [$(OPTSC)]\033[0m' | tee -a make.log
+	@echo -e "\033[1;31m Compiling options\033[0m" | tee -a make.log
+	@echo -e "\033[1m [$(OPTSC)]\033[0m" | tee -a make.log
 	@echo | tee -a make.log
-	@echo -e '\033[1;31m Linking options \033[0m' | tee -a make.log
-	@echo -e '\033[1m [$(OPTSL)]\033[0m' | tee -a make.log
+	@echo -e "\033[1;31m Linking options \033[0m" | tee -a make.log
+	@echo -e "\033[1m [$(OPTSL)]\033[0m" | tee -a make.log
 	@echo | tee -a make.log
+
+.PHONY : $(MKDIRS)
+$(MKDIRS):
+	@mkdir -p $@
 
 .PHONY : cleanobj
 cleanobj:
@@ -595,8 +599,4 @@ tar: cleanall
 doc:
 	@echo -e "\033[1;31m Building documentation\033[0m" | tee make.log
 	@doxygen .doxygenconfig
-
-.PHONY : $(MKDIRS)
-$(MKDIRS):
-	@mkdir -p $@
 #----------------------------------------------------------------------------------------------------------------------------------

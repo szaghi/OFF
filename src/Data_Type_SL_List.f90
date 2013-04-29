@@ -36,14 +36,16 @@ integer(I1P), parameter:: tp_SR4  = 5  !< Scalar real(R4P) type.
 integer(I1P), parameter:: tp_SR8  = 6  !< Scalar real(R8P) type.
 integer(I1P), parameter:: tp_SR16 = 7  !< Scalar real(R16P) type.
 integer(I1P), parameter:: tp_SCH  = 8  !< Scalar character type.
-integer(I1P), parameter:: tp_AI1  = 9  !< Array of integer(I1P) type.
-integer(I1P), parameter:: tp_AI2  = 10 !< Array of integer(I2P) type.
-integer(I1P), parameter:: tp_AI4  = 11 !< Array of integer(I4P) type.
-integer(I1P), parameter:: tp_AI8  = 12 !< Array of integer(I8P) type.
-integer(I1P), parameter:: tp_AR4  = 13 !< Array of real(R4P) type.
-integer(I1P), parameter:: tp_AR8  = 14 !< Array of real(R8P) type.
-integer(I1P), parameter:: tp_AR16 = 15 !< Array of real(R16P) type.
-integer(I1P), parameter:: tp_ACH  = 16 !< Array of character type.
+integer(I1P), parameter:: tp_SLOG = 9  !< Scalar character type.
+integer(I1P), parameter:: tp_AI1  = 10 !< Array of integer(I1P) type.
+integer(I1P), parameter:: tp_AI2  = 11 !< Array of integer(I2P) type.
+integer(I1P), parameter:: tp_AI4  = 12 !< Array of integer(I4P) type.
+integer(I1P), parameter:: tp_AI8  = 13 !< Array of integer(I8P) type.
+integer(I1P), parameter:: tp_AR4  = 14 !< Array of real(R4P) type.
+integer(I1P), parameter:: tp_AR8  = 15 !< Array of real(R8P) type.
+integer(I1P), parameter:: tp_AR16 = 16 !< Array of real(R16P) type.
+integer(I1P), parameter:: tp_ACH  = 17 !< Array of character type.
+integer(I1P), parameter:: tp_ALOG = 18 !< Array of character type.
 !> @brief Derived type containing link data of a single linked list.
 !> @ingroup Data_Type_SL_ListDerivedType
 type:: Type_SL_Link
@@ -60,37 +62,44 @@ type:: Type_SL_Link
     procedure, non_overridable:: delh => delh_link        ! Procedure for deleting head link of the list.
     procedure, non_overridable:: delt => delt_link        ! Procedure for deleting tail link of the list.
     generic::                    get =>  &         ! Procedure for getting data from the n-th link of the list (generic interface).
-                                 get_link_R8,get_link_R4,get_link_I8,get_link_I4,get_link_I2,get_link_I1,get_link_ch
+                                 get_link_R8,get_link_R4, &
+                                 get_link_I8,get_link_I4,get_link_I2,get_link_I1,get_link_ch,get_link_log
     generic::                    geth =>  &        ! Procedure for getting data from the list head (generic interface).
 #ifdef r16p
                                  geth_link_R16,&
 #endif
-                                 geth_link_R8,geth_link_R4,geth_link_I8,geth_link_I4,geth_link_I2,geth_link_I1,geth_link_ch
+                                 geth_link_R8,geth_link_R4, &
+                                 geth_link_I8,geth_link_I4,geth_link_I2,geth_link_I1,geth_link_ch,geth_link_log
     generic::                    gett =>  &        ! Procedure for getting a link data from the list tail (generic interface).
 #ifdef r16p
                                  gett_link_R16,&
 #endif
-                                 gett_link_R8,gett_link_R4,gett_link_I8,gett_link_I4,gett_link_I2,gett_link_I1,gett_link_ch
+                                 gett_link_R8,gett_link_R4, &
+                                 gett_link_I8,gett_link_I4,gett_link_I2,gett_link_I1,gett_link_ch,gett_link_log
     generic::                    put =>  &         ! Procedure for inserting a link into the n-th link of list (generic interface).
 #ifdef r16p
                                  put_link_R16,&
 #endif
-                                 put_link_R8,put_link_R4,put_link_I8,put_link_I4,put_link_I2,put_link_I1,put_link_ch
+                                 put_link_R8,put_link_R4, &
+                                 put_link_I8,put_link_I4,put_link_I2,put_link_I1,put_link_ch,put_link_log
     generic::                    puth =>  &        ! Procedure for inserting a link into the list head (generic interface).
 #ifdef r16p
                                  puth_link_R16,&
 #endif
-                                 puth_link_R8,puth_link_R4,puth_link_I8,puth_link_I4,puth_link_I2,puth_link_I1,puth_link_ch
+                                 puth_link_R8,puth_link_R4, &
+                                 puth_link_I8,puth_link_I4,puth_link_I2,puth_link_I1,puth_link_ch,puth_link_log
     generic::                    putt =>  &        ! Procedure for inserting a link into the list tail (generic interface).
 #ifdef r16p
                                  putt_link_R16,&
 #endif
-                                 putt_link_R8,putt_link_R4,putt_link_I8,putt_link_I4,putt_link_I2,putt_link_I1,putt_link_ch
+                                 putt_link_R8,putt_link_R4, &
+                                 putt_link_I8,putt_link_I4,putt_link_I2,putt_link_I1,putt_link_ch,putt_link_log
     generic::                    array =>  &       ! Procedure for converting list to array (generic interface).
 #ifdef r16p
                                  array_link_R16,&
 #endif
-                                 array_link_R8,array_link_R4,array_link_I8,array_link_I4,array_link_I2,array_link_I1,array_link_ch
+                                 array_link_R8,array_link_R4, &
+                                 array_link_I8,array_link_I4,array_link_I2,array_link_I1,array_link_ch,array_link_log
 #ifdef r16p
     procedure, non_overridable:: get_link_R16      ! Procedure for getting data from the n-th link of the list (R16P).
 #endif
@@ -101,6 +110,7 @@ type:: Type_SL_Link
     procedure, non_overridable:: get_link_I2       ! Procedure for getting data from the n-th link of the list (I2P).
     procedure, non_overridable:: get_link_I1       ! Procedure for getting data from the n-th link of the list (I1P).
     procedure, non_overridable:: get_link_ch       ! Procedure for getting data from the n-th link of the list (character).
+    procedure, non_overridable:: get_link_log      ! Procedure for getting data from the n-th link of the list (logical).
 #ifdef r16p
     procedure, non_overridable:: geth_link_R16     ! Procedure for getting a link data from the list head (R16P).
 #endif
@@ -111,6 +121,7 @@ type:: Type_SL_Link
     procedure, non_overridable:: geth_link_I2      ! Procedure for getting a link data from the list head (I4P).
     procedure, non_overridable:: geth_link_I1      ! Procedure for getting a link data from the list head (I4P).
     procedure, non_overridable:: geth_link_ch      ! Procedure for getting a link data from the list head (character).
+    procedure, non_overridable:: geth_link_log     ! Procedure for getting a link data from the list head (logical).
 #ifdef r16p
     procedure, non_overridable:: gett_link_R16     ! Procedure for getting a link data from the list tail (R16P).
 #endif
@@ -121,6 +132,7 @@ type:: Type_SL_Link
     procedure, non_overridable:: gett_link_I2      ! Procedure for getting a link data from the list tail (I4P).
     procedure, non_overridable:: gett_link_I1      ! Procedure for getting a link data from the list tail (I4P).
     procedure, non_overridable:: gett_link_ch      ! Procedure for getting a link data from the list tail (character).
+    procedure, non_overridable:: gett_link_log     ! Procedure for getting a link data from the list tail (logical).
 #ifdef r16p
     procedure, non_overridable:: put_link_R16      ! Procedure for inserting a link into the n-th link of list (R16P).
 #endif
@@ -131,6 +143,7 @@ type:: Type_SL_Link
     procedure, non_overridable:: put_link_I2       ! Procedure for inserting a link into the n-th link of list (I2P).
     procedure, non_overridable:: put_link_I1       ! Procedure for inserting a link into the n-th link of list (I1P).
     procedure, non_overridable:: put_link_ch       ! Procedure for inserting a link into the n-th link of list (character).
+    procedure, non_overridable:: put_link_log      ! Procedure for inserting a link into the n-th link of list (logical).
 #ifdef r16p
     procedure, non_overridable:: puth_link_R16     ! Procedure for inserting a link into the list head (R16P).
 #endif
@@ -141,6 +154,7 @@ type:: Type_SL_Link
     procedure, non_overridable:: puth_link_I2      ! Procedure for inserting a link into the list head (I2P).
     procedure, non_overridable:: puth_link_I1      ! Procedure for inserting a link into the list head (I1P).
     procedure, non_overridable:: puth_link_ch      ! Procedure for inserting a link into the list head (character).
+    procedure, non_overridable:: puth_link_log     ! Procedure for inserting a link into the list head (logical).
 #ifdef r16p
     procedure, non_overridable:: putt_link_R16     ! Procedure for inserting a link into the list tail (R16P).
 #endif
@@ -151,6 +165,7 @@ type:: Type_SL_Link
     procedure, non_overridable:: putt_link_I2      ! Procedure for inserting a link into the list tail (I2P).
     procedure, non_overridable:: putt_link_I1      ! Procedure for inserting a link into the list tail (I1P).
     procedure, non_overridable:: putt_link_ch      ! Procedure for inserting a link into the list tail (character).
+    procedure, non_overridable:: putt_link_log     ! Procedure for inserting a link into the list tail (logical).
 #ifdef r16p
     procedure, non_overridable:: array_link_R16    ! Procedure for converting list to array (R16P).
 #endif
@@ -161,15 +176,16 @@ type:: Type_SL_Link
     procedure, non_overridable:: array_link_I2     ! Procedure for converting list to array (I2P).
     procedure, non_overridable:: array_link_I1     ! Procedure for converting list to array (I1P).
     procedure, non_overridable:: array_link_ch     ! Procedure for converting list to array (character).
+    procedure, non_overridable:: array_link_log    ! Procedure for converting list to array (logical).
 endtype Type_SL_Link
 !> @brief Derived type containing single linked list.
 !> Type_SL_List is a \b generic Single Linked List. The term \b generic means that the data stored in each node (link) of the list
 !> is \b generic: at present, the stored data can be integer (of any kinds defined in IR_Precision module), real (of any kinds
-!> defined in IR_Precision module) and characters (of any length). In order to insert and retrieve data from the list nodes (and in
-!> general for list manipulation) the type bound methods must be used, because the data is not directly accessible. This is due to
-!> the internal representation of the data. In order to allow generic data, the intrinsic \b transfer function is used to encode all
-!> user data into the internal integer(I1P) array representation. As a consequence, if the node is directed accessed the user can
-!> obtain unpredictable results due to the encoded internal representation.
+!> defined in IR_Precision module), characters (of any length) and logical. In order to insert and retrieve data from the list nodes
+!> (and in general for list manipulation) the type bound methods must be used, because the data is not directly accessible. This is
+!> due to the internal representation of the data. In order to allow generic data, the intrinsic \b transfer function is used to
+!> encode all user data into the internal integer(I1P) array representation. As a consequence, if the node is directed accessed the
+!> user can obtain unpredictable results due to the encoded internal representation.
 !> The provide methods for list handling are the following:
 !> @code
 !> ...
@@ -234,37 +250,44 @@ type, public:: Type_SL_List
 #ifdef r16p
                                  get_list_R16,&
 #endif
-                                 get_list_R8,get_list_R4,get_list_I8,get_list_I4,get_list_I2,get_list_I1,get_list_ch
+                                 get_list_R8,get_list_R4, &
+                                 get_list_I8,get_list_I4,get_list_I2,get_list_I1,get_list_ch,get_list_log
     generic::                    geth =>  &        ! Procedure for getting a link data from the list head (generic interface).
 #ifdef r16p
                                  geth_list_R16,&
 #endif
-                                 geth_list_R8,geth_list_R4,geth_list_I8,geth_list_I4,geth_list_I2,geth_list_I1,geth_list_ch
+                                 geth_list_R8,geth_list_R4, &
+                                 geth_list_I8,geth_list_I4,geth_list_I2,geth_list_I1,geth_list_ch,geth_list_log
     generic::                    gett =>  &        ! Procedure for getting a link data from the list tail (generic interface).
 #ifdef r16p
                                  gett_list_R16,&
 #endif
-                                 gett_list_R8,gett_list_R4,gett_list_I8,gett_list_I4,gett_list_I2,gett_list_I1,gett_list_ch
+                                 gett_list_R8,gett_list_R4, &
+                                 gett_list_I8,gett_list_I4,gett_list_I2,gett_list_I1,gett_list_ch,gett_list_log
     generic::                    put =>  &         ! Procedure for inserting a link into the n-th link of list (generic interface).
 #ifdef r16p
                                  put_list_R16,&
 #endif
-                                 put_list_R8,put_list_R4,put_list_I8,put_list_I4,put_list_I2,put_list_I1,put_list_ch
+                                 put_list_R8,put_list_R4, &
+                                 put_list_I8,put_list_I4,put_list_I2,put_list_I1,put_list_ch,put_list_log
     generic::                    puth =>  &        ! Procedure for inserting a link into the list head (generic interface).
 #ifdef r16p
                                  puth_list_R16,&
 #endif
-                                 puth_list_R8,puth_list_R4,puth_list_I8,puth_list_I4,puth_list_I2,puth_list_I1,puth_list_ch
+                                 puth_list_R8,puth_list_R4, &
+                                 puth_list_I8,puth_list_I4,puth_list_I2,puth_list_I1,puth_list_ch,puth_list_log
     generic::                    putt =>  &        ! Procedure for inserting a link into the list tail (generic interface).
 #ifdef r16p
                                  putt_list_R16,&
 #endif
-                                 putt_list_R8,putt_list_R4,putt_list_I8,putt_list_I4,putt_list_I2,putt_list_I1,putt_list_ch
+                                 putt_list_R8,putt_list_R4, &
+                                 putt_list_I8,putt_list_I4,putt_list_I2,putt_list_I1,putt_list_ch,putt_list_log
     generic::                    array =>  &       ! Procedure for converting list to array (generic interface).
 #ifdef r16p
                                  array_list_R16,&
 #endif
-                                 array_list_R8,array_list_R4,array_list_I8,array_list_I4,array_list_I2,array_list_I1,array_list_ch
+                                 array_list_R8,array_list_R4, &
+                                 array_list_I8,array_list_I4,array_list_I2,array_list_I1,array_list_ch,array_list_log
 #ifdef r16p
     procedure, non_overridable:: get_list_R16      ! Procedure for getting data from the n-th link of the list (R16P).
 #endif
@@ -275,6 +298,7 @@ type, public:: Type_SL_List
     procedure, non_overridable:: get_list_I2       ! Procedure for getting data from the n-th link of the list (I2P).
     procedure, non_overridable:: get_list_I1       ! Procedure for getting data from the n-th link of the list (I1P).
     procedure, non_overridable:: get_list_ch       ! Procedure for getting data from the n-th link of the list (character).
+    procedure, non_overridable:: get_list_log      ! Procedure for getting data from the n-th link of the list (logical).
 #ifdef r16p
     procedure, non_overridable:: geth_list_R16     ! Procedure for getting a link data from the list head (R16P).
 #endif
@@ -285,6 +309,7 @@ type, public:: Type_SL_List
     procedure, non_overridable:: geth_list_I2      ! Procedure for getting a link data from the list head (I4P).
     procedure, non_overridable:: geth_list_I1      ! Procedure for getting a link data from the list head (I4P).
     procedure, non_overridable:: geth_list_ch      ! Procedure for getting a link data from the list head (character).
+    procedure, non_overridable:: geth_list_log     ! Procedure for getting a link data from the list head (logical).
 #ifdef r16p
     procedure, non_overridable:: gett_list_R16     ! Procedure for getting a link data from the list tail (R16P).
 #endif
@@ -295,6 +320,7 @@ type, public:: Type_SL_List
     procedure, non_overridable:: gett_list_I2      ! Procedure for getting a link data from the list tail (I4P).
     procedure, non_overridable:: gett_list_I1      ! Procedure for getting a link data from the list tail (I4P).
     procedure, non_overridable:: gett_list_ch      ! Procedure for getting a link data from the list tail (character).
+    procedure, non_overridable:: gett_list_log     ! Procedure for getting a link data from the list tail (logical).
 #ifdef r16p
     procedure, non_overridable:: put_list_R16      ! Procedure for inserting a link into the n-th link of list (R16P).
 #endif
@@ -305,6 +331,7 @@ type, public:: Type_SL_List
     procedure, non_overridable:: put_list_I2       ! Procedure for inserting a link into the n-th link of list (I2P).
     procedure, non_overridable:: put_list_I1       ! Procedure for inserting a link into the n-th link of list (I1P).
     procedure, non_overridable:: put_list_ch       ! Procedure for inserting a link into the n-th link of list (character).
+    procedure, non_overridable:: put_list_log      ! Procedure for inserting a link into the n-th link of list (logical).
 #ifdef r16p
     procedure, non_overridable:: puth_list_R16     ! Procedure for inserting a link into the list head (R16P).
 #endif
@@ -315,6 +342,7 @@ type, public:: Type_SL_List
     procedure, non_overridable:: puth_list_I2      ! Procedure for inserting a link into the list head (I2P).
     procedure, non_overridable:: puth_list_I1      ! Procedure for inserting a link into the list head (I1P).
     procedure, non_overridable:: puth_list_ch      ! Procedure for inserting a link into the list head (character).
+    procedure, non_overridable:: puth_list_log     ! Procedure for inserting a link into the list head (logical).
 #ifdef r16p
     procedure, non_overridable:: putt_list_R16     ! Procedure for inserting a link into the list tail (R16P).
 #endif
@@ -325,6 +353,7 @@ type, public:: Type_SL_List
     procedure, non_overridable:: putt_list_I2      ! Procedure for inserting a link into the list tail (I2P).
     procedure, non_overridable:: putt_list_I1      ! Procedure for inserting a link into the list tail (I1P).
     procedure, non_overridable:: putt_list_ch      ! Procedure for inserting a link into the list tail (character).
+    procedure, non_overridable:: putt_list_log     ! Procedure for inserting a link into the list tail (logical).
 #ifdef r16p
     procedure, non_overridable:: array_list_R16    ! Procedure for converting list to array (R16P).
 #endif
@@ -335,6 +364,7 @@ type, public:: Type_SL_List
     procedure, non_overridable:: array_list_I2     ! Procedure for converting list to array (I2P).
     procedure, non_overridable:: array_list_I1     ! Procedure for converting list to array (I1P).
     procedure, non_overridable:: array_list_ch     ! Procedure for converting list to array (character).
+    procedure, non_overridable:: array_list_log    ! Procedure for converting list to array (logical).
 endtype Type_SL_List
 !> @ingroup Data_Type_SL_ListGlobalVarPar
 !> @{
@@ -701,6 +731,26 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine get_link_ch
 
+  !> @brief Subroutine for getting data from the n-th link of list (logical).
+  !> @note If n<1 then the first link data is returned, whereas if n> list's length the last data is returned.
+  !> @note If data is not present the minimum representable value is returned (for error checking).
+  subroutine get_link_log(l,n,d)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_Link), target, intent(IN)::  l            !< List.
+  integer(I4P),                intent(IN)::  n            !< Element of the list to be found.
+  logical,                     intent(OUT):: d            !< Link data.
+  type(Type_SL_Link), pointer::              ln => null() !< Pointer to "n-th" link of the list.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  d = .false.
+  ln => link(l=l,n=n)
+  if (associated(ln%d)) d = transfer(ln%d,.false.)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine get_link_log
+
 #ifdef r16p
   !> @brief Subroutine for getting a link data from the list head (R16P).
   !> @note If data is not present the minimum representable value is returned (for error checking).
@@ -831,6 +881,22 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine geth_link_ch
+
+  !> @brief Subroutine for getting a link data from the list head (logical).
+  !> @note If data is not present the minimum representable value is returned (for error checking).
+  subroutine geth_link_log(l,d)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_Link), intent(IN)::  l !< List.
+  logical,             intent(OUT):: d !< Link data.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  d = .false.
+  if (associated(l%d)) d = transfer(l%d,.false.)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine geth_link_log
 
 #ifdef r16p
   !> @brief Subroutine for getting a link data from the list tail (R16P).
@@ -994,6 +1060,26 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine gett_link_ch
+
+  !> @brief Subroutine for getting a link data from the list tail (logical).
+  !> @note If data is not present the minimum representable value is returned (for error checking).
+  recursive subroutine gett_link_log(l,d)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_Link), intent(IN)::  l !< List.
+  logical,             intent(OUT):: d !< Link data.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (.not.associated(l%n)) then
+    d = .false.
+    if (associated(l%d)) d = transfer(l%d,.false.)
+  else
+    call gett_link_log(l=l%n,d=d)
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine gett_link_log
 
 #ifdef r16p
   !> @brief Subroutine for inserting a link into the n-th link of list (R16P).
@@ -1197,6 +1283,31 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine put_link_ch
 
+  !> @brief Subroutine for inserting a link into the n-th link of list (logical).
+  !> @note If n<1 then the data is inserted at first link , whereas if n> list's length the data is inserted at last.
+  subroutine put_link_log(l,n,d)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_Link), target, intent(INOUT):: l                                !< List.
+  integer(I4P),                intent(IN)::    n                                !< Element of the list to be inserted.
+  logical,                     intent(IN)::    d                                !< Data of the current link.
+  type(Type_SL_Link), pointer::                lp=>null(),lc=>null(),ln=>null() !< Previous, current and new links.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  allocate(ln) ; allocate(ln%d(1:1)) ; ln%d = transfer(d,SL_List_Mold) ; ln%tp = tp_SLOG
+  lp => l%link(n=n-1)
+  if (associated(lp)) then
+    lc => lp%n
+    lp%n => ln
+    ln%n => lc
+  else
+    call l%putt(d=d)
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine put_link_log
+
 #ifdef r16p
   !> @brief Subroutine for inserting a link data into the list head (R16P).
   subroutine puth_link_R16(l,d)
@@ -1384,6 +1495,29 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine puth_link_ch
 
+  !> @brief Subroutine for inserting a link data into the list head (logical).
+  subroutine puth_link_log(l,d)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_Link), intent(INOUT):: l               !< List.
+  logical,             intent(IN)::    d               !< Data of the current link.
+  integer(I1P),       pointer::        dtmp(:)=>null() !< Temporary data.
+  type(Type_SL_Link), pointer::        n=>null()       !< New link.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (.not.associated(l%d)) then
+    allocate(l%d(1:1)) ; l%d = transfer(d,SL_List_Mold)
+  else
+    allocate(dtmp(1:bit_size(l%d)/8)) ; dtmp = l%d ; l%d = transfer(d,SL_List_Mold)
+    allocate(n) ; allocate(n%d(1:bit_size(dtmp)/8)) ; n%d = dtmp ; n%tp = l%tp ; n%n => l%n ; l%n => n
+    deallocate(dtmp)
+  endif
+  l%tp = tp_SLOG
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine puth_link_log
+
 #ifdef r16p
   !> @brief Recursive subroutine for inserting a link data into the list tail (R16P).
   recursive subroutine putt_link_R16(l,d)
@@ -1529,6 +1663,24 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine putt_link_ch
+
+  !> @brief Recursive subroutine for inserting a link data into the list tail (logical).
+  recursive subroutine putt_link_log(l,d)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_Link), intent(INOUT):: l !< List.
+  logical,             intent(IN)::    d !< Data of the current link.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (associated(l%d)) then
+    if (.not.associated(l%n)) allocate(l%n) ; call putt_link_log(l=l%n,d=d)
+  else
+    if (.not.associated(l%d)) allocate(l%d(1:1)) ; l%d = transfer(d,SL_List_Mold) ; l%tp = tp_SLOG
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine putt_link_log
 
 #ifdef r16p
   !> @brief Subroutine for converting list to array (R16P).
@@ -1814,6 +1966,41 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine array_link_ch
 
+  !> @brief Subroutine for converting list to array (logical).
+  subroutine array_link_log(l,a)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_Link),  intent(IN)::  l    ! List.
+  logical, allocatable, intent(OUT):: a(:) ! Array containing the list.
+  type(Type_SL_Link), pointer::       n    ! Pointer for scanning the list.
+  integer(I1P),       pointer::       d(:) ! Pointer for scanning the list.
+  integer(I4P)::                      Nl   ! Elements number.
+  integer(I4P)::                      e    ! Elements counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  Nl = l%leng()
+  if (allocated(a)) deallocate(a)
+  if (Nl>0) then
+    allocate(a(1:Nl))
+    e = 0
+    d => l%d
+    n => l%n
+    do while (associated(d))
+      e = e + 1
+      a(e) = transfer(d,.false.)
+      if (associated(n)) then
+        d => n%d
+        n => n%n
+      else
+        d => null()
+      endif
+    enddo
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine array_link_log
+
   !> @brief Subroutine for freeing (destroying) the list.
   subroutine free_list(l)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2058,6 +2245,24 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine get_list_ch
 
+  !> @brief Subroutine for getting data from the n-th link of list (logical).
+  !> @note If n<1 then the first link data is returned, whereas if n> list's length the last data is returned.
+  !> @note If data is not present the minimum representable value is returned (for error checking).
+  subroutine get_list_log(l,n,d)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_List), intent(IN)::  l !< List.
+  integer(I4P),        intent(IN)::  n !< Element of the list to be found.
+  logical,             intent(OUT):: d !< Link data.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  d = .false.
+  if (associated(l%f)) call l%f%get(n=n,d=d)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine get_list_log
+
 #ifdef r16p
   !> @brief Subroutine for getting a link data from the list head (R16P).
   !> @note If data is not present the minimum representable value is returned (for error checking).
@@ -2188,6 +2393,22 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine geth_list_ch
 
+  !> @brief Subroutine for getting a link data from the list head (logical).
+  !> @note If data is not present the minimum representable value is returned (for error checking).
+  subroutine geth_list_log(l,d)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_List), intent(IN)::  l !< List.
+  logical,             intent(OUT):: d !< Link data.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  d = .false.
+  if (associated(l%f)) call l%f%geth(d=d)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine geth_list_log
+
 #ifdef r16p
   !> @brief Subroutine for getting a link data from the list tail (R16P).
   !> @note If data is not present the minimum representable value is returned (for error checking).
@@ -2317,6 +2538,22 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine gett_list_ch
+
+  !> @brief Subroutine for getting a link data from the list tail (logical).
+  !> @note If data is not present the minimum representable value is returned (for error checking).
+  subroutine gett_list_log(l,d)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_List), intent(IN)::  l !< List.
+  logical,             intent(OUT):: d !< Link data.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  d = .false.
+  if (associated(l%f)) call l%f%gett(d=d)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine gett_list_log
 
 #ifdef r16p
   !> @brief Subroutine for inserting a link into the n-th link of list (R16P).
@@ -2464,6 +2701,24 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine put_list_ch
 
+  !> @brief Subroutine for inserting a link into the n-th link of list (logical).
+  !> @note If n<1 then the data is inserted at first link , whereas if n> list's length the data is inserted at last.
+  subroutine put_list_log(l,n,d)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_List), intent(INOUT)::  l !< List.
+  integer(I4P),        intent(IN)::     n !< Element of the list to be inserted.
+  logical,             intent(IN)::     d !< Link data.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (.not.associated(l%f)) allocate(l%f)
+  call l%f%put(n=n,d=d)
+  l%l = l%l + 1
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine put_list_log
+
 #ifdef r16p
   !> @brief Subroutine for inserting a link data into the list head (R16P).
   subroutine puth_list_R16(l,d)
@@ -2592,6 +2847,22 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine puth_list_ch
+
+  !> @brief Subroutine for inserting a link data into the list head (logical).
+  subroutine puth_list_log(l,d)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_List), intent(INOUT):: l !< List.
+  logical,             intent(IN)::    d !< Data of the current link.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (.not.associated(l%f)) allocate(l%f)
+  call l%f%puth(d=d)
+  l%l = l%l + 1
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine puth_list_log
 
 #ifdef r16p
   !> @brief Subroutine for inserting a link data into the list tail (R16P).
@@ -2723,6 +2994,22 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine putt_list_ch
 
+  !> @brief Subroutine for inserting a link data into the list tail (logical).
+  subroutine putt_list_log(l,d)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_List), intent(INOUT):: l !< List.
+  logical,             intent(IN)::    d !< Data of the current link.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (.not.associated(l%f)) allocate(l%f)
+  call l%f%putt(d=d)
+  l%l = l%l + 1
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine putt_list_log
+
 #ifdef r16p
   !> @brief Subroutine for converting list to array (R16P).
   subroutine array_list_R16(l,a)
@@ -2853,5 +3140,21 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine array_list_ch
+
+  !> @brief Subroutine for converting list to array (logical).
+  subroutine array_list_log(l,a)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SL_List),  intent(IN)::  l    ! List.
+  logical, allocatable, intent(OUT):: a(:) ! Array containing the list.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (associated(l%f)) then
+    if (l%f%homogeneous()) call l%f%array(a=a)
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine array_list_log
   !> @}
 endmodule Data_Type_SL_List

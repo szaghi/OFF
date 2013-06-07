@@ -86,7 +86,7 @@ endtype Type_Tensor
 !> @ingroup Data_Type_TensorGlobalVarPar
 !> @{
 type(Type_Tensor), parameter:: unity = Type_Tensor(ex,ey,ez) !< Unity (identity) tensor
-                                                             !< (see \ref Data_Type_Tensor::Type_Tensor "definition").
+                                                             !< (see \ref data_type_tensor::type_tensor "definition").
 !> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 

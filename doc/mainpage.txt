@@ -104,7 +104,7 @@ The turbulent motion of compressible viscous fluid is described by a system of e
 
 For fluid subjected to external forces and heat sources the above vectors and tensors could be written as:
 
-\f$\overrightarrow U  = \left[ {\begin{array}{*{20}{c}} \rho \\ {\rho \vec v}\\ {\rho E} \end{array}} \right]\f$ \ref Data_Type_Conservative::Type_Conservative "see definition of conservative derived type".
+\f$\overrightarrow U  = \left[ {\begin{array}{*{20}{c}} \rho \\ {\rho \vec v}\\ {\rho E} \end{array}} \right]\f$ \ref data_type_conservative::type_conservative "see definition of conservative derived type".
 
 
 \f$\overline{\overline F}  - \overline{\overline {{Q_S}}}  = \left[ {\begin{array}{*{20}{c}} {\rho \vec v}\\ {\rho \vec v\vec v - \overline{\overline \sigma } }\\ {\rho E\vec v - \overline{\overline \sigma }  \cdot \vec v - k\overrightarrow \nabla  T} \end{array}} \right]\f$
@@ -238,11 +238,11 @@ where the residual function \f$R\left({\overrightarrow U }\right)\f$ is the spac
 
 For computing the numerical fluxes several different solvers are used. It is useful to distinguish between convective and diffusive fluxes:
 
-For the convective fluxes \f$(\overline{\overline F}  - \overline{\overline {{Q_S}}})_{conv}  = \left[ {\begin{array}{*{20}{c}} {\rho \vec v}\\ {\rho \vec v\vec v + p\overline{\overline I } }\\ {(\rho E+p)\vec v } \end{array}} \right]\f$ Riemann Problem solvers are used (see \ref Lib_Riemann "Riemann module library"). High order approximation of numerical fluxes is obtained by means of WENO (Weighted Essentially Non Oscillatory) reconstruction, see \ref Lib_WENO "WENO module library".
+For the convective fluxes \f$(\overline{\overline F}  - \overline{\overline {{Q_S}}})_{conv}  = \left[ {\begin{array}{*{20}{c}} {\rho \vec v}\\ {\rho \vec v\vec v + p\overline{\overline I } }\\ {(\rho E+p)\vec v } \end{array}} \right]\f$ Riemann Problem solvers are used (see \ref lib_riemann "Riemann module library"). High order approximation of numerical fluxes is obtained by means of WENO (Weighted Essentially Non Oscillatory) reconstruction, see \ref lib_weno "WENO module library".
 
 For the diffusive fluxes \f${\left( {\overline{\overline F}  - \overline{\overline {{Q_S}}} } \right)_{diff}} = \left[ {\begin{array}{*{20}{c}} 0\\ { - \overline{\overline \tau } }\\ { - \overline{\overline \tau }  \cdot \vec v - k\overrightarrow \nabla  T} \end{array}} \right]\f$ a standard central second order approximation is used (based on Finite-Volume derivative approximation).
 
-The time integration of the unsteady terms is computed by means of Runge-Kutta schemes, see \ref Lib_Runge_Kutta "Runge-Kutta module library".
+The time integration of the unsteady terms is computed by means of Runge-Kutta schemes, see \ref lib_runge_kutta "Runge-Kutta module library".
 
 For more details see the Application Program Interface (API) pages of this documentation.
 
@@ -261,7 +261,7 @@ A set of sub-models are implemented in order to taking into account other physic
 
 The programming style is similar to Object Oriented Programming (OOP), but it is not a fully OOP code (Fortran 2003 is not fully compliant with OOP). The programming style is based on modules: each derived type has its own module containing the definition of type (object) and the procedures and local/global variables (and parameters) to handle it.  Moreover also the libraries of procedures (e.g. Runge-Kutta, WENO, mesh, fluid dynamics... procedures) are contained in modules.  Everywhere is possible the procedures are nested (OOP encapsulation) into the scope where they are necessary and they are not visible outside that scope. OOP dynamic dispatching by means of generic interfaces has been used when it was considered useful. A very basic OOP inheritance is present among some derived type (e.g. boundary conditions types, vector and tensor types, fluid dynamics ones).  Finally some OOP polymorphism is present.
 
-The basic module that \b all other modules and programs must use it the \ref IR_Precision "IR_Precision portable kinds library".  This module contains a parametric definition of portable (architecture independent) kinds for integers and reals representation. By means of this module the code uses always the same precision (with the same significant digits) for representing numbers independently on what architecture is using.
+The basic module that \b all other modules and programs must use it the \ref ir_precision "IR_Precision portable kinds library".  This module contains a parametric definition of portable (architecture independent) kinds for integers and reals representation. By means of this module the code uses always the same precision (with the same significant digits) for representing numbers independently on what architecture is using.
 
 @section Hierarchy Data Structures Hierarchy
 
@@ -269,9 +269,9 @@ The underling numerical mesh adopted is a multi-blocks (presently without overla
 - Global level data: are data related to all grid blocks; this kind of data has \em global pertinence; there is only one global level allocated variable (instance in OOP view);
 - Block level data: are data related to only one block; this kind of data has \em block pertinence; each block has its own block level data (many instances how are the blocks).
 
-The two above data structures are defined by two derived types contained into the libraries \ref Data_Type_Global "Data_Type_Global" and \ref Data_Type_SBlock "Data_Type_SBlock". The two derived types are:
-- \ref Data_Type_Global::Type_Global;
-- \ref Data_Type_SBlock::Type_SBlock.
+The two above data structures are defined by two derived types contained into the libraries \ref data_type_global "Data_Type_Global" and \ref data_type_sblock "Data_Type_SBlock". The two derived types are:
+- \ref data_type_global::type_global;
+- \ref data_type_sblock::type_sblock.
 Nested to these two derived types are many different kinds of data.
 
 Details of the above types can be found in the <em>Application Program Interface</em> (API) documentation pages.
@@ -282,9 +282,9 @@ type(Type_Block), allocatable:: block(:,:) ! Dimensions [1:Nb,1:Nl] being Nb the
 @endcode
 where the inner index ranges in the blocks number while the outer index ranges in the grid (refinement) levels number. At today a bug afflicts multigrid algorithm thus the use of more different grid levels (Nl>1) is not useful.
 
-Inside the block level data there are a lot of dynamically allocated 3D arrays. The use of nested dynamic data needs a careful treatment of the memory allocated. For those derived types (e.g. boundary conditions and fluid dynamics types) that have dynamic data specific procedures for allocating and freeing the memory have been provided (e.g. see \ref Data_Type_Conservative::free "Type Conservative freeing memory procedure").
+Inside the block level data there are a lot of dynamically allocated 3D arrays. The use of nested dynamic data needs a careful treatment of the memory allocated. For those derived types (e.g. boundary conditions and fluid dynamics types) that have dynamic data specific procedures for allocating and freeing the memory have been provided (e.g. see \ref data_type_conservative::free "Type Conservative freeing memory procedure").
 
-According to the data hierarchy there are procedures that operate on some level of data structure and other on different level.  There are for example procedures operating on whole blocks of some grid level (e.g. see \ref Lib_Fluidynamic::solve_grl and \ref Lib_Fluidynamic::boundary_conditions) and other procedures operating on only one block at time (e.g. see \ref Lib_Fluidynamic::conservative2primitive).
+According to the data hierarchy there are procedures that operate on some level of data structure and other on different level.  There are for example procedures operating on whole blocks of some grid level (e.g. see \ref lib_fluidynamic::solve_grl and \ref lib_fluidynamic::boundary_conditions) and other procedures operating on only one block at time (e.g. see \ref lib_fluidynamic::conservative2primitive).
 
 @page FilesFormat Input Output Files Structures
 
@@ -366,25 +366,25 @@ The options are self explained.
 Among the possible choices it has been chosen to don't use multi-blocks file: each data file contains only one block data. The author thinks that this one-block file template provides more flexibility and an easier file handling with MPI multi-processes simulations.
 
 @subsection MeshFiles Mesh File
-The data contained into mesh files and the format used are defined by \ref Data_Type_SBlock::load_bmesh "loading" and \ref Data_Type_SBlock::save_bmesh "saving" procedures. The mesh files are binary (unformatted) files with the following naming convention:
+The data contained into mesh files and the format used are defined by \ref data_type_sblock::load_bmesh "loading" and \ref data_type_sblock::save_bmesh "saving" procedures. The mesh files are binary (unformatted) files with the following naming convention:
 @code
 mesh_base_name.g##.b###.geo
 @endcode
-where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific \ref Data_Type_Global::file_name "procedure".
+where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific \ref data_type_global::file_name "procedure".
 
 @subsection BCFiles Boundary Conditions File
-The data contained into boundary conditions files and the format used are defined by \ref Data_Type_SBlock::load_bbc "loading" and \ref Data_Type_SBlock::save_bbc "saving" procedures. The boundary conditions files are binary (unformatted) files with the following naming convention:
+The data contained into boundary conditions files and the format used are defined by \ref data_type_sblock::load_bbc "loading" and \ref data_type_sblock::save_bbc "saving" procedures. The boundary conditions files are binary (unformatted) files with the following naming convention:
 @code
 bc_base_name.g##.b###.bco
 @endcode
-where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific \ref Data_Type_Global::file_name "procedure".
+where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific \ref data_type_global::file_name "procedure".
 
 @subsection SolFiles Solution File
-The data contained into solution files and the format used are defined by \ref Data_Type_SBlock::load_bfluid "loading" and \ref Data_Type_SBlock::save_bfluid "saving" procedures. The solution files are binary (unformatted) files with the following naming convention:
+The data contained into solution files and the format used are defined by \ref data_type_sblock::load_bfluid "loading" and \ref data_type_sblock::save_bfluid "saving" procedures. The solution files are binary (unformatted) files with the following naming convention:
 @code
 sol_base_name.g##.b###.geo
 @endcode
-where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific \ref Data_Type_Global::file_name "procedure".
+where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific \ref data_type_global::file_name "procedure".
 
 @page Compiling Compiling Instruction
 @off has been developed on GNU/Linux architectures. Other OS are not supported (and in general there is no best alternative to

@@ -86,11 +86,11 @@ endtype Type_Vector_Ptr
 !> @ingroup Data_Type_VectorGlobalVarPar
 !> @{
 type(Type_Vector), parameter:: ex = Type_Vector(1._R8P,0._R8P,0._R8P) !< X direction versor
-                                                                      !< (see \ref Data_Type_Vector::Type_Vector "definition").
+                                                                      !< (see \ref data_type_vector::type_vector "definition").
 type(Type_Vector), parameter:: ey = Type_Vector(0._R8P,1._R8P,0._R8P) !< Y direction versor
-                                                                      !< (see \ref Data_Type_Vector::Type_Vector "definition").
+                                                                      !< (see \ref data_type_vector::type_vector "definition").
 type(Type_Vector), parameter:: ez = Type_Vector(0._R8P,0._R8P,1._R8P) !< Z direction versor
-                                                                      !< (see \ref Data_Type_Vector::Type_Vector "definition").
+                                                                      !< (see \ref data_type_vector::type_vector "definition").
 !> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 

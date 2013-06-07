@@ -72,7 +72,7 @@ contains
   !> @{
   !> Subroutine for initializing Runge-Kutta coefficients.
   !> @note
-  !> Currently 5 different schemes are available whose coefficients are (see \ref Lib_Runge_Kutta "definition" in Runge-Kutta
+  !> Currently 5 different schemes are available whose coefficients are (see \ref lib_runge_kutta "definition" in Runge-Kutta
   !> library):
   !> - <b> 1 stage</b>: Forward Euler, one stage, \f$1^{st}\f$ order \n
   !>   - \f$ c_1 = \left[1\right]\f$

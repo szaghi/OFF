@@ -47,7 +47,7 @@ public:: tokenize
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @ingroup Lib_IO_MiscGlobalVarPar
-type(Type_OS):: OS !< OS definition (see \ref Data_Type_OS::Type_OS "definition").
+type(Type_OS):: OS !< OS definition (see \ref data_type_os::type_os "definition").
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @ingroup Lib_IO_MiscPublicProcedure

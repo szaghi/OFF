@@ -2235,7 +2235,7 @@ contains
   implicit none
   class(Type_SL_List), intent(IN)::  l !< List.
   integer(I4P),        intent(IN)::  n !< Element of the list to be found.
-  character(*),        intent(OUT):: d ! Link data.
+  character(*),        intent(OUT):: d !< Link data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

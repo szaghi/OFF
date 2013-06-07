@@ -69,9 +69,9 @@ contains
   pure subroutine prim2cons(prim,cons)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Primitive),    intent(IN)::    prim !< Primitive variables (see \ref Data_Type_Primitive::Type_Primitive
+  type(Type_Primitive),    intent(IN)::    prim !< Primitive variables (see \ref data_type_primitive::type_primitive
                                                 !< "Type_Primitive" definition).
-  type(Type_Conservative), intent(INOUT):: cons !< Conservative variables (see \ref Data_Type_Conservative::Type_Conservative
+  type(Type_Conservative), intent(INOUT):: cons !< Conservative variables (see \ref data_type_conservative::type_conservative
                                                 !< "Type_Conservative" definition).
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -100,10 +100,10 @@ contains
   real(R_P),               intent(IN)::    cp0(:)                  !< Specific heat at constant p of initial species.
   real(R_P),               intent(IN)::    cv0(:)                  !< Specific heat at constant v of initial species.
   type(Type_Conservative), intent(IN)::    cons                    !< Conservative variables (see
-                                                                   !< \ref Data_Type_Conservative::Type_Conservative
+                                                                   !< \ref data_type_conservative::type_conservative
                                                                    !< "Type_Conservative" definition).
   type(Type_Primitive),    intent(INOUT):: prim                    !< Primitive variables (see
-                                                                   !< \ref Data_Type_Primitive::Type_Primitive "Type_Primitive"
+                                                                   !< \ref data_type_primitive::type_primitive "Type_Primitive"
                                                                    !< definition).
   real(R_P)::                              c(1:size(cp0(:),dim=1)) !< Species concentration.
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -125,7 +125,7 @@ contains
   subroutine primitive2conservative(block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_SBlock), intent(INOUT):: block !< Block-level data (see \ref Data_Type_SBlock::Type_SBlock "Type_SBlock" definition).
+  type(Type_SBlock), intent(INOUT):: block !< Block-level data (see \ref data_type_sblock::type_sblock "Type_SBlock" definition).
   integer(I_P)::                     i,j,k !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -183,7 +183,7 @@ contains
   subroutine conservative2primitive(block)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_SBlock), intent(INOUT):: block  !< Block-level data (see \ref Data_Type_SBlock::Type_SBlock "Type_SBlock" definition).
+  type(Type_SBlock), intent(INOUT):: block  !< Block-level data (see \ref data_type_sblock::type_sblock "Type_SBlock" definition).
   integer(I_P)::                     i,j,k  !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -1173,7 +1173,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I_P),      intent(IN)::    l         !< Current grid level.
-  type(Type_SBlock), intent(INOUT):: block(1:) !< Block-level data(see \ref Data_Type_SBlock::Type_SBlock "Type_SBlock" definition).
+  type(Type_SBlock), intent(INOUT):: block(1:) !< Block-level data(see \ref data_type_sblock::type_sblock "Type_SBlock" definition).
   type(Type_Global), pointer::       global    !< Global-level data.
   real(R_P), allocatable::           Dtmin(:)  !< Min t step of actual process for each blk.
   real(R_P)::                        DtminL    !< Min t step of actual process over all blks.

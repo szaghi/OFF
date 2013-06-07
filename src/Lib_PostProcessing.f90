@@ -58,7 +58,7 @@ type, public:: Type_PP_Format
 endtype Type_PP_Format
 !> @ingroup Lib_PostProcessingGlobalVarPar
 !> @{
-type(Type_PP_Format):: pp_format !< Post-processing format options (see \ref Lib_PostProcessing::Type_PP_Format "definition").
+type(Type_PP_Format):: pp_format !< Post-processing format options (see \ref lib_postprocessing::type_pp_format "definition").
 !> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains

@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['e',['E',['../d6/dec/group__Library.html#aff885a7d609a2fe6b3081ec681f23cec',1,'Lib_Thermodynamic_Laws_Ideal']]],
-  ['eq',['eq',['../dd/d55/group__Interface.html#a4f88e6ff9c8699e4d8a6e4f89667b7cf',1,'Data_Type_Time::operator(==)::eq()'],['../db/d28/group__Data__Type__TimePrivateProcedure.html#ga1d1ed67e1ffe4725d82d549e5b1a0099',1,'Data_Type_Time::eq()']]]
+  ['e',['e',['../dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga5d31eca5ba59325c74195eeb96a3e4c8',1,'lib_thermodynamic_laws_ideal']]],
+  ['encode_5fbits',['encode_bits',['../db/d1c/group__Lib__Base64PrivateProcedure.html#ga9018ec10f231c44a3fb5e6e8c66b8e1b',1,'lib_base64']]],
+  ['eq',['eq',['../dc/d3b/group__Data__Type__TimeInterface.html#a0143d4f3efab762614553d37d2ce0e13',1,'data_type_time::operator(==)::eq()'],['../db/d28/group__Data__Type__TimePrivateProcedure.html#gab837e4285bb63f8ef710914f514b761d',1,'data_type_time::eq()']]]
 ];

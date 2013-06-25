@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['z_5fwavesspeed14',['Z_WavesSpeed14',['../d6/dec/group__Library.html#a8dfc7609a7ea892e815b0566c1b555a5',1,'Lib_Riemann']]]
+  ['z_5fwavesspeed14',['z_wavesspeed14',['../d3/da1/group__Lib__RiemannPrivateProcedure.html#ga494cafb07c0ca522c44f6b632d44da0c',1,'lib_riemann']]]
 ];

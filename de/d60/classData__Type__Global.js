@@ -1,13 +1,22 @@
 var classData__Type__Global =
 [
-    [ "Block_File_Name", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#ga5c6f7bb7f2caa2b3b5a66c9c1c5e7d44", null ],
-    [ "Block_Step_File_Name", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#ga5c7422b00d180b098a8e7de4cdd40662", null ],
-    [ "Block_Flip_File_Name", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#ga389c4973fc706abf5efb691f3dbe6313", null ],
-    [ "compute_values0", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#ga7993630caa5ee8936f47c496c45ed757", null ],
-    [ "alloc_gbc", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#gadc447f6454ca3c4f135bf9ee691f0bde", null ],
-    [ "alloc_gfluid", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#gae11c09cd10deac586d1fdaf39b3bfcfd", null ],
-    [ "load_gbc_in1", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#ga6b05743621938f85dc2a857d684def04", null ],
-    [ "load_gfluid_soption", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#ga5dd4ed952dc5d2e6baf3a86af6401185", null ],
-    [ "load_gfluid_Ns", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#ga7b9ed884458bf114bfc4ee8b71dd424e", null ],
-    [ "load_gfluid_0species", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#ga4a5c3f49ed3e1d5d6aecf35f2a193185", null ]
+    [ "Re", "de/d60/classData__Type__Global.html#a3ca560e354b7164909b08c861df41724", null ],
+    [ "Fr", "de/d60/classData__Type__Global.html#ae359e210f9a7910679179828db08bb78", null ],
+    [ "Pr", "de/d60/classData__Type__Global.html#a8f0ee54e287d2b8b727d671a638d8f61", null ],
+    [ "L0", "de/d60/classData__Type__Global.html#a134863c1c96c3a5701b43a9a025a27a9", null ],
+    [ "r0", "de/d60/classData__Type__Global.html#a5595be385675a361ef02857f587b9758", null ],
+    [ "v0", "de/d60/classData__Type__Global.html#a1ea8c32a072a2ec2dee74385b0925a2c", null ],
+    [ "c0", "de/d60/classData__Type__Global.html#a515fbaa235e1be94a157cc402a693eee", null ],
+    [ "mu0", "de/d60/classData__Type__Global.html#a0a9b6f19cd634489cd0cbb350ed2d3ec", null ],
+    [ "f0", "de/d60/classData__Type__Global.html#a4dd47a26b31625ba9692af9bf1666bdc", null ],
+    [ "k0", "de/d60/classData__Type__Global.html#aa4160b771c9f5039c53a5efb32ec0015", null ],
+    [ "Dt0", "de/d60/classData__Type__Global.html#a72353e538cd021fa7a1f42463d2292a0", null ],
+    [ "p0", "de/d60/classData__Type__Global.html#aaf82c02d1349f124aacef0ef80502a0f", null ],
+    [ "a0", "de/d60/classData__Type__Global.html#a6e660cfc17cec51d2ade4bc0b4d5cfd5", null ],
+    [ "T0", "de/d60/classData__Type__Global.html#a4e9581bd6a3b1b598e18dd6ab6e2aee2", null ],
+    [ "E0", "de/d60/classData__Type__Global.html#a732f2486391a92b9d37f7e53d6cfa4be", null ],
+    [ "q0", "de/d60/classData__Type__Global.html#ac3e2326a90880fbdcea582ec3478cb80", null ],
+    [ "Re_inv", "de/d60/classData__Type__Global.html#af4a20a61500dde5339cc21f42ceaabaf", null ],
+    [ "Fr2_inv", "de/d60/classData__Type__Global.html#ac18f185b36396c045008f758ec6196d4", null ],
+    [ "PrRe_inv", "de/d60/classData__Type__Global.html#a6087b09cd5ab2bcfd49d6545358725d0", null ]
 ];

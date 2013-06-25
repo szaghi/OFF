@@ -42,318 +42,340 @@
 \form#41:$\frac{1}{\rm{Re}}$
 \form#42:$\frac{1}{\rm{Fr}^2}$
 \form#43:$\frac{1}{\rm{Pr Re}}$
-\form#44:$ \gamma = \frac{c_p}{c_v} $
-\form#45:$ {\rm result\%r = prim1\%r*prim2\%r} $
-\form#46:$ {\rm result\%v = prim1\%v*prim2\%v} $
-\form#47:$ {\rm result\%p = prim1\%p*prim2\%p} $
-\form#48:$ {\rm result\%d = prim1\%d*prim2\%d} $
-\form#49:$ {\rm result\%g = prim1\%g*prim2\%g} $
-\form#50:$ {\rm result\%r = prim\%r*scalar} $
-\form#51:$ {\rm result\%v = prim\%v*scalar} $
-\form#52:$ {\rm result\%p = prim\%p*scalar} $
-\form#53:$ {\rm result\%d = prim\%d*scalar} $
-\form#54:$ {\rm result\%g = prim\%g*scalar} $
-\form#55:$ {\rm result\%r = \frac{prim1\%r}{prim2\%r}} $
-\form#56:$ {\rm result\%v = \frac{prim1\%v}{prim2\%v}} $
-\form#57:$ {\rm result\%p = \frac{prim1\%p}{prim2\%p}} $
-\form#58:$ {\rm result\%d = \frac{prim1\%d}{prim2\%d}} $
-\form#59:$ {\rm result\%g = \frac{prim1\%g}{prim2\%g}} $
-\form#60:$ {\rm result\%r = \frac{prim\%r}{scalar}} $
-\form#61:$ {\rm result\%v = \frac{prim\%v}{scalar}} $
-\form#62:$ {\rm result\%p = \frac{prim\%p}{scalar}} $
-\form#63:$ {\rm result\%d = \frac{prim\%d}{scalar}} $
-\form#64:$ {\rm result\%g = \frac{prim\%g}{scalar}} $
-\form#65:$ {\rm result\%r = prim1\%r+prim2\%r} $
-\form#66:$ {\rm result\%v = prim1\%v+prim2\%v} $
-\form#67:$ {\rm result\%p = prim1\%p+prim2\%p} $
-\form#68:$ {\rm result\%d = prim1\%d+prim2\%d} $
-\form#69:$ {\rm result\%g = prim1\%g+prim2\%g} $
-\form#70:$ {\rm result\%r = prim\%r+scalar} $
-\form#71:$ {\rm result\%v = prim\%v+scalar} $
-\form#72:$ {\rm result\%p = prim\%p+scalar} $
-\form#73:$ {\rm result\%d = prim\%d+scalar} $
-\form#74:$ {\rm result\%g = prim\%g+scalar} $
-\form#75:$ {\rm result\%r = prim1\%r-prim2\%r} $
-\form#76:$ {\rm result\%v = prim1\%v-prim2\%v} $
-\form#77:$ {\rm result\%p = prim1\%p-prim2\%p} $
-\form#78:$ {\rm result\%d = prim1\%d-prim2\%d} $
-\form#79:$ {\rm result\%g = prim1\%g-prim2\%g} $
-\form#80:$ {\rm result\%r = scalar-prim\%r} $
-\form#81:$ {\rm result\%v = scalar-prim\%v} $
-\form#82:$ {\rm result\%p = scalar-prim\%p} $
-\form#83:$ {\rm result\%d = scalar-prim\%d} $
-\form#84:$ {\rm result\%g = scalar-prim\%g} $
-\form#85:$ {\rm result\%r = prim\%r-scalar} $
-\form#86:$ {\rm result\%v = prim\%v-scalar} $
-\form#87:$ {\rm result\%p = prim\%p-scalar} $
-\form#88:$ {\rm result\%d = prim\%d-scalar} $
-\form#89:$ {\rm result\%g = prim\%g-scalar} $
-\form#90:$ T_{ij}=\left[{\begin{array}{*{20}{c}}t_{11}&t_{12}&t_{13}\\ t_{21}&t_{22}&t_{23}\\ t_{31}&t_{32}&t_{33}\end{array}}\right] =\left[{\begin{array}{*{20}{c}} {x\% x}&{x\% y}&{x\% z}\\ {y\% x}&{y\% y}&{y\% z}\\ {z\% x}&{z\% y}&{z\% z}\end{array}}\right]$
-\form#91:$ {\rm result\%x = ten1\%x*ten2\%x} $
-\form#92:$ {\rm result\%y = ten1\%y*ten2\%y} $
-\form#93:$ {\rm result\%z = ten1\%z*ten2\%z} $
-\form#94:$ {\rm result\%x = ten\%x*scalar} $
-\form#95:$ {\rm result\%y = ten\%y*scalar} $
-\form#96:$ {\rm result\%z = ten\%z*scalar} $
-\form#97:$ {\rm result\%x = \frac{ten1\%x}{ten2\%x}} $
-\form#98:$ {\rm result\%y = \frac{ten1\%y}{ten2\%y}} $
-\form#99:$ {\rm result\%z = \frac{ten1\%z}{ten2\%z}} $
-\form#100:$ {\rm result\%x = \frac{ten\%x}{scalar}} $
-\form#101:$ {\rm result\%y = \frac{ten\%y}{scalar}} $
-\form#102:$ {\rm result\%z = \frac{ten\%z}{scalar}} $
-\form#103:$ {\rm result\%x = ten1\%x+ten2\%x} $
-\form#104:$ {\rm result\%y = ten1\%y+ten2\%y} $
-\form#105:$ {\rm result\%z = ten1\%z+ten2\%z} $
-\form#106:$ {\rm result\%x = ten\%x+scalar} $
-\form#107:$ {\rm result\%y = ten\%y+scalar} $
-\form#108:$ {\rm result\%z = ten\%z+scalar} $
-\form#109:$ {\rm result\%x = ten1\%x-ten2\%x} $
-\form#110:$ {\rm result\%y = ten1\%y-ten2\%y} $
-\form#111:$ {\rm result\%z = ten1\%z-ten2\%z} $
-\form#112:$ {\rm result\%x = scalar-ten\%x} $
-\form#113:$ {\rm result\%y = scalar-ten\%y} $
-\form#114:$ {\rm result\%z = scalar-ten\%z} $
-\form#115:$ {\rm result\%x = ten\%x-scalar} $
-\form#116:$ {\rm result\%y = ten\%y-scalar} $
-\form#117:$ {\rm result\%z = ten\%z-scalar} $
-\form#118:$ \det = \left| {\begin{array}{*{20}{c}} {x\% x}&{x\% y}&{x\% z}\\ {y\% x}&{y\% y}&{y\% z}\\ {z\% x}&{z\% y}&{z\% z} \end{array}} \right| = $
-\form#119:$=x\%x(z\%z\cdot y\%y-z\%y\cdot y\%z)-$
-\form#120:$ y\%x(z\%z\cdot x\%y-z\%y\cdot x\%z)+$
-\form#121:$ z\%x(y\%z\cdot x\%y-y\%y\cdot x\%z) $
-\form#122:$ T_{ij}^{ - 1} = \frac{1}{{\det (T)}}\left[ {\begin{array}{*{20}{c}} {z\%z\cdot y\%y-z\%y\cdot y\%z}&{-(z\%z\cdot x\%y-z\%y\cdot x\%z)}&{y\%z\cdot x\%y-y\%y\cdot x\%z}\\{-(z\%z\cdot y\%x- z\%x\cdot y\%z)}&{z\%z\cdot x\%x-z\%x\cdot x\%z}&{-(y\%z\cdot x\%x-y\%x\cdot x\%z)}\\{z\%y\cdot y\%x-z\%x\cdot y\%y}&{-(z\%y \cdot x\%x-z\%x\cdot x\%y)}&{y\%y\cdot x\%x-y\%x\cdot x\%y} \end{array}} \right]$
-\form#123:$ N = x_x^2 + x_y^2 + x_z^2 + y_x^2 + y_y^2 + y_z^2 +...$
-\form#124:$N = \sqrt {x_x^2 + x_y^2 + x_z^2 + y_y^2 + y_z^2 +...}$
-\form#125:$ {\rm result\%x = vec1\%x*vec2\%x} $
-\form#126:$ {\rm result\%y = vec1\%y*vec2\%y} $
-\form#127:$ {\rm result\%z = vec1\%z*vec2\%z} $
-\form#128:$ {\rm result\%x = vec\%x*scalar} $
-\form#129:$ {\rm result\%y = vec\%y*scalar} $
-\form#130:$ {\rm result\%z = vec\%z*scalar} $
-\form#131:$ {\rm result\%x = \frac{vec1\%x}{vec2\%x}} $
-\form#132:$ {\rm result\%y = \frac{vec1\%y}{vec2\%y}} $
-\form#133:$ {\rm result\%z = \frac{vec1\%z}{vec2\%z}} $
-\form#134:$ {\rm result\%x = \frac{vec\%x}{scalar}} $
-\form#135:$ {\rm result\%y = \frac{vec\%y}{scalar}} $
-\form#136:$ {\rm result\%z = \frac{vec\%z}{scalar}} $
-\form#137:$ {\rm result\%x = vec1\%x+vec2\%x} $
-\form#138:$ {\rm result\%y = vec1\%y+vec2\%y} $
-\form#139:$ {\rm result\%z = vec1\%z+vec2\%z} $
-\form#140:$ {\rm result\%x = vec\%x+scalar} $
-\form#141:$ {\rm result\%y = vec\%y+scalar} $
-\form#142:$ {\rm result\%z = vec\%z+scalar} $
-\form#143:$ {\rm result\%x = vec1\%x-vec2\%x} $
-\form#144:$ {\rm result\%y = vec1\%y-vec2\%y} $
-\form#145:$ {\rm result\%z = vec1\%z-vec2\%z} $
-\form#146:$ {\rm result\%x = scalar-vec\%x} $
-\form#147:$ {\rm result\%y = scalar-vec\%y} $
-\form#148:$ {\rm result\%z = scalar-vec\%z} $
-\form#149:$ {\rm result\%x = vec\%x-scalar} $
-\form#150:$ {\rm result\%y = vec\%y-scalar} $
-\form#151:$ {\rm result\%z = vec\%z-scalar} $
-\form#152:$ N = x^2 + y^2 + z^2$
-\form#153:$N = \sqrt {x^2 + y^2 + z^2 }$
-\form#154:$[10^{-307} , 10^{+307} - 1]$
-\form#155:$[10^{-37} , 10^{+37} - 1]$
-\form#156:$[-2^{63},+2^{63} - 1]$
-\form#157:$[-2^{31},+2^{31} - 1]$
-\form#158:$[-2^{15},+2^{15} - 1]$
-\form#159:$[-2^{7} ,+2^{7} - 1]$
-\form#160:$|_{conservative} =\left| \rho_s\right|_{primitive}$
-\form#161:$|_{conservative} = \left| \rho \vec V \right|_{primitive}$
-\form#162:$|_{conservative}=\left|\frac{p}{\gamma-1}+\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right|_{primitive}$
-\form#163:$|_{primitive} =\left| \rho_s\right|_{conservative}$
-\form#164:$|_{primitive} =\left|\sum_{s=1}^{Ns}\rho_s\right|_{conservative}$
-\form#165:$|_{primitive}=\left|\frac{\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cp_s^0}} {\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cv_s^0}}\right|_{conservative}$
-\form#166:$|_{primitive} =\left|\frac{\vec momentum}{\rho}\right|_{conservative}$
-\form#167:$|_{primitive}=\left|(\gamma-1)\left[energy-\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right]\right|_{conservative}$
-\form#168:$cp_s^0,cv_s^0$
-\form#169:$ c^0 $
-\form#170:$ c^1 $
-\form#171:$ c^N $
-\form#172:$ \begin{array}{*{20}{c}} P^0 = P^1 \\ P_{\vec v\cdot \vec n}^0 = - P_{\vec v\cdot \vec n}^1\end{array} $
-\form#173:$ P^0 = P^1 $
-\form#174:$ P^0 = P^N $
-\form#175:$ P^0 = P^a $
-\form#176:$ P^0 = P^{in1} $
-\form#177:$P$
-\form#178:$A=R \Lambda L$
-\form#179:$ \frac{\partial P}{\partial t} + R \Lambda L \frac{\partial P}{\partial n} = 0$
-\form#180:$\Lambda$
-\form#181:$u$
-\form#182:$\vec i$
-\form#183:$\frac{{\partial u}}{{\partial i}} =\frac{1}{V}\sum\limits_{f = 1}^6 {{u_f}\overrightarrow {{n_f}} \cdot \vec i\,{S_f}}$
-\form#184:$V$
-\form#185:$\overrightarrow {{n_f}}$
-\form#186:$f^{th}$
-\form#187:$S_f$
-\form#188:$\pi $
-\form#189:$(\overline{\overline F} - \overline{\overline {{Q_S}}})_{conv} $
-\form#190:$p_1,\rho_1,u_1,\gamma_1$
-\form#191:$p_4,\rho_4,u_4,\gamma_4$
-\form#192:$F_r$
-\form#193:$F_u$
-\form#194:$F_E$
-\form#195:$ u_t = R(t,u) $
-\form#196:$ u^{n+1} = u^n +\Delta t \sum_{s=1}^{Ns}c_1^s K^s $
-\form#197:$K^s$
-\form#198:$s^{th}$
-\form#199:$ K^s = R\left( t^n+c_3^s \Delta t, u^n +\Delta t \sum_{i=1}^{s-1}c_2^{s,i} K^i \right) $
-\form#200:$s-1$
-\form#201:$c_1$
-\form#202:$c_2$
-\form#203:$c_3$
-\form#204:$\begin{array}{l} \begin{array}{*{20}{c}} {c_3^1}\\ {c_3^2}\\ \vdots \\ {c_3^{Ns}} \end{array}\left| \!{\underline {\, {\begin{array}{*{20}{c}} {c_2^{1,1}}&{c_2^{1,2}}& \cdots &{c_2^{1,Ns}}\\ {c_2^{2,1}}&{c_2^{2,2}}& \cdots &{c_2^{1,Ns}}\\ \vdots & \vdots & \ddots & \vdots \\ {c_2^{Ns,1}}&{c_2^{Ns,2}}& \ldots &{c_2^{Ns,Ns}} \end{array}} \,}} \right. \\ \begin{array}{*{20}{c}} {\;\;\;\;\;\;\;}&{c_1^1}&{\;\;\;\;\;c_1^2}&{\;\;\;\;\; \cdots }&{c_1^{Ns}} \end{array} \end{array}$
-\form#205:$\begin{array}{l} \begin{array}{*{20}{c}} {c_3^1}\\ {c_3^1}\\ \vdots \\ {c_3^{Ns}} \end{array}\left| \!{\underline {\, {\begin{array}{*{20}{c}} 0&0& \cdots &0\\ {c_2^{2,1}}&0& \cdots &0\\ \vdots & \vdots & \ddots & \vdots \\ {c_2^{Ns,1}}&{c_2^{Ns,2}}& \ldots &0 \end{array}} \,}} \right. \\ \begin{array}{*{20}{c}} {\;\;\;\;\;\;\;}&{c_1^1}&{\;\;\;\;\;c_1^2}&{\;\;\;\;\; \cdots }&{c_1^{Ns}} \end{array} \end{array}$
-\form#206:$ c_3^s = \sum_{i=1}^{Ns}c_2^{s,i} $
-\form#207:$1^{st}$
-\form#208:$ c_1 = \left[1\right]$
-\form#209:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0 \end{array}} \right] $
-\form#210:$ c_3 = \left[0\right]$
-\form#211:$2^{nd}$
-\form#212:$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{1}{2}&\frac{1}{2} \end{array}} \right] $
-\form#213:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0\\ 1&0 \end{array}} \right] $
-\form#214:$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \end{array}} \right] $
-\form#215:$3^{rd}$
-\form#216:$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{1}{6}&\frac{1}{6}&\frac{1}{3} \end{array}} \right] $
-\form#217:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0&0\\ 1&0&0\\ \frac{1}{4}&\frac{1}{4}&0 \end{array}} \right] $
-\form#218:$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \\ \frac{1}{2} \end{array}} \right] $
-\form#219:$4^{rd}$
-\form#220:$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{55}{108}&\frac{1}{3}&\frac{1}{3}&\frac{1}{6} \end{array}} \right] $
-\form#221:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0&0&0\\ 1&0&0&0\\ \frac{1}{4}&\frac{1}{2}&0&0\\ \frac{5}{18}&0&1&0 \end{array}} \right] $
-\form#222:$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \\ \frac{3}{4} \\ \frac{23}{18} \end{array}} \right] $
-\form#223:$ c_1 = \left[ {\begin{array}{*{20}{c}} 0.14681187618661&0.24848290924556&0.10425883036650&0.27443890091960& 0.22600748319395 \end{array}} \right] $
-\form#224:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0&0&0&0 \\ 0.39175222700392&0&0&0&0 \\ 0.21766909633821&0.36841059262959&0&0&0 \\ 0.08269208670950& 0.13995850206999&0.25189177424738&0&0 \\ 0.06796628370320&0.11503469844438&0.20703489864929&0.54497475021237&0 \end{array}} \right] $
-\form#225:$ c_3 = \left[ {\begin{array}{*{20}{c}} 0\\0.39175222700392\\0.58607968896780\\0.47454236302687\\0.93501063100924 \end{array}} \right] $
-\form#226:$s1^{th}$
-\form#227:$u^{n+1}$
-\form#228:$\rho$
-\form#229:$\gamma=\frac{{c_p}}{{c_v}}$
-\form#230:$ E = \frac{p}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
-\form#231:$ H = \frac{{\gamma p}}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
-\form#232:$dc = dc = \sum\limits_{i = 1}^{NC} {nvertex_i }$
-\form#233:$dc=8+5=13$
-\form#234:$1^\circ$
-\form#235:$2^\circ$
-\form#236:$3^\circ$
-\form#237:$4^\circ$
-\form#238:$5^\circ$
-\form#239:$6^\circ$
-\form#240:$7^\circ$
-\form#241:$8^\circ$
-\form#242:$offset_c=\sum\limits_{i=1}^{c}{nvertex_i}$
-\form#243:$offset_c$
-\form#244:$c^{th}$
-\form#245:$nvertex_i$
-\form#246:$i^{th}$
-\form#247:$dc = NC + \sum\limits_{i = 1}^{NC} {nvertex_i }$
-\form#248:$dc$
-\form#249:$dc=2+8+5=15$
-\form#250:$2^\circ $
-\form#251:$P^{th}$
-\form#252:$2S^{th}$
-\form#253:$2S^{th}-1$
-\form#254:$\gamma,\eta,\chi$
-\form#255:$5^{th}$
-\form#256:$7^{th}$
-\form#257:$4^{th}$
-\form#258:$\frac{\partial }{{\partial t}}\int\limits_V {\overrightarrow U dV} + \oint\limits_{S(V)} {\overline{\overline F} \cdot \overrightarrow n dS} = \int\limits_V {\overrightarrow {{Q_V}} dV} + \oint\limits_{S(V)} {\overline{\overline {{Q_S}}} \cdot \overrightarrow n dS} $
-\form#259:$S(V)$
-\form#260:$\vec n$
-\form#261:$\overrightarrow U $
-\form#262:$\overline{\overline F}$
-\form#263:$\overrightarrow{Q_V}$
-\form#264:$\overline{\overline{Q_S}}$
-\form#265:$\overrightarrow U = \left[ {\begin{array}{*{20}{c}} \rho \\ {\rho \vec v}\\ {\rho E} \end{array}} \right]$
-\form#266:$\overline{\overline F} - \overline{\overline {{Q_S}}} = \left[ {\begin{array}{*{20}{c}} {\rho \vec v}\\ {\rho \vec v\vec v - \overline{\overline \sigma } }\\ {\rho E\vec v - \overline{\overline \sigma } \cdot \vec v - k\overrightarrow \nabla T} \end{array}} \right]$
-\form#267:$\overrightarrow {{Q_V}} = \left[ {\begin{array}{*{20}{c}} 0\\ {\rho \overrightarrow {{f_e}} }\\ {\rho \overrightarrow {{f_e}} \cdot \vec v + {q_h}} \end{array}} \right]$
-\form#268:$\vec v$
-\form#269:$\vec v \vec v$
-\form#270:$\vec u\vec v = \left[ {\begin{array}{*{20}{c}} {{u_1}{v_1}} & {{u_1}{v_2}} & {{u_1}{v_3}} \\ {{u_2}{v_1}} & {{u_2}{v_2}} & {{u_2}{v_3}} \\ {{u_3}{v_1}} & {{u_3}{v_2}} & {{u_3}{v_3}} \end{array}} \right]$
-\form#271:$E$
-\form#272:$T$
-\form#273:$\overline{\overline \sigma}$
-\form#274:$k$
-\form#275:$-k\overrightarrow \nabla T$
-\form#276:$\overrightarrow{{f_e}}$
-\form#277:$q_h$
-\form#278:$ \overline{\overline \sigma} = -p\overline{\overline I}+ \overline{\overline \tau}$
-\form#279:$p$
-\form#280:$\overline{\overline I}$
-\form#281:$\overline{\overline \tau}$
-\form#282:${\tau _{ij}} = \mu \left( {{\partial _i}{v_j} + {\partial _j}{v_i}} \right) + \lambda \left( {\overrightarrow \nabla \cdot \vec v} \right){\delta _{ij}}$
-\form#283:$\mu$
-\form#284:$\lambda = -\frac{2}{3}\mu$
-\form#285:$\delta_{ij}$
-\form#286:${\delta _{ij}} = \left\{ {\begin{array}{*{20}{c}} {0{\rm{,}}\;{\rm{if}}\;i \ne j}\\ {{\rm{1,}}\;{\rm{if}}\;i = j} \end{array}} \right.$
-\form#287:$\overline{\overline \tau } = 2\mu \frac{1}{2}\left( {\overrightarrow \nabla \vec v + \overrightarrow \nabla {{\vec v}^T}} \right) + \lambda \left( {\overrightarrow \nabla \cdot \vec v} \right)\overline{\overline I} $
-\form#288:$ \frac{1}{2}\left( {\overrightarrow \nabla \vec v + \overrightarrow \nabla {{\vec v}^T}} \right)$
-\form#289:$ p = \rho R T$
-\form#290:$R$
-\form#291:$\begin{array}{*{20}{c}}\gamma = \frac{c_p}{c_v} \\ R = c_p -c_v \\ c_p = \frac{\gamma R}{\gamma -1} \\ c_p = \frac{R}{\gamma -1} \end{array}$
-\form#292:$ E = c_v T + \frac{|\vec v|^2}{2} = \frac{p}{\rho(\gamma-1)} + \frac{|\vec v|^2}{2}$
-\form#293:$ a = \sqrt{\frac{\gamma p}{\rho}} $
-\form#294:$ H = c_p T + \frac{|\vec v|^2}{2} = \frac{\gamma p}{\rho(\gamma-1)} + \frac{|\vec v|^2}{2}= \frac{a^2}{\gamma-1} + \frac{|\vec v|^2}{2}$
-\form#295:$x'=\frac{x}{x_0}$
-\form#296:$x$
-\form#297:$x_0$
-\form#298:$ \begin{array}{l} \frac{{{\rho _0}L_0^3}}{{{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'} + {\rho _0}{v_0}L_0^2\oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \cdot \vec ndS'} = 0\\ \frac{{{\rho _0}{v_0}L_0^3}}{{{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'} + {\rho _0}v_0^2L_0^2\oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \overrightarrow {v'} \cdot \vec ndS'} + {p_0}L_0^2\oint\limits_{S'(V')} {p'\overline{\overline I} \cdot \vec ndS'} - {\tau _0}L_0^2\oint\limits_{S'(V')} {\overline{\overline {\tau '}} \cdot \vec ndS'} = {\rho _0}{f_0}L_0^3\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ \frac{{{\rho _0}{E_0}L_0^3}}{{{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'} + {\rho _0}{E_0}{v_0}L_0^2\oint\limits_{S'(V')} {\rho 'E'\overrightarrow {v'} \cdot \vec ndS'} + {p_0}L_0^2\oint\limits_{S'(V')} {p'\overrightarrow {v'} \cdot \vec ndS'} - {\tau _0}{v_0}L_0^2\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}} \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'} + \\ -\frac{{{k_0}{T_0}L_0^2}}{{{L_0}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'} = {\rho _0}{f_0}{v_0}L_0^3\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} \cdot \overrightarrow {v'} dV'} + {\rho _0}{q_0}L_0^3\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array} $
-\form#299:${\rho _0}{v_0}L_0^2$
-\form#300:${\rho _0}{v_0^2}L_0^2$
-\form#301:${\rho _0}{E_0}{v_0}L_0^2$
-\form#302:$ \begin{array}{l} \frac{{{L_0}}}{{{v_0}{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \cdot \vec ndS'} = 0\\ \frac{{{L_0}}}{{{v_0}{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \overrightarrow {v'} \cdot \vec ndS'} + \frac{{{p_0}}}{{{\rho _0}v_0^2}}\oint\limits_{S'(V')} {p'\overline{\overline I} \cdot \vec ndS'} - \frac{{{\tau _0}}}{{{\rho _0}v_0^2}}\oint\limits_{S'(V')} {\overline{\overline {\tau '}} \cdot \vec ndS'} = \frac{{{f_0}{L_0}}}{{v_0^2}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ \frac{{{L_0}}}{{{v_0}{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'} + \oint\limits_{S'(V')} {\rho 'E'\overrightarrow {v'} \cdot \vec ndS'} + \frac{{{p_0}}}{{{\rho _0}{E_0}{v_0}}}\oint\limits_{S'(V')} {p'\overrightarrow {v'} \cdot \vec ndS'} - \frac{{{\tau _0}}}{{{\rho _0}{E_0}}}\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}} \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'} + \\ - \frac{{{k_0}{T_0}}}{{{\rho _0}{E_0}{v_0}{L_0}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'} = \frac{{{f_0}{L_0}}}{{{E_0}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} \cdot \overrightarrow {v'} dV'} + \frac{{{q_0}{L_0}}}{{{E_0}{v_0}}}\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array}$
-\form#303:$ \rm{St} = \frac{L_0}{v_0 t_0}$
-\form#304:$ \rm{Ru} = \frac{\rho_0 v_0^2}{p_0}$
-\form#305:$ \rm{Ma} = \frac{v_0}{a_0}$
-\form#306:$ \rm{Re} = \frac{\rho_0 v_0 L_0}{\mu_0}$
-\form#307:$ \rm{Fr} = \sqrt{\frac{v_0^2}{f_0 L_0}}$
-\form#308:$ \rm{Pr} = \frac{\mu_0 c_{p0}}{k_0}$
-\form#309:$ \rm{Ec} = \frac{v_0^2}{c_{p0}T_0}$
-\form#310:$ \begin{array}{l} {\rm{St}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \cdot \vec ndS'} = 0\\ {\rm{St}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \overrightarrow {v'} \cdot \vec ndS'} + \frac{1}{{{\rm{Ru}}}}\oint\limits_{S'(V')} {p'\overline{\overline I} \cdot \vec ndS'} - \frac{1}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\overline{\overline {\tau '}} \cdot \vec ndS'} = \frac{1}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ {\rm{St}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'} + \oint\limits_{S'(V')} {\rho 'E'\overrightarrow {v'} \cdot \vec ndS'} + \frac{{{\rm{Ec}}}}{{{\rm{Ru}}}}\oint\limits_{S'(V')} {p'\overrightarrow {v'} \cdot \vec ndS'} - \frac{{{\rm{Ec}}}}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}} \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'} + \\ - \frac{1}{{{\rm{PrRe}}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'} = \frac{{{\rm{Ec}}}}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} \cdot \overrightarrow {v'} dV'} + \frac{{{q_0}{L_0}}}{{{E_0}{v_0}}}\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array} $
-\form#311:$\rm{St} = 1$
-\form#312:$\rm{Ru} = 1 => \rm{Ma} = \frac{1}{\sqrt{\gamma}}$
-\form#313:$\rm{Ec} = 1$
-\form#314:$ t_0 = \frac{L_0}{v_0}$
-\form#315:$ p_0 = \rho_0 v_0^2 => a_0 = \sqrt{\gamma}v_0$
-\form#316:$ c_{p0}T_0 = v_0^2$
-\form#317:$ \begin{array}{l} \frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \cdot \vec ndS'} = 0\\ \frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'} + \oint\limits_{S'(V')} {\left( {\rho '\overrightarrow {v'} \overrightarrow {v'} + p'\overline{\overline I} } \right) \cdot \vec ndS'} - \frac{1}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\overline{\overline {\tau '}} \cdot \vec ndS'} = \frac{1}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ \frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'} + \oint\limits_{S'(V')} {\left( {\rho 'E' + p'} \right)\overrightarrow {v'} \cdot \vec ndS'} - \frac{{\rm{1}}}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}} \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'} - \frac{1}{{{\rm{PrRe}}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'} = \\ \frac{{\rm{1}}}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} \cdot \overrightarrow {v'} dV'} + \frac{{{q_0}{L_0}}}{{{E_0}{v_0}}}\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array} $
-\form#318:$L_0$
-\form#319:$v_0$
-\form#320:$\mu_0$
-\form#321:$ L_0 $
-\form#322:$ \rho_0 $
-\form#323:$ v_0 $
-\form#324:$ \mu_0 $
-\form#325:$ f_0 $
-\form#326:$ c_0 $
-\form#327:$ k_0 $
-\form#328:$ \mu_0 = \frac{\rho_0 v_0 L_0}{\rm{Re}}$
-\form#329:$ f_0 = \frac{v_0^2}{L_0 \rm{Fr}^2}$
-\form#330:$ k_0 = \frac{\mu_0 c_0}{\rm{Pr}}$
-\form#331:$ p_0 = \rho_0 v_0^2 $
-\form#332:$ a_0 = \sqrt{\gamma}v_0 $
-\form#333:$ T_0 = \frac{v_0^2}{c_0} $
-\form#334:$ E_0 = v_0^2 $
-\form#335:$ q_0 = \frac{v_0^3}{L_0} $
-\form#336:$D$
-\form#337:$N_b$
-\form#338:$D^b$
-\form#339:$N_i \times N_j \times N_k$
-\form#340:$D_{ijk}^b$
-\form#341:$\bigcup D_{ijk}^b = D^b$
-\form#342:$\frac{\partial }{{\partial t}}\int\limits_{{V_{ijk}}} {\overrightarrow U d{V_{ijk}}} + \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline F} \cdot \overrightarrow {{n_s}} d{S_s}} } = \int\limits_{{V_{ijk}}} {\overrightarrow {{Q_V}} d{V_{ijk}}} + \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline {{Q_S}}} \cdot \overrightarrow {{n_s}} d{S_s}} } $
-\form#343:$S_s$
-\form#344:$D_{ijk}$
-\form#345:$V_{ijk}$
-\form#346:$\begin{array}{l} \frac{\partial }{{\partial t}}\int\limits_{{V_{ijk}}} {\overrightarrow U d{V_{ijk}}} = R\left( {\overrightarrow U } \right)\\ R\left( {\overrightarrow U } \right) = - \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline F} \cdot \overrightarrow {{n_s}} d{S_s}} } + \int\limits_{{V_{ijk}}} {\overrightarrow {{Q_V}} d{V_{ijk}}} + \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline {{Q_S}}} \cdot \overrightarrow {{n_s}} d{S_s}} } \end{array}$
-\form#347:$R\left({\overrightarrow U }\right)$
-\form#348:$(\overline{\overline F} - \overline{\overline {{Q_S}}})_{conv} = \left[ {\begin{array}{*{20}{c}} {\rho \vec v}\\ {\rho \vec v\vec v + p\overline{\overline I } }\\ {(\rho E+p)\vec v } \end{array}} \right]$
-\form#349:${\left( {\overline{\overline F} - \overline{\overline {{Q_S}}} } \right)_{diff}} = \left[ {\begin{array}{*{20}{c}} 0\\ { - \overline{\overline \tau } }\\ { - \overline{\overline \tau } \cdot \vec v - k\overrightarrow \nabla T} \end{array}} \right]$
-\form#350:$ \frac{\partial }{{\partial t}}\int\limits_{{V_{ijk}}} {\overrightarrow U d{V_{ijk}}} = R\left( {\overrightarrow U } \right) $
-\form#351:$ U\left( {x,t = 0} \right) = {U_0}\left( x \right) = \left\{ \begin{array}{l} {U_L}\,x < x_0\\ {U_R}\,x > x_0 \end{array} \right. $
-\form#352:$U_L$
-\form#353:$U_R$
-\form#354:$v$
-\form#355:$v \pm a$
-\form#356:$a=\sqrt{\frac{\gamma p}{\rho}}$
-\form#357:$P_L = \left[ {\begin{array}{*{20}{c}} \rho \\ {v}\\ {p} \end{array}} \right]=\left[ {\begin{array}{*{20}{c}} 1 \\ 0\\ 1 \end{array}} \right]$
-\form#358:$P_R = \left[ {\begin{array}{*{20}{c}} \rho \\ {v}\\ {p} \end{array}} \right]=\left[ {\begin{array}{*{20}{c}} 0.125 \\ 0\\ 0.1 \end{array}} \right]$
+\form#44:$ Nchild=\sum_{l=1}^{lvl_{max_u}}{2^{3 \cdot l}}$
+\form#45:$ \gamma = \frac{c_p}{c_v} $
+\form#46:$ {\rm result\%r = prim1\%r*prim2\%r} $
+\form#47:$ {\rm result\%v = prim1\%v*prim2\%v} $
+\form#48:$ {\rm result\%p = prim1\%p*prim2\%p} $
+\form#49:$ {\rm result\%d = prim1\%d*prim2\%d} $
+\form#50:$ {\rm result\%g = prim1\%g*prim2\%g} $
+\form#51:$ {\rm result\%r = prim\%r*scalar} $
+\form#52:$ {\rm result\%v = prim\%v*scalar} $
+\form#53:$ {\rm result\%p = prim\%p*scalar} $
+\form#54:$ {\rm result\%d = prim\%d*scalar} $
+\form#55:$ {\rm result\%g = prim\%g*scalar} $
+\form#56:$ {\rm result\%r = \frac{prim1\%r}{prim2\%r}} $
+\form#57:$ {\rm result\%v = \frac{prim1\%v}{prim2\%v}} $
+\form#58:$ {\rm result\%p = \frac{prim1\%p}{prim2\%p}} $
+\form#59:$ {\rm result\%d = \frac{prim1\%d}{prim2\%d}} $
+\form#60:$ {\rm result\%g = \frac{prim1\%g}{prim2\%g}} $
+\form#61:$ {\rm result\%r = \frac{prim\%r}{scalar}} $
+\form#62:$ {\rm result\%v = \frac{prim\%v}{scalar}} $
+\form#63:$ {\rm result\%p = \frac{prim\%p}{scalar}} $
+\form#64:$ {\rm result\%d = \frac{prim\%d}{scalar}} $
+\form#65:$ {\rm result\%g = \frac{prim\%g}{scalar}} $
+\form#66:$ {\rm result\%r = prim1\%r+prim2\%r} $
+\form#67:$ {\rm result\%v = prim1\%v+prim2\%v} $
+\form#68:$ {\rm result\%p = prim1\%p+prim2\%p} $
+\form#69:$ {\rm result\%d = prim1\%d+prim2\%d} $
+\form#70:$ {\rm result\%g = prim1\%g+prim2\%g} $
+\form#71:$ {\rm result\%r = prim\%r+scalar} $
+\form#72:$ {\rm result\%v = prim\%v+scalar} $
+\form#73:$ {\rm result\%p = prim\%p+scalar} $
+\form#74:$ {\rm result\%d = prim\%d+scalar} $
+\form#75:$ {\rm result\%g = prim\%g+scalar} $
+\form#76:$ {\rm result\%r = prim1\%r-prim2\%r} $
+\form#77:$ {\rm result\%v = prim1\%v-prim2\%v} $
+\form#78:$ {\rm result\%p = prim1\%p-prim2\%p} $
+\form#79:$ {\rm result\%d = prim1\%d-prim2\%d} $
+\form#80:$ {\rm result\%g = prim1\%g-prim2\%g} $
+\form#81:$ {\rm result\%r = scalar-prim\%r} $
+\form#82:$ {\rm result\%v = scalar-prim\%v} $
+\form#83:$ {\rm result\%p = scalar-prim\%p} $
+\form#84:$ {\rm result\%d = scalar-prim\%d} $
+\form#85:$ {\rm result\%g = scalar-prim\%g} $
+\form#86:$ {\rm result\%r = prim\%r-scalar} $
+\form#87:$ {\rm result\%v = prim\%v-scalar} $
+\form#88:$ {\rm result\%p = prim\%p-scalar} $
+\form#89:$ {\rm result\%d = prim\%d-scalar} $
+\form#90:$ {\rm result\%g = prim\%g-scalar} $
+\form#91:$ T_{ij}=\left[{\begin{array}{*{20}{c}}t_{11}&t_{12}&t_{13}\\ t_{21}&t_{22}&t_{23}\\ t_{31}&t_{32}&t_{33}\end{array}}\right] =\left[{\begin{array}{*{20}{c}} {x\% x}&{x\% y}&{x\% z}\\ {y\% x}&{y\% y}&{y\% z}\\ {z\% x}&{z\% y}&{z\% z}\end{array}}\right]$
+\form#92:$ {\rm result\%x = ten1\%x*ten2\%x} $
+\form#93:$ {\rm result\%y = ten1\%y*ten2\%y} $
+\form#94:$ {\rm result\%z = ten1\%z*ten2\%z} $
+\form#95:$ {\rm result\%x = ten\%x*scalar} $
+\form#96:$ {\rm result\%y = ten\%y*scalar} $
+\form#97:$ {\rm result\%z = ten\%z*scalar} $
+\form#98:$ {\rm result\%x = \frac{ten1\%x}{ten2\%x}} $
+\form#99:$ {\rm result\%y = \frac{ten1\%y}{ten2\%y}} $
+\form#100:$ {\rm result\%z = \frac{ten1\%z}{ten2\%z}} $
+\form#101:$ {\rm result\%x = \frac{ten\%x}{scalar}} $
+\form#102:$ {\rm result\%y = \frac{ten\%y}{scalar}} $
+\form#103:$ {\rm result\%z = \frac{ten\%z}{scalar}} $
+\form#104:$ {\rm result\%x = ten1\%x+ten2\%x} $
+\form#105:$ {\rm result\%y = ten1\%y+ten2\%y} $
+\form#106:$ {\rm result\%z = ten1\%z+ten2\%z} $
+\form#107:$ {\rm result\%x = ten\%x+scalar} $
+\form#108:$ {\rm result\%y = ten\%y+scalar} $
+\form#109:$ {\rm result\%z = ten\%z+scalar} $
+\form#110:$ {\rm result\%x = ten1\%x-ten2\%x} $
+\form#111:$ {\rm result\%y = ten1\%y-ten2\%y} $
+\form#112:$ {\rm result\%z = ten1\%z-ten2\%z} $
+\form#113:$ {\rm result\%x = scalar-ten\%x} $
+\form#114:$ {\rm result\%y = scalar-ten\%y} $
+\form#115:$ {\rm result\%z = scalar-ten\%z} $
+\form#116:$ {\rm result\%x = ten\%x-scalar} $
+\form#117:$ {\rm result\%y = ten\%y-scalar} $
+\form#118:$ {\rm result\%z = ten\%z-scalar} $
+\form#119:$ \det = \left| {\begin{array}{*{20}{c}} {x\% x}&{x\% y}&{x\% z}\\ {y\% x}&{y\% y}&{y\% z}\\ {z\% x}&{z\% y}&{z\% z} \end{array}} \right| = $
+\form#120:$=x\%x(z\%z\cdot y\%y-z\%y\cdot y\%z)-$
+\form#121:$ y\%x(z\%z\cdot x\%y-z\%y\cdot x\%z)+$
+\form#122:$ z\%x(y\%z\cdot x\%y-y\%y\cdot x\%z) $
+\form#123:$ T_{ij}^{ - 1} = \frac{1}{{\det (T)}}\left[ {\begin{array}{*{20}{c}} {z\%z\cdot y\%y-z\%y\cdot y\%z}&{-(z\%z\cdot x\%y-z\%y\cdot x\%z)}&{y\%z\cdot x\%y-y\%y\cdot x\%z}\\{-(z\%z\cdot y\%x- z\%x\cdot y\%z)}&{z\%z\cdot x\%x-z\%x\cdot x\%z}&{-(y\%z\cdot x\%x-y\%x\cdot x\%z)}\\{z\%y\cdot y\%x-z\%x\cdot y\%y}&{-(z\%y \cdot x\%x-z\%x\cdot x\%y)}&{y\%y\cdot x\%x-y\%x\cdot x\%y} \end{array}} \right]$
+\form#124:$ N = x_x^2 + x_y^2 + x_z^2 + y_x^2 + y_y^2 + y_z^2 +...$
+\form#125:$N = \sqrt {x_x^2 + x_y^2 + x_z^2 + y_y^2 + y_z^2 +...}$
+\form#126:$ {\rm result\%x = vec1\%x*vec2\%x} $
+\form#127:$ {\rm result\%y = vec1\%y*vec2\%y} $
+\form#128:$ {\rm result\%z = vec1\%z*vec2\%z} $
+\form#129:$ {\rm result\%x = vec\%x*scalar} $
+\form#130:$ {\rm result\%y = vec\%y*scalar} $
+\form#131:$ {\rm result\%z = vec\%z*scalar} $
+\form#132:$ {\rm result\%x = \frac{vec1\%x}{vec2\%x}} $
+\form#133:$ {\rm result\%y = \frac{vec1\%y}{vec2\%y}} $
+\form#134:$ {\rm result\%z = \frac{vec1\%z}{vec2\%z}} $
+\form#135:$ {\rm result\%x = \frac{vec\%x}{scalar}} $
+\form#136:$ {\rm result\%y = \frac{vec\%y}{scalar}} $
+\form#137:$ {\rm result\%z = \frac{vec\%z}{scalar}} $
+\form#138:$ {\rm result\%x = vec1\%x+vec2\%x} $
+\form#139:$ {\rm result\%y = vec1\%y+vec2\%y} $
+\form#140:$ {\rm result\%z = vec1\%z+vec2\%z} $
+\form#141:$ {\rm result\%x = vec\%x+scalar} $
+\form#142:$ {\rm result\%y = vec\%y+scalar} $
+\form#143:$ {\rm result\%z = vec\%z+scalar} $
+\form#144:$ {\rm result\%x = vec1\%x-vec2\%x} $
+\form#145:$ {\rm result\%y = vec1\%y-vec2\%y} $
+\form#146:$ {\rm result\%z = vec1\%z-vec2\%z} $
+\form#147:$ {\rm result\%x = scalar-vec\%x} $
+\form#148:$ {\rm result\%y = scalar-vec\%y} $
+\form#149:$ {\rm result\%z = scalar-vec\%z} $
+\form#150:$ {\rm result\%x = vec\%x-scalar} $
+\form#151:$ {\rm result\%y = vec\%y-scalar} $
+\form#152:$ {\rm result\%z = vec\%z-scalar} $
+\form#153:$ N = x^2 + y^2 + z^2$
+\form#154:$N = \sqrt {x^2 + y^2 + z^2 }$
+\form#155:$[10^{-307} , 10^{+307} - 1]$
+\form#156:$[10^{-37} , 10^{+37} - 1]$
+\form#157:$[-2^{63},+2^{63} - 1]$
+\form#158:$[-2^{31},+2^{31} - 1]$
+\form#159:$[-2^{15},+2^{15} - 1]$
+\form#160:$[-2^{7} ,+2^{7} - 1]$
+\form#161:$|_{conservative} =\left| \rho_s\right|_{primitive}$
+\form#162:$|_{conservative} = \left| \rho \vec V \right|_{primitive}$
+\form#163:$|_{conservative}=\left|\frac{p}{\gamma-1}+\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right|_{primitive}$
+\form#164:$|_{primitive} =\left| \rho_s\right|_{conservative}$
+\form#165:$|_{primitive} =\left|\sum_{s=1}^{Ns}\rho_s\right|_{conservative}$
+\form#166:$|_{primitive}=\left|\frac{\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cp_s^0}} {\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cv_s^0}}\right|_{conservative}$
+\form#167:$|_{primitive} =\left|\frac{\vec momentum}{\rho}\right|_{conservative}$
+\form#168:$|_{primitive}=\left|(\gamma-1)\left[energy-\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right]\right|_{conservative}$
+\form#169:$cp_s^0,cv_s^0$
+\form#170:$ c^0 $
+\form#171:$ c^1 $
+\form#172:$ c^N $
+\form#173:$ \begin{array}{*{20}{c}} P^0 = P^1 \\ P_{\vec v\cdot \vec n}^0 = - P_{\vec v\cdot \vec n}^1\end{array} $
+\form#174:$ P^0 = P^1 $
+\form#175:$ P^0 = P^N $
+\form#176:$ P^0 = P^a $
+\form#177:$ P^0 = P^{in1} $
+\form#178:$P$
+\form#179:$A=R \Lambda L$
+\form#180:$ \frac{\partial P}{\partial t} + R \Lambda L \frac{\partial P}{\partial n} = 0$
+\form#181:$\Lambda$
+\form#182:$u$
+\form#183:$\vec i$
+\form#184:$\frac{{\partial u}}{{\partial i}} =\frac{1}{V}\sum\limits_{f = 1}^6 {{u_f}\overrightarrow {{n_f}} \cdot \vec i\,{S_f}}$
+\form#185:$V$
+\form#186:$\overrightarrow {{n_f}}$
+\form#187:$f^{th}$
+\form#188:$S_f$
+\form#189:$\pi $
+\form#190:$2^{Ns}=b$
+\form#191:$Ns=\frac{log(b)}{log2}$
+\form#192:$\frac{1}{log2}$
+\form#193:$(\overline{\overline F} - \overline{\overline {{Q_S}}})_{conv} $
+\form#194:$p_1,\rho_1,u_1,\gamma_1$
+\form#195:$p_4,\rho_4,u_4,\gamma_4$
+\form#196:$F_r$
+\form#197:$F_u$
+\form#198:$F_E$
+\form#199:$ u_t = R(t,u) $
+\form#200:$ u^{n+1} = u^n +\Delta t \sum_{s=1}^{Ns}c_1^s K^s $
+\form#201:$K^s$
+\form#202:$s^{th}$
+\form#203:$ K^s = R\left( t^n+c_3^s \Delta t, u^n +\Delta t \sum_{i=1}^{s-1}c_2^{s,i} K^i \right) $
+\form#204:$s-1$
+\form#205:$c_1$
+\form#206:$c_2$
+\form#207:$c_3$
+\form#208:$\begin{array}{l} \begin{array}{*{20}{c}} {c_3^1}\\ {c_3^2}\\ \vdots \\ {c_3^{Ns}} \end{array}\left| \!{\underline {\, {\begin{array}{*{20}{c}} {c_2^{1,1}}&{c_2^{1,2}}& \cdots &{c_2^{1,Ns}}\\ {c_2^{2,1}}&{c_2^{2,2}}& \cdots &{c_2^{1,Ns}}\\ \vdots & \vdots & \ddots & \vdots \\ {c_2^{Ns,1}}&{c_2^{Ns,2}}& \ldots &{c_2^{Ns,Ns}} \end{array}} \,}} \right. \\ \begin{array}{*{20}{c}} {\;\;\;\;\;\;\;}&{c_1^1}&{\;\;\;\;\;c_1^2}&{\;\;\;\;\; \cdots }&{c_1^{Ns}} \end{array} \end{array}$
+\form#209:$\begin{array}{l} \begin{array}{*{20}{c}} {c_3^1}\\ {c_3^1}\\ \vdots \\ {c_3^{Ns}} \end{array}\left| \!{\underline {\, {\begin{array}{*{20}{c}} 0&0& \cdots &0\\ {c_2^{2,1}}&0& \cdots &0\\ \vdots & \vdots & \ddots & \vdots \\ {c_2^{Ns,1}}&{c_2^{Ns,2}}& \ldots &0 \end{array}} \,}} \right. \\ \begin{array}{*{20}{c}} {\;\;\;\;\;\;\;}&{c_1^1}&{\;\;\;\;\;c_1^2}&{\;\;\;\;\; \cdots }&{c_1^{Ns}} \end{array} \end{array}$
+\form#210:$ c_3^s = \sum_{i=1}^{Ns}c_2^{s,i} $
+\form#211:$1^{st}$
+\form#212:$ c_1 = \left[1\right]$
+\form#213:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0 \end{array}} \right] $
+\form#214:$ c_3 = \left[0\right]$
+\form#215:$2^{nd}$
+\form#216:$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{1}{2}&\frac{1}{2} \end{array}} \right] $
+\form#217:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0\\ 1&0 \end{array}} \right] $
+\form#218:$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \end{array}} \right] $
+\form#219:$3^{rd}$
+\form#220:$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{1}{6}&\frac{1}{6}&\frac{1}{3} \end{array}} \right] $
+\form#221:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0&0\\ 1&0&0\\ \frac{1}{4}&\frac{1}{4}&0 \end{array}} \right] $
+\form#222:$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \\ \frac{1}{2} \end{array}} \right] $
+\form#223:$4^{rd}$
+\form#224:$ c_1 = \left[ {\begin{array}{*{20}{c}} \frac{55}{108}&\frac{1}{3}&\frac{1}{3}&\frac{1}{6} \end{array}} \right] $
+\form#225:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0&0&0\\ 1&0&0&0\\ \frac{1}{4}&\frac{1}{2}&0&0\\ \frac{5}{18}&0&1&0 \end{array}} \right] $
+\form#226:$ c_3 = \left[ {\begin{array}{*{20}{c}} 0 \\ 1 \\ \frac{3}{4} \\ \frac{23}{18} \end{array}} \right] $
+\form#227:$ c_1 = \left[ {\begin{array}{*{20}{c}} 0.14681187618661&0.24848290924556&0.10425883036650&0.27443890091960& 0.22600748319395 \end{array}} \right] $
+\form#228:$ c_2 = \left[ {\begin{array}{*{20}{c}} 0&0&0&0&0 \\ 0.39175222700392&0&0&0&0 \\ 0.21766909633821&0.36841059262959&0&0&0 \\ 0.08269208670950& 0.13995850206999&0.25189177424738&0&0 \\ 0.06796628370320&0.11503469844438&0.20703489864929&0.54497475021237&0 \end{array}} \right] $
+\form#229:$ c_3 = \left[ {\begin{array}{*{20}{c}} 0\\0.39175222700392\\0.58607968896780\\0.47454236302687\\0.93501063100924 \end{array}} \right] $
+\form#230:$s1^{th}$
+\form#231:$u^{n+1}$
+\form#232:$\rho$
+\form#233:$\gamma=\frac{{c_p}}{{c_v}}$
+\form#234:$ E = \frac{p}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
+\form#235:$ H = \frac{{\gamma p}}{{\left( {\gamma - 1} \right)\rho }} + \frac{{u^2 }}{2} $
+\form#236:$dc = dc = \sum\limits_{i = 1}^{NC} {nvertex_i }$
+\form#237:$dc=8+5=13$
+\form#238:$1^\circ$
+\form#239:$2^\circ$
+\form#240:$3^\circ$
+\form#241:$4^\circ$
+\form#242:$5^\circ$
+\form#243:$6^\circ$
+\form#244:$7^\circ$
+\form#245:$8^\circ$
+\form#246:$offset_c=\sum\limits_{i=1}^{c}{nvertex_i}$
+\form#247:$offset_c$
+\form#248:$c^{th}$
+\form#249:$nvertex_i$
+\form#250:$i^{th}$
+\form#251:$dc = NC + \sum\limits_{i = 1}^{NC} {nvertex_i }$
+\form#252:$dc$
+\form#253:$dc=2+8+5=15$
+\form#254:$2^\circ $
+\form#255:$P^{th}$
+\form#256:$2S^{th}$
+\form#257:$2S^{th}-1$
+\form#258:$\gamma,\eta,\chi$
+\form#259:$5^{th}$
+\form#260:$7^{th}$
+\form#261:$4^{th}$
+\form#262:$\frac{\partial }{{\partial t}}\int\limits_V {\overrightarrow U dV} + \oint\limits_{S(V)} {\overline{\overline F} \cdot \overrightarrow n dS} = \int\limits_V {\overrightarrow {{Q_V}} dV} + \oint\limits_{S(V)} {\overline{\overline {{Q_S}}} \cdot \overrightarrow n dS} $
+\form#263:$S(V)$
+\form#264:$\vec n$
+\form#265:$\overrightarrow U $
+\form#266:$\overline{\overline F}$
+\form#267:$\overrightarrow{Q_V}$
+\form#268:$\overline{\overline{Q_S}}$
+\form#269:$\overrightarrow U = \left[ {\begin{array}{*{20}{c}} \rho \\ {\rho \vec v}\\ {\rho E} \end{array}} \right]$
+\form#270:$\overline{\overline F} - \overline{\overline {{Q_S}}} = \left[ {\begin{array}{*{20}{c}} {\rho \vec v}\\ {\rho \vec v\vec v - \overline{\overline \sigma } }\\ {\rho E\vec v - \overline{\overline \sigma } \cdot \vec v - k\overrightarrow \nabla T} \end{array}} \right]$
+\form#271:$\overrightarrow {{Q_V}} = \left[ {\begin{array}{*{20}{c}} 0\\ {\rho \overrightarrow {{f_e}} }\\ {\rho \overrightarrow {{f_e}} \cdot \vec v + {q_h}} \end{array}} \right]$
+\form#272:$\vec v$
+\form#273:$\vec v \vec v$
+\form#274:$\vec u\vec v = \left[ {\begin{array}{*{20}{c}} {{u_1}{v_1}} & {{u_1}{v_2}} & {{u_1}{v_3}} \\ {{u_2}{v_1}} & {{u_2}{v_2}} & {{u_2}{v_3}} \\ {{u_3}{v_1}} & {{u_3}{v_2}} & {{u_3}{v_3}} \end{array}} \right]$
+\form#275:$E$
+\form#276:$T$
+\form#277:$\overline{\overline \sigma}$
+\form#278:$k$
+\form#279:$-k\overrightarrow \nabla T$
+\form#280:$\overrightarrow{{f_e}}$
+\form#281:$q_h$
+\form#282:$ \overline{\overline \sigma} = -p\overline{\overline I}+ \overline{\overline \tau}$
+\form#283:$p$
+\form#284:$\overline{\overline I}$
+\form#285:$\overline{\overline \tau}$
+\form#286:${\tau _{ij}} = \mu \left( {{\partial _i}{v_j} + {\partial _j}{v_i}} \right) + \lambda \left( {\overrightarrow \nabla \cdot \vec v} \right){\delta _{ij}}$
+\form#287:$\mu$
+\form#288:$\lambda = -\frac{2}{3}\mu$
+\form#289:$\delta_{ij}$
+\form#290:${\delta _{ij}} = \left\{ {\begin{array}{*{20}{c}} {0{\rm{,}}\;{\rm{if}}\;i \ne j}\\ {{\rm{1,}}\;{\rm{if}}\;i = j} \end{array}} \right.$
+\form#291:$\overline{\overline \tau } = 2\mu \frac{1}{2}\left( {\overrightarrow \nabla \vec v + \overrightarrow \nabla {{\vec v}^T}} \right) + \lambda \left( {\overrightarrow \nabla \cdot \vec v} \right)\overline{\overline I} $
+\form#292:$ \frac{1}{2}\left( {\overrightarrow \nabla \vec v + \overrightarrow \nabla {{\vec v}^T}} \right)$
+\form#293:$ p = \rho R T$
+\form#294:$R$
+\form#295:$\begin{array}{*{20}{c}}\gamma = \frac{c_p}{c_v} \\ R = c_p -c_v \\ c_p = \frac{\gamma R}{\gamma -1} \\ c_p = \frac{R}{\gamma -1} \end{array}$
+\form#296:$ E = c_v T + \frac{|\vec v|^2}{2} = \frac{p}{\rho(\gamma-1)} + \frac{|\vec v|^2}{2}$
+\form#297:$ a = \sqrt{\frac{\gamma p}{\rho}} $
+\form#298:$ H = c_p T + \frac{|\vec v|^2}{2} = \frac{\gamma p}{\rho(\gamma-1)} + \frac{|\vec v|^2}{2}= \frac{a^2}{\gamma-1} + \frac{|\vec v|^2}{2}$
+\form#299:$x'=\frac{x}{x_0}$
+\form#300:$x$
+\form#301:$x_0$
+\form#302:$ \begin{array}{l} \frac{{{\rho _0}L_0^3}}{{{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'} + {\rho _0}{v_0}L_0^2\oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \cdot \vec ndS'} = 0\\ \frac{{{\rho _0}{v_0}L_0^3}}{{{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'} + {\rho _0}v_0^2L_0^2\oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \overrightarrow {v'} \cdot \vec ndS'} + {p_0}L_0^2\oint\limits_{S'(V')} {p'\overline{\overline I} \cdot \vec ndS'} - {\tau _0}L_0^2\oint\limits_{S'(V')} {\overline{\overline {\tau '}} \cdot \vec ndS'} = {\rho _0}{f_0}L_0^3\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ \frac{{{\rho _0}{E_0}L_0^3}}{{{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'} + {\rho _0}{E_0}{v_0}L_0^2\oint\limits_{S'(V')} {\rho 'E'\overrightarrow {v'} \cdot \vec ndS'} + {p_0}L_0^2\oint\limits_{S'(V')} {p'\overrightarrow {v'} \cdot \vec ndS'} - {\tau _0}{v_0}L_0^2\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}} \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'} + \\ -\frac{{{k_0}{T_0}L_0^2}}{{{L_0}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'} = {\rho _0}{f_0}{v_0}L_0^3\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} \cdot \overrightarrow {v'} dV'} + {\rho _0}{q_0}L_0^3\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array} $
+\form#303:${\rho _0}{v_0}L_0^2$
+\form#304:${\rho _0}{v_0^2}L_0^2$
+\form#305:${\rho _0}{E_0}{v_0}L_0^2$
+\form#306:$ \begin{array}{l} \frac{{{L_0}}}{{{v_0}{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \cdot \vec ndS'} = 0\\ \frac{{{L_0}}}{{{v_0}{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \overrightarrow {v'} \cdot \vec ndS'} + \frac{{{p_0}}}{{{\rho _0}v_0^2}}\oint\limits_{S'(V')} {p'\overline{\overline I} \cdot \vec ndS'} - \frac{{{\tau _0}}}{{{\rho _0}v_0^2}}\oint\limits_{S'(V')} {\overline{\overline {\tau '}} \cdot \vec ndS'} = \frac{{{f_0}{L_0}}}{{v_0^2}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ \frac{{{L_0}}}{{{v_0}{t_0}}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'} + \oint\limits_{S'(V')} {\rho 'E'\overrightarrow {v'} \cdot \vec ndS'} + \frac{{{p_0}}}{{{\rho _0}{E_0}{v_0}}}\oint\limits_{S'(V')} {p'\overrightarrow {v'} \cdot \vec ndS'} - \frac{{{\tau _0}}}{{{\rho _0}{E_0}}}\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}} \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'} + \\ - \frac{{{k_0}{T_0}}}{{{\rho _0}{E_0}{v_0}{L_0}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'} = \frac{{{f_0}{L_0}}}{{{E_0}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} \cdot \overrightarrow {v'} dV'} + \frac{{{q_0}{L_0}}}{{{E_0}{v_0}}}\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array}$
+\form#307:$ \rm{St} = \frac{L_0}{v_0 t_0}$
+\form#308:$ \rm{Ru} = \frac{\rho_0 v_0^2}{p_0}$
+\form#309:$ \rm{Ma} = \frac{v_0}{a_0}$
+\form#310:$ \rm{Re} = \frac{\rho_0 v_0 L_0}{\mu_0}$
+\form#311:$ \rm{Fr} = \sqrt{\frac{v_0^2}{f_0 L_0}}$
+\form#312:$ \rm{Pr} = \frac{\mu_0 c_{p0}}{k_0}$
+\form#313:$ \rm{Ec} = \frac{v_0^2}{c_{p0}T_0}$
+\form#314:$ \begin{array}{l} {\rm{St}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \cdot \vec ndS'} = 0\\ {\rm{St}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \overrightarrow {v'} \cdot \vec ndS'} + \frac{1}{{{\rm{Ru}}}}\oint\limits_{S'(V')} {p'\overline{\overline I} \cdot \vec ndS'} - \frac{1}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\overline{\overline {\tau '}} \cdot \vec ndS'} = \frac{1}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ {\rm{St}}\frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'} + \oint\limits_{S'(V')} {\rho 'E'\overrightarrow {v'} \cdot \vec ndS'} + \frac{{{\rm{Ec}}}}{{{\rm{Ru}}}}\oint\limits_{S'(V')} {p'\overrightarrow {v'} \cdot \vec ndS'} - \frac{{{\rm{Ec}}}}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}} \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'} + \\ - \frac{1}{{{\rm{PrRe}}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'} = \frac{{{\rm{Ec}}}}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} \cdot \overrightarrow {v'} dV'} + \frac{{{q_0}{L_0}}}{{{E_0}{v_0}}}\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array} $
+\form#315:$\rm{St} = 1$
+\form#316:$\rm{Ru} = 1 => \rm{Ma} = \frac{1}{\sqrt{\gamma}}$
+\form#317:$\rm{Ec} = 1$
+\form#318:$ t_0 = \frac{L_0}{v_0}$
+\form#319:$ p_0 = \rho_0 v_0^2 => a_0 = \sqrt{\gamma}v_0$
+\form#320:$ c_{p0}T_0 = v_0^2$
+\form#321:$ \begin{array}{l} \frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'dV'} + \oint\limits_{S'(V')} {\rho '\overrightarrow {v'} \cdot \vec ndS'} = 0\\ \frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho '\overrightarrow {v'} dV'} + \oint\limits_{S'(V')} {\left( {\rho '\overrightarrow {v'} \overrightarrow {v'} + p'\overline{\overline I} } \right) \cdot \vec ndS'} - \frac{1}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\overline{\overline {\tau '}} \cdot \vec ndS'} = \frac{1}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} dV'} \\ \frac{\partial }{{\partial t'}}\int\limits_{V'} {\rho 'E'dV'} + \oint\limits_{S'(V')} {\left( {\rho 'E' + p'} \right)\overrightarrow {v'} \cdot \vec ndS'} - \frac{{\rm{1}}}{{{\rm{Re}}}}\oint\limits_{S'(V')} {\left( {\overline{\overline {\tau '}} \cdot \overrightarrow {v'} } \right) \cdot \vec ndS'} - \frac{1}{{{\rm{PrRe}}}}\oint\limits_{S'(V')} {k'\overrightarrow {\nabla '} T' \cdot \vec ndS'} = \\ \frac{{\rm{1}}}{{{\rm{F}}{{\rm{r}}^2}}}\int\limits_{V'} {\rho '\overrightarrow {{{f'}_e}} \cdot \overrightarrow {v'} dV'} + \frac{{{q_0}{L_0}}}{{{E_0}{v_0}}}\int\limits_{V'} {\rho '{{q'}_h}dV'} \end{array} $
+\form#322:$L_0$
+\form#323:$v_0$
+\form#324:$\mu_0$
+\form#325:$ L_0 $
+\form#326:$ \rho_0 $
+\form#327:$ v_0 $
+\form#328:$ \mu_0 $
+\form#329:$ f_0 $
+\form#330:$ c_0 $
+\form#331:$ k_0 $
+\form#332:$ \mu_0 = \frac{\rho_0 v_0 L_0}{\rm{Re}}$
+\form#333:$ f_0 = \frac{v_0^2}{L_0 \rm{Fr}^2}$
+\form#334:$ k_0 = \frac{\mu_0 c_0}{\rm{Pr}}$
+\form#335:$ p_0 = \rho_0 v_0^2 $
+\form#336:$ a_0 = \sqrt{\gamma}v_0 $
+\form#337:$ T_0 = \frac{v_0^2}{c_0} $
+\form#338:$ E_0 = v_0^2 $
+\form#339:$ q_0 = \frac{v_0^3}{L_0} $
+\form#340:$D$
+\form#341:$N_b$
+\form#342:$D^b$
+\form#343:$N_i \times N_j \times N_k$
+\form#344:$D_{ijk}^b$
+\form#345:$\bigcup D_{ijk}^b = D^b$
+\form#346:$\frac{\partial }{{\partial t}}\int\limits_{{V_{ijk}}} {\overrightarrow U d{V_{ijk}}} + \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline F} \cdot \overrightarrow {{n_s}} d{S_s}} } = \int\limits_{{V_{ijk}}} {\overrightarrow {{Q_V}} d{V_{ijk}}} + \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline {{Q_S}}} \cdot \overrightarrow {{n_s}} d{S_s}} } $
+\form#347:$S_s$
+\form#348:$D_{ijk}$
+\form#349:$V_{ijk}$
+\form#350:$\begin{array}{l} \frac{\partial }{{\partial t}}\int\limits_{{V_{ijk}}} {\overrightarrow U d{V_{ijk}}} = R\left( {\overrightarrow U } \right)\\ R\left( {\overrightarrow U } \right) = - \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline F} \cdot \overrightarrow {{n_s}} d{S_s}} } + \int\limits_{{V_{ijk}}} {\overrightarrow {{Q_V}} d{V_{ijk}}} + \sum\limits_{s = 1}^6 {\int\limits_{{S_s}\left( {{V_{ijk}}} \right)} {\overline{\overline {{Q_S}}} \cdot \overrightarrow {{n_s}} d{S_s}} } \end{array}$
+\form#351:$R\left({\overrightarrow U }\right)$
+\form#352:$(\overline{\overline F} - \overline{\overline {{Q_S}}})_{conv} = \left[ {\begin{array}{*{20}{c}} {\rho \vec v}\\ {\rho \vec v\vec v + p\overline{\overline I } }\\ {(\rho E+p)\vec v } \end{array}} \right]$
+\form#353:${\left( {\overline{\overline F} - \overline{\overline {{Q_S}}} } \right)_{diff}} = \left[ {\begin{array}{*{20}{c}} 0\\ { - \overline{\overline \tau } }\\ { - \overline{\overline \tau } \cdot \vec v - k\overrightarrow \nabla T} \end{array}} \right]$
+\form#354:$ \frac{\partial }{{\partial t}}\int\limits_{{V_{ijk}}} {\overrightarrow U d{V_{ijk}}} = R\left( {\overrightarrow U } \right) $
+\form#355:$ U\left( {x,t = 0} \right) = {U_0}\left( x \right) = \left\{ \begin{array}{l} {U_L}\,x < x_0\\ {U_R}\,x > x_0 \end{array} \right. $
+\form#356:$U_L$
+\form#357:$U_R$
+\form#358:$v$
+\form#359:$v \pm a$
+\form#360:$a=\sqrt{\frac{\gamma p}{\rho}}$
+\form#361:$P_L = \left[ {\begin{array}{*{20}{c}} \rho \\ {v}\\ {p} \end{array}} \right]=\left[ {\begin{array}{*{20}{c}} 1 \\ 0\\ 1 \end{array}} \right]$
+\form#362:$P_R = \left[ {\begin{array}{*{20}{c}} \rho \\ {v}\\ {p} \end{array}} \right]=\left[ {\begin{array}{*{20}{c}} 0.125 \\ 0\\ 0.1 \end{array}} \right]$
+\form#363:$ N_b \cdot N_{bc} \cdot Nchild $
+\form#364:$ N_b = 100 $
+\form#365:$ N_{bc} = 1 \cdot 10^6 $
+\form#366:$ lvl_{max_u} = 5 $
+\form#367:$ 3 \cdot 10^{12}$
+\form#368:$ Nchild=\sum_{l=1}^{lvl_{max_u}}{2^{s \cdot l}}$
+\form#369:$s$
+\form#370:$[0,1]\times[0,1]$
+\form#371:$100\times100=10000$
+\form#372:$800\times800=640000$
+\form#373:$CPU_{SER}$
+\form#374:$\frac{CPU}{CPU_{SER}}$
+\form#375:$\#CORE$
+\form#376:$1$
+\form#377:$\frac{1}{\#CORE}$
+\form#378:$[2,12]$
+\form#379:$9.7\%$
+\form#380:$16.9\%$

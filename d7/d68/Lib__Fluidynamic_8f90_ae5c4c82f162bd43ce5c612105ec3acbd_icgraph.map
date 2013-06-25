@@ -1,4 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga3cc6f55a99802e9ba522253542e7199b" title="Subroutine for imposing the boundary conditions of blocks of grid level &quot;l&quot; updating the ghost cells..." alt="" coords="243,5,485,35"/>
-<area shape="rect" id="node5" href="$d7/d68/Lib__Fluidynamic_8f90.html#aef477167f825c3906129fd9265aeba87" title="Subroutine for imposing extrapolation of ghost cells from internal ones (left boundary)." alt="" coords="120,31,195,60"/>
-</map>

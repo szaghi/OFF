@@ -2,7 +2,7 @@ var classData__Type__Conservative =
 [
     [ "write_conservative", "dd/d22/group__Data__Type__ConservativePublicProcedure.html#ga1bf6f13113b9a3925dd53611d20b634c", null ],
     [ "read_conservative", "dd/d22/group__Data__Type__ConservativePublicProcedure.html#ga9f3019662281d5dd69575b14e58a61cd", null ],
-    [ "init", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaffa1b85a8fbd976a8d2cd53b2add9e22", null ],
+    [ "init", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gaa7c817ee7bacd20c496c5515c3590ea4", null ],
     [ "free", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga8024db1fec24e276567f8c04b6798dd5", null ],
     [ "cons2array", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#gad5a3898ed9167f5853934ab2110cfb1d", null ],
     [ "array2cons", "dc/d40/group__Data__Type__ConservativePrivateProcedure.html#ga0fce4592886c2bb6131a8ea602d7bcfb", null ],

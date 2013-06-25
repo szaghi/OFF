@@ -2,7 +2,7 @@ var classData__Type__Primitive =
 [
     [ "write_primitive", "d2/d15/group__Data__Type__PrimitivePublicProcedure.html#gac3e079dc48b11fc85fff5ce010589813", null ],
     [ "read_primitive", "d2/d15/group__Data__Type__PrimitivePublicProcedure.html#ga69ae2f96c124cf0b433b740a08b18b8a", null ],
-    [ "init", "d0/d0e/group__Data__Type__PrimitivePrivateProcedure.html#ga3a3087f1408f3fd08dd1913002c6f5db", null ],
+    [ "init", "d0/d0e/group__Data__Type__PrimitivePrivateProcedure.html#gaf61144d09dce439a7ba497263f2bf191", null ],
     [ "free", "d0/d0e/group__Data__Type__PrimitivePrivateProcedure.html#ga30776ceae9ffda3860558285dcf311b1", null ],
     [ "prim2array", "d0/d0e/group__Data__Type__PrimitivePrivateProcedure.html#gae7ba02e6bb3b982a0b22cbcb6068d66a", null ],
     [ "array2prim", "d0/d0e/group__Data__Type__PrimitivePrivateProcedure.html#ga0e345a986c6711e62bc587a9b5c82fb3", null ],

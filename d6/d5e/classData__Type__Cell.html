@@ -103,63 +103,24 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <!-- doxytag: class="Data_Type_Cell" -->
-<p>This module contains the definition of <a class="el" href="../../dd/dfd/group__DerivedType.html#d6/d65/structData__Type__Cell_1_1Type__Cell" title="Derived type containing cell informations.">Type_Cell</a> and its procedures.  
+<p>This module contains the definition of <a class="el" href="../../d1/d93/group__Data__Type__CellDerivedType.html#d6/d65/structData__Type__Cell_1_1Type__Cell" title="Derived type containing cell-level data.">Type_Cell</a> and its procedures.  
  <a href="../../d6/d5e/classData__Type__Cell.html#details">More...</a></p>
 
 <p><a href="../../d2/de9/moduleData__Type__Cell-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
 Data Types</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">type &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dfd/group__DerivedType.html#d6/d65/structData__Type__Cell_1_1Type__Cell">Type_Cell</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived type containing cell informations.  <a href="../../dd/dfd/group__DerivedType.html#d6/d65/structData__Type__Cell_1_1Type__Cell">More...</a><br/></td></tr>
-<tr><td colspan="2"><h2><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I_P) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/de6/group__Data__Type__CellPublicProcedure.html#gaef978bc544e4e857e60d6bb640e727e2">write_cell</a> (scalar, array1D, array2D, array3D, format, unit)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for writing <a class="el" href="../../dd/dfd/group__DerivedType.html#d6/d65/structData__Type__Cell_1_1Type__Cell" title="Derived type containing cell informations.">Type_Cell</a> data.  <a href="../../d6/de6/group__Data__Type__CellPublicProcedure.html#gaef978bc544e4e857e60d6bb640e727e2"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I_P) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/de6/group__Data__Type__CellPublicProcedure.html#gab7321c62622f8f00108bfd4e76574c77">read_cell</a> (scalar, array1D, array2D, array3D, format, unit)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for reading <a class="el" href="../../dd/dfd/group__DerivedType.html#d6/d65/structData__Type__Cell_1_1Type__Cell" title="Derived type containing cell informations.">Type_Cell</a> data.  <a href="../../d6/de6/group__Data__Type__CellPublicProcedure.html#gab7321c62622f8f00108bfd4e76574c77"></a><br/></td></tr>
-<tr><td colspan="2"><h2><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">character(3), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da6/group__Data__Type__Cell.html#gadd401e6c2cd27ca2ab1a3e2ff2bd6473">cell_unset_str</a> = 'UNS'</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">String corresponding to unset cell identifier.  <a href="../../d7/da6/group__Data__Type__Cell.html#gadd401e6c2cd27ca2ab1a3e2ff2bd6473"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I1P), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da6/group__Data__Type__Cell.html#gae221144f05126ac63dcf3866a82cc0f0">cell_unset</a> = -1_I1P</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Unset cell identifier.  <a href="../../d7/da6/group__Data__Type__Cell.html#gae221144f05126ac63dcf3866a82cc0f0"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">character(3), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da6/group__Data__Type__Cell.html#gab0d3f7dbdb45cb6b0098ebbe30f8e831">cell_active_str</a> = 'ACT'</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">String corresponding to active cell identifier.  <a href="../../d7/da6/group__Data__Type__Cell.html#gab0d3f7dbdb45cb6b0098ebbe30f8e831"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I1P), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da6/group__Data__Type__Cell.html#ga8fe5fd8cd2d0dc7de08aaac1b7fbdb67">cell_active</a> = 0_I1P</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Active cell identifier.  <a href="../../d7/da6/group__Data__Type__Cell.html#ga8fe5fd8cd2d0dc7de08aaac1b7fbdb67"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">character(3), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da6/group__Data__Type__Cell.html#ga551ccb36bcd8bb053dabd68e3635ea5b">cell_passive_str</a> = 'PAS'</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">String corresponding to passive identifier.  <a href="../../d7/da6/group__Data__Type__Cell.html#ga551ccb36bcd8bb053dabd68e3635ea5b"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I1P), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da6/group__Data__Type__Cell.html#ga911a357554a0d57a478c1615bbeb55f0">cell_passive</a> = 1_I1P</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Passive cell identifier.  <a href="../../d7/da6/group__Data__Type__Cell.html#ga911a357554a0d57a478c1615bbeb55f0"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">character(3), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da6/group__Data__Type__Cell.html#gad39c903b36fbc30acee4dc40177dde9b">cell_probe_str</a> = 'PRB'</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">String corresponding to probe cell identifier.  <a href="../../d7/da6/group__Data__Type__Cell.html#gad39c903b36fbc30acee4dc40177dde9b"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I1P), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da6/group__Data__Type__Cell.html#ga80c26e98edf1a2ec2801283d779cbb7b">cell_probe</a> = 2_I1P</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Probe cell identifier.  <a href="../../d7/da6/group__Data__Type__Cell.html#ga80c26e98edf1a2ec2801283d779cbb7b"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">character(3), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da6/group__Data__Type__Cell.html#gae116752c7dffe1de86c7dbf21be78d68">cell_isoss_str</a> = 'ISS'</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">String corresponding to isotropic cell identifier.  <a href="../../d7/da6/group__Data__Type__Cell.html#gae116752c7dffe1de86c7dbf21be78d68"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I1P), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da6/group__Data__Type__Cell.html#ga2cb393667d80ea07e92329e18ef43d17">cell_isoss</a> = 3_I1P</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Isotropic cell identifier.  <a href="../../d7/da6/group__Data__Type__Cell.html#ga2cb393667d80ea07e92329e18ef43d17"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I_P), parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da6/group__Data__Type__Cell.html#ga61d6673afeceabd074b620f9d15880a5">Nid</a> = 5</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of possible cell identifiers.  <a href="../../d7/da6/group__Data__Type__Cell.html#ga61d6673afeceabd074b620f9d15880a5"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">character(3), dimension(1:nid), <br class="typebreak"/>
-parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da6/group__Data__Type__Cell.html#ga3c94ec4ef490f0f59e8bb560509db25d">cell_list_str</a> = (/ <a class="el" href="../../d7/da6/group__Data__Type__Cell.html#gadd401e6c2cd27ca2ab1a3e2ff2bd6473">cell_unset_str</a>, <a class="el" href="../../d7/da6/group__Data__Type__Cell.html#gab0d3f7dbdb45cb6b0098ebbe30f8e831">cell_active_str</a>, <a class="el" href="../../d7/da6/group__Data__Type__Cell.html#ga551ccb36bcd8bb053dabd68e3635ea5b">cell_passive_str</a>, <a class="el" href="../../d7/da6/group__Data__Type__Cell.html#gad39c903b36fbc30acee4dc40177dde9b">cell_probe_str</a>, <a class="el" href="../../d7/da6/group__Data__Type__Cell.html#gae116752c7dffe1de86c7dbf21be78d68">cell_isoss_str</a> /)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Cell identifiers string list.  <a href="../../d7/da6/group__Data__Type__Cell.html#ga3c94ec4ef490f0f59e8bb560509db25d"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">integer(I1P), dimension(1:nid), <br class="typebreak"/>
-parameter, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/da6/group__Data__Type__Cell.html#gae58276318f01249f2475bd48b5f6dd06">cell_list</a> = (/ <a class="el" href="../../d7/da6/group__Data__Type__Cell.html#gae221144f05126ac63dcf3866a82cc0f0">cell_unset</a>, <a class="el" href="../../d7/da6/group__Data__Type__Cell.html#ga8fe5fd8cd2d0dc7de08aaac1b7fbdb67">cell_active</a>, <a class="el" href="../../d7/da6/group__Data__Type__Cell.html#ga911a357554a0d57a478c1615bbeb55f0">cell_passive</a>, <a class="el" href="../../d7/da6/group__Data__Type__Cell.html#ga80c26e98edf1a2ec2801283d779cbb7b">cell_probe</a>, <a class="el" href="../../d7/da6/group__Data__Type__Cell.html#ga2cb393667d80ea07e92329e18ef43d17">cell_isoss</a> /)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Cell identifiers list.  <a href="../../d7/da6/group__Data__Type__Cell.html#gae58276318f01249f2475bd48b5f6dd06"></a><br/></td></tr>
-<tr><td colspan="2"><h2><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dcf/group__Data__Type__CellPrivateProcedure.html#gac4145cf9cf48b36135f267743d44b1a3">str2id</a> (cell, id_str)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for setting integer id from string id.  <a href="../../d4/dcf/group__Data__Type__CellPrivateProcedure.html#gac4145cf9cf48b36135f267743d44b1a3"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">elemental function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dcf/group__Data__Type__CellPrivateProcedure.html#gaccee186a0199cdac79e0b1d15570ffd9">id2str</a> (cell)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for converting integer id to string id.  <a href="../../d4/dcf/group__Data__Type__CellPrivateProcedure.html#gaccee186a0199cdac79e0b1d15570ffd9"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">type &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d93/group__Data__Type__CellDerivedType.html#d6/d65/structData__Type__Cell_1_1Type__Cell">Type_Cell</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived type containing cell-level data.  <a href="../../d1/d93/group__Data__Type__CellDerivedType.html#d6/d65/structData__Type__Cell_1_1Type__Cell">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">type &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d93/group__Data__Type__CellDerivedType.html#d6/d11/structData__Type__Cell_1_1Type__Cell__Ptr">Type_Cell_Ptr</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer of Type_SCell for creating array of pointers of Type_SCell.  <a href="../../d1/d93/group__Data__Type__CellDerivedType.html#d6/d11/structData__Type__Cell_1_1Type__Cell__Ptr">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dcf/group__Data__Type__CellPrivateProcedure.html#gabe595e6caf7d1741f81a65e0092409c9">free_cell</a> (cell)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for freeing dynamic data of <a class="el" href="../../d1/d93/group__Data__Type__CellDerivedType.html#d6/d65/structData__Type__Cell_1_1Type__Cell" title="Derived type containing cell-level data.">Type_Cell</a> variables.  <a href="../../d4/dcf/group__Data__Type__CellPrivateProcedure.html#gabe595e6caf7d1741f81a65e0092409c9"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dcf/group__Data__Type__CellPrivateProcedure.html#ga0d57b1427319f97b0e868d0370e9058e">init_cell</a> (cell, Ns, prim0, cons0, rk_ord)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for initializing dynamic data of <a class="el" href="../../d1/d93/group__Data__Type__CellDerivedType.html#d6/d65/structData__Type__Cell_1_1Type__Cell" title="Derived type containing cell-level data.">Type_Cell</a> variables.  <a href="../../d4/dcf/group__Data__Type__CellPrivateProcedure.html#ga0d57b1427319f97b0e868d0370e9058e"></a><br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><p>This module contains the definition of <a class="el" href="../../dd/dfd/group__DerivedType.html#d6/d65/structData__Type__Cell_1_1Type__Cell" title="Derived type containing cell informations.">Type_Cell</a> and its procedures. </p>
+<div class="textblock"><p>This module contains the definition of <a class="el" href="../../d1/d93/group__Data__Type__CellDerivedType.html#d6/d65/structData__Type__Cell_1_1Type__Cell" title="Derived type containing cell-level data.">Type_Cell</a> and its procedures. </p>
 <dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000001">Todo:</a></b></dt><dd><b>DocWriteRead:</b> Complete the documentation of write and read functions </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d9/d94/Data__Type__Cell_8f90_source.html#l00022">22</a> of file <a class="el" href="../../d9/d94/Data__Type__Cell_8f90_source.html">Data_Type_Cell.f90</a>.</p>
@@ -186,7 +147,7 @@ Private Member Functions</h2></td></tr>
     <ul>
       <li class="navelem"><a class="el" href="../../d6/d5e/classData__Type__Cell.html">Data_Type_Cell</a>      </li>
 
-    <li class="footer">Generated on Wed Nov 7 2012 14:31:46 for OFF by
+    <li class="footer">Generated on Thu Apr 4 2013 13:58:33 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

@@ -1,5 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$da/d1c/group__Lib__Fluxes__ConvectivePrivateProcedure.html#ga5f9c7107fd875ad5599d39d8df08bb74" title="Function for computing left eigenvectors matrix (L) of the Jacobian fluxes matrix &#160;in primitive varia..." alt="" coords="165,5,203,35"/>
-<area shape="rect" id="node7" href="$da/d1c/group__Lib__Fluxes__ConvectivePrivateProcedure.html#ga3eb0875421ac207b36a46c5b5efc8645" title="Function for computing right eigenvectors matrix (R) of the Jacobian fluxes matrix &#160;in primitive vari..." alt="" coords="164,59,204,88"/>
-<area shape="rect" id="node5" href="$da/d1c/group__Lib__Fluxes__ConvectivePrivateProcedure.html#gaf0068e7aabd9ab57a990b59df32c1b24" title="Positivity preserving limiter." alt="" coords="255,5,436,35"/>
-</map>

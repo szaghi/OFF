@@ -1,4 +1,6 @@
 var group__Program =
 [
-    [ "Functions/Subroutines", "db/db0/group__Program.html", "db/db0/group__Program_dup" ]
+    [ "IBM", "da/d4b/group__IBMProgram.html", "da/d4b/group__IBMProgram" ],
+    [ "OFF", "d9/d99/group__OFFProgram.html", "d9/d99/group__OFFProgram" ],
+    [ "POG", "dd/d2d/group__POGProgram.html", "dd/d2d/group__POGProgram" ]
 ];

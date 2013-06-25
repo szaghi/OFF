@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['normalize',['normalize',['../dd/d55/group__Interface.html#d8/d4b/interfaceData__Type__Tensor_1_1normalize',1,'Data_Type_Tensor']]],
-  ['norml2',['normL2',['../dd/d55/group__Interface.html#db/de7/interfaceData__Type__Tensor_1_1normL2',1,'Data_Type_Tensor']]]
+  ['normalize',['normalize',['../d5/d78/group__Data__Type__TensorInterface.html#d5/df1/interfacedata__type__tensor_1_1normalize',1,'data_type_tensor']]],
+  ['norml2',['norml2',['../d5/d78/group__Data__Type__TensorInterface.html#d3/d94/interfacedata__type__tensor_1_1norml2',1,'data_type_tensor']]]
 ];

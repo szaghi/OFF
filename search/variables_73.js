@@ -1,15 +1,19 @@
 var searchData=
 [
-  ['screen_5fout',['screen_out',['../dd/dfd/group__DerivedType.html#a87a78acb2ebc50eab533829feb23577d',1,'Data_Type_Global::Type_File']]],
-  ['seconds',['Seconds',['../dd/dfd/group__DerivedType.html#a28b84a68e96e2ced667616adf5410bf2',1,'Data_Type_Time::Type_Time']]],
-  ['sep',['sep',['../dd/dfd/group__DerivedType.html#a34e0250226ce69c37785e88ae67e5eb6',1,'Data_Type_OS::Type_OS']]],
+  ['s',['s',['../d8/d1e/group__Data__Type__FaceDerivedType.html#ae9c04e6c571dfafb6fe93bf22904d7d6',1,'data_type_face::type_face']]],
+  ['screen_5fout',['screen_out',['../dd/d09/group__Data__Type__GlobalDerivedType.html#aadaf531b7748516cd7d59bd7108b65f0',1,'data_type_global::type_file']]],
+  ['seconds',['seconds',['../d1/dae/group__Data__Type__TimeDerivedType.html#abc6cc48127ef3313974a9f45c67b470b',1,'data_type_time::type_time']]],
+  ['sendmap',['sendmap',['../d8/df4/group__Lib__ParallelPrivateVarPar.html#ga06f4afa013fa92f69aa3f8632f086472',1,'lib_parallel']]],
+  ['sep',['sep',['../de/da2/group__Data__Type__OSDerivedType.html#abe7862d9ee194735b6d991119926fb68',1,'data_type_os::type_os']]],
   ['shell',['SHELL',['../d8/d16/makefile.html#a79f0bac0e73874da7fb7ee23d49c929c',1,'makefile']]],
-  ['si',['Si',['../dd/dfd/group__DerivedType.html#af1bc035ec800c40150d170085c054502',1,'Data_Type_SBlock::Type_SBlock']]],
-  ['sj',['Sj',['../dd/dfd/group__DerivedType.html#abd4205c6cfa3075ac6c76f87fb34e3d1',1,'Data_Type_SBlock::Type_SBlock']]],
-  ['sk',['Sk',['../dd/dfd/group__DerivedType.html#a6e74526b7a94bbab4269bf1b6bfcb023',1,'Data_Type_SBlock::Type_SBlock']]],
-  ['smallr4p',['smallR4P',['../da/dd4/group__IR__Precision.html#ga620bdc21056b416f7ae10d87666e75c9',1,'IR_Precision']]],
-  ['smallr8p',['smallR8P',['../da/dd4/group__IR__Precision.html#gaf4372ce9bbef13c7f318ce211dbbca49',1,'IR_Precision']]],
-  ['smallr_5fp',['smallR_P',['../da/dd4/group__IR__Precision.html#gace480f862b422f3d59c6663f8704344c',1,'IR_Precision']]],
-  ['sol_5fout',['sol_out',['../dd/dfd/group__DerivedType.html#a6720f80fe982c2b0ba50b9e8717c04c8',1,'Data_Type_Global::Type_File']]],
-  ['sp_5ford',['sp_ord',['../dd/dfd/group__DerivedType.html#ac9145733fe8131c3b6c2faac86d6b594',1,'Data_Type_Global::Type_Global']]]
+  ['shft',['shft',['../db/d19/group__Lib__MortonPrivateVarPar.html#ga48b588892629a27893defaf790f73abb',1,'lib_morton']]],
+  ['signif',['signif',['../db/d19/group__Lib__MortonPrivateVarPar.html#gaa58534df3e20dfaa22e44ad41ea68950',1,'lib_morton']]],
+  ['sl_5flist_5fmold',['sl_list_mold',['../de/d22/classdata__type__sl__list.html#ab78b1ea0f9a85abad796c5171a726fa0',1,'data_type_sl_list']]],
+  ['smallr16p',['smallr16p',['../dc/d7d/group__IR__PrecisionGlobalVarPar.html#ga6c9d0d7779db660cb20ca7b3b0cfb355',1,'ir_precision']]],
+  ['smallr4p',['smallr4p',['../dc/d7d/group__IR__PrecisionGlobalVarPar.html#gaabc14fe4c8311c14cb5a78192f8d4a27',1,'ir_precision']]],
+  ['smallr8p',['smallr8p',['../dc/d7d/group__IR__PrecisionGlobalVarPar.html#gaa585db8bbd8b9dc196f99c1d361dd94f',1,'ir_precision']]],
+  ['smallr_5fp',['smallr_p',['../dc/d7d/group__IR__PrecisionGlobalVarPar.html#gacd2a76d436632ec9975c6b4ac641ee7a',1,'ir_precision']]],
+  ['sol_5fext',['sol_ext',['../dd/d09/group__Data__Type__GlobalDerivedType.html#a5d595aa7858ae7d9f8459f8e1514f760',1,'data_type_global::type_file']]],
+  ['sol_5fout',['sol_out',['../dd/d09/group__Data__Type__GlobalDerivedType.html#a624252a2c4629b3d68a90a114252670a',1,'data_type_global::type_file']]],
+  ['sp_5ford',['sp_ord',['../da/d5f/structdata__type__global_1_1type__global.html#aec4fa7d66574be9df5f3cccdd2a6eb1b',1,'data_type_global::type_global']]]
 ];

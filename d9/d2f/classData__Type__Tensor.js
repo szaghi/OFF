@@ -1,6 +1,6 @@
 var classData__Type__Tensor =
 [
-    [ "determinant", "d9/d0c/group__Data__Type__TensorPublicProcedure.html#ga635b777e6fdc506f23ea0a0ebd87e11a", null ],
+    [ "determinant", "d9/d0c/group__Data__Type__TensorPublicProcedure.html#ga5c06ba53ce595db253d749efaef8faf9", null ],
     [ "invert", "d9/d0c/group__Data__Type__TensorPublicProcedure.html#gae028d9cade88dc323c6e2b43a4b7d603", null ],
     [ "invertible", "d9/d0c/group__Data__Type__TensorPublicProcedure.html#ga5861e136980a2deb328998e5ece7df22", null ],
     [ "write_tensor", "d9/d0c/group__Data__Type__TensorPublicProcedure.html#ga5682c1c015d22a1e94a981f4da0696e8", null ],
@@ -76,5 +76,5 @@ var classData__Type__Tensor =
     [ "vec_dot_ten", "d1/dff/group__Data__Type__TensorPrivateProcedure.html#ga5218ba192c0ecf5191e63a06404bb249", null ],
     [ "ddotproduct", "d1/dff/group__Data__Type__TensorPrivateProcedure.html#ga53c6c1fe7dd188c14a87db45a6b11818", null ],
     [ "diadicproduct", "d1/dff/group__Data__Type__TensorPrivateProcedure.html#gab7b0fc7ad1aca7b719bd3188c84e6ce4", null ],
-    [ "unity", "d3/da2/group__Data__Type__Tensor.html#ga27294978da54eb644f12a06a8cd7b4c9", null ]
+    [ "unity", "df/dfd/group__Data__Type__TensorGlobalVarPar.html#ga27294978da54eb644f12a06a8cd7b4c9", null ]
 ];

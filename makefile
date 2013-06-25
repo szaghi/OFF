@@ -534,8 +534,8 @@ tar: cleanall
 	@echo -e "\033[1;31m Creating tar archive of the code \033[0m" | tee make.log
 	@rm -rf OFF
 	@mkdir -p OFF
-	@cp -r examples OFF/
-	@cp -rL inputs-template lib util src makefile README.md .doxygenconfig .gitignore OFF/
+	@cp -r EXAMPLE.md examples inputs-template lib makefile README.md util .doxygenconfig .gitignore OFF/
+	@cp -rL src OFF/
 	@tar czf OFF.tgz OFF
 	@rm -rf OFF
 

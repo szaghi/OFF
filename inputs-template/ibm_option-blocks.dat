@@ -3,15 +3,14 @@
 'uix'                                                        OS_type     = Operating System, UIX or WIN
                                   INPUT FILES
 './'                                                         Path_InPut  = input path
-'initial_species.dat'                                        File_Spec   = name of initial species file        
+'initial_species.dat'                                        File_Spec   = name of initial species file
 'blocks'                                                     In_type     = type of input, blocks or icemcfd
-'blocks-SOD-x_m.dat'                                         File_Blocks = name of blocks file                 
+'blocks.dat'                                                 File_Blocks = name of blocks file
                                   GRID OPTIONS
 1                                                            Nl          = number of grid level
-4                                                            gc          = number of ghost cells
                                   OUTPUT FILES
-'SOD-x_m/'                                                   Path_OutPut   = output path
-'tube'                                                       File_Mesh   = basename of mesh file                   
-'tube'                                                       File_BC     = basename of boundary conditions file    
-'sod'                                                        File_Init   = basename of initial conditions file     
+'./output/'                                                  Path_OutPut = output path
+'1DRP'                                                       File_Mesh   = basename of mesh file
+'1DRP'                                                       File_BC     = basename of boundary conditions file
+'1DRP'                                                       File_Init   = basename of initial conditions file
 -----------------------------------------------------------------------------------------------------------------------------------

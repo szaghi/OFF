@@ -16,4 +16,5 @@
 10                                                           sol_out       = actual solution output frequency
 10                                                           restart_out   = restart output frequency
 1                                                            probe_out     = probes output frequency
+'prof'                                                       File_Prof     = prefix of profiling file names
 ------------------------------------------------------------------------------------------------------------------------------------

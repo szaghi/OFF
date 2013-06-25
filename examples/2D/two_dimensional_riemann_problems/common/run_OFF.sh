@@ -36,6 +36,7 @@ else
   rm -rf output lockfile input # cleaning working directory
   ln -fs ../ibm/output input   # link to IBM output
   mkdir -p output              # creating outout directory
+  ulimit -s unlimited          # increasing the stack size
   if [ "$1" = "-no_mpi"  ] ; then
     cd input ; ln -fs procmap-no_mpi.dat procmap.dat ; cd ../ # linking procmap.dat to map without MPI
     ./OFF off_options.dat # running OFF without MPI

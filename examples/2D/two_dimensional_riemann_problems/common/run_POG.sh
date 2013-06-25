@@ -38,6 +38,7 @@ else
   rm -rf output input        # cleaning working directory
   ln -fs ../off/output input # link to OFF output
   mkdir -p output            # creating outout directory
+  ulimit -s unlimited        # increasing the stack size
   for file in $( ls ./input/*b001*N_*.sol ); do
     nlast=`basename $file | awk -F . '{print $3}' | awk -F _ '{print $2}' | sed 's/^0*//'`
   done

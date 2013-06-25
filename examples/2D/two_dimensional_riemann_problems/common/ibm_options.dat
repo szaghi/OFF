@@ -2,7 +2,7 @@
                                   OS TYPE
 'uix'                                                        OS_type     = Operating System, UIX or WIN
                                   INPUT FILES
-'./'                                                         Path_InPut  = input path
+'./input/'                                                   Path_InPut  = input path
 'initial_species.dat'                                        File_Spec   = name of initial species file
 'blocks'                                                     In_type     = type of input, blocks or icemcfd
 'blocks_description.dat'                                     File_Blocks = name of blocks file

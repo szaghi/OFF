@@ -28,6 +28,7 @@ elif [ "$1" == "-out" ] ; then
   fi
   rm -rf output            # cleaning working directory
   mkdir -p output          # creating outout directory
+  ulimit -s unlimited      # increasing the stack size
   ./IBM ibm_options.dat # running IBM with options defined in "ibm_options.dat"
   cp ./input/solver.dat ./output/          # copying solver options
   cp ./input/procmap-no_mpi.dat ./output/  # copyng procmap without MPI

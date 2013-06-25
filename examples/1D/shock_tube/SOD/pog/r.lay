@@ -2,6 +2,10 @@
 # Created by Tecplot 360 build 11.3.29.563
 $!VarSet |LFDSFN1| = '"output/sod.g01.b001.plt" "output/sod.g01.b002.plt"'
 $!VarSet |LFDSVL1| = '"x" "y" "z" "r_1" "r" "u" "v" "w" "p" "g"'
+$!VarSet |LFDSFN2| = '"exact_sod-100-t02-block-split.dat"'
+$!VarSet |LFDSVL2| = '"x" "y" "z" "r_1" "r" "u" "v" "w" "p" "g"'
+$!VarSet |LFDSFN3| = '"output-ref/sod.g01.b001.plt" "output-ref/sod.g01.b002.plt"'
+$!VarSet |LFDSVL3| = '"x" "y" "z" "r_1" "r" "u" "v" "w" "p" "g"'
 $!SETSTYLEBASE FACTORY
 $!GLOBALLINKING 
   LINKCOLORMAPS = YES
@@ -891,6 +895,28 @@ $!READDATASET  '|LFDSFN1|'
   VARNAMELIST = '|LFDSVL1|'
 $!REMOVEVAR |LFDSVL1|
 $!REMOVEVAR |LFDSFN1|
+$!READDATASET  '|LFDSFN2|'
+  INITIALPLOTTYPE = XYLINE
+  INCLUDETEXT = NO
+  INCLUDEGEOM = NO
+  READDATAOPTION = APPEND
+  RESETSTYLE = NO
+  ASSIGNSTRANDIDS = YES
+  VARLOADMODE = BYNAME
+  VARNAMELIST = '|LFDSVL2|'
+$!REMOVEVAR |LFDSVL2|
+$!REMOVEVAR |LFDSFN2|
+$!READDATASET  '|LFDSFN3|'
+  INITIALPLOTTYPE = XYLINE
+  INCLUDETEXT = NO
+  INCLUDEGEOM = NO
+  READDATAOPTION = APPEND
+  RESETSTYLE = NO
+  ASSIGNSTRANDIDS = YES
+  VARLOADMODE = BYNAME
+  VARNAMELIST = '|LFDSVL3|'
+$!REMOVEVAR |LFDSVL3|
+$!REMOVEVAR |LFDSFN3|
 $!FRAMELAYOUT 
   SHOWBORDER = NO
   SHOWHEADER = NO
@@ -908,7 +934,7 @@ $!THREEDAXIS
 $!PLOTTYPE  = XYLINE
 $!FRAMENAME  = 'Frame 001'
 $!DELETELINEMAPS 
-$!ACTIVELINEMAPS  =  [1-2]
+$!ACTIVELINEMAPS  =  [1-6]
 $!GLOBALLINEPLOT 
   DATALABELS
     {
@@ -916,16 +942,29 @@ $!GLOBALLINEPLOT
     }
   LEGEND
     {
+    SHOW = YES
+    TEXTSHAPE
+      {
+      FONT = HELV
+      HEIGHT = 4
+      }
+    BOX
+      {
+      BOXTYPE = FILLED
+      MARGIN = 1
+      COLOR = WHITE
+      }
     XYPOS
       {
-      X = 95
+      X = 85.467
+      Y = 85.114
       }
     }
 $!LINEMAP  [1]
   NAME = '&ZN&'
   ASSIGN
     {
-    ZONE = 1
+    ZONE = 3
     XAXISVAR = 1
     YAXISVAR = 5
     }
@@ -936,11 +975,77 @@ $!LINEMAP  [1]
     }
   SYMBOLS
     {
+    SHOW = NO
     SYMBOLSHAPE
       {
       GEOMSHAPE = CIRCLE
       }
     COLOR = BLACK
+    FILLCOLOR = RED
+    SIZE = 0.5
+    }
+  BARCHARTS
+    {
+    COLOR = RED
+    FILLCOLOR = RED
+    }
+  ERRORBARS
+    {
+    COLOR = RED
+    }
+$!LINEMAP  [2]
+  NAME = '&ZN&'
+  ASSIGN
+    {
+    ZONE = 4
+    XAXISVAR = 1
+    YAXISVAR = 5
+    }
+  LINES
+    {
+    COLOR = BLACK
+    LINETHICKNESS = 0.25
+    }
+  SYMBOLS
+    {
+    SHOW = NO
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = CIRCLE
+      }
+    COLOR = BLACK
+    FILLCOLOR = GREEN
+    SIZE = 0.5
+    }
+  BARCHARTS
+    {
+    COLOR = GREEN
+    FILLCOLOR = GREEN
+    }
+  ERRORBARS
+    {
+    COLOR = GREEN
+    }
+$!LINEMAP  [3]
+  NAME = 'OFF Reference'
+  ASSIGN
+    {
+    ZONE = 5
+    XAXISVAR = 1
+    YAXISVAR = 5
+    }
+  LINES
+    {
+    COLOR = CUSTOM6
+    LINETHICKNESS = 0.25
+    }
+  SYMBOLS
+    {
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = CIRCLE
+      }
+    COLOR = CUSTOM6
     FILLCOLOR = RED
     SIZE = 0.5
     }
@@ -964,17 +1069,17 @@ $!LINEMAP  [1]
       MAX = 1
       }
     }
-$!LINEMAP  [2]
-  NAME = '&ZN&'
+$!LINEMAP  [4]
+  NAME = 'OFF Reference'
   ASSIGN
     {
-    ZONE = 2
+    ZONE = 6
     XAXISVAR = 1
     YAXISVAR = 5
     }
   LINES
     {
-    COLOR = BLACK
+    COLOR = CUSTOM6
     LINETHICKNESS = 0.25
     }
   SYMBOLS
@@ -983,7 +1088,93 @@ $!LINEMAP  [2]
       {
       GEOMSHAPE = CIRCLE
       }
-    COLOR = BLACK
+    COLOR = CUSTOM6
+    FILLCOLOR = GREEN
+    SIZE = 0.5
+    }
+  BARCHARTS
+    {
+    COLOR = GREEN
+    FILLCOLOR = GREEN
+    }
+  ERRORBARS
+    {
+    COLOR = GREEN
+    }
+  INDICES
+    {
+    JRANGE
+      {
+      MAX = 1
+      }
+    KRANGE
+      {
+      MAX = 1
+      }
+    }
+$!LINEMAP  [5]
+  NAME = 'OFF output'
+  ASSIGN
+    {
+    ZONE = 1
+    XAXISVAR = 1
+    YAXISVAR = 5
+    }
+  LINES
+    {
+    COLOR = RED
+    LINETHICKNESS = 0.25
+    }
+  SYMBOLS
+    {
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = CIRCLE
+      }
+    COLOR = RED
+    FILLCOLOR = RED
+    SIZE = 0.5
+    }
+  BARCHARTS
+    {
+    COLOR = RED
+    FILLCOLOR = RED
+    }
+  ERRORBARS
+    {
+    COLOR = RED
+    }
+  INDICES
+    {
+    JRANGE
+      {
+      MAX = 1
+      }
+    KRANGE
+      {
+      MAX = 1
+      }
+    }
+$!LINEMAP  [6]
+  NAME = 'OFF output'
+  ASSIGN
+    {
+    ZONE = 2
+    XAXISVAR = 1
+    YAXISVAR = 5
+    }
+  LINES
+    {
+    COLOR = RED
+    LINETHICKNESS = 0.25
+    }
+  SYMBOLS
+    {
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = CIRCLE
+      }
+    COLOR = RED
     FILLCOLOR = GREEN
     SIZE = 0.5
     }

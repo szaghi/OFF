@@ -1,6 +1,8 @@
 /**
 @page TWOD-RP 2D Example: Two dimensional Riemann problems
 
+How to simulate 2D Riemann Problems
+
 @section TWOD-RiemannP Two dimensional Riemann problems
 
 The examples reported here concern with 2D Riemann problems. The initial conditions are the same as the ones reported by Kurganov and Tadmor [\ref kurganov "1"].

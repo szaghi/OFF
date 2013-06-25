@@ -503,7 +503,8 @@ contains
 #ifdef TECIO
     err = tecdat112(N,dat,1)
 #else
-    write(stderr,'(A)') 'Error: your are trying to save binary tecplot file without compiling against the Tecplot library.'
+    write(stderr,'(A)',iostat=err) 'Error: your are trying to save binary tecplot file without compiling against the '//&
+                                   'Tecplot library.'
     stop
 #endif
     return
@@ -526,9 +527,13 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   global => block(1)%global
   ! writing data blocks
+  if (global%Nb>1) then
   do b=1,global%Nb
     err = vtk_blk_data( global = global, block = block(b), filename = trim(filename)//'_b'//trim(strz(4,b))//'.vts')
   enddo
+  else
+    err = vtk_blk_data( global = global, block = block(1), filename = trim(filename)//'.vts')
+  endif
   !! writing the VTM wrapper for multiblock dataset
   !err = VTM_INI_XML(filename=trim(filename)//'.vtm')
   !err = VTM_BLK_XML(block_action='open')
@@ -612,38 +617,38 @@ contains
     err = VTK_FLD_XML(fld=block%global%n,fname='CYCLE')
     err = VTK_FLD_XML(fld_action='close')
     ! saving the geometry
-    err = VTK_GEO_XML(nx1 = ni1, nx2 = ni2,                                            &
-                      ny1 = nj1, ny2 = nj2,                                            &
-                      nz1 = nk1, nz2 = nk2,                                            &
-                      NN = nnode,                                                      &
-                      X=reshape(block%node(ni1:ni2,nj1:nj2,nk1:nk2)%x,(/nnode/)), &
-                      Y=reshape(block%node(ni1:ni2,nj1:nj2,nk1:nk2)%y,(/nnode/)), &
-                      Z=reshape(block%node(ni1:ni2,nj1:nj2,nk1:nk2)%z,(/nnode/)))
+    err = VTK_GEO_XML(nx1 = ni1, nx2 = ni2,                    &
+                      ny1 = nj1, ny2 = nj2,                    &
+                      nz1 = nk1, nz2 = nk2,                    &
+                      NN = nnode,                              &
+                      X=block%node(ni1:ni2,nj1:nj2,nk1:nk2)%x, &
+                      Y=block%node(ni1:ni2,nj1:nj2,nk1:nk2)%y, &
+                      Z=block%node(ni1:ni2,nj1:nj2,nk1:nk2)%z)
     if (.not.meshonly) then
       ! saving dependent variables
       if (pp_format%node) then
         err = VTK_DAT_XML(var_location = 'node', var_block_action = 'open')
         do s=1,global%Ns
-          err=VTK_VAR_XML(NC_NN=nnode,varname='r('//trim(str(.true.,s))//')',var=reshape(r(s,ni1:ni2,nj1:nj2,nk1:nk2),(/nnode/)))
+          err=VTK_VAR_XML(NC_NN=nnode,varname='r('//trim(str(.true.,s))//')',var=r(s,ni1:ni2,nj1:nj2,nk1:nk2))
         enddo
-        err=VTK_VAR_XML(NC_NN=nnode,varname='r',var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%d,  (/nnode/)))
-        err=VTK_VAR_XML(NC_NN=nnode,varname='u',var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%v%x,(/nnode/)))
-        err=VTK_VAR_XML(NC_NN=nnode,varname='v',var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%v%y,(/nnode/)))
-        err=VTK_VAR_XML(NC_NN=nnode,varname='w',var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%v%z,(/nnode/)))
-        err=VTK_VAR_XML(NC_NN=nnode,varname='p',var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%p,  (/nnode/)))
-        err=VTK_VAR_XML(NC_NN=nnode,varname='g',var=reshape(P(ni1:ni2,nj1:nj2,nk1:nk2)%g,  (/nnode/)))
+        err=VTK_VAR_XML(NC_NN=nnode,varname='r',var=P(ni1:ni2,nj1:nj2,nk1:nk2)%d  )
+        err=VTK_VAR_XML(NC_NN=nnode,varname='u',var=P(ni1:ni2,nj1:nj2,nk1:nk2)%v%x)
+        err=VTK_VAR_XML(NC_NN=nnode,varname='v',var=P(ni1:ni2,nj1:nj2,nk1:nk2)%v%y)
+        err=VTK_VAR_XML(NC_NN=nnode,varname='w',var=P(ni1:ni2,nj1:nj2,nk1:nk2)%v%z)
+        err=VTK_VAR_XML(NC_NN=nnode,varname='p',var=P(ni1:ni2,nj1:nj2,nk1:nk2)%p  )
+        err=VTK_VAR_XML(NC_NN=nnode,varname='g',var=P(ni1:ni2,nj1:nj2,nk1:nk2)%g  )
         err=VTK_DAT_XML(var_location ='node',var_block_action = 'close')
       else
         err = VTK_DAT_XML(var_location = 'cell', var_block_action = 'open')
         do s=1,global%Ns
-          err=VTK_VAR_XML(NC_NN=ncell,varname='r('//trim(str(.true.,s))//')',var=reshape(r(s,ci1:ci2,cj1:cj2,ck1:ck2),(/ncell/)))
+          err=VTK_VAR_XML(NC_NN=ncell,varname='r('//trim(str(.true.,s))//')',var=r(s,ci1:ci2,cj1:cj2,ck1:ck2))
         enddo
-        err=VTK_VAR_XML(NC_NN=ncell,varname='r',var=reshape(block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%d,  (/ncell/)))
-        err=VTK_VAR_XML(NC_NN=ncell,varname='u',var=reshape(block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%v%x,(/ncell/)))
-        err=VTK_VAR_XML(NC_NN=ncell,varname='v',var=reshape(block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%v%y,(/ncell/)))
-        err=VTK_VAR_XML(NC_NN=ncell,varname='w',var=reshape(block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%v%z,(/ncell/)))
-        err=VTK_VAR_XML(NC_NN=ncell,varname='p',var=reshape(block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%p,  (/ncell/)))
-        err=VTK_VAR_XML(NC_NN=ncell,varname='g',var=reshape(block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%g,  (/ncell/)))
+        err=VTK_VAR_XML(NC_NN=ncell,varname='r',var=block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%d  )
+        err=VTK_VAR_XML(NC_NN=ncell,varname='u',var=block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%v%x)
+        err=VTK_VAR_XML(NC_NN=ncell,varname='v',var=block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%v%y)
+        err=VTK_VAR_XML(NC_NN=ncell,varname='w',var=block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%v%z)
+        err=VTK_VAR_XML(NC_NN=ncell,varname='p',var=block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%p  )
+        err=VTK_VAR_XML(NC_NN=ncell,varname='g',var=block%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%g  )
         err=VTK_DAT_XML(var_location ='cell',var_block_action = 'close')
       endif
     endif
@@ -659,20 +664,24 @@ contains
   function gnu_output(meshonly,block,filename) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  logical,           intent(IN):: meshonly  !< Flag for post-process only mesh.
-  type(Type_SBlock), intent(IN):: block(1:) !< Block-level data.
-  character(*),      intent(IN):: filename  !< File name of the output file.
-  integer(I_P)::                  err       !< Error trapping flag: 0 no errors, >0 error occurs.
-  type(Type_Global), pointer::    global    !< Global-level data.
-  integer(I_P)::                  b         !< Counter.
+  logical,           intent(IN)::    meshonly  !< Flag for post-process only mesh.
+  type(Type_SBlock), intent(INOUT):: block(1:) !< Block-level data.
+  character(*),      intent(IN)::    filename  !< File name of the output file.
+  integer(I_P)::                     err       !< Error trapping flag: 0 no errors, >0 error occurs.
+  type(Type_Global), pointer::       global    !< Global-level data.
+  integer(I_P)::                     b         !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   global => block(1)%global
   ! writing data blocks
+  if (global%Nb>1) then
   do b=1,global%Nb
     err = gnu_blk_data(block = block(b), filename = trim(filename)//'_b'//trim(strz(4,b))//'.gnu.dat')
   enddo
+  else
+    err = gnu_blk_data(block = block(1), filename = trim(filename)//'.gnu.dat')
+  endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   contains
@@ -683,39 +692,86 @@ contains
 
     !-------------------------------------------------------------------------------------------------------------------------------
     implicit none
-    type(Type_SBlock), intent(IN):: block    ! Block-level data.
-    character(*),      intent(IN):: filename ! File name of the output block file.
-    integer(I_P)::                  err      ! Error trapping flag: 0 no errors, >0 error occurs.
-    integer(I_P)::                  i,j,k    ! Counters.
-    integer(I_P)::                  ugnu     ! Logic unit.
+    type(Type_SBlock), intent(INOUT):: block                               ! Block-level data.
+    character(*),      intent(IN)::    filename                            ! File name of the output block file.
+    integer(I_P)::                     err                                 ! Error trapping flag: 0 no errors, >0 error occurs.
+    integer(I_P)::                     i,j,k                               ! Counters.
+    integer(I_P)::                     ugnu                                ! Logic unit.
+    type(Type_Primitive)::             P(0:block%Ni,0:block%Nj,0:block%Nk) ! Primitive variables intepolated at nodes.
+    integer(I_P)::                     ni1,ni2,nj1,nj2,nk1,nk2             ! Bounds of dimensions of node-centered data.
+    integer(I_P)::                     ci1,ci2,cj1,cj2,ck1,ck2             ! Bounds of dimensions of cell-centered data.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
+    if (pp_format%node) then
+      ! tri-linear interpolation of cell-centered values at nodes
+      call interpolate_primitive(block=block,P=P)
+    endif
+    ! initialize the block dimensions
+    call compute_dimensions(block=block,                                     &
+                            ni1=ni1,ni2=ni2,nj1=nj1,nj2=nj2,nk1=nk1,nk2=nk2, &
+                            ci1=ci1,ci2=ci2,cj1=cj1,cj2=cj2,ck1=ck1,ck2=ck2)
     open(unit=Get_Unit(ugnu),file=trim(filename))
-    if (meshonly) then
-      do k=1,block%Nk
-        do j=1,block%Nj
-          do i=1,block%Ni
-            write(ugnu,'(3('//FR8P//',1X))',iostat=err) block%C(i,j,k)%cent%x,block%C(i,j,k)%cent%y,block%C(i,j,k)%cent%z
+    if (pp_format%node) then
+      if (meshonly) then
+        do k=nk1,nk2
+          do j=nj1,nj2
+            do i=ni1,ni2
+              write(ugnu,'(3('//FR8P//',1X))',iostat=err) block%node(i,j,k)%x,block%node(i,j,k)%y,block%node(i,j,k)%z
+            enddo
+            write(ugnu,*,iostat=err)
           enddo
+          write(ugnu,*,iostat=err)
         enddo
-      enddo
+      else
+        do k=nk1,nk2
+          do j=nj1,nj2
+            do i=ni1,ni2
+              write(ugnu,'(9('//FR8P//',1X))',iostat=err) block%node(i,j,k)%x, &
+                                                          block%node(i,j,k)%y, &
+                                                          block%node(i,j,k)%z, &
+                                                          P(i,j,k)%d,          &
+                                                          P(i,j,k)%v%x,        &
+                                                          P(i,j,k)%v%y,        &
+                                                          P(i,j,k)%v%z,        &
+                                                          P(i,j,k)%p,          &
+                                                          P(i,j,k)%g
+            enddo
+            write(ugnu,*,iostat=err)
+          enddo
+          write(ugnu,*,iostat=err)
+        enddo
+      endif
     else
-      do k=1,block%Nk
-        do j=1,block%Nj
-          do i=1,block%Ni
-            write(ugnu,'(9('//FR8P//',1X))',iostat=err) block%C(i,j,k)%cent%x, &
-                                                        block%C(i,j,k)%cent%y, &
-                                                        block%C(i,j,k)%cent%z, &
-                                                        block%C(i,j,k)%P%d,    &
-                                                        block%C(i,j,k)%P%v%x,  &
-                                                        block%C(i,j,k)%P%v%y,  &
-                                                        block%C(i,j,k)%P%v%z,  &
-                                                        block%C(i,j,k)%P%p,    &
-                                                        block%C(i,j,k)%P%g
+      if (meshonly) then
+        do k=ck1,ck2
+          do j=cj1,cj2
+            do i=ci1,ci2
+              write(ugnu,'(3('//FR8P//',1X))',iostat=err) block%C(i,j,k)%cent%x,block%C(i,j,k)%cent%y,block%C(i,j,k)%cent%z
+            enddo
+            write(ugnu,*,iostat=err)
           enddo
+          write(ugnu,*,iostat=err)
         enddo
-      enddo
+      else
+        do k=ck1,ck2
+          do j=cj1,cj2
+            do i=ci1,ci2
+              write(ugnu,'(9('//FR8P//',1X))',iostat=err) block%C(i,j,k)%cent%x, &
+                                                          block%C(i,j,k)%cent%y, &
+                                                          block%C(i,j,k)%cent%z, &
+                                                          block%C(i,j,k)%P%d,    &
+                                                          block%C(i,j,k)%P%v%x,  &
+                                                          block%C(i,j,k)%P%v%y,  &
+                                                          block%C(i,j,k)%P%v%z,  &
+                                                          block%C(i,j,k)%P%p,    &
+                                                          block%C(i,j,k)%P%g
+            enddo
+            write(ugnu,*,iostat=err)
+          enddo
+          write(ugnu,*,iostat=err)
+        enddo
+      endif
     endif
     close(ugnu)
     return

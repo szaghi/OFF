@@ -1,6 +1,4 @@
-=======
-OFF
-==========
+# OFF
 
 OFF, Open source Finite volumes Fluid dynamics code [see documentation](http://szaghi.github.com/OFF/index.html).
 
@@ -48,12 +46,10 @@ The main features of _OFF_ code are the following:
     - Fine, local parallelism by means of GPU programming (e.g. CUDA framework) providing the ability to use GPUs cluster
       facilities (to be developed in future).
 
-Copyrights
-----------
+## Copyrights
 
 OFF is an open source project, it is distributed under the [GPL v3](http://www.gnu.org/licenses/gpl-3.0.html). Anyone is interest to use, to develop or to contribute to OFF is welcome.
 
-Documentation
-----------
+## Documentation
 
 Detailed documentation can be found on the [GitHub pages](http://szaghi.github.com/OFF/index.html) of the project.

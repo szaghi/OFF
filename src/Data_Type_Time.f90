@@ -358,6 +358,14 @@ contains
   !> @return \b seconds real(R8P) variable.
   function Crono(start,instant1,instant0) result(seconds)
   !---------------------------------------------------------------------------------------------------------------------------------
+#ifdef OPENMP
+  USE omp_lib ! OpenMP runtime library.
+#elif defined MPI2
+  USE MPI ! MPI runtime library.
+#endif
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   logical,   intent(IN), optional:: start    !< Flag for starting time measurament.
   real(R8P), intent(IN), optional:: instant1 !< Seconds from instant1 (external supplied, different from instant0).
@@ -368,6 +376,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 #ifdef OPENMP
   seconds = omp_get_wtime()      ! Getting seconds.
+#elif defined MPI2
+  seconds = MPI_Wtime()
 #else
   call CPU_TIME(seconds)         ! Getting seconds.
 #endif

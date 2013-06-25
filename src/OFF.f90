@@ -94,14 +94,13 @@
 program OFF
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                        ! Integers and reals precision definition.
-USE Data_Type_AMRBlock                                  ! Definition of Type_AMRBlock.
 USE Data_Type_BC                                        ! Definition of Type_BC.
 USE Data_Type_Global                                    ! Definition of Type_Global.
 USE Data_Type_OS                                        ! Definition of Type_OS.
 USE Data_Type_Primitive                                 ! Definition of Type_Primitive.
 USE Data_Type_Probe                                     ! Definition of Type_Probe.
 USE Data_Type_SBlock                                    ! Definition of Type_SBlock.
-USE Data_Type_Tensor                                    ! Definition of Type_Tensor.
+USE Data_Type_Tensor, sq_norm_ten => sq_norm            ! Definition of Type_Tensor.
 USE Data_Type_Time                                      ! Definition of Type_Time.
 USE Lib_Fluidynamic, only: primitive2conservative, &    ! Function for converting primitive variables to conservative ones.
                            conservative2primitive, &    ! Function for converting conservative variables to primitive ones.
@@ -125,8 +124,10 @@ USE OMP_LIB                                             ! OpenMP runtime library
 USE MPI                                                 ! MPI runtime library.
 USE Lib_Parallel,    only: Init_sendrecv                ! Subroutine for initialize send/receive communications.
 #endif
-USE Lib_Morton   !  Procedure for Morton's encoding.
-USE Data_Type_HashID   !  Procedure for Morton's encoding.
+! AMR check
+!USE Data_Type_AMRBlock                                  ! Definition of Type_AMRBlock.
+!USE Lib_Morton   !  Procedure for Morton's encoding.
+!USE Data_Type_HashID   !  Procedure for Morton's encoding.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -143,7 +144,7 @@ character(20)::                  date          !< Actual date.
 integer(I_P)::                   Nprb = 0_I_P  !< Number of probes.
 type(Type_Probe), allocatable::  probes(:)     !< Probes [1:Nprb].
 integer(I_P)::                   unitprobe     !< Probes unit file.
-type(Type_AMRBlock), allocatable:: amrblock(:) !< AMR grids [1:Nb].
+!type(Type_AMRBlock), allocatable:: amrblock(:) !< AMR grids [1:Nb].
 !> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -182,7 +183,6 @@ Temporal_Loop: do
   endif
   ! control sentinel for the temporal Loop
   if ((global%t==global%Tmax).OR.(global%n==global%Nmax).OR.(global%residual_stop)) exit Temporal_Loop
-  !endif
 enddo Temporal_Loop
 
 ! saving the final time step solution
@@ -196,7 +196,7 @@ do l=1,global%Nl
   ! saving the output file
   do b=1,global%Nb
     err = block(b,l)%save_fluid(filename=file_name(basename=trim(global%file%Path_OutPut)//global%file%File_Sol,&
-                                                   suffix='.sol',blk=blockmap(b),grl=l,n=global%n))
+                                                   suffix=trim(global%file%Sol_Ext),blk=blockmap(b),grl=l,n=global%n))
   enddo
 enddo
 
@@ -206,13 +206,13 @@ if (global%myrank==0) then
   close(global%file%unit_res)   ! close log residuals file
 endif
 ! finalizing parallel environments
-#ifdef MPI2
-call MPI_FINALIZE(err)
-#endif
 #ifdef PROFILING
 ! finalizing profiling
 call profile(p=7,pstop=.true.,myrank=global%myrank)
 call profile(finalize=.true.,myrank=global%myrank)
+#endif
+#ifdef MPI2
+call MPI_FINALIZE(err)
 #endif
 stop
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -232,17 +232,10 @@ contains
   character(500)::  varname_res       !< Variables name for the gnuplot residuals file.
   character(DI_P):: Ncstr             !< String containing current number id of conservative variables.
   integer(I_P)::    UnitFree          !< Free logic unit.
-  logical::         is_file           !< Flag for inquiring the presence of file.
+  logical::         is_file=.true.    !< Flag for inquiring the presence of file.
 #ifndef PROFILING
   real(R8P)::       instant0 = 0._R8P !< The Crono starting instant used for profing the code.
 #endif
-  ! cazzo
-  integer(I8P):: i64 , j64, k64
-  !integer(I4P):: i4  , j4 , k4
-  integer(I2P):: i2  , j2 , k2
-  !integer(I1P):: i1  , j1 , k1
-  type(Type_HashID)::                   ID    !< ID value.
-  ! cazzo
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -286,45 +279,6 @@ contains
     write(stdout,'(A)',   iostat=err)'----------------------------------------------------------------------'
     write(stdout,'(A)',   iostat=err)' Some information about the precision of runnig machine'
     call IR_Print()
-    ! cazzo
-    !allocate(amrblock(1))
-    !amrblock(1)%gc = 0
-    !amrblock(1)%Ni = 4
-    !amrblock(1)%Nj = 4
-    !amrblock(1)%Nk = 4
-    !call amrblock(1)%init(1_I2P)
-    !do k=1,amrblock(1)%Nk
-    !  do j=1,amrblock(1)%Nj
-    !    do i=1,amrblock(1)%Ni
-    !      call ID%build(b=1_I2P,i=i,j=j,k=k,l=0_I1P,p=0_I8P)
-    !      call demorton3(ID%bcl,i2,j2,k2)
-    !      write(stdout,'(4I10)')ID%bcl,i2,j2,k2
-    !    enddo
-    !  enddo
-    !enddo
-    !read(stdout,'(B8.8)') i4
-    !write(stdout,'(I10)') i4
-    !!read(stdout,'(B64.64)') i64
-    !!write(stdout,'(Z64.64)') i64
-    !!write(stdout,'(I10)') int(log10(4._R_P)/log10(2._R_P),I1P)
-    !i1 = 6 ; j1 = 11 ; k1 = 30
-    !i64 = morton2(i=i1,j=j1)
-    !write(stdout,'(4I10,1X)') i1,j1,k1,i64
-    !call demorton2(key=i64,i=i1,j=j1)
-    !write(stdout,'(4I10,1X)') i1,j1,k1
-    !i2 = 16 ; j2 = 101 ; k2 = 300
-    !i64 = morton2(i=i2,j=j2)
-    !write(stdout,'(4I10,1X)') i2,j2,k2,i64
-    !call demorton2(key=i64,i=i2,j=j2)
-    !write(stdout,'(4I10,1X)') i2,j2,k2
-    !i4 = 600 ; j4 = 1001 ; k4 = 3000
-    !i64 = morton2(i=i4,j=j4)
-    !write(stdout,'(4I10,1X)') i4,j4,k4,i64
-    !call demorton2(key=i64,i=i4,j=j4)
-    !write(stdout,'(4I10,1X)') i4,j4,k4
-    !i64 = treedim(3,5)*100/10**6
-    !write(stdout,'(I10)') i64
-    !stop 'cazzo'
     write(stdout,'(A)',   iostat=err)'----------------------------------------------------------------------'
     write(stdout,*)
     write(stdout,'(A)',   iostat=err)'----------------------------------------------------------------------'
@@ -335,7 +289,7 @@ contains
   endif
 
   ! parsing command line for getting global option file name
-  Nca = command_argument_count ()
+  Nca = command_argument_count()
   if (Nca==0) then
     write(stderr,'(A,I3)')' My RANK is: ',global%myrank
     write(stderr,'(A)')   ' A valid file name of the options file must be provided as command line argument'
@@ -348,7 +302,7 @@ contains
 #endif
     stop
   else
-    call get_command_argument (1, File_Option)
+    call get_command_argument(1, File_Option)
     File_Option = string_OS_sep(File_Option) ; File_Option = adjustl(trim(File_Option))
   endif
   if (global%myrank==0) then
@@ -595,13 +549,14 @@ contains
 
 #ifdef PROFILING
   ! code profiling initialization
-  call profile(Np=7,header=['ZONE T="solve_grl"             ', &
-                            'ZONE T="conservative2primitive"', &
-                            'ZONE T="boundary_conditions"   ', &
-                            'ZONE T="compute_time"          ', &
-                            'ZONE T="residuals"             ', &
-                            'ZONE T="rk_time_integration"   ', &
-                            'ZONE T="OFF"                   '],myrank=global%myrank)
+  call profile(Np=7,fnamep=trim(global%file%Path_OutPut)//trim(global%file%File_Prof),&
+               header=['ZONE T="solve_grl"             ',                             &
+                       'ZONE T="conservative2primitive"',                             &
+                       'ZONE T="boundary_conditions"   ',                             &
+                       'ZONE T="compute_time"          ',                             &
+                       'ZONE T="residuals"             ',                             &
+                       'ZONE T="rk_time_integration"   ',                             &
+                       'ZONE T="OFF"                   '],myrank=global%myrank)
 #else
   instant0 = Crono(start=.true.)
 #endif
@@ -640,10 +595,12 @@ contains
   read(UnitFree,*,iostat=err) !               OUTPUT OPTIONS
   read(UnitFree,*,iostat=err)global%file%Path_OutPut
   read(UnitFree,*,iostat=err)global%file%File_Sol
+  read(UnitFree,*,iostat=err)global%file%Sol_Ext
   read(UnitFree,*,iostat=err)global%file%screen_out
   read(UnitFree,*,iostat=err)global%file%sol_out
   read(UnitFree,*,iostat=err)global%file%restart_out
   read(UnitFree,*,iostat=err)global%file%probe_out
+  read(UnitFree,*,iostat=err)global%file%File_Prof
   close(UnitFree)
   os_type = Upper_Case(os_type) ; call OS%init(c_id=os_type,myrank=global%myrank)
 

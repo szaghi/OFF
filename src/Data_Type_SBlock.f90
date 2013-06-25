@@ -35,20 +35,20 @@ private
 !> connectivity) numerical grid.
 !> @ingroup Data_Type_SBlockDerivedType
 type, public:: Type_SBlock
-  type(Type_Global), pointer::     global          !< Pointer to global-level data.
+  type(Type_Global), pointer::     global                 !< Pointer to global-level data.
   integer(I1P)::                   gc(1:6)=&
-                                          (/1,1, & ! gc(1) => left i, gc(2) => right i.
-                                            1,1, & ! gc(3) => left j, gc(4) => right j.
-                                            1,1  & ! gc(5) => left k, gc(6) => right k.
-                                            /)     !< Number of ghost cells for the 6 faces of the block.
-  integer(I4P)::                   Ni     = 0      !< Number of cells in i direction.
-  integer(I4P)::                   Nj     = 0      !< Number of cells in j direction.
-  integer(I4P)::                   Nk     = 0      !< Number of cells in k direction.
-  type(Type_Vector), allocatable:: node(:,:,:)     !< Nodes coord.  [0-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
-  type(Type_Face),   allocatable:: Fi(:,:,:)       !< Faces i data  [0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  type(Type_Face),   allocatable:: Fj(:,:,:)       !< Faces j data  [1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
-  type(Type_Face),   allocatable:: Fk(:,:,:)       !< Faces k data  [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
-  type(Type_Cell),   allocatable:: C(:,:,:)        !< Cells data    [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+                                          [1_I1P,1_I1P, & ! gc(1) => left i, gc(2) => right i.
+                                           1_I1P,1_I1P, & ! gc(3) => left j, gc(4) => right j.
+                                           1_I1P,1_I1P  & ! gc(5) => left k, gc(6) => right k.
+                                           ]              !< Number of ghost cells for the 6 faces of the block.
+  integer(I4P)::                   Ni     = 0_I4P         !< Number of cells in i direction.
+  integer(I4P)::                   Nj     = 0_I4P         !< Number of cells in j direction.
+  integer(I4P)::                   Nk     = 0_I4P         !< Number of cells in k direction.
+  type(Type_Vector), allocatable:: node(:,:,:)            !< Nodes coord.  [0-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
+  type(Type_Face),   allocatable:: Fi(:,:,:)              !< Faces i data  [0-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+  type(Type_Face),   allocatable:: Fj(:,:,:)              !< Faces j data  [1-gc(1):Ni+gc(2),0-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
+  type(Type_Face),   allocatable:: Fk(:,:,:)              !< Faces k data  [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
+  type(Type_Cell),   allocatable:: C(:,:,:)               !< Cells data    [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
   contains
     procedure, non_overridable:: alloc => alloc_block                  ! Procedure for allocating memory.
     procedure, non_overridable:: free => free_block                    ! Procedure for freeing memory.
@@ -77,7 +77,7 @@ contains
   integer(I1P)::                      gc(1:6)  !< Temporary variable  for storing block ghost cells number.
   integer(I_P)::                      Ni,Nj,Nk !< Temporary variables for storing block dimensions.
   integer(I_P)::                      Ns       !< Temporary variable  for storing number of species.
-  integer(I_P)::                      rk_ord   !< Temporary variable  for storing rk_ord.
+  integer(I1P)::                      rk_ord   !< Temporary variable  for storing rk_ord.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

@@ -46,8 +46,10 @@ type, public:: Type_File
   character(60)::  File_Mesh   ='unset' !< Base name of mesh file.
   character(60)::  File_Spec   ='unset' !< Name of initial species file.
   character(60)::  File_Sol    ='unset' !< Base name of solution file.
+  character(4)::   Sol_Ext     ='null'  !< Solution file extension.
   character(60)::  File_Solver ='unset' !< Name of solver options file.
   character(60)::  File_Pout   ='unset' !< Post-processed output file name.
+  character(60)::  File_Prof   ='unset' !< Prefix name of profiling file names.
   character(500):: varform_res = ''     !< Gnuplot residuals writing format.
   integer(I8P)::   screen_out  = 1      !< Console refresh frequency.
   integer(I8P)::   sol_out     = 0      !< Actual solution writing frequency (if 0 only restart solution is saved).
@@ -89,7 +91,7 @@ type, public:: Type_Global
   integer(I_P):: Nl     = 1_I_P !< Number of grid levels.
   integer(I_P):: Nb     = 0_I_P !< Number of blocks.
   integer(I_P):: Nb_tot = 0_I_P !< Number of total blocks (sum over each process).
-  integer(I1P):: gco    = 1_I_P !< Number of ghost cells necessary to achieve the space reconstruction order.
+  integer(I1P):: gco    = 1_I1P !< Number of ghost cells necessary to achieve the space reconstruction order.
   ! boundary conditions data
   integer(I_P)::                      Nin1 = 0_I_P !< Number of inflow 1 boundary conditions.
   type(Type_Primitive), allocatable:: in1(:)       !< Inflow 1 boundary conditions primitive variables [1:Nin1].
@@ -103,8 +105,8 @@ type, public:: Type_Global
   logical::                 unsteady      = .true.   !< Type of simulation: unsteady or not.
   integer(I8P)::            Nmax          = 0_I8P    !< Max number of iterations.
   real(R_P)::               Tmax          = 0._R_P   !< Max time, ignored if Nmax>0.
-  integer(I1P)::            sp_ord        = 1_I_P    !< Order of space convergence (number of ghost cells).
-  integer(I1P)::            rk_ord        = 1_I_P    !< Order of time convergence (number of Runge-Kutta stages).
+  integer(I1P)::            sp_ord        = 1_I1P    !< Order of space convergence (number of ghost cells).
+  integer(I1P)::            rk_ord        = 1_I1P    !< Order of time convergence (number of Runge-Kutta stages).
   real(R_P)::               CFL           = 0.3_R_P  !< Value of stability coefficient.
   real(R_P)::               residual_toll = 0.01_R_P !< Tolerance for residuals vanishing evaluation.
   logical::                 residual_stop = .false.  !< Sentinel for stopping steady simulation when residuals vanish.
@@ -148,7 +150,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   character(*), intent(IN)::                           basename !< Base name of file name.
-  character(*), intent(IN)::                           suffix   !< Suffix   of file name.
+  character(*), intent(IN)::                           suffix   !< Suffix    of file name.
   integer(I_P), intent(IN)::                           blk      !< Block number.
   integer(I_P), intent(IN)::                           grl      !< Grid refinement level.
   character(len_trim(basename)+4+5+len_trim(suffix)):: filename !< Output file name.
@@ -233,7 +235,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   if (allocated(global%in1)) then
-    call global%in1%free ; deallocate(global%in1)
+    !call global%in1%free ; deallocate(global%in1)
   endif
   if (global%Nin1>0) allocate(global%in1(1:global%Nin1)) ; call global%in1%init(Ns=global%Ns)
   return

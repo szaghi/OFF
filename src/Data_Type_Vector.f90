@@ -74,8 +74,8 @@ type, public:: Type_Vector
   contains
     procedure, non_overridable:: set                         ! Procedure for setting vector components.
     procedure, non_overridable:: pprint                      ! Procedure for printing vector components with a "pretty" format.
-    procedure, non_overridable:: sq_norm                     ! Procedure for computing the square of the norm of a vector.
-    procedure, non_overridable:: normL2                      ! Procedure for computing the norm L2 of a vector.
+    procedure, non_overridable:: sq_norm => sq_norm_self     ! Procedure for computing the square of the norm of a vector.
+    procedure, non_overridable:: normL2 => normL2_self       ! Procedure for computing the norm L2 of a vector.
     procedure, non_overridable:: normalize => normalize_self ! Procedure for normalizing a vector.
 endtype Type_Vector
 !> Pointer of Type_Vector for creating array of pointers of Type_Vector.
@@ -380,8 +380,8 @@ contains
   elemental function sq_norm(vec) result(sq)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Vector), intent(IN):: vec !< Vector.
-  real(R8P)::                      sq  !< Square of the Norm.
+  type(Type_Vector), intent(IN):: vec !< Vector.
+  real(R8P)::                     sq  !< Square of the Norm.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -396,8 +396,8 @@ contains
   elemental function normL2(vec) result(norm)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Vector), intent(IN):: vec  !< Vector.
-  real(R8P)::                      norm !< Norm L2.
+  type(Type_Vector), intent(IN):: vec  !< Vector.
+  real(R8P)::                     norm !< Norm L2.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -675,8 +675,39 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine normalize_self
 
+  !> @brief Function for computing the square of the norm of a vector.
+  !> The square norm if defined as \f$ N = x^2  + y^2  + z^2\f$.
+  !> @return \b sq square norm
+  elemental function sq_norm_self(vec) result(sq)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Vector), intent(IN):: vec !< Vector.
+  real(R8P)::                      sq  !< Square of the Norm.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  sq = (vec%x*vec%x) + (vec%y*vec%y) + (vec%z*vec%z)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction sq_norm_self
+
+  !> @brief Function for computing the norm L2 of a vector.
+  !> The norm L2 if defined as \f$N = \sqrt {x^2  + y^2  + z^2 }\f$.
+  !> @return \b norm norm L2
+  elemental function normL2_self(vec) result(norm)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Vector), intent(IN):: vec  !< Vector.
+  real(R8P)::                      norm !< Norm L2.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  norm = sqrt((vec%x*vec%x) + (vec%y*vec%y) + (vec%z*vec%z))
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction normL2_self
+
   ! Assignment (=)
-#ifdef r16p
   elemental subroutine assign_ScalR16P(vec,scal)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Subroutine for assignment between a scalar (real R16P) and vec.
@@ -695,7 +726,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR16P
-#endif
 
   elemental subroutine assign_ScalR8P(vec,scal)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -832,7 +862,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_mul_vec
 
-#ifdef r16p
   elemental function ScalR16P_mul_vec(scal,vec) result(mul)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for multiply scalar (real R16P) for vec.
@@ -872,7 +901,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_mul_ScalR16P
-#endif
 
   elemental function ScalR8P_mul_vec(scal,vec) result(mul)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1135,7 +1163,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_div_vec
 
-#ifdef r16p
   elemental function vec_div_ScalR16P(vec,scal) result(div)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for divide vec for scalar (real R16P).
@@ -1155,7 +1182,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_div_ScalR16P
-#endif
 
   elemental function vec_div_ScalR8P(vec,scal) result(div)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1317,7 +1343,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sum_vec
 
-#ifdef r16p
   elemental function ScalR16P_sum_vec(scal,vec) result(summ)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for sum scalar (real R16P) and vec.
@@ -1357,7 +1382,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sum_ScalR16P
-#endif
 
   elemental function ScalR8P_sum_vec(scal,vec) result(summ)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1639,7 +1663,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sub_vec
 
-#ifdef r16p
   elemental function ScalR16P_sub_vec(scal,vec) result(sub)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for subtract scalar (real R16P) and vec.
@@ -1679,7 +1702,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_sub_ScalR16P
-#endif
 
   elemental function ScalR8P_sub_vec(scal,vec) result(sub)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1948,7 +1970,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_not_eq_vec
 
-#ifdef r16p
   elemental function R16P_not_eq_vec(scal,vec) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function returns .true. if the normL2 of the vec is /= with respect the value of scalar scal, .false. otherwise.
@@ -1984,7 +2005,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_not_eq_R16P
-#endif
 
   elemental function R8P_not_eq_vec(scal,vec) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2221,7 +2241,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_vec
 
-#ifdef r16p
   elemental function R16P_low_vec(scal,vec) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function returns .true. if the normL2 of the vec1 is < with respect the  value of scalar scal, .false. otherwise.
@@ -2257,7 +2276,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_R16P
-#endif
 
   elemental function R8P_low_vec(scal,vec) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2494,7 +2512,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_eq_vec
 
-#ifdef r16p
   elemental function R16P_low_eq_vec(scal,vec) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function returns .true. if the normL2 of the vec1 is <= with respect the  value of scalar scal, .false. otherwise.
@@ -2530,7 +2547,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_low_eq_R16P
-#endif
 
   elemental function R8P_low_eq_vec(scal,vec) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2774,7 +2790,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_eq_vec
 
-#ifdef r16p
   elemental function R16P_eq_vec(scal,vec) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function returns .true. if the normL2 of the vec is = with respect the value of scalar scal, .false. otherwise.
@@ -2810,7 +2825,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_eq_R16P
-#endif
 
   elemental function R8P_eq_vec(scal,vec) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3047,7 +3061,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_eq_vec
 
-#ifdef r16p
   elemental function R16P_great_eq_vec(scal,vec) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function returns .true. if the normL2 of the vec1 is >= with respect the  value of scalar scal, .false. otherwise.
@@ -3083,7 +3096,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_eq_R16P
-#endif
 
   elemental function R8P_great_eq_vec(scal,vec) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -3320,7 +3332,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_vec
 
-#ifdef r16p
   elemental function R16P_great_vec(scal,vec) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function returns .true. if the normL2 of the vec1 is > with respect the  value of scalar scal, .false. otherwise.
@@ -3356,7 +3367,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_great_R16P
-#endif
 
   elemental function R8P_great_vec(scal,vec) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------

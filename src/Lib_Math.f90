@@ -34,37 +34,25 @@
 module Lib_Math
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                        ! Integers and reals precision definition.
-USE Data_Type_SL_List                   ! Definition of Type_SL_List.
+!USE Data_Type_SL_List                   ! Definition of Type_SL_List.
 USE Data_Type_Vector, only: Type_Vector ! Definition of Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 private
-public:: prime
+public:: pi,pi_R16,pi_R8,pi_R4
+!public:: prime
 public:: isort
 public:: qsort
 public:: spline3
-
-public:: stretchinglside
-public:: stretchingrside
-public:: stretching2side
+public:: stretchinglside,stretchingrside,stretching2side
 public:: average
 public:: digit
 public:: div2
-public:: interpolate1
-public:: interpolate2
-public:: interpolate3
-public:: pi
-#ifdef r16p
-public:: pi_R16
-#endif
-public:: pi_R8
-public:: pi_R4
-public:: degree
-public:: radiant
-public:: delta1_2o
-public:: delta2_2o
+public:: interpolate1,interpolate2,interpolate3
+public:: degree,radiant
+public:: delta1_2o,delta2_2o
 public:: abs_grad
 public:: laplacian
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -73,9 +61,7 @@ public:: laplacian
 ! Pi greek definitions with parametric kind precision.
 !> @ingroup Lib_MathGlobalVarPar
 !> @{
-#ifdef r16p
 real(R16P), parameter:: pi_R16 = 2._R16P*asin(1._R16P) !< \f$\pi \f$ with R16P precision.
-#endif
 real(R8P),  parameter:: pi_R8  = 2._R8P* asin(1._R8P)  !< \f$\pi \f$ with R8P  precision.
 real(R4P),  parameter:: pi_R4  = 2._R4P* asin(1._R4P)  !< \f$\pi \f$ with R4P  precision.
 real(R_P),  parameter:: pi     = 2._R_P* asin(1._R_P)  !< \f$\pi \f$ with R_P  precision.
@@ -96,9 +82,9 @@ real(R_P),  parameter:: pi     = 2._R_P* asin(1._R_P)  !< \f$\pi \f$ with R_P  p
 !> The input integer n can have all the kinds defined in IR_Precision module.
 !> @note The output array containing the factors must allocatable of the same kind of input integer.
 !> @ingroup Lib_MathInterface
-interface prime
-  module procedure prime_I8,prime_I4,prime_I2,prime_I1
-endinterface
+!interface prime
+!  module procedure prime_I8,prime_I4,prime_I2,prime_I1
+!endinterface
 !> @brief Subroutine for performing InsertionSort with ascending order.
 !> Example of usage:
 !> @code
@@ -251,162 +237,161 @@ contains
   !> @{
   !> @brief Subroutine for computing prime factors of input integer number (I8P). The results is an array of integers containing the
   !> prime factors list.
-  subroutine prime_I8(n,p)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I8P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
-  integer(I8P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
-  type(Type_SL_List)::                     pl   !< Prime factors list.
-  integer(I8P)::                           nn   !< Copy of Input number.
-  integer(I8P)::                           d    !< Divisor.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  if (n==1) then
-    allocate(p(1:1)) ; p = 1
-    return
-  endif
-  nn=n
-  do ! removing all factors of 2
-    if (mod(nn,2_I8P)/=0.OR.nn==1) exit
-    nn = nn/2_I8P
-    call pl%putt(d=2_I8P)
-  enddo
-  d=3
-  do ! removing factor 3, 5, 7, ...
-    if (d>nn) exit ! if a factor is too large, exit and done
-    do
-      if (mod(nn,d)/=0.OR.nn==1) exit
-      nn = nn/d ! remove this factor from n
-      call pl%putt(d=d)
-    enddo
-    d = d + 2_I8P ! move to next odd number
-  enddo
-  call pl%array(p)
-  call pl%free()
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine prime_I8
+ !subroutine prime_I8(n,p)
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !implicit none
+ !integer(I8P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
+ !integer(I8P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
+ !type(Type_SL_List)::                     pl   !< Prime factors list.
+ !integer(I8P)::                           nn   !< Copy of Input number.
+ !integer(I8P)::                           d    !< Divisor.
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !if (n==1) then
+ !  allocate(p(1:1)) ; p = 1
+ !  return
+ !endif
+ !nn=n
+ !do ! removing all factors of 2
+ !  if (mod(nn,2_I8P)/=0.OR.nn==1) exit
+ !  nn = nn/2_I8P
+ !  call pl%putt(d=2_I8P)
+ !enddo
+ !d=3
+ !do ! removing factor 3, 5, 7, ...
+ !  if (d>nn) exit ! if a factor is too large, exit and done
+ !  do
+ !    if (mod(nn,d)/=0.OR.nn==1) exit
+ !    nn = nn/d ! remove this factor from n
+ !    call pl%putt(d=d)
+ !  enddo
+ !  d = d + 2_I8P ! move to next odd number
+ !enddo
+ !call pl%array(p)
+ !call pl%free()
+ !return
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !endsubroutine prime_I8
 
   !> @brief Subroutine for computing prime factors of input integer number (I4P). The results is an array of integers containing the
   !> prime factors list.
-  subroutine prime_I4(n,p)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
-  integer(I4P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
-  type(Type_SL_List)::                     pl   !< Prime factors list.
-  integer(I4P)::                           nn   !< Copy of Input number.
-  integer(I4P)::                           d    !< Divisor.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  if (n==1) then
-    allocate(p(1:1)) ; p = 1
-    return
-  endif
-  nn=n
-  do ! removing all factors of 2
-    if (mod(nn,2_I4P)/=0.OR.nn==1) exit
-    nn = nn/2_I4P
-    call pl%putt(d=2_I4P)
-  enddo
-  d=3
-  do ! removing factor 3, 5, 7, ...
-    if (d>nn) exit ! if a factor is too large, exit and done
-    do
-      if (mod(nn,d)/=0.OR.nn==1) exit
-      nn = nn/d ! remove this factor from n
-      call pl%putt(d=d)
-    enddo
-    d = d + 2_I4P ! move to next odd number
-  enddo
-  call pl%array(p)
-  call pl%free()
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine prime_I4
+ !subroutine prime_I4(n,p)
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !implicit none
+ !integer(I4P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
+ !integer(I4P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
+ !type(Type_SL_List)::                     pl   !< Prime factors list.
+ !integer(I4P)::                           nn   !< Copy of Input number.
+ !integer(I4P)::                           d    !< Divisor.
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !if (n==1) then
+ !  allocate(p(1:1)) ; p = 1
+ !  return
+ !endif
+ !nn=n
+ !do ! removing all factors of 2
+ !  if (mod(nn,2_I4P)/=0.OR.nn==1) exit
+ !  nn = nn/2_I4P
+ !  call pl%putt(d=2_I4P)
+ !enddo
+ !d=3
+ !do ! removing factor 3, 5, 7, ...
+ !  if (d>nn) exit ! if a factor is too large, exit and done
+ !  do
+ !    if (mod(nn,d)/=0.OR.nn==1) exit
+ !    nn = nn/d ! remove this factor from n
+ !    call pl%putt(d=d)
+ !  enddo
+ !  d = d + 2_I4P ! move to next odd number
+ !enddo
+ !call pl%array(p)
+ !call pl%free()
+ !return
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !endsubroutine prime_I4
 
   !> @brief Subroutine for computing prime factors of input integer number (I2P). The results is an array of integers containing the
   !> prime factors list.
-  subroutine prime_I2(n,p)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I2P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
-  integer(I2P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
-  type(Type_SL_List)::                     pl   !< Prime factors list.
-  integer(I2P)::                           nn   !< Copy of Input number.
-  integer(I2P)::                           d    !< Divisor.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  if (n==1) then
-    allocate(p(1:1)) ; p = 1
-    return
-  endif
-  nn=n
-  do ! removing all factors of 2
-    if (mod(nn,2_I2P)/=0.OR.nn==1) exit
-    nn = nn/2_I2P
-    call pl%putt(d=2_I2P)
-  enddo
-  d=3
-  do ! removing factor 3, 5, 7, ...
-    if (d>nn) exit ! if a factor is too large, exit and done
-    do
-      if (mod(nn,d)/=0.OR.nn==1) exit
-      nn = nn/d ! remove this factor from n
-      call pl%putt(d=d)
-    enddo
-    d = d + 2_I2P ! move to next odd number
-  enddo
-  call pl%array(p)
-  call pl%free()
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine prime_I2
+ !subroutine prime_I2(n,p)
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !implicit none
+ !integer(I2P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
+ !integer(I2P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
+ !type(Type_SL_List)::                     pl   !< Prime factors list.
+ !integer(I2P)::                           nn   !< Copy of Input number.
+ !integer(I2P)::                           d    !< Divisor.
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !if (n==1) then
+ !  allocate(p(1:1)) ; p = 1
+ !  return
+ !endif
+ !nn=n
+ !do ! removing all factors of 2
+ !  if (mod(nn,2_I2P)/=0.OR.nn==1) exit
+ !  nn = nn/2_I2P
+ !  call pl%putt(d=2_I2P)
+ !enddo
+ !d=3
+ !do ! removing factor 3, 5, 7, ...
+ !  if (d>nn) exit ! if a factor is too large, exit and done
+ !  do
+ !    if (mod(nn,d)/=0.OR.nn==1) exit
+ !    nn = nn/d ! remove this factor from n
+ !    call pl%putt(d=d)
+ !  enddo
+ !  d = d + 2_I2P ! move to next odd number
+ !enddo
+ !call pl%array(p)
+ !call pl%free()
+ !return
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !endsubroutine prime_I2
 
   !> @brief Subroutine for computing prime factors of input integer number (I1P). The results is an array of integers containing the
   !> prime factors list.
-  subroutine prime_I1(n,p)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I1P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
-  integer(I1P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
-  type(Type_SL_List)::                     pl   !< Prime factors list.
-  integer(I1P)::                           nn   !< Copy of Input number.
-  integer(I1P)::                           d    !< Divisor.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  if (n==1) then
-    allocate(p(1:1)) ; p = 1
-    return
-  endif
-  nn=n
-  do ! removing all factors of 2
-    if (mod(nn,2_I1P)/=0.OR.nn==1) exit
-    nn = nn/2_I1P
-    call pl%putt(d=2_I1P)
-  enddo
-  d=3
-  do ! removing factor 3, 5, 7, ...
-    if (d>nn) exit ! if a factor is too large, exit and done
-    do
-      if (mod(nn,d)/=0.OR.nn==1) exit
-      nn = nn/d ! remove this factor from n
-      call pl%putt(d=d)
-    enddo
-    d = d + 2_I1P ! move to next odd number
-  enddo
-  call pl%array(p)
-  call pl%free()
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine prime_I1
+ !subroutine prime_I1(n,p)
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !implicit none
+ !integer(I1P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
+ !integer(I1P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
+ !type(Type_SL_List)::                     pl   !< Prime factors list.
+ !integer(I1P)::                           nn   !< Copy of Input number.
+ !integer(I1P)::                           d    !< Divisor.
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !if (n==1) then
+ !  allocate(p(1:1)) ; p = 1
+ !  return
+ !endif
+ !nn=n
+ !do ! removing all factors of 2
+ !  if (mod(nn,2_I1P)/=0.OR.nn==1) exit
+ !  nn = nn/2_I1P
+ !  call pl%putt(d=2_I1P)
+ !enddo
+ !d=3
+ !do ! removing factor 3, 5, 7, ...
+ !  if (d>nn) exit ! if a factor is too large, exit and done
+ !  do
+ !    if (mod(nn,d)/=0.OR.nn==1) exit
+ !    nn = nn/d ! remove this factor from n
+ !    call pl%putt(d=d)
+ !  enddo
+ !  d = d + 2_I1P ! move to next odd number
+ !enddo
+ !call pl%array(p)
+ !call pl%free()
+ !return
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !endsubroutine prime_I1
 
   ! InsertionSort
-#ifdef r16p
   !> @brief Subroutine for performing InsertionSort with ascending order (R16P).
   pure subroutine isort_R16(array)
   !-------------------------------------------------------------------------------------------------------------------------------
@@ -429,7 +414,6 @@ contains
   return
   !-------------------------------------------------------------------------------------------------------------------------------
   endsubroutine isort_R16
-#endif
 
   !> @brief Subroutine for performing InsertionSort with ascending order (R8P).
   pure subroutine isort_R8(array)
@@ -570,7 +554,6 @@ contains
   endsubroutine isort_I1
 
   ! QuickSort
-#ifdef r16p
   !> @brief Subroutine for performing QuickSort with ascending order (R16P).
   !> @note If the number of array elements is "small" the InsertionSort is directly used.
   subroutine qsort_R16(array)
@@ -643,7 +626,6 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     endsubroutine subsor
   endsubroutine qsort_R16
-#endif
 
   !> @brief Subroutine for performing QuickSort with ascending order (R8P).
   !> @note If the number of array elements is "small" the InsertionSort is directly used.
@@ -1084,7 +1066,6 @@ contains
   endsubroutine qsort_I1
 
   ! cubic spline
-#ifdef r16p
   !> @brief Function for computing cubic spline interpolation of an array of values (R16P).
   pure function spline3_R16(bc1,bcn,x,v,xi) result (vi)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1174,7 +1155,6 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     endfunction cspline
   endfunction spline3_R16
-#endif
 
   !> @brief Function for computing cubic spline interpolation of an array of values (R8P).
   pure function spline3_R8(bc1,bcn,x,v,xi) result (vi)
@@ -1506,7 +1486,6 @@ contains
   endfunction stretching2side
 
   ! average
-#ifdef r16p
   pure function average_Vectorial1D_R16(x) result(mean)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function computes arithmetic mean of array elements with parametric precision R16P (vectorial 1D).
@@ -1519,11 +1498,10 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mean=sum(x)/size(x)
+  mean=sum(x)/real(size(x),R16P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction average_Vectorial1D_R16
-#endif
 
   pure function average_Vectorial1D_R8(x) result(mean)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1537,7 +1515,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mean=sum(x)/size(x)
+  mean=sum(x)/real(size(x),R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction average_Vectorial1D_R8
@@ -1554,12 +1532,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mean=sum(x)/size(x)
+  mean=sum(x)/real(size(x),R4P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction average_Vectorial1D_R4
 
-#ifdef r16p
   pure function average_Vectorial2D_R16(x) result(mean)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function computes arithmetic mean of array elements with parametric precision R16P (vectorial 2D).
@@ -1572,11 +1549,10 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mean=sum(x)/size(x)
+  mean=sum(x)/real(size(x),R16P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction average_Vectorial2D_R16
-#endif
 
   pure function average_Vectorial2D_R8(x) result(mean)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1590,7 +1566,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mean=sum(x)/size(x)
+  mean=sum(x)/real(size(x),R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction average_Vectorial2D_R8
@@ -1607,12 +1583,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mean=sum(x)/size(x)
+  mean=sum(x)/real(size(x),R4P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction average_Vectorial2D_R4
 
-#ifdef r16p
   pure function average_Vectorial3D_R16(x) result(mean)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function computes arithmetic mean of array elements with parametric precision R16P (vectorial 3D).
@@ -1625,11 +1600,10 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mean=sum(x)/size(x)
+  mean=sum(x)/real(size(x),R16p)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction average_Vectorial3D_R16
-#endif
 
   pure function average_Vectorial3D_R8(x) result(mean)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1643,7 +1617,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mean=sum(x)/size(x)
+  mean=sum(x)/real(size(x),R8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction average_Vectorial3D_R8
@@ -1660,7 +1634,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  mean=sum(x)/size(x)
+  mean=sum(x)/real(size(x),R4P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction average_Vectorial3D_R4
@@ -1759,7 +1733,7 @@ contains
     d2 = -1
     return
   endif
-  do d2 = 0,bit_size(n)-1
+  do d2 = 0_I4P,int(bit_size(n),I4P)-1_I4P
     if (btest(n,d2)) return
   enddo
   return
@@ -1782,7 +1756,7 @@ contains
     d2 = -1
     return
   endif
-  do d2 = 0,bit_size(n)-1
+  do d2 = 0_I4P,int(bit_size(n),I4P)-1_I4P
     if (btest(n,d2)) return
   enddo
   return
@@ -1805,7 +1779,7 @@ contains
     d2 = -1
     return
   endif
-  do d2 = 0,bit_size(n)-1
+  do d2 = 0_I4P,int(bit_size(n),I4P)-1_I4P
     if (btest(n,d2)) return
   enddo
   return
@@ -1828,7 +1802,7 @@ contains
     d2 = -1
     return
   endif
-  do d2 = 0,bit_size(n)-1
+  do d2 = 0_I4P,int(bit_size(n),I4P)-1_I4P
     if (btest(n,d2)) return
   enddo
   return
@@ -1836,7 +1810,6 @@ contains
    endfunction div2_I8
 
   ! interpolate
-#ifdef r16p
   elemental function interpolate1_R16(x1,x2,V1,V2,x) result(V)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function makes a linear interpolation between 2 values at 2 different points with parametric precision R16P.
@@ -1855,7 +1828,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction interpolate1_R16
-#endif
 
   elemental function interpolate1_R8(x1,x2,V1,V2,x) result(V)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1895,7 +1867,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction interpolate1_R4
 
-#ifdef r16p
   elemental function interpolate2_R16(x1,y1,x2,y2,V11,V12,V21,V22,x,y) result(V)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function makes a bi-linear interpolation between 4 values evaluated on a 2D plane at 4 different points with parametric
@@ -1930,7 +1901,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction interpolate2_R16
-#endif
 
   elemental function interpolate2_R8(x1,y1,x2,y2,V11,V12,V21,V22,x,y) result(V)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2002,7 +1972,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction interpolate2_R4
 
-#ifdef r16p
   elemental function interpolate3_R16(x1,y1,z1,x2,y2,z2,V111,V121,V211,V221,V112,V122,V212,V222,x,y,z) result(V)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function makes a tri-linear interpolation between 8 values evaluated on a 3D prism at 8 different points with parametric
@@ -2046,7 +2015,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction interpolate3_R16
-#endif
 
   elemental function interpolate3_R8(x1,y1,z1,x2,y2,z2,V111,V121,V211,V221,V112,V122,V212,V222,x,y,z) result(V)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2137,7 +2105,6 @@ contains
   endfunction interpolate3_R4
 
   ! degree
-#ifdef r16p
   elemental function degree_Scalar_R16(x_rad) result(x_deg)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for converting radiants to degrees with parametric precision R16P (scalar).
@@ -2154,7 +2121,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction degree_Scalar_R16
-#endif
 
   elemental function degree_Scalar_R8(x_rad) result(x_deg)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2190,7 +2156,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction degree_Scalar_R4
 
-#ifdef r16p
   pure function degree_Vectorial1D_R16(x_rad) result(x_deg)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for converting radiants to degrees with parametric precision R16P (vectorial 1D).
@@ -2207,7 +2172,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction degree_Vectorial1D_R16
-#endif
 
   pure function degree_Vectorial1D_R8(x_rad) result(x_deg)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2243,7 +2207,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction degree_Vectorial1D_R4
 
-#ifdef r16p
   pure function degree_Vectorial2D_R16(x_rad) result(x_deg)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for converting radiants to degrees with parametric precision R16P (vectorial 2D).
@@ -2260,7 +2223,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction degree_Vectorial2D_R16
-#endif
 
   pure function degree_Vectorial2D_R8(x_rad) result(x_deg)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2296,7 +2258,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction degree_Vectorial2D_R4
 
-#ifdef r16p
   pure function degree_Vectorial3D_R16(x_rad) result(x_deg)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for converting radiants to degrees with parametric precision R16P (vectorial 3D).
@@ -2313,7 +2274,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction degree_Vectorial3D_R16
-#endif
 
   pure function degree_Vectorial3D_R8(x_rad) result(x_deg)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2350,7 +2310,6 @@ contains
   endfunction degree_Vectorial3D_R4
 
   ! radiant
-#ifdef r16p
   elemental function radiant_Scalar_R16(x_deg) result(x_rad)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for converting degrees to radiants with the parametric precision R16P (scalar).
@@ -2367,7 +2326,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction radiant_Scalar_R16
-#endif
 
   elemental function radiant_Scalar_R8(x_deg) result(x_rad)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2403,7 +2361,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction radiant_Scalar_R4
 
-#ifdef r16p
   pure function radiant_Vectorial1D_R16(x_deg) result(x_rad)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for converting degrees to radiants with the parametric precision R16P (vectorial 1D).
@@ -2420,7 +2377,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction radiant_Vectorial1D_R16
-#endif
 
   pure function radiant_Vectorial1D_R8(x_deg) result(x_rad)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2456,7 +2412,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction radiant_Vectorial1D_R4
 
-#ifdef r16p
   pure function radiant_Vectorial2D_R16(x_deg) result(x_rad)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for converting degrees to radiants with the parametric precision R16P (vectorial 2D).
@@ -2473,7 +2428,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction radiant_Vectorial2D_R16
-#endif
 
   pure function radiant_Vectorial2D_R8(x_deg) result(x_rad)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2509,7 +2463,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction radiant_Vectorial2D_R4
 
-#ifdef r16p
   pure function radiant_Vectorial3D_R16(x_deg) result(x_rad)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for converting degrees to radiants with the parametric precision R16P (vectorial 3D).
@@ -2526,7 +2479,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction radiant_Vectorial3D_R16
-#endif
 
   pure function radiant_Vectorial3D_R8(x_deg) result(x_rad)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2563,7 +2515,6 @@ contains
   endfunction radiant_Vectorial3D_R4
 
   ! first derivative
-#ifdef r16p
   elemental function delta1_2o_R16(Sp1,Sm1,Ds) result(D1)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function computes numerically the first derivative by 2 order central difference with parametric precision R16P.
@@ -2582,7 +2533,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction delta1_2o_R16
-#endif
 
   elemental function delta1_2o_R8(Sp1,Sm1,Ds) result(D1)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2623,7 +2573,6 @@ contains
   endfunction delta1_2o_R4
 
   ! second derivative
-#ifdef r16p
   elemental function delta2_2o_R16(Sp1,S,Sm1,Ds) result(D2)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function computes numerically the second derivative by 2 order central difference with parametric precision R16P.
@@ -2643,7 +2592,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction delta2_2o_R16
-#endif
 
   elemental function delta2_2o_R8(Sp1,S,Sm1,Ds) result(D2)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2686,7 +2634,6 @@ contains
   endfunction delta2_2o_R4
 
   ! absolute value of gradient
-#ifdef r16p
   elemental function abs_grad_R16(Vip1,Vim1,Di,Vjp1,Vjm1,Dj,Vkp1,Vkm1,Dk) result(abs_grad)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function computes numerically the absolute value of the gradient of a scalar by 2 order central difference with
@@ -2714,7 +2661,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction abs_grad_R16
-#endif
 
   elemental function abs_grad_R8(Vip1,Vim1,Di,Vjp1,Vjm1,Dj,Vkp1,Vkm1,Dk) result(abs_grad)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2773,7 +2719,6 @@ contains
   endfunction abs_grad_R4
 
   ! laplacian operator
-#ifdef r16p
   elemental function laplacian_R16(Vip1,Vi,Vim1,Di,Vjp1,Vj,Vjm1,Dj,Vkp1,Vk,Vkm1,Dk) result(laplace)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!This function computes numerically the laplacian operator of a scalar by 2 order central difference with parametric
@@ -2804,7 +2749,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction laplacian_R16
-#endif
 
   elemental function laplacian_R8(Vip1,Vi,Vim1,Di,Vjp1,Vj,Vjm1,Dj,Vkp1,Vk,Vkm1,Dk) result(laplace)
   !---------------------------------------------------------------------------------------------------------------------------------

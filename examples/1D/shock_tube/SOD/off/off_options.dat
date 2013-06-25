@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------------------------------------------------------------
                                   OS TYPE
 'uix'                                                        OS_type     = Operating System, UIX or WIN
-                                  INPUT FILES
+                                  INPUT OPTIONS
 './input/'                                                   Path_InPut  = input path
 'solver.dat'                                                 File_Solver = name of solver options file
 1                                                            Nl          = number of grid levels used
@@ -12,8 +12,8 @@
 'output/'                                                    Path_OutPut   = output path
 'sod'                                                        Title_out     = title of output file
 '.sol'                                                       Extension_out = extension of output file
-10                                                           screen_out    = console refresh frequency
-1                                                            sol_out       = actual solution output frequency
-20                                                           restart_out   = restart output frequency
+1000                                                         screen_out    = console refresh frequency
+10                                                           sol_out       = actual solution output frequency
+10                                                           restart_out   = restart output frequency
 1                                                            probe_out     = probes output frequency
 ------------------------------------------------------------------------------------------------------------------------------------

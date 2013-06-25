@@ -57,7 +57,7 @@ character(3), parameter:: bc_in1_str = 'IN1' !< Definition of inflow 1 boundary 
 integer(I1P), parameter:: bc_in1     = 5_I1P !< Definition of inflow 1 boundary condition parameter id.
 character(3), parameter:: bc_in2_str = 'IN2' !< Definition of inflow 2 boundary condition parameter string.
 integer(I1P), parameter:: bc_in2     = 6_I1P !< Definition of inflow 2 boundary condition parameter id.
-integer(I1P), parameter:: Nbc = 7            !< Number of possible boundary conditions.
+integer(I1P), parameter:: Nbc = 7_I1P        !< Number of possible boundary conditions.
 character(3), parameter:: bc_list_str(1:Nbc) = &
                                              (/ bc_nan_str, &
                                                 bc_ref_str, &
@@ -101,11 +101,11 @@ type, public:: Type_BC
   integer(I4P),   allocatable:: inf         !< Auxiliary informations for inflow-type boundary condition.
   type(Type_Adj), allocatable:: adj         !< Connection indexes for adjacent boundary condition.
   contains
-    procedure, non_overridable:: init   ! Procedure for initilizing allocatable variables.
-    procedure, non_overridable:: free   ! Procedure for freeing the memory of allocatable variables.
-    procedure, non_overridable:: set    ! Procedure for setting bc members.
-    procedure, non_overridable:: str2id ! Procedure for setting integer id from string id.
-    procedure, non_overridable:: id2str ! Procedure for converting integer id to string id.
+    procedure, non_overridable:: init            ! Procedure for initilizing allocatable variables.
+    procedure, non_overridable:: free => free_bc ! Procedure for freeing the memory of allocatable variables.
+    procedure, non_overridable:: set             ! Procedure for setting bc members.
+    procedure, non_overridable:: str2id          ! Procedure for setting integer id from string id.
+    procedure, non_overridable:: id2str          ! Procedure for converting integer id to string id.
 endtype Type_BC
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
@@ -474,7 +474,7 @@ contains
   endsubroutine init
 
   !> @brief Subroutine for freeing the memory of Type_BC allocatable variables.
-  elemental subroutine free(bc)
+  elemental subroutine free_bc(bc)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_BC), intent(INOUT):: bc  !< Boundary conditions data.
@@ -485,7 +485,7 @@ contains
    if (allocated(bc%adj)) deallocate(bc%adj)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine free
+  endsubroutine free_bc
 
   !> @brief Subroutine for setting members of Type_BC variable.
   elemental subroutine set(bc,tp,inf,adj)
@@ -515,7 +515,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  do b=1,Nbc
+  do b=1_I1P,Nbc
     if (adjustl(trim(bc_str))==adjustl(trim(bc_list_str(b)))) then
       bc%tp = bc_list(b)
       exit
@@ -536,7 +536,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  do b=1,Nbc
+  do b=1_I1P,Nbc
     if (bc%tp==bc_list(b)) then
       bc_str = adjustl(trim(bc_list_str(b)))
       exit

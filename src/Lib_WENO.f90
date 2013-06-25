@@ -64,10 +64,10 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! initialize weno_exp
-  weno_exp = S
-  if (S>4) weno_exp = S - 1
+  weno_exp = int(S,I_P)
+  if (S>4_I1P) weno_exp = int(S-1_I1P,I_P)
   ! computing weno_odd
-  weno_odd = mod(S,2_I1P)
+  weno_odd = int(mod(S,2_I1P),I_P)
   ! computing a reasonable value of weno_eps according to the (finest) grid spacing
   weno_eps = MaxR_P
   do b=1,block(1)%global%Nb
@@ -304,18 +304,18 @@ contains
   pure subroutine noweno_central(S,V,VR)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN)::  S         !< Number of stencils used.
+  integer(I1P), intent(IN)::  S         !< Number of stencils used.
   real(R_P),    intent(IN)::  V (1:,0:) !< Variable to be reconstructed.                           [1:2,0:2*S].
   real(R_P),    intent(OUT):: VR(1:)    !< Left and right (1,2) interface value of reconstructed V [1:2      ].
-  integer(I_P)::              k,f       !< Counters.
+  integer(I1P)::              k,f       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! computing the central difference reconstruction
   VR = 0._R_P
-  do k=1,2*S
-    do f=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-      VR(f) = VR(f) + weno_c(f,k)*V(f,k+f-2)
+  do k=1_I1P,2_I1P*S
+    do f=1_I1P,2_I1P ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
+      VR(f) = VR(f) + weno_c(f,k)*V(f,k+f-2_I1P)
     enddo
   enddo
   return
@@ -329,7 +329,7 @@ contains
   pure subroutine weno_optimal(S,V,VR)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN)::  S             !< Number of stencils used.
+  integer(I1P), intent(IN)::  S             !< Number of stencils used.
   real(R_P),    intent(IN)::  V (1:,1-S:)   !< Variable to be reconstructed                            [1:2,1-S:-1+S].
   real(R_P),    intent(OUT):: VR(1:)        !< Left and right (1,2) interface value of reconstructed V [1:2         ].
   real(R_P)::                 VP(1:2,0:S-1) !< Polynomial reconstructions.
@@ -340,7 +340,7 @@ contains
   ! computing the polynomials
   call weno_polynomials( S = S, V = V, VP = VP)
   ! using optimal weights
-  w(1:2,0:S-1) = weno_a(1:2,0:S-1)
+  w(1:2,0:S-1_I1P) = weno_a(1:2,0:S-1_I1P)
   ! computing the convultion of reconstructing plynomials
   call weno_convolution(S = S, VP = VP, w = w, VR = VR)
   return
@@ -353,11 +353,11 @@ contains
   pure subroutine weno(S,V,VR)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN)::  S             !< Number of stencils used.
-  real(R_P),    intent(IN)::  V (1:,1-S:)   !< Variable to be reconstructed                            [1:2,1-S:-1+S].
-  real(R_P),    intent(OUT):: VR(1:)        !< Left and right (1,2) interface value of reconstructed V [1:2         ].
-  real(R_P)::                 VP(1:2,0:S-1) !< Polynomial reconstructions.
-  real(R_P)::                 w (1:2,0:S-1) !< Weights of the stencils.
+  integer(I1P), intent(IN)::  S                 !< Number of stencils used.
+  real(R_P),    intent(IN)::  V (1:,1_I1P-S:)   !< Variable to be reconstructed                            [1:2,1-S:-1+S].
+  real(R_P),    intent(OUT):: VR(1:)            !< Left and right (1,2) interface value of reconstructed V [1:2         ].
+  real(R_P)::                 VP(1:2,0:S-1_I1P) !< Polynomial reconstructions.
+  real(R_P)::                 w (1:2,0:S-1_I1P) !< Weights of the stencils.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -380,18 +380,18 @@ contains
   pure subroutine weno_polynomials(S,V,VP)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN)::  S           !< Number of stencils used.
+  integer(I1P), intent(IN)::  S           !< Number of stencils used.
   real(R_P),    intent(IN)::  V (1:,1-S:) !< Variable to be reconstructed [1:2,1-S:-1+S].
   real(R_P),    intent(OUT):: VP(1:,0:)   !< Polynomial reconstructions   [1:2,  0:S-1 ].
-  integer(I_P)::              s1,s2,f     !< Counters.
+  integer(I1P)::              s1,s2,f     !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! computing the polynomials
   VP = 0._R_P
-  do s1=0,S-1 ! stencil counter
-    do s2=0,S-1 ! cell counter counter
-      do f=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
+  do s1=0_I1P,S-1_I1P ! stencil counter
+    do s2=0_I1P,S-1_I1P ! cell counter counter
+      do f=1_I1P,2_I1P ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
         VP(f,s1) = VP(f,s1) + weno_p(f,s2,s1)*V(f,-s2+s1)
       enddo
     enddo
@@ -406,7 +406,7 @@ contains
   pure subroutine weno_weights(S,V,w)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN)::  S                !< Number of stencils used.
+  integer(I1P), intent(IN)::  S                !< Number of stencils used.
   real(R_P),    intent(IN)::  V    (1:,1-S:)   !< Variable to be reconstructed [1:2,1-S:-1+S].
   real(R_P),    intent(OUT):: w    (1:,0:)     !< Weights of the stencils      [1:2,  0:S-1 ].
   real(R_P)::                 IS   (1:2,0:S-1) !< Smoothness indicators of the stencils.
@@ -415,16 +415,16 @@ contains
 #ifdef WENOZ
   real(R_P)::                 tao  (1:2)       !< Normalization factor.
 #endif
-  integer(I_P)::              s1,s2,s3,f       !< Counters.
+  integer(I1P)::              s1,s2,s3,f       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! computing smoothness indicators
-  do s1=0,S-1 ! stencil counter
-    do f=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
+  do s1=0_I1P,S-1_I1P ! stencil counter
+    do f=1_I1P,2_I1P ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
       IS(f,s1) = 0._R_P
-      do s2=0,S-1
-        do s3=0,S-1
+      do s2=0_I1P,S-1_I1P
+        do s3=0_I1P,S-1_I1P
           IS(f,s1) = IS(f,s1) + weno_d(s3,s2,s1)*V(f,s1-s3)*V(f,s1-s2)
         enddo
       enddo
@@ -432,21 +432,21 @@ contains
   enddo
 #ifdef WENOZ
   ! computing smooth-difference tao
-  if (S>2) then
-    do f=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-      tao(f) = abs(IS(f,0) - (1-weno_odd)*IS(f,1) - (1-weno_odd)*IS(f,S-2) + (1-2*weno_odd)*IS(f,S-1))
+  if (S>2_I1P) then
+    do f=1_I1P,2_I1P ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
+      tao(f) = abs(IS(f,0) - (1-weno_odd)*IS(f,1) - (1-weno_odd)*IS(f,S-2_I1P) + (1-2*weno_odd)*IS(f,S-1_I1P))
     enddo
   else
     do f=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
-      tao(f) = udiff(p=2*S-2,v=V(f,1-S:S-1))
+      tao(f) = udiff(p=2*S-2,v=V(f,1_I1P-S:S-1_I1P))
       tao(f) = tao(f)*tao(f)
     enddo
   endif
 #endif
   ! computing alfa coefficients
   a_tot = 0._R_P
-  do s1=0,S-1
-    do f=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
+  do s1=0_I1P,S-1_I1P
+    do f=1_I1P,2_I1P ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
 #ifdef WENOZ
       if (tao(f)>minval(IS(f,:))) then
         a(f,s1) = weno_a(f,s1)*(1._R_P+(tao(f)/(weno_eps+IS(f,s1)))**(weno_exp)) ; a_tot(f) = a_tot(f) + a(f,s1)
@@ -459,24 +459,24 @@ contains
     enddo
   enddo
   ! computing the weights
-  do s1=0,S-1
-    do f=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
+  do s1=0_I1P,S-1_I1P
+    do f=1_I1P,2_I1P ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
       w(f,s1) = a(f,s1)/a_tot(f)
     enddo
   enddo
 #ifdef WENOM
   ! Henrick mapping
   a_tot = 0._R_P
-  do s1=0,S-1
-    do f=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
+  do s1=0_I1P,S-1_I1P
+    do f=1_I1P,2_I1P ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
       a(f,s1)  = ( w(f,s1)*( weno_a(f,s1) + weno_a(f,s1)*weno_a(f,s1) - 3._R_P*weno_a(f,s1)*w(f,s1) + w(f,s1)*w(f,s1) ) )/ &
                  ( weno_a(f,s1)*weno_a(f,s1) + w(f,s1)*( 1._R_P - 2._R_P*weno_a(f,s1) ) )
       a_tot(f) = a_tot(f) + a(f,s1)
     enddo
   enddo
   ! computing the weights with the mapped a(f,s1)
-  do s1=0,S-1
-    do f=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
+  do s1=0_I1P,S-1_I1P
+    do f=1_I1P,2_I1P ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
       w(f,s1) = a(f,s1)/a_tot(f)
     enddo
   enddo
@@ -491,18 +491,18 @@ contains
   pure subroutine weno_convolution(S,VP,w,VR)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I_P), intent(IN)::  S         !< Number of stencils used.
+  integer(I1P), intent(IN)::  S         !< Number of stencils used.
   real(R_P),    intent(IN)::  VP(1:,0:) !< Polynomial reconstructions                              [1:2,0:S-1].
   real(R_P),    intent(IN)::  w (1:,0:) !< Weights of the stencils                                 [1:2,0:S-1].
   real(R_P),    intent(OUT):: VR(1:   ) !< Left and right (1,2) interface value of reconstructed V [1:2      ].
-  integer(I_P)::              k,f       !< Counters.
+  integer(I1P)::              k,f       !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! computing the convultion
   VR = 0._R_P
-  do k=0,S-1
-    do f=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
+  do k=0_I1P,S-1_I1P
+    do f=1_I1P,2_I1P ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
       VR(f) = VR(f) + w(f,k)*VP(f,k)
     enddo
   enddo

@@ -65,8 +65,8 @@ integer(I8P), parameter:: mask(1:6,1:2) = reshape((/mask1_1,mask2_2,mask4_4,mask
                                                     mask1_2,mask2_4,mask4_8,mask8_16,mask16_32,mask32_32/), & ! 2 bits interleaving.
                                                    (/6,2/))
 !> Shift number array.
-integer(I1P), parameter:: shft(1:6,1:2) = reshape((/1,2,4,8, 16,32,&          ! 1 bit interleaving.
-                                                    2,4,8,16,32,64/),(/6,2/)) ! 2 bits interleaving.
+integer(I1P), parameter:: shft(1:6,1:2) = reshape((/1_I1P,2_I1P,4_I1P,8_I1P, 16_I1P,32_I1P,&          ! 1 bit interleaving.
+                                                    2_I1P,4_I1P,8_I1P,16_I1P,32_I1P,64_I1P/),(/6,2/)) ! 2 bits interleaving.
 !> Real parameter for computing the number of shifts (Ns). The number of shifts is computed by \f$2^{Ns}=b\f$ where 'b' is the
 !> significant bits. As a consequence \f$Ns=\frac{log(b)}{log2}\f$, therefore it is convenient to store the value of
 !> \f$\frac{1}{log2}\f$.
@@ -131,7 +131,7 @@ contains
   l = int(log10(b*1._R4P)*log10_2_inv,I1P)
   d = int(i,I8P)
   d = iand(d,signif(l))
-  do m=l,1,-1 !(3/2/1,1,-1)
+  do m=l,1_I1P,-1_I1P !(3/2/1,1,-1)
     d = iand(ior(d,ishft(d,shft(m,z))),mask(m,z))
   enddo
   return
@@ -155,7 +155,7 @@ contains
   l = int(log10(b*1._R4P)*log10_2_inv,I1P)
   d = int(i,I8P)
   d = iand(d,signif(l))
-  do m=l,1,-1 !(4/3/2/1,1,-1)
+  do m=l,1_I1P,-1_I1P !(4/3/2/1,1,-1)
     d = iand(ior(d,ishft(d,shft(m,z))),mask(m,z))
   enddo
   return
@@ -179,7 +179,7 @@ contains
   l = int(log10(b*1._R4P)*log10_2_inv,I1P)
   d = int(i,I8P)
   d = iand(d,signif(l))
-  do m=l,1,-1 !(5/4/3/2/1,1,-1)
+  do m=l,1_I1P,-1_I1P !(5/4/3/2/1,1,-1)
     d = iand(ior(d,ishft(d,shft(m,z))),mask(m,z))
   enddo
   return
@@ -203,7 +203,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   d = iand(i,mask(1,z))
-  do m=1,int(log10(b*1._R4P)*log10_2_inv,I1P),1 !(1,3/2/1)
+  do m=1_I1P,int(log10(b*1._R4P)*log10_2_inv,I1P),1_I1P !(1,3/2/1)
     d = iand(ieor(d,ishft(d,-shft(m,z))),mask(m+1,z))
   enddo
   c = int(d,I1P)
@@ -228,7 +228,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   d = iand(i,mask(1,z))
-  do m=1,int(log10(b*1._R4P)*log10_2_inv,I1P),1 !(1,4/3/2/1)
+  do m=1_I1P,int(log10(b*1._R4P)*log10_2_inv,I1P),1_I1P !(1,4/3/2/1)
     d = iand(ieor(d,ishft(d,-shft(m,z))),mask(m+1,z))
   enddo
   c = int(d,I2P)
@@ -253,7 +253,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   d = iand(i,mask(1,z))
-  do m=1,int(log10(b*1._R4P)*log10_2_inv,I1P),1 !(1,5/4/3/2/1)
+  do m=1_I1P,int(log10(b*1._R4P)*log10_2_inv,I1P),1_I1P !(1,5/4/3/2/1)
     d = iand(ieor(d,ishft(d,-shft(m,z))),mask(m+1,z))
   enddo
   c = int(d,I4P)

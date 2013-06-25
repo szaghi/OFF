@@ -741,7 +741,8 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             = examples/2D/two_dimensional_riemann_problems/kt-c03/pog/ \
+IMAGE_PATH             = doc/                                                     \
+                         examples/2D/two_dimensional_riemann_problems/kt-c03/pog/ \
                          examples/2D/two_dimensional_riemann_problems/kt-c04/pog/ \
                          examples/2D/two_dimensional_riemann_problems/kt-c05/pog/ \
                          examples/2D/two_dimensional_riemann_problems/kt-c06/pog/ \

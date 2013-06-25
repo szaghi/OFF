@@ -19,6 +19,7 @@ OPTIMIZE  = no
 OPENMP    = no
 MPI       = no
 R16P      = no
+SYSless   = no
 NULi      = no
 NULj      = no
 NULk      = no
@@ -63,12 +64,13 @@ help:
 	@echo -e '\033[1;31m  MPI=yes(no)      \033[0m\033[1m => on(off) MPI    directives      (default $(MPI)) \033[0m'
 	@echo
 	@echo -e '\033[1;31m Preprocessing options\033[0m'
-	@echo -e '\033[1;31m  R16P=yes(no)\033[0m\033[1m => on(off) definition of real with "128 bit" (default $(R16P))\033[0m'
-	@echo -e '\033[1;31m  NULi=yes(no)\033[0m\033[1m => on(off) nullify i direction (1D or 2D)    (default $(NULi))\033[0m'
-	@echo -e '\033[1;31m  NULj=yes(no)\033[0m\033[1m => on(off) nullify j direction (1D or 2D)    (default $(NULj))\033[0m'
-	@echo -e '\033[1;31m  NULk=yes(no)\033[0m\033[1m => on(off) nullify k direction (1D or 2D)    (default $(NULk))\033[0m'
-	@echo -e '\033[1;31m  PPL=yes(no) \033[0m\033[1m => on(off) Positivity Preserving Limiter     (default $(PPL))\033[0m'
-	@echo -e '\033[1;31m  LMA=yes(no) \033[0m\033[1m => on(off) Low Mach number Adjsutment        (default $(LMA))\033[0m'
+	@echo -e '\033[1;31m  R16P=yes(no)   \033[0m\033[1m => on(off) definition of real with "128 bit" (default $(R16P))\033[0m'
+	@echo -e '\033[1;31m  SYSless=yes(no)\033[0m\033[1m => on(off) system call functions             (default $(SYSless))\033[0m'
+	@echo -e '\033[1;31m  NULi=yes(no)   \033[0m\033[1m => on(off) nullify i direction (1D or 2D)    (default $(NULi))\033[0m'
+	@echo -e '\033[1;31m  NULj=yes(no)   \033[0m\033[1m => on(off) nullify j direction (1D or 2D)    (default $(NULj))\033[0m'
+	@echo -e '\033[1;31m  NULk=yes(no)   \033[0m\033[1m => on(off) nullify k direction (1D or 2D)    (default $(NULk))\033[0m'
+	@echo -e '\033[1;31m  PPL=yes(no)    \033[0m\033[1m => on(off) Positivity Preserving Limiter     (default $(PPL))\033[0m'
+	@echo -e '\033[1;31m  LMA=yes(no)    \033[0m\033[1m => on(off) Low Mach number Adjsutment        (default $(LMA))\033[0m'
 	@echo -e '\033[1;31m  WENO=WENO/WENOZ/WENOM\033[0m\033[1m WENO algorithm (default $(WENO))\033[0m'
 	@echo -e '\033[1m   WENO  => Original Jiang-Shu\033[0m'
 	@echo -e '\033[1m   WENOZ => Improved Borges-Carmona-Costa-Don\033[0m'
@@ -151,6 +153,7 @@ endif
 
 #----------------------------------------------------------------------------------------------------------------------------------
 # compiling and linking options
+# presets
 ifeq "$(PRESET)" "debug"
   DEBUG     = yes
   F03STD    = yes
@@ -191,145 +194,74 @@ ifeq "$(PRESET)" "openmp-mpi"
   OPENMP    = yes
   MPI       = yes
 endif
+# compiler specific rules
+# GNU
+WRN_GNU = -fmax-errors=0 -Wall -Wno-array-temporaries -Warray-bounds -Wcharacter-truncation -Wline-truncation -Wconversion-extra -Wimplicit-interface -Wimplicit-procedure -Wunderflow -Wextra -Wuninitialized
+CHK_GNU = -fcheck=all
+DEB_GNU = -fmodule-private -ffree-line-length-132 -fimplicit-none -ffpe-trap=invalid,overflow -fbacktrace -fdump-core -finit-real=nan #-fno-range-check  ,precision,denormal,underflow
+STD_GNU = -std=f2003 -fall-intrinsics
+OMP_GNU = -fopenmp
+OPT_GNU = -O3
+PRF_GNU =
+# Intel
+WRN_INT = -warn all
+CHK_INT = -check all
+DEB_INT = -debug all -extend-source 132 -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -traceback -gen-interfaces
+STD_INT = -std03
+OMP_INT = -openmp
+OPT_INT = -O3 -ipo -inline all -ipo-jobs4 -vec-report1
+PRF_INT = #-p
+# setting rules according user options
 ifeq "$(COMPILER)" "gnu"
-  OPTSC   = -cpp -c -J$(DMOD)
-  OPTSL   =
-  # debug
-  ifeq "$(DEBUG)" "yes"
-    PREPROC := $(PREPROC) -DDEBUG
-    OPTSC := $(OPTSC) -O0 -Wall -Warray-temporaries -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow
-    OPTSL := $(OPTSL) -O0 -Wall -Warray-temporaries -Warray-bounds -fcheck=all -fbacktrace -ffpe-trap=invalid,overflow,underflow
-  endif
-  # standard
-  ifeq "$(F03STD)" "yes"
-    OPTSC := $(OPTSC) -std=f2008 -fall-intrinsics
-    OPTSL := $(OPTSL) -std=f2008 -fall-intrinsics
-  endif
-  # profiling
-  ifeq "$(PROFILING)" "yes"
-    PREPROC := $(PREPROC) -DPROFILING
-  endif
-  # optimization
-  ifeq "$(OPTIMIZE)" "yes"
-    OPTSC := $(OPTSC) -O3
-    OPTSL := $(OPTSL) -O3
-  endif
-  # openmp
-  ifeq "$(OPENMP)" "yes"
-    OPTSC := $(OPTSC) -fopenmp
-    OPTSL := $(OPTSL) -fopenmp
-    PREPROC := $(PREPROC) -DOPENMP
-  endif
-  # mpi
-  ifeq "$(MPI)" "yes"
-    PREPROC := $(PREPROC) -DMPI2
-    FC = mpif90
-  else
-    FC = gfortran-4.7
-  endif
+  FC = gfortran
+  OPTSC = -cpp -c -J$(DMOD) -static -fprotect-parens -fno-realloc-lhs
+  OPTSL =
+  WRN = $(WRN_GNU)
+  CHK = $(CHK_GNU)
+  DEB = $(DEB_GNU)
+  STD = $(STD_GNU)
+  OMP = $(OMP_GNU)
+  OPT = $(OPT_GNU)
+  PRF = $(PRF_GNU)
 endif
 ifeq "$(COMPILER)" "intel"
-  OPTSC   = -cpp -c -module $(DMOD)
-  OPTSL   =
-  # debug
-  ifeq "$(DEBUG)" "yes"
-    PREPROC := $(PREPROC) -DDEBUG
-    CHK = -check all
-    DEB = -debug all
-    WRN = -warn all
-    OPTSC := $(OPTSC) -O0 -fpe-all=0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
-    OPTSL := $(OPTSL) -O0 -fpe-all=0 -fp-stack-check -traceback $(WRN) $(CHK) $(DEB)
-  endif
-  # standard
-  ifeq "$(F03STD)" "yes"
-    OPTSC := $(OPTSC) -std03
-    OPTSL := $(OPTSL) -std03
-  endif
-  # profiling
-  ifeq "$(PROFILING)" "yes"
-    PREPROC := $(PREPROC) -pg -DPROFILING
-  endif
-  # optimization
-  ifeq "$(OPTIMIZE)" "yes"
-    OPTSC := $(OPTSC) -O3 -ipo -inline all
-    OPTSL := $(OPTSL) -O3 -ipo -inline all
-  endif
-  # openmp
-  ifeq "$(OPENMP)" "yes"
-    OPTSC := $(OPTSC) -openmp
-    OPTSL := $(OPTSL) -openmp
-    PREPROC := $(PREPROC) -DOPENMP
-  endif
-  # mpi
-  ifeq "$(MPI)" "yes"
-    PREPROC := $(PREPROC) -DMPI2
-    FC = mpif90
-  else
-    FC = ifort
-  endif
+  FC = ifort
+  OPTSC = -cpp -c -module $(DMOD) -static -assume protect_parens -assume norealloc_lhs -fp-model source
+  OPTSL =
+  WRN = $(WRN_INT)
+  CHK = $(CHK_INT)
+  DEB = $(DEB_INT)
+  STD = $(STD_INT)
+  OMP = $(OMP_INT)
+  OPT = $(OPT_INT)
+  PRF = $(PRF_INT)
 endif
-ifeq "$(COMPILER)" "pgi"
-  OPTSC   = -Mpreprocess -c -module $(DMOD)
-  OPTSL   =
-	PREPROC := $(PREPROC) -Dpgf95
-  # debug
-  ifeq "$(DEBUG)" "yes"
-    PREPROC := $(PREPROC) -DDEBUG
-    OPTSC := $(OPTSC) -C -g -Mbounds -Mchkstk
-    OPTSL := $(OPTSL) -C -g -Mbounds -Mchkstk
-  endif
-  # standard
-  ifeq "$(F03STD)" "yes"
-    OPTSC := $(OPTSC) -Mstandard
-    OPTSL := $(OPTSL) -Mstandard
-  endif
-  # profiling
-  ifeq "$(PROFILING)" "yes"
-    PREPROC := $(PREPROC) -DPROFILING
-  endif
-  # optimization
-  ifeq "$(OPTIMIZE)" "yes"
-    OPTSC := $(OPTSC) -O1
-    OPTSL := $(OPTSL) -O1
-  endif
-  # openmp
-  ifeq "$(OPENMP)" "yes"
-    OPTSC := $(OPTSC) -mp
-    OPTSL := $(OPTSL) -mp
-    PREPROC := $(PREPROC) -DOPENMP
-  endif
-  # mpi
-  ifeq "$(MPI)" "yes"
-    PREPROC := $(PREPROC) -DMPI2
-    FC = mpif90
-  else
-    FC = pgf95
-  endif
+ifeq "$(DEBUG)" "yes"
+  PREPROC := $(PREPROC) -DDEBUG
+  OPTSC := $(OPTSC) -O0 -C -g $(WRN) $(CHK) $(DEB)
+  OPTSL := $(OPTSL) -O0 -C -g $(WRN) $(CHK) $(DEB)
 endif
-ifeq "$(COMPILER)" "g95"
-  OPTSC   = -cpp -c -fmod=$(DMOD)
-  OPTSL   =
-  # debug
-  ifeq "$(DEBUG)" "yes"
-    PREPROC := $(PREPROC) -DDEBUG
-    OPTSC := $(OPTSC) -O0 -g
-    OPTSL := $(OPTSL) -O0 -g
-  endif
-  # standard
-  ifeq "$(F03STD)" "yes"
-    OPTSC := $(OPTSC) -std=f2003 -fintrinsic-extensions
-    OPTSL := $(OPTSL) -std=f2003 -fintrinsic-extensions
-  endif
-  # profiling
-  ifeq "$(PROFILING)" "yes"
-    PREPROC := $(PREPROC) -DPROFILING
-  endif
-  # optimization
-  ifeq "$(OPTIMIZE)" "yes"
-    OPTSC := $(OPTSC) -O3
-    OPTSL := $(OPTSL) -O3
-  endif
-  FC = g95
+ifeq "$(F03STD)" "yes"
+  OPTSC := $(OPTSC) $(STD)
+  OPTSL := $(OPTSL) $(STD)
+endif
+ifeq "$(PROFILING)" "yes"
+  PREPROC := $(PREPROC) -DPROFILING
+  OPTSC := $(OPTSC) $(PRF)
+  OPTSL := $(OPTSL) $(PRF)
+endif
+ifeq "$(OPTIMIZE)" "yes"
+  OPTSC := $(OPTSC) $(OPT)
+  OPTSL := $(OPTSL) $(OPT)
+endif
+ifeq "$(OPENMP)" "yes"
+  PREPROC := $(PREPROC) -DOPENMP
+  OPTSC := $(OPTSC) $(OMP)
+  OPTSL := $(OPTSL) $(OMP)
+endif
+ifeq "$(MPI)" "yes"
+  PREPROC := $(PREPROC) -DMPI2
+  FC = mpif90
 endif
 # pre-processing options
 # R16 precision
@@ -340,6 +272,15 @@ endif
 ifeq "$(R16P)" "yes"
   R16PCHK = (Known R16P switch) Used R16P=$(R16P)
   PREPROC := $(PREPROC) -Dr16p
+endif
+# SYSless
+SYSlessCHK = (Unknown SYSless switch) Used default SYSless=no
+ifeq "$(SYSless)" "no"
+  SYSlessCHK = (Known SYSless switch) Used SYSless=$(SYSless)
+endif
+ifeq "$(SYSless)" "yes"
+  SYSlessCHK = (Known SYSless switch) Used SYSless=$(SYSless)
+  PREPROC := $(PREPROC) -DSYSTEMless
 endif
 # 1D or 2D solver
 NULiCHK = (Unknown NULi switch) Used default NULi=no
@@ -529,6 +470,7 @@ PRINTCHK = "\\033[1;31m Compiler used \\033[0m\\033[1m $(COMPILER) => $(WHICHFC)
             \\033[1;31m OpenMP        \\033[0m\\033[1m $(OPENMP)\\033[0m \n\
             \\033[1;31m MPI           \\033[0m\\033[1m $(MPI)\\033[0m \n\
             \\033[1;31m R16P          \\033[0m\\033[1m $(R16PCHK)\\033[0m \n\
+            \\033[1;31m SYSless       \\033[0m\\033[1m $(SYSlessCHK)\\033[0m \n\
             \\033[1;31m Nullify i     \\033[0m\\033[1m $(NULiCHK)\\033[0m \n\
             \\033[1;31m Nullify j     \\033[0m\\033[1m $(NULjCHK)\\033[0m \n\
             \\033[1;31m Nullify k     \\033[0m\\033[1m $(NULkCHK)\\033[0m \n\
@@ -635,18 +577,18 @@ $(DEXE)POG : PRINTINFO $(MKDIRS) $(DOBJ)pog.o
 	@$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1>> diagnostic_messages 2>> error_messages
 EXES := $(EXES) POG
 
-$(DOBJ)data_type_amrblock.o : Data_Type_AMRBlock.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_cell.o \
-	$(DOBJ)data_type_global.o \
-	$(DOBJ)data_type_hashid.o \
-	$(DOBJ)data_type_hashtcell.o \
-	$(DOBJ)data_type_hashtface.o \
-	$(DOBJ)data_type_hashtnode.o \
-	$(DOBJ)data_type_vector.o \
-	$(DOBJ)lib_io_misc.o
-	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+#$(DOBJ)data_type_amrblock.o : Data_Type_AMRBlock.f90 \
+#  $(DOBJ)ir_precision.o \
+#  $(DOBJ)data_type_cell.o \
+#  $(DOBJ)data_type_global.o \
+#  $(DOBJ)data_type_hashid.o \
+#  $(DOBJ)data_type_hashtcell.o \
+#  $(DOBJ)data_type_hashtface.o \
+#  $(DOBJ)data_type_hashtnode.o \
+#  $(DOBJ)data_type_vector.o \
+#  $(DOBJ)lib_io_misc.o
+#  @echo $(COTEXT) | tee -a make.log
+#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_bc.o : Data_Type_BC.f90 \
 	$(DOBJ)ir_precision.o
@@ -681,32 +623,32 @@ $(DOBJ)data_type_global.o : Data_Type_Global.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-$(DOBJ)data_type_hashid.o : Data_Type_HashID.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)lib_morton.o
-	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+#$(DOBJ)data_type_hashid.o : Data_Type_HashID.f90 \
+#  $(DOBJ)ir_precision.o \
+#  $(DOBJ)lib_morton.o
+#  @echo $(COTEXT) | tee -a make.log
+#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-$(DOBJ)data_type_hashtcell.o : Data_Type_HashTCell.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_cell.o \
-	$(DOBJ)data_type_hashid.o
-	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+#$(DOBJ)data_type_hashtcell.o : Data_Type_HashTCell.f90 \
+#  $(DOBJ)ir_precision.o \
+#  $(DOBJ)data_type_cell.o \
+#  $(DOBJ)data_type_hashid.o
+#  @echo $(COTEXT) | tee -a make.log
+#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-$(DOBJ)data_type_hashtface.o : Data_Type_HashTFace.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_face.o \
-	$(DOBJ)data_type_hashid.o
-	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+#$(DOBJ)data_type_hashtface.o : Data_Type_HashTFace.f90 \
+#  $(DOBJ)ir_precision.o \
+#  $(DOBJ)data_type_face.o \
+#  $(DOBJ)data_type_hashid.o
+#  @echo $(COTEXT) | tee -a make.log
+#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-$(DOBJ)data_type_hashtnode.o : Data_Type_HashTNode.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_hashid.o \
-	$(DOBJ)data_type_vector.o
-	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+#$(DOBJ)data_type_hashtnode.o : Data_Type_HashTNode.f90 \
+#  $(DOBJ)ir_precision.o \
+#  $(DOBJ)data_type_hashid.o \
+#  $(DOBJ)data_type_vector.o
+#  @echo $(COTEXT) | tee -a make.log
+#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_os.o : Data_Type_OS.f90 \
 	$(DOBJ)ir_precision.o
@@ -736,10 +678,10 @@ $(DOBJ)data_type_sblock.o : Data_Type_SBlock.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-$(DOBJ)data_type_sl_list.o : Data_Type_SL_List.f90 \
-	$(DOBJ)ir_precision.o
-	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+#$(DOBJ)data_type_sl_list.o : Data_Type_SL_List.f90 \
+#  $(DOBJ)ir_precision.o
+#  @echo $(COTEXT) | tee -a make.log
+#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_tensor.o : Data_Type_Tensor.f90 \
 	$(DOBJ)ir_precision.o \
@@ -772,6 +714,11 @@ $(DOBJ)ibm.o : IBM.f90 \
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)ir_precision.o : IR_Precision.f90
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_base64.o : Lib_Base64.f90 \
+	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
@@ -827,17 +774,23 @@ $(DOBJ)lib_io_misc.o : Lib_IO_Misc.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
+#$(DOBJ)lib_math.o : Lib_Math.f90 \
+#  $(DOBJ)ir_precision.o \
+#  $(DOBJ)data_type_sl_list.o \
+#  $(DOBJ)data_type_vector.o
+#  @echo $(COTEXT) | tee -a make.log
+#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
 $(DOBJ)lib_math.o : Lib_Math.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_sl_list.o \
 	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-$(DOBJ)lib_morton.o : Lib_Morton.f90 \
-	$(DOBJ)ir_precision.o
-	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+#$(DOBJ)lib_morton.o : Lib_Morton.f90 \
+#  $(DOBJ)ir_precision.o
+#  @echo $(COTEXT) | tee -a make.log
+#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_multigrid.o : Lib_Multigrid.f90 \
 	$(DOBJ)ir_precision.o \
@@ -892,7 +845,8 @@ $(DOBJ)lib_thermodynamic_laws_ideal.o : Lib_Thermodynamic_Laws_Ideal.f90 \
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_vtk_io.o : Lib_VTK_IO.f90 \
-	$(DOBJ)ir_precision.o
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)lib_base64.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
@@ -904,7 +858,6 @@ $(DOBJ)lib_weno.o : Lib_WENO.f90 \
 
 $(DOBJ)off.o : OFF.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_amrblock.o \
 	$(DOBJ)data_type_bc.o \
 	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_os.o \
@@ -919,9 +872,7 @@ $(DOBJ)off.o : OFF.f90 \
 	$(DOBJ)lib_profiling.o \
 	$(DOBJ)lib_runge_kutta.o \
 	$(DOBJ)lib_weno.o \
-	$(DOBJ)lib_parallel.o \
-	$(DOBJ)lib_morton.o \
-	$(DOBJ)data_type_hashid.o
+	$(DOBJ)lib_parallel.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 

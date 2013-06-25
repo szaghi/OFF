@@ -107,7 +107,7 @@ do l=1,global%Nl
   enddo
 enddo
 do b=1,global%Nb_tot
-  write(stdout,'(A)',iostat=err)' Saving output files of block '//str(.true.,b)
+  write(stdout,'(A)',iostat=err)' Saving output files of block '//trim(str(.true.,b))
   ! setting mesh dimensions for grid level 1
   block(1,1)%gc = blocks(b)%gc
   block(1,1)%Ni = blocks(b)%Ni
@@ -150,7 +150,7 @@ do b=1,global%Nb_tot
     call block(1,l)%alloc
   enddo
   do l=1,global%Nl
-    write(stdout,'(A,I3)',iostat=err)'   Grid level ',l
+    write(stdout,'(A)',iostat=err)'   Grid level '//trim(str(.true.,l))
     ! mesh files
     err = read_vector(array3D=block(1,l)%node,unit=UnitScratch(1,b,l))
     !err = read_cell(  array3D=block(1,l)%cell,unit=UnitScratch(1,b,l))
@@ -410,6 +410,7 @@ contains
   enddo
   ! generating mesh, boundary and initial conditions of each block and storing in scratch files
   do b=1,global%Nb_tot
+    write(stdout,'(A)')'  Block '//trim(str(.true.,b))//' of '//trim(str(.true.,global%Nb_tot))
     ! setting mesh dimensions for grid level 1
     block(1,1)%gc = blocks(b)%gc
     block(1,1)%Ni = blocks(b)%Ni
@@ -646,7 +647,7 @@ contains
       enddo
     enddo
     ! initial conditions setting
-    write(stdout,'(A)')'  Setting initial conditions'//str(.true.,b)
+    write(stdout,'(A)')'    Setting initial conditions'
     do l=1,global%Nl
       block(1,l)%C%P = blocks(b)%P
     enddo

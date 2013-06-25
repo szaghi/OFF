@@ -75,7 +75,7 @@ contains
   integer(I_P),            intent(IN), optional:: Ns     !< Number of species.
   type(Type_Primitive),    intent(IN), optional:: prim0  !< Primitive inizialization data.
   type(Type_Conservative), intent(IN), optional:: cons0  !< Conservative inizialization data.
-  integer(I_P),            intent(IN)::           rk_ord !< Number of Runge-Kutta stages.
+  integer(I1P),            intent(IN)::           rk_ord !< Number of Runge-Kutta stages.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 /**
 @page SOD 1D Example: SOD shock tube
 
+How to simulate 1D SOD shock tube problem
+
 @section RiemannP Riemann Problem definition
 
 A shock tube test consists in a one dimensional Riemann Problem with non reflective boundary conditions. A Riemann Problem could be defined as following. Assuming that the conservation laws \f$ \frac{\partial }{{\partial t}}\int\limits_{{V_{ijk}}} {\overrightarrow U d{V_{ijk}}}  = R\left( {\overrightarrow U } \right) \f$ in the space domain [0,1], are coupled with the following initial conditions:

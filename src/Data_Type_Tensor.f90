@@ -721,9 +721,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   n = u
   call n%normalize
-  call ten%x%set(x=cos(ang)+n%x*n%x*(1-cos(ang))    ,y=n%x*n%y*(1-cos(ang))-u%z*sin(ang),z=n%x*n%z*(1-cos(ang))+u%y*sin(ang))
-  call ten%y%set(x=n%y*n%x*(1-cos(ang))+u%z*sin(ang),y=cos(ang)+n%y*n%y*(1-cos(ang))    ,z=n%y*n%z*(1-cos(ang))-u%x*sin(ang))
-  call ten%z%set(x=n%z*n%x*(1-cos(ang))-u%y*sin(ang),y=n%z*n%y*(1-cos(ang))+u%x*sin(ang),z=cos(ang)+n%z*n%z*(1-cos(ang))    )
+  call ten%x%set(x=cos(ang)+n%x*n%x*(1._R8P-cos(ang))    ,&
+                 y=n%x*n%y*(1._R8P-cos(ang))-u%z*sin(ang),&
+                 z=n%x*n%z*(1._R8P-cos(ang))+u%y*sin(ang))
+  call ten%y%set(x=n%y*n%x*(1._R8P-cos(ang))+u%z*sin(ang),&
+                 y=cos(ang)+n%y*n%y*(1._R8P-cos(ang))    ,&
+                 z=n%y*n%z*(1._R8P-cos(ang))-u%x*sin(ang))
+  call ten%z%set(x=n%z*n%x*(1._R8P-cos(ang))-u%y*sin(ang),&
+                 y=n%z*n%y*(1._R8P-cos(ang))+u%x*sin(ang),&
+                 z=cos(ang)+n%z*n%z*(1._R8P-cos(ang)))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine rotou

@@ -95,6 +95,8 @@ It can be found at: https://github.com/szaghi/OFF
 
 @page Equations Governing Equations
 
+Description of the main mathematical models
+
 @section conseq Conservation Laws
 
 The turbulent motion of compressible viscous fluid is described by a system of equations, that read, in integral, dimensional form:
@@ -255,6 +257,8 @@ A set of sub-models are implemented in order to taking into account other physic
 
 @page DataStructure Data Structures
 
+General Remarks on Data Structures
+
 @section Considerations General Considerations
 
 @off data structures are based on derived typed, dynamic allocatable objects.
@@ -282,11 +286,15 @@ type(Type_Block), allocatable:: block(:,:) ! Dimensions [1:Nb,1:Nl] being Nb the
 @endcode
 where the inner index ranges in the blocks number while the outer index ranges in the grid (refinement) levels number. At today a bug afflicts multigrid algorithm thus the use of more different grid levels (Nl>1) is not useful.
 
-Inside the block level data there are a lot of dynamically allocated 3D arrays. The use of nested dynamic data needs a careful treatment of the memory allocated. For those derived types (e.g. boundary conditions and fluid dynamics types) that have dynamic data specific procedures for allocating and freeing the memory have been provided (e.g. see \ref data_type_conservative::free "Type Conservative freeing memory procedure").
+Inside the block level data there are a lot of dynamically allocated 3D arrays. The use of nested dynamic data needs a careful treatment of the memory allocated. For those derived types (e.g. boundary conditions and fluid dynamics types) that have dynamic data specific procedures for allocating and freeing the memory have been provided (e.g. see \ref data_type_conservative::free_cons "Type Conservative freeing memory procedure").
 
 According to the data hierarchy there are procedures that operate on some level of data structure and other on different level.  There are for example procedures operating on whole blocks of some grid level (e.g. see \ref lib_fluidynamic::solve_grl and \ref lib_fluidynamic::boundary_conditions) and other procedures operating on only one block at time (e.g. see \ref lib_fluidynamic::conservative2primitive).
 
 @page FilesFormat Input Output Files Structures
+
+General Remarks on Input/Output Files
+
+@section IOFilesList List of IO Files
 
 @off (and other auxiliary programs) uses a set of different input/output files:
 - Input:
@@ -386,14 +394,18 @@ sol_base_name.g##.b###.geo
 @endcode
 where '.g##' is the grid level and '.b###' is the block number. For building such a name there is a specific \ref data_type_global::file_name "procedure".
 
-@page Compiling Compiling Instruction
-@off has been developed on GNU/Linux architectures. Other OS are not supported (and in general there is no best alternative to
-GNU/Linux :-).
+@page Compiling Compiling Instructions
+
+Compiling Instructions
+
+@section CompilersList List of Supported Compilers
+
+@off has been developed on GNU/Linux architectures. Other OS are not supported (and in general there is no best alternative to GNU/Linux :-).
 
 The codes provided (@off, IBM and POG) have been successfully compiled with the following compilers:
 
-- GNU gfortran (from version 4.7.0)
-- Intel Fortran Compiler ifort (from version 12.0)
+- GNU gfortran (version 4.7.0 or higher)
+- Intel Fortran Compiler ifort (version 12.0 or higher)
 
 Other compilers are not supported. For the Portland Group Compiler pgf it is known the presence of problems (and lack of performance due to the dynamic data nested into derived types).
 
@@ -402,6 +414,8 @@ Other compilers are not supported. For the Portland Group Compiler pgf it is kno
 - OpenMPI (from version 1.4.5)  compiled against Intel Fortran Compiler ifort;
 - MPICH2 (from version 1.4.1)  compiled against GNU gfortran;
 - MPICH2 (from version 1.4.1)  compiled against Intel Fortran Compiler ifort.
+
+@section CompInst Compiling Instructions
 
 The codes are constituted by several modules. Therefore there are many dependences. The most easy way to compile the code is to start with the provided makefile thus it is necessary that the system has "Make" program (preferably GNU make http://www.gnu.org/software/make/).
 
@@ -434,7 +448,7 @@ Examples of compiling are:
 
 In the following subsections there are more details of each option and rule of the provided makefile.
 
-@section Makefile
+@subsection Makefile
 
 The provided makefile has several options. It has one rule that prints all options available and the default settings. Typing in the shell prompt: @code make help @endcode the following output will be printed:
 
@@ -603,6 +617,8 @@ POG code can produce Tecplot binary files. To this aim the proprietary library t
 
 @page Examples Examples of usage
 
+Some Examples Description
+
 The provided examples are contained into directory "examples". There are three types of examples:
  - \b 1D One dimensional test cases:
    - \subpage SOD "SOD" shock tube;
@@ -612,5 +628,38 @@ The provided examples are contained into directory "examples". There are three t
    - Under expanded supersonic jet transient;
    - Double Mach reflections;
    - Shock corner diffraction.
+
+@page Scalability Parallel Performance
+
+Partial Assessment of Parallel Scalability on small HPC Cluster
+
+For the (partial) assessment of \off performance let us consider the fifth test of Kurganov and Tadmor [\ref kurganov "1"] reported in the example section \ref kt-c05. Four different grid refinement levels have been considered for the whole \f$[0,1]\times[0,1]\f$ two dimensional domain ranging from \f$100\times100=10000\f$ (grid-1) to \f$800\times800=640000\f$ (grid-4) finite volumes. Each grid level is four times finer than the previous one.
+
+Two different architectures have been used: 1) shared memory multicore workstation and 2) distributed memory cluster built up of shared memory multicore nodes. The shared memory workstation has two Esa core (12 cores) Intel(R) Xeon(R) X5650 at 2.67GHz with 24GB of DDR3 RAM at 1333MHz, whereas the cluster nodes have two Quad core (8 cores) Intel(R) Xeon(R) X5462 at 2.8GHz with 8GB of DDR3 RAM at 800MHz.
+
+The numerical grid of the example section has been modified: each original block has been split into 4 new ones obtaining a 16 blocks grid. This allows to use up to 16 MPI processes increasing the tests matrix.
+
+The assessment of \off scalability has been performed comparing the performance of the serial-compiled code with respect the parallel versions ones. In particular, defined \f$CPU_{SER}\f$ the CPU time used for the serial runs, the speedup is defined as \f$\frac{CPU}{CPU_{SER}}\f$. As a consequence, the ideal speedup is a linear function of the number of cores (processors, indicated as \f$\#CORE\f$ hereafter) used, ranging from \f$1\f$ (serial case) to \f$\frac{1}{\#CORE}\f$ (best case). In both the two architectures, three different parallel compilations have been considered: 1) pure OpenMP, 2) pure MPI and 3) hybrid OpenMP/MPI. All serial and parallel compilations have been performed using Intel Fortran compiler v. 13.1.1 and OpenMPI v. 1.6.4 (compiled with Intel Parallel suite, v. 13.1.1). Moreover, the -O3 (entailing vectorization) and -ipo optimization flags have been used.
+
+@section SharedMemSpeedUP SpeedUp on Shared Memory Architecture
+
+Figures \ref fig-shaspeedup050 "1", \ref fig-shaspeedup100 "2", \ref fig-shaspeedup200 "3" and \ref fig-shaspeedup400 "4" summarize the tests matrix performed on the shared memory architecture and the computed speedup. For the pure OpenMP runs all 11 possible configurations have been tested with the number of OpenMP threads used ranging in \f$[2,12]\f$. For the pure MPI and hybrid runs also some not balanced runs have performed. In particular, the tests with 3, 6 and 12 MPI processes are not balanced (having 16 blocks, the processes have different loads in these cases).
+
+\off shows a good scalability on the shared memory architecture available. The pure MPI version exhibits a quasi-linear speedup for the balanced configurations, whereas OpenMP performance is lower. After a deep profiling some OpenMP issues have arisen: the current OpenMP (3.1) support for advanced Fortran 2003 features still lags behind and the most complex code sections had to be manually refactored to be parallelized. This clearly limits the performances which can be obtained especially when comparing to the pure MPI version. It is worth noting that, due to the memory bandwidth saturation the intra-node scaling is strongly limited up to 6 cores. As a consequence all the benchmarks using more than 6 cores show a non exciting speedup. As expected after the code profiling, the hybrid version scales better than the pure OpenMP.
+
+<table border="0">
+<tr><th>\anchor fig-shaspeedup050 \image html shaspeedup050x050.png "Figure 1: \off Scalability for the fifth test of Kurganov and Tadmor for grid level 1"</th><th> </th><th>\anchor fig-shaspeedup100 \image html shaspeedup100x100.png "Figure 2: \off Scalability for the fifth test of Kurganov and Tadmor for grid level 2"</th></tr>
+<tr><th>\anchor fig-shaspeedup200 \image html shaspeedup200x200.png "Figure 3: \off Scalability for the fifth test of Kurganov and Tadmor for grid level 3"</th><th> </th><th>\anchor fig-shaspeedup400 \image html shaspeedup400x400.png "Figure 4: \off Scalability for the fifth test of Kurganov and Tadmor for grid level 4"</th></tr>
+</table>
+
+@section DistributedMemSpeedUP SpeedUp on Distributed Memory Architecture
+
+The available distributed memory cluster has a total of 20 nodes, but only 8 nodes (for a total of 64 cores) have been available for these benchmarks. The numerical grid used has 16 blocks thus a maximum of 16 MPI processes can be executed in parallel. Due to the nodes RAM limitation (8GB) the serial run with the finest grid (grid-4) uses swap memory, thus invalidate the reference performance. As a consequence, for the cluster benchmarks the finest grid used is the third. Figures \ref fig-disspeedup050 "5" and \ref fig-disspeedup200 "6" summarizes the tests matrix performed on the cluster architecture and the computed speedup only for the grid levels 1 and 3. \off shows good scalability also on the distributed memory architecture. The inter-nodes performance are satisfactory as well as the intra-node scalability previously assessed on the shared memory workstation. The pure MPI and hybrid OpenMP/MPI codes are more efficient than the pure OpenMP version for the same overheads aforementioned. As expected, comparing the tests with different number of nodes and the number of cores used being equals, the best performance are obtained with the largest number of nodes because of the saturation of node memory bandwidth is minimized, e.g. comparing the MPI tests for grid-3 using 16 processors (with 2, 4 or 8 nodes) the best speedup is achieved with 8 nodes (\f$9.7\%\f$) while the 2 nodes test is the worst (\f$16.9\%\f$).
+
+<table border="0">
+<tr><th>\anchor fig-disspeedup050 \image html disspeedup050x050.png "Figure 5: \off Scalability for the fifth test of Kurganov and Tadmor for grid level 1"</th><th> </th><th>\anchor fig-disspeedup200 \image html disspeedup200x200.png "Figure 6: \off Scalability for the fifth test of Kurganov and Tadmor for grid level 3"</th></tr>
+</table>
+
+It is worth noting that, the reported benchmarks analysis constitutes only a partial assessment of the \off parallel scalability. In particular, tests on more powerful architectures (GIGA/PETA scale) with thousands to hundreds of thousands cores are necessary. On both the two architectures used the intra-node memory bandwidth limit has strongly affected the parallel scalability, more than the communications overheads. Indeed, this is a typical behavior of CFD codes, where the computations are orders of magnitude heavier than the communications.
 
 */

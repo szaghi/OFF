@@ -19,12 +19,12 @@
 !> @ingroup Lib_Fluxes_DiffusiveLibrary
 module Lib_Fluxes_Diffusive
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision           ! Integers and reals precision definition.
-USE Data_Type_Conservative ! Definition of Type_Conservative.
-USE Data_Type_Primitive    ! Definition of Type_Primitive.
-USE Data_Type_SBlock       ! Definition of Type_SBlock.
-USE Data_Type_Tensor       ! Definition of Type_Tensor.
-USE Data_Type_Vector       ! Definition of Type_Vector.
+USE IR_Precision                             ! Integers and reals precision definition.
+USE Data_Type_Conservative                   ! Definition of Type_Conservative.
+USE Data_Type_Primitive                      ! Definition of Type_Primitive.
+USE Data_Type_SBlock                         ! Definition of Type_SBlock.
+USE Data_Type_Tensor, sq_norm_ten => sq_norm ! Definition of Type_Tensor.
+USE Data_Type_Vector, sq_norm_vec => sq_norm ! Definition of Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------

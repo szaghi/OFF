@@ -33,12 +33,14 @@ private
 public:: OS
 public:: stdout,stderr
 public:: Get_Unit
+#ifndef SYSTEMless
+public:: make_dir
 public:: remove_file
 public:: copy_file
+#endif
 public:: lc_file
 public:: File_Not_Found
 public:: basedir,basename
-public:: make_dir
 public:: Upper_Case
 public:: Lower_Case
 public:: string_OS_sep
@@ -84,6 +86,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Get_Unit
 
+#ifndef SYSTEMless
   !> @brief Function for creating a directory if it doesn't exist.
   !> @return \b err integer(I_P) variable for error trapping.
   function make_dir(myrank,directory) result(err)
@@ -177,6 +180,7 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction copy_file
+#endif
 
   !> @brief Function for calculating the number of lines (records) of a sequential file.
   !>@return \b n integer(I4P) variable

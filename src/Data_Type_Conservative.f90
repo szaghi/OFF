@@ -34,6 +34,7 @@ USE Data_Type_Vector ! Definition of Type_Vector.
 implicit none
 private
 public:: write_conservative,read_conservative
+public:: array2consf
 public:: assignment (=)
 public:: operator (*)
 public:: operator (/)
@@ -54,11 +55,11 @@ type, public:: Type_Conservative
   type(Type_Vector)::      rv          !< Momentum vector.
   real(R8P)::              re = 0._R8P !< Product of density for specific total internal energy (sum(r)*E).
   contains
-    procedure, non_overridable:: init       ! Procedure for initializing allocatable variables.
-    procedure, non_overridable:: free       ! Procedure for freeing the memory of allocatable variables.
-    procedure, non_overridable:: cons2array ! Procedure for converting derived type Type_Conservative to array.
-    procedure, non_overridable:: array2cons ! Procedure for converting array to derived type Type_Conservative.
-    procedure, non_overridable:: pprint     ! Procedure for printing Type_Conservative components with a "pretty" format.
+    procedure, non_overridable:: init              ! Procedure for initializing allocatable variables.
+    procedure, non_overridable:: free => free_cons ! Procedure for freeing the memory of allocatable variables.
+    procedure, non_overridable:: cons2array        ! Procedure for converting derived type Type_Conservative to array.
+    procedure, non_overridable:: array2cons        ! Procedure for converting array to derived type Type_Conservative.
+    procedure, non_overridable:: pprint            ! Procedure for printing Type_Conservative components with a "pretty" format.
 endtype Type_Conservative
 !-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -463,6 +464,27 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction read_conservative
+
+  !> Function for converting array to derived type Type_Conservative.
+  pure function array2consf(array) result(cons)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  real(R8P), intent(IN)::   array(:) !< Conservative data in the form of array.
+  type(Type_Conservative):: cons     !< Derived type conservative data.
+  integer(I_P)::            Ns       !< Number of species.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  Ns = size(array)-4
+  if (allocated(cons%rs)) deallocate(cons%rs) ; allocate(cons%rs(1:Ns))
+  cons%rs   = array(1:Ns)
+  cons%rv%x = array(Ns+1)
+  cons%rv%y = array(Ns+2)
+  cons%rv%z = array(Ns+3)
+  cons%re   = array(Ns+4)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction array2consf
   !> @}
 
   !> @ingroup Data_Type_ConservativePrivateProcedure
@@ -487,7 +509,7 @@ contains
   endsubroutine init
 
   !> @brief Subroutine for freeing the memory of Type_Conservative allocatable variables.
-  elemental subroutine free(cons)
+  elemental subroutine free_cons(cons)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Conservative), intent(INOUT):: cons !< Conservative data.
@@ -497,7 +519,7 @@ contains
   if (allocated(cons%rs)) deallocate(cons%rs)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine free
+  endsubroutine free_cons
 
   !> @brief Function for converting derived type Type_Conservative to array.
   !> @return \b array real(R8P), dimension(1:size(cons\%rs)+4) variable.

@@ -88,7 +88,7 @@ contains
   !>  - Ns+3) density                 (r=sum(rs))
   !>  - Ns+4) specific heats ratio    (g)
   !> @ingroup Lib_Fluxes_ConvectivePublicProcedure
-  subroutine fluxes_convective(gc,N,Ns,cp0,cv0,F,C,Fl)
+  pure subroutine fluxes_convective(gc,N,Ns,cp0,cv0,F,C,Fl)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I1P),            intent(IN)::    gc                         !< Number of ghost cells used.
@@ -209,7 +209,7 @@ contains
     real(R_P)::                    CR (1:Ns+2,       1:2           ) !< Reconstructed interface value of charac. variables.
 #endif
     logical::                      ROR(1:2)                          !< Logical flag for testing the result of WENO reconst.
-    integer(I_P)::                 or                                !< Counter of order for ROR algorithm.
+    integer(I1P)::                 or                                !< Counter of order for ROR algorithm.
     integer(I_P)::                 i,j,k,v                           !< Counters.
     !-------------------------------------------------------------------------------------------------------------------------------
 
@@ -227,11 +227,13 @@ contains
       enddo
 #ifdef RECVC
       ! computing mean left and right eigenvectors matrix across the interface
+      LPm = 0._R_P
+      RPm = 0._R_P
       do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
         if (i==0  .AND.j==1) cycle
         if (i==N+1.AND.j==2) cycle
         ! computing mean of primitive variables across the interface
-        Pm(1:Ns) = 0.5_R_P*( C(i+j-1)%P%r(1:NS)           +  C(i+j-2)%P%r(1:NS)          ) ! rs
+        Pm(1:Ns) = 0.5_R_P*( C(i+j-1)%P%r(1:Ns)           +  C(i+j-2)%P%r(1:Ns)          ) ! rs
         Pm(Ns+1) = 0.5_R_P*((C(i+j-1)%P%v.dot.F(i+j-2)%N) + (C(i+j-2)%P%v.dot.F(i+j-2)%N)) ! un
         Pm(Ns+2) = 0.5_R_P*( C(i+j-1)%P%p                 +  C(i+j-2)%P%p                ) ! p
         Pm(Ns+3) = 0.5_R_P*( C(i+j-1)%P%d                 +  C(i+j-2)%P%d                ) ! r
@@ -241,6 +243,7 @@ contains
         RPm(1:Ns+2,1:Ns+2,j) = RP(Ns,Pm(1:Ns+4))
       enddo
       ! transforming variables into local characteristic fields for the stencil [1-gc,-1+gc]
+      CA = 0._R_P
       do k=i+1-gc,i-1+gc
         do j=1,2 ! 1 => left interface (i-1/2), 2 => right interface (i+1/2)
           if (i==0  .AND.j==1) cycle
@@ -252,7 +255,7 @@ contains
       enddo
 #endif
       ! computing WENO reconstruction with ROR (Recursive Order Reduction) algorithm
-      ROR_check: do or=gc,2,-1
+      ROR_check: do or=gc,2_I1P,-1_I1P
         ! computing WENO reconstruction
 #ifdef RECVC
         do v=1,Ns+2

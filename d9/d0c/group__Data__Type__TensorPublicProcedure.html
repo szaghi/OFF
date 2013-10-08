@@ -146,8 +146,8 @@ $(document).ready(function(){initNavTree('d9/d0c/group__Data__Type__TensorPublic
 <p>Function for computing the determinant of a tensor. </p>
 <dl class="section return"><dt>Returns</dt><dd><b>det</b> real(R8P) variable </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The determinant is computed according the following equation: <br/>
- <img class="formulaInl" alt="$ \det = \left| {\begin{array}{*{20}{c}} {x\% x}&amp;{x\% y}&amp;{x\% z}\\ {y\% x}&amp;{y\% y}&amp;{y\% z}\\ {z\% x}&amp;{z\% y}&amp;{z\% z} \end{array}} \right| = $" src="../../form_119.png"/> <br/>
- <img class="formulaInl" alt="$=x\%x(z\%z\cdot y\%y-z\%y\cdot y\%z)-$" src="../../form_120.png"/> <img class="formulaInl" alt="$ y\%x(z\%z\cdot x\%y-z\%y\cdot x\%z)+$" src="../../form_121.png"/> <img class="formulaInl" alt="$ z\%x(y\%z\cdot x\%y-y\%y\cdot x\%z) $" src="../../form_122.png"/></dd></dl>
+ <img class="formulaInl" alt="$ \det = \left| {\begin{array}{*{20}{c}} {x\% x}&amp;{x\% y}&amp;{x\% z}\\ {y\% x}&amp;{y\% y}&amp;{y\% z}\\ {z\% x}&amp;{z\% y}&amp;{z\% z} \end{array}} \right| = $" src="../../form_239.png"/> <br/>
+ <img class="formulaInl" alt="$=x\%x(z\%z\cdot y\%y-z\%y\cdot y\%z)-$" src="../../form_240.png"/> <img class="formulaInl" alt="$ y\%x(z\%z\cdot x\%y-z\%y\cdot x\%z)+$" src="../../form_241.png"/> <img class="formulaInl" alt="$ z\%x(y\%z\cdot x\%y-y\%y\cdot x\%z) $" src="../../form_242.png"/></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">ten</td><td>Tensor. </td></tr>
@@ -177,7 +177,7 @@ $(document).ready(function(){initNavTree('d9/d0c/group__Data__Type__TensorPublic
 <p>If the tensor is not invertible a null tensor is returned. </p>
 <dl class="section return"><dt>Returns</dt><dd><b>inv</b> type(Type_Tensor) variable </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The inverse tensor is computed according the following equation: <br/>
- <img class="formulaInl" alt="$ T_{ij}^{ - 1} = \frac{1}{{\det (T)}}\left[ {\begin{array}{*{20}{c}} {z\%z\cdot y\%y-z\%y\cdot y\%z}&amp;{-(z\%z\cdot x\%y-z\%y\cdot x\%z)}&amp;{y\%z\cdot x\%y-y\%y\cdot x\%z}\\{-(z\%z\cdot y\%x- z\%x\cdot y\%z)}&amp;{z\%z\cdot x\%x-z\%x\cdot x\%z}&amp;{-(y\%z\cdot x\%x-y\%x\cdot x\%z)}\\{z\%y\cdot y\%x-z\%x\cdot y\%y}&amp;{-(z\%y \cdot x\%x-z\%x\cdot x\%y)}&amp;{y\%y\cdot x\%x-y\%x\cdot x\%y} \end{array}} \right]$" src="../../form_123.png"/> <br/>
+ <img class="formulaInl" alt="$ T_{ij}^{ - 1} = \frac{1}{{\det (T)}}\left[ {\begin{array}{*{20}{c}} {z\%z\cdot y\%y-z\%y\cdot y\%z}&amp;{-(z\%z\cdot x\%y-z\%y\cdot x\%z)}&amp;{y\%z\cdot x\%y-y\%y\cdot x\%z}\\{-(z\%z\cdot y\%x- z\%x\cdot y\%z)}&amp;{z\%z\cdot x\%x-z\%x\cdot x\%z}&amp;{-(y\%z\cdot x\%x-y\%x\cdot x\%z)}\\{z\%y\cdot y\%x-z\%x\cdot y\%y}&amp;{-(z\%y \cdot x\%x-z\%x\cdot x\%y)}&amp;{y\%y\cdot x\%x-y\%x\cdot x\%y} \end{array}} \right]$" src="../../form_243.png"/> <br/>
  where det(T) is the determinant computed by means of the function determinant.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -382,7 +382,7 @@ $(document).ready(function(){initNavTree('d9/d0c/group__Data__Type__TensorPublic
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue Oct 8 2013 10:13:59 for OFF by
+    <li class="footer">Generated on Tue Oct 8 2013 10:16:53 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>

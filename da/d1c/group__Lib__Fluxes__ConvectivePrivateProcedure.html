@@ -119,10 +119,10 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memdesc:ga9d808b664de53e363c8fce55e9ce562c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for reconstructing primitive variables along direction "NF".  <a href="#ga9d808b664de53e363c8fce55e9ce562c">More...</a><br/></td></tr>
 <tr class="separator:ga9d808b664de53e363c8fce55e9ce562c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6e5a9436729a6f4361d19694db4e8d79"><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d1c/group__Lib__Fluxes__ConvectivePrivateProcedure.html#ga6e5a9436729a6f4361d19694db4e8d79">lp</a> (Ns, primitive)</td></tr>
-<tr class="memdesc:ga6e5a9436729a6f4361d19694db4e8d79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing left eigenvectors matrix (L) of the Jacobian fluxes matrix <img class="formulaInl" alt="$A=R \Lambda L$" src="../../form_179.png"/> in primitive variables form.  <a href="#ga6e5a9436729a6f4361d19694db4e8d79">More...</a><br/></td></tr>
+<tr class="memdesc:ga6e5a9436729a6f4361d19694db4e8d79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing left eigenvectors matrix (L) of the Jacobian fluxes matrix <img class="formulaInl" alt="$A=R \Lambda L$" src="../../form_299.png"/> in primitive variables form.  <a href="#ga6e5a9436729a6f4361d19694db4e8d79">More...</a><br/></td></tr>
 <tr class="separator:ga6e5a9436729a6f4361d19694db4e8d79"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga023cd3273912d1ce70339db7283048bb"><td class="memItemLeft" align="right" valign="top">pure function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d1c/group__Lib__Fluxes__ConvectivePrivateProcedure.html#ga023cd3273912d1ce70339db7283048bb">rp</a> (Ns, primitive)</td></tr>
-<tr class="memdesc:ga023cd3273912d1ce70339db7283048bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing right eigenvectors matrix (R) of the Jacobian fluxes matrix <img class="formulaInl" alt="$A=R \Lambda L$" src="../../form_179.png"/> in primitive variables form.  <a href="#ga023cd3273912d1ce70339db7283048bb">More...</a><br/></td></tr>
+<tr class="memdesc:ga023cd3273912d1ce70339db7283048bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function for computing right eigenvectors matrix (R) of the Jacobian fluxes matrix <img class="formulaInl" alt="$A=R \Lambda L$" src="../../form_299.png"/> in primitive variables form.  <a href="#ga023cd3273912d1ce70339db7283048bb">More...</a><br/></td></tr>
 <tr class="separator:ga023cd3273912d1ce70339db7283048bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf0068e7aabd9ab57a990b59df32c1b24"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d1c/group__Lib__Fluxes__ConvectivePrivateProcedure.html#gaf0068e7aabd9ab57a990b59df32c1b24">positivity_preserving_limiter</a> (o, vmean, vr)</td></tr>
 <tr class="memdesc:gaf0068e7aabd9ab57a990b59df32c1b24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Positivity preserving limiter.  <a href="#gaf0068e7aabd9ab57a990b59df32c1b24">More...</a><br/></td></tr>
@@ -262,8 +262,8 @@ Functions/Subroutines</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Function for computing left eigenvectors matrix (L) of the Jacobian fluxes matrix <img class="formulaInl" alt="$A=R \Lambda L$" src="../../form_179.png"/> in primitive variables form. </p>
-<dl class="section note"><dt>Note</dt><dd>This function consider only the normal direction: <img class="formulaInl" alt="$ \frac{\partial P}{\partial t} + R \Lambda L \frac{\partial P}{\partial n} = 0$" src="../../form_180.png"/> where P are the primitive variables and n is the normal direction. R is the matrix of the right eigenvectors, <img class="formulaInl" alt="$\Lambda$" src="../../form_181.png"/> is the diagonal matrix of the eigenvalues and L is the matrix of the left eigenvectors. </dd></dl>
+<p>Function for computing left eigenvectors matrix (L) of the Jacobian fluxes matrix <img class="formulaInl" alt="$A=R \Lambda L$" src="../../form_299.png"/> in primitive variables form. </p>
+<dl class="section note"><dt>Note</dt><dd>This function consider only the normal direction: <img class="formulaInl" alt="$ \frac{\partial P}{\partial t} + R \Lambda L \frac{\partial P}{\partial n} = 0$" src="../../form_300.png"/> where P are the primitive variables and n is the normal direction. R is the matrix of the right eigenvectors, <img class="formulaInl" alt="$\Lambda$" src="../../form_301.png"/> is the diagonal matrix of the eigenvalues and L is the matrix of the left eigenvectors. </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d7/d27/Lib__Fluxes__Convective_8f90_source.html#l00263">263</a> of file <a class="el" href="../../d7/d27/Lib__Fluxes__Convective_8f90_source.html">Lib_Fluxes_Convective.f90</a>.</p>
 
@@ -327,8 +327,8 @@ Functions/Subroutines</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Function for computing right eigenvectors matrix (R) of the Jacobian fluxes matrix <img class="formulaInl" alt="$A=R \Lambda L$" src="../../form_179.png"/> in primitive variables form. </p>
-<dl class="section note"><dt>Note</dt><dd>This function consider only the normal direction: <img class="formulaInl" alt="$ \frac{\partial P}{\partial t} + R \Lambda L \frac{\partial P}{\partial n} = 0$" src="../../form_180.png"/> where P are the primitive variables and n is the normal direction. R is the matrix of the right eigenvectors, <img class="formulaInl" alt="$\Lambda$" src="../../form_181.png"/> is the diagonal matrix of the eigenvalues and L is the matrix of the left eigenvectors. </dd></dl>
+<p>Function for computing right eigenvectors matrix (R) of the Jacobian fluxes matrix <img class="formulaInl" alt="$A=R \Lambda L$" src="../../form_299.png"/> in primitive variables form. </p>
+<dl class="section note"><dt>Note</dt><dd>This function consider only the normal direction: <img class="formulaInl" alt="$ \frac{\partial P}{\partial t} + R \Lambda L \frac{\partial P}{\partial n} = 0$" src="../../form_300.png"/> where P are the primitive variables and n is the normal direction. R is the matrix of the right eigenvectors, <img class="formulaInl" alt="$\Lambda$" src="../../form_301.png"/> is the diagonal matrix of the eigenvalues and L is the matrix of the left eigenvectors. </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d7/d27/Lib__Fluxes__Convective_8f90_source.html#l00296">296</a> of file <a class="el" href="../../d7/d27/Lib__Fluxes__Convective_8f90_source.html">Lib_Fluxes_Convective.f90</a>.</p>
 
@@ -422,7 +422,7 @@ Functions/Subroutines</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue Oct 8 2013 10:14:00 for OFF by
+    <li class="footer">Generated on Tue Oct 8 2013 10:16:53 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>

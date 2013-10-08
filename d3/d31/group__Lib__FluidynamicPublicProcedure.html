@@ -164,9 +164,9 @@ Functions/Subroutines</h2></td></tr>
 <p>The conversion laws are: <br/>
 </p>
 <ul>
-<li>Partial densities <img class="formulaInl" alt="$|_{conservative} =\left| \rho_s\right|_{primitive}$" src="../../form_161.png"/></li>
-<li>Momentum <img class="formulaInl" alt="$|_{conservative} = \left| \rho \vec V \right|_{primitive}$" src="../../form_162.png"/></li>
-<li>Energy <img class="formulaInl" alt="$|_{conservative}=\left|\frac{p}{\gamma-1}+\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right|_{primitive}$" src="../../form_163.png"/></li>
+<li>Partial densities <img class="formulaInl" alt="$|_{conservative} =\left| \rho_s\right|_{primitive}$" src="../../form_281.png"/></li>
+<li>Momentum <img class="formulaInl" alt="$|_{conservative} = \left| \rho \vec V \right|_{primitive}$" src="../../form_282.png"/></li>
+<li>Energy <img class="formulaInl" alt="$|_{conservative}=\left|\frac{p}{\gamma-1}+\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right|_{primitive}$" src="../../form_283.png"/></li>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -233,12 +233,12 @@ Functions/Subroutines</h2></td></tr>
 <p>The conversion laws are: <br/>
 </p>
 <ul>
-<li>Partial densities <img class="formulaInl" alt="$|_{primitive} =\left| \rho_s\right|_{conservative}$" src="../../form_164.png"/></li>
-<li>Density <img class="formulaInl" alt="$|_{primitive} =\left|\sum_{s=1}^{Ns}\rho_s\right|_{conservative}$" src="../../form_165.png"/></li>
-<li>Specific heats ratio <img class="formulaInl" alt="$|_{primitive}=\left|\frac{\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cp_s^0}} {\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cv_s^0}}\right|_{conservative}$" src="../../form_166.png"/></li>
-<li>Velocity <img class="formulaInl" alt="$|_{primitive} =\left|\frac{\vec momentum}{\rho}\right|_{conservative}$" src="../../form_167.png"/></li>
-<li>Pressure <img class="formulaInl" alt="$|_{primitive}=\left|(\gamma-1)\left[energy-\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right]\right|_{conservative}$" src="../../form_168.png"/> <br/>
- where Ns is the number of initial species and <img class="formulaInl" alt="$cp_s^0,cv_s^0$" src="../../form_169.png"/> are the initial specific heats.</li>
+<li>Partial densities <img class="formulaInl" alt="$|_{primitive} =\left| \rho_s\right|_{conservative}$" src="../../form_284.png"/></li>
+<li>Density <img class="formulaInl" alt="$|_{primitive} =\left|\sum_{s=1}^{Ns}\rho_s\right|_{conservative}$" src="../../form_285.png"/></li>
+<li>Specific heats ratio <img class="formulaInl" alt="$|_{primitive}=\left|\frac{\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cp_s^0}} {\sum_{s=1}^{Ns}{\frac{\rho_s}{\rho}cv_s^0}}\right|_{conservative}$" src="../../form_286.png"/></li>
+<li>Velocity <img class="formulaInl" alt="$|_{primitive} =\left|\frac{\vec momentum}{\rho}\right|_{conservative}$" src="../../form_287.png"/></li>
+<li>Pressure <img class="formulaInl" alt="$|_{primitive}=\left|(\gamma-1)\left[energy-\frac{1}{2}\rho \left(V_x^2+V_y^2+V_z^2\right)\right]\right|_{conservative}$" src="../../form_288.png"/> <br/>
+ where Ns is the number of initial species and <img class="formulaInl" alt="$cp_s^0,cv_s^0$" src="../../form_289.png"/> are the initial specific heats.</li>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -411,13 +411,13 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Subroutine for imposing the boundary conditions of blocks of grid level "l" updating the ghost cells. </p>
-<dl class="section note"><dt>Note</dt><dd>Considering the ghost cell <img class="formulaInl" alt="$ c^0 $" src="../../form_170.png"/> and the inner one <img class="formulaInl" alt="$ c^1 $" src="../../form_171.png"/> (being <img class="formulaInl" alt="$ c^N $" src="../../form_172.png"/> the other bound) the available boundary conditions are:<ul>
-<li><b>REF:</b> reflective boundary condition <img class="formulaInl" alt="$ \begin{array}{*{20}{c}} P^0 = P^1 \\ P_{\vec v\cdot \vec n}^0 = - P_{\vec v\cdot \vec n}^1\end{array} $" src="../../form_173.png"/>;</li>
-<li><b>EXT:</b> extrapolation boundary condition <img class="formulaInl" alt="$ P^0 = P^1 $" src="../../form_174.png"/>;</li>
-<li><b>PER:</b> periodic boundary condition <img class="formulaInl" alt="$ P^0 = P^N $" src="../../form_175.png"/>;</li>
-<li><b>ADJ:</b> adjacent (cell) boundary condition <img class="formulaInl" alt="$ P^0 = P^a $" src="../../form_176.png"/> where "a" is the adjacent cell (b,i,j,k indexes must be specified);</li>
-<li><b>IN1:</b> supersonic inflow steady boundary condition <img class="formulaInl" alt="$ P^0 = P^{in1} $" src="../../form_177.png"/>. <br/>
- where <img class="formulaInl" alt="$P$" src="../../form_178.png"/> are the primitive variables.</li>
+<dl class="section note"><dt>Note</dt><dd>Considering the ghost cell <img class="formulaInl" alt="$ c^0 $" src="../../form_290.png"/> and the inner one <img class="formulaInl" alt="$ c^1 $" src="../../form_291.png"/> (being <img class="formulaInl" alt="$ c^N $" src="../../form_292.png"/> the other bound) the available boundary conditions are:<ul>
+<li><b>REF:</b> reflective boundary condition <img class="formulaInl" alt="$ \begin{array}{*{20}{c}} P^0 = P^1 \\ P_{\vec v\cdot \vec n}^0 = - P_{\vec v\cdot \vec n}^1\end{array} $" src="../../form_293.png"/>;</li>
+<li><b>EXT:</b> extrapolation boundary condition <img class="formulaInl" alt="$ P^0 = P^1 $" src="../../form_294.png"/>;</li>
+<li><b>PER:</b> periodic boundary condition <img class="formulaInl" alt="$ P^0 = P^N $" src="../../form_295.png"/>;</li>
+<li><b>ADJ:</b> adjacent (cell) boundary condition <img class="formulaInl" alt="$ P^0 = P^a $" src="../../form_296.png"/> where "a" is the adjacent cell (b,i,j,k indexes must be specified);</li>
+<li><b>IN1:</b> supersonic inflow steady boundary condition <img class="formulaInl" alt="$ P^0 = P^{in1} $" src="../../form_297.png"/>. <br/>
+ where <img class="formulaInl" alt="$P$" src="../../form_298.png"/> are the primitive variables.</li>
 </ul>
 </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -526,7 +526,7 @@ Functions/Subroutines</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue Oct 8 2013 10:14:00 for OFF by
+    <li class="footer">Generated on Tue Oct 8 2013 10:16:53 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>

@@ -115,13 +115,13 @@ $(document).ready(function(){initNavTree('db/d22/group__Lib__WENOPublicProcedure
 <tr class="memdesc:ga1a5e0d343a16642c749d337839834cc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for initialization of WENO coefficients.  <a href="#ga1a5e0d343a16642c749d337839834cc8">More...</a><br/></td></tr>
 <tr class="separator:ga1a5e0d343a16642c749d337839834cc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1b0e81cf9b2cc65c9d4274edb5a8fb62"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga1b0e81cf9b2cc65c9d4274edb5a8fb62">lib_weno::noweno_central</a> (S, V, VR)</td></tr>
-<tr class="memdesc:ga1b0e81cf9b2cc65c9d4274edb5a8fb62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing central difference reconstruction of <img class="formulaInl" alt="$2S^{th}$" src="../../form_256.png"/> order instead of WENO <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_257.png"/> one.  <a href="#ga1b0e81cf9b2cc65c9d4274edb5a8fb62">More...</a><br/></td></tr>
+<tr class="memdesc:ga1b0e81cf9b2cc65c9d4274edb5a8fb62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing central difference reconstruction of <img class="formulaInl" alt="$2S^{th}$" src="../../form_370.png"/> order instead of WENO <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_371.png"/> one.  <a href="#ga1b0e81cf9b2cc65c9d4274edb5a8fb62">More...</a><br/></td></tr>
 <tr class="separator:ga1b0e81cf9b2cc65c9d4274edb5a8fb62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga22b42ac3ffb139046b81c9fdaf418d08"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga22b42ac3ffb139046b81c9fdaf418d08">lib_weno::weno_optimal</a> (S, V, VR)</td></tr>
-<tr class="memdesc:ga22b42ac3ffb139046b81c9fdaf418d08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_257.png"/> order.  <a href="#ga22b42ac3ffb139046b81c9fdaf418d08">More...</a><br/></td></tr>
+<tr class="memdesc:ga22b42ac3ffb139046b81c9fdaf418d08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_371.png"/> order.  <a href="#ga22b42ac3ffb139046b81c9fdaf418d08">More...</a><br/></td></tr>
 <tr class="separator:ga22b42ac3ffb139046b81c9fdaf418d08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1dd3408cb49b8f2eef25dc1a1c63ab6a"><td class="memItemLeft" align="right" valign="top">pure subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d22/group__Lib__WENOPublicProcedure.html#ga1dd3408cb49b8f2eef25dc1a1c63ab6a">lib_weno::weno</a> (S, V, VR)</td></tr>
-<tr class="memdesc:ga1dd3408cb49b8f2eef25dc1a1c63ab6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing WENO reconstruction of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_257.png"/> order.  <a href="#ga1dd3408cb49b8f2eef25dc1a1c63ab6a">More...</a><br/></td></tr>
+<tr class="memdesc:ga1dd3408cb49b8f2eef25dc1a1c63ab6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing WENO reconstruction of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_371.png"/> order.  <a href="#ga1dd3408cb49b8f2eef25dc1a1c63ab6a">More...</a><br/></td></tr>
 <tr class="separator:ga1dd3408cb49b8f2eef25dc1a1c63ab6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -219,7 +219,7 @@ $(document).ready(function(){initNavTree('db/d22/group__Lib__WENOPublicProcedure
       </table>
 </div><div class="memdoc">
 
-<p>Subroutine for computing central difference reconstruction of <img class="formulaInl" alt="$2S^{th}$" src="../../form_256.png"/> order instead of WENO <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_257.png"/> one. </p>
+<p>Subroutine for computing central difference reconstruction of <img class="formulaInl" alt="$2S^{th}$" src="../../form_370.png"/> order instead of WENO <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_371.png"/> one. </p>
 <dl class="section note"><dt>Note</dt><dd>For avoiding the creation of temporary arrays (improving the efficiency) the arrays <b>V</b> and <b>VR</b> are declared as assumed-shape with only the lower bound defined. Their extensions are: V [1:2,0:2*S], VR [1:2].</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -266,7 +266,7 @@ $(document).ready(function(){initNavTree('db/d22/group__Lib__WENOPublicProcedure
       </table>
 </div><div class="memdoc">
 
-<p>Subroutine for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_257.png"/> order. </p>
+<p>Subroutine for computing WENO reconstruction with optimal weights (without smoothness indicators computations) of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_371.png"/> order. </p>
 <dl class="section note"><dt>Note</dt><dd>For avoiding the creation of temporary arrays (improving the efficiency) the arrays <b>V</b> and <b>VR</b> are declared as assumed-shape with only the lower bound defined. Their extensions are: V [1:2,1-S:-1+S], VR [1:2].</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -324,7 +324,7 @@ $(document).ready(function(){initNavTree('db/d22/group__Lib__WENOPublicProcedure
       </table>
 </div><div class="memdoc">
 
-<p>Subroutine for computing WENO reconstruction of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_257.png"/> order. </p>
+<p>Subroutine for computing WENO reconstruction of <img class="formulaInl" alt="$2S^{th}-1$" src="../../form_371.png"/> order. </p>
 <dl class="section note"><dt>Note</dt><dd>For avoiding the creation of temporary arrays (improving the efficiency) the arrays <b>V</b> and <b>VR</b> are declared as assumed-shape with only the lower bound defined. Their extensions are: V [1:2,1-S:-1+S], VR [1:2].</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -370,7 +370,7 @@ $(document).ready(function(){initNavTree('db/d22/group__Lib__WENOPublicProcedure
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue Oct 8 2013 10:14:02 for OFF by
+    <li class="footer">Generated on Tue Oct 8 2013 10:16:53 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>

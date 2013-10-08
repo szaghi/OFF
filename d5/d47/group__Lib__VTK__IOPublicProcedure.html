@@ -886,29 +886,29 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Function that <b>must</b> be used when unstructured grid is used, it saves the connectivity of the unstructured gird. </p>
-<dl class="section note"><dt>Note</dt><dd>The vector <b>connect</b> must follow the VTK-legacy standard. It is passed as <em>assumed-shape</em> array because its dimensions is related to the mesh dimensions in a complex way. Its dimensions can be calculated by the following equation: <img class="formulaInl" alt="$dc = NC + \sum\limits_{i = 1}^{NC} {nvertex_i }$" src="../../form_251.png"/> where <img class="formulaInl" alt="$dc$" src="../../form_252.png"/> is connectivity vector dimension and <img class="formulaInl" alt="$nvertex_i$" src="../../form_249.png"/> is the number of vertices of <img class="formulaInl" alt="$i^{th}$" src="../../form_250.png"/> cell. The VTK- legacy standard for the mesh connectivity is quite obscure at least at first sight. It is more simple analyzing an example. Suppose we have a mesh composed by 2 cells, one hexahedron (8 vertices) and one pyramid with square basis (5 vertices) and suppose that the basis of pyramid is constitute by a face of the hexahedron and so the two cells share 4 vertices. The above equation !&gt; gives <img class="formulaInl" alt="$dc=2+8+5=15$" src="../../form_253.png"/>. The connectivity vector for this mesh can be: <br/>
+<dl class="section note"><dt>Note</dt><dd>The vector <b>connect</b> must follow the VTK-legacy standard. It is passed as <em>assumed-shape</em> array because its dimensions is related to the mesh dimensions in a complex way. Its dimensions can be calculated by the following equation: <img class="formulaInl" alt="$dc = NC + \sum\limits_{i = 1}^{NC} {nvertex_i }$" src="../../form_365.png"/> where <img class="formulaInl" alt="$dc$" src="../../form_366.png"/> is connectivity vector dimension and <img class="formulaInl" alt="$nvertex_i$" src="../../form_363.png"/> is the number of vertices of <img class="formulaInl" alt="$i^{th}$" src="../../form_364.png"/> cell. The VTK- legacy standard for the mesh connectivity is quite obscure at least at first sight. It is more simple analyzing an example. Suppose we have a mesh composed by 2 cells, one hexahedron (8 vertices) and one pyramid with square basis (5 vertices) and suppose that the basis of pyramid is constitute by a face of the hexahedron and so the two cells share 4 vertices. The above equation !&gt; gives <img class="formulaInl" alt="$dc=2+8+5=15$" src="../../form_367.png"/>. The connectivity vector for this mesh can be: <br/>
  first cell <br/>
- connect(1) = 8 number of vertices of <img class="formulaInl" alt="$1^\circ$" src="../../form_238.png"/> cell <br/>
- connect(2) = 0 identification flag of <img class="formulaInl" alt="$1^\circ$" src="../../form_238.png"/> vertex of 1° cell <br/>
- connect(3) = 1 identification flag of <img class="formulaInl" alt="$2^\circ$" src="../../form_239.png"/> vertex of 1° cell <br/>
- connect(4) = 2 identification flag of <img class="formulaInl" alt="$3^\circ$" src="../../form_240.png"/> vertex of 1° cell <br/>
- connect(5) = 3 identification flag of <img class="formulaInl" alt="$4^\circ$" src="../../form_241.png"/> vertex of 1° cell <br/>
- connect(6) = 4 identification flag of <img class="formulaInl" alt="$5^\circ$" src="../../form_242.png"/> vertex of 1° cell <br/>
- connect(7) = 5 identification flag of <img class="formulaInl" alt="$6^\circ$" src="../../form_243.png"/> vertex of 1° cell <br/>
- connect(8) = 6 identification flag of <img class="formulaInl" alt="$7^\circ$" src="../../form_244.png"/> vertex of 1° cell <br/>
- connect(9) = 7 identification flag of <img class="formulaInl" alt="$8^\circ$" src="../../form_245.png"/> vertex of 1° cell <br/>
+ connect(1) = 8 number of vertices of <img class="formulaInl" alt="$1^\circ$" src="../../form_352.png"/> cell <br/>
+ connect(2) = 0 identification flag of <img class="formulaInl" alt="$1^\circ$" src="../../form_352.png"/> vertex of 1° cell <br/>
+ connect(3) = 1 identification flag of <img class="formulaInl" alt="$2^\circ$" src="../../form_353.png"/> vertex of 1° cell <br/>
+ connect(4) = 2 identification flag of <img class="formulaInl" alt="$3^\circ$" src="../../form_354.png"/> vertex of 1° cell <br/>
+ connect(5) = 3 identification flag of <img class="formulaInl" alt="$4^\circ$" src="../../form_355.png"/> vertex of 1° cell <br/>
+ connect(6) = 4 identification flag of <img class="formulaInl" alt="$5^\circ$" src="../../form_356.png"/> vertex of 1° cell <br/>
+ connect(7) = 5 identification flag of <img class="formulaInl" alt="$6^\circ$" src="../../form_357.png"/> vertex of 1° cell <br/>
+ connect(8) = 6 identification flag of <img class="formulaInl" alt="$7^\circ$" src="../../form_358.png"/> vertex of 1° cell <br/>
+ connect(9) = 7 identification flag of <img class="formulaInl" alt="$8^\circ$" src="../../form_359.png"/> vertex of 1° cell <br/>
  second cell <br/>
- connect(10) = 5 number of vertices of <img class="formulaInl" alt="$2^\circ $" src="../../form_254.png"/>cell <br/>
- connect(11) = 0 identification flag of <img class="formulaInl" alt="$1^\circ$" src="../../form_238.png"/> vertex of 2° cell <br/>
- connect(12) = 1 identification flag of <img class="formulaInl" alt="$2^\circ$" src="../../form_239.png"/> vertex of 2° cell <br/>
- connect(13) = 2 identification flag of <img class="formulaInl" alt="$3^\circ$" src="../../form_240.png"/> vertex of 2° cell <br/>
- connect(14) = 3 identification flag of <img class="formulaInl" alt="$4^\circ$" src="../../form_241.png"/> vertex of 2° cell <br/>
- connect(15) = 8 identification flag of <img class="formulaInl" alt="$5^\circ$" src="../../form_242.png"/> vertex of 2° cell <br/>
+ connect(10) = 5 number of vertices of <img class="formulaInl" alt="$2^\circ $" src="../../form_368.png"/>cell <br/>
+ connect(11) = 0 identification flag of <img class="formulaInl" alt="$1^\circ$" src="../../form_352.png"/> vertex of 2° cell <br/>
+ connect(12) = 1 identification flag of <img class="formulaInl" alt="$2^\circ$" src="../../form_353.png"/> vertex of 2° cell <br/>
+ connect(13) = 2 identification flag of <img class="formulaInl" alt="$3^\circ$" src="../../form_354.png"/> vertex of 2° cell <br/>
+ connect(14) = 3 identification flag of <img class="formulaInl" alt="$4^\circ$" src="../../form_355.png"/> vertex of 2° cell <br/>
+ connect(15) = 8 identification flag of <img class="formulaInl" alt="$5^\circ$" src="../../form_356.png"/> vertex of 2° cell <br/>
  Note that the first 4 identification flags of pyramid vertices as the same of the first 4 identification flags of the hexahedron because the two cells share this face. It is also important to note that the identification flags start form $0$ value: this is impose to the VTK standard. The function VTK_CON does not calculate the connectivity vector: it writes the connectivity vector conforming the VTK standard, but does not calculate it. The vector variable <em>cell_type</em> must conform the VTK-legacy standard (see the file VTK-Standard at the Kitware homepage). It contains the <em>type</em> of each cells. For the above example this vector is: <br/>
  first cell <br/>
- cell_type(1) = 12 hexahedron type of <img class="formulaInl" alt="$1^\circ$" src="../../form_238.png"/> cell <br/>
+ cell_type(1) = 12 hexahedron type of <img class="formulaInl" alt="$1^\circ$" src="../../form_352.png"/> cell <br/>
  second cell <br/>
- cell_type(2) = 14 pyramid type of <img class="formulaInl" alt="$2^\circ$" src="../../form_239.png"/> cell <br/>
+ cell_type(2) = 14 pyramid type of <img class="formulaInl" alt="$2^\circ$" src="../../form_353.png"/> cell <br/>
  </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>E_IO: integer(I4P) error flag</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -1045,7 +1045,7 @@ Functions/Subroutines</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue Oct 8 2013 10:14:02 for OFF by
+    <li class="footer">Generated on Tue Oct 8 2013 10:16:53 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>

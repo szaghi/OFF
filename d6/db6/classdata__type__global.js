@@ -1,0 +1,35 @@
+var classdata__type__global =
+[
+    [ "type_adimensional", "d6/db6/classdata__type__global.html#da/d84/structdata__type__global_1_1type__adimensional", [
+      [ "re", "d6/db6/classdata__type__global.html#ac5fbab3a76dc664c95b059e4138a84e8", null ],
+      [ "fr", "d6/db6/classdata__type__global.html#ada579d4a9997b0489fce85c0602ca823", null ],
+      [ "pr", "d6/db6/classdata__type__global.html#a0611b703ab3e95f056afd0601127d1ce", null ],
+      [ "l0", "d6/db6/classdata__type__global.html#a64978d47a0680c1e3a2119a8ce1f1581", null ],
+      [ "r0", "d6/db6/classdata__type__global.html#a8ee896cd9697284dcbf91c2f86931e01", null ],
+      [ "v0", "d6/db6/classdata__type__global.html#aefe88f9258ad47a40ac479458d9d1d44", null ],
+      [ "c0", "d6/db6/classdata__type__global.html#aaec0db078dd0877bb32aff72f4b47991", null ],
+      [ "mu0", "d6/db6/classdata__type__global.html#aa158785f9ad29096ff6a72f49fc59bfc", null ],
+      [ "f0", "d6/db6/classdata__type__global.html#ace67a34a266db87468fe4b1dfd7a27bc", null ],
+      [ "k0", "d6/db6/classdata__type__global.html#a02d5796d29275f4655cfd30d0f80720f", null ],
+      [ "dt0", "d6/db6/classdata__type__global.html#ae7dc81ba081ad6f3469fd365421b02c5", null ],
+      [ "p0", "d6/db6/classdata__type__global.html#ae5a60be1057aa913d545a0ebff5cb64c", null ],
+      [ "a0", "d6/db6/classdata__type__global.html#aac49ddf3ce86f1409a2bff2789ffa311", null ],
+      [ "t0", "d6/db6/classdata__type__global.html#af624ae6c65879abfe99659be98733dbe", null ],
+      [ "e0", "d6/db6/classdata__type__global.html#a9a956b3ab90bfd972bfda314c1807a7c", null ],
+      [ "q0", "d6/db6/classdata__type__global.html#a11d27ba1b1a683fb04c7b48743c4f00a", null ],
+      [ "re_inv", "d6/db6/classdata__type__global.html#a90e45b4bc73f39cde7d3436f135092c6", null ],
+      [ "fr2_inv", "d6/db6/classdata__type__global.html#a6ec4c75d403666d452388b8be91d2e8c", null ],
+      [ "prre_inv", "d6/db6/classdata__type__global.html#aa49055647109ecc972a54cb66729693e", null ]
+    ] ],
+    [ "type_global", "da/d5f/structdata__type__global_1_1type__global.html", "da/d5f/structdata__type__global_1_1type__global" ],
+    [ "block_file_name", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#gaff7d17f934aee49a90a3446820266a44", null ],
+    [ "block_step_file_name", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#gad6ea7712be11b922476f79b84713eb72", null ],
+    [ "block_flip_file_name", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#ga1118700dae5bd53775e91dab0d13c745", null ],
+    [ "compute_values0", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#ga57af2f9f4cc4b809b85b90cc6c4095aa", null ],
+    [ "alloc_gbc", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#gaa0f78df16f6e0733c15c0cf5dd055270", null ],
+    [ "alloc_gfluid", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#gae513ceb86e6ef230719bcc03924b1e92", null ],
+    [ "load_gbc_in1", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#gaa3a5d0f9bee6885b412e36e41357436d", null ],
+    [ "load_gfluid_soption", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#ga34bf8129f1fd45c86798cca9260cbe7a", null ],
+    [ "load_gfluid_ns", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#gab7ca0f257480fa7f16740d2bf0b65ab6", null ],
+    [ "load_gfluid_0species", "d2/db8/group__Data__Type__GlobalPrivateProcedure.html#gab4f023ddf5803c7e5ed11db345e12085", null ]
+];

@@ -1,0 +1,7 @@
+<map id="lib_riemann::roe_ua" name="lib_riemann::roe_ua">
+<area shape="rect" id="node3" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga6ca1a1d96fc7ca18478df58038265330" title="Function for evaluating the smoothness of a cell using the Liu&#39;s entropy conditions. " alt="" coords="195,5,381,35"/>
+<area shape="rect" id="node5" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga494cafb07c0ca522c44f6b632d44da0c" title="lib_riemann::z_wavesspeed14" alt="" coords="189,59,387,88"/>
+<area shape="rect" id="node7" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga415ade9e5c3826b12fbfe991b23df469" title="Approximate Riemann solver based on (local) Lax&#45;Friedrichs (known also as Rusanov) algorithm..." alt="" coords="448,19,611,66"/>
+<area shape="rect" id="node11" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga39fc6b65a34187179c90685d10dc00f2" title="Approximate Riemann solver based on Roe linearization. " alt="" coords="436,89,623,119"/>
+<area shape="rect" id="node9" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga8ed95bd24286bc4b94bde0ae4efcc968" title="Approximate Riemann solver based on HLLC algorithm. " alt="" coords="673,28,863,57"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="lib_riemann::ts_up23" name="lib_riemann::ts_up23">
+<area shape="rect" id="node3" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga8b38c6f316d72bb679e1f32e658ac248" title="Function for evaluating the smoothness of an interface using a Riemann solver&#45;like algorithm..." alt="" coords="197,5,379,35"/>
+<area shape="rect" id="node5" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga415ade9e5c3826b12fbfe991b23df469" title="Approximate Riemann solver based on (local) Lax&#45;Friedrichs (known also as Rusanov) algorithm..." alt="" coords="207,58,369,105"/>
+<area shape="rect" id="node9" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga54a32069059c3d4e72a888e53e039533" title="lib_riemann::ts_states" alt="" coords="213,128,363,157"/>
+<area shape="rect" id="node7" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga8ed95bd24286bc4b94bde0ae4efcc968" title="Approximate Riemann solver based on HLLC algorithm. " alt="" coords="429,67,619,96"/>
+<area shape="rect" id="node11" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#gaf59030698bf09f9e92839a87c75a8f43" title="Approximate Riemann solver based on Two Shocks algorithm. " alt="" coords="433,124,615,153"/>
+<area shape="rect" id="node13" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga3afc3a43501ad3070d2e945854fa8f34" title="Approximate Riemann solver based on Adaptive (non iterative) PVL&#45;TR&#45;TS algorithm. ..." alt="" coords="427,177,621,207"/>
+</map>

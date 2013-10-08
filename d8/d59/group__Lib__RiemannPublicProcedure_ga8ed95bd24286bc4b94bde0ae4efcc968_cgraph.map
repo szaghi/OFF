@@ -1,0 +1,25 @@
+<map id="lib_riemann::riem_solver_hllc" name="lib_riemann::riem_solver_hllc">
+<area shape="rect" id="node3" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga82d4f5c7adace2fdffa51b872a3e80f9" title="Function for computing the speed of sound for an ideal calorically perfect gas. " alt="" coords="1037,650,1203,697"/>
+<area shape="rect" id="node5" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga72edfdd7b6205b7dc0fe8cfacb07d068" title="Function for computing the pressure for an ideal calorically perfect gas. " alt="" coords="1267,871,1432,918"/>
+<area shape="rect" id="node7" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#gafc7677510bfb5d5bfab4510107291d32" title="Function for computing the density for an ideal calorically perfect gas. " alt="" coords="1480,757,1645,803"/>
+<area shape="rect" id="node13" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga6999e3b0459edb6f9372ef23d2a5f463" title="lib_riemann::bclc_wavesspeed14" alt="" coords="759,1212,972,1241"/>
+<area shape="rect" id="node21" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#gaf5857945646f11c884e562ee727a57af" title="lib_riemann::cvl_wavesspeed14" alt="" coords="247,721,452,751"/>
+<area shape="rect" id="node25" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga415ade9e5c3826b12fbfe991b23df469" title="Approximate Riemann solver based on (local) Lax&#45;Friedrichs (known also as Rusanov) algorithm..." alt="" coords="268,418,431,465"/>
+<area shape="rect" id="node58" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#gad22f35c160871edcd8edf59ac9cd0d5f" title="Approximate Riemann solver based on Two Rarefactions algorithm. " alt="" coords="260,668,439,697"/>
+<area shape="rect" id="node78" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#gad6e7449cd3a6f31dd7348b0610229b42" title="lib_riemann::sampling\l_fluxes_vacuum" alt="" coords="532,1074,679,1121"/>
+<area shape="rect" id="node15" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga97d5fe3d357ec9b7ef4b3ee24a15bd0e" title="Function for computing the total specific entalpy (per unit of mass) for an ideal calorically perfect..." alt="" coords="1037,1226,1203,1273"/>
+<area shape="rect" id="node29" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga067ab1649b13e96cbdf82ed56c0b3922" title="lib_riemann::pvl_wavesspeed14" alt="" coords="503,379,708,408"/>
+<area shape="rect" id="node38" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga2bec79ff5d16c14e7bfad1d1564f436b" title="lib_riemann::ts_up23" alt="" coords="795,616,936,645"/>
+<area shape="rect" id="node43" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga194ca5d5366043d5045ef42ea8c7260d" title="lib_riemann::wavesspeed14up" alt="" coords="1021,93,1219,123"/>
+<area shape="rect" id="node45" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga494cafb07c0ca522c44f6b632d44da0c" title="lib_riemann::z_wavesspeed14" alt="" coords="507,197,704,227"/>
+<area shape="rect" id="node31" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga20d3a6228580917d8bf31eeccc76bb6a" title="lib_riemann::pvl_u23" alt="" coords="795,408,936,437"/>
+<area shape="rect" id="node33" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#gad2d6e8e9a2c9346ca4e0d9901684d3da" title="lib_riemann::wavesspeed14u" alt="" coords="771,301,960,331"/>
+<area shape="rect" id="node35" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga065af5f81dc92fd48573a64bb672772f" title="lib_riemann::pvl_up23" alt="" coords="792,355,939,384"/>
+<area shape="rect" id="node47" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga08d7fd16b9238808babe6bc429f64dda" title="lib_riemann::roe_ua" alt="" coords="799,144,932,173"/>
+<area shape="rect" id="node56" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#gad98417b8e455563771a576271b9355eb" title="lib_riemann::tr_up23" alt="" coords="796,197,935,227"/>
+<area shape="rect" id="node52" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#gaecb7cda8793b426e90cf27d50a9bd31a" title="lib_riemann::roe_up23" alt="" coords="1045,197,1195,227"/>
+<area shape="rect" id="node62" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga1d3c8ff6486a7652c1683ba4e37a02d0" title="lib_riemann::pvl_states" alt="" coords="528,563,683,592"/>
+<area shape="rect" id="node68" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#gacc2f7cc2ec002cfe3d490460f46ac3a6" title="lib_riemann::sampling\l_fluxes" alt="" coords="532,821,679,867"/>
+<area shape="rect" id="node65" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga48f6deb32ad40369a3e4c7ad3c5417f8" title="lib_riemann::wavesspeed1234up" alt="" coords="760,563,971,592"/>
+<area shape="rect" id="node70" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga3a681bc3b342b628e094aff4fa0bd3e8" title="lib_riemann::fluxes" alt="" coords="800,1125,931,1155"/>
+</map>

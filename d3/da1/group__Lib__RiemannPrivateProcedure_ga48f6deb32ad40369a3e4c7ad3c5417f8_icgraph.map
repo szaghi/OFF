@@ -1,0 +1,6 @@
+<map id="lib_riemann::wavesspeed1234up" name="lib_riemann::wavesspeed1234up">
+<area shape="rect" id="node3" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga1d3c8ff6486a7652c1683ba4e37a02d0" title="lib_riemann::pvl_states" alt="" coords="265,32,420,61"/>
+<area shape="rect" id="node5" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#gad22f35c160871edcd8edf59ac9cd0d5f" title="Approximate Riemann solver based on Two Rarefactions algorithm. " alt="" coords="477,5,656,35"/>
+<area shape="rect" id="node9" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga3afc3a43501ad3070d2e945854fa8f34" title="Approximate Riemann solver based on Adaptive (non iterative) PVL&#45;TR&#45;TS algorithm. ..." alt="" coords="469,59,664,88"/>
+<area shape="rect" id="node7" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga8ed95bd24286bc4b94bde0ae4efcc968" title="Approximate Riemann solver based on HLLC algorithm. " alt="" coords="713,5,903,35"/>
+</map>

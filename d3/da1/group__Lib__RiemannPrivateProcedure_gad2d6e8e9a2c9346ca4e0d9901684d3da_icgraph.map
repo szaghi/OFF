@@ -1,0 +1,10 @@
+<map id="lib_riemann::wavesspeed14u" name="lib_riemann::wavesspeed14u">
+<area shape="rect" id="node3" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#gaaeaf104cf5e7b8d418ad7f7ea9d7863b" title="lib_riemann::cvl_states" alt="" coords="272,21,427,51"/>
+<area shape="rect" id="node5" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga067ab1649b13e96cbdf82ed56c0b3922" title="lib_riemann::pvl_wavesspeed14" alt="" coords="247,75,452,104"/>
+<area shape="rect" id="node13" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga611ba0404c0ec7673be07eb6e6f4b994" title="lib_riemann::tr_states" alt="" coords="276,128,423,157"/>
+<area shape="rect" id="node7" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga415ade9e5c3826b12fbfe991b23df469" title="Approximate Riemann solver based on (local) Lax&#45;Friedrichs (known also as Rusanov) algorithm..." alt="" coords="517,5,680,51"/>
+<area shape="rect" id="node11" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga39fc6b65a34187179c90685d10dc00f2" title="Approximate Riemann solver based on Roe linearization. " alt="" coords="505,75,692,104"/>
+<area shape="rect" id="node9" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga8ed95bd24286bc4b94bde0ae4efcc968" title="Approximate Riemann solver based on HLLC algorithm. " alt="" coords="745,13,935,43"/>
+<area shape="rect" id="node15" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#gaf59030698bf09f9e92839a87c75a8f43" title="Approximate Riemann solver based on Two Shocks algorithm. " alt="" coords="508,128,689,157"/>
+<area shape="rect" id="node17" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga3afc3a43501ad3070d2e945854fa8f34" title="Approximate Riemann solver based on Adaptive (non iterative) PVL&#45;TR&#45;TS algorithm. ..." alt="" coords="501,181,696,211"/>
+</map>

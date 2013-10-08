@@ -1,0 +1,6 @@
+<map id="lib_fluxes_diffusive::fluxes_diffusive" name="lib_fluxes_diffusive::fluxes_diffusive">
+<area shape="rect" id="node3" href="$de/d10/Lib__Fluxes__Diffusive_8f90.html#a9414535b1f7fdfa3cea8caf234173cf1" title="Subroutine for computing the metrics (normals and interfaces area) of finite volume centered at inter..." alt="" coords="189,5,328,35"/>
+<area shape="rect" id="node5" href="$de/d10/Lib__Fluxes__Diffusive_8f90.html#a58df0a04159e35d79e1be2e0cca5af16" title="Subroutine for computing the velocity vector at interfaces of finite volume centered at interface i..." alt="" coords="188,59,329,88"/>
+<area shape="rect" id="node7" href="$de/d10/Lib__Fluxes__Diffusive_8f90.html#a08881dcc7c9d8e20716593cd12695430" title="Subroutine for computing the shear stress tensor at center of a finite volume. " alt="" coords="211,112,307,141"/>
+<area shape="rect" id="node9" href="$de/d10/Lib__Fluxes__Diffusive_8f90.html#a1b039456e07cdfbe3b6394d43e947688" title="Function for computing first partial derivative by means of Finite Volumes approach (Green&#39;s theorem)..." alt="" coords="379,112,443,141"/>
+</map>

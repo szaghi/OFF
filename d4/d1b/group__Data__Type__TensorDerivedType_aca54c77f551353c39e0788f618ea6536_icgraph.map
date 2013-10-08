@@ -1,0 +1,10 @@
+<map id="data_type_tensor::type_tensor::normalize" name="data_type_tensor::type_tensor::normalize">
+<area shape="rect" id="node3" href="$db/daf/group__Data__Type__VectorPublicProcedure.html#gad54c796ae4206a51de5dcc668b28bebc" title="Function for calculating the normal of the face defined by the 3 points vector pt1, pt2 and pt3. " alt="" coords="219,5,373,51"/>
+<area shape="rect" id="node5" href="$db/daf/group__Data__Type__VectorPublicProcedure.html#ga2c629c58f595a60139c5b68f9d7df738" title="Function for calculating the normal of the face defined by 4 points vector pt1, pt2, pt3 and pt4. " alt="" coords="219,74,373,121"/>
+<area shape="rect" id="node7" href="$d0/d54/group__Data__Type__SBlockPrivateProcedure.html#gaa9422615554c75722d0c3c54ad2984d8" title="Subroutine for computing the metrics of structured block. " alt="" coords="433,113,607,143"/>
+<area shape="rect" id="node10" href="$d0/d54/group__Data__Type__SBlockPrivateProcedure.html#ga2e5d4db0a5088d0560e286e405035297" title="Subroutine for correcting the metrics of natural (and negative volume) boundary conditions cells of s..." alt="" coords="209,194,383,241"/>
+<area shape="rect" id="node12" href="$d1/dc3/group__Data__Type__VectorPrivateProcedure.html#gae18f4e50f8053c6783ad08c949fb29e4" title="data_type_vector::parallel" alt="" coords="211,264,381,293"/>
+<area shape="rect" id="node14" href="$d2/dc1/group__Data__Type__VectorDerivedType.html#a8404fa15a648647c0f6d20a9b247ac32" title="data_type_vector::type\l_vector::set" alt="" coords="219,317,373,363"/>
+<area shape="rect" id="node16" href="$d1/dc3/group__Data__Type__VectorPrivateProcedure.html#gaec39c401aaf19ef7ba71e2cf1e6651f4" title="data_type_vector::vec\l_eq_vec" alt="" coords="221,386,371,433"/>
+<area shape="rect" id="node18" href="$d1/dc3/group__Data__Type__VectorPrivateProcedure.html#ga4e67f8774b890fe737e8720bcdba5e26" title="data_type_vector::vec\l_not_eq_vec" alt="" coords="221,455,371,502"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="lib_weno::udiff" name="lib_weno::udiff">
+<area shape="rect" id="node3" href="$de/de2/group__Lib__WENOPrivateProcedure.html#ga9b6449679170cdd7ea3cf6d964074075" title="Function for computing the WENO convolution of the polynomial reconstructions. " alt="" coords="161,155,345,184"/>
+<area shape="rect" id="node19" href="$de/de2/group__Lib__WENOPrivateProcedure.html#ga4cd33883f3d1e2dc952ebd84dd46175d" title="Subroutine for computing WENO weights of the polynomial reconstructions. " alt="" coords="172,101,335,131"/>
+<area shape="rect" id="node5" href="$db/d22/group__Lib__WENOPublicProcedure.html#ga1dd3408cb49b8f2eef25dc1a1c63ab6a" title="Subroutine for computing WENO reconstruction of &#160;order. " alt="" coords="420,101,532,131"/>
+<area shape="rect" id="node17" href="$db/d22/group__Lib__WENOPublicProcedure.html#ga22b42ac3ffb139046b81c9fdaf418d08" title="Subroutine for computing WENO reconstruction with optimal weights (without smoothness indicators comp..." alt="" coords="396,155,556,184"/>
+<area shape="rect" id="node7" href="$da/d1c/group__Lib__Fluxes__ConvectivePrivateProcedure.html#ga6e5a9436729a6f4361d19694db4e8d79" title="Function for computing left eigenvectors matrix (L) of the Jacobian fluxes matrix &#160;in primitive varia..." alt="" coords="607,101,644,131"/>
+<area shape="rect" id="node9" href="$da/d1c/group__Lib__Fluxes__ConvectivePrivateProcedure.html#ga9d808b664de53e363c8fce55e9ce562c" title="Subroutine for reconstructing primitive variables along direction &quot;NF&quot;. " alt="" coords="704,5,811,35"/>
+<area shape="rect" id="node11" href="$d0/d9b/group__Data__Type__SL__ListPrivateProcedure.html#gad0919762b27f8e92ba82901c2707f707" title="Subroutine for inserting a link into the n&#45;th link of list (R4P). " alt="" coords="693,58,821,105"/>
+<area shape="rect" id="node13" href="$d0/d9b/group__Data__Type__SL__ListPrivateProcedure.html#ga0df98f538d45a1786d314ca2a4cabb41" title="Subroutine for inserting a link data into the list head (I8P). " alt="" coords="693,127,821,174"/>
+<area shape="rect" id="node15" href="$d0/d9b/group__Data__Type__SL__ListPrivateProcedure.html#gaf8193a4a17db2141124e26eb2ba25e67" title="Subroutine for inserting a link data into the list head (R4P). " alt="" coords="693,197,821,243"/>
+</map>

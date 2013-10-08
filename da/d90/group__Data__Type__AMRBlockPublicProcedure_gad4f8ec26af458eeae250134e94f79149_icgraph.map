@@ -1,0 +1,5 @@
+<map id="data_type_amrblock::level" name="data_type_amrblock::level">
+<area shape="rect" id="node3" href="$da/d90/group__Data__Type__AMRBlockPublicProcedure.html#ga9368786e7154190c1b030a9380138091" title="Function for computing the first ID of the passed level. " alt="" coords="192,5,331,51"/>
+<area shape="rect" id="node5" href="$da/d90/group__Data__Type__AMRBlockPublicProcedure.html#gac45ae14011c807316c26223b681fa373" title="Function for computing the last ID of the passed level. " alt="" coords="192,74,331,121"/>
+<area shape="rect" id="node7" href="$da/d90/group__Data__Type__AMRBlockPublicProcedure.html#ga04ebf4cd8385ec988a6100e9ea5a65d1" title="Function for computing the parent ID of a given ID at a given level. " alt="" coords="192,143,331,190"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="lib_riemann::pvl_u23" name="lib_riemann::pvl_u23">
+<area shape="rect" id="node3" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga643e4e39cc96374bbf6da30f230e6801" title="lib_riemann::pvl_wavesspeed1234" alt="" coords="195,5,416,35"/>
+<area shape="rect" id="node7" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga067ab1649b13e96cbdf82ed56c0b3922" title="lib_riemann::pvl_wavesspeed14" alt="" coords="203,59,408,88"/>
+<area shape="rect" id="node5" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga39fc6b65a34187179c90685d10dc00f2" title="Approximate Riemann solver based on Roe linearization. " alt="" coords="465,5,652,35"/>
+<area shape="rect" id="node9" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga415ade9e5c3826b12fbfe991b23df469" title="Approximate Riemann solver based on (local) Lax&#45;Friedrichs (known also as Rusanov) algorithm..." alt="" coords="477,58,640,105"/>
+<area shape="rect" id="node11" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga8ed95bd24286bc4b94bde0ae4efcc968" title="Approximate Riemann solver based on HLLC algorithm. " alt="" coords="703,67,892,96"/>
+</map>

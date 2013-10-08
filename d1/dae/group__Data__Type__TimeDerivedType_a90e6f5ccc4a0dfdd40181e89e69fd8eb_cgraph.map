@@ -1,0 +1,8 @@
+<map id="data_type_time::type_time::sec2time" name="data_type_time::type_time::sec2time">
+<area shape="rect" id="node3" href="$dc/d3b/group__Data__Type__TimeInterface.html#a0143d4f3efab762614553d37d2ce0e13" title="data_type_time::operator\l(==)::eq" alt="" coords="199,5,364,51"/>
+<area shape="rect" id="node5" href="$dc/d3b/group__Data__Type__TimeInterface.html#a127d4caececd68bb44678f71a6c18695" title="data_type_time::operator\l(\&gt;)::great" alt="" coords="199,74,364,121"/>
+<area shape="rect" id="node7" href="$dc/d3b/group__Data__Type__TimeInterface.html#a5a8e10921a1c7a039f194dfb19d87118" title="data_type_time::operator\l(\&gt;=)::great_eq" alt="" coords="199,143,364,190"/>
+<area shape="rect" id="node9" href="$dc/d3b/group__Data__Type__TimeInterface.html#af267472193284f03b2b848e19421b6dd" title="data_type_time::operator\l(\&lt;)::low" alt="" coords="199,213,364,259"/>
+<area shape="rect" id="node11" href="$dc/d3b/group__Data__Type__TimeInterface.html#addaacb8a66e234c13c3abf9f1ea9f6ad" title="data_type_time::operator\l(\&lt;=)::low_eq" alt="" coords="199,282,364,329"/>
+<area shape="rect" id="node13" href="$dc/d3b/group__Data__Type__TimeInterface.html#ab155a19a7ae2562ad8e4b8b771b4399a" title="data_type_time::operator\l(/=)::not_eq" alt="" coords="199,351,364,398"/>
+</map>

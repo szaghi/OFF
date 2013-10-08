@@ -1,0 +1,6 @@
+<map id="scan_proc" name="scan_proc">
+<area shape="rect" id="node3" href="$d7/db4/group__Lib__ParallelPrivateProcedure.html#ga0e664f4ee5dc1d0feade784abe5d688f" title="lib_parallel::compute\l_recv_maps" alt="" coords="136,5,277,51"/>
+<area shape="rect" id="node5" href="$d1/dbb/group__Lib__ParallelPublicProcedure.html#ga83bf079fae800cd22e30013013bdb6c2" title="Subroutine for initializing the send/receive communications data. " alt="" coords="327,5,433,51"/>
+<area shape="rect" id="node7" href="$d9/d99/group__OFFProgram.html#gab96c351668e50a49652d8e1afdacbd71" title="OFF is an Open source Finite volumes Fluid dynamics code. " alt="" coords="593,13,631,43"/>
+<area shape="rect" id="node9" href="$d7/d45/group__OFFPrivateProcedure.html#ga9dcb24129377de3118ee0766fc6a9594" title="Subroutine for initializing the simulation according to the input options. " alt="" coords="483,39,544,68"/>
+</map>

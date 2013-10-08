@@ -1,0 +1,7 @@
+<map id="data_type_global::type_global::load_bc_in1" name="data_type_global::type_global::load_bc_in1">
+<area shape="rect" id="node3" href="$da/d5f/structdata__type__global_1_1type__global.html#a0e91480b59942b8a4964b0222fb45f68" title="data_type_global::type\l_global::alloc_fluid" alt="" coords="209,74,361,121"/>
+<area shape="rect" id="node11" href="$d2/db8/group__Data__Type__GlobalPrivateProcedure.html#gae513ceb86e6ef230719bcc03924b1e92" title="Subroutine for allocating dynamic data of Type_Global fluid dynamic variables. " alt="" coords="208,143,363,190"/>
+<area shape="rect" id="node5" href="$d3/de7/group__Data__Type__GlobalInterface.html#a36c21e9e744097b3756f83924bb0903f" title="Function for building block&#45;clean file name. " alt="" coords="427,5,589,51"/>
+<area shape="rect" id="node7" href="$d3/de7/group__Data__Type__GlobalInterface.html#a71bd8498ef25277b983e1c85f3c53051" title="Function for building block&#45;time_step file name. " alt="" coords="411,74,605,121"/>
+<area shape="rect" id="node9" href="$d3/de7/group__Data__Type__GlobalInterface.html#ae0c9b470539312b2d87b3c65f572e597" title="Function for building block&#45;flip_flop file name. " alt="" coords="415,143,601,190"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="lib_riemann::z_wavesspeed14" name="lib_riemann::z_wavesspeed14">
+<area shape="rect" id="node3" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga415ade9e5c3826b12fbfe991b23df469" title="Approximate Riemann solver based on (local) Lax&#45;Friedrichs (known also as Rusanov) algorithm..." alt="" coords="264,5,427,51"/>
+<area shape="rect" id="node7" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga39fc6b65a34187179c90685d10dc00f2" title="Approximate Riemann solver based on Roe linearization. " alt="" coords="252,75,439,104"/>
+<area shape="rect" id="node5" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga8ed95bd24286bc4b94bde0ae4efcc968" title="Approximate Riemann solver based on HLLC algorithm. " alt="" coords="489,13,679,43"/>
+</map>

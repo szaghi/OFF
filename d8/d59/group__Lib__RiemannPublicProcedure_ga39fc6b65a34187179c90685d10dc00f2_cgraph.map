@@ -1,0 +1,21 @@
+<map id="lib_riemann::riem_solver_roe" name="lib_riemann::riem_solver_roe">
+<area shape="rect" id="node3" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga82d4f5c7adace2fdffa51b872a3e80f9" title="Function for computing the speed of sound for an ideal calorically perfect gas. " alt="" coords="781,223,947,270"/>
+<area shape="rect" id="node5" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga72edfdd7b6205b7dc0fe8cfacb07d068" title="Function for computing the pressure for an ideal calorically perfect gas. " alt="" coords="1011,295,1176,342"/>
+<area shape="rect" id="node7" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#gafc7677510bfb5d5bfab4510107291d32" title="Function for computing the density for an ideal calorically perfect gas. " alt="" coords="1224,259,1389,306"/>
+<area shape="rect" id="node13" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga5d31eca5ba59325c74195eeb96a3e4c8" title="Function for computing the total specific energy (per unit of mass) for an ideal calorically perfect ..." alt="" coords="781,101,947,147"/>
+<area shape="rect" id="node17" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga3a681bc3b342b628e094aff4fa0bd3e8" title="lib_riemann::fluxes" alt="" coords="549,144,680,173"/>
+<area shape="rect" id="node26" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga643e4e39cc96374bbf6da30f230e6801" title="lib_riemann::pvl_wavesspeed1234" alt="" coords="243,276,464,305"/>
+<area shape="rect" id="node34" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga067ab1649b13e96cbdf82ed56c0b3922" title="lib_riemann::pvl_wavesspeed14" alt="" coords="251,355,456,384"/>
+<area shape="rect" id="node42" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga0a1b1171c6db13dac9e1be9f59ffd7e1" title="lib_riemann::roe_state" alt="" coords="540,671,689,700"/>
+<area shape="rect" id="node47" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga2bbd0aa0b8ae0a0b848621d82b1325ff" title="lib_riemann::tr_wavesspeed14" alt="" coords="255,619,452,648"/>
+<area shape="rect" id="node49" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga494cafb07c0ca522c44f6b632d44da0c" title="lib_riemann::z_wavesspeed14" alt="" coords="255,435,452,464"/>
+<area shape="rect" id="node21" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga97d5fe3d357ec9b7ef4b3ee24a15bd0e" title="Function for computing the total specific entalpy (per unit of mass) for an ideal calorically perfect..." alt="" coords="781,551,947,598"/>
+<area shape="rect" id="node28" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga194ca5d5366043d5045ef42ea8c7260d" title="lib_riemann::wavesspeed14up" alt="" coords="765,344,963,373"/>
+<area shape="rect" id="node30" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga20d3a6228580917d8bf31eeccc76bb6a" title="lib_riemann::pvl_u23" alt="" coords="544,301,685,331"/>
+<area shape="rect" id="node32" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#gaee542b5a501f73a46c545c6ce5f3db78" title="lib_riemann::wavesspeed1234u" alt="" coords="513,197,716,227"/>
+<area shape="rect" id="node37" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#gad2d6e8e9a2c9346ca4e0d9901684d3da" title="lib_riemann::wavesspeed14u" alt="" coords="520,355,709,384"/>
+<area shape="rect" id="node39" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga065af5f81dc92fd48573a64bb672772f" title="lib_riemann::pvl_up23" alt="" coords="541,408,688,437"/>
+<area shape="rect" id="node51" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga08d7fd16b9238808babe6bc429f64dda" title="lib_riemann::roe_ua" alt="" coords="548,515,681,544"/>
+<area shape="rect" id="node60" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#gad98417b8e455563771a576271b9355eb" title="lib_riemann::tr_up23" alt="" coords="545,461,684,491"/>
+<area shape="rect" id="node56" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#gaecb7cda8793b426e90cf27d50a9bd31a" title="lib_riemann::roe_up23" alt="" coords="789,448,939,477"/>
+</map>

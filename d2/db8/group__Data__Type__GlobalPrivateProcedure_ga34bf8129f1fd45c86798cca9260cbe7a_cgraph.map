@@ -1,0 +1,6 @@
+<map id="data_type_global::load_gfluid_soption" name="data_type_global::load_gfluid_soption">
+<area shape="rect" id="node3" href="$d2/db8/group__Data__Type__GlobalPrivateProcedure.html#ga57af2f9f4cc4b809b85b90cc6c4095aa" title="Subroutine for computing the reference values for non&#45;dimensional quantities. " alt="" coords="205,5,384,51"/>
+<area shape="rect" id="node5" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga070c459fd5e26bcec905b7a2f2419ad3" title="Subroutine for printing to stderr a &quot;file not found error&quot;. " alt="" coords="227,74,363,121"/>
+<area shape="rect" id="node7" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga03b3d23e7eb885f6fb3c00f7a977b33d" title="The Get_Unit function returns a free logic unit for opening a file. " alt="" coords="224,144,365,173"/>
+<area shape="rect" id="node9" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga862ef887fb16a081f1ad8c00fee96985" title="The Upper_Case function converts the lower case characters of a string to upper case one..." alt="" coords="213,197,376,227"/>
+</map>

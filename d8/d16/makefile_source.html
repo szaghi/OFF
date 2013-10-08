@@ -641,8 +641,8 @@ $(document).ready(function(){initNavTree('d8/d16/makefile_source.html','../../')
 <div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;        @echo -e <span class="stringliteral">&quot;\033[1;31m Creating tar archive of the code \033[0m&quot;</span> | tee make.log</div>
 <div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;        @rm -rf OFF</div>
 <div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;        @mkdir -p OFF</div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;        @cp -r examples OFF/</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;        @cp -rL inputs-<span class="keyword">template</span> lib util src makefile README.md .doxygenconfig .gitignore OFF/</div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;        @cp -r EXAMPLE.md examples inputs-<span class="keyword">template</span> lib makefile README.md util .doxygenconfig .gitignore OFF/</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;        @cp -rL src OFF/</div>
 <div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;        @tar czf OFF.tgz OFF</div>
 <div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;        @rm -rf OFF</div>
 <div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;</div>
@@ -1006,7 +1006,7 @@ $(document).ready(function(){initNavTree('d8/d16/makefile_source.html','../../')
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../d8/d16/makefile.html">makefile</a></li>
-    <li class="footer">Generated on Tue Jun 25 2013 14:03:23 for OFF by
+    <li class="footer">Generated on Tue Oct 8 2013 10:13:56 for OFF by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>

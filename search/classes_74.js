@@ -30,7 +30,7 @@ var searchData=
   ['type_5ftensor',['type_tensor',['../d4/d1b/group__Data__Type__TensorDerivedType.html#d5/db8/structdata__type__tensor_1_1type__tensor',1,'data_type_tensor']]],
   ['type_5ftime',['type_time',['../d1/dae/group__Data__Type__TimeDerivedType.html#da/deb/structdata__type__time_1_1type__time',1,'data_type_time']]],
   ['type_5fvector',['type_vector',['../d2/dc1/group__Data__Type__VectorDerivedType.html#d1/d7a/structdata__type__vector_1_1type__vector',1,'data_type_vector']]],
-  ['type_5fvector_5fptr',['type_vector_ptr',['../d2/d5a/classdata__type__vector.html#d4/d3b/structdata__type__vector_1_1type__vector__ptr',1,'data_type_vector']]],
+  ['type_5fvector_5fptr',['type_vector_ptr',['../d2/dc1/group__Data__Type__VectorDerivedType.html#d4/d3b/structdata__type__vector_1_1type__vector__ptr',1,'data_type_vector']]],
   ['type_5fvtk_5ffile',['type_vtk_file',['../d3/d6a/structlib__vtk__io_1_1type__vtk__file.html',1,'lib_vtk_io']]],
   ['type_5fvtm_5ffile',['type_vtm_file',['../de/de8/structlib__vtk__io_1_1type__vtm__file.html',1,'lib_vtk_io']]]
 ];

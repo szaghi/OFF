@@ -74,10 +74,7 @@ var files =
       [ "data_type_time", "db/d04/classdata__type__time.html", "db/d04/classdata__type__time" ]
     ] ],
     [ "Data_Type_Vector.f90", "d9/d50/Data__Type__Vector_8f90.html", [
-      [ "data_type_vector", "d2/d5a/classdata__type__vector.html", "d2/d5a/classdata__type__vector" ],
-      [ "type_vector_ptr", "d2/d5a/classdata__type__vector.html#d4/d3b/structdata__type__vector_1_1type__vector__ptr", [
-        [ "p", "d2/d5a/classdata__type__vector.html#aacae01e33b3a73012d23558bb6ae9968", null ]
-      ] ]
+      [ "data_type_vector", "d2/d5a/classdata__type__vector.html", "d2/d5a/classdata__type__vector" ]
     ] ],
     [ "IBM.f90", "d3/dc5/IBM_8f90.html", "d3/dc5/IBM_8f90" ],
     [ "IR_Precision.f90", "da/d4b/IR__Precision_8f90.html", null ],

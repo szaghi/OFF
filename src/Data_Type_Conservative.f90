@@ -55,11 +55,11 @@ type, public:: Type_Conservative
   type(Type_Vector)::      rv          !< Momentum vector.
   real(R8P)::              re = 0._R8P !< Product of density for specific total internal energy (sum(r)*E).
   contains
-    procedure, non_overridable:: init              ! Procedure for initializing allocatable variables.
-    procedure, non_overridable:: free => free_cons ! Procedure for freeing the memory of allocatable variables.
-    procedure, non_overridable:: cons2array        ! Procedure for converting derived type Type_Conservative to array.
-    procedure, non_overridable:: array2cons        ! Procedure for converting array to derived type Type_Conservative.
-    procedure, non_overridable:: pprint            ! Procedure for printing Type_Conservative components with a "pretty" format.
+    procedure:: init              ! Procedure for initializing allocatable variables.
+    procedure:: free => free_cons ! Procedure for freeing the memory of allocatable variables.
+    procedure:: cons2array        ! Procedure for converting derived type Type_Conservative to array.
+    procedure:: array2cons        ! Procedure for converting array to derived type Type_Conservative.
+    procedure:: pprint            ! Procedure for printing Type_Conservative components with a "pretty" format.
 endtype Type_Conservative
 !-----------------------------------------------------------------------------------------------------------------------------------
 

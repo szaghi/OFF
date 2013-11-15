@@ -58,7 +58,7 @@ type, public:: Type_Time
   integer(I4P) Minutes !< Number of minutes.
   real(R8P)    Seconds !< Number of seconds.
   contains
-    procedure, non_overridable:: sec2time ! Procedure for converting seconds to Type_Time format.
+    procedure:: sec2time ! Procedure for converting seconds to Type_Time format.
 endtype Type_Time
 !> @ingroup Data_Type_TimePrivateVarPar
 real(R8P):: inst0 = 0._R8P !< The Crono starting instant used for profing the code.

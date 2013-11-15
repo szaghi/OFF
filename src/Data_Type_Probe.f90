@@ -34,7 +34,7 @@ type, public:: Type_Probe
   integer(I4P):: j = 0_I4P !< J direction index.
   integer(I4P):: k = 0_I4P !< K direction index.
   contains
-    procedure, non_overridable:: set ! Procedure for setting members of Type_Probe.
+    procedure:: set ! Procedure for setting members of Type_Probe.
 endtype Type_Probe
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains

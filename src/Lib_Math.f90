@@ -34,7 +34,7 @@
 module Lib_Math
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                        ! Integers and reals precision definition.
-!USE Data_Type_SL_List                   ! Definition of Type_SL_List.
+USE Data_Type_SL_List                   ! Definition of Type_SL_List.
 USE Data_Type_Vector, only: Type_Vector ! Definition of Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ USE Data_Type_Vector, only: Type_Vector ! Definition of Type_Vector.
 implicit none
 private
 public:: pi,pi_R16,pi_R8,pi_R4
-!public:: prime
+public:: prime
 public:: isort
 public:: qsort
 public:: spline3
@@ -82,9 +82,9 @@ real(R_P),  parameter:: pi     = 2._R_P* asin(1._R_P)  !< \f$\pi \f$ with R_P  p
 !> The input integer n can have all the kinds defined in IR_Precision module.
 !> @note The output array containing the factors must allocatable of the same kind of input integer.
 !> @ingroup Lib_MathInterface
-!interface prime
-!  module procedure prime_I8,prime_I4,prime_I2,prime_I1
-!endinterface
+interface prime
+  module procedure prime_I8,prime_I4,prime_I2,prime_I1
+endinterface
 !> @brief Subroutine for performing InsertionSort with ascending order.
 !> Example of usage:
 !> @code
@@ -237,159 +237,159 @@ contains
   !> @{
   !> @brief Subroutine for computing prime factors of input integer number (I8P). The results is an array of integers containing the
   !> prime factors list.
- !subroutine prime_I8(n,p)
- !!---------------------------------------------------------------------------------------------------------------------------------
- !implicit none
- !integer(I8P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
- !integer(I8P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
- !type(Type_SL_List)::                     pl   !< Prime factors list.
- !integer(I8P)::                           nn   !< Copy of Input number.
- !integer(I8P)::                           d    !< Divisor.
- !!---------------------------------------------------------------------------------------------------------------------------------
- !
- !!---------------------------------------------------------------------------------------------------------------------------------
- !if (n==1) then
- !  allocate(p(1:1)) ; p = 1
- !  return
- !endif
- !nn=n
- !do ! removing all factors of 2
- !  if (mod(nn,2_I8P)/=0.OR.nn==1) exit
- !  nn = nn/2_I8P
- !  call pl%putt(d=2_I8P)
- !enddo
- !d=3
- !do ! removing factor 3, 5, 7, ...
- !  if (d>nn) exit ! if a factor is too large, exit and done
- !  do
- !    if (mod(nn,d)/=0.OR.nn==1) exit
- !    nn = nn/d ! remove this factor from n
- !    call pl%putt(d=d)
- !  enddo
- !  d = d + 2_I8P ! move to next odd number
- !enddo
- !call pl%array(p)
- !call pl%free()
- !return
- !!---------------------------------------------------------------------------------------------------------------------------------
- !endsubroutine prime_I8
+  subroutine prime_I8(n,p)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I8P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
+  integer(I8P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
+  type(Type_SL_List)::                     pl   !< Prime factors list.
+  integer(I8P)::                           nn   !< Copy of Input number.
+  integer(I8P)::                           d    !< Divisor.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (n==1) then
+   allocate(p(1:1)) ; p = 1
+   return
+  endif
+  nn=n
+  do ! removing all factors of 2
+   if (mod(nn,2_I8P)/=0.OR.nn==1) exit
+   nn = nn/2_I8P
+   call pl%putt(d=2_I8P)
+  enddo
+  d=3
+  do ! removing factor 3, 5, 7, ...
+   if (d>nn) exit ! if a factor is too large, exit and done
+   do
+     if (mod(nn,d)/=0.OR.nn==1) exit
+     nn = nn/d ! remove this factor from n
+     call pl%putt(d=d)
+   enddo
+   d = d + 2_I8P ! move to next odd number
+  enddo
+  call pl%array(p)
+  call pl%free()
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine prime_I8
 
   !> @brief Subroutine for computing prime factors of input integer number (I4P). The results is an array of integers containing the
   !> prime factors list.
- !subroutine prime_I4(n,p)
- !!---------------------------------------------------------------------------------------------------------------------------------
- !implicit none
- !integer(I4P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
- !integer(I4P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
- !type(Type_SL_List)::                     pl   !< Prime factors list.
- !integer(I4P)::                           nn   !< Copy of Input number.
- !integer(I4P)::                           d    !< Divisor.
- !!---------------------------------------------------------------------------------------------------------------------------------
- !
- !!---------------------------------------------------------------------------------------------------------------------------------
- !if (n==1) then
- !  allocate(p(1:1)) ; p = 1
- !  return
- !endif
- !nn=n
- !do ! removing all factors of 2
- !  if (mod(nn,2_I4P)/=0.OR.nn==1) exit
- !  nn = nn/2_I4P
- !  call pl%putt(d=2_I4P)
- !enddo
- !d=3
- !do ! removing factor 3, 5, 7, ...
- !  if (d>nn) exit ! if a factor is too large, exit and done
- !  do
- !    if (mod(nn,d)/=0.OR.nn==1) exit
- !    nn = nn/d ! remove this factor from n
- !    call pl%putt(d=d)
- !  enddo
- !  d = d + 2_I4P ! move to next odd number
- !enddo
- !call pl%array(p)
- !call pl%free()
- !return
- !!---------------------------------------------------------------------------------------------------------------------------------
- !endsubroutine prime_I4
+  subroutine prime_I4(n,p)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I4P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
+  integer(I4P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
+  type(Type_SL_List)::                     pl   !< Prime factors list.
+  integer(I4P)::                           nn   !< Copy of Input number.
+  integer(I4P)::                           d    !< Divisor.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (n==1) then
+    allocate(p(1:1)) ; p = 1
+    return
+  endif
+  nn=n
+  do ! removing all factors of 2
+    if (mod(nn,2_I4P)/=0.OR.nn==1) exit
+    nn = nn/2_I4P
+    call pl%putt(d=2_I4P)
+  enddo
+  d=3
+  do ! removing factor 3, 5, 7, ...
+    if (d>nn) exit ! if a factor is too large, exit and done
+    do
+      if (mod(nn,d)/=0.OR.nn==1) exit
+      nn = nn/d ! remove this factor from n
+      call pl%putt(d=d)
+    enddo
+    d = d + 2_I4P ! move to next odd number
+  enddo
+  call pl%array(p)
+  call pl%free()
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine prime_I4
 
   !> @brief Subroutine for computing prime factors of input integer number (I2P). The results is an array of integers containing the
   !> prime factors list.
- !subroutine prime_I2(n,p)
- !!---------------------------------------------------------------------------------------------------------------------------------
- !implicit none
- !integer(I2P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
- !integer(I2P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
- !type(Type_SL_List)::                     pl   !< Prime factors list.
- !integer(I2P)::                           nn   !< Copy of Input number.
- !integer(I2P)::                           d    !< Divisor.
- !!---------------------------------------------------------------------------------------------------------------------------------
- !
- !!---------------------------------------------------------------------------------------------------------------------------------
- !if (n==1) then
- !  allocate(p(1:1)) ; p = 1
- !  return
- !endif
- !nn=n
- !do ! removing all factors of 2
- !  if (mod(nn,2_I2P)/=0.OR.nn==1) exit
- !  nn = nn/2_I2P
- !  call pl%putt(d=2_I2P)
- !enddo
- !d=3
- !do ! removing factor 3, 5, 7, ...
- !  if (d>nn) exit ! if a factor is too large, exit and done
- !  do
- !    if (mod(nn,d)/=0.OR.nn==1) exit
- !    nn = nn/d ! remove this factor from n
- !    call pl%putt(d=d)
- !  enddo
- !  d = d + 2_I2P ! move to next odd number
- !enddo
- !call pl%array(p)
- !call pl%free()
- !return
- !!---------------------------------------------------------------------------------------------------------------------------------
- !endsubroutine prime_I2
+  subroutine prime_I2(n,p)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I2P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
+  integer(I2P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
+  type(Type_SL_List)::                     pl   !< Prime factors list.
+  integer(I2P)::                           nn   !< Copy of Input number.
+  integer(I2P)::                           d    !< Divisor.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (n==1) then
+    allocate(p(1:1)) ; p = 1
+    return
+  endif
+  nn=n
+  do ! removing all factors of 2
+    if (mod(nn,2_I2P)/=0.OR.nn==1) exit
+    nn = nn/2_I2P
+    call pl%putt(d=2_I2P)
+  enddo
+  d=3
+  do ! removing factor 3, 5, 7, ...
+    if (d>nn) exit ! if a factor is too large, exit and done
+    do
+      if (mod(nn,d)/=0.OR.nn==1) exit
+      nn = nn/d ! remove this factor from n
+      call pl%putt(d=d)
+    enddo
+    d = d + 2_I2P ! move to next odd number
+  enddo
+  call pl%array(p)
+  call pl%free()
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine prime_I2
 
   !> @brief Subroutine for computing prime factors of input integer number (I1P). The results is an array of integers containing the
   !> prime factors list.
- !subroutine prime_I1(n,p)
- !!---------------------------------------------------------------------------------------------------------------------------------
- !implicit none
- !integer(I1P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
- !integer(I1P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
- !type(Type_SL_List)::                     pl   !< Prime factors list.
- !integer(I1P)::                           nn   !< Copy of Input number.
- !integer(I1P)::                           d    !< Divisor.
- !!---------------------------------------------------------------------------------------------------------------------------------
- !
- !!---------------------------------------------------------------------------------------------------------------------------------
- !if (n==1) then
- !  allocate(p(1:1)) ; p = 1
- !  return
- !endif
- !nn=n
- !do ! removing all factors of 2
- !  if (mod(nn,2_I1P)/=0.OR.nn==1) exit
- !  nn = nn/2_I1P
- !  call pl%putt(d=2_I1P)
- !enddo
- !d=3
- !do ! removing factor 3, 5, 7, ...
- !  if (d>nn) exit ! if a factor is too large, exit and done
- !  do
- !    if (mod(nn,d)/=0.OR.nn==1) exit
- !    nn = nn/d ! remove this factor from n
- !    call pl%putt(d=d)
- !  enddo
- !  d = d + 2_I1P ! move to next odd number
- !enddo
- !call pl%array(p)
- !call pl%free()
- !return
- !!---------------------------------------------------------------------------------------------------------------------------------
- !endsubroutine prime_I1
+  subroutine prime_I1(n,p)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I1P),              intent(IN)::  n    !< Input number of which prime factors must be computed.
+  integer(I1P), allocatable, intent(OUT):: p(:) !< Prime factors of n.
+  type(Type_SL_List)::                     pl   !< Prime factors list.
+  integer(I1P)::                           nn   !< Copy of Input number.
+  integer(I1P)::                           d    !< Divisor.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (n==1) then
+    allocate(p(1:1)) ; p = 1
+    return
+  endif
+  nn=n
+  do ! removing all factors of 2
+    if (mod(nn,2_I1P)/=0.OR.nn==1) exit
+    nn = nn/2_I1P
+    call pl%putt(d=2_I1P)
+  enddo
+  d=3
+  do ! removing factor 3, 5, 7, ...
+    if (d>nn) exit ! if a factor is too large, exit and done
+    do
+      if (mod(nn,d)/=0.OR.nn==1) exit
+      nn = nn/d ! remove this factor from n
+      call pl%putt(d=d)
+    enddo
+    d = d + 2_I1P ! move to next odd number
+  enddo
+  call pl%array(p)
+  call pl%free()
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine prime_I1
 
   ! InsertionSort
   !> @brief Subroutine for performing InsertionSort with ascending order (R16P).

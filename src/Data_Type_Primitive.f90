@@ -55,11 +55,11 @@ type, public:: Type_Primitive
   real(R8P)::              d = 0._R8P !< Density = sum(r(1:Ns)).
   real(R8P)::              g = 0._R8P !< Specific heats ratio \f$ \gamma = \frac{c_p}{c_v} \f$.
   contains
-    procedure, non_overridable:: init       ! Procedure for initilizing allocatable variables.
-    procedure, non_overridable:: free       ! Procedure for freeing the memory of allocatable variables.
-    procedure, non_overridable:: prim2array ! Procedure for converting derived type Type_Primitive to array.
-    procedure, non_overridable:: array2prim ! Procedure for converting array to derived type Type_Primitive.
-    procedure, non_overridable:: pprint     ! Procedure for printing Type_Primitive components with a "pretty" format.
+    procedure:: init       ! Procedure for initilizing allocatable variables.
+    procedure:: free       ! Procedure for freeing the memory of allocatable variables.
+    procedure:: prim2array ! Procedure for converting derived type Type_Primitive to array.
+    procedure:: array2prim ! Procedure for converting array to derived type Type_Primitive.
+    procedure:: pprint     ! Procedure for printing Type_Primitive components with a "pretty" format.
 endtype Type_Primitive
 !-----------------------------------------------------------------------------------------------------------------------------------
 

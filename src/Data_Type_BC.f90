@@ -101,11 +101,11 @@ type, public:: Type_BC
   integer(I4P),   allocatable:: inf         !< Auxiliary informations for inflow-type boundary condition.
   type(Type_Adj), allocatable:: adj         !< Connection indexes for adjacent boundary condition.
   contains
-    procedure, non_overridable:: init            ! Procedure for initilizing allocatable variables.
-    procedure, non_overridable:: free => free_bc ! Procedure for freeing the memory of allocatable variables.
-    procedure, non_overridable:: set             ! Procedure for setting bc members.
-    procedure, non_overridable:: str2id          ! Procedure for setting integer id from string id.
-    procedure, non_overridable:: id2str          ! Procedure for converting integer id to string id.
+    procedure:: init            ! Procedure for initilizing allocatable variables.
+    procedure:: free => free_bc ! Procedure for freeing the memory of allocatable variables.
+    procedure:: set             ! Procedure for setting bc members.
+    procedure:: str2id          ! Procedure for setting integer id from string id.
+    procedure:: id2str          ! Procedure for converting integer id to string id.
 endtype Type_BC
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains

@@ -18,8 +18,8 @@
 module Data_Type_Face
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision     ! Integers and reals precision definition.
-USE Data_Type_BC     !< Definition of Type_BC.
-USE Data_Type_Vector !< Definition of Type_Vector.
+USE Data_Type_BC     ! Definition of Type_BC.
+USE Data_Type_Vector ! Definition of Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -36,8 +36,8 @@ type, public:: Type_Face
   real(R8P)::         S = 0._R8P !< Face area.
   type(Type_BC)::     BC         !< Boundary conditions.
   contains
-    procedure, non_overridable:: init => init_face ! Procedure for initilizing allocatable variables.
-    procedure, non_overridable:: free => free_face ! Procedure for freeing the memory of allocatable variables.
+    procedure:: init => init_face ! Procedure for initilizing allocatable variables.
+    procedure:: free => free_face ! Procedure for freeing the memory of allocatable variables.
 endtype Type_Face
 !> @brief Pointer of Type_Face for creating array of pointers of Type_SFace.
 !> @ingroup Data_Type_FaceDerivedType

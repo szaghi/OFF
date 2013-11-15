@@ -38,9 +38,9 @@ type, public:: Type_SLL
   type(Type_HashID), allocatable:: ID             !< ID (unique) of the current link node.
   type(Type_Cell),   allocatable:: d              !< Link data.
   contains
-    procedure, non_overridable:: put =>  put_sll  ! Procedure for inserting a link into the list.
-    procedure, non_overridable:: get =>  get_sll  ! Procedure for getting a link from the list.
-    procedure, non_overridable:: free => free_sll ! Procedure for freeing (destroyng) the list.
+    procedure:: put =>  put_sll  ! Procedure for inserting a link into the list.
+    procedure:: get =>  get_sll  ! Procedure for getting a link from the list.
+    procedure:: free => free_sll ! Procedure for freeing (destroyng) the list.
 endtype Type_SLL
 
 !> @brief Derived type containing the hash table of cells data. The the collisions of different (unique) IDs into  the same
@@ -50,10 +50,10 @@ type, public:: Type_HashTCell
   type(Type_SLL), allocatable:: ht(:)        !< Hash table.
   integer(I4P)::                leng = 0_I4P !< Lenght of the hash table.
   contains
-    procedure, non_overridable:: init => init_hasht ! Procedure for initializing the table.
-    procedure, non_overridable:: put =>  put_hasht  ! Procedure for inserting a node into the table.
-    procedure, non_overridable:: get =>  get_hasht  ! Procedure for getting a node from the table.
-    procedure, non_overridable:: free => free_hasht ! Procedure for freeing (destroyng) the table.
+    procedure:: init => init_hasht ! Procedure for initializing the table.
+    procedure:: put =>  put_hasht  ! Procedure for inserting a node into the table.
+    procedure:: get =>  get_hasht  ! Procedure for getting a node from the table.
+    procedure:: free => free_hasht ! Procedure for freeing (destroyng) the table.
 endtype Type_HashTCell
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains

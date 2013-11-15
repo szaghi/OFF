@@ -33,7 +33,29 @@ HYBRID    = NOHYBRID
 PPL       = no
 LMA       = no
 TECIO     = no
+#----------------------------------------------------------------------------------------------------------------------------------
 
+#----------------------------------------------------------------------------------------------------------------------------------
+# compiler specific rules
+# GNU
+WRN_GNU = -fmax-errors=0 -Wall -Wno-array-temporaries -Warray-bounds -Wcharacter-truncation -Wline-truncation -Wconversion-extra -Wimplicit-interface -Wimplicit-procedure -Wunderflow -Wextra -Wuninitialized
+CHK_GNU = -fcheck=all
+DEB_GNU = -fmodule-private -ffree-line-length-132 -fimplicit-none -ffpe-trap=invalid,overflow -fbacktrace -fdump-core -finit-real=nan #-fno-range-check  ,precision,denormal,underflow
+STD_GNU = -std=f2003 -fall-intrinsics
+OMP_GNU = -fopenmp
+OPT_GNU = -O3
+PRF_GNU =
+# Intel
+WRN_INT = -warn all
+CHK_INT = -check all
+DEB_INT = -debug all -extend-source 132 -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -traceback -gen-interfaces
+STD_INT = -std03
+OMP_INT = -openmp
+OPT_INT = -O3 -ipo -inline all -ipo-jobs4 -vec-report1
+PRF_INT = #-p
+#----------------------------------------------------------------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------------------------------------------------------------
 .PHONY : DEFAULTRULE
 DEFAULTRULE: $(DEXE)OFF
 
@@ -194,23 +216,6 @@ ifeq "$(PRESET)" "openmp-mpi"
   OPENMP    = yes
   MPI       = yes
 endif
-# compiler specific rules
-# GNU
-WRN_GNU = -fmax-errors=0 -Wall -Wno-array-temporaries -Warray-bounds -Wcharacter-truncation -Wline-truncation -Wconversion-extra -Wimplicit-interface -Wimplicit-procedure -Wunderflow -Wextra -Wuninitialized
-CHK_GNU = -fcheck=all
-DEB_GNU = -fmodule-private -ffree-line-length-132 -fimplicit-none -ffpe-trap=invalid,overflow -fbacktrace -fdump-core -finit-real=nan #-fno-range-check  ,precision,denormal,underflow
-STD_GNU = -std=f2003 -fall-intrinsics
-OMP_GNU = -fopenmp
-OPT_GNU = -O3
-PRF_GNU =
-# Intel
-WRN_INT = -warn all
-CHK_INT = -check all
-DEB_INT = -debug all -extend-source 132 -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -traceback -gen-interfaces
-STD_INT = -std03
-OMP_INT = -openmp
-OPT_INT = -O3 -ipo -inline all -ipo-jobs4 -vec-report1
-PRF_INT = #-p
 # setting rules according user options
 ifeq "$(COMPILER)" "gnu"
   FC = gfortran
@@ -678,10 +683,10 @@ $(DOBJ)data_type_sblock.o : Data_Type_SBlock.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-#$(DOBJ)data_type_sl_list.o : Data_Type_SL_List.f90 \
-#  $(DOBJ)ir_precision.o
-#  @echo $(COTEXT) | tee -a make.log
-#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+$(DOBJ)data_type_sl_list.o : Data_Type_SL_List.f90 \
+  $(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_tensor.o : Data_Type_Tensor.f90 \
 	$(DOBJ)ir_precision.o \
@@ -774,18 +779,18 @@ $(DOBJ)lib_io_misc.o : Lib_IO_Misc.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
+$(DOBJ)lib_math.o : Lib_Math.f90 \
+  $(DOBJ)ir_precision.o \
+  $(DOBJ)data_type_sl_list.o \
+  $(DOBJ)data_type_vector.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
 #$(DOBJ)lib_math.o : Lib_Math.f90 \
 #  $(DOBJ)ir_precision.o \
-#  $(DOBJ)data_type_sl_list.o \
 #  $(DOBJ)data_type_vector.o
 #  @echo $(COTEXT) | tee -a make.log
 #  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
-
-$(DOBJ)lib_math.o : Lib_Math.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_vector.o
-	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 #$(DOBJ)lib_morton.o : Lib_Morton.f90 \
 #  $(DOBJ)ir_precision.o

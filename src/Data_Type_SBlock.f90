@@ -50,20 +50,20 @@ type, public:: Type_SBlock
   type(Type_Face),   allocatable:: Fk(:,:,:)              !< Faces k data  [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
   type(Type_Cell),   allocatable:: C(:,:,:)               !< Cells data    [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
   contains
-    procedure, non_overridable:: alloc => alloc_block                  ! Procedure for allocating memory.
-    procedure, non_overridable:: free => free_block                    ! Procedure for freeing memory.
-    procedure, non_overridable:: save_mesh => save_bmesh               ! Procedure for saving the mesh data.
-    procedure, non_overridable:: load_mesh_dims => load_bmesh_dims     ! Procedure for loading the mesh data dimensions.
-    procedure, non_overridable:: load_mesh => load_bmesh               ! Procedure for loading the mesh data.
-    procedure, non_overridable:: print_info_mesh => print_info_bmesh   ! Procedure for printing mesh data.
-    procedure, non_overridable:: save_bc => save_bbc                   ! Procedure for saving the bc data.
-    procedure, non_overridable:: load_bc => load_bbc                   ! Procedure for loading the bc data.
-    procedure, non_overridable:: save_fluid => save_bfluid             ! Procedure for saving the fluid dynamic data.
-    procedure, non_overridable:: load_fluid => load_bfluid             ! Procedure for loading the fluid dynamic data.
-    procedure, non_overridable:: print_info_fluid => print_info_bfluid ! Procedure for printing fluid dynamic data.
-    procedure, non_overridable:: metrics                               ! Procedure for computing block metrics.
-    procedure, non_overridable:: metrics_correction                    ! Procedure for correcting block metrics of bc cells.
-    procedure, non_overridable:: node2center                           ! Procedure for computing cell center coo from cell nodes.
+    procedure:: alloc => alloc_block                  ! Procedure for allocating memory.
+    procedure:: free => free_block                    ! Procedure for freeing memory.
+    procedure:: save_mesh => save_bmesh               ! Procedure for saving the mesh data.
+    procedure:: load_mesh_dims => load_bmesh_dims     ! Procedure for loading the mesh data dimensions.
+    procedure:: load_mesh => load_bmesh               ! Procedure for loading the mesh data.
+    procedure:: print_info_mesh => print_info_bmesh   ! Procedure for printing mesh data.
+    procedure:: save_bc => save_bbc                   ! Procedure for saving the bc data.
+    procedure:: load_bc => load_bbc                   ! Procedure for loading the bc data.
+    procedure:: save_fluid => save_bfluid             ! Procedure for saving the fluid dynamic data.
+    procedure:: load_fluid => load_bfluid             ! Procedure for loading the fluid dynamic data.
+    procedure:: print_info_fluid => print_info_bfluid ! Procedure for printing fluid dynamic data.
+    procedure:: metrics                               ! Procedure for computing block metrics.
+    procedure:: metrics_correction                    ! Procedure for correcting block metrics of bc cells.
+    procedure:: node2center                           ! Procedure for computing cell center coo from cell nodes.
 endtype Type_SBlock
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains

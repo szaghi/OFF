@@ -64,25 +64,24 @@ public:: operator (.ortho.)
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!> @ingroup Data_Type_VectorDerivedType
-!> @{
 !> Derived type defining vectors.
+!> @ingroup Data_Type_VectorDerivedType
 type, public:: Type_Vector
   real(R8P):: x = 0._R8P !< Cartesian component in x direction.
   real(R8P):: y = 0._R8P !< Cartesian component in y direction.
   real(R8P):: z = 0._R8P !< Cartesian component in z direction.
   contains
-    procedure, non_overridable:: set                         ! Procedure for setting vector components.
-    procedure, non_overridable:: pprint                      ! Procedure for printing vector components with a "pretty" format.
-    procedure, non_overridable:: sq_norm => sq_norm_self     ! Procedure for computing the square of the norm of a vector.
-    procedure, non_overridable:: normL2 => normL2_self       ! Procedure for computing the norm L2 of a vector.
-    procedure, non_overridable:: normalize => normalize_self ! Procedure for normalizing a vector.
+    procedure:: set                         ! Procedure for setting vector components.
+    procedure:: pprint                      ! Procedure for printing vector components with a "pretty" format.
+    procedure:: sq_norm => sq_norm_self     ! Procedure for computing the square of the norm of a vector.
+    procedure:: normL2 => normL2_self       ! Procedure for computing the norm L2 of a vector.
+    procedure:: normalize => normalize_self ! Procedure for normalizing a vector.
 endtype Type_Vector
 !> Pointer of Type_Vector for creating array of pointers of Type_Vector.
+!> @ingroup Data_Type_VectorDerivedType
 type, public:: Type_Vector_Ptr
   type(Type_Vector), pointer:: p => null()
 endtype Type_Vector_Ptr
-!> @}
 !> @ingroup Data_Type_VectorGlobalVarPar
 !> @{
 type(Type_Vector), parameter:: ex = Type_Vector(1._R8P,0._R8P,0._R8P) !< X direction versor

@@ -99,8 +99,8 @@ type, public:: Type_HashID
   integer(I1P):: lvl = 0_I1P !< Level 8 bits: 256 maximum levels, but arbitrarily fixed to 16 (due to path memory limit).
   integer(I8P):: pth = 0_I8P !< Path (of children) 64 bits: (4 bits, values in [0,1,2...,7])x(16 max levels), Morton encoded.
   contains
-    procedure, non_overridable:: build ! Procedure for building ID from indexes information.
-    procedure, non_overridable:: hash  ! Procedure for "hashing" ID.
+    procedure:: build ! Procedure for building ID from indexes information.
+    procedure:: hash  ! Procedure for "hashing" ID.
 endtype Type_HashID
 !-----------------------------------------------------------------------------------------------------------------------------------
 

@@ -110,8 +110,8 @@ type, public:: Type_AMRBlock
   type(Type_HashTFace):: Fk   !< (Hash table of) Faces k data.
   type(Type_HashTCell):: C    !< (Hash table of) Cells data.
   contains
-    procedure, non_overridable:: init => init_amrblock ! Procedure for initializing the AMR grid.
-    procedure, non_overridable:: load_basemesh_dims  ! Procedure for loading the base mesh data dimensions.
+    procedure:: init => init_amrblock ! Procedure for initializing the AMR grid.
+    procedure:: load_basemesh_dims    ! Procedure for loading the base mesh data dimensions.
 endtype Type_AMRBlock
   !integer(I4P)::              Nc = 0_I4P ! Number of cells on the current process
   !integer(I8P), allocatable:: IDfirst(:) ! ID of the first cell on each process [1:Nproc].

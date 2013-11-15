@@ -70,18 +70,18 @@ type, public:: Type_Tensor
   type(Type_Vector):: y !< Cartesian vector component in y direction.
   type(Type_Vector):: z !< Cartesian vector component in z direction.
   contains
-    procedure, non_overridable:: set                         ! Procedure for setting tensor components.
-    procedure, non_overridable:: sq_norm => sq_norm_ten      ! Procedure for computing the square of the norm of a tensor.
-    procedure, non_overridable:: normL2 => normL2_ten        ! Procedure for computing the norm L2 of a tensor.
-    procedure, non_overridable:: normalize => normalize_self ! Procedure for normalizing a tensor.
-    procedure, non_overridable:: transpose => transpose_self ! Procedure for transposing a tensor.
-    procedure, non_overridable:: determinant                 ! Procedure for computing the determinant of a tensor.
-    procedure, non_overridable:: invert => invert_self       ! Procedure for inverting a tensor.
-    procedure, non_overridable:: invertible                  ! Procedure for checking if a tensor is invertible.
-    procedure, non_overridable:: rotox                       ! Procedure for computing the rotation tensor along x axis.
-    procedure, non_overridable:: rotoy                       ! Procedure for computing the rotation tensor along y axis.
-    procedure, non_overridable:: rotoz                       ! Procedure for computing the rotation tensor along z axis.
-    procedure, non_overridable:: rotou                       ! Procedure for computing the rotation tensor along a vector axis.
+    procedure:: set                         ! Procedure for setting tensor components.
+    procedure:: sq_norm => sq_norm_ten      ! Procedure for computing the square of the norm of a tensor.
+    procedure:: normL2 => normL2_ten        ! Procedure for computing the norm L2 of a tensor.
+    procedure:: normalize => normalize_self ! Procedure for normalizing a tensor.
+    procedure:: transpose => transpose_self ! Procedure for transposing a tensor.
+    procedure:: determinant                 ! Procedure for computing the determinant of a tensor.
+    procedure:: invert => invert_self       ! Procedure for inverting a tensor.
+    procedure:: invertible                  ! Procedure for checking if a tensor is invertible.
+    procedure:: rotox                       ! Procedure for computing the rotation tensor along x axis.
+    procedure:: rotoy                       ! Procedure for computing the rotation tensor along y axis.
+    procedure:: rotoz                       ! Procedure for computing the rotation tensor along z axis.
+    procedure:: rotou                       ! Procedure for computing the rotation tensor along a vector axis.
 endtype Type_Tensor
 !> @ingroup Data_Type_TensorGlobalVarPar
 !> @{

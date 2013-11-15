@@ -114,12 +114,12 @@ type, public:: Type_Global
   real(R_P), allocatable::  cv0(:)                   !< Initial specific heat cv for each specie [1:Ns].
   type(Type_Adimensional):: adim                     !< Non-dimensionalization data.
   contains
-    procedure, non_overridable:: alloc_bc => alloc_gbc                       ! Procedure for allocating bc memory.
-    procedure, non_overridable:: load_bc_in1 => load_gbc_in1                 ! Procedure for loading the inflow1 bc data.
-    procedure, non_overridable:: load_fluid_soption => load_gfluid_soption   ! Procedure for loading the fluidynamic solver options.
-    procedure, non_overridable:: load_fluid_Ns => load_gfluid_Ns             ! Procedure for loading the number of species.
-    procedure, non_overridable:: load_fluid_0species => load_gfluid_0species ! Procedure for loading the initial species.
-    procedure, non_overridable:: alloc_fluid => alloc_gfluid                 ! Procedure for allocating the fluidynamic data.
+    procedure:: alloc_bc => alloc_gbc                       ! Procedure for allocating bc memory.
+    procedure:: load_bc_in1 => load_gbc_in1                 ! Procedure for loading the inflow1 bc data.
+    procedure:: load_fluid_soption => load_gfluid_soption   ! Procedure for loading the fluidynamic solver options.
+    procedure:: load_fluid_Ns => load_gfluid_Ns             ! Procedure for loading the number of species.
+    procedure:: load_fluid_0species => load_gfluid_0species ! Procedure for loading the initial species.
+    procedure:: alloc_fluid => alloc_gfluid                 ! Procedure for allocating the fluidynamic data.
 endtype Type_Global
 !> @}
 !-----------------------------------------------------------------------------------------------------------------------------------

@@ -221,5 +221,5 @@ contains
     return
     !-------------------------------------------------------------------------------------------------------------------------------
     endsubroutine shear_stress
-endsubroutine fluxes_diffusive
+  endsubroutine fluxes_diffusive
 endmodule Lib_Fluxes_Diffusive

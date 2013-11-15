@@ -12,26 +12,31 @@
 !> @ingroup Library
 !> @{
 !> @defgroup IR_PrecisionLibrary IR_Precision
+!> Portable kind-parameters module
 !> @}
 
 !> @ingroup Interface
 !> @{
 !> @defgroup IR_PrecisionInterface IR_Precision
+!> Portable kind-parameters module
 !> @}
 
 !> @ingroup GlobalVarPar
 !> @{
 !> @defgroup IR_PrecisionGlobalVarPar IR_Precision
+!> Portable kind-parameters module
 !> @}
 
 !> @ingroup PublicProcedure
 !> @{
 !> @defgroup IR_PrecisionPublicProcedure IR_Precision
+!> Portable kind-parameters module
 !> @}
 
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup IR_PrecisionPrivateProcedure IR_Precision
+!> Portable kind-parameters module
 !> @}
 
 !> @brief     Module IR_Precision makes available some portable kind-parameters and some useful procedures to deal with them.
@@ -1012,7 +1017,7 @@ contains
   ! checking the bit ordering architecture
   call check_endian
   ! computing the bits/bytes sizes of real variables
-  BIR16P = int(bit_size(i=MaxR16P),I2P) ; BYR16P = BIR16P/8_I2P
+  BIR16P = bit_size(i=MaxR16P) ; BYR16P = BIR16P/8_I2P
   BIR8P  = bit_size(i=MaxR8P)  ; BYR8P  = BIR8P/8_I1P
   BIR4P  = bit_size(i=MaxR4P)  ; BYR4P  = BIR4P/8_I1P
   BIR_P  = bit_size(i=MaxR_P)  ; BYR_P  = BIR_P/8_I1P

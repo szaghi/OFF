@@ -18,9 +18,9 @@
 module Data_Type_Cell
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision           ! Integers and reals precision definition.
-USE Data_Type_Conservative !< Definition of Type_Conservative.
-USE Data_Type_Primitive    !< Definition of Type_Primitive.
-USE Data_Type_Vector       !< Definition of Type_Vector.
+USE Data_Type_Conservative ! Definition of Type_Conservative.
+USE Data_Type_Primitive    ! Definition of Type_Primitive.
+USE Data_Type_Vector       ! Definition of Type_Vector.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -40,8 +40,8 @@ type, public:: Type_Cell
   type(Type_Conservative)::              U           !< Conservative variables.
   type(Type_Conservative), allocatable:: KS(:)       !< Runge-Kutta stages of conservative variables [1:rk_ord].
   contains
-    procedure, non_overridable:: init => init_cell ! Procedure for initilizing allocatable variables.
-    procedure, non_overridable:: free => free_cell ! Procedure for freeing the memory of allocatable variables.
+    procedure:: init => init_cell ! Procedure for initilizing allocatable variables.
+    procedure:: free => free_cell ! Procedure for freeing the memory of allocatable variables.
 endtype Type_Cell
 !> @brief Pointer of Type_SCell for creating array of pointers of Type_SCell.
 !> @ingroup Data_Type_CellDerivedType

@@ -1,31 +1,37 @@
 !> @ingroup Library
 !> @{
 !> @defgroup Lib_Base64Library Lib_Base64
+!> base64 encoding/decoding library
 !> @}
 
 !> @ingroup Interface
 !> @{
 !> @defgroup Lib_Base64Interface Lib_Base64
+!> base64 encoding/decoding library
 !> @}
 
 !> @ingroup PublicProcedure
 !> @{
 !> @defgroup Lib_Base64PublicProcedure Lib_Base64
+!> base64 encoding/decoding library
 !> @}
 
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup Lib_Base64PrivateProcedure Lib_Base64
+!> base64 encoding/decoding library
 !> @}
 
 !> @ingroup GlobalVarPar
 !> @{
 !> @defgroup Lib_Base64GlobalVarPar Lib_Base64
+!> base64 encoding/decoding library
 !> @}
 
 !> @ingroup PrivateVarPar
 !> @{
 !> @defgroup Lib_Base64PrivateVarPar Lib_Base64
+!> base64 encoding/decoding library
 !> @}
 
 !> This module contains base64 encoding/decoding procedures.
@@ -100,13 +106,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -121,13 +127,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -142,13 +148,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -163,13 +169,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -184,13 +190,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -205,13 +211,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -226,13 +232,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -247,13 +253,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -268,13 +274,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -289,13 +295,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -310,13 +316,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -331,13 +337,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -352,13 +358,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -373,13 +379,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -394,13 +400,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -415,13 +421,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -436,13 +442,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -457,13 +463,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -478,13 +484,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -499,13 +505,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -520,13 +526,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -541,13 +547,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -562,13 +568,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -583,13 +589,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -604,13 +610,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -625,13 +631,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -646,13 +652,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -667,13 +673,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -688,13 +694,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -709,13 +715,13 @@ contains
   integer(I1P), allocatable, intent(INOUT):: packed(:) !< Packed data into I1P array.
   integer(I1P), allocatable::                p1(:)     !< Temporary packed data of first stream.
   integer(I1P), allocatable::                p2(:)     !< Temporary packed data of second stream.
+  integer(I4P)::                             np        !< Size of temporary packed data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(p1(1:size(transfer(a1,p1))),p2(1:size(transfer(a2,p2))))
-  p1 = transfer(a1,p1) ; p2 = transfer(a2,p2)
-  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1)))
-  packed = [p1,p2]
+  np = size(transfer(a1,p1)) ; allocate(p1(1:np)) ; p1 = transfer(a1,p1)
+  np = size(transfer(a2,p2)) ; allocate(p2(1:np)) ; p2 = transfer(a2,p2)
+  if (allocated(packed)) deallocate(packed) ; allocate(packed(1:size(p1,dim=1)+size(p2,dim=1))) ; packed = [p1,p2]
   deallocate(p1,p2)
   return
   !---------------------------------------------------------------------------------------------------------------------------------

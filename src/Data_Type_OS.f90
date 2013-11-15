@@ -37,20 +37,20 @@ public:: win_id, c_win_id, win_sep, win_remove, win_copy, win_mkdir
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @ingroup Data_Type_OSGlobalVarPar
 !> @{
-character(3), parameter:: c_uix_id   = "UIX"   !< Unix/Linux string identifier.
-integer(I1P), parameter:: uix_id     = 1_I1P   !< Unix/Linux identifier.
-character(1), parameter:: uix_sep    = "/"     !< Unix/Linux directories separator.
-character(2), parameter:: uix_remove = "rm"    !< Unix/Linux remove command.
-character(2), parameter:: uix_copy   = "cp"    !< Unix/Linux copy command.
-character(5), parameter:: uix_mkdir  = "mkdir" !< Unix/Linux make dir command.
-character(3), parameter:: c_win_id   = "WIN"   !< MS Windows string identifier.
-integer(I1P), parameter:: win_id     = 2_I1P   !< MS Windows identifier.
+character(3), parameter:: c_uix_id   = "UIX"    !< Unix/Linux string identifier.
+integer(I1P), parameter:: uix_id     = 1_I1P    !< Unix/Linux identifier.
+character(1), parameter:: uix_sep    = "/"      !< Unix/Linux directories separator.
+character(2), parameter:: uix_remove = "rm"     !< Unix/Linux remove command.
+character(2), parameter:: uix_copy   = "cp"     !< Unix/Linux copy command.
+character(5), parameter:: uix_mkdir  = "mkdir"  !< Unix/Linux make dir command.
+character(3), parameter:: c_win_id   = "WIN"    !< MS Windows string identifier.
+integer(I1P), parameter:: win_id     = 2_I1P    !< MS Windows identifier.
 #ifndef DOXYGEN_SKIP
-character(1), parameter:: win_sep    = "\"     !< MS Windows directories separator.
+character(1), parameter:: win_sep    = char(92) !< MS Windows directories separator.
 #endif
-character(3), parameter:: win_remove = "del"   !< MS Windows remove command.
-character(4), parameter:: win_copy   = "copy"  !< MS Windows copy command.
-character(5), parameter:: win_mkdir  = "mkdir" !< MS Windows make dir command.
+character(3), parameter:: win_remove = "del"    !< MS Windows remove command.
+character(4), parameter:: win_copy   = "copy"   !< MS Windows copy command.
+character(5), parameter:: win_mkdir  = "mkdir"  !< MS Windows make dir command.
 !> @}
 !> @brief Derived type contains useful parameters for performing portable system calls.
 !> @note By default the Unix/Linux initalization is used.
@@ -62,7 +62,7 @@ type, public:: Type_OS
  character(4):: copy   = uix_copy   !< OS copy command.
  character(5):: mkdir  = uix_mkdir  !< OS make dir command.
  contains
-   procedure, non_overridable:: init ! Procedure for initializing Type_OS.
+   procedure:: init ! Procedure for initializing Type_OS.
 endtype Type_OS
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains

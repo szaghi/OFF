@@ -207,8 +207,8 @@ In the High Performance Computing (HPC) context it is usual to have a resources 
       mkdir -p output                                        # creating outout directory
       cd input ; ln -fs procmap-mpi.dat procmap.dat ; cd ../ # linking procmap.dat to map with MPI
 
-      # running OFF; note that the number of MPI process is left generic (#mpi_procs) and you must specify other mpirun-options eventually nedeed (#other_options)
-      mpirun -np #mpi_procs [#other_options] ./OFF off_options.dat
+      # running OFF; note that the number of MPI process is left generic (mpi_procs) and you must specify other mpirun-options eventually nedeed (other_options)
+      mpirun -np mpi_procs [other_options] ./OFF off_options.dat
 ```
 
 Once the `runjob.pbs` file has been properly edited accordingly to your scheduler just submit it (maybe something like `qsub runjob.pbs`).

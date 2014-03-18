@@ -49,7 +49,7 @@ There are 3 sub-directories:
 + off
 + pog
 
-Into each of the above directories there is a bash script, __run_[IBM,OFF,POG].sh__ that help you to complete the example. Moreover, there are the necessary option files to run each code. The bash scripts are designed to be executed on a workstation where you can directly execute programs without dealing with a resource manager system that schedules the jobs, such as [Torque](http://www.adaptivecomputing.com/products/open-source/torque/). For the execution of this example on a system using a jobs scheduler see the subsection [How-to deal with Torque-like scheduler](#jobscheduler).
+Into each of the above directories there is a bash script, __run_[IBM,OFF,POG].sh__ that help you to complete the example. Moreover, there are the necessary option files to run each code. The bash scripts are designed to be executed on a workstation where you can directly execute programs without dealing with a resource manager system that schedules the jobs, such as [Torque](http://www.adaptivecomputing.com/products/open-source/torque/). For the execution of this example on a system using a jobs scheduler see the subsection [How-to facing with a jobs scheduler like Torque](#jobscheduler).
 
 The 3 subdirectories _ibm_, _off_ and _pog_ indicate the 3 steps that must be completed in sequence.
 
@@ -135,7 +135,7 @@ For each kt-?? there are 3 sub-directories:
 + off
 + pog
 
-Into each of the above directories there is a bash script, __run_[IBM,OFF,POG].sh__ that help you to complete the example. Moreover, there are the necessary option files to run each code. The bash scripts are designed to be executed on a workstation where you can directly execute programs without dealing with a resource manager system that schedules the jobs, such as [Torque](http://www.adaptivecomputing.com/products/open-source/torque/). For the execution of this example on a system using a jobs scheduler see the subsection [How-to deal with Torque-like scheduler](#jobscheduler).
+Into each of the above directories there is a bash script, __run_[IBM,OFF,POG].sh__ that help you to complete the example. Moreover, there are the necessary option files to run each code. The bash scripts are designed to be executed on a workstation where you can directly execute programs without dealing with a resource manager system that schedules the jobs, such as [Torque](http://www.adaptivecomputing.com/products/open-source/torque/). For the execution of this example on a system using a jobs scheduler see the subsection [How-to facing with a jobs scheduler like Torque](#jobscheduler).
 
 The 3 subdirectories _ibm_, _off_ and _pog_ indicate the 3 steps that must be completed in sequence.
 
@@ -179,4 +179,38 @@ It is worth noting that all the 2D Riemann problems are set to finish at 20 time
 
 Into this directory there is the option file `solver.dat`: the fourth line should contain the maximum number of iterations performed, _Nmax_, just set it to 0 in order to finish the simulation at the physical time set below, _Tmax_, instead of using _Nmax_.
 
-### <a name="jobscheduler"></a> How-to run the examples within a resource manager scheduling jobs like Torque or PBS
+### <a name="jobscheduler"></a> How-to facing with a jobs scheduler like Torque (PBS, OpenPBS, etc...)
+
+In the High Performance Computing (HPC) context it is usual to have a resources manager program that schedules the jobs in order to optimize the computing resources. Portable Batch System (PBS) is one of the most used scheduler considering all of its _forks_, e.g. [Torque](http://www.adaptivecomputing.com/products/open-source/torque/) being based on the OpenPBS fork of the original PBS project. In this framework the bash script for running OFF on parallel MPI-enabled architecture cannot be used. Indeed, a job-submission script, suitable for the actual scheduler used, must be created. For the non expert users of Torque-like scheduler an example of job-submission script is here reported. Assuming the input files for OFF have already created, navigate to _off_ directory and save the following job-submission example file to `runjob.pbs`:
+
+```bash
+      #!/bin/bash
+      #PBS -N OFF
+      #PBS -q debug_eth
+      #PBS -l nodes=1:ppn=2
+      #PBS -l walltime=00:30:00
+      #PBS -j oe
+      #PBS -V
+
+      # in many PBS-like frameworks it is suggested to explicity declare/navigate the current working directory
+      cd $PBS_O_WORKDIR
+
+      # load here the modules eventually needed
+      module add ...
+
+      # set the necessary enviroments variables
+      export ...
+
+      # OFF stuffs
+      rm -rf output lockfile input                           # cleaning working directory
+      ln -fs ../ibm/output input                             # link to IBM output
+      mkdir -p output                                        # creating outout directory
+      cd input ; ln -fs procmap-mpi.dat procmap.dat ; cd ../ # linking procmap.dat to map with MPI
+
+      # running OFF; note that the number of MPI process is left generic (#mpi_procs) and you must specify other mpirun-options eventually nedeed (#other_options)
+      mpirun -np #mpi_procs [#other_options] ./OFF off_options.dat
+```
+
+Once the `runjob.pbs` file has been properly edited accordingly to your scheduler just submit it (maybe something like `qsub runjob.pbs`).
+
+The final POG post-processing phase can be completed as detailed in the above sections.

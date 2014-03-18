@@ -4,9 +4,9 @@ The directory _examples_ into the root of the project contains some simple examp
 
 ## 1D Examples: SOD Riemann Problem
 
-The first 1D example concerns the solution of the Riemann Problem of Sod, that is a classical 1D shock tube test. A shock tube test consists in a one dimensional Riemann Problem with non reflective boundary conditions. A Riemann Problem could be defined as following. Assuming that the conservation laws
+The first 1D example concerns the solution of the Riemann Problem of Sod, that is a classical 1D shock tube test.
 
-\f$ \frac{\partial }{{\partial t}}\int\limits_{{V_{ijk}}} {\overrightarrow U d{V_{ijk}}}  = R\left( {\overrightarrow U } \right) \f$
+![equation](http://www.sciweavers.org/tex2img.php?eq=%5Cfrac%7B%5Cpartial%20%7D%7B%7B%5Cpartial%20t%7D%7D%5Cint%5Climits_%7B%7BV_%7Bijk%7D%7D%7D%20%7B%5Coverrightarrow%20U%20d%7BV_%7Bijk%7D%7D%7D%20%3D%20R%5Cleft%28%20%7B%5Coverrightarrow%20U%20%7D%20%5Cright%29&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0[/img])
 
 in the space domain [0,1], are coupled with the following initial conditions:
 

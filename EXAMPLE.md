@@ -6,13 +6,15 @@ The directory _examples_ into the root of the project contains some simple examp
 
 The first 1D example concerns the solution of the Riemann Problem of Sod, that is a classical 1D shock tube test.
 
-![equation](http://www.sciweavers.org/tex2img.php?eq=%5Cfrac%7B%5Cpartial%20%7D%7B%7B%5Cpartial%20t%7D%7D%5Cint%5Climits_%7B%7BV_%7Bijk%7D%7D%7D%20%7B%5Coverrightarrow%20U%20d%7BV_%7Bijk%7D%7D%7D%20%3D%20R%5Cleft%28%20%7B%5Coverrightarrow%20U%20%7D%20%5Cright%29&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0[/img])
+A shock tube test consists in a one dimensional Riemann Problem with non reflective boundary conditions. A Riemann Problem could be defined as following. Assuming that the conservation laws
+
+![equation](http://www.sciweavers.org/tex2img.php?eq=%5Cfrac%7B%5Cpartial%20%7D%7B%7B%5Cpartial%20t%7D%7D%5Cint%5Climits_%7B%7BV_%7Bijk%7D%7D%7D%20%7B%5Coverrightarrow%20U%20d%7BV_%7Bijk%7D%7D%7D%20%3D%20R%5Cleft%28%20%7B%5Coverrightarrow%20U%20%7D%20%5Cright%29&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
 
 in the space domain [0,1], are coupled with the following initial conditions:
 
-\f$ U\left( {x,t = 0} \right) = {U_0}\left( x \right) = \left\{ \begin{array}{l} {U_L}\,x < x_0\\ {U_R}\,x > x_0 \end{array} \right. \f$ \n
+![equation](http://www.sciweavers.org/tex2img.php?eq=U%5Cleft%28%20%7Bx%2Ct%20%3D%200%7D%20%5Cright%29%20%3D%20%7BU_0%7D%5Cleft%28%20x%20%5Cright%29%20%3D%20%5Cleft%5C%7B%20%5Cbegin%7Barray%7D%7Bl%7D%20%7BU_L%7D%5C%2Cx%20%3C%20x_0%5C%5C%20%7BU_R%7D%5C%2Cx%20%3E%20x_0%20%5Cend%7Barray%7D%20%5Cright.&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
 
-where \f$U_L\f$ and \f$U_R\f$ are two constant values of the conservative variables and \f$x_0\f$ is the abscissa of the interface, the Riemann Problem can be defined as a partial derivative problem coupled with a piecewise constant initial conditions having a single discontinuity. Solving a Riemann Problem consists to find the time evolution, according to the conservative laws, of the discontinuity on the initial conditions. The structure of the solution of the Riemann Problem for the Euler conservation is composed by three waves. The middle wave (traveling along \f$v\f$) is always a contact discontinuity while the left and right waves (traveling along \f$v \pm a\f$, being \f$a=\sqrt{\frac{\gamma p}{\rho}}\f$ the speed of sound) are the non-linear acoustic waves and they can be either a shocks or rarefactions. Therefore there are four possible wave patterns.
+where ![equation](http://www.sciweavers.org/tex2img.php?eq=U_L&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) and ![equation](http://www.sciweavers.org/tex2img.php?eq=U_R&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) are two constant values of the conservative variables and ![equation](http://www.sciweavers.org/tex2img.php?eq=x_0&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) is the abscissa of the interface, the Riemann Problem can be defined as a partial derivative problem coupled with a piecewise constant initial conditions having a single discontinuity. Solving a Riemann Problem consists to find the time evolution, according to the conservative laws, of the discontinuity on the initial conditions. The structure of the solution of the Riemann Problem for the Euler conservation is composed by three waves. The middle wave (traveling along _v_) is always a contact discontinuity while the left and right waves (traveling along _v +- a_, being _a_ the speed of sound) are the non-linear acoustic waves and they can be either a shocks or rarefactions. Therefore there are four possible wave patterns.
 
 ### Compiling Codes
 

@@ -48,7 +48,7 @@ The main features of _OFF_ code are the following:
 
 ## Copyrights
 
-OFF is an open source project, it is distributed under the [GPL v3](http://www.gnu.org/licenses/gpl-3.0.html). Anyone is interest to use, to develop or to contribute to OFF is welcome.
+OFF is an open source project, it is distributed under the [GPL v3](http://www.gnu.org/licenses/gpl-3.0.html). Anyone is interest to use, to develop or to contribute to OFF is welcome. Take a look at the [contributing guidelines](CONTRIBUTING.md) for starting to contribute to the project.
 
 ## Documentation
 

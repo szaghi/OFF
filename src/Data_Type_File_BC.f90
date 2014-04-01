@@ -81,7 +81,8 @@ contains
   implicit none
   class(Type_File_BC), intent(INOUT):: file_d      !< File data.
   type(Type_SBlock),   intent(INOUT):: block       !< Block data.
-  integer(I4P),        intent(IN)::    b,l         !< Local index of block to be loaded.
+  integer(I4P),        intent(IN)::    b           !< Local index of block to be loaded.
+  integer(I4P),        intent(IN)::    l           !< Level of block to be loaded.
   type(Type_Parallel), intent(IN)::    parallel    !< Parallel data.
   type(Type_XML_Tag)::                 tag         !< Dummy XML tag for parsing file.
   character(len=1)::                   c1          !< Dummy string for parsing file.
@@ -177,7 +178,8 @@ contains
   logical,             optional, intent(IN)::    bc_tag_open  !< Switch for opening the 'Boundary_Conditions' tag (and init file).
   logical,             optional, intent(IN)::    bc_tag_close !< Switch for closing the 'Boundary_Conditions' tag.
   type(Type_SBlock),   optional, intent(IN)::    block        !< Block data.
-  integer(I4P),        optional, intent(IN)::    b,l          !< Local index of block to be saved.
+  integer(I4P),        optional, intent(IN)::    b            !< Local index of block to be saved.
+  integer(I4P),        optional, intent(IN)::    l            !< Level of block to be saved.
   type(Type_Parallel), optional, intent(IN)::    parallel     !< Parallel data.
   integer(I4P)::                                 i,j,k        !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------

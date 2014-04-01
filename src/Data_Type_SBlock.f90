@@ -53,7 +53,6 @@ private
 !> connectivity) numerical grid. A structured block is an hexahedron with quadrilateral faces ussing the following internal
 !> numeration for vertices and faces:
 !> @code
-!>
 !> /|\Y
 !>  |                            F(4)         _ F(6)
 !>  |                            /|\          /!
@@ -87,7 +86,7 @@ private
 !>  | /
 !>  |/                                                    X
 !>  o----------------------------------------------------->
-!>
+!> @endcode
 !> @ingroup Data_Type_SBlockDerivedType
 type, public:: Type_SBlock
   ! Block global data

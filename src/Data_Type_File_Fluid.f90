@@ -168,9 +168,11 @@ contains
   !> @brief Procedure for loading blocks cells fluid dyamic data from fluid file.
   !> @note After the header (see 'load_header_file_fluid' documentation) the fluid file contains the cells fluid dynamic data. These
   !> are saved inside the 'Fluid_Cells' tag. The tag syntax is the following:
+  !> @code
   !>   <Fluid_Cells>
   !>     <block_fluid_cells b="..." l="..." encoding="..."> fluid_data </block>
   !>   </Fluid_Cells>
+  !> @endcode
   !> Each 'block_fluid_cells' tag has 3 attributes, 'b' and 'l' indicating the block number and grid level, and 'encoding' that can
   !> be set to 3 different values: 'ascii', 'raw' or 'base64' in the case fluid_data are saved in asciii, raw-binary or Base64-ascii
   !> encoded format, respectively.
@@ -182,7 +184,8 @@ contains
   implicit none
   class(Type_File_Fluid), intent(INOUT):: file_d      !< File data.
   type(Type_SBlock),      intent(INOUT):: block       !< Block data.
-  integer(I4P),           intent(IN)::    b,l         !< Local index of block to be loaded.
+  integer(I4P),           intent(IN)::    b           !< Local index of block to be loaded.
+  integer(I4P),           intent(IN)::    l           !< Level of block to be loaded.
   type(Type_Parallel),    intent(IN)::    parallel    !< Parallel data.
   type(Type_XML_Tag)::                    tag         !< Dummy XML tag for parsing file.
   character(len=1)::                      c1          !< Dummy string for parsing file.
@@ -263,7 +266,8 @@ contains
   logical,             optional, intent(IN)::    fluid_cells_tag_open  !< Switch for opening the 'Fluid_Cells' tag.
   logical,             optional, intent(IN)::    fluid_cells_tag_close !< Switch for closing the 'Fluid_Cells' tag.
   type(Type_SBlock),   optional, intent(IN)::    block                 !< Block data.
-  integer(I4P),        optional, intent(IN)::    b,l                   !< Local index of block to be saved.
+  integer(I4P),        optional, intent(IN)::    b                     !< Local index of block to be saved.
+  integer(I4P),        optional, intent(IN)::    l                     !< Level of block to be saved.
   type(Type_Parallel), optional, intent(IN)::    parallel              !< Parallel data.
   integer(I4P)::                                 i,j,k                 !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------

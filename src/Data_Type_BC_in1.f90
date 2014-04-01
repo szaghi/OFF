@@ -4,12 +4,6 @@
 !> Module definition of Type_BC_in1
 !> @}
 
-!> @ingroup InterfaceVarPar
-!> @{
-!> @defgroup Data_Type_BC_in1InterfaceVarPar Data_Type_BC_in1
-!> Module definition of Type_BC_in1
-!> @}
-
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup Data_Type_BC_in1PrivateProcedure Data_Type_BC_in1

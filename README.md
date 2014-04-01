@@ -1,12 +1,43 @@
 # OFF
 
-OFF, Open source Finite volumes Fluid dynamics code [see documentation](http://szaghi.github.com/OFF/index.html).
+~~~
+OFF, Open source Finite volumes Fluid dynamics code
+~~~
 
-It is written in in standard (compliant) Fortran 2003 with highly modularity as design target.
+_OFF_ is a CFD code designed to be accurate, efficient and modular for solving, numerically, the Navier-Stokes equations of fluid dynamics by means of Finite Volume technique. It is written in standard (compliant) Fortran 2003 by means of OOP paradigm. _OFF_ can be executed on parallel CPU-based architecture (shared memory multi-cores workstation, distributed memory cluster and hybrid distributed memory cluster based on shared memory nodes).
 
-The aim of _OFF_ is to solve, numerically, the Navier-Stokes equations of fluid dynamics by means of Finite Volume technique.
+### Obtaining OFF
 
-The main features of _OFF_ code are the following:
+_OFF_ can be obtained only from github repository. You can use `Download ZIP` button provided from github or you can locally clone the github repository:
+
+~~~
+git clone https://github.com/szaghi/OFF
+~~~
+
+Two branches are generally present: `master` branch that holds the stable version and `testing` one for developing purposes. In general, the git `tags` are used for referencing versions updates.
+
+### Copyrights
+
+_OFF_ is an open source project, it is distributed under the [GPL v3](http://www.gnu.org/licenses/gpl-3.0.html). Anyone is interest to use, to develop or to contribute to _OFF_ is welcome. Take a look at the [contributing guidelines](CONTRIBUTING.md) for starting to contribute to the project.
+
+## Main features
+
+### API
+
+* Clean and lightweight programming style:
+    - explicit declaration imposed (pervasive `implicit none` usage);
+    - Fortran free form syntax;
+    - clear and comprehensive comments;
+* easy to maintain and to extend:
+    - extensive use of OOP paradigm;
+* high quality API documentation:
+    - doxygen-based high quality html pages;
+* simple development environment:
+    - easy source files maintenance by means of Git, one of the best distributed versioning system;
+    - collaborative framework by means of GitHub repository.
+
+### Mathematical and numerical models
+
 * Finite Volume, Godunov-like scheme based on Euler conservation Laws written in fully conservative formulation:
     - the extension to viscous Navier-Stokes equations is under developing;
 * Underling Riemann Problem solver for convective fluxes:
@@ -45,10 +76,6 @@ The main features of _OFF_ code are the following:
     - Fine, local parallelism by means of OpenMP paradigm providing the ability to use shared-memory cluster facilities;
     - Fine, local parallelism by means of GPU programming (e.g. CUDA framework) providing the ability to use GPUs cluster
       facilities (to be developed in future).
-
-## Copyrights
-
-OFF is an open source project, it is distributed under the [GPL v3](http://www.gnu.org/licenses/gpl-3.0.html). Anyone is interest to use, to develop or to contribute to OFF is welcome. Take a look at the [contributing guidelines](CONTRIBUTING.md) for starting to contribute to the project.
 
 ## Documentation
 

@@ -149,9 +149,11 @@ contains
   !> @note The 'block_nodes' tag contains the following data:
   !>   - block%node.
   !> The tag syntax is the following:
+  !> @code
   !>   <Mesh_Nodes>
   !>     <block_nodes b="..." l="..." encoding="..."> nodes_data </block_nodes>
   !>   </Mesh_Nodes>
+  !> @endcode
   !> Each 'block_nodes' tag has 3 attributes, 'b' and 'l' indicating the block number and grid level, and 'encoding' that can be
   !> set to 3 different values: 'ascii', 'raw' or 'base64' in the case nodes_data are saved in asciii, raw-binary or Base64-ascii
   !> encoded format, respectively.
@@ -163,7 +165,8 @@ contains
   implicit none
   class(Type_File_Mesh), intent(INOUT):: file_d      !< File data.
   type(Type_SBlock),     intent(INOUT):: block       !< Block data.
-  integer(I4P),          intent(IN)::    b,l         !< Local index of block to be loaded.
+  integer(I4P),          intent(IN)::    b           !< Local index of block to be loaded.
+  integer(I4P),          intent(IN)::    l           !< Level of block to be loaded.
   type(Type_Parallel),   intent(IN)::    parallel    !< Parallel data.
   type(Type_XML_Tag)::                   tag         !< Dummy XML tag for parsing file.
   character(len=1)::                     c1          !< Dummy string for parsing file.
@@ -245,7 +248,8 @@ contains
   logical,             optional, intent(IN)::    mesh_nodes_tag_open  !< Switch for opening the 'Mesh_Nodes' tag.
   logical,             optional, intent(IN)::    mesh_nodes_tag_close !< Switch for closing the 'Mesh_Nodes' tag.
   type(Type_SBlock),   optional, intent(IN)::    block                !< Block data.
-  integer(I4P),        optional, intent(IN)::    b,l                  !< Local index of block to be saved.
+  integer(I4P),        optional, intent(IN)::    b                    !< Local index of block to be saved.
+  integer(I4P),        optional, intent(IN)::    l                    !< Level of block to be saved.
   type(Type_Parallel), optional, intent(IN)::    parallel             !< Parallel data.
   integer(I4P)::                                 i,j,k                !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------

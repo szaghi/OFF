@@ -172,8 +172,8 @@ contains
   !> @brief Procedure for opening file.
   !> @note Accordingly to the passed arguments different files are open:
   !>   * the trim(path_in/out)//name if neither "n" nor "flip" are passed;
-  !>   * the trim(path_in/out)//name//'-N_#n' if "n" is passed;
-  !>   * the trim(path_in/out)//name//'-F_#flip' if "flip" is passed.
+  !>   * the trim(path_in/out)//name//'-N_\#n' if "n" is passed;
+  !>   * the trim(path_in/out)//name//'-F_\#flip' if "flip" is passed.
   subroutine open_file_base(file_d,n,flip,ascii,append,replace,action)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none

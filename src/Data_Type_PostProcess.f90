@@ -57,10 +57,20 @@ contains
   subroutine compute_dimensions(pp,block,ni1,ni2,nj1,nj2,nk1,nk2,ci1,ci2,cj1,cj2,ck1,ck2)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_PostProcess), intent(IN)::  pp                      !< Post-processing options.
-  type(Type_SBlock),       intent(IN)::  block                   !< Block-level data.
-  integer(I4P),            intent(OUT):: ni1,ni2,nj1,nj2,nk1,nk2 !< Bounds of dimensions of node-centered data.
-  integer(I4P),            intent(OUT):: ci1,ci2,cj1,cj2,ck1,ck2 !< Bounds of dimensions of cell-centered data.
+  class(Type_PostProcess), intent(IN)::  pp    !< Post-processing options.
+  type(Type_SBlock),       intent(IN)::  block !< Block-level data.
+  integer(I4P),            intent(OUT):: ni1   !< Minimum I index of node-centered data.
+  integer(I4P),            intent(OUT):: ni2   !< Maximum I index of node-centered data.
+  integer(I4P),            intent(OUT):: nj1   !< Minimum J index of node-centered data.
+  integer(I4P),            intent(OUT):: nj2   !< Maximum J index of node-centered data.
+  integer(I4P),            intent(OUT):: nk1   !< Minimum K index of node-centered data.
+  integer(I4P),            intent(OUT):: nk2   !< Maximum K index of node-centered data.
+  integer(I4P),            intent(OUT):: ci1   !< Minimum I index of cell-centered data.
+  integer(I4P),            intent(OUT):: ci2   !< Maximum I index of cell-centered data.
+  integer(I4P),            intent(OUT):: cj1   !< Minimum J index of cell-centered data.
+  integer(I4P),            intent(OUT):: cj2   !< Maximum J index of cell-centered data.
+  integer(I4P),            intent(OUT):: ck1   !< Minimum K index of cell-centered data.
+  integer(I4P),            intent(OUT):: ck2   !< Maximum K index of cell-centered data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

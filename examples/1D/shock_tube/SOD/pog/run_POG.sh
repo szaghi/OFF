@@ -22,7 +22,6 @@ if [ $# -eq 0 ] ; then
 fi
 if [ "$1" == "-clean" ] ; then
   rm -rf output input        # cleaning working directory
-  ln -fs ../off/output input # link to OFF output
 else
   if [ ! -d ../off/output ]; then
     echo "OFF output dir not found!"
@@ -38,22 +37,20 @@ else
   rm -rf output input        # cleaning working directory
   ln -fs ../off/output input # link to OFF output
   mkdir -p output            # creating outout directory
-  for file in $( ls ./input/*b001*N_*.sol ); do
-    nlast=`basename $file | awk -F . '{print $3}' | awk -F _ '{print $2}' | sed 's/^0*//'`
+  for file in $( ls ./input/*N_* ); do
+    flast=`basename $file`
   done
-  n=`printf "%10.10d" $nlast`
   if [ "$1" = "-tec" ]; then
     tout="-tec yes -vtk no -gnu no"
   elif [ "$1" = "-vtk" ]; then
     tout="-tec no -vtk yes -gnu no"
   elif [ "$1" = "-gnu" ]; then
-    tout="-tec no -vtk no -gnu yes"
+    tout="-tec no -vtk no -gnu yes -ascii"
   else
     echo "Unknown switch $1"
     print_usage
   fi
-  ./POG -m ./input/sod.g01.b001.geo -s ./input/sod.g01.b001-N_$n.sol -o output/sod.g01.b001 $tout # post-processing block 1
-  ./POG -m ./input/sod.g01.b002.geo -s ./input/sod.g01.b002-N_$n.sol -o output/sod.g01.b002 $tout # post-processing block 2
+  ./POG -m ./input/sod.geo -s ./input/$flast -o output/sod $tout
   if [ "$1" = "-gnu" ]; then
     gnuplot r.gnu
   fi

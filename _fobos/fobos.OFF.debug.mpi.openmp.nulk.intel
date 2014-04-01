@@ -1,0 +1,17 @@
+[builder]
+compiler=intel
+cflags=-traceback -gen-interfaces -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -O0 -warn all -check all -debug all -openmp -cpp -c -module ./mod/ -assume protect_parens -assume realloc_lhs
+lflags=-traceback -gen-interfaces -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -O0 -warn all -check all -debug all -openmp -assume protect_parens -assume realloc_lhs
+preproc=-D_OSYSTEMuix -DNULk -DSMSWz -DOPENMP -D_MPI -DPPL
+dmod=./mod/
+dobj=./obj/
+dexe=./
+src=./src/
+colors=True
+quiet=False
+j=10
+mpi=yes
+[files]
+target=src/OFF.f90
+o=OFF.dbg.mpi.omp.nulk
+log=False

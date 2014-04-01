@@ -49,7 +49,6 @@ public:: transpose
 public:: determinant
 public:: invert,invertible
 public:: write_tensor,read_tensor
-public:: assignment (=)
 public:: operator (*)
 public:: operator (/)
 public:: operator (+)
@@ -82,6 +81,24 @@ type, public:: Type_Tensor
     procedure:: rotoy                       ! Procedure for computing the rotation tensor along y axis.
     procedure:: rotoz                       ! Procedure for computing the rotation tensor along z axis.
     procedure:: rotou                       ! Procedure for computing the rotation tensor along a vector axis.
+    ! operators overloading
+    generic:: assignment(=) => assign_Vec,                   &
+#ifdef r16p
+                               assign_ScalR16P,              &
+#endif
+                               assign_ScalR8P,assign_ScalR4P,&
+                               assign_ScalI8P,assign_ScalI4P,assign_ScalI2P,assign_ScalI1P
+    ! private procedures
+    procedure, pass(ten ), private:: assign_Vec
+#ifdef r16p
+    procedure, pass(ten ), private:: assign_ScalR16P
+#endif
+    procedure, pass(ten ), private:: assign_ScalR8P
+    procedure, pass(ten ), private:: assign_ScalR4P
+    procedure, pass(ten ), private:: assign_ScalI8P
+    procedure, pass(ten ), private:: assign_ScalI4P
+    procedure, pass(ten ), private:: assign_ScalI2P
+    procedure, pass(ten ), private:: assign_ScalI1P
 endtype Type_Tensor
 !> @ingroup Data_Type_TensorGlobalVarPar
 !> @{
@@ -115,20 +132,6 @@ endinterface
 interface transpose
   module procedure transpose_ten
 endinterface
-!> @brief Assignment operator (=) overloading.
-!> @ingroup Data_Type_TensorInterface
-interface assignment (=)
-  module procedure assign_Vec
-#ifdef r16p
-  module procedure assign_ScalR16P
-#endif
-  module procedure assign_ScalR8P
-  module procedure assign_ScalR4P
-  module procedure assign_ScalI8P
-  module procedure assign_ScalI4P
-  module procedure assign_ScalI2P
-  module procedure assign_ScalI1P
-end interface
 !> @brief Multiplication operator (*) overloading.
 !> @note The admissible multiplications are:
 !>       - Type_Tensor * Type_Tensor: each component of first tensor variable (ten1) is multiplied for the
@@ -617,9 +620,12 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  tran%x = ten.dot.ex
-  tran%y = ten.dot.ey
-  tran%z = ten.dot.ez
+  !tran%x = ten.dot.ex
+  !tran%y = ten.dot.ey
+  !tran%z = ten.dot.ez
+  tran%x = ten_dot_vec(ten,ex)
+  tran%y = ten_dot_vec(ten,ey)
+  tran%z = ten_dot_vec(ten,ez)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction transpose_ten
@@ -735,15 +741,12 @@ contains
   endsubroutine rotou
 
   ! Assignment (=)
+  !!Subroutine for assignment between a vector and ten.
   elemental subroutine assign_Vec(ten,vec)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for assignment between a vector and ten.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Tensor), intent(INOUT):: ten
-  type(Type_Vector), intent(IN)::    vec
+  class(Type_Tensor), intent(INOUT):: ten
+  type(Type_Vector),  intent(IN)::    vec
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -754,16 +757,12 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_Vec
 
-#ifdef r16p
+  !!Subroutine for assignment between a scalar (real R16P) and ten.
   elemental subroutine assign_ScalR16P(ten,scal)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for assignment between a scalar (real R16P) and ten.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Tensor), intent(INOUT):: ten
-  real(R16P),        intent(IN)::    scal
+  class(Type_Tensor), intent(INOUT):: ten
+  real(R16P),         intent(IN)::    scal
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -773,17 +772,13 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR16P
-#endif
 
+  !!Subroutine for assignment between a scalar (real R8P) and ten.
   elemental subroutine assign_ScalR8P(ten,scal)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for assignment between a scalar (real R8P) and ten.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Tensor), intent(INOUT):: ten
-  real(R8P),         intent(IN)::    scal
+  class(Type_Tensor), intent(INOUT):: ten
+  real(R8P),          intent(IN)::    scal
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -794,15 +789,12 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR8P
 
+  !!Subroutine for assignment between a scalar (real R4P) and ten.
   elemental subroutine assign_ScalR4P(ten,scal)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for assignment between a scalar (real R4P) and ten.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Tensor), intent(INOUT):: ten
-  real(R4P),         intent(IN)::    scal
+  class(Type_Tensor), intent(INOUT):: ten
+  real(R4P),          intent(IN)::    scal
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -813,15 +805,12 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalR4P
 
+  !!Subroutine for assignment between a scalar (integer I8P) and ten.
   elemental subroutine assign_ScalI8P(ten,scal)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for assignment between a scalar (integer I8P) and ten.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Tensor), intent(INOUT):: ten
-  integer(I8P),      intent(IN)::    scal
+  class(Type_Tensor), intent(INOUT):: ten
+  integer(I8P),       intent(IN)::    scal
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -832,15 +821,12 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI8P
 
+  !!Subroutine for assignment between a scalar (integer I4P) and ten.
   elemental subroutine assign_ScalI4P(ten,scal)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for assignment between a scalar (integer I4P) and ten.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Tensor), intent(INOUT):: ten
-  integer(I4P),      intent(IN)::    scal
+  class(Type_Tensor), intent(INOUT):: ten
+  integer(I4P),       intent(IN)::    scal
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -851,15 +837,12 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI4P
 
+  !!Subroutine for assignment between a scalar (integer I2P) and ten.
   elemental subroutine assign_ScalI2P(ten,scal)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for assignment between a scalar (integer I2P) and ten.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Tensor), intent(INOUT):: ten
-  integer(I2P),      intent(IN)::    scal
+  class(Type_Tensor), intent(INOUT):: ten
+  integer(I2P),       intent(IN)::    scal
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -870,15 +853,12 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine assign_ScalI2P
 
+  !!Subroutine for assignment between a scalar (integer I1P) and ten.
   elemental subroutine assign_ScalI1P(ten,scal)
   !---------------------------------------------------------------------------------------------------------------------------------
-  !!Subroutine for assignment between a scalar (integer I1P) and ten.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Tensor), intent(INOUT):: ten
-  integer(I1P),      intent(IN)::    scal
+  class(Type_Tensor), intent(INOUT):: ten
+  integer(I1P),       intent(IN)::    scal
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -910,7 +890,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_mul_ten
 
-#ifdef r16p
   elemental function ScalR16P_mul_ten(scal,ten) result(mul)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for multiply scalar (real R16P) for ten.
@@ -950,7 +929,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_mul_ScalR16P
-#endif
 
   elemental function ScalR8P_mul_ten(scal,ten) result(mul)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1213,7 +1191,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_div_ten
 
-#ifdef r16p
   elemental function ten_div_ScalR16P(ten,scal) result(div)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for divide ten for scalar (real R16P).
@@ -1233,7 +1210,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_div_ScalR16P
-#endif
 
   elemental function ten_div_ScalR8P(ten,scal) result(div)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1395,7 +1371,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sum_ten
 
-#ifdef r16p
   elemental function ScalR16P_sum_ten(scal,ten) result(summ)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for sum scalar (real R16P) and ten.
@@ -1435,7 +1410,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sum_ScalR16P
-#endif
 
   elemental function ScalR8P_sum_ten(scal,ten) result(summ)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1717,7 +1691,6 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sub_ten
 
-#ifdef r16p
   elemental function ScalR16P_sub_ten(scal,ten) result(sub)
   !---------------------------------------------------------------------------------------------------------------------------------
   !!Function for subtract scalar (real R16P) and ten.
@@ -1757,7 +1730,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ten_sub_ScalR16P
-#endif
 
   elemental function ScalR8P_sub_ten(scal,ten) result(sub)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -2031,7 +2003,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call dot%set(x=((ten.dot.ex).dot.vec),y=((ten.dot.ey).dot.vec),z=((ten.dot.ez).dot.vec))
+  !call dot%set(x=((ten.dot.ex).dot.vec),y=((ten.dot.ey).dot.vec),z=((ten.dot.ez).dot.vec))
+  call dot%set(x=((ten_dot_vec(ten,ex)).dot.vec),y=((ten_dot_vec(ten,ey)).dot.vec),z=((ten_dot_vec(ten,ez)).dot.vec))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction vec_dot_ten
@@ -2050,7 +2023,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  ddot = (ten1%x.dot.(ten2.dot.ex)) + (ten1%y.dot.(ten2.dot.ey)) + (ten1%z.dot.(ten2.dot.ez))
+  !ddot = (ten1%x.dot.(ten2.dot.ex)) + (ten1%y.dot.(ten2.dot.ey)) + (ten1%z.dot.(ten2.dot.ez))
+  ddot = (ten1%x.dot.(ten_dot_vec(ten2,ex))) + (ten1%y.dot.(ten_dot_vec(ten2,ey))) + (ten1%z.dot.(ten_dot_vec(ten2,ez)))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ddotproduct

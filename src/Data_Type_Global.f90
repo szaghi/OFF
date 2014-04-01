@@ -1,416 +1,491 @@
 !> @ingroup DerivedType
 !> @{
 !> @defgroup Data_Type_GlobalDerivedType Data_Type_Global
+!> Module definition of Type_Global
 !> @}
 
 !> @ingroup Interface
 !> @{
 !> @defgroup Data_Type_GlobalInterface Data_Type_Global
+!> Module definition of Type_Global
 !> @}
 
 !> @ingroup PublicProcedure
 !> @{
 !> @defgroup Data_Type_GlobalPublicProcedure Data_Type_Global
+!> Module definition of Type_Global
 !> @}
 
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup Data_Type_GlobalPrivateProcedure Data_Type_Global
+!> Module definition of Type_Global
 !> @}
 
 !> @brief Module Data_Type_Global contains the definition of Type_Global and useful procedures for its handling.
 !> Global-level data are referred to those informations of global interest.
 module Data_Type_Global
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision           !< Integers and reals precision definition.
-USE Data_Type_Primitive    !< Definition of Type_Primitive.
-USE Lib_IO_Misc            !< Procedures for IO and strings operations.
+USE IR_Precision                                          ! Integers and reals precision definition.
+USE Data_Type_BC                                          ! Definition of Type_BC.
+USE Data_Type_Adimensional,    only: Type_Adimensional    ! Definition of Type_Adimensional.
+USE Data_Type_BC_in1,          only: Type_BC_in1          ! Definition of Type_BC_in1.
+USE Data_Type_Cell,            only: Type_Cell            ! Definition of Type_Cell.
+USE Data_Type_Cell,            only: cells_bc_set_ext     ! Procedure for setting etrapolation BC of cells array.
+USE Data_Type_Cell,            only: cells_bc_set_ref     ! Procedure for setting reflective BC of cells array.
+USE Data_Type_Cell,            only: cells_bc_set_per     ! Procedure for setting periodic BC of cells array.
+USE Data_Type_CompiledCode,    only: Type_CompiledCode    ! Definition of Type_CompiledCode.
+USE Data_Type_Face,            only: Type_Face            ! Definition of Type_Face.
+USE Data_Type_File_Profile,    only: Type_File_Profile    ! Definition of Type_File_Profile.
+USE Data_Type_Mesh_Dimensions, only: Type_Mesh_Dimensions ! Definition of Type_Mesh_Dimensions.
+USE Data_Type_OS,              only: Type_OS              ! Definition of Type_OS.
+USE Data_Type_Parallel,        only: Type_Parallel        ! Definition of Type_Parallel.
+USE Data_Type_SBlock,          only: Type_SBlock          ! Definition of Type_SBlock.
+USE Data_Type_Space_Step,      only: Type_Space_Step      ! Definition of Type_Space_Step.
+USE Data_Type_Species,         only: Type_Species         ! Definition of Type_Species.
+USE Data_Type_Time_Step,       only: Type_Time_Step       ! Definition of Type_Time_Step.
+USE Data_Type_Vector,          only: Type_Vector          ! Definition of Type_Vector.
+#ifdef _MPI
+USE Lib_Parallel,              only: prim_sendrecv        ! Library for send/receive data for parallel (MPI) operations.
+USE MPI                                                   ! MPI runtime library.
+#endif
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 private
-public:: file_name
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!> @ingroup Data_Type_GlobalDerivedType
-!> @{
-!> @brief Derived type containing the global-level file data.
-!> Global-level file data are referred to those informations concerning with files of global interest.
-type, public:: Type_File
-  character(60)::  Path_InPut  = ''     !< Path of input files.
-  character(60)::  Path_OutPut = ''     !< Path of output files.
-  character(60)::  File_BC     ='unset' !< Base name of boundary conditions file.
-  character(60)::  File_Init   ='unset' !< Base name of initial conditions file.
-  character(60)::  File_Mesh   ='unset' !< Base name of mesh file.
-  character(60)::  File_Spec   ='unset' !< Name of initial species file.
-  character(60)::  File_Sol    ='unset' !< Base name of solution file.
-  character(4)::   Sol_Ext     ='null'  !< Solution file extension.
-  character(60)::  File_Solver ='unset' !< Name of solver options file.
-  character(60)::  File_Pout   ='unset' !< Post-processed output file name.
-  character(60)::  File_Prof   ='unset' !< Prefix name of profiling file names.
-  character(500):: varform_res = ''     !< Gnuplot residuals writing format.
-  integer(I8P)::   screen_out  = 1      !< Console refresh frequency.
-  integer(I8P)::   sol_out     = 0      !< Actual solution writing frequency (if 0 only restart solution is saved).
-  integer(I8P)::   restart_out = 1      !< Restart Solution writing frequency.
-  integer(I8P)::   probe_out   = 1      !< Probes writing frequency.
-  integer(I_P)::   unit_res    = 10     !< Logical unit of gnuplot log file of residuals.
-endtype Type_File
-!> Derived type containing global-level non-dimensional numbers and reference values.
-type, public:: Type_Adimensional
-  ! non dimensional numbers loaded from input file
-  real(R_P):: Re = 1._R_P !< \f$\rm{Re}=\frac{\rho_0 v_0 L_0}{\mu_0}\f$ Reynolds number.
-  real(R_P):: Fr = 1._R_P !< \f$\rm{Fr}=\sqrt{\frac{v_0^2}{f_0 L_0}}\f$ Froude number.
-  real(R_P):: Pr = 1._R_P !< \f$\rm{Pr}=\frac{\mu_0 c_p}{k_0}\f$ Prandtl number.
-  ! reference values loaded from input file
-  real(R_P):: L0 = 1._R_P !< Reference length.
-  real(R_P):: r0 = 1._R_P !< Reference density.
-  real(R_P):: v0 = 1._R_P !< Reference velocity.
-  real(R_P):: c0 = 1._R_P !< Reference specific heats (\f$cp_0 = cv_0 = R_0 = c_0\f$).
-  ! reference values computed by means of previous values
-  real(R_P):: mu0  = 1._R_P !< \f$\mu_0= \frac{\rho_0 v_0 L_0}{\rm{Re}}\f$ Reference dynamic viscosity.
-  real(R_P):: f0   = 1._R_P !< \f$f_0= \frac{v_0^2}{L_0 \rm{Fr}^2}\f$ Reference specific force.
-  real(R_P):: k0   = 1._R_P !< \f$k_0= \frac{\mu_0 c_0}{\rm{Pr}}\f$ Reference thermal conductivity coefficient.
-  real(R_P):: Dt0  = 1._R_P !< \f$Dt_0=\frac{L_0}{v_0}\f$ Reference time interval.
-  real(R_P):: p0   = 1._R_P !< \f$p_0=\rho_0 v_0^2\f$ Reference pressure.
-  real(R_P):: a0   = 1._R_P !< \f$a_0=v_0\f$ Reference speed of sound.
-  real(R_P):: T0   = 1._R_P !< \f$T_0=\frac{v_0^2}{c_0}\f$ Reference temperature.
-  real(R_P):: E0   = 1._R_P !< \f$E_0=v_0^2\f$ Reference specific energy.
-  real(R_P):: q0   = 1._R_P !< \f$q_0=\frac{v_0^3}{L_0}\f$ Reference specific heat.
-  ! equations coefficients computed by means of previous values
-  real(R_P):: Re_inv   = 1._R_P !< \f$\frac{1}{\rm{Re}}\f$ Inverse of Reynolds number (coefficient of viscous terms).
-  real(R_P):: Fr2_inv  = 1._R_P !< \f$\frac{1}{\rm{Fr}^2}\f$ Inverse of square of Froude number (coefficient of volume forces).
-  real(R_P):: PrRe_inv = 1._R_P !< \f$\frac{1}{\rm{Pr Re}}\f$ Inverse of Prandtl and Reynolds numbers (coef. of condution terms).
-endtype Type_Adimensional
 !> @brief Derived type containing the global-level data.
+!> @ingroup Data_Type_GlobalDerivedType
 type, public:: Type_Global
-  integer(I_P):: myrank = 0_I_P !< Rank of the process which data belongs to.
-  type(Type_File):: file !< File data.
-  ! mesh data
-  integer(I_P):: Nl     = 1_I_P !< Number of grid levels.
-  integer(I_P):: Nb     = 0_I_P !< Number of blocks.
-  integer(I_P):: Nb_tot = 0_I_P !< Number of total blocks (sum over each process).
-  integer(I1P):: gco    = 1_I1P !< Number of ghost cells necessary to achieve the space reconstruction order.
-  ! boundary conditions data
-  integer(I_P)::                      Nin1 = 0_I_P !< Number of inflow 1 boundary conditions.
-  type(Type_Primitive), allocatable:: in1(:)       !< Inflow 1 boundary conditions primitive variables [1:Nin1].
-  ! fluid dynamic data
-  integer(I8P)::            n             = 0_I8P    !< Time steps counter.
-  real(R_P)::               t             = 0._R_P   !< Time.
-  integer(I_P)::            Ns            = 1_I_P    !< Number of species.
-  integer(I_P)::            Np            = 7_I_P    !< Number of primitive variables    (Np = Ns + 6).
-  integer(I_P)::            Nc            = 5_I_P    !< Number of conservative variables (Nc = Ns + 4).
-  logical::                 inviscid      = .true.   !< Type of simulation: inviscid (Euler's eq.) or viscous (Navier-Stokes eq.).
-  logical::                 unsteady      = .true.   !< Type of simulation: unsteady or not.
-  integer(I8P)::            Nmax          = 0_I8P    !< Max number of iterations.
-  real(R_P)::               Tmax          = 0._R_P   !< Max time, ignored if Nmax>0.
-  integer(I1P)::            sp_ord        = 1_I1P    !< Order of space convergence (number of ghost cells).
-  integer(I1P)::            rk_ord        = 1_I1P    !< Order of time convergence (number of Runge-Kutta stages).
-  real(R_P)::               CFL           = 0.3_R_P  !< Value of stability coefficient.
-  real(R_P)::               residual_toll = 0.01_R_P !< Tolerance for residuals vanishing evaluation.
-  logical::                 residual_stop = .false.  !< Sentinel for stopping steady simulation when residuals vanish.
-  real(R_P), allocatable::  cp0(:)                   !< Initial specific heat cp for each specie [1:Ns].
-  real(R_P), allocatable::  cv0(:)                   !< Initial specific heat cv for each specie [1:Ns].
-  type(Type_Adimensional):: adim                     !< Non-dimensionalization data.
+  type(Type_CompiledCode)::        cco        !< Compiled code used options.
+  type(Type_OS)::                  OS         !< Running architecture.
+  type(Type_Parallel)::            parallel   !< Parallelization data.
+  type(Type_Space_Step)::          space_step !< Space step data.
+  type(Type_Time_Step)::           time_step  !< Time step data.
+  type(Type_Species)::             species0   !< Initial species.
+  type(Type_Adimensional)::        adim       !< Non-dimensionalization data.
+  type(Type_BC_in1)::              bc_in1     !< Inflow 1 boundary conditions.
+  type(Type_Mesh_Dimensions)::     mesh_dims  !< Mesh global dimensions.
+  type(Type_SBlock), allocatable:: block(:,:) !< Block-level data [1:mesh_dims%Nb,1:mesh_dims%Nl].
   contains
-    procedure:: alloc_bc => alloc_gbc                       ! Procedure for allocating bc memory.
-    procedure:: load_bc_in1 => load_gbc_in1                 ! Procedure for loading the inflow1 bc data.
-    procedure:: load_fluid_soption => load_gfluid_soption   ! Procedure for loading the fluidynamic solver options.
-    procedure:: load_fluid_Ns => load_gfluid_Ns             ! Procedure for loading the number of species.
-    procedure:: load_fluid_0species => load_gfluid_0species ! Procedure for loading the initial species.
-    procedure:: alloc_fluid => alloc_gfluid                 ! Procedure for allocating the fluidynamic data.
+    procedure:: free                 ! Procedure for freeing memory.
+    procedure:: alloc                ! Procedure for allocating memory.
+    procedure:: set_Ns_from_species0 ! Procedure for setting the number of species accordingly species0.
+    procedure:: set_Nrk_from_rk_ord  ! Procedure for setting the number of Runge-Kutta stages from time order accuracy, rk_ord.
+    procedure:: blocks_dims_update   ! Procedure for updating blocks dimensions form mesh ones.
+    procedure:: solve_grl            ! Procedure for solving the conservation equations for one grid level.
+    procedure:: boundary_conditions  ! Procedure for imposing the boundary conditions for one grid level.
+    final::     finalize             ! Procedure for freeing dynamic memory when finalizing.
 endtype Type_Global
-!> @}
-!-----------------------------------------------------------------------------------------------------------------------------------
-
-!-----------------------------------------------------------------------------------------------------------------------------------
-!> @brief Generic procedure for building file names.
-!> Three different types of output file name can be build by means of this generic interface: \n
-!> - File name of \b block-clean data; this type of file name is referred to those files containing block-level data; calling
-!>   signature is of the type:
-!>   @code fname = file_name(basename,suffix,blk,grl) @endcode
-!> - File name of \b block-time_step data; this type of file name is referred to those files containing block-level data that
-!>   varying with time; calling signature is of the type:
-!>   @code fname = file_name(basename,suffix,blk,grl,n) @endcode
-!> - File name of \b block-flip_flop data; this type of file name is referred to those files containing block-level data stored as
-!>   backup flip/flop file; calling signature is of the type:
-!>   @code fname = file_name(basename,suffix,blk,grl,flip) @endcode
-!> @ingroup Data_Type_GlobalInterface
-interface file_name
-  module procedure Block_File_Name,Block_Step_File_Name,Block_Flip_File_Name
-endinterface
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @ingroup Data_Type_GlobalPrivateProcedure
   !> @{
-  !> Function for building block-clean file name.
-  !> @return \b filename character(len_trim(basename)+4+5+len_trim(suffix)) variable.
-  function Block_File_Name(basename,suffix,blk,grl) result(filename)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  character(*), intent(IN)::                           basename !< Base name of file name.
-  character(*), intent(IN)::                           suffix   !< Suffix    of file name.
-  integer(I_P), intent(IN)::                           blk      !< Block number.
-  integer(I_P), intent(IN)::                           grl      !< Grid refinement level.
-  character(len_trim(basename)+4+5+len_trim(suffix)):: filename !< Output file name.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  filename = trim(basename)//'.g'//trim(strz(2,grl))//'.b'//trim(strz(3,blk))//trim(suffix)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Block_File_Name
-
-  !> Function for building block-time_step file name.
-  !> @return \b filename character(len_trim(basename)+4+5+13+len_trim(suffix)) variable.
-  function Block_Step_File_Name(basename,suffix,blk,grl,n) result(filename)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  character(*), intent(IN)::                              basename !< Base name of file name.
-  character(*), intent(IN)::                              suffix   !< Suffix   of file name.
-  integer(I_P), intent(IN)::                              blk      !< Block number.
-  integer(I_P), intent(IN)::                              grl      !< Grid refinement level.
-  integer(I8P), intent(IN)::                              n        !< Time step number.
-  character(len_trim(basename)+4+5+13+len_trim(suffix)):: filename !< Output file name.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  filename = trim(basename)//'.g'//trim(strz(2,grl))//'.b'//trim(strz(3,blk))//'-N_'//trim(strz(10,n))//trim(suffix)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Block_Step_File_Name
-
-  !> Function for building block-flip_flop file name.
-  !> @return \b filename character(len_trim(basename)+3+4+5+len_trim(suffix)) variable.
-  function Block_Flip_File_Name(basename,suffix,blk,grl,flip) result(filename)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  character(*), intent(IN)::                             basename !< Base name of file name.
-  character(*), intent(IN)::                             suffix   !< Suffix   of file name.
-  integer(I_P), intent(IN)::                             blk      !< Block number.
-  integer(I_P), intent(IN)::                             grl      !< Grid refinement level.
-  integer(I1P), intent(IN)::                             flip     !< Flip-flop number.
-  character(len_trim(basename)+3+4+5+len_trim(suffix)):: filename !< Output file name.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  filename = trim(basename)//'-f'//trim(strz(1,flip))//'.g'//trim(strz(2,grl))//'.b'//trim(strz(3,blk))//trim(suffix)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Block_Flip_File_Name
-
-  !> Subroutine for computing the reference values for non-dimensional quantities.
-  subroutine compute_values0(global)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_Global), intent(INOUT):: global !< Global level data.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  ! reference values
-  global%adim%mu0  = (global%adim%r0*global%adim%v0*global%adim%L0)/global%adim%Re
-  global%adim%f0   = (global%adim%v0*global%adim%v0)/(global%adim%L0*global%adim%Fr*global%adim%Fr)
-  global%adim%k0   = (global%adim%mu0*global%adim%c0)/global%adim%Pr
-  global%adim%Dt0  = global%adim%L0/global%adim%v0
-  global%adim%p0   = global%adim%r0*global%adim%v0*global%adim%v0
-  global%adim%a0   = global%adim%v0
-  global%adim%T0   = (global%adim%v0*global%adim%v0)/global%adim%c0
-  global%adim%E0   = global%adim%v0*global%adim%v0
-  global%adim%q0   = (global%adim%v0*global%adim%v0*global%adim%v0)/global%adim%L0
-  ! equations coefficients
-  global%adim%Re_inv   = 1._R_P/global%adim%Re
-  global%adim%Fr2_inv  = 1._R_P/(global%adim%Fr*global%adim%Fr)
-  global%adim%PrRe_inv = 1._R_P/(global%adim%Pr*global%adim%Re)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine compute_values0
-
-  !> Subroutine for allocating dynamic data of Type_Global boundary conditions variables.
-  subroutine alloc_gbc(global)
+  !> @brief Procedure for freeing dynamic data of Type_Global variables.
+  elemental subroutine free(global)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Global), intent(INOUT):: global !< Global data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(global%in1)) then
-    !call global%in1%free ; deallocate(global%in1)
+  call global%bc_in1%free
+  call global%mesh_dims%free
+  if (allocated(global%block)) then
+    call global%block%free ; deallocate(global%block)
   endif
-  if (global%Nin1>0) allocate(global%in1(1:global%Nin1)) ; call global%in1%init(Ns=global%Ns)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine alloc_gbc
+  endsubroutine free
 
-  !> Subroutine for allocating dynamic data of Type_Global fluid dynamic variables.
-  subroutine alloc_gfluid(global)
+  !> @brief Procedure for allocating dynamic data of Type_Global variables.
+  elemental subroutine alloc(global)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Global), intent(INOUT):: global !< Global data.
+  integer(I4P)::                      b,l    !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(global%cp0)) deallocate(global%cp0) ; allocate(global%cp0(1:global%Ns))
-  if (allocated(global%cv0)) deallocate(global%cv0) ; allocate(global%cv0(1:global%Ns))
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine alloc_gfluid
-
-  !> Function for loading inflow 1 boundary conditions.
-  !> @return \b err integer(I4P) variable.
-  function load_gbc_in1(global,filename,in1) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_Global), intent(INOUT):: global   !< Global level data.
-  character(*),       intent(IN)::    filename !< Name of file where boundary conditions variables are saved.
-  integer(I_P),       intent(IN)::    in1      !< Actual in1 index.
-  integer(I_P)::                      err      !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I_P)::                      UnitFree !< Free logic unit.
-  logical::                           is_file  !< Flag for inquiring the presence of boundary conditions file.
-  character(DI_P)::                   rks      !< String containing myrank.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
-  if (.NOT.is_file) call File_Not_Found(global%myrank,filename,'load_gbc_in1')
-  open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
-  err = read_primitive(scalar=global%in1(in1),format='*',unit=UnitFree)
-  close(UnitFree)
-  rks = 'rank'//trim(str(.true.,global%myrank))
-  write(stdout,'(A)',iostat=err)trim(rks)//'----------------------------------------------------------------------'
-  write(stdout,'(A)',iostat=err)trim(rks)//' Inflow 1 primitive variables loaded:'
-  err = global%in1(in1)%pprint(myrank=global%myrank,unit=stdout)
-  write(stdout,'(A)',iostat=err)trim(rks)//'----------------------------------------------------------------------'
-  write(stdout,*,iostat=err)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction load_gbc_in1
-
-  !> Function for loading solver option variables.
-  !> @return \b err integer(I4P) variable.
-  function load_gfluid_soption(global,filename) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_Global), intent(INOUT):: global   !< Global level data.
-  character(*),       intent(IN)::    filename !< Name of file where option variables are saved.
-  integer(I_P)::                      err      !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I_P)::                      UnitFree !< Free logic unit.
-  logical::                           is_file  !< Flag for inquiring the presence of option file.
-  character(8)::                      timing   !< timing = 'unsteady' simulation otherwise steady one.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  err = 1
-  inquire(file=adjustl(trim(filename)),exist=is_file)
-  if (.NOT.is_file) call File_Not_Found(global%myrank,filename,'load_gfluid_soption')
-  open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
-  read(UnitFree,*,iostat=err) ! record skipped because unnecessary
-  read(UnitFree,*,iostat=err) ! record skipped because unnecessary
-  read(UnitFree,*,iostat=err)timing ; timing = Upper_Case(timing) ; global%unsteady = (adjustl(trim(timing))=='UNSTEADY')
-  read(UnitFree,*,iostat=err)global%Nmax
-  read(UnitFree,*,iostat=err)global%Tmax
-  read(UnitFree,*,iostat=err)global%sp_ord
-  read(UnitFree,*,iostat=err)global%rk_ord
-  read(UnitFree,*,iostat=err)global%CFL
-  read(UnitFree,*,iostat=err)global%residual_toll
-  read(UnitFree,*,iostat=err) ! record skipped because unnecessary
-  read(UnitFree,*,iostat=err)global%adim%Re
-  read(UnitFree,*,iostat=err)global%adim%Fr
-  read(UnitFree,*,iostat=err)global%adim%Pr
-  read(UnitFree,*,iostat=err) ! record skipped because unnecessary
-  read(UnitFree,*,iostat=err)global%adim%L0
-  read(UnitFree,*,iostat=err)global%adim%r0
-  read(UnitFree,*,iostat=err)global%adim%v0
-  read(UnitFree,*,iostat=err)global%adim%c0
-  close(UnitFree)
-  if (global%unsteady) then
-    if (global%Nmax>0_I8P) then
-      global%Tmax=-1._R_P ! the value of Tmax is ignored because Nmax>0
-    endif
-  else
-    global%Tmax=-1._R_P ! the value of Tmax is ignored because steady simulation
+  if (allocated(global%block)) then
+    call global%block%free ; deallocate(global%block)
   endif
-  call compute_values0(global) ! computing the reference values for non-dimensional quantities
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction load_gfluid_soption
-
-  !> Function for loading the number of species from fluid dynamic file "filename".
-  !> @return \b err integer(I4P) variable.
-  function load_gfluid_Ns(global,binary,filename) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_Global), intent(INOUT)::        global   !< Global level data.
-  logical,            intent(IN), optional:: binary   !< Flag for binary of ascii input file.
-  character(*),       intent(IN)::           filename !< Name of file where mesh variables are saved.
-  integer(I_P)::                             err      !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I_P)::                             UnitFree !< Free logic unit.
-  logical::                                  is_file  !< Flag for inquiring the presence of fluid dynamic file.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  inquire(file=trim(filename),exist=is_file,iostat=err)
-  if (.NOT.is_file) call File_Not_Found(global%myrank,filename,'load_gfluid_Ns')
-  if (present(binary)) then
-    open(unit = Get_Unit(UnitFree), file = trim(filename), status = 'OLD', action = 'READ', form = 'UNFORMATTED')
-    read(UnitFree,iostat=err)global%Ns
-  else
-    open(unit = Get_Unit(UnitFree), file = trim(filename), status = 'OLD', action = 'READ', form = 'FORMATTED')
-    read(UnitFree,*,iostat=err) ! record skipped
-    read(UnitFree,*,iostat=err) ! record skipped
-    read(UnitFree,*,iostat=err)global%Ns
-  endif
-  close(UnitFree)
-  global%Np = global%Ns + 6
-  global%Nc = global%Ns + 4
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction load_gfluid_Ns
-
-  !> Function for loading initial species from ascii file.
-  !> @return \b err integer(I4P) variable.
-  function load_gfluid_0species(global,filename) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_Global), intent(INOUT):: global   !< Global level data.
-  character(*),       intent(IN)::    filename !< Name of file where initial species are saved.
-  integer(I_P)::                      err      !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I_P)::                      UnitFree !< Free logic unit.
-  logical::                           is_file  !< Flag for inquiring the presence of initial species file.
-  integer(I_P)::                      s        !< Species counter.
-  real(R_P)::                         g        !< Specific heats ratio (cp/cv).
-  real(R_P)::                         R        !< Specific heats difference (cp-cv).
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  inquire(file=adjustl(trim(filename)),exist=is_file,iostat=err)
-  if (.NOT.is_file) call File_Not_Found(global%myrank,filename,'load_gfluid_0species')
-  open(unit = Get_Unit(UnitFree), file = adjustl(trim(filename)), status = 'OLD', action = 'READ', form = 'FORMATTED')
-  read(UnitFree,*,iostat=err) ! record skipped
-  read(UnitFree,*,iostat=err) ! record skipped
-  read(UnitFree,*,iostat=err)global%Ns ; call global%alloc_fluid
-  do s=1,global%Ns
-    read(UnitFree,*,iostat=err) ! record skipped
-    read(UnitFree,*,iostat=err)g
-    read(UnitFree,*,iostat=err)R
-    read(UnitFree,*,iostat=err)global%cp0(s)
-    read(UnitFree,*,iostat=err)global%cv0(s)
-    if ((g>0.0_R_P).AND.(R>0.0_R_P)) then
-      global%cv0(s)=R/(g-1._R_P)
-      global%cp0(s)=g*global%cv0(s)
-    elseif ((g>0.0_R_P).AND.(global%cp0(s)>0.0_R_P)) then
-      global%cv0(s)=global%cp0(s)/g
-    elseif ((g>0.0_R_P).AND.(global%cv0(s)>0.0_R_P)) then
-      global%cp0(s)=global%cv0(s)*g
-    elseif ((R>0.0_R_P).AND.(global%cp0(s)>0.0_R_P)) then
-      global%cv0(s)=global%cp0(s)-R
-    elseif ((R>0.0_R_P).AND.(global%cv0(s)>0.0_R_P)) then
-      global%cp0(s)=global%cv0(s)+R
-    endif
+  allocate(global%block(1:global%mesh_dims%Nb,1:global%mesh_dims%Nl))
+  do l=1,global%mesh_dims%Nl
+    do b=1,global%mesh_dims%Nb
+      global%block(b,l)%dims = global%mesh_dims%block_dims(global%parallel%blockmap(b),l)
+    enddo
   enddo
-  close(UnitFree)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction load_gfluid_0species
+  endsubroutine alloc
+
+  !> @brief Subroutine for freeing dynamic memory when finalizing.
+  elemental subroutine finalize(global)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Global), intent(INOUT):: global !< Global data.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  call global%free
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine finalize
+
+  !> @brief Procedure for setting the number of species accordingly species0.
+  elemental subroutine set_Ns_from_species0(global)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Global), intent(INOUT):: global !< Global data.
+  integer(I4P)::                      b,l    !< Counters.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  do l=1,global%mesh_dims%Nl
+    do b=1,global%mesh_dims%Nb_tot
+      global%mesh_dims%block_dims(b,l)%Np = global%species0%Np
+      global%mesh_dims%block_dims(b,l)%Nc = global%species0%Nc
+      global%mesh_dims%block_dims(b,l)%Ns = global%species0%Ns
+    enddo
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine set_Ns_from_species0
+
+  !> @brief Procedure for setting the number of Runge-Kutta stages from time order accuracy, rk_ord.
+  elemental subroutine set_Nrk_from_rk_ord(global)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Global), intent(INOUT):: global !< Global data.
+  integer(I4P)::                      b,l    !< Counters.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  do l=1,global%mesh_dims%Nl
+    do b=1,global%mesh_dims%Nb_tot
+      global%mesh_dims%block_dims(b,l)%Nrk = global%time_step%rk_ord
+    enddo
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine set_Nrk_from_rk_ord
+
+  !> @brief Procedure for updating blocks dimensions form mesh ones.
+  elemental subroutine blocks_dims_update(global)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Global), intent(INOUT):: global !< Global data.
+  integer(I4P)::                      b,l    !< Counters.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  associate(mesh_dims => global%mesh_dims, blockmap => global%parallel%blockmap)
+    do l=1,global%mesh_dims%Nl
+      do b=1,global%mesh_dims%Nb
+        global%block(b,l)%dims = mesh_dims%block_dims(blockmap(b),l)
+      enddo
+    enddo
+  endassociate
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine blocks_dims_update
+
+  !> @brief Procedure for imposing bc over a generic direction.
+  !> @note For avoiding the creation of temporary arrays (improving the efficiency) arrays are declared as assumed-shape ones.
+  pure subroutine set_bc(global,l,gc,ic,N,F,C)
+  !-------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Global), intent(IN)::    global       !< Global-level data.
+  integer(I4P),      intent(IN)::    l            !< Current grid level.
+  integer(I1P),      intent(IN)::    gc(1: )      !< Number of ghost cells [1:2].
+  integer(I4P),      intent(IN)::    ic           !< Number of internal cells used for extrapolation (1 or gc).
+  integer(I4P),      intent(IN)::    N            !< Number of internal cells.
+  type(Type_Face),   intent(IN)::    F(0-gc(1):)  !< Faces data [0-gc(1):N+gc(2)].
+  type(Type_Cell),   intent(INOUT):: C(1-gc(1):)  !< Cells data [1-gc(1):N+gc(2)].
+  !-------------------------------------------------------------------------------------------------------------------------------
+
+  !-------------------------------------------------------------------------------------------------------------------------------
+  associate(block=>global%block(:,l))
+    ! left
+    select case(F(0)%BC%tp)
+    case(bc_ext)
+      call cells_bc_set_ext(gc=gc,ic=ic,N=N,          boundary='l',C=C(1-gc(1):N+gc(2)))
+    case(bc_ref)
+      call cells_bc_set_ref(gc=gc,ic=ic,N=N,NF=F(0)%N,boundary='l',C=C(1-gc(1):N+gc(2)))
+    case(bc_per)
+      call cells_bc_set_per(gc=gc,ic=ic,N=N,          boundary='l',C=C(1-gc(1):N+gc(2)))
+    case(bc_adj)
+      call set_adj(global=global,block=block,gc=gc(1),F=F(1-gc(1):0),C=C(1-gc(1):0))
+    case(bc_in1)
+      call set_in1(global=global,gc=gc(1),F=F(1-gc(1):0),C=C(1-gc(1):0))
+    endselect
+    ! right
+    select case(F(N)%BC%tp)
+    case(bc_ext)
+      call cells_bc_set_ext(gc=gc,ic=ic,N=N,          boundary='r',C=C(1-gc(1):N+gc(2)))
+    case(bc_ref)
+      call cells_bc_set_ref(gc=gc,ic=ic,N=N,NF=F(N)%N,boundary='r',C=C(1-gc(1):N+gc(2)))
+    case(bc_per)
+      call cells_bc_set_per(gc=gc,ic=ic,N=N,          boundary='r',C=C(1-gc(1):N+gc(2)))
+    case(bc_adj)
+      call set_adj(global=global,block=block,gc=gc(2),F=F(N:N+gc(2)-1),C=C(N+1:N+gc(2)))
+    case(bc_in1)
+      call set_in1(global=global,gc=gc(2),F=F(N:N+gc(2)-1),C=C(N+1:N+gc(2)))
+    endselect
+  endassociate
+  return
+  !-------------------------------------------------------------------------------------------------------------------------------
+  contains
+    !> @brief Subroutine for imposing adjacent boundary conditions.
+    !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b bc and \b P are declared as
+    !> assumed-shape with only the lower bound defined. Their extentions are: bc [1-gc:0], P [1-gc:0].
+    !> @note When this subroutine is called for a 'right' (Ni,Nj,Nk) boundary the section of arrays BC and P must be
+    !> properly remapped: in the section [1-gc:0] must be passed the actual section [N:N+gc-1] for BC and [N+1:N+gc] for P.
+    pure subroutine set_adj(global,block,gc,F,C)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    type(Type_Global), intent(IN)::    global       !< Global-level data.
+    type(Type_SBlock), intent(IN)::    block(1:)    !< Block-level data.
+    integer(I1P),      intent(IN)::    gc           !< Number of ghost cells.
+    type(Type_Face),   intent(IN)::    F(1-gc:)     !< Faces data [1-gc:0].
+    type(Type_Cell),   intent(INOUT):: C(1-gc:)     !< Cells data [1-gc:0].
+    integer(I_P)::                     il,bg        !< Counters.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+#ifdef _MPI
+    ! for multi-processes simulation it is possible that the adjacent cell is in other processes than the actual and in case the
+    ! data have been already exchanged by the MPI procedure prim_sendrecv
+    if (global%parallel%procmap(F(0)%BC%adj%b)/=global%parallel%myrank) return
+#endif
+    do il=1-gc,0
+      bg = minloc(array=global%parallel%blockmap,dim=1,mask=global%parallel%blockmap==F(il)%BC%adj%b)
+      C(il)%P = block(bg)%C(F(il)%BC%adj%i,F(il)%BC%adj%j,F(il)%BC%adj%k)%P
+    enddo
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine set_adj
+
+    !> @brief Subroutine for imposing inflow 1 boundary conditions.
+    !> @note For avoiding the creation of temporary arrays (improving the efficiency) the arrays \b bc and \b P are declared as
+    !> assumed-shape with only the lower bound defined. Their extentions are: bc [1-gc:0], P [1-gc:0].
+    !> @note When this subroutine is called for a 'right' (Ni,Nj,Nk) boundary the section of arrays BC and P must be
+    !> properly remapped: in the section [1-gc:0] must be passed the actual section [N:N+gc-1] for BC and [N+1:N+gc] for P.
+    pure subroutine set_in1(global,gc,F,C)
+    !-------------------------------------------------------------------------------------------------------------------------------
+    implicit none
+    type(Type_Global), intent(IN)::    global   !< Global-level data.
+    integer(I1P),      intent(IN)::    gc       !< Number of ghost cells.
+    type(Type_Face),   intent(IN)::    F(1-gc:) !< Faces data [1-gc:0].
+    type(Type_Cell),   intent(INOUT):: C(1-gc:) !< Cells data [1-gc:0].
+    integer(I_P)::                     i        !< Cell counter.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    do i=1-gc,0
+      C(i)%P = global%BC_in1%P(F(i)%BC%inf)
+    enddo
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine set_in1
+  endsubroutine set_bc
+
+  !> @brief Procedure for imposing the boundary conditions of blocks of grid level "l" updating the ghost cells.
+  !> @note Considering the ghost cell \f$ c^0 \f$ and the inner one \f$ c^1 \f$ (being \f$ c^N \f$ the other bound)
+  !> the available boundary conditions are:
+  !> - \b REF: reflective boundary condition \f$ \begin{array}{*{20}{c}} P^0 = P^1 \\ P_{\vec v\cdot \vec n}^0 =
+  !>           - P_{\vec v\cdot \vec n}^1\end{array} \f$;
+  !> - \b EXT: extrapolation boundary condition \f$ P^0 = P^1 \f$;
+  !> - \b PER: periodic boundary condition \f$ P^0 = P^N \f$;
+  !> - \b ADJ: adjacent (cell) boundary condition \f$ P^0 = P^a \f$ where "a" is the adjacent cell (b,i,j,k indexes must be
+  !>           specified);
+  !> - \b IN1: supersonic inflow steady boundary condition \f$ P^0 = P^{in1} \f$. \n
+  !> where \f$P\f$ are the primitive variables.
+  subroutine boundary_conditions(global,l)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Global), intent(INOUT):: global    !< Global-level data.
+  integer(I4P),       intent(IN)::    l         !< Current grid level.
+  integer(I4P)::                      b,i,j,k   !< Counters.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+#ifdef _MPI
+  ! doing the multi-processes communications if necessary
+  do b=1,global%mesh_dims%Nb
+    call prim_sendrecv(l=l,parallel=global%parallel,mesh_dims=global%mesh_dims,block=global%block(:,l))
+  enddo
+#endif
+  associate(Nb=>global%mesh_dims%Nb,block=>global%block(:,l))
+  do b=1,Nb
+    associate(gc=>block(b)%dims%gc,Ni=>block(b)%dims%Ni,Nj=>block(b)%dims%Nj,Nk=>block(b)%dims%Nk)
+    !!$OMP PARALLEL DEFAULT(NONE) &
+    !!$OMP FIRSTPRIVATE(b)        &
+    !!$OMP PRIVATE(i,j,k)         &
+    !!$OMP SHARED(Ni,Nj,Nk,gc,global)
+    !!$OMP DO
+    do k=1,Nk
+      do j=1,Nj
+        call set_bc(global=global,l=l,gc=gc(1:2),ic=0,N=Ni,&
+                    F=block(b)%Fi(0-gc(1):Ni+gc(2),j,k),   &
+                    C=block(b)%C( 1-gc(1):Ni+gc(2),j,k))
+      enddo
+    enddo
+    !!$OMP DO
+    do k=1,Nk
+      do i=1,Ni
+        call set_bc(global=global,l=l,gc=gc(3:4),ic=0,N=Nj,&
+                    F=block(b)%Fj(i,0-gc(3):Nj+gc(4),k),   &
+                    C=block(b)%C( i,1-gc(3):Nj+gc(4),k))
+      enddo
+    enddo
+    !!$OMP DO
+    do j=1,Nj
+      do i=1,Ni
+        call set_bc(global=global,l=l,gc=gc(5:6),ic=0,N=Nk,&
+                    F=block(b)%Fk(i,j,0-gc(5):Nk+gc(6)),   &
+                    C=block(b)%C( i,j,1-gc(5):Nk+gc(6)))
+      enddo
+    enddo
+    !!$OMP END PARALLEL
+    endassociate
+  enddo
+  endassociate
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine boundary_conditions
+
+  !> @brief Procedure for solving (performing one time step integration) the conservation equations for grid level "l".
+  subroutine solve_grl(global,l,prof)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Global),      intent(INOUT):: global    !< Global data.
+  integer(I4P),            intent(IN)::    l         !< Current grid level.
+  type(Type_File_Profile), intent(INOUT):: prof      !< Profiling file.
+  real(R8P), allocatable::                 Dtmin(:)  !< Min t step of actual process for each blk.
+  real(R8P)::                              DtminL    !< Min t step of actual process over all blks.
+  real(R8P)::                              gDtmin    !< Global (all processes/all blks) min t step.
+  real(R8P), allocatable::                 RU  (:,:) !< NormL2 of conservartive residuals.
+  real(R8P), allocatable::                 mRU (:)   !< Maximum of RU of actual process.
+  real(R8P), allocatable::                 gmRU(:)   !< Global (all processes) maximum of RU.
+  integer(I4P)::                           b         !< Blocks counter.
+  integer(I1P)::                           s1        !< Runge-Kutta stages counters.
+  integer(I4P)::                           i,j,k     !< Counters.
+#ifdef _MPI
+  integer(I4P)::                           err       !< Error trapping flag: 0 no errors, >0 errors.
+#endif
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  associate(Nb=>global%mesh_dims%Nb,block=>global%block(:,l),n=>global%time_step%n,&
+            myrank=>global%parallel%myrank,Nthreads=>global%parallel%Nthreads,Nproc=>global%parallel%Nproc)
+    ! allocating dynamic arrays
+    allocate(Dtmin(1:Nb),RU(1:global%species0%Nc,1:Nb),mRU(1:global%species0%Nc),gmRU(1:global%species0%Nc))
+    ! converting conservative variables to primitive ones
+#ifdef PROFILING
+    call prof%profile(p=2,pstart=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
+#endif
+    do b=1,Nb
+      call block(b)%conservative2primitive(species0=global%species0)
+    enddo
+#ifdef PROFILING
+    call prof%profile(p=2,pstop=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
+#endif
+    ! imposing the boundary conditions
+#ifdef PROFILING
+    call prof%profile(p=3,pstart=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
+#endif
+    call global%boundary_conditions(l=l)
+#ifdef PROFILING
+    call prof%profile(p=3,pstop=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
+#endif
+    ! updating time varying variables: Dt,Dtmin
+    n = n + 1_I8P
+#ifdef PROFILING
+    call prof%profile(p=4,pstart=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
+#endif
+    do b=1,Nb
+      call block(b)%compute_time(time_step=global%time_step,Dtmin=Dtmin(b))
+    enddo
+#ifdef PROFILING
+    call prof%profile(p=4,pstop=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
+#endif
+    DtminL = minval(Dtmin)
+#ifdef _MPI
+    ! for multi-processes simulation all processes must exchange their DtminL for computing the global variables
+    call MPI_ALLREDUCE(DtminL,gDtmin,1,MPI_REAL8,MPI_MIN,MPI_COMM_WORLD,err)
+#else
+    ! for single processes DtminL are already global variables
+    gDtmin = DtminL
+#endif
+    if (global%time_step%unsteady) then
+      call global%time_step%update(gDtmin=gDtmin)
+      do b=1,Nb
+        block(b)%C%Dt = gDtmin
+      enddo
+    endif
+    ! evaluating the Runge-Kutta stages
+    ! Runge-Kutta stages initialization
+    do b=1,Nb
+      associate(gc=>block(b)%dims%gc,Ni=>block(b)%dims%Ni,Nj=>block(b)%dims%Nj,Nk=>block(b)%dims%Nk)
+        do k=1-gc(5),Nk+gc(6)
+          do j=1-gc(3),Nj+gc(4)
+            do i=1-gc(1),Ni+gc(2)
+              block(b)%C(i,j,k)%KS = 0._R8P
+            enddo
+          enddo
+        enddo
+      endassociate
+    enddo
+    do s1=1,global%time_step%rk_ord
+      if (s1>1) then
+        ! summing the stages up to s1-1: $K_{s1}=R\left(U^n+\sum_{s2=1}^{s1-1}{Dt \cdot rk_{c2}(s1,s2) \cdot K_{s2}}\right)$
+        ! updating primitive variables: $P=conservative2primitive(K_{s1})$
+        do b=1,Nb
+            call block(b)%rk_stages_sum(s1=s1,species0=global%species0)
+        enddo
+        ! imposing the boundary conditions
+        call global%boundary_conditions(l=l)
+      endif
+      ! computing the s1-th Runge-Kutta stage
+#ifdef PROFILING
+      call prof%profile(p=5,pstart=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
+#endif
+      do b=1,Nb
+        call block(b)%residuals(s1=s1,space_step=global%space_step,species0=global%species0)
+      enddo
+#ifdef PROFILING
+      call prof%profile(p=5,pstop=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
+#endif
+    enddo
+    ! Runge-Kutta time integration
+#ifdef PROFILING
+    call prof%profile(p=6,pstart=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
+#endif
+    do b=1,Nb
+      call block(b)%rk_time_integration(RU=RU(:,b))
+    enddo
+#ifdef PROFILING
+    call prof%profile(p=6,pstop=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
+#endif
+    ! finding the maximum value of residuals of actual process
+    mRU = maxval(RU,dim=2)
+#ifdef _MPI
+    ! for multi-processes simulation all processes must exchange their mRU for computing the global gmRU
+    call MPI_ALLREDUCE(mRU,gmRU,global%species0%Nc,MPI_REAL8,MPI_MAX,MPI_COMM_WORLD,err)
+#else
+    ! for single processes mRU is already global gmRU
+    gmRU = mRU
+#endif
+    ! deallocating dynamic arrays
+    deallocate(Dtmin,RU,mRU,gmRU)
+  endassociate
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine solve_grl
   !> @}
 endmodule Data_Type_Global

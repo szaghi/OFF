@@ -10,6 +10,7 @@ $(VERBOSE).SILENT:
 
 #----------------------------------------------------------------------------------------------------------------------------------
 # User options
+OSYSTEM   = uix
 PRESET    = no
 COMPILER  = intel
 DEBUG     = no
@@ -19,15 +20,11 @@ OPTIMIZE  = no
 OPENMP    = no
 MPI       = no
 R16P      = no
-SYSless   = no
 NULi      = no
 NULj      = no
 NULk      = no
 WENO      = WENO
-RECV      = RECVC
-RSU       = HLLCp
 VACUUM    = no
-WS        = WSup
 SMSW      = SMSWz
 HYBRID    = NOHYBRID
 PPL       = no
@@ -48,7 +45,7 @@ PRF_GNU =
 # Intel
 WRN_INT = -warn all
 CHK_INT = -check all
-DEB_INT = -debug all -extend-source 132 -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -traceback -gen-interfaces
+DEB_INT = -debug all -extend-source 132 -traceback -gen-interfaces#-fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz
 STD_INT = -std03
 OMP_INT = -openmp
 OPT_INT = -O3 -ipo -inline all -ipo-jobs4 -vec-report1
@@ -63,6 +60,10 @@ DEFAULTRULE: $(DEXE)OFF
 help:
 	@echo
 	@echo -e '\033[1;31m Make options of OFF codes\033[0m'
+	@echo
+	@echo -e '\033[1;31m OS running selection: OSYSTEM=$(OSYSTEM)\033[0m\033[1m => default\033[0m'
+	@echo -e '\033[1;31m  OSYSTEM=uix      \033[0m\033[1m => OS running is Unix/Linux \033[0m'
+	@echo -e '\033[1;31m  OSYSTEM=win      \033[0m\033[1m => OS running is MS Windows \033[0m'
 	@echo
 	@echo -e '\033[1;31m Preset configurations: PRESET=$(PRESET)\033[0m\033[1m => default\033[0m'
 	@echo -e '\033[1;31m  PRESET=debug     \033[0m\033[1m => debug (no optimized) and serial\033[0m'
@@ -87,37 +88,15 @@ help:
 	@echo
 	@echo -e '\033[1;31m Preprocessing options\033[0m'
 	@echo -e '\033[1;31m  R16P=yes(no)   \033[0m\033[1m => on(off) definition of real with "128 bit" (default $(R16P))\033[0m'
-	@echo -e '\033[1;31m  SYSless=yes(no)\033[0m\033[1m => on(off) system call functions             (default $(SYSless))\033[0m'
 	@echo -e '\033[1;31m  NULi=yes(no)   \033[0m\033[1m => on(off) nullify i direction (1D or 2D)    (default $(NULi))\033[0m'
 	@echo -e '\033[1;31m  NULj=yes(no)   \033[0m\033[1m => on(off) nullify j direction (1D or 2D)    (default $(NULj))\033[0m'
 	@echo -e '\033[1;31m  NULk=yes(no)   \033[0m\033[1m => on(off) nullify k direction (1D or 2D)    (default $(NULk))\033[0m'
-	@echo -e '\033[1;31m  PPL=yes(no)    \033[0m\033[1m => on(off) Positivity Preserving Limiter     (default $(PPL))\033[0m'
-	@echo -e '\033[1;31m  LMA=yes(no)    \033[0m\033[1m => on(off) Low Mach number Adjsutment        (default $(LMA))\033[0m'
+	@echo -e '\033[1;31m  PPL=yes(no) \033[0m\033[1m => on(off) Positivity Preserving Limiter     (default $(PPL))\033[0m'
+	@echo -e '\033[1;31m  LMA=yes(no) \033[0m\033[1m => on(off) Low Mach number Adjsutment        (default $(LMA))\033[0m'
 	@echo -e '\033[1;31m  WENO=WENO/WENOZ/WENOM\033[0m\033[1m WENO algorithm (default $(WENO))\033[0m'
 	@echo -e '\033[1m   WENO  => Original Jiang-Shu\033[0m'
 	@echo -e '\033[1m   WENOZ => Improved Borges-Carmona-Costa-Don\033[0m'
 	@echo -e '\033[1m   WENOM => Improved Henrick-Aslam-Powers    \033[0m'
-	@echo -e '\033[1;31m  RECV=RECVC/RECVP\033[0m\033[1m reconstruction variables type (default $(RECV))\033[0m'
-	@echo -e '\033[1m   RECVC => reconstruction in (local) characteristic variables\033[0m'
-	@echo -e '\033[1m   RECVP => reconstruction in primitive variables             \033[0m'
-	@echo -e '\033[1;31m  RSU=HLLCb/HLLCc/HLLCp/HLLCt/HLLCz/EXA/PVL/TR/TS/APRS/ALFR/LF/LFz/ROE\033[0m\033[1m Riemann solver algorithm (default $(RSU))\033[0m'
-	@echo -e '\033[1m   HLLCb => Approximate HLLC solver using BCLC waves speed estimation         \033[0m'
-	@echo -e '\033[1m   HLLCc => Approximate HLLC solver using CVL  waves speed estimation         \033[0m'
-	@echo -e '\033[1m   HLLCp => Approximate HLLC solver using PVL  waves speed estimation         \033[0m'
-	@echo -e '\033[1m   HLLCt => Approximate HLLC solver using TR   waves speed estimation         \033[0m'
-	@echo -e '\033[1m   HLLCz => Approximate HLLC solver using Z    waves speed estimation         \033[0m'
-	@echo -e '\033[1m   EXA   => Exact solver                                                      \033[0m'
-	@echo -e '\033[1m   PVL   => Approximate PVL solver                                            \033[0m'
-	@echo -e '\033[1m   TR    => Approximate TR solver                                             \033[0m'
-	@echo -e '\033[1m   TS    => Approximate TS solver                                             \033[0m'
-	@echo -e '\033[1m   APRS  => Approximate APRS solver                                           \033[0m'
-	@echo -e '\033[1m   ALFR  => Approximate ALFR solver                                           \033[0m'
-	@echo -e '\033[1m   LFp   => Approximate Lax-Friedrichs solver using PVL waves speed estimation\033[0m'
-	@echo -e '\033[1m   LFz   => Approximate Lax-Friedrichs solver using Z   waves speed estimation\033[0m'
-	@echo -e '\033[1m   ROE   => Approximate Roe solver                                            \033[0m'
-	@echo -e '\033[1;31m  WS=WSu/WSup\033[0m\033[1m Waves Speed estimation algorithm (default $(WS))\033[0m'
-	@echo -e '\033[1m   WSu  => WavesSpeed14u  or WavesSpeed1234u  algorithm\033[0m'
-	@echo -e '\033[1m   WSup => WavesSpeed14up or WavesSpeed1234up algorithm\033[0m'
 	@echo -e '\033[1;31m  SMSW=SMSWz/SMSWliu/SMSWvanleer/SMSWvanalbada/SMSWharten\033[0m\033[1m smoothness switchg algorithm (default $(SMSW))\033[0m'
 	@echo -e '\033[1m   SMSWz         => Riemann-solver-like algorithm      \033[0m'
 	@echo -e '\033[1m   SMSWliu       => Liu algorithm                      \033[0m'
@@ -167,14 +146,23 @@ ifeq "$(TECIO)" "yes"
 	else
 		LIBS = $(DLIB)32bit/tecio.a $(DLIB)32bit/libstdc++.5.0.7.so
 	endif
+	STATIC =
 else
   PREPROC =
   LIBS =
+	STATIC = #-static
 endif
 #----------------------------------------------------------------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------------------------------------------------------------
 # compiling and linking options
+# OS running
+ifeq "$(OSYSTEM)" "uix"
+  PREPROC := $(PREPROC) -D_OSYSTEMuix
+endif
+ifeq "$(OSYSTEM)" "win"
+  PREPROC := $(PREPROC) -D_OSYSTEMwin
+endif
 # presets
 ifeq "$(PRESET)" "debug"
   DEBUG     = yes
@@ -219,8 +207,8 @@ endif
 # setting rules according user options
 ifeq "$(COMPILER)" "gnu"
   FC = gfortran
-  OPTSC = -cpp -c -J$(DMOD) -static -fprotect-parens -fno-realloc-lhs
-  OPTSL =
+  OPTSC = -cpp -c -J$(DMOD) $(STATIC) -fprotect-parens
+  OPTSL =                   $(STATIC) -fprotect-parens
   WRN = $(WRN_GNU)
   CHK = $(CHK_GNU)
   DEB = $(DEB_GNU)
@@ -231,8 +219,8 @@ ifeq "$(COMPILER)" "gnu"
 endif
 ifeq "$(COMPILER)" "intel"
   FC = ifort
-  OPTSC = -cpp -c -module $(DMOD) -static -assume protect_parens -assume norealloc_lhs -fp-model source
-  OPTSL =
+  OPTSC = -cpp -c -module $(DMOD) $(STATIC) -assume protect_parens -assume realloc_lhs -fp-model source
+  OPTSL =                         $(STATIC) -assume protect_parens -assume realloc_lhs -fp-model source
   WRN = $(WRN_INT)
   CHK = $(CHK_INT)
   DEB = $(DEB_INT)
@@ -265,7 +253,7 @@ ifeq "$(OPENMP)" "yes"
   OPTSL := $(OPTSL) $(OMP)
 endif
 ifeq "$(MPI)" "yes"
-  PREPROC := $(PREPROC) -DMPI2
+  PREPROC := $(PREPROC) -D_MPI
   FC = mpif90
 endif
 # pre-processing options
@@ -277,15 +265,6 @@ endif
 ifeq "$(R16P)" "yes"
   R16PCHK = (Known R16P switch) Used R16P=$(R16P)
   PREPROC := $(PREPROC) -Dr16p
-endif
-# SYSless
-SYSlessCHK = (Unknown SYSless switch) Used default SYSless=no
-ifeq "$(SYSless)" "no"
-  SYSlessCHK = (Known SYSless switch) Used SYSless=$(SYSless)
-endif
-ifeq "$(SYSless)" "yes"
-  SYSlessCHK = (Known SYSless switch) Used SYSless=$(SYSless)
-  PREPROC := $(PREPROC) -DSYSTEMless
 endif
 # 1D or 2D solver
 NULiCHK = (Unknown NULi switch) Used default NULi=no
@@ -343,88 +322,6 @@ ifeq "$(WENO)" "WENOM"
   WENOCHK = (Known WENO switch) Used WENO=$(WENO)
   PREPROC := $(PREPROC) -D$(WENO)
 endif
-# reconstruction variables type
-ifeq "$(RECV)" "RECVC"
-  RECVCHK = (Known RECV switch) Used RECV=$(RECV)
-  PREPROC := $(PREPROC) -D$(RECV)
-else
-  ifeq "$(RECV)" "RECVP"
-    RECVCHK = (Known RECV switch) Used RECV=$(RECV)
-    PREPROC := $(PREPROC) -D$(RECV)
-  else
-    RECVCHK = (Unknown RECV switch) Used default RECV=RECVC
-    PREPROC := $(PREPROC) -DRECVC
-  endif
-endif
-# Riemann solver
-RSUCHK = (Unknown RSU switch) Used default RSU=HLLCp
-ifeq "$(RSU)" "HLLCb"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-ifeq "$(RSU)" "HLLCc"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-ifeq "$(RSU)" "HLLCp"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-ifeq "$(RSU)" "HLLCt"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-ifeq "$(RSU)" "HLLCz"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-ifeq "$(RSU)" "EXA"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-ifeq "$(RSU)" "PVL"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-ifeq "$(RSU)" "TR"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-ifeq "$(RSU)" "TS"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-ifeq "$(RSU)" "APRS"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-ifeq "$(RSU)" "ALFR"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-ifeq "$(RSU)" "ROE"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-ifeq "$(RSU)" "LFp"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-ifeq "$(RSU)" "LFz"
-  RSUCHK = (Known RSU switch) Used RSU=$(RSU)
-  RS = -DRS$(RSU)
-endif
-PREPROC := $(PREPROC) $(RS)
-# Waves Speed estimation algorithm
-WSCHK = (Unknown WS switch) Used default WS=WSup
-ifeq "$(WS)" "WSu"
-  WSCHK = (Known WS switch) Used WS=$(WS)
-  PREPROC := $(PREPROC) -D$(WS)
-endif
-ifeq "$(WS)" "WSup"
-  WSCHK = (Known WS switch) Used WS=$(WS)
-  PREPROC := $(PREPROC) -D$(WS)
-endif
 # Smoothness switch algorithm
 SMSWCHK = (Unknown SMSW switch) Used default SMSW=SMSWz
 ifeq "$(SMSW)" "SMSWz"
@@ -460,11 +357,10 @@ ifeq "$(HYBRID)" "HYBRIDC"
   HYBRIDCHK = (Known HYBRID switch) Used HYBRID=$(HYBRID)
   PREPROC := $(PREPROC) -D$(HYBRID)
 endif
-OPTSC := $(OPTSC) $(PREPROC)
-OPTSL := $(OPTSL) $(PREPROC)
+
+PREPROC := $(PREPROC) -D_COMPILER='$(shell $(FC) --version | head -n 1)' -D_COMPFLAG='$(OPTSC)' -D_COMPPROC='$(PREPROC)' -D_COMPLIBS='$(LIBS)'
 
 WHICHFC = $(shell which $(FC))
-
 PRINTCHK = "\\033[1;31m Compiler used \\033[0m\\033[1m $(COMPILER) => $(WHICHFC)\\033[0m \n\
             \\033[1;31mSource dir    \\033[0m\\033[1m $(DSRC)\\033[0m \n\
             \\033[1;31mLibraries     \\033[0m\\033[1m $(LIBS)\\033[0m \n \n\
@@ -475,16 +371,13 @@ PRINTCHK = "\\033[1;31m Compiler used \\033[0m\\033[1m $(COMPILER) => $(WHICHFC)
             \\033[1;31m OpenMP        \\033[0m\\033[1m $(OPENMP)\\033[0m \n\
             \\033[1;31m MPI           \\033[0m\\033[1m $(MPI)\\033[0m \n\
             \\033[1;31m R16P          \\033[0m\\033[1m $(R16PCHK)\\033[0m \n\
-            \\033[1;31m SYSless       \\033[0m\\033[1m $(SYSlessCHK)\\033[0m \n\
             \\033[1;31m Nullify i     \\033[0m\\033[1m $(NULiCHK)\\033[0m \n\
             \\033[1;31m Nullify j     \\033[0m\\033[1m $(NULjCHK)\\033[0m \n\
             \\033[1;31m Nullify k     \\033[0m\\033[1m $(NULkCHK)\\033[0m \n\
             \\033[1;31m PP Limiter    \\033[0m\\033[1m $(PPLCHK)\\033[0m \n\
             \\033[1;31m LMA Limiter   \\033[0m\\033[1m $(LMACHK)\\033[0m \n\
             \\033[1;31m WENO          \\033[0m\\033[1m $(WENOCHK)\\033[0m \n\
-            \\033[1;31m RECV type     \\033[0m\\033[1m $(RECVCHK)\\033[0m \n\
             \\033[1;31m Riemann Solver\\033[0m\\033[1m $(RSUCHK)\\033[0m \n\
-            \\033[1;31m WS Algorithm  \\033[0m\\033[1m $(WSCHK)\\033[0m \n\
             \\033[1;31m Smooth switch \\033[0m\\033[1m $(SMSWCHK)\\033[0m \n\
             \\033[1;31m Hybrid scheme \\033[0m\\033[1m $(HYBRIDCHK)\\033[0m \n\
             \\033[1;31m TECIO         \\033[0m\\033[1m $(TECIO)\\033[0m"
@@ -502,6 +395,9 @@ PRINTINFO:
 	@echo | tee -a make.log
 	@echo -e "\033[1;31m Linking options \033[0m" | tee -a make.log
 	@echo -e "\033[1m [$(OPTSL)]\033[0m" | tee -a make.log
+	@echo | tee -a make.log
+	@echo -e "\033[1;31m Preprocessing options \033[0m" | tee -a make.log
+	@echo -e "\033[1m [$(PREPROC)]\033[0m" | tee -a make.log
 	@echo | tee -a make.log
 
 .PHONY : $(MKDIRS)
@@ -565,167 +461,497 @@ $(DEXE)IBM : PRINTINFO $(MKDIRS) $(DOBJ)ibm.o
 	@rm -f $(filter-out $(DOBJ)ibm.o,$(EXESOBJ))
 	@echo | tee -a make.log
 	@echo $(LITEXT) | tee -a make.log
-	@$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSL) $(PREPROC) $(DOBJ)*.o $(LIBS) -o $@ 1>> diagnostic_messages 2>> error_messages
 EXES := $(EXES) IBM
 
 $(DEXE)OFF : PRINTINFO $(MKDIRS) $(DOBJ)off.o
 	@rm -f $(filter-out $(DOBJ)off.o,$(EXESOBJ))
 	@echo | tee -a make.log
 	@echo $(LITEXT) | tee -a make.log
-	@$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSL) $(PREPROC) $(DOBJ)*.o $(LIBS) -o $@ 1>> diagnostic_messages 2>> error_messages
 EXES := $(EXES) OFF
 
 $(DEXE)POG : PRINTINFO $(MKDIRS) $(DOBJ)pog.o
 	@rm -f $(filter-out $(DOBJ)pog.o,$(EXESOBJ))
 	@echo | tee -a make.log
 	@echo $(LITEXT) | tee -a make.log
-	@$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSL) $(PREPROC) $(DOBJ)*.o $(LIBS) -o $@ 1>> diagnostic_messages 2>> error_messages
 EXES := $(EXES) POG
 
-#$(DOBJ)data_type_amrblock.o : Data_Type_AMRBlock.f90 \
-#  $(DOBJ)ir_precision.o \
-#  $(DOBJ)data_type_cell.o \
-#  $(DOBJ)data_type_global.o \
-#  $(DOBJ)data_type_hashid.o \
-#  $(DOBJ)data_type_hashtcell.o \
-#  $(DOBJ)data_type_hashtface.o \
-#  $(DOBJ)data_type_hashtnode.o \
-#  $(DOBJ)data_type_vector.o \
-#  $(DOBJ)lib_io_misc.o
-#  @echo $(COTEXT) | tee -a make.log
-#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
-
-$(DOBJ)data_type_bc.o : Data_Type_BC.f90 \
+$(DOBJ)data_type_adimensional.o : Data_Type_Adimensional.f90 \
 	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_amrblock.o : Data_Type_AMRBlock.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_cell.o \
+	$(DOBJ)data_type_global.o \
+	$(DOBJ)data_type_hashid.o \
+	$(DOBJ)data_type_hashtcell.o \
+	$(DOBJ)data_type_hashtface.o \
+	$(DOBJ)data_type_hashtnode.o \
+	$(DOBJ)data_type_vector.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_bc.o : Data_Type_BC.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_cell_indexes.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_bc_in1.o : Data_Type_BC_in1.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_primitive.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_block_bc.o : Data_Type_Block_BC.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_bc.o \
+	$(DOBJ)data_type_xml_tag.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_block_dimensions.o : Data_Type_Block_Dimensions.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_xml_tag.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_block_extents.o : Data_Type_Block_Extents.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_vector.o \
+	$(DOBJ)data_type_xml_tag.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_cell.o : Data_Type_Cell.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_conservative.o \
 	$(DOBJ)data_type_primitive.o \
-	$(DOBJ)data_type_vector.o
+	$(DOBJ)data_type_species.o \
+	$(DOBJ)data_type_vector.o \
+	$(DOBJ)lib_variables_conversions.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_cell_indexes.o : Data_Type_Cell_Indexes.f90 \
+	$(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_compiledcode.o : Data_Type_CompiledCode.f90 \
+	$(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_conservative.o : Data_Type_Conservative.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_face.o : Data_Type_Face.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_bc.o \
 	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_base.o : Data_Type_File_Base.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_os.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_bc.o : Data_Type_File_BC.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_global.o \
+	$(DOBJ)data_type_parallel.o \
+	$(DOBJ)data_type_sblock.o \
+	$(DOBJ)data_type_xml_tag.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_blocks_cartesian.o : Data_Type_File_Blocks_Cartesian.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_mesh_dimensions.o \
+	$(DOBJ)data_type_region.o \
+	$(DOBJ)data_type_sblock.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_fluid.o : Data_Type_File_Fluid.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_global.o \
+	$(DOBJ)data_type_parallel.o \
+	$(DOBJ)data_type_species.o \
+	$(DOBJ)data_type_sblock.o \
+	$(DOBJ)data_type_time_step.o \
+	$(DOBJ)data_type_xml_tag.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_gnu.o : Data_Type_File_GNU.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_global.o \
+	$(DOBJ)data_type_postprocess.o \
+	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)lib_io_misc.o \
+	$(DOBJ)lib_math.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_ibm_options.o : Data_Type_File_IBM_Options.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_os.o \
+	$(DOBJ)data_type_varying_string.o \
+	$(DOBJ)data_type_xml_tag.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_icemcfd.o : Data_Type_File_ICEMCFD.f90 \
+	$(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_lock.o : Data_Type_File_Lock.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_time.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_mesh.o : Data_Type_File_Mesh.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_global.o \
+	$(DOBJ)data_type_mesh_dimensions.o \
+	$(DOBJ)data_type_parallel.o \
+	$(DOBJ)data_type_sblock.o \
+	$(DOBJ)data_type_xml_tag.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_off_options.o : Data_Type_File_OFF_Options.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_os.o \
+	$(DOBJ)data_type_xml_tag.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_procmap.o : Data_Type_File_Procmap.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_mesh_dimensions.o \
+	$(DOBJ)data_type_parallel.o \
+	$(DOBJ)data_type_xml_tag.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_profile.o : Data_Type_File_Profile.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_residuals.o : Data_Type_File_Residuals.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_os.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_files.o : Data_Type_Files.f90 \
+	$(DOBJ)data_type_file_bc.o \
+	$(DOBJ)data_type_file_fluid.o \
+	$(DOBJ)data_type_file_blocks_cartesian.o \
+	$(DOBJ)data_type_file_gnu.o \
+	$(DOBJ)data_type_file_ibm_options.o \
+	$(DOBJ)data_type_file_lock.o \
+	$(DOBJ)data_type_file_mesh.o \
+	$(DOBJ)data_type_file_off_options.o \
+	$(DOBJ)data_type_file_procmap.o \
+	$(DOBJ)data_type_file_profile.o \
+	$(DOBJ)data_type_file_species.o \
+	$(DOBJ)data_type_file_solver_options.o \
+	$(DOBJ)data_type_file_tec.o \
+	$(DOBJ)data_type_file_vtk.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_solver_options.o : Data_Type_File_Solver_Options.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_adimensional.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_space_step.o \
+	$(DOBJ)data_type_time_step.o \
+	$(DOBJ)data_type_xml_tag.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_species.o : Data_Type_File_Species.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_species.o \
+	$(DOBJ)data_type_xml_tag.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_tec.o : Data_Type_File_Tec.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_global.o \
+	$(DOBJ)data_type_postprocess.o \
+	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_sblock.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_file_vtk.o : Data_Type_File_VTK.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_file_base.o \
+	$(DOBJ)data_type_global.o \
+	$(DOBJ)data_type_postprocess.o \
+	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)lib_io_misc.o \
+	$(DOBJ)lib_math.o \
+	$(DOBJ)lib_vtk_io.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_global.o : Data_Type_Global.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_primitive.o \
-	$(DOBJ)lib_io_misc.o
+	$(DOBJ)data_type_bc.o \
+	$(DOBJ)data_type_adimensional.o \
+	$(DOBJ)data_type_bc_in1.o \
+	$(DOBJ)data_type_cell.o \
+	$(DOBJ)data_type_compiledcode.o \
+	$(DOBJ)data_type_face.o \
+	$(DOBJ)data_type_file_profile.o \
+	$(DOBJ)data_type_mesh_dimensions.o \
+	$(DOBJ)data_type_os.o \
+	$(DOBJ)data_type_parallel.o \
+	$(DOBJ)data_type_sblock.o \
+	$(DOBJ)data_type_space_step.o \
+	$(DOBJ)data_type_species.o \
+	$(DOBJ)data_type_time_step.o \
+	$(DOBJ)data_type_vector.o \
+	$(DOBJ)lib_parallel.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-#$(DOBJ)data_type_hashid.o : Data_Type_HashID.f90 \
-#  $(DOBJ)ir_precision.o \
-#  $(DOBJ)lib_morton.o
-#  @echo $(COTEXT) | tee -a make.log
-#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+$(DOBJ)data_type_hashid.o : Data_Type_HashID.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)lib_morton.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-#$(DOBJ)data_type_hashtcell.o : Data_Type_HashTCell.f90 \
-#  $(DOBJ)ir_precision.o \
-#  $(DOBJ)data_type_cell.o \
-#  $(DOBJ)data_type_hashid.o
-#  @echo $(COTEXT) | tee -a make.log
-#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+$(DOBJ)data_type_hashtcell.o : Data_Type_HashTCell.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_cell.o \
+	$(DOBJ)data_type_hashid.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-#$(DOBJ)data_type_hashtface.o : Data_Type_HashTFace.f90 \
-#  $(DOBJ)ir_precision.o \
-#  $(DOBJ)data_type_face.o \
-#  $(DOBJ)data_type_hashid.o
-#  @echo $(COTEXT) | tee -a make.log
-#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+$(DOBJ)data_type_hashtface.o : Data_Type_HashTFace.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_face.o \
+	$(DOBJ)data_type_hashid.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-#$(DOBJ)data_type_hashtnode.o : Data_Type_HashTNode.f90 \
-#  $(DOBJ)ir_precision.o \
-#  $(DOBJ)data_type_hashid.o \
-#  $(DOBJ)data_type_vector.o
-#  @echo $(COTEXT) | tee -a make.log
-#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+$(DOBJ)data_type_hashtnode.o : Data_Type_HashTNode.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_hashid.o \
+	$(DOBJ)data_type_vector.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_mesh_dimensions.o : Data_Type_Mesh_Dimensions.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_block_dimensions.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_os.o : Data_Type_OS.f90 \
 	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_parallel.o : Data_Type_Parallel.f90 \
+	$(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_postprocess.o : Data_Type_PostProcess.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_sblock.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_primitive1d.o : Data_Type_Primitive1D.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_species.o \
+	$(DOBJ)lib_thermodynamic_laws_ideal.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_primitive.o : Data_Type_Primitive.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_vector.o
+	$(DOBJ)data_type_species.o \
+	$(DOBJ)data_type_vector.o \
+	$(DOBJ)data_type_xml_tag.o \
+	$(DOBJ)lib_io_misc.o \
+	$(DOBJ)lib_thermodynamic_laws_ideal.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-$(DOBJ)data_type_probe.o : Data_Type_Probe.f90 \
-	$(DOBJ)ir_precision.o
+$(DOBJ)data_type_region.o : Data_Type_Region.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_vector.o \
+	$(DOBJ)data_type_xml_tag.o \
+	$(DOBJ)lib_io_misc.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_riemann_conservative1d.o : Data_Type_Riemann_Conservative1D.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)lib_thermodynamic_laws_ideal.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_riemann_interstate1d.o : Data_Type_Riemann_InterState1D.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)lib_thermodynamic_laws_ideal.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_riemann_primitive1d.o : Data_Type_Riemann_Primitive1D.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)lib_thermodynamic_laws_ideal.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_sblock.o : Data_Type_SBlock.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_bc.o \
+	$(DOBJ)data_type_block_bc.o \
+	$(DOBJ)data_type_block_dimensions.o \
+	$(DOBJ)data_type_block_extents.o \
 	$(DOBJ)data_type_cell.o \
+	$(DOBJ)data_type_conservative.o \
 	$(DOBJ)data_type_face.o \
-	$(DOBJ)data_type_global.o \
+	$(DOBJ)data_type_mesh_dimensions.o \
 	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_region.o \
+	$(DOBJ)data_type_species.o \
+	$(DOBJ)data_type_space_step.o \
+	$(DOBJ)data_type_time_step.o \
 	$(DOBJ)data_type_vector.o \
-	$(DOBJ)lib_io_misc.o
+	$(DOBJ)lib_fluxes_convective.o \
+	$(DOBJ)lib_io_misc.o \
+	$(DOBJ)lib_runge_kutta.o \
+	$(DOBJ)lib_thermodynamic_laws_ideal.o \
+	$(DOBJ)lib_variables_conversions.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_sl_list.o : Data_Type_SL_List.f90 \
-  $(DOBJ)ir_precision.o
+	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_space_step.o : Data_Type_Space_Step.f90 \
+	$(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_specie.o : Data_Type_Specie.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_xml_tag.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_species.o : Data_Type_Species.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_specie.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_tensor.o : Data_Type_Tensor.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_time.o : Data_Type_Time.f90 \
 	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_time_step.o : Data_Type_Time_Step.f90 \
+	$(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_varying_string.o : Data_Type_Varying_String.f90 \
+	$(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)data_type_vector.o : Data_Type_Vector.f90 \
 	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_xml_tag.o : Data_Type_XML_Tag.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_varying_string.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)ibm.o : IBM.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_bc.o \
-	$(DOBJ)data_type_conservative.o \
+	$(DOBJ)data_type_files.o \
 	$(DOBJ)data_type_global.o \
-	$(DOBJ)data_type_os.o \
-	$(DOBJ)data_type_primitive.o \
 	$(DOBJ)data_type_sblock.o \
-	$(DOBJ)data_type_time.o \
-	$(DOBJ)data_type_vector.o \
 	$(DOBJ)lib_io_misc.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)ir_precision.o : IR_Precision.f90
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_base64.o : Lib_Base64.f90 \
 	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_fluidynamic.o : Lib_Fluidynamic.f90 \
 	$(DOBJ)ir_precision.o \
@@ -733,22 +959,21 @@ $(DOBJ)lib_fluidynamic.o : Lib_Fluidynamic.f90 \
 	$(DOBJ)data_type_cell.o \
 	$(DOBJ)data_type_conservative.o \
 	$(DOBJ)data_type_face.o \
+	$(DOBJ)data_type_files.o \
 	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_primitive.o \
 	$(DOBJ)data_type_sblock.o \
 	$(DOBJ)data_type_time.o \
 	$(DOBJ)data_type_vector.o \
 	$(DOBJ)lib_fluxes_convective.o \
-	$(DOBJ)lib_fluxes_diffusive.o \
 	$(DOBJ)lib_io_misc.o \
 	$(DOBJ)lib_math.o \
-	$(DOBJ)lib_parallel.o \
 	$(DOBJ)lib_profiling.o \
 	$(DOBJ)lib_runge_kutta.o \
 	$(DOBJ)lib_thermodynamic_laws_ideal.o \
 	$(DOBJ)lib_parallel.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_fluxes_convective.o : Lib_Fluxes_Convective.f90 \
 	$(DOBJ)ir_precision.o \
@@ -756,12 +981,21 @@ $(DOBJ)lib_fluxes_convective.o : Lib_Fluxes_Convective.f90 \
 	$(DOBJ)data_type_conservative.o \
 	$(DOBJ)data_type_face.o \
 	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_primitive1d.o \
+	$(DOBJ)data_type_riemann_conservative1d.o \
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)data_type_species.o \
 	$(DOBJ)data_type_vector.o \
-	$(DOBJ)lib_riemann.o \
+	$(DOBJ)lib_riemann_solvers.o \
 	$(DOBJ)lib_weno.o \
-	$(DOBJ)lib_thermodynamic_laws_ideal.o
+	$(DOBJ)lib_variables_conversions.o \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_cell.o \
+	$(DOBJ)data_type_face.o \
+	$(DOBJ)data_type_primitive1d.o \
+	$(DOBJ)data_type_species.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_fluxes_diffusive.o : Lib_Fluxes_Diffusive.f90 \
 	$(DOBJ)ir_precision.o \
@@ -771,31 +1005,24 @@ $(DOBJ)lib_fluxes_diffusive.o : Lib_Fluxes_Diffusive.f90 \
 	$(DOBJ)data_type_tensor.o \
 	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_io_misc.o : Lib_IO_Misc.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_os.o
+	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_math.o : Lib_Math.f90 \
-  $(DOBJ)ir_precision.o \
-  $(DOBJ)data_type_sl_list.o \
-  $(DOBJ)data_type_vector.o
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_sl_list.o \
+	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-#$(DOBJ)lib_math.o : Lib_Math.f90 \
-#  $(DOBJ)ir_precision.o \
-#  $(DOBJ)data_type_vector.o
-#  @echo $(COTEXT) | tee -a make.log
-#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
-
-#$(DOBJ)lib_morton.o : Lib_Morton.f90 \
-#  $(DOBJ)ir_precision.o
-#  @echo $(COTEXT) | tee -a make.log
-#  @$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+$(DOBJ)lib_morton.o : Lib_Morton.f90 \
+	$(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_multigrid.o : Lib_Multigrid.f90 \
 	$(DOBJ)ir_precision.o \
@@ -803,98 +1030,163 @@ $(DOBJ)lib_multigrid.o : Lib_Multigrid.f90 \
 	$(DOBJ)data_type_vector.o \
 	$(DOBJ)lib_fluidynamic.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_parallel.o : Lib_Parallel.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_bc.o \
-	$(DOBJ)data_type_global.o \
-	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_mesh_dimensions.o \
+	$(DOBJ)data_type_parallel.o \
 	$(DOBJ)data_type_sblock.o \
 	$(DOBJ)lib_io_misc.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
-
-$(DOBJ)lib_postprocessing.o : Lib_PostProcessing.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_global.o \
-	$(DOBJ)data_type_primitive.o \
-	$(DOBJ)data_type_sblock.o \
-	$(DOBJ)lib_io_misc.o \
-	$(DOBJ)lib_vtk_io.o
-	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_profiling.o : Lib_Profiling.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)data_type_time.o \
 	$(DOBJ)lib_io_misc.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-$(DOBJ)lib_riemann.o : Lib_Riemann.f90 \
+$(DOBJ)lib_riemann_cvl_solver.o : Lib_Riemann_CVL_Solver.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)lib_thermodynamic_laws_ideal.o
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)data_type_riemann_interstate1d.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_riemann_hllc_solver.o : Lib_Riemann_HLLC_Solver.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_riemann_conservative1d.o \
+	$(DOBJ)data_type_riemann_interstate1d.o \
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)lib_riemann_cvl_solver.o \
+	$(DOBJ)lib_riemann_pvl_solver.o \
+	$(DOBJ)lib_riemann_tr_solver.o \
+	$(DOBJ)lib_riemann_ts_solver.o \
+	$(DOBJ)lib_riemann_z_solver.o \
+	$(DOBJ)lib_thermodynamic_laws_ideal.o \
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)data_type_riemann_interstate1d.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_riemann_lf_solver.o : Lib_Riemann_LF_Solver.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_riemann_conservative1d.o \
+	$(DOBJ)data_type_riemann_interstate1d.o \
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)lib_riemann_pvl_solver.o \
+	$(DOBJ)lib_riemann_z_solver.o \
+	$(DOBJ)lib_thermodynamic_laws_ideal.o \
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)data_type_riemann_interstate1d.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_riemann_pvl_solver.o : Lib_Riemann_PVL_Solver.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)data_type_riemann_interstate1d.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_riemann_solvers.o : Lib_Riemann_Solvers.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_riemann_conservative1d.o \
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)lib_riemann_hllc_solver.o \
+	$(DOBJ)lib_riemann_lf_solver.o \
+	$(DOBJ)data_type_riemann_conservative1d.o \
+	$(DOBJ)data_type_riemann_primitive1d.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_riemann_tr_solver.o : Lib_Riemann_TR_Solver.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)data_type_riemann_interstate1d.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_riemann_ts_solver.o : Lib_Riemann_TS_Solver.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)data_type_riemann_interstate1d.o \
+	$(DOBJ)lib_riemann_pvl_solver.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_riemann_z_solver.o : Lib_Riemann_Z_Solver.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)data_type_riemann_interstate1d.o \
+	$(DOBJ)lib_riemann_pvl_solver.o \
+	$(DOBJ)lib_riemann_tr_solver.o \
+	$(DOBJ)lib_riemann_ts_solver.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_runge_kutta.o : Lib_Runge_Kutta.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_conservative.o
+	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_thermodynamic_laws_ideal.o : Lib_Thermodynamic_Laws_Ideal.f90 \
 	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_variables_conversions.o : Lib_Variables_Conversions.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_conservative.o \
+	$(DOBJ)data_type_primitive.o \
+	$(DOBJ)data_type_primitive1d.o \
+	$(DOBJ)data_type_riemann_primitive1d.o \
+	$(DOBJ)data_type_species.o \
+	$(DOBJ)data_type_vector.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_vtk_io.o : Lib_VTK_IO.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)lib_base64.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)lib_weno.o : Lib_WENO.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_sblock.o
+	$(DOBJ)ir_precision.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)off.o : OFF.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_bc.o \
+	$(DOBJ)data_type_files.o \
 	$(DOBJ)data_type_global.o \
-	$(DOBJ)data_type_os.o \
-	$(DOBJ)data_type_primitive.o \
-	$(DOBJ)data_type_probe.o \
-	$(DOBJ)data_type_sblock.o \
-	$(DOBJ)data_type_tensor.o \
 	$(DOBJ)data_type_time.o \
-	$(DOBJ)lib_fluidynamic.o \
 	$(DOBJ)lib_io_misc.o \
-	$(DOBJ)lib_math.o \
-	$(DOBJ)lib_profiling.o \
+	$(DOBJ)lib_fluxes_convective.o \
+	$(DOBJ)lib_riemann_solvers.o \
 	$(DOBJ)lib_runge_kutta.o \
 	$(DOBJ)lib_weno.o \
 	$(DOBJ)lib_parallel.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)pog.o : POG.f90 \
 	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_files.o \
 	$(DOBJ)data_type_global.o \
 	$(DOBJ)data_type_os.o \
+	$(DOBJ)data_type_postprocess.o \
 	$(DOBJ)data_type_sblock.o \
-	$(DOBJ)data_type_time.o \
-	$(DOBJ)data_type_vector.o \
-	$(DOBJ)lib_io_misc.o \
-	$(DOBJ)lib_postprocessing.o
+	$(DOBJ)lib_io_misc.o
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 $(DOBJ)%.o : %.f90
 	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+	@$(FC) $(OPTSC) $(PREPROC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
 #-----------------------------------------------------------------------------------------------------------------------------------

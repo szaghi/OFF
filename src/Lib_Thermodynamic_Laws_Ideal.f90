@@ -27,7 +27,7 @@ public:: H
 contains
   !> @ingroup Lib_Thermodynamic_Laws_IdealPublicProcedure
   !> @{
-  !> Function for computing the pressure for an ideal calorically perfect gas.
+  !> @brief Procedure for computing the pressure for an ideal calorically perfect gas.
   elemental function p(r,a,g) result(pressure)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -43,7 +43,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction p
 
-  !> Function for computing the density for an ideal calorically perfect gas.
+  !> @brief Procedure for computing the density for an ideal calorically perfect gas.
   elemental function r(p,a,g) result(density)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -59,7 +59,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction r
 
-  !> Function for computing the speed of sound for an ideal calorically perfect gas.
+  !> @brief Procedure for computing the speed of sound for an ideal calorically perfect gas.
   elemental function a(p,r,g) result(ss)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -75,7 +75,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction a
 
-  !> Function for computing the total specific energy (per unit of mass) for an ideal calorically perfect gas.
+  !> @brief Procedure for computing the total specific energy (per unit of mass) for an ideal calorically perfect gas.
   !> @note This law is defined as: \n
   !> \f$ E = \frac{p}{{\left( {\gamma  - 1} \right)\rho }} + \frac{{u^2 }}{2} \f$
   elemental function E(p,r,u,g) result(energy)
@@ -94,7 +94,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction E
 
-  !> Function for computing the total specific entalpy (per unit of mass) for an ideal calorically perfect gas.
+  !> @brief Procedure for computing the total specific entalpy (per unit of mass) for an ideal calorically perfect gas.
   !> @note This law is defined as: \n
   !> \f$ H = \frac{{\gamma p}}{{\left( {\gamma  - 1} \right)\rho }} + \frac{{u^2 }}{2} \f$
   elemental function H(p,r,u,g) result(entalpy)

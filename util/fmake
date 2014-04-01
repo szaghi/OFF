@@ -105,10 +105,10 @@ function write_crule {
   fi
   if [ "$SIMPLE" = "yes" ] ; then
     echo "	@echo \$(COTEXT)" >> $MFILE
-    echo "	@\$(FC) \$(OPTSC) \$< -o \$@" >> $MFILE
+    echo "	@\$(FC) \$(OPTSC) \$(PREPROC) \$< -o \$@" >> $MFILE
   else
     echo "	@echo \$(COTEXT) | tee -a make.log" >> $MFILE
-    echo "	@\$(FC) \$(OPTSC) \$< -o \$@ 1>> diagnostic_messages 2>> error_messages" >> $MFILE
+    echo "	@\$(FC) \$(OPTSC) \$(PREPROC) \$< -o \$@ 1>> diagnostic_messages 2>> error_messages" >> $MFILE
   fi
   echo >> $MFILE
 }
@@ -120,11 +120,11 @@ function write_lrule {
   if [ "$SIMPLE" = "yes" ] ; then
     echo "	@echo" >> $MFILE
     echo "	@echo \$(LITEXT)" >> $MFILE
-    echo "	@\$(FC) \$(OPTSL) \$(DOBJ)*.o \$(LIBS) -o \$@" >> $MFILE
+    echo "	@\$(FC) \$(OPTSL) \$(PREPROC) \$(DOBJ)*.o \$(LIBS) -o \$@" >> $MFILE
   else
     echo "	@echo | tee -a make.log" >> $MFILE
     echo "	@echo \$(LITEXT) | tee -a make.log" >> $MFILE
-    echo "	@\$(FC) \$(OPTSL) \$(DOBJ)*.o \$(LIBS) -o \$@ 1>> diagnostic_messages 2>> error_messages" >> $MFILE
+    echo "	@\$(FC) \$(OPTSL) \$(PREPROC) \$(DOBJ)*.o \$(LIBS) -o \$@ 1>> diagnostic_messages 2>> error_messages" >> $MFILE
   fi
   echo "EXES := \$(EXES) $3" >> $MFILE
   echo >> $MFILE
@@ -323,7 +323,7 @@ for f in $( ls $DSRC*.[fF] $DSRC*.[fF]9[05] $DSRC*.[fF]0[38] $DSRC*.[fF]2[kK] 2>
   FF=`basename $f`
   EXTE=`echo $FF | awk -F . '{print "."$NF}'`
   LEXTES="$LEXTES$EXTE;"
-  DEP=`grep -i '^ *use *' $f | grep -vi 'omp_lib' | grep -vi 'mpi' | grep -vi ', *intrinsic::' | tr '[:upper:]' '[:lower:]' | sed s/'^ *use *'// | sed s/'^:: *'// | awk '{print $1}' | sed s/,// | sed s/$/\.o/ | awk  '{print "$(DOBJ)"$1}'`
+  DEP=`grep -i '^ *use *' $f | sed s/'^ *[Uu][Ss][Ee] *'// | grep -vi '^omp_lib' | grep -vi '^mpi' | grep -vi ', *intrinsic::' | tr '[:upper:]' '[:lower:]' | sed s/'^ *use *'// | sed s/'^:: *'// | awk '{print $1}' | sed s/,// | sed s/$/\.o/ | awk  '{print "$(DOBJ)"$1}'`
   RULE="\$(DOBJ)"`basename $f $EXTE | tr '[:upper:]' '[:lower:]'`.o" : $FF"
   write_crule "$RULE" "$DEP"
 done

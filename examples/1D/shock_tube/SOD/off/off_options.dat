@@ -1,20 +1,20 @@
-------------------------------------------------------------------------------------------------------------------------------------
-                                  OS TYPE
-'uix'                                                        OS_type     = Operating System, UIX or WIN
-                                  INPUT OPTIONS
-'./input/'                                                   Path_InPut  = input path
-'solver.dat'                                                 File_Solver = name of solver options file
-1                                                            Nl          = number of grid levels used
-'sod'                                                        File_Mesh   = basename of mesh file
-'sod'                                                        File_BC     = basename of boundary conditions file
-'sod'                                                        File_Init   = basename of initial conditions file
-                                  OUTPUT OPTIONS
-'output/'                                                    Path_OutPut   = output path
-'sod'                                                        Title_out     = title of output file
-'.sol'                                                       Extension_out = extension of output file
-1000                                                         screen_out    = console refresh frequency
-10                                                           sol_out       = actual solution output frequency
-10                                                           restart_out   = restart output frequency
-1                                                            probe_out     = probes output frequency
-'prof'                                                       File_Prof     = prefix of profiling file names
-------------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0"?>
+<OFF_Options>
+  <inputs>
+    <path>              ./input/    </path>
+    <solver_file_name>  solver.opt  </solver_file_name>
+    <mesh_file_name>    sod.geo     </mesh_file_name>
+    <bc_file_name>      sod.bco     </bc_file_name>
+    <init_file_name>    sod.itc     </init_file_name>
+    <procmap_file_name> procmap.opt </procmap_file_name>
+  </inputs>
+  <outputs>
+    <path>                       ./output/ </path>
+    <solution_file_name>         sod.sol   </solution_file_name>
+    <profiling_file_name>        profile   </profiling_file_name>
+    <shell_out_frequency>        10        </shell_out_frequency>
+    <solution_out_frequency>     10        </solution_out_frequency>
+    <solution_restart_frequency> 10        </solution_restart_frequency>
+    <probe_out_frequency>        1         </probe_out_frequency>
+  </outputs>
+</OFF_Options>

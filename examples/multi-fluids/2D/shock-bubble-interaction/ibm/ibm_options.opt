@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<IBM_Options>
+  <inputs>
+    <path> ./input/ </path>
+    <species_file_name> initial_species.opt </species_file_name>
+    <blocks_description type="blocks"> blocks_description.opt </blocks_description>
+  </inputs>
+  <outputs>
+    <grid_levels> 1 </grid_levels>
+    <path> ./output/ </path>
+    <mesh_file_name>  bsi.geo </mesh_file_name>
+    <bc_file_name>    bsi.bco </bc_file_name>
+    <init_file_name>  bsi.itc </init_file_name>
+  </outputs>
+</IBM_Options>

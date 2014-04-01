@@ -1,13 +1,13 @@
 #!MC 1120
 # Created by Tecplot 360 build 11.3.29.563
-$!VarSet |LFDSFN1| = '"output/sod.g01.b001.plt" "output/sod.g01.b002.plt"'
+$!VarSet |LFDSFN1| = '"output/sod.plt"'
 $!VarSet |LFDSVL1| = '"x" "y" "z" "r_1" "r" "u" "v" "w" "p" "g"'
-$!VarSet |LFDSFN2| = '"exact_sod-100-t02-block-split.dat"'
+$!VarSet |LFDSFN2| = '"output-exc/sod-100-t02.dat"'
 $!VarSet |LFDSVL2| = '"x" "y" "z" "r_1" "r" "u" "v" "w" "p" "g"'
-$!VarSet |LFDSFN3| = '"output-ref/sod.g01.b001.plt" "output-ref/sod.g01.b002.plt"'
+$!VarSet |LFDSFN3| = '"output-ref/sod.plt"'
 $!VarSet |LFDSVL3| = '"x" "y" "z" "r_1" "r" "u" "v" "w" "p" "g"'
 $!SETSTYLEBASE FACTORY
-$!GLOBALLINKING 
+$!GLOBALLINKING
   LINKCOLORMAPS = YES
 $!GLOBALCOLORMAP  1
   CONTOURCOLORMAP = SMRAINBOW
@@ -849,9 +849,9 @@ $!GLOBALCOLORMAP  8
         }
       }
     }
-$!PLOTOPTIONS 
+$!PLOTOPTIONS
   SUBDIVIDEALLCELLS = NO
-$!GLOBALPAPER 
+$!GLOBALPAPER
   PAPERSIZEINFO
     {
     LETTER
@@ -864,7 +864,7 @@ $!GLOBALPAPER
       BOTTOMHARDCLIPOFFSET = 0.125
       }
     }
-$!PAGE 
+$!PAGE
   NAME = ''
   PAPERATTRIBUTES
     {
@@ -917,7 +917,7 @@ $!READDATASET  '|LFDSFN3|'
   VARNAMELIST = '|LFDSVL3|'
 $!REMOVEVAR |LFDSVL3|
 $!REMOVEVAR |LFDSFN3|
-$!FRAMELAYOUT 
+$!FRAMELAYOUT
   SHOWBORDER = NO
   SHOWHEADER = NO
   HEADERCOLOR = RED
@@ -928,14 +928,14 @@ $!FRAMELAYOUT
     }
   WIDTH = 9
   HEIGHT = 8
-$!THREEDAXIS 
+$!THREEDAXIS
   ASPECTRATIOLIMIT = 25
   BOXASPECTRATIOLIMIT = 25
 $!PLOTTYPE  = XYLINE
 $!FRAMENAME  = 'Frame 001'
-$!DELETELINEMAPS 
+$!DELETELINEMAPS
 $!ACTIVELINEMAPS  =  [1-6]
-$!GLOBALLINEPLOT 
+$!GLOBALLINEPLOT
   DATALABELS
     {
     DISTANCESKIP = 5
@@ -1198,9 +1198,9 @@ $!LINEMAP  [6]
       MAX = 1
       }
     }
-$!XYLINEAXIS 
+$!XYLINEAXIS
   DEPXTOYRATIO = 1
-$!XYLINEAXIS 
+$!XYLINEAXIS
   XDETAIL 1
     {
     RANGEMIN = 0
@@ -1235,7 +1235,7 @@ $!XYLINEAXIS
       LINETHICKNESS = 0.25
       }
     }
-$!XYLINEAXIS 
+$!XYLINEAXIS
   YDETAIL 1
     {
     RANGEMIN = 0
@@ -1269,6 +1269,6 @@ $!XYLINEAXIS
       LINETHICKNESS = 0.25
       }
     }
-$!LINEPLOTLAYERS 
+$!LINEPLOTLAYERS
   SHOWSYMBOLS = YES
 $!SETSTYLEBASE CONFIG

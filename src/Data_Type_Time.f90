@@ -36,7 +36,6 @@ USE OMP_LIB      ! OpenMP runtime library.
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
-save
 private
 public:: operator (/=)
 public:: operator (<)
@@ -45,23 +44,22 @@ public:: operator (==)
 public:: operator (>=)
 public:: operator (>)
 public:: Get_Date_String
-public:: Seconds_To_Time
-public:: Crono
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> Derived type containing time variables.
 !> @ingroup Data_Type_TimeDerivedType
 type, public:: Type_Time
-  integer(I4P) Days    !< Number of days.
-  integer(I4P) Hours   !< Number of hours.
-  integer(I4P) Minutes !< Number of minutes.
-  real(R8P)    Seconds !< Number of seconds.
+  integer(I4P):: Days    = 0_I4P  !< Number of days.
+  integer(I4P):: Hours   = 0_I4P  !< Number of hours.
+  integer(I4P):: Minutes = 0_I4P  !< Number of minutes.
+  real(R8P)::    Seconds = 0._R8P !< Number of seconds.
+  real(R8P)::    inst0   = 0._R8P !< The inital instant.
   contains
-    procedure:: sec2time ! Procedure for converting seconds to Type_Time format.
+    procedure:: sec2dhms                 ! Procedure for converting seconds to day/hours/minutes/seconds format.
+    procedure:: chronos                  ! Procedure for timing the codes.
+    procedure:: print => print_time_self ! Procedure for printing time with a pretty format.
 endtype Type_Time
-!> @ingroup Data_Type_TimePrivateVarPar
-real(R8P):: inst0 = 0._R8P !< The Crono starting instant used for profing the code.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -99,11 +97,11 @@ endinterface
 contains
   !> @ingroup Data_Type_TimePrivateProcedure
   !> @{
-  !> Subroutine for converting seconds to Type_Time (days,hours,minutes,seconds) format.
-  elemental subroutine sec2time(Time,seconds)
+  !> Subroutine for converting seconds to days/hours/minutes/seconds format.
+  elemental subroutine sec2dhms(Time,seconds)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Time), intent(INOUT):: Time    !< Time in days,hours,minutes,seconds format.
+  class(Type_Time), intent(INOUT):: Time    !< Time data.
   real(R8P),        intent(IN)::    seconds !< Number of seconds.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -114,7 +112,71 @@ contains
   Time%Seconds =      Seconds-Time%Days*86400-Time%Hours*3600-Time%Minutes*60
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine sec2time
+  endsubroutine sec2dhms
+
+  !> @brief Procedure  for timing the codes.
+  subroutine chronos(time,start,instant1)
+  !---------------------------------------------------------------------------------------------------------------------------------
+#ifdef OPENMP
+  USE omp_lib ! OpenMP runtime library.
+#elif defined _MPI
+  USE MPI ! MPI runtime library.
+#endif
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Time),    intent(INOUT):: time     !< Time date.
+  logical,   optional, intent(IN)::    start    !< Flag for starting time measurament.
+  real(R8P), optional, intent(IN)::    instant1 !< Seconds from instant1 (external supplied, different from inst0).
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  ! getting actual seconds
+#ifdef OPENMP
+  time%seconds = omp_get_wtime()
+#elif defined _MPI
+  time%seconds = MPI_Wtime()
+#else
+  call CPU_TIME(time%seconds)
+#endif
+  ! updating time
+  if (present(start)) then
+    time%inst0 = time%seconds                ! Initialize instant0.
+  elseif (present(instant1)) then
+    time%seconds = time%seconds - instant1   ! Shifting time from instant1 (external supplied).
+  else
+    time%seconds = time%seconds - time%inst0 ! Shifting time from instant0 (internal supplied).
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine chronos
+
+  !> @brief Procedure for printing time with a pretty format.
+  subroutine print_time_self(time,pref,iostat,iomsg,unit)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Time),       intent(IN)::  time    !< Time data.
+  character(*), optional, intent(IN)::  pref    !< Prefixing string.
+  integer(I4P), optional, intent(OUT):: iostat  !< IO error.
+  character(*), optional, intent(OUT):: iomsg   !< IO error message.
+  integer(I4P),           intent(IN)::  unit    !< Logic unit.
+  character(len=:), allocatable::       prefd   !< Prefixing string.
+  integer(I4P)::                        iostatd !< IO error.
+  character(500)::                      iomsgd  !< Temporary variable for IO error message.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  prefd = '' ; if (present(pref)) prefd = pref
+  write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//' (D/H/M/S):'//trim(str(.true.,time%Days   ))//'/'//&
+                                                                              trim(str(.true.,time%Hours  ))//'/'//&
+                                                                              trim(str(.true.,time%Minutes))//'/'//&
+                                                                              trim(str('(F6.2)',time%Seconds))
+  if (present(iostat)) iostat = iostatd
+  if (present(iomsg))  iomsg  = iomsgd
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine print_time_self
 
   elemental function not_eq(time1,time2) result(compare)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -335,61 +397,5 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction Get_Date_String
-
-  !> Function for converting seconds to Type_Time (days,hours,minutes,seconds) format.
-  !> @return \b Time type(Type_Time) variable.
-  elemental function Seconds_To_Time(seconds) result(Time)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  real(R8P), intent(IN):: seconds !< Number of seconds.
-  type(Type_Time)::       Time    !< Time in days,hours,minutes,seconds format.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  Time%Days    = int(Seconds/86400)
-  Time%Hours   = int((Seconds-Time%Days*86400)/3600)
-  Time%Minutes = int((Seconds-Time%Days*86400-Time%Hours*3600)/60)
-  Time%Seconds =      Seconds-Time%Days*86400-Time%Hours*3600-Time%Minutes*60
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Seconds_To_Time
-
-  !> A simple stop/watch function.
-  !> @return \b seconds real(R8P) variable.
-  function Crono(start,instant1,instant0) result(seconds)
-  !---------------------------------------------------------------------------------------------------------------------------------
-#ifdef OPENMP
-  USE omp_lib ! OpenMP runtime library.
-#elif defined MPI2
-  USE MPI ! MPI runtime library.
-#endif
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  logical,   intent(IN), optional:: start    !< Flag for starting time measurament.
-  real(R8P), intent(IN), optional:: instant1 !< Seconds from instant1 (external supplied, different from instant0).
-  logical,   intent(IN), optional:: instant0 !< Seconds from instant0.
-  real(R8P)::                       seconds  !< Seconds from instant0 or instant1.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-#ifdef OPENMP
-  seconds = omp_get_wtime()      ! Getting seconds.
-#elif defined MPI2
-  seconds = MPI_Wtime()
-#else
-  call CPU_TIME(seconds)         ! Getting seconds.
-#endif
-  if (present(start)) then
-    inst0 = seconds              ! Initialize instant0.
-  elseif (present(instant1)) then
-    seconds = seconds - instant1 ! Shifting time from instant1 (external supplied).
-  elseif (present(instant0)) then
-    seconds = seconds - inst0    ! Shifting time from instant0 (internal supplied).
-  endif
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction Crono
   !> @}
 endmodule Data_Type_Time

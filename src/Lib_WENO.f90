@@ -23,14 +23,14 @@
 !> @ingroup Lib_WENOLibrary
 module Lib_WENO
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision       ! Integers and reals precision definition.
-USE Data_Type_SBlock   ! Definition of Type_SBlock.
+USE IR_Precision ! Integers and reals precision definition.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 save
 private
+public:: weno_print
 public:: weno_init
 public:: noweno_central
 public:: weno_optimal
@@ -41,25 +41,48 @@ public:: weno
 ! WENO coefficients (S = number of stencils used)
 !> @ingroup Lib_WENOPrivateVarPar
 !> @{
-real(R_P), allocatable:: weno_c(:,:)   !< Central difference coefficients    [1:2,1:2*S].
-real(R_P), allocatable:: weno_a(:,:)   !< Optimal weights                    [1:2,0:S-1].
-real(R_P), allocatable:: weno_p(:,:,:) !< Polynomials coefficients           [1:2,0:S-1,0:S-1].
-real(R_P), allocatable:: weno_d(:,:,:) !< Smoothness indicators coefficients [0:S-1,0:S-1,0:S-1].
-real(R_P)::              weno_eps      !< Parameter for avoiding divided by zero when computing smoothness indicators.
-integer(I_P)::           weno_odd      !< Constant for distinguishing between odd and even number of stencils (mod(S,2)).
-integer(I_P)::           weno_exp      !< Exponent for growing the diffusive part of weights.
+real(R8P), allocatable:: weno_c(:,:)   !< Central difference coefficients    [1:2,1:2*S].
+real(R8P), allocatable:: weno_a(:,:)   !< Optimal weights                    [1:2,0:S-1].
+real(R8P), allocatable:: weno_p(:,:,:) !< Polynomials coefficients           [1:2,0:S-1,0:S-1].
+real(R8P), allocatable:: weno_d(:,:,:) !< Smoothness indicators coefficients [0:S-1,0:S-1,0:S-1].
+real(R8P)::              weno_eps      !< Parameter for avoiding divided by zero when computing smoothness indicators.
+integer(I4P)::           weno_odd      !< Constant for distinguishing between odd and even number of stencils (mod(S,2)).
+integer(I4P)::           weno_exp      !< Exponent for growing the diffusive part of weights.
 !> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @ingroup Lib_WENOPublicProcedure
   !> @{
-  !> @brief Subroutine for initialization of WENO coefficients.
-  subroutine weno_init(block,S)
+  !> @brief Procedure for printing WENO settings
+  subroutine weno_print(pref,iostat,iomsg,unit)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_SBlock), intent(IN):: block(1:) !< Block-level data.
-  integer(I1P),      intent(IN):: S         !< Number of stencils used.
-  integer(I_P)::                  b         !< Blocks counter.
+  character(*), optional, intent(IN)::  pref    !< Prefixing string.
+  integer(I4P), optional, intent(OUT):: iostat  !< IO error.
+  character(*), optional, intent(OUT):: iomsg   !< IO error message.
+  integer(I4P),           intent(IN)::  unit    !< Logic unit.
+  character(len=:), allocatable::       prefd   !< Prefixing string.
+  integer(I4P)::                        iostatd !< IO error.
+  character(500)::                      iomsgd  !< Temporary variable for IO error message.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  prefd = '' ; if (present(pref)) prefd = pref
+  write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//' WENO "eps" parameter: '//trim(str(n=weno_eps))
+  write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//' WENO "exp" parameter: '//trim(str(n=weno_exp))
+  write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//' WENO stencil (S): '//trim(str(.true.,size(weno_a,dim=2)))
+  if (present(iostat)) iostat = iostatd
+  if (present(iomsg))  iomsg  = iomsgd
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine weno_print
+
+  !> @brief Subroutine for initialization of WENO coefficients.
+  subroutine weno_init(S,min_space_step)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  integer(I1P), intent(IN):: S              !< Number of stencils used.
+  real(R8P),    intent(IN):: min_space_step !< Minimum space step.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -69,19 +92,7 @@ contains
   ! computing weno_odd
   weno_odd = int(mod(S,2_I1P),I_P)
   ! computing a reasonable value of weno_eps according to the (finest) grid spacing
-  weno_eps = MaxR_P
-  do b=1,block(1)%global%Nb
-    call get_min_sstep(block = block(b), ss = weno_eps)
-  enddo
-  weno_eps = weno_eps**(3_I1P*S-4_I1P)
-  if (block(1)%global%myrank==0) then
-    write(*,'(A)')           '----------------------------------------------------------------------'
-    write(*,'(A,'//FR_P//')')' The "eps" WENO parameter used is: ',weno_eps
-    write(*,'(A,'//FI_P//')')' The "exp" WENO parameter used is: ',weno_exp
-    write(*,'(A,'//FI1P//')')' The "S"   WENO parameter used is: ',S
-    write(*,'(A)')           '----------------------------------------------------------------------'
-    write(*,*)
-  endif
+  weno_eps = min_space_step**(3_I1P*S-4_I1P)
   ! allocating variables
   if (allocated(weno_c)) deallocate(weno_c) ; allocate(weno_c(1:2,1:2*S))
   if (allocated(weno_a)) deallocate(weno_a) ; allocate(weno_a(1:2,0:S-1))
@@ -259,43 +270,6 @@ contains
   endselect
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  contains
-    pure subroutine get_min_sstep(block,ss)
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Function for evaluating minimum space step.
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    implicit none
-    type(Type_SBlock), intent(IN)::    block ! Block-level data.
-    real(R_P),         intent(INOUT):: ss    ! Minimum space step.
-    integer(I_P)::                     i,j,k ! Counters.
-    !-------------------------------------------------------------------------------------------------------------------------------
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    do k=1,block%Nk
-      do j=1,block%Nj
-        do i=1,block%Ni
-          ss = min(ss,                                                                 &
-                   (0.25_R_P*(block%node(i  ,j  ,k  )%x + block%node(i  ,j-1,k  )%x +  &
-                              block%node(i  ,j-1,k-1)%x + block%node(i  ,j  ,k-1)%x)-  &
-                    0.25_R_P*(block%node(i-1,j  ,k  )%x + block%node(i-1,j-1,k  )%x +  &
-                              block%node(i-1,j-1,k-1)%x + block%node(i-1,j  ,k-1)%x)), &
-                   (0.25_R_P*(block%node(i  ,j  ,k  )%y + block%node(i-1,j  ,k  )%y +  &
-                              block%node(i-1,j  ,k-1)%y + block%node(i  ,j  ,k-1)%y)-  &
-                    0.25_R_P*(block%node(i  ,j-1,k  )%y + block%node(i-1,j-1,k  )%y +  &
-                              block%node(i-1,j-1,k-1)%y + block%node(i  ,j-1,k-1)%y)), &
-                   (0.25_R_P*(block%node(i  ,j  ,k  )%z + block%node(i-1,j-1,k  )%z +  &
-                              block%node(i-1,j  ,k  )%z + block%node(i  ,j-1,k  )%z)-  &
-                    0.25_R_P*(block%node(i  ,j  ,k-1)%z + block%node(i-1,j-1,k-1)%z +  &
-                              block%node(i-1,j  ,k-1)%z + block%node(i  ,j-1,k-1)%z)))
-
-        enddo
-      enddo
-    enddo
-    return
-    !-------------------------------------------------------------------------------------------------------------------------------
-    endsubroutine get_min_sstep
   endsubroutine weno_init
 
   !> @brief Subroutine for computing central difference reconstruction of \f$2S^{th}\f$ order instead of WENO \f$2S^{th}-1\f$ one.

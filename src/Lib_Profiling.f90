@@ -18,10 +18,9 @@
 !> @ingroup Lib_ProfilingLibrary
 module Lib_Profiling
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                       ! Integers and reals precision definition.
-USE Data_Type_Time                     ! Definition of Type_Time.
-USE Lib_IO_Misc                        ! Procedures for IO and strings operations.
-USE Lib_Parallel, only: Nthreads,Nproc ! Number of threads and procs.
+USE IR_Precision   ! Integers and reals precision definition.
+USE Data_Type_Time ! Definition of Type_Time.
+USE Lib_IO_Misc    ! Procedures for IO and strings operations.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -34,20 +33,18 @@ public:: profile
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @ingroup Lib_ProfilingPrivateVarPar
 !> @{
-!real(R8P)::                 instant0 = 0._R8P !< The Crono starting instant used for profing the code.
-integer(I8P)::              instant0 = 0_I8P  !< The Crono starting instant used for profing the code.
-integer(I_P)::              Npp = 0_I_P       !< Number of parts of the code profiled.
-!real(R8P),    allocatable:: partial(:,:)      !< Partial times used for profing the code [1:2,1:Npp].
-integer(I8P), allocatable:: partial(:,:)      !< Partial times used for profing the code [1:2,1:Npp].
-integer(I_P), allocatable:: unitprofile(:)    !< Logic units for profiling files [1:Npp].
-integer(I_P), allocatable:: tictoc(:)         !< Counter of files access [1:Npp].
-integer(I_P)::              pp = 0_I_P        !< Index of current profiled part of the code.
+integer(I8P)::              instant0 = 0_I8P !< The Crono starting instant used for profing the code.
+integer(I_P)::              Npp = 0_I_P      !< Number of parts of the code profiled.
+integer(I8P), allocatable:: partial(:,:)     !< Partial times used for profing the code [1:2,1:Npp].
+integer(I_P), allocatable:: unitprofile(:)   !< Logic units for profiling files [1:Npp].
+integer(I_P), allocatable:: tictoc(:)        !< Counter of files access [1:Npp].
+integer(I_P)::              pp = 0_I_P       !< Index of current profiled part of the code.
 !> @}
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @brief Subroutine for profiling the code.
   !> @ingroup Lib_ProfilingPublicProcedure
-  subroutine profile(Np,fnamep,header,p,pstart,pstop,finalize,myrank)
+  subroutine profile(Np,fnamep,header,p,pstart,pstop,finalize,myrank,Nthreads,Nproc)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   integer(I_P), intent(IN), optional:: Np        !< Number of parts of the code profiled. Initializing the profiling if passed.
@@ -58,6 +55,8 @@ contains
   logical,      intent(IN), optional:: pstop     !< Flag for stop the profiling of the current profiled part of the code.
   logical,      intent(IN), optional:: finalize  !< Flag for finilizing the profiling of the code.
   integer(I_P), intent(IN)::           myrank    !< Current rank process.
+  integer(I4P), intent(IN)::           Nthreads  !< Number of OpenMP threads.
+  integer(I4P), intent(IN)::           Nproc     !< Number of MPI processes.
   integer(I_P)::                       u         !< Unit files counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 

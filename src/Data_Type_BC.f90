@@ -1,90 +1,77 @@
 !> @ingroup DerivedType
 !> @{
 !> @defgroup Data_Type_BCDerivedType Data_Type_BC
+!> Module definition of Type_BC
 !> @}
 
 !> @ingroup GlobalVarPar
 !> @{
 !> @defgroup Data_Type_BCGlobalVarPar Data_Type_BC
+!> Module definition of Type_BC
 !> @}
 
-!> @ingroup PublicProcedure
+!> @ingroup Interface
 !> @{
-!> @defgroup Data_Type_BCPublicProcedure Data_Type_BC
+!> @defgroup Data_Type_BCInterface Data_Type_BC
+!> Module definition of Type_BC
 !> @}
 
 !> @ingroup PrivateProcedure
 !> @{
 !> @defgroup Data_Type_BCPrivateProcedure Data_Type_BC
+!> Module definition of Type_BC
 !> @}
 
 !> @brief This module contains the definition of Type_BC and its procedures.
 !> Type_BC is a derived type containing all boundary conditions informations.
 module Data_Type_BC
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision ! Integers and reals precision definition.
+USE IR_Precision                                    ! Integers and reals precision definition.
+USE Data_Type_Cell_Indexes, only: Type_Cell_Indexes ! Definition of Type_Cell_Indexes.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
 private
-public:: bc_nan_str,bc_nan
-public:: bc_ref_str,bc_ref
-public:: bc_ext_str,bc_ext
-public:: bc_per_str,bc_per
-public:: bc_adj_str,bc_adj
-public:: bc_in1_str,bc_in1
-public:: bc_in2_str,bc_in2
-public:: Nbc
-public:: bc_list,bc_list_str
-public:: write_bc,read_bc
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @ingroup Data_Type_BCGlobalVarPar
 !> @{
-character(3), parameter:: bc_nan_str = 'NAN' !< Definition of non-assigned boundary condition parameter string.
-integer(I1P), parameter:: bc_nan     =-1_I1P !< Definition of non-assigned boundary condition parameter id.
-character(3), parameter:: bc_ref_str = 'REF' !< Definition of reflective boundary condition parameter string.
-integer(I1P), parameter:: bc_ref     = 1_I1P !< Definition of reflective boundary condition parameter id.
-character(3), parameter:: bc_ext_str = 'EXT' !< Definition of extrapolation boundary condition parameter string.
-integer(I1P), parameter:: bc_ext     = 2_I1P !< Definition of extrapolation boundary condition parameter id.
-character(3), parameter:: bc_per_str = 'PER' !< Definition of periodic boundary condition parameter string.
-integer(I1P), parameter:: bc_per     = 3_I1P !< Definition of periodic boundary condition parameter id.
-character(3), parameter:: bc_adj_str = 'ADJ' !< Definition of adjacent boundary condition parameter string.
-integer(I1P), parameter:: bc_adj     = 4_I1P !< Definition of adjacent boundary condition parameter id.
-character(3), parameter:: bc_in1_str = 'IN1' !< Definition of inflow 1 boundary condition parameter string.
-integer(I1P), parameter:: bc_in1     = 5_I1P !< Definition of inflow 1 boundary condition parameter id.
-character(3), parameter:: bc_in2_str = 'IN2' !< Definition of inflow 2 boundary condition parameter string.
-integer(I1P), parameter:: bc_in2     = 6_I1P !< Definition of inflow 2 boundary condition parameter id.
-integer(I1P), parameter:: Nbc = 7_I1P        !< Number of possible boundary conditions.
-character(3), parameter:: bc_list_str(1:Nbc) = &
-                                             (/ bc_nan_str, &
-                                                bc_ref_str, &
-                                                bc_ext_str, &
-                                                bc_per_str, &
-                                                bc_adj_str, &
-                                                bc_in1_str, &
-                                                bc_in2_str  &
-                                              /) !< Boundary conditions string list.
-integer(I1P), parameter:: bc_list    (1:Nbc) = &
-                                             (/ bc_nan, &
-                                                bc_ref, &
-                                                bc_ext, &
-                                                bc_per, &
-                                                bc_adj, &
-                                                bc_in1, &
-                                                bc_in2  &
-                                              /) !< Boundary conditions list.
+character(3), parameter, public:: bc_nan_str = 'NAN' !< Definition of non-assigned boundary condition parameter string.
+integer(I1P), parameter, public:: bc_nan     =-1_I1P !< Definition of non-assigned boundary condition parameter id.
+character(3), parameter, public:: bc_ref_str = 'REF' !< Definition of reflective boundary condition parameter string.
+integer(I1P), parameter, public:: bc_ref     = 1_I1P !< Definition of reflective boundary condition parameter id.
+character(3), parameter, public:: bc_ext_str = 'EXT' !< Definition of extrapolation boundary condition parameter string.
+integer(I1P), parameter, public:: bc_ext     = 2_I1P !< Definition of extrapolation boundary condition parameter id.
+character(3), parameter, public:: bc_per_str = 'PER' !< Definition of periodic boundary condition parameter string.
+integer(I1P), parameter, public:: bc_per     = 3_I1P !< Definition of periodic boundary condition parameter id.
+character(3), parameter, public:: bc_adj_str = 'ADJ' !< Definition of adjacent boundary condition parameter string.
+integer(I1P), parameter, public:: bc_adj     = 4_I1P !< Definition of adjacent boundary condition parameter id.
+character(3), parameter, public:: bc_in1_str = 'IN1' !< Definition of inflow 1 boundary condition parameter string.
+integer(I1P), parameter, public:: bc_in1     = 5_I1P !< Definition of inflow 1 boundary condition parameter id.
+character(3), parameter, public:: bc_in2_str = 'IN2' !< Definition of inflow 2 boundary condition parameter string.
+integer(I1P), parameter, public:: bc_in2     = 6_I1P !< Definition of inflow 2 boundary condition parameter id.
+integer(I1P), parameter, public:: Nbc = 7_I1P        !< Number of possible boundary conditions.
+character(3), parameter, public:: bc_list_str(1:Nbc) = &
+                                                     (/ bc_nan_str, &
+                                                        bc_ref_str, &
+                                                        bc_ext_str, &
+                                                        bc_per_str, &
+                                                        bc_adj_str, &
+                                                        bc_in1_str, &
+                                                        bc_in2_str  &
+                                                      /) !< Boundary conditions string list.
+integer(I1P), parameter, public:: bc_list    (1:Nbc) = &
+                                                     (/ bc_nan, &
+                                                        bc_ref, &
+                                                        bc_ext, &
+                                                        bc_per, &
+                                                        bc_adj, &
+                                                        bc_in1, &
+                                                        bc_in2  &
+                                                      /) !< Boundary conditions list.
 !> @}
-!> Derived type containing adjacent boundary condition.
-!> @ingroup Data_Type_BCDerivedType
-type, public:: Type_Adj
-  integer(I4P):: b = 0_I4P !< b index of adjacent block.
-  integer(I4P):: i = 0_I4P !< i index of adjacent cell in the b block.
-  integer(I4P):: j = 0_I4P !< j index of adjacent cell in the b block.
-  integer(I4P):: k = 0_I4P !< k index of adjacent cell in the b block.
-endtype Type_Adj
 !> Derived type containing boundary conditions informations.
 !> @note
 !>   meaning of \b inf component \n
@@ -97,404 +84,90 @@ endtype Type_Adj
 !>     where n is the time step counter.
 !> @ingroup Data_Type_BCDerivedType
 type, public:: Type_BC
-  integer(I1P)::                tp = bc_ext !< Type of boundary condition (bc_nan,bc_ref,bc_ext...).
-  integer(I4P),   allocatable:: inf         !< Auxiliary informations for inflow-type boundary condition.
-  type(Type_Adj), allocatable:: adj         !< Connection indexes for adjacent boundary condition.
+  integer(I1P)::                         tp = bc_ext !< Type of boundary condition (bc_nan,bc_ref,bc_ext...).
+  integer(I4P),            allocatable:: inf         !< Auxiliary informations for inflow-type boundary condition.
+  type(Type_Cell_Indexes), allocatable:: adj         !< Connection indexes for adjacent boundary condition.
   contains
-    procedure:: init            ! Procedure for initilizing allocatable variables.
-    procedure:: free => free_bc ! Procedure for freeing the memory of allocatable variables.
-    procedure:: set             ! Procedure for setting bc members.
-    procedure:: str2id          ! Procedure for setting integer id from string id.
-    procedure:: id2str          ! Procedure for converting integer id to string id.
+    procedure:: free                    ! Procedure for freeing dynamic memory.
+    procedure:: alloc                   ! Procedure for allocating dynamic memory.
+    procedure:: set                     ! Procedure for setting bc members.
+    procedure:: load   => load_bc_self  ! Procedure for loading boundary conditions.
+    procedure:: save   => save_bc_self  ! Procedure for saving boundary conditions.
+    procedure:: print  => print_bc_self ! Procedure for printing boundary conditions with a pretty format.
+    procedure:: str2id                  ! Procedure for setting integer id from string id.
+    procedure:: id2str                  ! Procedure for converting integer id to string id.
+    procedure:: is_ref                  ! Procedure for checking if bc is reflective.
+    procedure:: is_ext                  ! Procedure for checking if bc is extrapolation.
+    procedure:: is_per                  ! Procedure for checking if bc is periodic.
+    procedure:: is_adj                  ! Procedure for checking if bc is adjacent.
+    procedure:: is_in1                  ! Procedure for checking if bc is inflow 1.
+    procedure:: is_in2                  ! Procedure for checking if bc is inflow 2.
+    procedure:: is_inf                  ! Procedure for checking if bc is inflow.
+    final::     finalize                ! Procedure for freeing dynamic memory when finalizing.
+    ! operators overloading
+    generic:: assignment(=) => assign_bc
+    ! private procedures
+    procedure, pass(bc1), private:: assign_bc
 endtype Type_BC
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  !> @ingroup Data_Type_BCPublicProcedure
-  !> @{
-  !> @brief Function for writing Type_BC data.
-  !> The vector data could be scalar, one, two and three dimensional array. The format could be ascii or binary.
-  !> @return \b err integer(I_P) variable for error trapping.
-  function write_bc(scalar,array1D,array2D,array3D,format,unit) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_BC), intent(IN), optional:: scalar         !< Scalar bc data.
-  type(Type_BC), intent(IN), optional:: array1D(:)     !< One dimensional array bc data.
-  type(Type_BC), intent(IN), optional:: array2D(:,:)   !< Two dimensional array bc data.
-  type(Type_BC), intent(IN), optional:: array3D(:,:,:) !< Three dimensional array bc data.
-  character(*),  intent(IN), optional:: format         !< Format specifier.
-  integer(I4P),  intent(IN)::           unit           !< Logic unit.
-  integer(I_P)::                        err            !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                        i1,i2,i3       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(format)) then
-    select case(adjustl(trim(format)))
-    case('*')
-      if (present(scalar)) then
-        write(unit,*,iostat=err)scalar%tp
-        select case(scalar%tp)
-        case(bc_in1,bc_in2)
-          write(unit,*,iostat=err)scalar%inf
-        case(bc_adj)
-          write(unit,*,iostat=err)scalar%adj
-        endselect
-      elseif (present(array1D)) then
-        write(unit,*,iostat=err)array1D%tp
-        do i1=lbound(array1D,dim=1),ubound(array1D,dim=1)
-          select case(array1D(i1)%tp)
-          case(bc_in1,bc_in2)
-            write(unit,*,iostat=err)array1D(i1)%inf
-          case(bc_adj)
-            write(unit,*,iostat=err)array1D(i1)%adj
-          endselect
-        enddo
-      elseif (present(array2D)) then
-        write(unit,*,iostat=err)array2D%tp
-        do i2=lbound(array2D,dim=2),ubound(array2D,dim=2)
-          do i1=lbound(array2D,dim=1),ubound(array2D,dim=1)
-            select case(array2D(i1,i2)%tp)
-            case(bc_in1,bc_in2)
-              write(unit,*,iostat=err)array2D(i1,i2)%inf
-            case(bc_adj)
-              write(unit,*,iostat=err)array2D(i1,i2)%adj
-            endselect
-          enddo
-        enddo
-      elseif (present(array3D)) then
-        write(unit,*,iostat=err)array3D%tp
-        do i3=lbound(array3D,dim=3),ubound(array3D,dim=3)
-          do i2=lbound(array3D,dim=2),ubound(array3D,dim=2)
-            do i1=lbound(array3D,dim=1),ubound(array3D,dim=1)
-              select case(array3D(i1,i2,i3)%tp)
-              case(bc_in1,bc_in2)
-                write(unit,*,iostat=err)array3D(i1,i2,i3)%inf
-              case(bc_adj)
-                write(unit,*,iostat=err)array3D(i1,i2,i3)%adj
-              endselect
-            enddo
-          enddo
-        enddo
-      endif
-    case default
-      if (present(scalar)) then
-        write(unit,adjustl(trim(format)),iostat=err)scalar%tp
-        select case(scalar%tp)
-        case(bc_in1,bc_in2)
-          write(unit,adjustl(trim(format)),iostat=err)scalar%inf
-        case(bc_adj)
-          write(unit,adjustl(trim(format)),iostat=err)scalar%adj
-        endselect
-      elseif (present(array1D)) then
-        write(unit,adjustl(trim(format)),iostat=err)array1D%tp
-        do i1=lbound(array1D,dim=1),ubound(array1D,dim=1)
-          select case(array1D(i1)%tp)
-          case(bc_in1,bc_in2)
-            write(unit,adjustl(trim(format)),iostat=err)array1D(i1)%inf
-          case(bc_adj)
-            write(unit,adjustl(trim(format)),iostat=err)array1D(i1)%adj
-          endselect
-        enddo
-      elseif (present(array2D)) then
-        write(unit,adjustl(trim(format)),iostat=err)array2D%tp
-        do i2=lbound(array2D,dim=2),ubound(array2D,dim=2)
-          do i1=lbound(array2D,dim=1),ubound(array2D,dim=1)
-            select case(array2D(i1,i2)%tp)
-            case(bc_in1,bc_in2)
-              write(unit,adjustl(trim(format)),iostat=err)array2D(i1,i2)%inf
-            case(bc_adj)
-              write(unit,adjustl(trim(format)),iostat=err)array2D(i1,i2)%adj
-            endselect
-          enddo
-        enddo
-      elseif (present(array3D)) then
-        write(unit,adjustl(trim(format)),iostat=err)array3D%tp
-        do i3=lbound(array3D,dim=3),ubound(array3D,dim=3)
-          do i2=lbound(array3D,dim=2),ubound(array3D,dim=2)
-            do i1=lbound(array3D,dim=1),ubound(array3D,dim=1)
-              select case(array3D(i1,i2,i3)%tp)
-              case(bc_in1,bc_in2)
-                write(unit,adjustl(trim(format)),iostat=err)array3D(i1,i2,i3)%inf
-              case(bc_adj)
-                write(unit,adjustl(trim(format)),iostat=err)array3D(i1,i2,i3)%adj
-              endselect
-            enddo
-          enddo
-        enddo
-      endif
-    endselect
-  else
-    if (present(scalar)) then
-      write(unit,iostat=err)scalar%tp
-      select case(scalar%tp)
-      case(bc_in1,bc_in2)
-        write(unit,iostat=err)scalar%inf
-      case(bc_adj)
-        write(unit,iostat=err)scalar%adj
-      endselect
-    elseif (present(array1D)) then
-      write(unit,iostat=err)array1D%tp
-      do i1=lbound(array1D,dim=1),ubound(array1D,dim=1)
-        select case(array1D(i1)%tp)
-        case(bc_in1,bc_in2)
-          write(unit,iostat=err)array1D(i1)%inf
-        case(bc_adj)
-          write(unit,iostat=err)array1D(i1)%adj
-        endselect
-      enddo
-    elseif (present(array2D)) then
-      write(unit,iostat=err)array2D%tp
-      do i2=lbound(array2D,dim=2),ubound(array2D,dim=2)
-        do i1=lbound(array2D,dim=1),ubound(array2D,dim=1)
-          select case(array2D(i1,i2)%tp)
-          case(bc_in1,bc_in2)
-            write(unit,iostat=err)array2D(i1,i2)%inf
-          case(bc_adj)
-            write(unit,iostat=err)array2D(i1,i2)%adj
-          endselect
-        enddo
-      enddo
-    elseif (present(array3D)) then
-      write(unit,iostat=err)array3D%tp
-      do i3=lbound(array3D,dim=3),ubound(array3D,dim=3)
-        do i2=lbound(array3D,dim=2),ubound(array3D,dim=2)
-          do i1=lbound(array3D,dim=1),ubound(array3D,dim=1)
-            select case(array3D(i1,i2,i3)%tp)
-            case(bc_in1,bc_in2)
-              write(unit,iostat=err)array3D(i1,i2,i3)%inf
-            case(bc_adj)
-              write(unit,iostat=err)array3D(i1,i2,i3)%adj
-            endselect
-          enddo
-        enddo
-      enddo
-    endif
-  endif
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction write_bc
-
-  !> @brief Function for reading Type_BC data.
-  !> The vector data could be scalar, one, two and three dimensional array. The format could be ascii or binary.
-  !> @return \b err integer(I_P) variable for error trapping.
-  function read_bc(scalar,array1D,array2D,array3D,format,unit) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  type(Type_BC), intent(INOUT), optional:: scalar         !< Scalar bc data.
-  type(Type_BC), intent(INOUT), optional:: array1D(:)     !< One dimensional array bc data.
-  type(Type_BC), intent(INOUT), optional:: array2D(:,:)   !< Two dimensional array bc data.
-  type(Type_BC), intent(INOUT), optional:: array3D(:,:,:) !< Three dimensional array bc data.
-  character(*),  intent(IN),    optional:: format         !< Format specifier.
-  integer(I4P),  intent(IN)::              unit           !< Logic unit.
-  integer(I_P)::                           err            !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                           i1,i2,i3       !< Counters.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(format)) then
-    select case(adjustl(trim(format)))
-    case('*')
-      if (present(scalar)) then
-        read(unit,*,iostat=err)scalar%tp ; call scalar%init
-        select case(scalar%tp)
-        case(bc_in1,bc_in2)
-          read(unit,*,iostat=err)scalar%inf
-        case(bc_adj)
-          read(unit,*,iostat=err)scalar%adj
-        endselect
-      elseif (present(array1D)) then
-        read(unit,*,iostat=err)array1D%tp ; call array1D%init
-        do i1=lbound(array1D,dim=1),ubound(array1D,dim=1)
-          select case(array1D(i1)%tp)
-          case(bc_in1,bc_in2)
-            read(unit,*,iostat=err)array1D(i1)%inf
-          case(bc_adj)
-            read(unit,*,iostat=err)array1D(i1)%adj
-          endselect
-        enddo
-      elseif (present(array2D)) then
-        read(unit,*,iostat=err)array2D%tp ; call array2D%init
-        do i2=lbound(array2D,dim=2),ubound(array2D,dim=2)
-          do i1=lbound(array2D,dim=1),ubound(array2D,dim=1)
-            select case(array2D(i1,i2)%tp)
-            case(bc_in1,bc_in2)
-              read(unit,*,iostat=err)array2D(i1,i2)%inf
-            case(bc_adj)
-              read(unit,*,iostat=err)array2D(i1,i2)%adj
-            endselect
-          enddo
-        enddo
-      elseif (present(array3D)) then
-        read(unit,*,iostat=err)array3D%tp ; call array3D%init
-        do i3=lbound(array3D,dim=3),ubound(array3D,dim=3)
-          do i2=lbound(array3D,dim=2),ubound(array3D,dim=2)
-            do i1=lbound(array3D,dim=1),ubound(array3D,dim=1)
-              select case(array3D(i1,i2,i3)%tp)
-              case(bc_in1,bc_in2)
-                read(unit,*,iostat=err)array3D(i1,i2,i3)%inf
-              case(bc_adj)
-                read(unit,*,iostat=err)array3D(i1,i2,i3)%adj
-              endselect
-            enddo
-          enddo
-        enddo
-      endif
-    case default
-      if (present(scalar)) then
-        read(unit,adjustl(trim(format)),iostat=err)scalar%tp ; call scalar%init
-        select case(scalar%tp)
-        case(bc_in1,bc_in2)
-          read(unit,adjustl(trim(format)),iostat=err)scalar%inf
-        case(bc_adj)
-          read(unit,adjustl(trim(format)),iostat=err)scalar%adj
-        endselect
-      elseif (present(array1D)) then
-        read(unit,adjustl(trim(format)),iostat=err)array1D%tp ; call array1D%init
-        do i1=lbound(array1D,dim=1),ubound(array1D,dim=1)
-          select case(array1D(i1)%tp)
-          case(bc_in1,bc_in2)
-            read(unit,adjustl(trim(format)),iostat=err)array1D(i1)%inf
-          case(bc_adj)
-            read(unit,adjustl(trim(format)),iostat=err)array1D(i1)%adj
-          endselect
-        enddo
-      elseif (present(array2D)) then
-        read(unit,adjustl(trim(format)),iostat=err)array2D%tp ; call array2D%init
-        do i2=lbound(array2D,dim=2),ubound(array2D,dim=2)
-          do i1=lbound(array2D,dim=1),ubound(array2D,dim=1)
-            select case(array2D(i1,i2)%tp)
-            case(bc_in1,bc_in2)
-              read(unit,adjustl(trim(format)),iostat=err)array2D(i1,i2)%inf
-            case(bc_adj)
-              read(unit,adjustl(trim(format)),iostat=err)array2D(i1,i2)%adj
-            endselect
-          enddo
-        enddo
-      elseif (present(array3D)) then
-        read(unit,adjustl(trim(format)),iostat=err)array3D%tp ; call array3D%init
-        do i3=lbound(array3D,dim=3),ubound(array3D,dim=3)
-          do i2=lbound(array3D,dim=2),ubound(array3D,dim=2)
-            do i1=lbound(array3D,dim=1),ubound(array3D,dim=1)
-              select case(array3D(i1,i2,i3)%tp)
-              case(bc_in1,bc_in2)
-                read(unit,adjustl(trim(format)),iostat=err)array3D(i1,i2,i3)%inf
-              case(bc_adj)
-                read(unit,adjustl(trim(format)),iostat=err)array3D(i1,i2,i3)%adj
-              endselect
-            enddo
-          enddo
-        enddo
-      endif
-    endselect
-  else
-    if (present(scalar)) then
-      read(unit,iostat=err)scalar%tp ; call scalar%init
-      select case(scalar%tp)
-      case(bc_in1,bc_in2)
-        read(unit,iostat=err)scalar%inf
-      case(bc_adj)
-        read(unit,iostat=err)scalar%adj
-      endselect
-    elseif (present(array1D)) then
-      read(unit,iostat=err)array1D%tp ; call array1D%init
-      do i1=lbound(array1D,dim=1),ubound(array1D,dim=1)
-        select case(array1D(i1)%tp)
-        case(bc_in1,bc_in2)
-          read(unit,iostat=err)array1D(i1)%inf
-        case(bc_adj)
-          read(unit,iostat=err)array1D(i1)%adj
-        endselect
-      enddo
-    elseif (present(array2D)) then
-      read(unit,iostat=err)array2D%tp ; call array2D%init
-      do i2=lbound(array2D,dim=2),ubound(array2D,dim=2)
-        do i1=lbound(array2D,dim=1),ubound(array2D,dim=1)
-          select case(array2D(i1,i2)%tp)
-          case(bc_in1,bc_in2)
-            read(unit,iostat=err)array2D(i1,i2)%inf
-          case(bc_adj)
-            read(unit,iostat=err)array2D(i1,i2)%adj
-          endselect
-        enddo
-      enddo
-    elseif (present(array3D)) then
-      read(unit,iostat=err)array3D%tp ; call array3D%init
-      do i3=lbound(array3D,dim=3),ubound(array3D,dim=3)
-        do i2=lbound(array3D,dim=2),ubound(array3D,dim=2)
-          do i1=lbound(array3D,dim=1),ubound(array3D,dim=1)
-            select case(array3D(i1,i2,i3)%tp)
-            case(bc_in1,bc_in2)
-              read(unit,iostat=err)array3D(i1,i2,i3)%inf
-            case(bc_adj)
-              read(unit,iostat=err)array3D(i1,i2,i3)%adj
-            endselect
-          enddo
-        enddo
-      enddo
-    endif
-  endif
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction read_bc
-  !> @}
-
   !> @ingroup Data_Type_BCPrivateProcedure
   !> @{
-  !> @brief Subroutine for initializing Type_BC allocatable variables.
-  elemental subroutine init(bc,bc0)
+  !> @brief Procedure for freeing dynamic memory.
+  elemental subroutine free(bc)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_BC), intent(INOUT)::        bc  !< Boundary conditions data.
-  type(Type_BC),  intent(IN), optional:: bc0 !< Optional initialization data.
+  class(Type_BC), intent(INOUT):: bc !< Boundary conditions data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(bc0)) then
-    bc%tp = bc0%tp
-    select case(bc%tp)
-    case(bc_in1,bc_in2)
-      if (.not.allocated(bc%inf)) allocate(bc%inf) ; bc%inf = bc0%inf
-      if (     allocated(bc%adj)) deallocate(bc%adj)
-    case(bc_adj)
-      if (.not.allocated(bc%adj)) allocate(bc%adj) ; bc%adj = bc0%adj
-      if (     allocated(bc%inf)) deallocate(bc%inf)
-    endselect
-  else
-    select case(bc%tp)
-    case(bc_in1,bc_in2)
-      if (.not.allocated(bc%inf)) allocate(bc%inf) ; bc%inf = 0_I4P
-      if (     allocated(bc%adj)) deallocate(bc%adj)
-    case(bc_adj)
-      if (.not.allocated(bc%adj)) allocate(bc%adj)
-      if (     allocated(bc%inf)) deallocate(bc%inf)
-    endselect
-  endif
+  if (allocated(bc%inf)) deallocate(bc%inf)
+  if (allocated(bc%adj)) deallocate(bc%adj)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine init
+  endsubroutine free
 
-  !> @brief Subroutine for freeing the memory of Type_BC allocatable variables.
-  elemental subroutine free_bc(bc)
+  !> @brief Procedure for freeing dynamic memory.
+  elemental subroutine finalize(bc)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_BC), intent(INOUT):: bc  !< Boundary conditions data.
+  type(Type_BC), intent(INOUT):: bc !< Boundary conditions data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-   if (allocated(bc%inf)) deallocate(bc%inf)
-   if (allocated(bc%adj)) deallocate(bc%adj)
+  call bc%free
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine free_bc
+  endsubroutine finalize
 
-  !> @brief Subroutine for setting members of Type_BC variable.
+  !> @brief Procedure for allocating dynamic memory.
+  elemental subroutine alloc(bc)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_BC), intent(INOUT):: bc !< Boundary conditions data.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  select case(bc%tp)
+  case(bc_in1,bc_in2)
+    if (.not.allocated(bc%inf))   allocate(bc%inf) ; bc%inf = 0_I4P
+    if (     allocated(bc%adj)) deallocate(bc%adj)
+  case(bc_adj)
+    if (.not.allocated(bc%adj))   allocate(bc%adj)
+    if (     allocated(bc%inf)) deallocate(bc%inf)
+  endselect
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine alloc
+
+  !> @brief Procedure for setting members of Type_BC variable.
   elemental subroutine set(bc,tp,inf,adj)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_BC), intent(INOUT)::        bc  !< Vector.
-  integer(I1P),   intent(IN), optional:: tp  !< Type of boundary condition (bc_nan,bc_ref,bc_ext...).
-  integer(I4P),   intent(IN), optional:: inf !< Auxiliary informations for inflow-type boundary condition.
-  type(Type_Adj), intent(IN), optional:: adj !< Connection indexes for adjacent boundary condition.
+  class(Type_BC),          intent(INOUT)::        bc  !< Vector.
+  integer(I1P),            intent(IN), optional:: tp  !< Type of boundary condition (bc_nan,bc_ref,bc_ext...).
+  integer(I4P),            intent(IN), optional:: inf !< Auxiliary informations for inflow-type boundary condition.
+  type(Type_Cell_Indexes), intent(IN), optional:: adj !< Connection indexes for adjacent boundary condition.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -505,7 +178,101 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine set
 
-  !> @brief Subroutine for setting integer id from string id.
+  !> @brief Procedure for loading boundary conditions.
+  subroutine load_bc_self(bc,pos,iostat,iomsg,unit)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_BC),         intent(INOUT):: bc      !< Boundary conditions data.
+  integer(I8P), optional, intent(IN)::    pos     !< Position specifier.
+  integer(I4P), optional, intent(OUT)::   iostat  !< IO error.
+  character(*), optional, intent(OUT)::   iomsg   !< IO error message.
+  integer(I4P),           intent(IN)::    unit    !< Logic unit.
+  integer(I4P)::                          iostatd !< IO error.
+  character(500)::                        iomsgd  !< Temporary variable for IO error message.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (present(pos)) then
+    read(unit=unit,pos=pos,iostat=iostatd,iomsg=iomsgd)bc%tp
+  else
+    read(unit=unit,        iostat=iostatd,iomsg=iomsgd)bc%tp
+  endif
+  call bc%alloc
+  select case(bc%tp)
+  case(bc_in1,bc_in2)
+    read(unit=unit,        iostat=iostatd,iomsg=iomsgd)bc%inf
+  case(bc_adj)
+    read(unit=unit,        iostat=iostatd,iomsg=iomsgd)bc%adj
+  endselect
+  if (present(iostat)) iostat = iostatd
+  if (present(iomsg))  iomsg  = adjustl(trim(iomsgd))
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine load_bc_self
+
+  !> @brief Procedure for saving boundary conditions.
+  subroutine save_bc_self(bc,pos,iostat,iomsg,unit)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_BC),         intent(IN)::  bc      !< Boundary conditions data.
+  integer(I8P), optional, intent(IN)::  pos     !< Position specifier.
+  integer(I4P), optional, intent(OUT):: iostat  !< IO error.
+  character(*), optional, intent(OUT):: iomsg   !< IO error message.
+  integer(I4P),           intent(IN)::  unit    !< Logic unit.
+  integer(I4P)::                        iostatd !< IO error.
+  character(500)::                      iomsgd  !< Temporary variable for IO error message.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (present(pos)) then
+    write(unit=unit,pos=pos,iostat=iostatd,iomsg=iomsgd)bc%tp
+  else
+    write(unit=unit,        iostat=iostatd,iomsg=iomsgd)bc%tp
+  endif
+  select case(bc%tp)
+  case(bc_in1,bc_in2)
+    write(unit=unit,        iostat=iostatd,iomsg=iomsgd)bc%inf
+  case(bc_adj)
+    write(unit=unit,        iostat=iostatd,iomsg=iomsgd)bc%adj
+  endselect
+  if (present(iostat)) iostat = iostatd
+  if (present(iomsg))  iomsg  = adjustl(trim(iomsgd))
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine save_bc_self
+
+  !> @brief Procedure for printing boundary conditions with a pretty format.
+  subroutine print_bc_self(bc,pref,iostat,iomsg,unit)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_BC),         intent(IN)::  bc      !< Boundary conditions data.
+  character(*), optional, intent(IN)::  pref    !< Prefixing string.
+  integer(I4P), optional, intent(OUT):: iostat  !< IO error.
+  character(*), optional, intent(OUT):: iomsg   !< IO error message.
+  integer(I4P),           intent(IN)::  unit    !< Logic unit.
+  character(len=:), allocatable::       prefd   !< Prefixing string.
+  integer(I4P)::                        iostatd !< IO error.
+  character(500)::                      iomsgd  !< Temporary variable for IO error message.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  prefd = '' ; if (present(pref)) prefd = pref
+  write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//' type='//bc%id2str()
+  select case(bc%tp)
+  case(bc_adj)
+    write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//'   adjacent cell(b,i,j,k)='&
+      //trim(str(.true.,bc%adj%b))//','//&
+      trim(str(.true.,bc%adj%i))//','//trim(str(.true.,bc%adj%j))//','//trim(str(.true.,bc%adj%k))
+  case(bc_in1,bc_in2)
+    write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//'   inflow='//trim(str(.true.,bc%inf))
+  endselect
+  if (present(iostat)) iostat = iostatd
+  if (present(iomsg))  iomsg  = iomsgd
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine print_bc_self
+
+  !> @brief Procedure for setting integer id from string id.
   elemental subroutine str2id(bc,bc_str)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -516,7 +283,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   do b=1_I1P,Nbc
-    if (adjustl(trim(bc_str))==adjustl(trim(bc_list_str(b)))) then
+    if (trim(adjustl(bc_str))==trim(adjustl(bc_list_str(b)))) then
       bc%tp = bc_list(b)
       exit
     endif
@@ -525,8 +292,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine str2id
 
-  !> @brief Function for converting integer id to string id.
-  !> @return \b bc_str character(3) variable.
+  !> @brief Procedure for converting integer id to string id.
   elemental function id2str(bc) result(bc_str)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -538,12 +304,133 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   do b=1_I1P,Nbc
     if (bc%tp==bc_list(b)) then
-      bc_str = adjustl(trim(bc_list_str(b)))
+      bc_str = trim(adjustl(bc_list_str(b)))
       exit
     endif
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction id2str
+
+  !> @brief Procedure for checking if bc is reflective.
+  elemental function is_ref(bc) result(it_is)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_BC), intent(IN):: bc     !< BC data.
+  logical::                    it_is  !< Logical flag for checking if bc is of type reflective.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  it_is = (bc%tp==bc_ref)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction is_ref
+
+  !> @brief Procedure for checking if bc is extrapolation.
+  elemental function is_ext(bc) result(it_is)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_BC), intent(IN):: bc     !< BC data.
+  logical::                    it_is  !< Logical flag for checking if bc is of type extrapolation.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  it_is = (bc%tp==bc_ext)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction is_ext
+
+  !> @brief Procedure for checking if bc is periodic.
+  elemental function is_per(bc) result(it_is)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_BC), intent(IN):: bc     !< BC data.
+  logical::                    it_is  !< Logical flag for checking if bc is of type periodic.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  it_is = (bc%tp==bc_per)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction is_per
+
+  !> @brief Procedure for checking if bc is adjacent.
+  elemental function is_adj(bc) result(it_is)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_BC), intent(IN):: bc     !< BC data.
+  logical::                    it_is  !< Logical flag for checking if bc is of type adjacent.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  it_is = (bc%tp==bc_adj)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction is_adj
+
+  !> @brief Procedure for checking if bc is inflow 1.
+  elemental function is_in1(bc) result(it_is)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_BC), intent(IN):: bc     !< BC data.
+  logical::                    it_is  !< Logical flag for checking if bc is of type inflow.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  it_is = (bc%tp==bc_in1)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction is_in1
+
+  !> @brief Procedure for checking if bc is inflow 2.
+  elemental function is_in2(bc) result(it_is)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_BC), intent(IN):: bc     !< BC data.
+  logical::                    it_is  !< Logical flag for checking if bc is of type inflow.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  it_is = (bc%tp==bc_in2)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction is_in2
+
+  !> @brief Procedure for checking if bc is inflow.
+  elemental function is_inf(bc) result(it_is)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_BC), intent(IN):: bc     !< BC data.
+  logical::                    it_is  !< Logical flag for checking if bc is of type inflow.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  it_is = ((bc%is_in1()).or.(bc%is_in2()))
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction is_inf
+
+  ! Assignment (=)
+  !> @brief Procedure for assignment between two boundary conditions variables.
+  elemental subroutine assign_bc(bc1,bc2)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_BC), intent(INOUT):: bc1
+  type(Type_BC),  intent(IN)::    bc2
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  bc1%tp = bc2%tp
+  select case(bc1%tp)
+  case(bc_in1,bc_in2)
+    if (.not.allocated(bc1%inf))   allocate(bc1%inf) ; bc1%inf = bc2%inf
+    if (     allocated(bc1%adj)) deallocate(bc1%adj)
+  case(bc_adj)
+    if (.not.allocated(bc1%adj))   allocate(bc1%adj) ; bc1%adj = bc2%adj
+    if (     allocated(bc1%inf)) deallocate(bc1%inf)
+  endselect
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine assign_bc
   !> @}
 endmodule Data_Type_BC

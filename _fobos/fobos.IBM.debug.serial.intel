@@ -1,0 +1,15 @@
+[builder]
+compiler=intel
+cflags=-O0 -warn all -check all -debug all -cpp -c -module ./mod/ -static -assume protect_parens -assume realloc_lhs -fp-model source -D_OSYSTEMuix
+lflags=-O0 -warn all -check all -debug all -static -assume protect_parens -assume realloc_lhs -fp-model source
+dmod=./mod/
+dobj=./obj/
+dexe=./
+src=./src/
+colors=True
+quiet=False
+j=10
+[files]
+target=src/IBM.f90
+o=IBM.ser
+log=False

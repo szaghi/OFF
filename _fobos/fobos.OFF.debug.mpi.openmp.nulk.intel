@@ -1,7 +1,7 @@
 [builder]
 compiler=intel
-cflags=-traceback -gen-interfaces -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -O0 -warn all -check all -debug all -openmp -cpp -c -module ./mod/ -assume protect_parens -assume realloc_lhs
-lflags=-traceback -gen-interfaces -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -O0 -warn all -check all -debug all -openmp -assume protect_parens -assume realloc_lhs
+cflags=-O0 -g -warn all -check all -debug all -traceback -fp-stack-check -fstack-protector-all -ftrapuv -openmp -assume protect_parens -assume realloc_lhs -cpp -c -module ./mod/
+lflags=-O0 -g -warn all -check all -debug all -traceback -fp-stack-check -fstack-protector-all -ftrapuv -openmp -assume protect_parens -assume realloc_lhs
 preproc=-D_OSYSTEMuix -DNULk -DSMSWz -DOPENMP -D_MPI -DPPL
 dmod=./mod/
 dobj=./obj/

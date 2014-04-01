@@ -238,11 +238,11 @@ contains
   a  = sqrt(gp/prim%d)
   L  = 0._R8P
   ! assigning non-zero values of L
-    L(1,   Ns+1) = -gp/a           ; L(1,   Ns+2) =  1._R8P
+                       L(1,   Ns+1) = -gp/a           ; L(1,   Ns+2) =  1._R8P
   do s=2,Ns+1
-    L(s,   s-1 ) =  gp/prim%r(s-1) ; L(s,   Ns+2) = -1._R8P
+    if (prim%r(s-1)>0) L(s,   s-1 ) =  gp/prim%r(s-1) ; L(s,   Ns+2) = -1._R8P
   enddo
-    L(Ns+2,Ns+1) =  gp/a           ; L(Ns+2,Ns+2) =  1._R8P
+                       L(Ns+2,Ns+1) =  gp/a           ; L(Ns+2,Ns+2) =  1._R8P
     !L(Ns+3:Ns+4,:) = 1._R8P
     !L(:,Ns+3:Ns+4) = 1._R8P
   return

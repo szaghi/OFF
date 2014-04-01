@@ -99,7 +99,7 @@ contains
     file_d%iomsg  = file_d%errpref//' Attention: lockfile has been found into the working directory!'
     file_d%iostat = err_locked
   case(err_Nproc_unmatch)
-    file_d%iomsg  = file_d%errpref//' Attention: Nproc defined into procmap file differs from the one defined into mesh file!'
+    file_d%iomsg  = file_d%errpref//' Attention: Nproc defined into procmap file differs from the one used!'
     file_d%iostat = err_Nproc_unmatch
   case(err_not_tecio)
     file_d%iomsg  = file_d%errpref//' Attention: impossible to save binary tecplot file without Tecplot tecio library!'

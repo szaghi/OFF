@@ -90,9 +90,15 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  allocate(file_d%tecvarloc(1:3+global%species0%Np))
-  allocate(file_d%tecnull(  1:3+global%species0%Np))
   associate(pp=>file_d%pp,nvar=>file_d%nvar,Ns=>global%species0%Ns,Np=>global%species0%Np)
+    if (.not.pp%meshonly) then
+      nvar = 3 + Np
+      if (pp%schlieren) nvar = nvar + 1
+    else
+      nvar = 3
+    endif
+    allocate(file_d%tecvarloc(1:nvar))
+    allocate(file_d%tecnull(  1:nvar))
     if (pp%binary) then
       file_d%tecvarname = 'x y z'
       if (.not.pp%meshonly) then
@@ -100,6 +106,7 @@ contains
           file_d%tecvarname = trim(file_d%tecvarname)//' r_'//trim(str(.true.,s))
         enddo
         file_d%tecvarname = trim(file_d%tecvarname)//' r u v w p g'
+        if (pp%schlieren) file_d%tecvarname = trim(file_d%tecvarname)//' schl'
       endif
       if (pp%node) then
         file_d%tecvarloc = 1
@@ -107,11 +114,6 @@ contains
         file_d%tecvarloc(1:3) = 1 ; file_d%tecvarloc(4:3+Np)= 0
       endif
       file_d%tecnull = 0
-      if (.not.pp%meshonly) then
-        nvar = 3 + Np
-      else
-        nvar = 3
-      endif
     else
       file_d%tecvarname = ' VARIABLES ="x" "y" "z"'
       if (.not.pp%meshonly) then
@@ -119,12 +121,13 @@ contains
           file_d%tecvarname = trim(file_d%tecvarname)//' "r_'//trim(str(.true.,s))//'"'
         enddo
         file_d%tecvarname = trim(file_d%tecvarname)//' "r" "u" "v" "w" "p" "g"'
+        if (pp%schlieren) file_d%tecvarname = trim(file_d%tecvarname)//' "schl"'
       endif
       if (.not.pp%meshonly) then
         if (pp%node) then
-          file_d%tecvarlocstr = ', VARLOCATION=([1-'//trim(str(.true.,Np))//']=NODAL)'
+          file_d%tecvarlocstr = ', VARLOCATION=([1-'//trim(str(.true.,nvar))//']=NODAL)'
         else
-          file_d%tecvarlocstr = ', VARLOCATION=([1-3]=NODAL,[4-'//trim(str(.true.,Np))//']=CELLCENTERED)'
+          file_d%tecvarlocstr = ', VARLOCATION=([1-3]=NODAL,[4-'//trim(str(.true.,nvar))//']=CELLCENTERED)'
         endif
       else
         file_d%tecvarlocstr = ', VARLOCATION=([1-3]=NODAL)'
@@ -197,6 +200,7 @@ contains
     real(R8P),         intent(IN)::     t                       !< Time.
     type(Type_Primitive), allocatable:: P(:,:,:)                !< Prim variables intepolated at nodes.
     real(R8P),            allocatable:: r(:,:,:,:)              !< Array containing species densities.
+    real(R8P),            allocatable:: schl(:,:,:)             !< Array containing pseudo Schlieren field.
     integer(I4P)::                      ni1,ni2,nj1,nj2,nk1,nk2 !< Bounds of of node-centered data.
     integer(I4P)::                      ci1,ci2,cj1,cj2,ck1,ck2 !< Bounds of of cell-centered data.
     integer(I4P)::                      nnode,ncell             !< Number of nodes and cells.
@@ -244,6 +248,8 @@ contains
             enddo
           enddo
         endif
+        ! computing the (pseudo) Schlieren flow field
+        if (pp%schlieren) call blk%compute_schlieren(interpolate=pp%node,schl=schl)
         ! writing the block data
         if (pp%binary) then
 #ifdef TECIO
@@ -282,6 +288,7 @@ contains
               iostat=tecdat112(nnode,P(ni1:ni2,nj1:nj2,nk1:nk2)%v%z,1)
               iostat=tecdat112(nnode,P(ni1:ni2,nj1:nj2,nk1:nk2)%p  ,1)
               iostat=tecdat112(nnode,P(ni1:ni2,nj1:nj2,nk1:nk2)%g  ,1)
+              if (pp%schlieren) iostat=tecdat112(ncell,schl(ni1:ni2,nj1:nj2,nk1:nk2),1)
             else
               do s=1,Ns
                 file_d%iostat=tecdat112(ncell,r(s,ci1:ci2,cj1:cj2,ck1:ck2),1)
@@ -292,6 +299,7 @@ contains
               iostat=tecdat112(ncell,blk%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%v%z,1)
               iostat=tecdat112(ncell,blk%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%p  ,1)
               iostat=tecdat112(ncell,blk%C(ci1:ci2,cj1:cj2,ck1:ck2)%P%g  ,1)
+              if (pp%schlieren) iostat=tecdat112(ncell,schl(ci1:ci2,cj1:cj2,ck1:ck2),1)
             endif
           endif
 #else
@@ -318,6 +326,7 @@ contains
               write(unit=unit,fmt=FR8P,iostat=iostat,iomsg=iomsg)(((P(i,j,k)%v%z,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
               write(unit=unit,fmt=FR8P,iostat=iostat,iomsg=iomsg)(((P(i,j,k)%p  ,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
               write(unit=unit,fmt=FR8P,iostat=iostat,iomsg=iomsg)(((P(i,j,k)%g  ,i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
+              if (pp%schlieren) write(unit=unit,fmt=FR8P,iostat=iostat,iomsg=iomsg)(((schl(i,j,k),i=ni1,ni2),j=nj1,nj2),k=nk1,nk2)
             else
               do s=1,Ns
                 write(unit=unit,fmt=FR8P,iostat=iostat,iomsg=iomsg)(((blk%C(i,j,k)%P%r(s),i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
@@ -328,10 +337,13 @@ contains
               write(unit=unit,fmt=FR8P,iostat=iostat,iomsg=iomsg)(((blk%C(i,j,k)%P%v%z,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
               write(unit=unit,fmt=FR8P,iostat=iostat,iomsg=iomsg)(((blk%C(i,j,k)%P%p  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
               write(unit=unit,fmt=FR8P,iostat=iostat,iomsg=iomsg)(((blk%C(i,j,k)%P%g  ,i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
+              if (pp%schlieren) write(unit=unit,fmt=FR8P,iostat=iostat,iomsg=iomsg)(((schl(i,j,k),i=ci1,ci2),j=cj1,cj2),k=ck1,ck2)
             endif
           endif
         endif
-        deallocate(r)
+        if (allocated(P   )) deallocate(P   )
+        if (allocated(r   )) deallocate(r   )
+        if (allocated(schl)) deallocate(schl)
       endassociate
     endassociate
     return

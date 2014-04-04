@@ -21,13 +21,14 @@
 !> @ingroup POGProgram
 program POG
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                  ! Integers and reals precision definition.
-USE Data_Type_Files,       only: Type_Files       ! Definition of Type_Files.
-USE Data_Type_Global,      only: Type_Global      ! Definition of Type_Global.
-USE Data_Type_OS,          only: Type_OS          ! Definition of Type_OS.
-USE Data_Type_PostProcess, only: Type_PostProcess ! Definition of Type_PostProcess.
-USE Data_Type_SBlock,      only: Type_SBlock      ! Definition of Type_SBlock.
-USE Lib_IO_Misc                                   ! Procedures for IO and strings operations.
+USE IR_Precision                                                                 ! Integers and reals precision definition.
+USE Data_Type_Command_Line_Argument, only: Type_Command_Line_Argument,cli_parser ! Definition of Type_Command_Line_Argument.
+USE Data_Type_Files,                 only: Type_Files                            ! Definition of Type_Files.
+USE Data_Type_Global,                only: Type_Global                           ! Definition of Type_Global.
+USE Data_Type_OS,                    only: Type_OS                               ! Definition of Type_OS.
+USE Data_Type_PostProcess,           only: Type_PostProcess                      ! Definition of Type_PostProcess.
+USE Data_Type_SBlock,                only: Type_SBlock                           ! Definition of Type_SBlock.
+USE Lib_IO_Misc                                                                  ! Procedures for IO and strings operations.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -68,144 +69,74 @@ endif
 stop
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
-  ! Subroutine for printing the correct use of the program.
-  subroutine print_usage()
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  write(stdout,'(A)')' POG'
-  write(stdout,'(A)')' Post processing code for OFF code'
-  write(stdout,'(A)')' Usage:'
-  write(stdout,'(A)')'   POG -m mesh_file_name'
-  write(stdout,'(A)') '     [-o output_file_name'
-  write(stdout,'(A)') '      -s solution_file_name'
-  write(stdout,'(A)') '      -bc'
-  write(stdout,'(A)') '      -cell'
-  write(stdout,'(A)') '      -ascii'
-  write(stdout,'(A)') '      -schl'
-  write(stdout,'(A)') '      -mirrorX'
-  write(stdout,'(A)') '      -mirrorY'
-  write(stdout,'(A)') '      -mirrorZ'
-  write(stdout,'(A)') '      -tec yes/no'
-  write(stdout,'(A)') '      -vtk yes/no'
-  write(stdout,'(A)') '      -gnu yes/no]'
-  write(stdout,*)
-  write(stdout,'(A)') ' Optional arguments and default values:'
-  write(stdout,'(A)') '  -o output_file_name   => output file name; default is basename of mesh file with the proper extension'
-  write(stdout,'(A)') '  -s solution_file_name => solution file name; if passed the solution variables are saved'
-  write(stdout,'(A)') '  -bc                   => saving boundary conditions ghost cells (default no)'
-  write(stdout,'(A)') '  -cell                 => all vars other than nodes coord. are cell centered (default no, node centered)'
-  write(stdout,'(A)') '  -ascii                => write ascii output file (default no, write binary one)'
-  write(stdout,'(A)') '  -schl                 => saving (pseudo) Schlieren field (default no)'
-  write(stdout,'(A)') '  -mirrorX              => saving solution togheter a X-axis mirrored copy of flow fieds (default no)'
-  write(stdout,'(A)') '  -mirrorY              => saving solution togheter a Y-axis mirrored copy of flow fieds (default no)'
-  write(stdout,'(A)') '  -mirrorZ              => saving solution togheter a Z-axis mirrored copy of flow fieds (default no)'
-  write(stdout,'(A)') '  -tec yes/no           => write (or not) Tecplot file format (default yes)'
-  write(stdout,'(A)') '  -vtk yes/no           => write (or not) VTK file format (default no)'
-  write(stdout,'(A)') '  -gnu yes/no           => write (or not) Gnuplot file format (default no)'
-  write(stdout,*)
-  write(stdout,'(A)')' Examples: '
-  write(stdout,'(A)')'  Solution file'
-  write(stdout,'(A)')'    Teplot) POG -m example.geo -s example.sol -o example'
-  write(stdout,'(A)')'    VTK)    POG -m example.geo -s example.sol -o example'
-  write(stdout,'(A)')'  Only mesh file'
-  write(stdout,'(A)')'    Teplot) POG -m example.geo                -o example'
-  write(stdout,'(A)')'    VTK)    POG -m example.geo                -o example'
-  write(stdout,*)
-  write(stdout,'(A)') ' Notes:'
-  write(stdout,'(A)') '   1) the output file name extension is not necessary because it assigned according to the type of output:'
-  write(stdout,'(A)') '      binary       Tecplot => .plt'
-  write(stdout,'(A)') '      ascii        Tecplot => .dat'
-  write(stdout,'(A)') '      binary/ascii VTK     => .vtm'
-  write(stdout,'(A)') '      ascii        Gnuplot => .gnu'
-  write(stdout,*)
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine print_usage
-
-  ! Subroutine for printing the correct use of the program.
+  !> @brief Procedure for parsing Command Line Arguments (CLA) implementing POG Command Line Interface (CLI).
   subroutine parsing_command_line()
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P)::  Nca = 0   !< Number of command line arguments.
-  integer(I4P)::  c         !< Counter for command line arguments.
-  character(8)::  ca_switch !< Switch identifier.
-  character(3)::  yes       !< Yes (no) flag.
-  character(99):: filename  !< File names dummy string.
-  character(99):: outfname  !< Output file name dummy string.
+  character(3)::                     yes            !< Yes (no) flag.
+  character(99)::                    filename       !< File names dummy string.
+  character(len=:), allocatable::    outfname       !< Output file name dummy string.
+  type(Type_Command_Line_Argument):: cla_list(1:14) !< Command Line Arguments (CLA) list.
+  integer(I4P)::                     error          !< Error trapping flag.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  ! initializing solution file name to "unset" in order to capture when only mesh is to be post-processed
-  Nca = command_argument_count()
-  if (Nca==0) then
-    write(stderr,'(A)')' Error: no argument has been passed to command line'
-    call print_usage
-    stop
-  else
-    ! processing switch
-    c = 0
-    do while (c<Nca)
-      c = c + 1
-      call get_command_argument(c, ca_switch)
-      select case(trim(adjustl(ca_switch)))
-      case('-m') ! file name of mesh file
-        call get_command_argument(c+1, filename) ; c = c + 1
-        call IOFile%mesh%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
-      case('-o') ! file name of output file
-        call get_command_argument(c+1, outfname) ; c = c + 1
-        outfname=global%OS%string_separator_fix(string=trim(adjustl(outfname)))
-      case('-s') ! file name of solution file
-        call get_command_argument(c+1, filename) ; c = c + 1
-        call IOFile%sol%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
-      case('-proc') ! processes/blocks map
-        call get_command_argument(c+1, filename) ; c = c + 1
-        call IOFile%proc%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
-      case('-bc') ! saving boundary conditions ghost cells
-        pp%bc = .true.
-      case('-cell') ! dependent variables are saved cell centered instead of interpolated at nodes
-        pp%node = .false.
-      case('-ascii') ! ascii output
-        pp%binary = .false.
-      case('-schl') ! Schlieren field
-        pp%schlieren = .true.
-      case('-mirrorX') ! mirroring solution using X versor
-        pp%mirrorX = .true.
-      case('-mirrorY') ! mirroring solution using Y versor
-        pp%mirrorY = .true.
-      case('-mirrorZ') ! mirroring solution using Z versor
-        pp%mirrorZ = .true.
-      case('-tec') ! Tecplot file format
-        call get_command_argument(c+1,yes) ; c = c + 1 ; yes = Upper_Case(trim(adjustl(yes)))
-        pp%tec = (trim(adjustl(yes))=='YES')
-      case('-vtk') ! VKT file format
-        call get_command_argument(c+1,yes) ; c = c + 1 ; yes = Upper_Case(trim(adjustl(yes)))
-        pp%vtk = (trim(adjustl(yes))=='YES')
-      case('-gnu') ! Gnuplot file format
-        call get_command_argument(c+1,yes) ; c = c + 1 ; yes = Upper_Case(trim(adjustl(yes)))
-        pp%gnu = (trim(adjustl(yes))=='YES')
-      case default
-        write(stderr,'(A)') ' Error: switch "'//trim(adjustl(ca_switch))//'" is unknown'
-        call print_usage
-        stop
-      endselect
-    enddo
+  ! setting CLAs
+  call cla_list(1 )%init(switch='-m',       help='Mesh file name',                required=.true., act='store'                   )
+  call cla_list(2 )%init(switch='-o',       help='Output file name',              required=.false.,act='store',     def=''       )
+  call cla_list(3 )%init(switch='-s',       help='Solution file name',            required=.false.,act='store',     def=''       )
+  call cla_list(4 )%init(switch='-proc',    help='Processes/block map file name', required=.false.,act='store',     def=''       )
+  call cla_list(5 )%init(switch='-bc',      help='Save boundary conditions cells',required=.false.,act='store_true',def='.false.')
+  call cla_list(6 )%init(switch='-cell',    help='Save data at cells center',     required=.false.,act='store_true',def='.false.')
+  call cla_list(7 )%init(switch='-ascii',   help='Save ascii output',             required=.false.,act='store_true',def='.false.')
+  call cla_list(8 )%init(switch='-schl',    help='Save (pseudo) Schlieren field', required=.false.,act='store_true',def='.false.')
+  call cla_list(9 )%init(switch='-mirrorX', help='Save also a X-mirrored copy',   required=.false.,act='store_true',def='.false.')
+  call cla_list(10)%init(switch='-mirrorY', help='Save also a Y-mirrored copy',   required=.false.,act='store_true',def='.false.')
+  call cla_list(11)%init(switch='-mirrorZ', help='Save also a Z-mirrored copy',   required=.false.,act='store_true',def='.false.')
+  call cla_list(12)%init(switch='-tec',     help='Save output in Tecplot format', required=.false.,act='store',     def='yes'    )
+  call cla_list(13)%init(switch='-vtk',     help='Save output in VTK format',     required=.false.,act='store',     def='no'     )
+  call cla_list(14)%init(switch='-gnu',     help='Save output in VTK format',     required=.false.,act='store',     def='no'     )
+  ! parsing CLI
+  call cli_parser(examples=['POG -m example.geo -s example.sol -o example                 ', &
+                            'POG -m example.geo -s example.sol -o example -ascii -cell -bc', &
+                            'POG -m example.geo -ascii                                    '],&
+                  progname='POG',cla_list=cla_list,error=error,pref='|-->')
+  if (error/=0) stop
+  ! using CLA data to set POG behaviour
+  call cla_list(1)%get(val=filename)
+  call IOFile%mesh%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
+  if (cla_list(2)%passed) then
+    call cla_list(2)%get(val=filename)
+    outfname=global%OS%string_separator_fix(string=trim(adjustl(filename)))
   endif
-  if (pp%tec) call IOFile%tec%set(name=trim(adjustl(outfname)))
-  if (pp%vtk) call IOFile%vtk%set(name=trim(adjustl(outfname)))
-  if (pp%gnu) call IOFile%gnu%set(name=trim(adjustl(outfname)))
+  if (cla_list(3)%passed) then
+    call cla_list(3)%get(val=filename)
+    call IOFile%sol%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
+  endif
+  if (cla_list(4)%passed) then
+    call cla_list(4)%get(val=filename)
+    call IOFile%proc%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
+  endif
+  call cla_list(5)%get(val=pp%bc)
+  call cla_list(6)%get(val=pp%node) ; pp%node = .not.pp%node
+  call cla_list(7)%get(val=pp%binary) ; pp%binary = .not.pp%binary
+  call cla_list(8)%get(val=pp%schlieren)
+  call cla_list(9)%get(val=pp%mirrorX)
+  call cla_list(10)%get(val=pp%mirrorY)
+  call cla_list(11)%get(val=pp%mirrorZ)
+  call cla_list(12)%get(val=yes) ; pp%tec = (Upper_Case(trim(adjustl(yes)))=='YES')
+  call cla_list(13)%get(val=yes) ; pp%vtk = (Upper_Case(trim(adjustl(yes)))=='YES')
+  call cla_list(14)%get(val=yes) ; pp%gnu = (Upper_Case(trim(adjustl(yes)))=='YES')
+  if (allocated(outfname)) then
+    if (pp%tec) call IOFile%tec%set(name=trim(adjustl(outfname)))
+    if (pp%vtk) call IOFile%vtk%set(name=trim(adjustl(outfname)))
+    if (pp%gnu) call IOFile%gnu%set(name=trim(adjustl(outfname)))
+  endif
   if (pp%node.and.pp%bc) then
-    write(stderr,'(A)') ' It is not possible to save bc ghost cells and node-centered interpolated variables!'
+    write(stderr,'(A)')' It is not possible to save bc ghost cells and node-centered interpolated variables!'
     stop
   endif
-  if (.not.allocated(IOFile%mesh%name)) then
-    write(stderr,'(A)') ' File name of mesh file must be provided!'
-    call print_usage
-    stop
-  endif
-  ! the name of mesh file is used as output file base name
+  ! the name of mesh file is used as output file base name if output file name has been exeplicitely declared
   if (.not.allocated(IOFile%tec%name)) call IOFile%tec%set(name=IOFile%mesh%name)
   if (.not.allocated(IOFile%vtk%name)) call IOFile%vtk%set(name=IOFile%mesh%name)
   if (.not.allocated(IOFile%gnu%name)) call IOFile%gnu%set(name=IOFile%mesh%name)

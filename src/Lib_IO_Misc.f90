@@ -218,7 +218,7 @@ contains
 
   !> @brief The Upper_Case function converts the lower case characters of a string to upper case one.
   !>@return \b Upper_Case character(*) variable
-  function Upper_Case(string)
+  elemental function Upper_Case(string)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   character(len=*), intent(IN):: string     !< String to be converted.
@@ -240,7 +240,7 @@ contains
 
   !> @brief The Lower_Case function converts the upper case characters of a string to lower case one.
   !>@return \b Lower_Case character(*) variable
-  function Lower_Case(string)
+  elemental function Lower_Case(string)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   character(len=*), intent(IN):: string     !< String to be converted.

@@ -1,7 +1,7 @@
 [builder]
 compiler=intel
-cflags=-O0 -warn all -check all -debug all -cpp -c -module ./mod/ -static -assume protect_parens -assume realloc_lhs -fp-model source -D_OSYSTEMuix -DNULk -DTECIO
-lflags=-O0 -warn all -check all -debug all -assume protect_parens -assume realloc_lhs -fp-model source
+cflags=-O0 -warn all -check all -debug all -traceback -assume protect_parens -assume realloc_lhs -fp-model source -cpp -c -module ./mod/ -D_OSYSTEMuix -DNULk -DTECIO
+lflags=-O0 -warn all -check all -debug all -traceback -assume protect_parens -assume realloc_lhs -fp-model source
 libs=lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
 dmod=./mod/
 dobj=./obj/

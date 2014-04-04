@@ -37,6 +37,7 @@ USE Data_Type_Time_Step,          only: Type_Time_Step         ! Definition of T
 USE Data_Type_Vector,             only: Type_Vector,ex,ey,ez   ! Definition of Type_Vector.
 USE Lib_Fluxes_Convective,        only: fluxes_convective      ! Procedure for convective fluxes.
 USE Lib_IO_Misc,                  only: Upper_Case             ! Procedures for IO and strings operations.
+USE Lib_Math,                     only: abs_grad               ! Procedures for computing the absolute value of gradient.
 USE Lib_Runge_Kutta,              only: rk_stage,rk_time_integ ! Runge-Kutta time integration library.
 USE Lib_Thermodynamic_Laws_Ideal, only: a                      ! Procedure for computing speed of sound.
 USE Lib_Variables_Conversions,    only: cons2prim              ! Pocedures for varibles set conversions.
@@ -110,6 +111,7 @@ type, public:: Type_SBlock
     procedure:: min_space_step     => min_space_step_block     ! Procedure for computing the minimum value of space step.
     procedure:: create_uniform_grid                            ! Procedure for creating a uniform grid provided block extents.
     procedure:: create_grid_from_finer                         ! Procedure for creating the grid from the grid of a finer block.
+    procedure:: compute_schlieren                              ! Procedure for computing (pseudo) Schlieren flow field.
     procedure:: set_cells_bc                                   ! Procedure for setting cells boundary conditions from block ones.
     procedure:: set_region_ic                                  ! Procedure for setting initial condition in a region of block.
     procedure:: primitive2conservative                         ! Procedure for converting primitive to conservative variables.
@@ -318,11 +320,11 @@ contains
     do k=0,Nk
       do j=0,Nj
         do i=0,Ni
-            primN(i,j,k) = primC(i+1,j+1,k+1) + primC(i,j+1,k+1) &
-                         + primC(i+1,j  ,k+1) + primC(i,j,  k+1) &
-                         + primC(i+1,j+1,k  ) + primC(i,j+1,k  ) &
-                         + primC(i+1,j  ,k  ) + primC(i,j  ,k  )
-            primN(i,j,k) = mf*primN(i,j,k)
+          primN(i,j,k) = primC(i+1,j+1,k+1) + primC(i,j+1,k+1) &
+                       + primC(i+1,j  ,k+1) + primC(i,j,  k+1) &
+                       + primC(i+1,j+1,k  ) + primC(i,j+1,k  ) &
+                       + primC(i+1,j  ,k  ) + primC(i,j  ,k  )
+          primN(i,j,k) = mf*primN(i,j,k)
         enddo
       enddo
     enddo
@@ -904,6 +906,122 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine create_grid_from_finer
+
+  !> @brief Procedure for computing (pseudo) Schlieren flow field.
+  subroutine compute_schlieren(block,interpolate,schl)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_SBlock),     intent(IN)::    block        !< Block data.
+  logical, optional,      intent(IN)::    interpolate  !< Flag for interpolating output at nodes.
+  real(R8P), allocatable, intent(INOUT):: schl(:,:,:)  !< Schlieren flow field.
+  real(R8P), allocatable::                r(:,:,:)     !< Density flow field.
+  real(R8P)::                             mf           !< Mean factor.
+  real(R8P), allocatable::                schlN(:,:,:) !< Schlieren flow field interpolated at nodes.
+  integer(I4P)::                          i,j,k        !< Counters.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  associate(gc=>block%dims%gc,Ni=>block%dims%Ni,Nj=>block%dims%Nj,Nk=>block%dims%Nk,Ns=>block%dims%Ns)
+    if (allocated(schl)) deallocate(schl) ; allocate(schl(1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
+    if (allocated(r   )) deallocate(r   ) ; allocate(r   (1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)))
+    r = block%C%P%d
+    schl = 0._R8P
+#if !defined NULi && !defined NULj && !defined NULk
+    ! 3D data
+    mf = 0.125_R8P
+#elif defined NULi
+    r(0:1-gc(1)    ,:,:) = 0._R8P
+    r(Ni+1:Ni+gc(2),:,:) = 0._R8P
+#if !defined NULj && !defined NULk
+    ! 2D data
+    mf = 0.25_R8P
+#elif defined NULj
+    ! 1D data
+    mf = 0.5_R8P
+    r(:,0:1-gc(3)    ,:) = 0._R8P
+    r(:,Nj+1:Nj+gc(4),:) = 0._R8P
+#elif defined NULk
+    ! 1D data
+    mf = 0.5_R8P
+    r(:,:,0:1-gc(5)    ) = 0._R8P
+    r(:,:,Nk+1:Nk+gc(6)) = 0._R8P
+#endif
+#elif defined NULj
+    r(:,0:1-gc(3)    ,:) = 0._R8P
+    r(:,Nj+1:Nj+gc(4),:) = 0._R8P
+#if !defined NULi && !defined NULk
+    ! 2D data
+    mf = 0.25_R8P
+#elif defined NULi
+    ! 1D data
+    mf = 0.5_R8P
+    r(0:1-gc(1)    ,:,:) = 0._R8P
+    r(Ni+1:Ni+gc(2),:,:) = 0._R8P
+#elif defined NULk
+    ! 1D data
+    mf = 0.5_R8P
+    r(:,:,0:1-gc(5)    ) = 0._R8P
+    r(:,:,Nk+1:Nk+gc(6)) = 0._R8P
+#endif
+#elif defined NULk
+    r(:,:,0:1-gc(5)    ) = 0._R8P
+    r(:,:,Nk+1:Nk+gc(6)) = 0._R8P
+#if !defined NULi && !defined NULj
+    ! 2D data
+    mf = 0.25_R8P
+#elif defined NULi
+    ! 1D data
+    mf = 0.5_R8P
+    r(0:1-gc(1)    ,:,:) = 0._R8P
+    r(Ni+1:Ni+gc(2),:,:) = 0._R8P
+#elif defined NULj
+    ! 1D data
+    mf = 0.5_R8P
+    r(:,0:1-gc(3)    ,:) = 0._R8P
+    r(:,Nj+1:Nj+gc(4),:) = 0._R8P
+#endif
+#endif
+    !$OMP PARALLEL DEFAULT(NONE) &
+    !$OMP PRIVATE(i,j,k)         &
+    !$OMP SHARED(gc,Ni,Nj,Nk,r,schl)
+    !$OMP DO
+    do k=1-gc(5)+1,Nk+gc(6)-1
+      do j=1-gc(3)+1,Nj+gc(4)-1
+        do i=1-gc(1)+1,Ni+gc(2)-1
+          schl(i,j,k) = abs_grad(Vip1=r(i+1,j,k),Vim1=r(i-1,j,k),Di=(block%node(i,j,k)-block%node(i-1,j,k)).dot.ex,&
+                                 Vjp1=r(i,j+1,k),Vjm1=r(i,j-1,k),Dj=(block%node(i,j,k)-block%node(i,j-1,k)).dot.ey,&
+                                 Vkp1=r(i,j,k+1),Vkm1=r(i,j,k-1),Dk=(block%node(i,j,k)-block%node(i,j,k-1)).dot.ez)
+        enddo
+      enddo
+    enddo
+    !$OMP END PARALLEL
+    deallocate(r)
+    if (present(interpolate)) then
+      if (interpolate) then
+        if (allocated(schlN)) deallocate(schlN) ; allocate(schlN(0:Ni+1,0:Nj+1,0:Nk+1))
+          !$OMP PARALLEL DEFAULT(NONE) &
+          !$OMP PRIVATE(i,j,k)         &
+          !$OMP SHARED(gc,Ni,Nj,Nk,r,schl,schlN)
+          !$OMP DO
+          do k=0,Nk
+            do j=0,Nj
+              do i=0,Ni
+                schlN(i,j,k) = schl(i+1,j+1,k+1) + schl(i,j+1,k+1) &
+                             + schl(i+1,j  ,k+1) + schl(i,j,  k+1) &
+                             + schl(i+1,j+1,k  ) + schl(i,j+1,k  ) &
+                             + schl(i+1,j  ,k  ) + schl(i,j  ,k  )
+                schlN(i,j,k) = mf*schlN(i,j,k)
+              enddo
+            enddo
+          enddo
+          !$OMP END PARALLEL
+          call move_alloc(from=schlN,to=schl)
+      endif
+    endif
+  endassociate
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine compute_schlieren
 
   !> @brief Procedure for setting cells boundary conditions from block ones.
   !> @note This procedure is useful only for Cartesian grids.

@@ -46,7 +46,7 @@ else
   mkdir -p output            # creating outout directory
   # setting POG options
   if [ "$1" = "-tec" ]; then
-    tout="-tec yes -vtk no -gnu no -mirrorY"
+    tout="-tec yes -vtk no -gnu no -mirrorY -schl"
   elif [ "$1" = "-vtk" ]; then
     tout="-tec no -vtk yes -gnu no"
   elif [ "$1" = "-gnu" ]; then

@@ -82,55 +82,55 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
+  ! initializing CLI
+  call cli%init(progname='POG',                                                            &
+                examples=['POG -m example.geo -s example.sol -o example                 ', &
+                          'POG -m example.geo -s example.sol -o example -ascii -cell -bc', &
+                          'POG -m example.geo -ascii                                    '])
   ! setting CLAs
-  call cli%add(switch='-m',      help='Mesh file name',               required=.true., act='store'                   )
-  call cli%add(switch='-o',      help='Output file name',             required=.false.,act='store',     def=''       )
-  call cli%add(switch='-s',      help='Solution file name',           required=.false.,act='store',     def=''       )
-  call cli%add(switch='-proc',   help='Processes/block map file name',required=.false.,act='store',     def=''       )
-  call cli%add(switch='-bc',     help='Save BC cells',                required=.false.,act='store_true',def='.false.')
-  call cli%add(switch='-cell',   help='Save data at cells center',    required=.false.,act='store_true',def='.false.')
-  call cli%add(switch='-ascii',  help='Save ascii output',            required=.false.,act='store_true',def='.false.')
-  call cli%add(switch='-schl',   help='Save (pseudo) Schlieren field',required=.false.,act='store_true',def='.false.')
-  call cli%add(switch='-mirrorX',help='Save also a X-mirrored copy',  required=.false.,act='store_true',def='.false.')
-  call cli%add(switch='-mirrorY',help='Save also a Y-mirrored copy',  required=.false.,act='store_true',def='.false.')
-  call cli%add(switch='-mirrorZ',help='Save also a Z-mirrored copy',  required=.false.,act='store_true',def='.false.')
-  call cli%add(switch='-tec',    help='Save output in Tecplot format',required=.false.,act='store',     def='yes'    )
-  call cli%add(switch='-vtk',    help='Save output in VTK format',    required=.false.,act='store',     def='no'     )
-  call cli%add(switch='-gnu',    help='Save output in VTK format',    required=.false.,act='store',     def='no'     )
-  ! checking consistency of CLAs
-  call cli%check(error=error,pref='|-->') ; if (error/=0) stop
+  call cli%add(switch='-m',      help='Mesh file name',               required=.true., act='store'                   ,error=error)
+  call cli%add(switch='-o',      help='Output file name',             required=.false.,act='store',     def=''       ,error=error)
+  call cli%add(switch='-s',      help='Solution file name',           required=.false.,act='store',     def=''       ,error=error)
+  call cli%add(switch='-proc',   help='Processes/block map file name',required=.false.,act='store',     def=''       ,error=error)
+  call cli%add(switch='-bc',     help='Save BC cells',                required=.false.,act='store_true',def='.false.',error=error)
+  call cli%add(switch='-cell',   help='Save data at cells center',    required=.false.,act='store_true',def='.false.',error=error)
+  call cli%add(switch='-ascii',  help='Save ascii output',            required=.false.,act='store_true',def='.false.',error=error)
+  call cli%add(switch='-schl',   help='Save (pseudo) Schlieren field',required=.false.,act='store_true',def='.false.',error=error)
+  call cli%add(switch='-mirrorX',help='Save also a X-mirrored copy',  required=.false.,act='store_true',def='.false.',error=error)
+  call cli%add(switch='-mirrorY',help='Save also a Y-mirrored copy',  required=.false.,act='store_true',def='.false.',error=error)
+  call cli%add(switch='-mirrorZ',help='Save also a Z-mirrored copy',  required=.false.,act='store_true',def='.false.',error=error)
+  call cli%add(switch='-tec',    help='Save output in Tecplot format',required=.false.,act='store',     def='yes'    ,error=error)
+  call cli%add(switch='-vtk',    help='Save output in VTK format',    required=.false.,act='store',     def='no'     ,error=error)
+  call cli%add(switch='-gnu',    help='Save output in VTK format',    required=.false.,act='store',     def='no'     ,error=error)
   ! parsing CLI
   write(stdout,'(A)')'+--> Parsing Command Line Arguments'
-  call cli%parse(examples=['POG -m example.geo -s example.sol -o example                 ', &
-                           'POG -m example.geo -s example.sol -o example -ascii -cell -bc', &
-                           'POG -m example.geo -ascii                                    '],&
-                 progname='POG',error=error,pref='|-->')
+  call cli%parse(error=error,pref='|-->')
   if (error/=0) stop
   ! using CLI data to set POG behaviour
-  call cli%get(switch='-m',val=filename,pref='|-->')
+  call cli%get(switch='-m',val=filename,pref='|-->',error=error)
   call IOFile%mesh%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
   if (cli%passed(switch='-o')) then
-    call cli%get(switch='-o',val=filename,pref='|-->')
+    call cli%get(switch='-o',val=filename,pref='|-->',error=error)
     outfname=global%OS%string_separator_fix(string=trim(adjustl(filename)))
   endif
   if (cli%passed(switch='-s')) then
-    call cli%get(switch='-s',val=filename,pref='|-->')
+    call cli%get(switch='-s',val=filename,pref='|-->',error=error)
     call IOFile%sol%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
   endif
   if (cli%passed(switch='-proc')) then
-    call cli%get(switch='-proc',val=filename,pref='|-->')
+    call cli%get(switch='-proc',val=filename,pref='|-->',error=error)
     call IOFile%proc%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
   endif
-  call cli%get(switch='-bc',val=pp%bc,pref='|-->')
-  call cli%get(switch='-cell',val=pp%node,pref='|-->') ; pp%node = .not.pp%node
-  call cli%get(switch='-ascii',val=pp%binary,pref='|-->') ; pp%binary = .not.pp%binary
-  call cli%get(switch='-schl',val=pp%schlieren,pref='|-->')
-  call cli%get(switch='-mirrorX',val=pp%mirrorX,pref='|-->')
-  call cli%get(switch='-mirrorY',val=pp%mirrorY,pref='|-->')
-  call cli%get(switch='-mirrorZ',val=pp%mirrorZ,pref='|-->')
-  call cli%get(switch='-tec',val=yes,pref='|-->') ; pp%tec = (Upper_Case(trim(adjustl(yes)))=='YES')
-  call cli%get(switch='-vtk',val=yes,pref='|-->') ; pp%vtk = (Upper_Case(trim(adjustl(yes)))=='YES')
-  call cli%get(switch='-gnu',val=yes,pref='|-->') ; pp%gnu = (Upper_Case(trim(adjustl(yes)))=='YES')
+  call cli%get(switch='-bc',val=pp%bc,pref='|-->',error=error)
+  call cli%get(switch='-cell',val=pp%node,pref='|-->',error=error) ; pp%node = .not.pp%node
+  call cli%get(switch='-ascii',val=pp%binary,pref='|-->',error=error) ; pp%binary = .not.pp%binary
+  call cli%get(switch='-schl',val=pp%schlieren,pref='|-->',error=error)
+  call cli%get(switch='-mirrorX',val=pp%mirrorX,pref='|-->',error=error)
+  call cli%get(switch='-mirrorY',val=pp%mirrorY,pref='|-->',error=error)
+  call cli%get(switch='-mirrorZ',val=pp%mirrorZ,pref='|-->',error=error)
+  call cli%get(switch='-tec',val=yes,pref='|-->',error=error) ; pp%tec = (Upper_Case(trim(adjustl(yes)))=='YES')
+  call cli%get(switch='-vtk',val=yes,pref='|-->',error=error) ; pp%vtk = (Upper_Case(trim(adjustl(yes)))=='YES')
+  call cli%get(switch='-gnu',val=yes,pref='|-->',error=error) ; pp%gnu = (Upper_Case(trim(adjustl(yes)))=='YES')
   if (allocated(outfname)) then
     if (pp%tec) call IOFile%tec%set(name=trim(adjustl(outfname)))
     if (pp%vtk) call IOFile%vtk%set(name=trim(adjustl(outfname)))

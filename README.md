@@ -6,6 +6,25 @@ OFF, Open source Finite volumes Fluid dynamics code
 
 _OFF_ is a CFD code designed to be accurate, efficient and modular for solving, numerically, the Navier-Stokes equations of fluid dynamics by means of Finite Volume technique. It is written in standard (compliant) Fortran 2003 by means of OOP paradigm. _OFF_ can be executed on parallel CPU-based architecture (shared memory multi-cores workstation, distributed memory cluster and hybrid distributed memory cluster based on shared memory nodes).
 
+###### Citing
+
+Please kindly cite OFF in your publications if it helps your research:
+
+~~~
+@article{zaghi-2014,
+  author  = {S. Zaghi},
+  title   = {{OFF, Open source Finite volume Fluid dynamics code: A free, high-order solver based on parallel, modular, object-oriented Fortran API}},
+  journal = {Computer Physics Communications },
+  volume  = {},
+  number  = {0},
+  pages   = { - },
+  year    = {2014},
+  issn    = {0010-4655},
+  doi     = {http://dx.doi.org/10.1016/j.cpc.2014.04.005},
+  url     = {http://www.sciencedirect.com/science/article/pii/S0010465514001283},
+}
+~~~
+
 ## Table of Contents
 
 * [Team Members](#team-members)

@@ -1,7 +1,8 @@
 [builder]
 compiler=intel
-cflags=-O3 -cpp -c -module ./mod/ -static -assume protect_parens -assume realloc_lhs -fp-model source -D_OSYSTEMuix -DNULk -DSMSWz -DTECIO
+cflags=-O3 -assume protect_parens -assume realloc_lhs -fp-model source -cpp -c -module ./mod/
 lflags=-O3 -assume protect_parens -assume realloc_lhs -fp-model source
+preproc=-D_OSYSTEMuix -DNULk -DSMSWz
 libs=lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
 dmod=./mod/
 dobj=./obj/

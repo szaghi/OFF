@@ -21,14 +21,15 @@
 !> @ingroup POGProgram
 program POG
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                                                 ! Integers and reals precision definition.
-USE Data_Type_Command_Line_Argument, only: Type_Command_Line_Argument,cli_parser ! Definition of Type_Command_Line_Argument.
-USE Data_Type_Files,                 only: Type_Files                            ! Definition of Type_Files.
-USE Data_Type_Global,                only: Type_Global                           ! Definition of Type_Global.
-USE Data_Type_OS,                    only: Type_OS                               ! Definition of Type_OS.
-USE Data_Type_PostProcess,           only: Type_PostProcess                      ! Definition of Type_PostProcess.
-USE Data_Type_SBlock,                only: Type_SBlock                           ! Definition of Type_SBlock.
-USE Lib_IO_Misc                                                                  ! Procedures for IO and strings operations.
+USE IR_Precision                                                        ! Integers and reals precision definition.
+USE Data_Type_Command_Line_Interface, only: Type_Command_Line_Interface ! Definition of Type_Command_Line_Interface.
+USE Data_Type_Files,                  only: Type_Files                  ! Definition of Type_Files.
+USE Data_Type_Global,                 only: Type_Global                 ! Definition of Type_Global.
+USE Data_Type_OS,                     only: Type_OS                     ! Definition of Type_OS.
+USE Data_Type_PostProcess,            only: Type_PostProcess            ! Definition of Type_PostProcess.
+USE Data_Type_SBlock,                 only: Type_SBlock                 ! Definition of Type_SBlock.
+USE Data_Type_Varying_String                                            ! Definition of Type_Varying_String.
+USE Lib_IO_Misc                                                         ! Procedures for IO and strings operations.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -73,60 +74,63 @@ contains
   subroutine parsing_command_line()
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  character(3)::                     yes            !< Yes (no) flag.
-  character(99)::                    filename       !< File names dummy string.
-  character(len=:), allocatable::    outfname       !< Output file name dummy string.
-  type(Type_Command_Line_Argument):: cla_list(1:14) !< Command Line Arguments (CLA) list.
-  integer(I4P)::                     error          !< Error trapping flag.
+  character(3)::                      yes      !< Yes (no) flag.
+  character(99)::                     filename !< File names dummy string.
+  character(len=:), allocatable::     outfname !< Output file name dummy string.
+  type(Type_Command_Line_Interface):: cli      !< Command Line Interface (CLI).
+  integer(I4P)::                      error    !< Error trapping flag.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! setting CLAs
-  call cla_list(1 )%init(switch='-m',       help='Mesh file name',                required=.true., act='store'                   )
-  call cla_list(2 )%init(switch='-o',       help='Output file name',              required=.false.,act='store',     def=''       )
-  call cla_list(3 )%init(switch='-s',       help='Solution file name',            required=.false.,act='store',     def=''       )
-  call cla_list(4 )%init(switch='-proc',    help='Processes/block map file name', required=.false.,act='store',     def=''       )
-  call cla_list(5 )%init(switch='-bc',      help='Save boundary conditions cells',required=.false.,act='store_true',def='.false.')
-  call cla_list(6 )%init(switch='-cell',    help='Save data at cells center',     required=.false.,act='store_true',def='.false.')
-  call cla_list(7 )%init(switch='-ascii',   help='Save ascii output',             required=.false.,act='store_true',def='.false.')
-  call cla_list(8 )%init(switch='-schl',    help='Save (pseudo) Schlieren field', required=.false.,act='store_true',def='.false.')
-  call cla_list(9 )%init(switch='-mirrorX', help='Save also a X-mirrored copy',   required=.false.,act='store_true',def='.false.')
-  call cla_list(10)%init(switch='-mirrorY', help='Save also a Y-mirrored copy',   required=.false.,act='store_true',def='.false.')
-  call cla_list(11)%init(switch='-mirrorZ', help='Save also a Z-mirrored copy',   required=.false.,act='store_true',def='.false.')
-  call cla_list(12)%init(switch='-tec',     help='Save output in Tecplot format', required=.false.,act='store',     def='yes'    )
-  call cla_list(13)%init(switch='-vtk',     help='Save output in VTK format',     required=.false.,act='store',     def='no'     )
-  call cla_list(14)%init(switch='-gnu',     help='Save output in VTK format',     required=.false.,act='store',     def='no'     )
+  call cli%add(switch='-m',      help='Mesh file name',               required=.true., act='store'                   )
+  call cli%add(switch='-o',      help='Output file name',             required=.false.,act='store',     def=''       )
+  call cli%add(switch='-s',      help='Solution file name',           required=.false.,act='store',     def=''       )
+  call cli%add(switch='-proc',   help='Processes/block map file name',required=.false.,act='store',     def=''       )
+  call cli%add(switch='-bc',     help='Save BC cells',                required=.false.,act='store_true',def='.false.')
+  call cli%add(switch='-cell',   help='Save data at cells center',    required=.false.,act='store_true',def='.false.')
+  call cli%add(switch='-ascii',  help='Save ascii output',            required=.false.,act='store_true',def='.false.')
+  call cli%add(switch='-schl',   help='Save (pseudo) Schlieren field',required=.false.,act='store_true',def='.false.')
+  call cli%add(switch='-mirrorX',help='Save also a X-mirrored copy',  required=.false.,act='store_true',def='.false.')
+  call cli%add(switch='-mirrorY',help='Save also a Y-mirrored copy',  required=.false.,act='store_true',def='.false.')
+  call cli%add(switch='-mirrorZ',help='Save also a Z-mirrored copy',  required=.false.,act='store_true',def='.false.')
+  call cli%add(switch='-tec',    help='Save output in Tecplot format',required=.false.,act='store',     def='yes'    )
+  call cli%add(switch='-vtk',    help='Save output in VTK format',    required=.false.,act='store',     def='no'     )
+  call cli%add(switch='-gnu',    help='Save output in VTK format',    required=.false.,act='store',     def='no'     )
+  ! checking consistency of CLAs
+  call cli%check(error=error,pref='|-->') ; if (error/=0) stop
   ! parsing CLI
-  call cli_parser(examples=['POG -m example.geo -s example.sol -o example                 ', &
-                            'POG -m example.geo -s example.sol -o example -ascii -cell -bc', &
-                            'POG -m example.geo -ascii                                    '],&
-                  progname='POG',cla_list=cla_list,error=error,pref='|-->')
+  write(stdout,'(A)')'+--> Parsing Command Line Arguments'
+  call cli%parse(examples=['POG -m example.geo -s example.sol -o example                 ', &
+                           'POG -m example.geo -s example.sol -o example -ascii -cell -bc', &
+                           'POG -m example.geo -ascii                                    '],&
+                 progname='POG',error=error,pref='|-->')
   if (error/=0) stop
-  ! using CLA data to set POG behaviour
-  call cla_list(1)%get(val=filename)
+  ! using CLI data to set POG behaviour
+  call cli%get(switch='-m',val=filename,pref='|-->')
   call IOFile%mesh%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
-  if (cla_list(2)%passed) then
-    call cla_list(2)%get(val=filename)
+  if (cli%passed(switch='-o')) then
+    call cli%get(switch='-o',val=filename,pref='|-->')
     outfname=global%OS%string_separator_fix(string=trim(adjustl(filename)))
   endif
-  if (cla_list(3)%passed) then
-    call cla_list(3)%get(val=filename)
+  if (cli%passed(switch='-s')) then
+    call cli%get(switch='-s',val=filename,pref='|-->')
     call IOFile%sol%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
   endif
-  if (cla_list(4)%passed) then
-    call cla_list(4)%get(val=filename)
+  if (cli%passed(switch='-proc')) then
+    call cli%get(switch='-proc',val=filename,pref='|-->')
     call IOFile%proc%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
   endif
-  call cla_list(5)%get(val=pp%bc)
-  call cla_list(6)%get(val=pp%node) ; pp%node = .not.pp%node
-  call cla_list(7)%get(val=pp%binary) ; pp%binary = .not.pp%binary
-  call cla_list(8)%get(val=pp%schlieren)
-  call cla_list(9)%get(val=pp%mirrorX)
-  call cla_list(10)%get(val=pp%mirrorY)
-  call cla_list(11)%get(val=pp%mirrorZ)
-  call cla_list(12)%get(val=yes) ; pp%tec = (Upper_Case(trim(adjustl(yes)))=='YES')
-  call cla_list(13)%get(val=yes) ; pp%vtk = (Upper_Case(trim(adjustl(yes)))=='YES')
-  call cla_list(14)%get(val=yes) ; pp%gnu = (Upper_Case(trim(adjustl(yes)))=='YES')
+  call cli%get(switch='-bc',val=pp%bc,pref='|-->')
+  call cli%get(switch='-cell',val=pp%node,pref='|-->') ; pp%node = .not.pp%node
+  call cli%get(switch='-ascii',val=pp%binary,pref='|-->') ; pp%binary = .not.pp%binary
+  call cli%get(switch='-schl',val=pp%schlieren,pref='|-->')
+  call cli%get(switch='-mirrorX',val=pp%mirrorX,pref='|-->')
+  call cli%get(switch='-mirrorY',val=pp%mirrorY,pref='|-->')
+  call cli%get(switch='-mirrorZ',val=pp%mirrorZ,pref='|-->')
+  call cli%get(switch='-tec',val=yes,pref='|-->') ; pp%tec = (Upper_Case(trim(adjustl(yes)))=='YES')
+  call cli%get(switch='-vtk',val=yes,pref='|-->') ; pp%vtk = (Upper_Case(trim(adjustl(yes)))=='YES')
+  call cli%get(switch='-gnu',val=yes,pref='|-->') ; pp%gnu = (Upper_Case(trim(adjustl(yes)))=='YES')
   if (allocated(outfname)) then
     if (pp%tec) call IOFile%tec%set(name=trim(adjustl(outfname)))
     if (pp%vtk) call IOFile%vtk%set(name=trim(adjustl(outfname)))

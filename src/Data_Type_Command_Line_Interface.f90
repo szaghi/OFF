@@ -35,10 +35,11 @@ private
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-integer(I4P),  parameter:: max_val_len        = 1000          !< Maximum number of characters of CLA value.
-character(5),  parameter:: action_store       = 'STORE'       !< CLA that stores a value associated to its switch.
-character(10), parameter:: action_store_true  = 'STORE_TRUE'  !< CLA that stores .true. without the necessity of a value.
-character(11), parameter:: action_store_false = 'STORE_FALSE' !< CLA that stores .false. without the necessity of a value.
+integer(I4P),     parameter:: max_val_len        = 1000          !< Maximum number of characters of CLA value.
+character(len=*), parameter:: action_store       = 'STORE'       !< CLA that stores a value associated to its switch.
+character(len=*), parameter:: action_store_true  = 'STORE_TRUE'  !< CLA that stores .true. without the necessity of a value.
+character(len=*), parameter:: action_store_false = 'STORE_FALSE' !< CLA that stores .false. without the necessity of a value.
+character(len=*), parameter:: args_sep           = '||!||'       !< Arguments separator for multiple valued (list) CLA.
 !> Derived type containing the useful data for handling command line arguments (CLA).
 !> @note If not otherwise declared the action on CLA value is set to "store" a value.
 !> @ingroup Data_Type_Command_Line_InterfaceDerivedType
@@ -52,20 +53,22 @@ type:: Type_Command_Line_Argument
   logical::                       passed    =.false. !< Flag for checking if CLA has been passed to CLI.
   character(len=:), allocatable:: act                !< CLA value action.
   character(len=:), allocatable:: def                !< Default value.
-  character(len=:), allocatable:: nargs              !< Number of arguments of CLA.
+  character(len=:), allocatable:: nargs              !< Number of arguments consumed by CLA.
   character(len=:), allocatable:: choices            !< List (comma separated) of allowable values for the argument.
   character(len=:), allocatable:: val                !< CLA value.
   contains
-    procedure:: free          => free_cla           ! Procedure for freeing dynamic memory.
-    procedure:: get           => get_cla            ! Procedure for getting CLA value.
-    procedure:: check         => check_cla          ! Procedure for checking CLA data consistency.
-    procedure:: check_choices => check_choices_cla  ! Procedure for checking if CLA value is in allowed choices.
-    procedure:: print         => print_cla          ! Procedure for printing CLA data with a pretty format.
-    procedure:: add_signature                       ! Procedure for adding CLA signature to the CLI one.
-    final::     finalize_cla                        ! Procedure for freeing dynamic memory when finalizing.
+    procedure:: free          => free_cla             ! Procedure for freeing dynamic memory.
+    procedure:: check         => check_cla            ! Procedure for checking CLA data consistency.
+    procedure:: check_choices => check_choices_cla    ! Procedure for checking if CLA value is in allowed choices.
+    generic::   get           => get_cla,get_cla_list ! Procedure for getting CLA value(s).
+    procedure:: print         => print_cla            ! Procedure for printing CLA data with a pretty format.
+    procedure:: add_signature                         ! Procedure for adding CLA signature to the CLI one.
+    final::     finalize_cla                          ! Procedure for freeing dynamic memory when finalizing.
     ! operators overloading
     generic:: assignment(=) => assign_cla
     ! private procedures
+    procedure,              private:: get_cla
+    procedure,              private:: get_cla_list
     procedure, pass(self1), private:: assign_cla
 endtype Type_Command_Line_Argument
 !> Derived type implementing a flexible Command Line Interface (CLI).
@@ -79,17 +82,19 @@ type, public:: Type_Command_Line_Interface
   character(len=:), allocatable::                 help                !< Help message introducing the CLI usage.
   character(len=:), allocatable::                 examples(:)         !< Examples of correct usage.
   contains
-    procedure:: free     ! Procedure for freeing dynamic memory.
-    procedure:: init     ! Procedure for initializing CLI.
-    procedure:: add      ! Procedure for adding CLA to CLAs list.
-    procedure:: check    ! Procedure for checking CLAs data consistenc.
-    procedure:: passed   ! Procedure for checking if a CLA has been passed.
-    procedure:: parse    ! Procedure for parsing Command Line Interfaces by means of a previously initialized CLA list.
-    procedure:: get      ! Procedure for getting CLA value from CLAs list parsed.
-    final::     finalize ! Procedure for freeing dynamic memory when finalizing.
+    procedure:: free                                ! Procedure for freeing dynamic memory.
+    procedure:: init                                ! Procedure for initializing CLI.
+    procedure:: add                                 ! Procedure for adding CLA to CLAs list.
+    procedure:: check                               ! Procedure for checking CLAs data consistenc.
+    procedure:: passed                              ! Procedure for checking if a CLA has been passed.
+    procedure:: parse                               ! Procedure for parsing Command Line Interfaces.
+    generic::   get => get_cla_cli,get_cla_list_cli ! Procedure for getting CLA value(s) from CLAs list parsed.
+    final::     finalize                            ! Procedure for freeing dynamic memory when finalizing.
     ! operators overloading
     generic:: assignment(=) => assign_cli
     ! private procedures
+    procedure,              private:: get_cla_cli
+    procedure,              private:: get_cla_list_cli
     procedure, pass(self1), private:: assign_cli
 endtype Type_Command_Line_Interface
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -129,117 +134,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine finalize_cla
-
-  !> @brief Procedure for getting CLA value.
-  !> @note For logical type CLA the value is directly read without any robust error trapping.
-  subroutine get_cla(cla,pref,val,error)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_Command_Line_Argument), intent(INOUT):: cla     !< CLA data.
-  character(*), optional,            intent(IN)::    pref    !< Prefixing string.
-  class(*),                          intent(INOUT):: val     !< CLA value.
-  integer(I4P),                      intent(OUT)::   error   !< Error trapping flag.
-  character(len=:), allocatable::                    prefd   !< Prefixing string.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  prefd = '' ; if (present(pref)) prefd = pref
-  if (((.not.cla%passed).and.cla%required).or.((.not.cla%passed).and.(.not.allocated(cla%def)))) then
-    write(stderr,'(A)')prefd//' Error: CLA "'//trim(adjustl(cla%switch))//'" is required by CLI but it has not been passed!'
-    return
-  endif
-  if (cla%act==action_store) then
-    if (cla%passed) then
-      select type(val)
-#ifdef r16p
-      type is(real(R16P))
-        val = cton(str=trim(adjustl(cla%val)),knd=1._R16P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-#endif
-      type is(real(R8P))
-        val = cton(str=trim(adjustl(cla%val)),knd=1._R8P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      type is(real(R4P))
-        val = cton(str=trim(adjustl(cla%val)),knd=1._R4P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      type is(integer(I8P))
-        val = cton(str=trim(adjustl(cla%val)),knd=1_I8P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      type is(integer(I4P))
-        val = cton(str=trim(adjustl(cla%val)),knd=1_I4P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      type is(integer(I2P))
-        val = cton(str=trim(adjustl(cla%val)),knd=1_I2P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      type is(integer(I1P))
-        val = cton(str=trim(adjustl(cla%val)),knd=1_I1P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      type is(logical)
-        read(cla%val,*)val
-      type is(character(*))
-        val = cla%val
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      endselect
-    else
-      select type(val)
-#ifdef r16p
-      type is(real(R16P))
-        val = cton(str=trim(adjustl(cla%def)),knd=1._R16P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-#endif
-      type is(real(R8P))
-        val = cton(str=trim(adjustl(cla%def)),knd=1._R8P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      type is(real(R4P))
-        val = cton(str=trim(adjustl(cla%def)),knd=1._R4P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      type is(integer(I8P))
-        val = cton(str=trim(adjustl(cla%def)),knd=1_I8P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      type is(integer(I4P))
-        val = cton(str=trim(adjustl(cla%def)),knd=1_I4P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      type is(integer(I2P))
-        val = cton(str=trim(adjustl(cla%def)),knd=1_I2P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      type is(integer(I1P))
-        val = cton(str=trim(adjustl(cla%def)),knd=1_I1P)
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      type is(logical)
-        read(cla%def,*)val
-      type is(character(*))
-        val = cla%def
-        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
-      endselect
-    endif
-  elseif (cla%act==action_store_true) then
-    if (cla%passed) then
-      select type(val)
-      type is(logical)
-        val = .true.
-      endselect
-    else
-      select type(val)
-      type is(logical)
-        read(cla%def,*)val
-      endselect
-    endif
-  elseif (cla%act==action_store_false) then
-    if (cla%passed) then
-      select type(val)
-      type is(logical)
-        val = .false.
-      endselect
-    else
-      select type(val)
-      type is(logical)
-        read(cla%def,*)val
-      endselect
-    endif
-  endif
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine get_cla
 
   !> @brief Procedure for checking CLA data consistency.
   subroutine check_cla(cla,pref,error)
@@ -353,6 +247,306 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine check_choices_cla
 
+  !> @brief Procedure for getting CLA (single) value.
+  !> @note For logical type CLA the value is directly read without any robust error trapping.
+  subroutine get_cla(cla,pref,val,error)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Command_Line_Argument), intent(INOUT):: cla     !< CLA data.
+  character(*), optional,            intent(IN)::    pref    !< Prefixing string.
+  class(*),                          intent(INOUT):: val     !< CLA value.
+  integer(I4P),                      intent(OUT)::   error   !< Error trapping flag.
+  character(len=:), allocatable::                    prefd   !< Prefixing string.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  prefd = '' ; if (present(pref)) prefd = pref
+  if (((.not.cla%passed).and.cla%required).or.((.not.cla%passed).and.(.not.allocated(cla%def)))) then
+    error = 1
+    write(stderr,'(A)')prefd//' Error: CLA "'//trim(adjustl(cla%switch))//'" is required by CLI but it has not been passed!'
+    return
+  endif
+  if (cla%act==action_store) then
+    if (cla%passed) then
+      select type(val)
+#ifdef r16p
+      type is(real(R16P))
+        val = cton(str=trim(adjustl(cla%val)),knd=1._R16P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+#endif
+      type is(real(R8P))
+        val = cton(str=trim(adjustl(cla%val)),knd=1._R8P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      type is(real(R4P))
+        val = cton(str=trim(adjustl(cla%val)),knd=1._R4P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      type is(integer(I8P))
+        val = cton(str=trim(adjustl(cla%val)),knd=1_I8P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      type is(integer(I4P))
+        val = cton(str=trim(adjustl(cla%val)),knd=1_I4P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      type is(integer(I2P))
+        val = cton(str=trim(adjustl(cla%val)),knd=1_I2P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      type is(integer(I1P))
+        val = cton(str=trim(adjustl(cla%val)),knd=1_I1P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      type is(logical)
+        read(cla%val,*)val
+      type is(character(*))
+        val = cla%val
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      endselect
+    else
+      select type(val)
+#ifdef r16p
+      type is(real(R16P))
+        val = cton(str=trim(adjustl(cla%def)),knd=1._R16P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+#endif
+      type is(real(R8P))
+        val = cton(str=trim(adjustl(cla%def)),knd=1._R8P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      type is(real(R4P))
+        val = cton(str=trim(adjustl(cla%def)),knd=1._R4P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      type is(integer(I8P))
+        val = cton(str=trim(adjustl(cla%def)),knd=1_I8P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      type is(integer(I4P))
+        val = cton(str=trim(adjustl(cla%def)),knd=1_I4P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      type is(integer(I2P))
+        val = cton(str=trim(adjustl(cla%def)),knd=1_I2P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      type is(integer(I1P))
+        val = cton(str=trim(adjustl(cla%def)),knd=1_I1P)
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      type is(logical)
+        read(cla%def,*)val
+      type is(character(*))
+        val = cla%def
+        if (allocated(cla%choices)) call cla%check_choices(val=val,pref=prefd,error=error)
+      endselect
+    endif
+  elseif (cla%act==action_store_true) then
+    if (cla%passed) then
+      select type(val)
+      type is(logical)
+        val = .true.
+      endselect
+    else
+      select type(val)
+      type is(logical)
+        read(cla%def,*)val
+      endselect
+    endif
+  elseif (cla%act==action_store_false) then
+    if (cla%passed) then
+      select type(val)
+      type is(logical)
+        val = .false.
+      endselect
+    else
+      select type(val)
+      type is(logical)
+        read(cla%def,*)val
+      endselect
+    endif
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine get_cla
+
+  !> @brief Procedure for getting CLA (multiple) value.
+  !> @note For logical type CLA the value is directly read without any robust error trapping.
+  subroutine get_cla_list(cla,pref,val,error)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Command_Line_Argument), intent(INOUT):: cla      !< CLA data.
+  character(*), optional,            intent(IN)::    pref     !< Prefixing string.
+  class(*),                          intent(INOUT):: val(1:)  !< CLA values.
+  integer(I4P),                      intent(OUT)::   error    !< Error trapping flag.
+  integer(I4P)::                                     Nv       !< Number of values.
+  character(len=len(cla%val)), allocatable::         valsV(:) !< String array of values based on cla%val.
+  character(len=len(cla%def)), allocatable::         valsD(:) !< String array of values based on cla%def.
+  character(len=:), allocatable::                    prefd    !< Prefixing string.
+  integer(I4P)::                                     v        !< Values counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  prefd = '' ; if (present(pref)) prefd = pref
+  if (((.not.cla%passed).and.cla%required).or.((.not.cla%passed).and.(.not.allocated(cla%def)))) then
+    error = 1
+    if (.not.cla%positional) then
+      write(stderr,'(A)')prefd//' Error: CLA "'//trim(adjustl(cla%switch))//'" is required by CLI but it has not been passed!'
+    else
+      write(stderr,'(A)')prefd//' Error: positional CLA "'//trim(str(.true.,cla%position))//'-th" '//&
+                                ' is required by CLI but it has not been passed!'
+    endif
+    return
+  endif
+  if (.not.allocated(cla%nargs)) then
+    error = 2
+    if (.not.cla%positional) then
+      write(stderr,'(A)')prefd//' Error: CLA "'//trim(adjustl(cla%switch))//'" has not "nargs" value but an array has been '//&
+                                'passed to "get" method!'
+    else
+      write(stderr,'(A)')prefd//' Error: positional CLA "'//trim(str(.true.,cla%position))//'-th" '//&
+                                'has not "nargs" value but an array has been passed to "get" method!'
+    endif
+    return
+  endif
+  if (cla%act==action_store) then
+    if (cla%passed) then
+      call tokenize(strin=cla%val,delimiter=args_sep,Nt=Nv,toks=valsV)
+      select type(val)
+#ifdef r16p
+      type is(real(R16P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsV(v))),knd=1._R16P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+#endif
+      type is(real(R8P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsV(v))),knd=1._R8P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+      type is(real(R4P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsV(v))),knd=1._R4P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+      type is(integer(I8P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsV(v))),knd=1_I8P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+      type is(integer(I4P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsV(v))),knd=1_I4P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+      type is(integer(I2P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsV(v))),knd=1_I2P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+      type is(integer(I1P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsV(v))),knd=1_I1P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+      type is(logical)
+        do v=1,Nv
+          read(valsV(v),*)val(v)
+        enddo
+      type is(character(*))
+        do v=1,Nv
+          val(v)=valsV(v)
+        enddo
+      endselect
+    else
+      call tokenize(strin=cla%def,delimiter=' ',Nt=Nv,toks=valsD)
+      select type(val)
+#ifdef r16p
+      type is(real(R16P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsD(v))),knd=1._R16P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+#endif
+      type is(real(R8P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsD(v))),knd=1._R8P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+      type is(real(R4P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsD(v))),knd=1._R4P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+      type is(integer(I8P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsD(v))),knd=1_I8P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+      type is(integer(I4P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsD(v))),knd=1_I4P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+      type is(integer(I2P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsD(v))),knd=1_I2P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+      type is(integer(I1P))
+        do v=1,Nv
+          val(v) = cton(str=trim(adjustl(valsD(v))),knd=1_I1P)
+          if (allocated(cla%choices)) call cla%check_choices(val=val(v),pref=prefd,error=error)
+          if (error/=0) exit
+        enddo
+      type is(logical)
+        do v=1,Nv
+          read(valsD(v),*)val(v)
+        enddo
+      type is(character(*))
+        do v=1,Nv
+          val(v)=valsD(v)
+        enddo
+      endselect
+    endif
+  elseif (cla%act==action_store_true) then
+    if (cla%passed) then
+      select type(val)
+      type is(logical)
+        val = .true.
+      endselect
+    else
+      call tokenize(strin=cla%def,delimiter=' ',Nt=Nv,toks=valsD)
+      select type(val)
+      type is(logical)
+        do v=1,Nv
+          read(valsD(v),*)val(v)
+        enddo
+      endselect
+    endif
+  elseif (cla%act==action_store_false) then
+    if (cla%passed) then
+      select type(val)
+      type is(logical)
+        val = .false.
+      endselect
+    else
+      call tokenize(strin=cla%def,delimiter=' ',Nt=Nv,toks=valsD)
+      select type(val)
+      type is(logical)
+        do v=1,Nv
+          read(valsD(v),*)val(v)
+        enddo
+      endselect
+    endif
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine get_cla_list
+
   !> @brief Procedure for printing CLA data with a pretty format.
   subroutine print_cla(cla,pref,iostat,iomsg,unit)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -366,16 +560,36 @@ contains
   integer(I4P)::                                   iostatd !< IO error.
   character(500)::                                 iomsgd  !< Temporary variable for IO error message.
   character(len=:), allocatable::                  sig     !< CLA signature.
+  integer(I4P)::                                   nargs   !< Number of arguments consumed by CLA.
+  integer(I4P)::                                   a       !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   prefd = '' ; if (present(pref)) prefd = pref
   if (cla%act==action_store) then
     if (.not.cla%positional) then
-      if (trim(adjustl(cla%switch))/=trim(adjustl(cla%switch_ab))) then
-        sig = '   ['//trim(adjustl(cla%switch))//' value] or ['//trim(adjustl(cla%switch_ab))//' value]'
+      if (allocated(cla%nargs)) then
+        sig = ''
+        select case(cla%nargs)
+        case('+') ! not yet implemented
+        case('*') ! not yet implemented
+        case default
+          nargs = cton(str=trim(adjustl(cla%nargs)),knd=1_I4P)
+          do a=1,nargs
+            sig = sig//' value#'//trim(str(.true.,a))
+          enddo
+        endselect
+        if (trim(adjustl(cla%switch))/=trim(adjustl(cla%switch_ab))) then
+          sig = '   ['//trim(adjustl(cla%switch))//sig//'] or ['//trim(adjustl(cla%switch_ab))//sig//']'
+        else
+          sig = '   ['//trim(adjustl(cla%switch))//sig//']'
+        endif
       else
-        sig = '   ['//trim(adjustl(cla%switch))//' value]'
+        if (trim(adjustl(cla%switch))/=trim(adjustl(cla%switch_ab))) then
+          sig = '   ['//trim(adjustl(cla%switch))//' value] or ['//trim(adjustl(cla%switch_ab))//' value]'
+        else
+          sig = '   ['//trim(adjustl(cla%switch))//' value]'
+        endif
       endif
       if (allocated(cla%choices)) then
         sig = sig//' with value chosen in: ('//cla%choices//')'
@@ -417,30 +631,45 @@ contains
   implicit none
   class(Type_Command_Line_Argument), intent(IN)::    cla       !< CLA data.
   character(len=:), allocatable,     intent(INOUT):: signature !< CLI signature.
-  character(len=:), allocatable::                    signd     !< Temporary CLI signature.
+  character(len=:), allocatable::                    signd,sig !< Temporary CLI signatures.
+  integer(I4P)::                                     nargs     !< Number of arguments consumed by CLA.
+  integer(I4P)::                                     a         !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   signd = '' ; if (allocated(signature)) signd = signature
   if (cla%act==action_store) then
     if (.not.cla%positional) then
-      if (cla%required) then
-        signd = trim(signd)//' '//trim(adjustl(cla%switch))//' value'
+      if (allocated(cla%nargs)) then
+        select case(cla%nargs)
+        case('+') ! not yet implemented
+        case('*') ! not yet implemented
+        case default
+          nargs = cton(str=trim(adjustl(cla%nargs)),knd=1_I4P)
+          do a=1,nargs
+            sig = sig//' value#'//trim(str(.true.,a))
+          enddo
+        endselect
       else
-        signd = trim(signd)//' ['//trim(adjustl(cla%switch))//' value]'
+        sig = ' value'
+      endif
+      if (cla%required) then
+        signd = signd//' '//trim(adjustl(cla%switch))//sig
+      else
+        signd = signd//' ['//trim(adjustl(cla%switch))//sig//']'
       endif
     else
       if (cla%required) then
-        signd = trim(signd)//' value'
+        signd = signd//' value'
       else
-        signd = trim(signd)//' [value]'
+        signd = signd//' [value]'
       endif
     endif
   else
     if (cla%required) then
-      signd = trim(signd)//' '//trim(adjustl(cla%switch))
+      signd = signd//' '//trim(adjustl(cla%switch))
     else
-      signd = trim(signd)//' ['//trim(adjustl(cla%switch))//']'
+      signd = signd//' ['//trim(adjustl(cla%switch))//']'
     endif
   endif
   signature = signd
@@ -541,7 +770,7 @@ contains
   integer(I4P), optional,             intent(IN)::    position        !< Position of positional CLA.
   character(*), optional,             intent(IN)::    act             !< CLA value action.
   character(*), optional,             intent(IN)::    def             !< Default value.
-  character(*), optional,             intent(IN)::    nargs           !< Number of arguments of CLA.
+  character(*), optional,             intent(IN)::    nargs           !< Number of arguments consumed by CLA.
   character(*), optional,             intent(IN)::    choices         !< List of allowable values for the argument.
   integer(I4P),                       intent(OUT)::   error           !< Error trapping flag.
   type(Type_Command_Line_Argument)::                  cla             !< CLA data.
@@ -672,7 +901,8 @@ contains
   character(max_val_len)::                            val            !< Switch value.
   logical::                                           found          !< Flag for checking if switch has been found in cli%cla.
   character(len=:), allocatable::                     prefd          !< Prefixing string.
-  integer(I4P)::                                      a,aa           !< Counter for command line arguments.
+  integer(I4P)::                                      nargs          !< Number of arguments consumed by a CLA.
+  integer(I4P)::                                      a,aa,aaa       !< Counter for command line arguments.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -700,9 +930,30 @@ contains
           if (trim(adjustl(cli%cla(aa)%switch   ))==trim(adjustl(switch)).or.&
               trim(adjustl(cli%cla(aa)%switch_ab))==trim(adjustl(switch))) then
             if (cli%cla(aa)%act==action_store) then
-              a = a + 1
-              call get_command_argument(a,val)
-              cli%cla(aa)%val = trim(adjustl(val))
+              if (allocated(cli%cla(aa)%nargs)) then
+                cli%cla(aa)%val = ''
+                select case(cli%cla(aa)%nargs)
+                case('+') ! not yet implemented
+                case('*') ! not yet implemented
+                case default
+                  nargs = cton(str=trim(adjustl(cli%cla(aa)%nargs)),knd=1_I4P)
+                  if (a+nargs>Na) then
+                    write(stderr,'(A)')prefd//' Error: CLA "'//trim(adjustl(cli%cla(aa)%switch))//&
+                                              '" requires '//trim(str(.true.,nargs))//' arguments but no enough ones remain!'
+                    error = 2
+                  endif
+                  do aaa=a+1,a+nargs
+                    call get_command_argument(aaa,val)
+                    cli%cla(aa)%val = cli%cla(aa)%val//args_sep//trim(adjustl(val))
+                  enddo
+                  cli%cla(aa)%val = cli%cla(aa)%val(1+len(args_sep):)
+                  a = a + nargs
+                endselect
+              else
+                a = a + 1
+                call get_command_argument(a,val)
+                cli%cla(aa)%val = trim(adjustl(val))
+              endif
             endif
             cli%cla(aa)%passed = .true.
             found = .true.
@@ -713,10 +964,10 @@ contains
         if (.not.cli%cla(a)%positional) then
           write(stderr,'(A)')prefd//' Error: switch "'//trim(adjustl(switch))//'" is unknown!'
           call print_usage
-          error = 2
+          error = 3
           return
         else
-          ! positional CLA always  stores a value
+          ! positional CLA always stores a value
           cli%cla(a)%val = trim(adjustl(switch))
           cli%cla(a)%passed = .true.
         endif
@@ -735,7 +986,7 @@ contains
                                     ' is required by CLI but it has not been passed!'
         endif
         call print_usage
-        error = 3
+        error = 4
         return
       endif
     endif
@@ -771,9 +1022,9 @@ contains
     endsubroutine print_usage
   endsubroutine parse
 
-  !> @brief Procedure for getting CLA value from CLAs list parsed.
+  !> @brief Procedure for getting CLA (single) value from CLAs list parsed.
   !> @note For logical type CLA the value is directly read without any robust error trapping.
-  subroutine get(cli,pref,switch,position,val,error)
+  subroutine get_cla_cli(cli,pref,switch,position,val,error)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Command_Line_Interface), intent(INOUT):: cli      !< CLI data.
@@ -813,7 +1064,51 @@ contains
   endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine get
+  endsubroutine get_cla_cli
+
+  !> @brief Procedure for getting CLA multiple values from CLAs list parsed.
+  !> @note For logical type CLA the value is directly read without any robust error trapping.
+  subroutine get_cla_list_cli(cli,pref,switch,position,val,error)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Command_Line_Interface), intent(INOUT):: cli      !< CLI data.
+  character(*), optional,             intent(IN)::    pref     !< Prefixing string.
+  character(*), optional,             intent(IN)::    switch   !< Switch name.
+  integer(I4P), optional,             intent(IN)::    position !< Position of positional CLA.
+  class(*),                           intent(INOUT):: val(1:)  !< CLA values.
+  integer(I4P),                       intent(OUT)::   error    !< Error trapping flag.
+  character(len=:), allocatable::                     prefd    !< Prefixing string.
+  logical::                                           found    !< Flag for checking if CLA containing switch has been found.
+  integer(I4P)::                                      a        !< Argument counter.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  prefd = '' ; if (present(pref)) prefd = pref
+  if (present(switch)) then
+    ! searching for the CLA corresponding to switch
+    found = .false.
+    do a=1,cli%Na
+      if (.not.cli%cla(a)%positional) then
+        if ((cli%cla(a)%switch==switch).or.(cli%cla(a)%switch_ab==switch)) then
+          found = .true.
+          exit
+        endif
+      endif
+    enddo
+    if (.not.found) then
+      write(stderr,'(A)')prefd//' Error: there is no CLA into CLI containing "'//trim(adjustl(switch))//'"'
+    else
+      call cli%cla(a)%get(pref=prefd,val=val,error=error)
+    endif
+  elseif (present(position)) then
+    call cli%cla(position)%get(pref=prefd,val=val,error=error)
+  else
+    error = 1
+    write(stderr,'(A)')prefd//' Error: to obtaining a CLA value, one of CLA switch name or CLA position must be provided!'
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine get_cla_list_cli
 
   ! Assignment (=)
   !> @brief Procedure for assignment between two selfs.

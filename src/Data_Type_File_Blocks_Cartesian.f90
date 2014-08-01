@@ -14,12 +14,11 @@
 !> a simple ascii file describing a Cartesian structured blocks.
 module Data_Type_File_Blocks_Cartesian
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                          ! Integers and reals precision definition.
-USE Data_Type_File_Base,       only: Type_File_Base       ! Definition of Type_File_Base.
-USE Data_Type_Mesh_Dimensions, only: Type_Mesh_Dimensions ! Definition of Type_Mesh_Dimensions.
-USE Data_Type_Region,          only: Type_Region          ! Definition of Type_Region.
-USE Data_Type_SBlock,          only: Type_SBlock          ! Definition of Type_SBlock.
-USE Lib_IO_Misc,               only: stderr,iostat_eor    ! IO error utilities.
+USE IR_Precision                                    ! Integers and reals precision definition.
+USE Data_Type_File_Base, only: Type_File_Base       ! Definition of Type_File_Base.
+USE Data_Type_Region,    only: Type_Region          ! Definition of Type_Region.
+USE Data_Type_SBlock,    only: Type_SBlock          ! Definition of Type_SBlock.
+USE Lib_IO_Misc,         only: stderr,iostat_eor    ! IO error utilities.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -32,7 +31,7 @@ save
 !> @brief Derived type containing the definition of Type_File_Blocks_Cartesian.
 !> @ingroup Data_Type_File_Blocks_CartesianDerivedType
 type, public, extends(Type_File_Base):: Type_File_Blocks_Cartesian
-  type(Type_Mesh_Dimensions)::     mesh_dims  !< Mesh dimensions associated to the file.
+  integer(I4P)::                   Nb = 0_I4P !< Number of blocks.
   type(Type_SBlock), allocatable:: block(:)   !< Blocks input data [1:mesh_dims%Nb].
   integer(I4P)::                   Nr = 0_I4P !< Number of regions.
   type(Type_Region), allocatable:: region(:)  !< Regions input data [1:Nr].
@@ -41,7 +40,7 @@ type, public, extends(Type_File_Base):: Type_File_Blocks_Cartesian
     procedure:: alloc => alloc_blocks  ! Procedure for allocating dynamic memory.
     procedure:: load  => load_blocks   ! Procedure for loading IBM blocks description.
     procedure:: save  => save_blocks   ! Procedure for saving IBM blocks description.
-    procedure:: compute_mesh_dims      ! Procedure for saving IBM blocks into scratch files.
+    !procedure:: compute_mesh_dims      ! Procedure for saving IBM blocks into scratch files.
     final::     finalize               ! Procedure for freeing dynamic memory when finalizing.
 endtype Type_File_Blocks_Cartesian
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -59,6 +58,9 @@ contains
   call file_d%free_base
   if (allocated(file_d%block))  then
     call file_d%block%free ; deallocate(file_d%block)
+  endif
+  if (allocated(file_d%region))  then
+    call file_d%region%free ; deallocate(file_d%region)
   endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -85,10 +87,9 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(file_d%block))  then
-    call file_d%block%free ; deallocate(file_d%block)
-  endif
-  allocate(file_d%block(1:file_d%mesh_dims%Nb))
+  call file_d%free
+  if (file_d%Nb>0) allocate(file_d%block( 1:file_d%Nb))
+  if (file_d%Nr>0) allocate(file_d%region(1:file_d%Nr))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine alloc_blocks
@@ -164,7 +165,6 @@ contains
   !> description can appear in any order, the regions numeration is made by means of the attribute 'r' of the 'region' tag. The
   !> total number of regions defined is automatically computed parsing the whole file
   !> @note This file contains the following data:
-  !>   - file_d%mesh_dims%Nb;
   !>   - file_d%block.
   !> It is worth nothing that the syntax of tag names and attributes is case sensitive, whereas the syntax of their values is case
   !> insensitive.
@@ -180,23 +180,19 @@ contains
   associate(unit=>file_d%unit,iostat=>file_d%iostat,iomsg=>file_d%iomsg)
     call file_d%open(ascii=.true.,action='READ') ; if (file_d%iostat/=0) return
     allocate(character(len=1000):: line,tag)
-    file_d%mesh_dims%Nb = 0
+    file_d%Nb = 0
     Blocks_Count: do
       read(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg,end=10)line ; if (iostat/=0.and.iostat/=iostat_eor) return
-      if (index(string=line,substring='<block')>0) file_d%mesh_dims%Nb = file_d%mesh_dims%Nb + 1
+      if (index(string=line,substring='<block')>0) file_d%Nb = file_d%Nb + 1
     enddo Blocks_Count
     10 rewind(unit=unit)
-    file_d%mesh_dims%Nb_tot = file_d%mesh_dims%Nb
-    call file_d%alloc
     file_d%Nr = 0
     Regions_Count: do
       read(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg,end=20)line ; if (iostat/=0.and.iostat/=iostat_eor) return
       if (index(string=line,substring='<region')>0) file_d%Nr = file_d%Nr + 1
     enddo Regions_Count
     20 rewind(unit=unit)
-    if (file_d%Nr>0) then
-      if (allocated(file_d%region)) deallocate(file_d%region) ; allocate(file_d%region(1:file_d%Nr))
-    endif
+    call file_d%alloc
     Read_Loop: do
       read(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg,end=30)line ; if (iostat/=0.and.iostat/=iostat_eor) return
       if (index(string=line,substring='<block')>0) then
@@ -258,16 +254,18 @@ contains
   call file_d%open(ascii=.true.,action='WRITE') ; if (file_d%iostat/=0) return
   write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)'<?xml version="1.0"?>'
   write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)'<Blocks_Cartesian>'
-  do b=1,file_d%mesh_dims%Nb
-    associate(block => file_d%block(b))
-      write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)'<block b="'//trim(str(n=b))//'">'
-      write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)block%dims%save_str_xml()
-      write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)block%exts%save_str_xml()
-      write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)block%BC%save_str_xml()
-      write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)block%IC%save_str_xml()
-      write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)'</block>'
-    endassociate
-  enddo
+  if (file_d%Nb > 0) then
+    do b=1,file_d%Nb
+      associate(block => file_d%block(b))
+        write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)'<block b="'//trim(str(n=b))//'">'
+        write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)block%dims%save_str_xml()
+        write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)block%exts%save_str_xml()
+        write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)block%BC%save_str_xml()
+        write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)block%IC%save_str_xml()
+        write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)'</block>'
+      endassociate
+    enddo
+  endif
   write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat,iomsg=file_d%iomsg)'</Blocks_Cartesian>'
   if (file_d%Nr > 0) then
     do b=1,file_d%Nr
@@ -284,47 +282,29 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine save_blocks
 
-  !> @brief Procedure for computing the mesh dimensions associated to the Cartesian blocks loaded.
-  subroutine compute_mesh_dims(file_d,Nl)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_File_Blocks_Cartesian), intent(INOUT):: file_d !< File data.
-  integer(I4P),                      intent(IN)::    Nl     !< Number of grid levels.
-  integer(I4P)::                                     b,l    !< Counters.
-  !--------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  associate(mesh_dims=>file_d%mesh_dims,block=>file_d%block)
-    mesh_dims%Nl = Nl
-    call mesh_dims%alloc
-    do l=1,mesh_dims%Nl ; do b=1,mesh_dims%Nb
-      if     (mod(block(b)%dims%Ni,(2**(l-1)))/=0) then
-        write(stderr,'(A)')' Attention the number of grid levels used is not consistent with the number of cells'
-        write(stderr,'(A)')' Impossible to compute grid level '//trim(str(.true.,l))//' of block '//trim(str(.true.,b))
-        write(stderr,'(A)')' Inconsistent direction i, Ni '//trim(str(.true.,block(b)%dims%Ni))
-        stop
-      elseif (mod(block(b)%dims%Nj,(2**(l-1)))/=0) then
-        write(stderr,'(A)')' Attention the number of grid levels used is not consistent with the number of cells'
-        write(stderr,'(A)')' Impossible to compute grid level '//trim(str(.true.,l))//' of block '//trim(str(.true.,b))
-        write(stderr,'(A)')' Inconsistent direction j, Nj '//trim(str(.true.,block(b)%dims%Nj))
-        stop
-      elseif (mod(block(b)%dims%Nk,(2**(l-1)))/=0) then
-        write(stderr,'(A)')' Attention the number of grid levels used is not consistent with the number of cells'
-        write(stderr,'(A)')' Impossible to compute grid level '//trim(str(.true.,l))//' of block '//trim(str(.true.,b))
-        write(stderr,'(A)')' Inconsistent direction k, Nk '//trim(str(.true.,block(b)%dims%Nk))
-        stop
-      endif
-      mesh_dims%block_dims(b,l)%gc =      block(b)%dims%gc
-      mesh_dims%block_dims(b,l)%Ni =      block(b)%dims%Ni/(2**(l-1))
-      mesh_dims%block_dims(b,l)%Nj =      block(b)%dims%Nj/(2**(l-1))
-      mesh_dims%block_dims(b,l)%Nk =      block(b)%dims%Nk/(2**(l-1))
-      mesh_dims%block_dims(b,l)%Ns = size(block(b)%IC%r,dim=1)
-      call mesh_dims%block_dims(b,l)%compute_NpNc
-    enddo ; enddo
-    mesh_dims%set = .true.
-  endassociate
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine compute_mesh_dims
+ !!> @brief Procedure for computing the mesh dimensions associated to the Cartesian blocks loaded.
+ !subroutine compute_mesh_dims(file_d)
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !implicit none
+ !class(Type_File_Blocks_Cartesian), intent(INOUT):: file_d !< File data.
+ !integer(I4P)::                                     b      !< Counter.
+ !!--------------------------------------------------------------------------------------------------------------------------------
+ !
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !associate(mesh_dims=>file_d%mesh_dims,block=>file_d%block)
+ !  call mesh_dims%alloc
+ !  do b=1,mesh_dims%Nb
+ !    mesh_dims%block_dims(b)%gc =      block(b)%dims%gc
+ !    mesh_dims%block_dims(b)%Ni =      block(b)%dims%Ni
+ !    mesh_dims%block_dims(b)%Nj =      block(b)%dims%Nj
+ !    mesh_dims%block_dims(b)%Nk =      block(b)%dims%Nk
+ !    mesh_dims%block_dims(b)%Ns = size(block(b)%IC%r,dim=1)
+ !    call mesh_dims%block_dims(b)%compute_NpNc
+ !  enddo
+ !  mesh_dims%set = .true.
+ !endassociate
+ !return
+ !!---------------------------------------------------------------------------------------------------------------------------------
+ !endsubroutine compute_mesh_dims
   !> @}
 endmodule Data_Type_File_Blocks_Cartesian

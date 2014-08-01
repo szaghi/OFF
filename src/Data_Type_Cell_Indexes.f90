@@ -16,7 +16,7 @@
 !> @}
 
 !> @brief This module contains the definition of Type_Cell_Indexes and its procedures.
-!> Type_Cell_Indexes is a derived type containing adjacent boundary condition informations.
+!> Type_Cell_Indexes is a derived type containing cell indexes.
 module Data_Type_Cell_Indexes
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision ! Integers and reals precision definition.
@@ -28,41 +28,39 @@ private
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-!> Derived type containing adjacent boundary condition.
+!> Derived type containing cell indexes
 !> @ingroup Data_Type_Cell_IndexesDerivedType
 type, public:: Type_Cell_Indexes
-  !integer(I4P):: l = 0_I4P !< l index of adjacent block.
-  integer(I4P):: b = 0_I4P !< b index of adjacent block.
-  integer(I4P):: i = 0_I4P !< i index of adjacent cell in the (b,l) block.
-  integer(I4P):: j = 0_I4P !< j index of adjacent cell in the (b,l) block.
-  integer(I4P):: k = 0_I4P !< k index of adjacent cell in the (b,l) block.
+  integer(I8P):: ID = 0_I8P !< Block ID index.
+  integer(I4P):: i  = 0_I4P !< i index in the block arrays.
+  integer(I4P):: j  = 0_I4P !< j index in the block arrays.
+  integer(I4P):: k  = 0_I4P !< k index in the block arrays.
   contains
     ! operators overloading
-    generic:: assignment(=) => assign_bc_adjacent
+    generic:: assignment(=) => assign_cell_indexes
     ! private procedures
-    procedure, pass(bc1), private:: assign_bc_adjacent
+    procedure, pass(self1), private:: assign_cell_indexes
 endtype Type_Cell_Indexes
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @ingroup Data_Type_Cell_IndexesPrivateProcedure
   !> @{
   ! Assignment (=)
-  !> @brief Procedure for assignment between two adjacent boundary conditions variables.
-  elemental subroutine assign_bc_adjacent(bc1,bc2)
+  !> @brief Procedure for assignment between two cell indexes variables.
+  elemental subroutine assign_cell_indexes(self1,self2)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Cell_Indexes), intent(INOUT):: bc1
-  type(Type_Cell_Indexes),  intent(IN)::    bc2
+  class(Type_Cell_Indexes), intent(INOUT):: self1 !< LHS.
+  type(Type_Cell_Indexes),  intent(IN)::    self2 !< RHS.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  !bc1%l = bc2%l
-  bc1%b = bc2%b
-  bc1%i = bc2%i
-  bc1%j = bc2%j
-  bc1%k = bc2%k
+  self1%ID = self2%ID
+  self1%i  = self2%i
+  self1%j  = self2%j
+  self1%k  = self2%k
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine assign_bc_adjacent
+  endsubroutine assign_cell_indexes
   !> @}
 endmodule Data_Type_Cell_Indexes

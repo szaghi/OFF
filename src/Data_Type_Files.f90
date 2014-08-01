@@ -15,7 +15,7 @@ USE Data_Type_File_IBM_Options,      only: Type_File_IBM_Options      ! Definiti
 USE Data_Type_File_Lock,             only: Type_File_Lock             ! Definition of Type_File_Lock.
 USE Data_Type_File_Mesh,             only: Type_File_Mesh             ! Definition of Type_File_Mesh.
 USE Data_Type_File_OFF_Options,      only: Type_File_OFF_Options      ! Definition of Type_File_OFF_Options.
-USE Data_Type_File_Procmap,          only: Type_File_Procmap          ! Definition of Type_File_Procmap.
+!USE Data_Type_File_Procmap,          only: Type_File_Procmap          ! Definition of Type_File_Procmap.
 USE Data_Type_File_Profile,          only: Type_File_Profile          ! Definition of Type_File_Profile.
 USE Data_Type_File_Species,          only: Type_File_Species          ! Definition of Type_File_Species.
 USE Data_Type_File_Solver_Options,   only: Type_File_Solver_Options   ! Definition of Type_File_Solver_Options.
@@ -37,7 +37,7 @@ type, public:: Type_Files
   type(Type_File_Solver_Options)::   solv_opts !< Solver options file.
   type(Type_File_Blocks_Cartesian):: cart_blks !< IBM blocks description file.
   type(Type_File_Species)::          spec      !< Species file.
-  type(Type_File_Procmap)::          proc      !< Processes/blocks map file.
+  !type(Type_File_Procmap)::          proc      !< Processes/blocks map file.
   type(Type_File_Mesh)::             mesh      !< Mesh file.
   type(Type_File_BC)::               bc        !< Boundary conditions file.
   type(Type_File_Fluid)::            init      !< Initial conditions file.

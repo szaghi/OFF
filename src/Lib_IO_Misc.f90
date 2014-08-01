@@ -24,6 +24,8 @@
 module Lib_IO_Misc
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                                                  ! Integers and reals precision definition.
+USE Lib_Math, only: digit                                                         ! Procedure for computing the significant digits
+                                                                                  ! of a number.
 USE, intrinsic:: ISO_FORTRAN_ENV, only: stdout=>OUTPUT_UNIT, stderr=>ERROR_UNIT,& ! Standard output/error logical units.
                                         IOSTAT_END, IOSTAT_EOR                    ! Standard end-of-file/end-of record parameters.
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -454,7 +456,9 @@ endfunction count_substring
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (present(myrank)) rank = myrank ; if (present(Nproc)) Np = Nproc ; rks = 'rank'//trim(strz(Np,rank))
+  rank = 0 ; if (present(myrank)) rank = myrank
+  Np   = 1 ; if (present(Nproc )) Np   = Nproc
+  rks = 'rank'//trim(strz(digit(Np),rank))
   write(stderr,'(A)')trim(rks)//' Directory '//adjustl(trim(dirname))//' Not Found!'
   write(stderr,'(A)')trim(rks)//' Calling procedure "'//adjustl(trim(cpn))//'"'
   return

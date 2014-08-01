@@ -32,13 +32,12 @@
 module Lib_Parallel
 !-----------------------------------------------------------------------------------------------------------------------------------
 #ifdef _MPI
-USE IR_Precision        ! Integers and reals precision definition.
+USE IR_Precision               ! Integers and reals precision definition.
 USE Data_Type_BC, only: bc_adj ! Definition of Type_BC.
-USE Data_Type_Mesh_Dimensions  ! Definition of Type_Mesh_Dimensions.
 USE Data_Type_Parallel         ! Definition of Type_Parallel.
-USE Data_Type_SBlock    ! Definition of Type_SBlock.
-USE Lib_IO_Misc         ! Procedures for IO and strings operations.
-USE MPI                 ! MPI runtime library.
+USE Data_Type_SBlock           ! Definition of Type_SBlock.
+USE Lib_IO_Misc                ! Procedures for IO and strings operations.
+USE MPI                        ! MPI runtime library.
 #endif
 !-----------------------------------------------------------------------------------------------------------------------------------
 

@@ -187,7 +187,7 @@ contains
     call block_bc%F(f)%str2id(bc_str=Upper_Case(tag%att_val(f)%vs(1:3)))
     call block_bc%F(f)%alloc
     if     (block_bc%F(f)%is_adj()) then
-      block_bc%F(f)%adj%b = cton(str=tag%att_val(f)%vs(4:),knd=1_I4P)
+      block_bc%F(f)%adj%ID = cton(str=tag%att_val(f)%vs(4:),knd=1_I8P)
     elseif (block_bc%F(f)%is_inf()) then
       block_bc%F(f)%inf   = cton(str=tag%att_val(f)%vs(4:),knd=1_I4P)
     endif
@@ -212,7 +212,7 @@ contains
   str_xml = '<boundaryconditions'
   do f=1,6
     if     (block_bc%F(f)%is_adj()) then
-      str_xml = trim(str_xml)//' '//att_name(f)//'="'//block_bc%F(f)%id2str()//' '//trim(str(n=block_bc%F(f)%adj%b))//'"'
+      str_xml = trim(str_xml)//' '//att_name(f)//'="'//block_bc%F(f)%id2str()//' '//trim(str(n=block_bc%F(f)%adj%ID))//'"'
     elseif (block_bc%F(f)%is_inf()) then
       str_xml = trim(str_xml)//' '//att_name(f)//'="'//block_bc%F(f)%id2str()//' '//trim(str(n=block_bc%F(f)%inf  ))//'"'
     else

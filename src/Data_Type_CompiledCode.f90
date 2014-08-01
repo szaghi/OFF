@@ -29,13 +29,44 @@ type, public:: Type_CompiledCode
   character(len=:), allocatable:: compproc !< Pre-processing compilation flags.
   character(len=:), allocatable:: complibs !< External libraries used.
   contains
+    procedure:: free              ! Procedure for freeing dynamic memory.
     procedure:: init              ! Procedure for initializing code compilation options.
     procedure:: print => print_cc ! Procedure for printing code compilation options.
+    final::     finalize          ! Procedure for freeing dynamic memory when finalizing.
 endtype Type_CompiledCode
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @ingroup Data_Type_CompiledCodePrivateProcedure
   !> @{
+  !> @brief Procedure for freeing dynamic memory.
+  elemental subroutine free(cc)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_CompiledCode), intent(INOUT):: cc !< Code compilation options.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (allocated(cc%compiler)) deallocate(cc%compiler)
+  if (allocated(cc%compflag)) deallocate(cc%compflag)
+  if (allocated(cc%compproc)) deallocate(cc%compproc)
+  if (allocated(cc%complibs)) deallocate(cc%complibs)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine free
+
+  !> @brief Subroutine for freeing dynamic memory when finalizing.
+  elemental subroutine finalize(cc)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_CompiledCode), intent(INOUT):: cc !< Code compilation options.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  call cc%free
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine finalize
+
   !> @brief Procedure for initializing code compilation options.
 #define _STR_EXPAND(tok) #tok
 #define _STR(tok) _STR_EXPAND(tok)
@@ -48,15 +79,23 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 #ifdef _COMPILER
   cc%compiler = _STR(_COMPILER)
+#else
+  cc%compiler = "Unknown"
 #endif
 #ifdef _COMPFLAG
   cc%compflag = _STR(_COMPFLAG)
+#else
+  cc%compflag = "Unknown"
 #endif
 #ifdef _COMPPROC
   cc%compproc = _STR(_COMPPROC)
+#else
+  cc%compproc = "Unknown"
 #endif
 #ifdef _COMPLIBS
   cc%complibs = _STR(_COMPLIBS)
+#else
+  cc%complibs = "Unknown"
 #endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------

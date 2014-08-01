@@ -21,6 +21,7 @@ USE Data_Type_PostProcess, only: Type_PostProcess             ! Definition of Ty
 USE Data_Type_Primitive,   only: Type_Primitive               ! Definition of Type_Primitive.
 USE Data_Type_SBlock,      only: Type_SBlock                  ! Definition of Type_SBlock.
 USE Lib_IO_Misc,           only: set_extension                ! Procedures for IO and strings operations.
+USE Lib_Math,              only: digit                         ! Procedure for computing the significant digits of a number.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -139,35 +140,37 @@ contains
   endsubroutine init_file_tec
 
   !> @brief Procedure for saving one block.
-  subroutine save_block_tec(file_d,global,b,l)
+  subroutine save_block_tec(file_d,global,ID,Nb_tot)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_File_Tec), intent(INOUT):: file_d                  !< File data.
-  type(Type_Global),    intent(IN)::    global                  !< Global-level data.
-  integer(I4P),         intent(IN)::    b                       !< Block number.
-  integer(I4P),         intent(IN)::    l                       !< Grid level.
-  type(Type_SBlock)::                   blockmir                !< Mirrored block.
-  character(len=:), allocatable::       zname                   !< Zone name.
+  class(Type_File_Tec), intent(INOUT):: file_d   !< File data.
+  type(Type_Global),    intent(IN)::    global   !< Global-level data.
+  integer(I8P),         intent(IN)::    ID       !< ID-key of block.
+  integer(I8P),         intent(IN)::    Nb_tot   !< Total number of blocks.
+  type(Type_SBlock), pointer::          block    !< Pointer for scanning global%block tree.
+  type(Type_SBlock)::                   blockmir !< Mirrored block.
+  character(len=:), allocatable::       zname    !< Zone name.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   call get_zname(prefix='')
-  call save_block(zname=zname,blk=global%block(b,l),t=global%time_step%t)
+  block => global%block%dat(ID=ID)
+  call save_block(zname=zname,blk=block,t=global%time_step%t)
   if (file_d%pp%mirrorX) then
     call get_zname(prefix='mirX-')
-    blockmir = global%block(b,l)%mirror(mirrorX=.true.)
+    blockmir = block%mirror(mirrorX=.true.)
     call save_block(zname=zname,blk=blockmir,t=global%time_step%t)
     call blockmir%free
   endif
   if (file_d%pp%mirrorY) then
     call get_zname(prefix='mirY-')
-    blockmir = global%block(b,l)%mirror(mirrorY=.true.)
+    blockmir = block%mirror(mirrorY=.true.)
     call save_block(zname=zname,blk=blockmir,t=global%time_step%t)
     call blockmir%free
   endif
   if (file_d%pp%mirrorZ) then
     call get_zname(prefix='mirZ-')
-    blockmir = global%block(b,l)%mirror(mirrorZ=.true.)
+    blockmir = block%mirror(mirrorZ=.true.)
     call save_block(zname=zname,blk=blockmir,t=global%time_step%t)
     call blockmir%free
   endif
@@ -182,11 +185,11 @@ contains
 
     !-------------------------------------------------------------------------------------------------------------------------------
     if (file_d%pp%binary) then
-      zname = trim(adjustl(prefix))//'n_'//trim(strz(nz_pad=10,n=global%time_step%n))//'-b_'//&
-              trim(strz(nz_pad=global%mesh_dims%Nb,n=b))//file_d%tecendrec
+      zname = trim(adjustl(prefix))//'n_'//trim(strz(nz_pad=10,n=global%time_step%n))//'-ID_'//&
+              trim(strz(nz_pad=digit(Nb_tot),n=ID))//file_d%tecendrec
     else
-      zname = ' ZONE  T = "'//trim(adjustl(prefix))//'n_'//trim(strz(nz_pad=10,n=global%time_step%n))//'-b_'//&
-              trim(strz(nz_pad=global%mesh_dims%Nb,n=b))//'"'
+      zname = ' ZONE  T = "'//trim(adjustl(prefix))//'n_'//trim(strz(nz_pad=10,n=global%time_step%n))//'-ID_'//&
+              trim(strz(nz_pad=digit(Nb_tot),n=ID))//'"'
     endif
     return
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -357,13 +360,15 @@ contains
   implicit none
   class(Type_File_Tec), intent(INOUT):: file_d                           !< File data.
   type(Type_Global),    intent(IN)::    global                           !< Global-level data.
-  integer(I4P)::                        b,l                              !< Counters.
+  integer(I8P)::                        ID                               !< Counter.
+  integer(I8P)::                        Nb_tot                           !< Total number of blocks.
 #ifdef TECIO
   integer(I4P), external::              tecini112,tecauxstr112,tecend112 !< Tecplot 'tecio' external functions.
 #endif
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
+  Nb_tot = global%block%length()
   call file_d%init(global=global)
   associate(pp=>file_d%pp,tecendrec=>file_d%tecendrec,tecvarname=>file_d%tecvarname)
     file_d%name = set_extension(filename=file_d%name,extension='plt')
@@ -379,9 +384,9 @@ contains
       write(unit=file_d%unit,fmt='(A)',iostat=file_d%iostat)tecvarname
     endif
     ! writing data blocks
-    do l=1,global%mesh_dims%Nl ; do b=1,global%mesh_dims%Nb
-      call file_d%save_block(global=global,b=b,l=l)
-    enddo ; enddo
+    do while(global%block%loopID(ID=ID))
+      call file_d%save_block(global=global,ID=ID,Nb_tot=Nb_tot)
+    enddo
     ! finalizing tecplot file
     if (pp%binary) then
 #ifdef TECIO
@@ -395,7 +400,6 @@ contains
   endassociate
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-
   endsubroutine save_file_tec
   !> @}
 endmodule Data_Type_File_Tec

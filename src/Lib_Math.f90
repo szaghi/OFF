@@ -1649,7 +1649,7 @@ contains
   implicit none
   integer(I8P), intent(IN):: n     ! Input integer.
   character(DI8P)::          str   ! Returned string containing input number plus padding zeros.
-  integer::                  digit ! Number of digits.
+  integer(I4P)::             digit ! Number of digits.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1668,7 +1668,7 @@ contains
   implicit none
   integer(I4P), intent(IN):: n     ! Input integer.
   character(DI4P)::          str   ! Returned string containing input number plus padding zeros.
-  integer::                  digit ! Number of digits.
+  integer(I4P)::             digit ! Number of digits.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1687,7 +1687,7 @@ contains
   implicit none
   integer(I2P), intent(IN):: n     ! Input integer.
   character(DI2P)::          str   ! Returned string containing input number plus padding zeros.
-  integer::                  digit ! Number of digits.
+  integer(I4P)::             digit ! Number of digits.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1706,7 +1706,7 @@ contains
   implicit none
   integer(I1P), intent(IN):: n     ! Input integer.
   character(DI1P)::          str   ! Returned string containing input number plus padding zeros.
-  integer::                  digit ! Number of digits.
+  integer(I4P)::             digit ! Number of digits.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

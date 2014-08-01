@@ -261,7 +261,7 @@ contains
   select case(bc%tp)
   case(bc_adj)
     write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//'   adjacent cell(b,i,j,k)='&
-      //trim(str(.true.,bc%adj%b))//','//&
+      //trim(str(.true.,bc%adj%ID))//','//&
       trim(str(.true.,bc%adj%i))//','//trim(str(.true.,bc%adj%j))//','//trim(str(.true.,bc%adj%k))
   case(bc_in1,bc_in2)
     write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//'   inflow='//trim(str(.true.,bc%inf))
@@ -415,8 +415,8 @@ contains
   elemental subroutine assign_bc(bc1,bc2)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_BC), intent(INOUT):: bc1
-  type(Type_BC),  intent(IN)::    bc2
+  class(Type_BC), intent(INOUT):: bc1 !< LHS.
+  type(Type_BC),  intent(IN)::    bc2 !< RHS.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

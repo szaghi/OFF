@@ -29,17 +29,17 @@ save
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! Public parameters.
-character(1), public, parameter:: cr                   = char(10) !< Carriage-return character for stream-record finalizing.
-integer(I4P), public, parameter:: err_unkw             = 10100    !< Unknown error.
-integer(I4P), public, parameter:: err_not_LE           = 10101    !< Not Little Endian architecture error ID.
-integer(I4P), public, parameter:: err_not_BE           = 10102    !< Not Big Endian architecture error ID.
-integer(I4P), public, parameter:: err_not_connected    = 10103    !< File not connected error ID.
-integer(I4P), public, parameter:: err_connected        = 10104    !< File connected error ID.
-integer(I4P), public, parameter:: err_unkw_open_action = 10105    !< Unknown open action.
-integer(I4P), public, parameter:: err_locked           = 10106    !< Present lockfile.
-integer(I4P), public, parameter:: err_Nproc_unmatch    = 10107    !< Number of MPI processes inconsistent.
-integer(I4P), public, parameter:: err_not_tecio        = 10108    !< Tecplot IO library unavailable.
-integer(I4P), public, parameter:: err_gnu_binary       = 10109    !< Impossible to save Gnuplot binary file.
+character(1), public, parameter:: cr                   = achar(10) !< Carriage-return character for stream-record finalizing.
+integer(I4P), public, parameter:: err_unkw             = 10100     !< Unknown error.
+integer(I4P), public, parameter:: err_not_LE           = 10101     !< Not Little Endian architecture error ID.
+integer(I4P), public, parameter:: err_not_BE           = 10102     !< Not Big Endian architecture error ID.
+integer(I4P), public, parameter:: err_not_connected    = 10103     !< File not connected error ID.
+integer(I4P), public, parameter:: err_connected        = 10104     !< File connected error ID.
+integer(I4P), public, parameter:: err_unkw_open_action = 10105     !< Unknown open action.
+integer(I4P), public, parameter:: err_locked           = 10106     !< Present lockfile.
+integer(I4P), public, parameter:: err_Nproc_unmatch    = 10107     !< Number of MPI processes inconsistent.
+integer(I4P), public, parameter:: err_not_tecio        = 10108     !< Tecplot IO library unavailable.
+integer(I4P), public, parameter:: err_gnu_binary       = 10109     !< Impossible to save Gnuplot binary file.
 !> @brief Derived type containing the definition of Type_File_Base.
 !> @ingroup Data_Type_File_BaseDerivedType
 type, public, abstract:: Type_File_Base

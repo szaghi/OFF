@@ -122,7 +122,7 @@ contains
   endsubroutine alloc
 
   !> @brief Procedure for setting tag data.
-  !> @note If the att_name argument is passed all the attributes names must have the same number of charcters.
+  !> @note If the att_name argument is passed all the attributes names must have the same number of characters.
   pure subroutine set(tag,string,tag_name,att_name)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none

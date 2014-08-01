@@ -18,6 +18,7 @@ USE Data_Type_File_Base,   only: Type_File_Base   ! Definition of Type_File_Base
 USE Data_Type_Global,      only: Type_Global      ! Definition of Type_Global.
 USE Data_Type_PostProcess, only: Type_PostProcess ! Definition of Type_PostProcess.
 USE Data_Type_Primitive,   only: Type_Primitive   ! Definition of Type_Primitive.
+USE Data_Type_SBlock,      only: Type_SBlock      ! Definition of Type_SBlock.
 USE Lib_IO_Misc,           only: set_extension    ! Procedures for imposing extension to a file name.
 USE Lib_Math,              only: digit            ! Procedure for computing the significant digits of a number.
 USE Lib_VTK_IO                                    ! Library for IO VTK files.
@@ -42,14 +43,14 @@ contains
   !> @ingroup Data_Type_File_VTKPrivateProcedure
   !> @{
   !> @brief Procedure for saving one block.
-  subroutine save_block_vtk(file_d,filename,global,b,l)
+  subroutine save_block_vtk(file_d,filename,global,ID)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_File_VTK), intent(INOUT):: file_d                  !< File data.
   character(*),         intent(IN)::    filename                !< File name.
   type(Type_Global),    intent(IN)::    global                  !< Global-level data.
-  integer(I4P),         intent(IN)::    b                       !< Block number.
-  integer(I4P),         intent(IN)::    l                       !< Grid level.
+  integer(I8P),         intent(IN)::    ID                      !< ID-key of block.
+  type(Type_SBlock), pointer::          block                   !< Pointer for scanning global%block tree.
   type(Type_Primitive), allocatable::   P(:,:,:)                !< Prim variables intepolated at nodes.
   real(R8P),            allocatable::   r(:,:,:,:)              !< Array containing species densities.
   integer(I4P)::                        ni1,ni2,nj1,nj2,nk1,nk2 !< Bounds of of node-centered data.
@@ -60,7 +61,8 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   associate(unit=>file_d%unit,iostat=>file_d%iostat,iomsg=>file_d%iomsg,pp=>file_d%pp)
-    associate(Nb=>global%mesh_dims%Nb,n=>global%time_step%n,t=>global%time_step%t,block=>global%block(b,l))
+    associate(n=>global%time_step%n,t=>global%time_step%t)
+      block => global%block%dat(ID=ID)
       associate(Ni=>block%dims%Ni,Nj=>block%dims%Nj,Nk=>block%dims%Nk,Ns=>block%dims%Ns)
         allocate(r(1:Ns,0:Ni,0:Nj,0:Nk))
         if (pp%node) call block%interpolate_primitive(primN=P) ! tri-linear interpolation of cell-centered values at nodes
@@ -163,26 +165,33 @@ contains
   subroutine save_file_vtk(file_d,global)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_File_VTK), intent(INOUT):: file_d !< File data.
-  type(Type_Global),    intent(IN)::    global !< Global-level data.
-  integer(I4P)::                        b,l    !< Counters.
+  class(Type_File_VTK), intent(INOUT):: file_d   !< File data.
+  type(Type_Global),    intent(IN)::    global   !< Global-level data.
+  integer(I8P)::                        ID       !< ID-key of block.
+  integer(I8P)::                        Nb_tot   !< Total number of blocks.
+  character(len=:), allocatable::       flist(:) !< List of file names.
+  integer(I4P)::                        b        !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  associate(iostat=>file_d%iostat,pp=>file_d%pp,Nb_tot=>global%mesh_dims%Nb_tot,Nb=>global%mesh_dims%Nb,Nl=>global%mesh_dims%Nl)
+  Nb_tot = global%block%length()
+  allocate(flist(1:Nb_tot),source=set_extension(filename=file_d%name//'-ID'//trim(strz(digit(Nb_tot),0_I8P)),extension='vts'))
+  b = 0
+  do while(global%block%loopID(ID=ID))
+    b = b + 1
+    flist(b) = set_extension(filename=file_d%name//'-ID'//trim(strz(digit(Nb_tot),ID)),extension='vts')
+  enddo
+  associate(iostat=>file_d%iostat,pp=>file_d%pp)
     ! writing data blocks
-    do l=1,Nl ; do b=1,Nb
-    call file_d%save_block(filename=set_extension(filename=file_d%name//                                                    &
-                                                           '-b'//trim(strz(digit(Nb_tot),b))//'-l'//trim(strz(digit(Nl),l)),&
-                                                  extension='vts'),global=global,b=b,l=l)
-    enddo ; enddo
+    b = 0
+    do while(global%block%loopID(ID=ID))
+      b = b + 1
+      call file_d%save_block(filename=flist(b),global=global,ID=ID)
+    enddo
     ! writing the VTM wrapper for multiblock dataset
     iostat = VTM_INI_XML(filename=set_extension(filename=file_d%name,extension='vtm'))
     iostat = VTM_BLK_XML(block_action='open')
-    iostat = VTM_WRF_XML(flist=[((global%OS%basename(&
-                                  set_extension(filename=file_d%name//                                                    &
-                                                         '-b'//trim(strz(digit(Nb_tot),b))//'-l'//trim(strz(digit(Nl),l)),&
-                                                 extension='vts')),b=1,Nb),l=1,Nl)])
+    iostat = VTM_WRF_XML(flist=flist)
     iostat = VTM_BLK_XML(block_action='close')
     iostat = VTM_END_XML()
   endassociate

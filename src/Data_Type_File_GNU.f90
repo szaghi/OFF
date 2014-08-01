@@ -19,6 +19,7 @@ USE Data_Type_File_Base,   only: Type_File_Base,err_gnu_binary ! Definition of T
 USE Data_Type_Global,      only: Type_Global                   ! Definition of Type_Global.
 USE Data_Type_PostProcess, only: Type_PostProcess              ! Definition of Type_PostProcess.
 USE Data_Type_Primitive,   only: Type_Primitive                ! Definition of Type_Primitive.
+USE Data_Type_SBlock,      only: Type_SBlock                   ! Definition of Type_SBlock.
 USE Lib_IO_Misc,           only: Get_Unit,set_extension        ! Procedures for IO and strings operations.
 USE Lib_Math,              only: digit                         ! Procedure for computing the significant digits of a number.
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -42,14 +43,14 @@ contains
   !> @ingroup Data_Type_File_GNUPrivateProcedure
   !> @{
   !> @brief Procedure for saving one block.
-  subroutine save_block_gnu(file_d,filename,global,b,l)
+  subroutine save_block_gnu(file_d,filename,global,ID)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_File_GNU), intent(INOUT):: file_d                  !< File data.
   character(*),         intent(IN)::    filename                !< File name.
   type(Type_Global),    intent(IN)::    global                  !< Global-level data.
-  integer(I4P),         intent(IN)::    b                       !< Block number.
-  integer(I4P),         intent(IN)::    l                       !< Grid level.
+  integer(I8P),         intent(IN)::    ID                      !< ID-key of block.
+  type(Type_SBlock), pointer::          block                   !< Pointer for scanning global%block tree.
   type(Type_Primitive), allocatable::   P(:,:,:)                !< Prim variables intepolated at nodes.
   real(R8P),            allocatable::   r(:,:,:,:)              !< Array containing species densities.
   integer(I4P)::                        ni1,ni2,nj1,nj2,nk1,nk2 !< Bounds of of node-centered data.
@@ -60,7 +61,8 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   associate(unit=>file_d%unit,iostat=>file_d%iostat,iomsg=>file_d%iomsg,pp=>file_d%pp)
-    associate(Nb=>global%mesh_dims%Nb,n=>global%time_step%n,t=>global%time_step%t,block=>global%block(b,l))
+    associate(n=>global%time_step%n,t=>global%time_step%t)
+      block => global%block%dat(ID=ID)
       associate(Ni=>block%dims%Ni,Nj=>block%dims%Nj,Nk=>block%dims%Nk,Ns=>block%dims%Ns)
         allocate(r(1:Ns,0:Ni,0:Nj,0:Nk))
         if (pp%node) call block%interpolate_primitive(primN=P) ! tri-linear interpolation of cell-centered values at nodes
@@ -173,17 +175,18 @@ contains
   implicit none
   class(Type_File_GNU), intent(INOUT):: file_d !< File data.
   type(Type_Global),    intent(IN)::    global !< Global-level data.
-  integer(I4P)::                        b,l    !< Counters.
+  integer(I8P)::                        ID     !< Counter.
+  integer(I8P)::                        Nb_tot !< Total number of blocks.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  associate(iostat=>file_d%iostat,pp=>file_d%pp,Nb_tot=>global%mesh_dims%Nb_tot,Nb=>global%mesh_dims%Nb,Nl=>global%mesh_dims%Nl)
+  Nb_tot = global%block%length()
+  associate(iostat=>file_d%iostat,pp=>file_d%pp)
     ! writing data blocks
-    do l=1,Nl ; do b=1,Nb
-    call file_d%save_block(filename=set_extension(filename=file_d%name//                                                    &
-                                                           '-b'//trim(strz(digit(Nb_tot),b))//'-l'//trim(strz(digit(Nl),l)),&
-                                                  extension='gnu'),global=global,b=b,l=l)
-    enddo ; enddo
+    do while(global%block%loopID(ID=ID))
+      call file_d%save_block(filename=set_extension(filename=file_d%name//'-ID'//trim(strz(digit(Nb_tot),ID)),extension='gnu'),&
+                             global=global,ID=ID)
+    enddo
   endassociate
   return
   !---------------------------------------------------------------------------------------------------------------------------------

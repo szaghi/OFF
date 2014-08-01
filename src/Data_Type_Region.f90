@@ -41,9 +41,11 @@ type, public:: Type_Region
   real(R8P)::                     height = 0._R8P !< Height of the region.
   type(Type_Primitive)::          prim            !< Primitive variables.
   contains
+    procedure:: free                  ! Procedure for freeing dynamic memory.
     procedure:: load_shape_str_xml    ! Procedure for loading region shape from a string in XML format.
     procedure:: save_shape_str_xml    ! Procedure for saving region shape into a string in XML format.
     procedure:: print => print_region ! Procedure for printing region with a pretty format.
+    final::     finalize              ! Procedure for freeing dynamic memory when finalizing.
     ! operators overloading
     generic:: assignment(=) => assign_self
     ! private procedures
@@ -53,6 +55,32 @@ endtype Type_Region
 contains
   !> @ingroup Data_Type_RegionPrivateProcedure
   !> @{
+  !> @brief Procedure for freeing dynamic memory.
+  elemental subroutine free(region)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Region), intent(INOUT):: region  !< Region data.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  if (allocated(region%shtype)) deallocate(region%shtype)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine free
+
+  !> @brief Procedure for freeing dynamic memory when finalizing.
+  elemental subroutine finalize(region)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  type(Type_Region), intent(INOUT):: region  !< Region data.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  call region%free
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine finalize
+
   !> @brief Procedure for loading region shape from a string formatted in XML syntax.
   !> @note The XML string of region shape data must have the following syntax:
   !> @code

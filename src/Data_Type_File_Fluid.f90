@@ -51,9 +51,9 @@ contains
   !> @note This header filecontains the following data:
   !>   - species0;
   !>   - time_step.
-  !> @note The fluid file is an unformatted file with STREAM access. However it is formatted by means of XML syntax, thus
-  !> string containing a tag must be terminated by means of a carriage-return (cr=char(10)) character.
-  !> @note The header of fluid file is composed as following:
+  !> The fluid file is an unformatted file with STREAM access. However it is formatted by means of XML syntax, thus
+  !> string containing a tag must be terminated by means of a carriage-return (cr=achar(10)) character.
+  !> The header of fluid file is composed as following:
   !> @code
   !>   <?xml version="1.0"?>
   !>   <Fluid_Header>
@@ -67,9 +67,7 @@ contains
   !>     <Time_Step>...</Time_Step>
   !>   </Fluid_Header>
   !> @endcode
-  !> @note Note that it is not necessary to explicitely declare the global blocks number, Nb_tot, and grid levels that are computed
-  !> parsing the mesh file that must be loaded before the present file.
-  !> @note The fluid file header is composed by means of 3 tags:
+  !> The fluid file header is composed by means of 3 tags:
   !>   * 'Initial_Species' defining the initial species; it contains 'Ns' 'Specie' tags that are parsed accordingly the definition
   !>     of Type_Specie; it is no necessary to explicitely define the number of initial species 'Ns' that is automatically computed
   !>     parsing the header; the tag 'Specie' is an 'overloading' tag of 'specie' one actually defining the specie componenents; the
@@ -170,94 +168,97 @@ contains
   !> are saved inside the 'Fluid_Cells' tag. The tag syntax is the following:
   !> @code
   !>   <Fluid_Cells>
-  !>     <block_fluid_cells b="..." l="..." encoding="..."> fluid_data </block>
+  !>     <block_fluid_cells ID="1" encoding="..."> fluid_data </block_fluid_cells>
+  !>     <block_fluid_cells ID="2" encoding="..."> fluid_data </block_fluid_cells>
+  !>     ...
+  !>     <block_fluid_cells ID="Nb_tot" encoding="..."> fluid_data </block_fluid_cells>
   !>   </Fluid_Cells>
   !> @endcode
-  !> Each 'block_fluid_cells' tag has 3 attributes, 'b' and 'l' indicating the block number and grid level, and 'encoding' that can
+  !> Each 'block_fluid_cells' tag has 2 attributes, 'ID' indicating the block ID-key and 'encoding' that can
   !> be set to 3 different values: 'ascii', 'raw' or 'base64' in the case fluid_data are saved in asciii, raw-binary or Base64-ascii
   !> encoded format, respectively.
+  !> Note that it is not necessary to explicitely declare the global blocks number, Nb_tot, and grid levels that are computed
+  !> parsing the mesh file that must be loaded before the present file.
+  !> The 'block_fluid_cells' tag contains the following data:
+  !>   - block%C.
   !> It is worth noting that the 'block_fluid_cells' tags can appear in any order.
   !> It is worth nothing that the syntax of tag attributes is case sensitive, whereas the syntax of their values is case
   !> insensitive.
-  subroutine load_block_cells_file_fluid(file_d,block,b,l,parallel)
+  subroutine load_block_cells_file_fluid(file_d,block,ID)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_File_Fluid), intent(INOUT):: file_d      !< File data.
-  type(Type_SBlock),      intent(INOUT):: block       !< Block data.
-  integer(I4P),           intent(IN)::    b           !< Local index of block to be loaded.
-  integer(I4P),           intent(IN)::    l           !< Level of block to be loaded.
-  type(Type_Parallel),    intent(IN)::    parallel    !< Parallel data.
-  type(Type_XML_Tag)::                    tag         !< Dummy XML tag for parsing file.
-  character(len=1)::                      c1          !< Dummy string for parsing file.
-  character(len=:), allocatable::         c2          !< Dummy string for parsing file.
-  integer(I4P)::                          bb,ll,i,j,k !< Counters.
+  class(Type_File_Fluid), intent(INOUT):: file_d !< File data.
+  type(Type_SBlock),      intent(INOUT):: block  !< Block data.
+  integer(I8P),           intent(IN)::    ID     !< ID-key of block to be loaded.
+  type(Type_XML_Tag)::                    tag    !< Dummy XML tag for parsing file.
+  character(len=1)::                      c1     !< Dummy string for parsing file.
+  character(len=:), allocatable::         c2     !< Dummy string for parsing file.
+  integer(I8P)::                          ib     !< Counter.
+  integer(I4P)::                          i,j,k  !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  associate(blockmap => parallel%blockmap)
-    call file_d%open(action='READ') ; if (file_d%iostat/=0) return
-    ! reading file until 'Fluid_Cells' is reached
-    Fluid_Cells_Tag_Search: do
-      read(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg,end=10)c1 ; if (file_d%iostat/=0) return
-      if (index(string=c1,substring='<')>0) then
-        c2 = c1
-        Tag_End_Serch: do
-          read(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg,end=10)c1 ; if (file_d%iostat/=0) return
-          c2 = c2//c1
-          if (index(string=c1,substring='>')>0) exit Tag_End_Serch
-        enddo Tag_End_Serch
-        if (index(string=c2,substring='<Fluid_Cells>')>0) then
-          read(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg,end=10)c1 ; if (file_d%iostat/=0) return ! reading cr char
-          exit Fluid_Cells_Tag_Search
-        endif
+  call file_d%open(action='READ') ; if (file_d%iostat/=0) return
+  ! reading file until 'Fluid_Cells' is reached
+  Fluid_Cells_Tag_Search: do
+    read(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg,end=10)c1 ; if (file_d%iostat/=0) return
+    if (index(string=c1,substring='<')>0) then
+      c2 = c1
+      Tag_End_Serch: do
+        read(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg,end=10)c1 ; if (file_d%iostat/=0) return
+        c2 = c2//c1
+        if (index(string=c1,substring='>')>0) exit Tag_End_Serch
+      enddo Tag_End_Serch
+      if (index(string=c2,substring='<Fluid_Cells>')>0) then
+        read(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg,end=10)c1 ; if (file_d%iostat/=0) return ! reading cr char
+        exit Fluid_Cells_Tag_Search
       endif
-    enddo Fluid_Cells_Tag_Search
-    10 continue
-    call tag%set(tag_name='block_fluid_cells')
-    call tag%alloc(att_name=.true.,Na=3)
-    tag%att_name(1)%vs = 'b'
-    tag%att_name(2)%vs = 'l'
-    tag%att_name(3)%vs = 'encoding'
-    Tag_Block_Fluid_Cells_Parsing: do
-      read(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg,end=20)c1 ; if (file_d%iostat/=0) return
-      if (c1=='<') then
-        c2 = c1
-        Tag_Block_Fluid_Cells_End_Serch: do
-          read(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg,end=20)c1 ; if (file_d%iostat/=0) return
-          c2 = c2//c1
-          if (c1=='>') exit Tag_Block_Fluid_Cells_End_Serch
-        enddo Tag_Block_Fluid_Cells_End_Serch
-        if     (index(string=c2,substring='<block_fluid_cells')>0) then
-          call tag%set(string=c2) ; call tag%get_attributes
-          bb = cton(str=tag%att_val(1)%vs,knd=1_I4P) ; ll = cton(str=tag%att_val(2)%vs,knd=1_I4P)
-          if (bb==blockmap(b).and.ll==l) then
-            associate(gc => block%dims%gc,Ni => block%dims%Ni,Nj => block%dims%Nj,Nk => block%dims%Nk)
-              do k=1-gc(5),Nk+gc(6)
-                do j=1-gc(3),Nj+gc(4)
-                  do i=1-gc(1),Ni+gc(2)
-                    call block%C(i,j,k)%load(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg)
-                  enddo
+    endif
+  enddo Fluid_Cells_Tag_Search
+  10 continue
+  call tag%set(tag_name='block_fluid_cells')
+  call tag%alloc(att_name=.true.,Na=3)
+  tag%att_name(1)%vs = 'ID'
+  tag%att_name(2)%vs = 'encoding'
+  Tag_Block_Fluid_Cells_Parsing: do
+    read(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg,end=20)c1 ; if (file_d%iostat/=0) return
+    if (c1=='<') then
+      c2 = c1
+      Tag_Block_Fluid_Cells_End_Serch: do
+        read(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg,end=20)c1 ; if (file_d%iostat/=0) return
+        c2 = c2//c1
+        if (c1=='>') exit Tag_Block_Fluid_Cells_End_Serch
+      enddo Tag_Block_Fluid_Cells_End_Serch
+      if     (index(string=c2,substring='<block_fluid_cells')>0) then
+        call tag%set(string=c2) ; call tag%get_attributes
+        ib = cton(str=tag%att_val(1)%vs,knd=1_I8P)
+        if (ib==ID) then
+          associate(gc => block%dims%gc,Ni => block%dims%Ni,Nj => block%dims%Nj,Nk => block%dims%Nk)
+            do k=1-gc(5),Nk+gc(6)
+              do j=1-gc(3),Nj+gc(4)
+                do i=1-gc(1),Ni+gc(2)
+                  call block%C(i,j,k)%load(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg)
                 enddo
               enddo
-            endassociate
-            exit Tag_Block_Fluid_Cells_Parsing
-          else
-            cycle Tag_Block_Fluid_Cells_Parsing
-          endif
-        elseif (index(string=c2,substring='</Fluid_Cells')>0) then
+            enddo
+          endassociate
           exit Tag_Block_Fluid_Cells_Parsing
+        else
+          cycle Tag_Block_Fluid_Cells_Parsing
         endif
+      elseif (index(string=c2,substring='</Fluid_Cells')>0) then
+        exit Tag_Block_Fluid_Cells_Parsing
       endif
-    enddo Tag_Block_Fluid_Cells_Parsing
-    20 call file_d%close
-  endassociate
+    endif
+  enddo Tag_Block_Fluid_Cells_Parsing
+  20 call file_d%close
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine load_block_cells_file_fluid
 
   !> @brief Procedure for saving blocks cells fluid dynamic data from mesh file.
   !> @note The definition of the cells fluid dynamic data syntax is described in the 'load_cells_file_mesh' documentation.
-  subroutine save_block_cells_file_fluid(file_d,n,flip,fluid_cells_tag_open,fluid_cells_tag_close,block,b,l,parallel)
+  subroutine save_block_cells_file_fluid(file_d,n,flip,fluid_cells_tag_open,fluid_cells_tag_close,block,ID)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_File_Fluid),        intent(INOUT):: file_d                !< File data.
@@ -266,9 +267,7 @@ contains
   logical,             optional, intent(IN)::    fluid_cells_tag_open  !< Switch for opening the 'Fluid_Cells' tag.
   logical,             optional, intent(IN)::    fluid_cells_tag_close !< Switch for closing the 'Fluid_Cells' tag.
   type(Type_SBlock),   optional, intent(IN)::    block                 !< Block data.
-  integer(I4P),        optional, intent(IN)::    b                     !< Local index of block to be saved.
-  integer(I4P),        optional, intent(IN)::    l                     !< Level of block to be saved.
-  type(Type_Parallel), optional, intent(IN)::    parallel              !< Parallel data.
+  integer(I8P),        optional, intent(IN)::    ID                    !< ID-key of block to be saved.
   integer(I4P)::                                 i,j,k                 !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -288,10 +287,9 @@ contains
     if (fluid_cells_tag_close) then
       write(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg)'</Fluid_Cells>'//cr
     endif
-  elseif (present(block).and.present(b).and.present(l).and.present(parallel)) then
-    associate(blockmap => parallel%blockmap,unit=>file_d%unit,iostat=>file_d%iostat,iomsg=>file_d%iomsg)
-      write(unit=unit,iostat=iostat,iomsg=iomsg)'<block_fluid_cells b="'//trim(str(n=blockmap(b)))//'" l="'//trim(str(n=l))//&
-                                                '" encoding="raw">'
+  elseif (present(block).and.present(ID)) then
+    associate(unit=>file_d%unit,iostat=>file_d%iostat,iomsg=>file_d%iomsg)
+      write(unit=unit,iostat=iostat,iomsg=iomsg)'<block_fluid_cells ID="'//trim(str(n=ID))//'" encoding="raw">'
       associate(gc => block%dims%gc,Ni => block%dims%Ni,Nj => block%dims%Nj,Nk => block%dims%Nk)
         do k=1-gc(5),Nk+gc(6)
           do j=1-gc(3),Nj+gc(4)
@@ -312,7 +310,11 @@ contains
   !> @brief Procedure for loading fluid file.
   !> @note The fluid file is an unformatted file with STREAM access. However it is formatted by means of XML syntax, thus
   !> string containing a tag must be terminated by means of a carriage-return (cr=char(10)) character.
-  !> @note The fluid file is composed as following:
+  !> The fluid file contains the following data:
+  !>   - global%species0;
+  !>   - global%time_step.
+  !>   - global%block%C for all blocks.
+  !> The fluid file is composed as following:
   !> @code
   !>   <?xml version="1.0"?>
   !>   <Fluid_Header>
@@ -324,14 +326,15 @@ contains
   !> @endcode
   !> For 'Fluid_Header' and 'Fluid_Cells' tags see the documentation of 'load_header_file_fluid' and 'load_block_cells_file_fluid',
   !> respectively.
-  !> It is worth nothing that the syntax of tag attributes is case sensitive, whereas the syntax of their values is case
-  !> insensitive.
+  !> The blocks loaded are only the ones belonging to myrank. This is accomplished in a transparent way. It is worth nothing that
+  !> the syntax of tag attributes is case sensitive, whereas the syntax of their values is case insensitive.
   subroutine load_file_fluid(file_d,global)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_File_Fluid), intent(INOUT):: file_d !< File data.
   type(Type_Global),      intent(INOUT):: global !< Global data.
-  integer(I4P)::                          b,l    !< Counters.
+  type(Type_SBlock), pointer::            block  !< Block pointer for scanning global%block tree.
+  integer(I8P)::                          ID     !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -339,13 +342,12 @@ contains
   call global%set_Ns_from_species0
   call global%set_Nrk_from_rk_ord
   call global%blocks_dims_update
-  call global%block%alloc(members=.true.)
-  do l=1,global%mesh_dims%Nl
-    do b=1,global%mesh_dims%Nb
-      call file_d%load_block(block=global%block(b,l),b=b,l=l,parallel=global%parallel)
-      call global%block(b,l)%update_primitive(species0=global%species0)
-      call global%block(b,l)%primitive2conservative
-    enddo
+  do while(global%block%loopID(ID=ID))
+    block => global%block%dat(ID=ID)
+    call block%alloc(members=.true.)
+    call file_d%load_block(block=block,ID=ID)
+    call block%update_primitive(species0=global%species0)
+    call block%primitive2conservative
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -360,11 +362,12 @@ contains
   integer(I8P), optional, intent(IN)::    n      !< Time step number.
   integer(I1P), optional, intent(IN)::    flip   !< Flip-flop number.
   type(Type_Global),      intent(IN)::    global !< Global data.
-  integer(I4P)::                          b,l    !< Counters.
+  type(Type_SBlock), pointer::            block  !< Block pointer for scanning global%block tree.
+  integer(I8P)::                          ID     !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (global%parallel%myrank==0) then
+  if (global%parallel%is_master()) then
     if     (present(n)) then
       call file_d%save_header(species0=global%species0,time_step=global%time_step,n=n)
       call file_d%save_block(fluid_cells_tag_open=.true.,n=n)
@@ -378,19 +381,18 @@ contains
   endif
 #ifdef _MPI
 #else
-  do l=1,global%mesh_dims%Nl
-    do b=1,global%mesh_dims%Nb
-      if     (present(n)) then
-        call file_d%save_block(block=global%block(b,l),b=b,l=l,parallel=global%parallel,n=n)
-      elseif (present(flip)) then
-        call file_d%save_block(block=global%block(b,l),b=b,l=l,parallel=global%parallel,flip=flip)
-      else
-        call file_d%save_block(block=global%block(b,l),b=b,l=l,parallel=global%parallel)
-      endif
-    enddo
+  do while(global%block%loopID(ID=ID))
+    block => global%block%dat(ID=ID)
+    if     (present(n)) then
+      call file_d%save_block(block=block,ID=ID,n=n)
+    elseif (present(flip)) then
+      call file_d%save_block(block=block,ID=ID,flip=flip)
+    else
+      call file_d%save_block(block=block,ID=ID)
+    endif
   enddo
 #endif
-  if (global%parallel%myrank==0) then
+  if (global%parallel%is_master()) then
     if     (present(n)) then
       call file_d%save_block(fluid_cells_tag_close=.true.,n=n)
     elseif (present(flip)) then

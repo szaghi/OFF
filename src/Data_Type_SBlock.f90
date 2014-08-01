@@ -28,12 +28,12 @@ USE Data_Type_Block_Extents,      only: Type_Block_Extents     ! Definition of T
 USE Data_Type_Cell,               only: Type_Cell              ! Definition of Type_Cell.
 USE Data_Type_Conservative,       only: Type_Conservative      ! Definition of Type_Conservative.
 USE Data_Type_Face,               only: Type_Face              ! Definition of Type_Face.
-USE Data_Type_Mesh_Dimensions,    only: Type_Mesh_Dimensions   ! Definition of Type_Mesh_Dimensions.
 USE Data_Type_Primitive,          only: Type_Primitive         ! Definition of Type_Primitive.
 USE Data_Type_Region,             only: Type_Region            ! Definition of Type_Region.
 USE Data_Type_Species,            only: Type_Species           ! Definition of Type_Species.
 USE Data_Type_Space_Step,         only: Type_Space_Step        ! Definition of Type_Space_Step.
 USE Data_Type_Time_Step,          only: Type_Time_Step         ! Definition of Type_Time_Step.
+USE Data_Type_Tree,               only: Type_Tree              ! Definition of Type_Tree.
 USE Data_Type_Vector,             only: Type_Vector,ex,ey,ez   ! Definition of Type_Vector.
 USE Lib_Fluxes_Convective,        only: fluxes_convective      ! Procedure for convective fluxes.
 USE Lib_IO_Misc,                  only: Upper_Case             ! Procedures for IO and strings operations.
@@ -102,7 +102,7 @@ type, public:: Type_SBlock
   type(Type_Face),   allocatable:: Fk(:,:,:)   !< Faces k data  [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),0-gc(5):Nk+gc(6)].
   type(Type_Cell),   allocatable:: C(:,:,:)    !< Cells data    [1-gc(1):Ni+gc(2),1-gc(3):Nj+gc(4),1-gc(5):Nk+gc(6)].
   contains
-    procedure:: free               => free_block               ! Procedure for freeing memory.
+    procedure:: free               => free_block               ! Procedure for freeing dynamic memory.
     procedure:: alloc              => alloc_block              ! Procedure for allocating memory.
     procedure:: interpolate_primitive                          ! Procedure for interpolating primitive variables at nodes.
     procedure:: metrics            => metrics_block            ! Procedure for computing block metrics.
@@ -1025,13 +1025,13 @@ contains
 
   !> @brief Procedure for setting cells boundary conditions from block ones.
   !> @note This procedure is useful only for Cartesian grids.
-  elemental subroutine set_cells_bc(block,mesh_dims,l)
+  elemental subroutine set_cells_bc(block,block_dims)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_SBlock),         intent(INOUT):: block     !< Block-level data.
-  type(Type_Mesh_Dimensions), intent(IN)::    mesh_dims !< Mesh dimensions.
-  integer(I4P),               intent(IN)::    l         !< Grid level.
-  integer(I4P)::                              i,j,k     !< Counters.
+  class(Type_SBlock), intent(INOUT)::    block      !< Block-level data.
+  type(Type_Tree),    intent(IN)::       block_dims !< Mesh dimensions.
+  type(Type_Block_Dimensions), pointer:: blkdims    !< Pointer for scanning block_dims tree.
+  integer(I4P)::                         i,j,k      !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1040,10 +1040,11 @@ contains
     do k=1,Nk ; do j=1,Nj ; do i=1-gc(1),0
       block%Fi(i,j,k)%BC%tp = block%BC%F(1)%tp ; call block%Fi(i,j,k)%BC%alloc
       if (block%BC%F(1)%is_adj()) then
-        block%Fi(i,j,k)%BC%adj%b = block%BC%F(1)%adj%b
-        block%Fi(i,j,k)%BC%adj%i = mesh_dims%block_dims(block%BC%F(1)%adj%b,l)%Ni/(2**(l-1))+i
-        block%Fi(i,j,k)%BC%adj%j = j
-        block%Fi(i,j,k)%BC%adj%k = k
+        blkdims => block_dims%dat(ID=block%BC%F(1)%adj%ID)
+        block%Fi(i,j,k)%BC%adj%ID = block%BC%F(1)%adj%ID
+        block%Fi(i,j,k)%BC%adj%i  = blkdims%Ni+i
+        block%Fi(i,j,k)%BC%adj%j  = j
+        block%Fi(i,j,k)%BC%adj%k  = k
       elseif (block%BC%F(1)%is_in1()) then
         block%Fi(i,j,k)%BC%inf = block%BC%F(1)%inf
       endif
@@ -1052,10 +1053,10 @@ contains
     do k=1,Nk ; do j=1,Nj ; do i=Ni+1,Ni+gc(2)
       block%Fi(i-1,j,k)%BC%tp = block%BC%F(2)%tp ; call block%Fi(i-1,j,k)%BC%alloc
       if (block%BC%F(2)%is_adj()) then
-        block%Fi(i-1,j,k)%BC%adj%b = block%BC%F(2)%adj%b
-        block%Fi(i-1,j,k)%BC%adj%i = i-block%dims%Ni/(2**(l-1))
-        block%Fi(i-1,j,k)%BC%adj%j = j
-        block%Fi(i-1,j,k)%BC%adj%k = k
+        block%Fi(i-1,j,k)%BC%adj%ID = block%BC%F(2)%adj%ID
+        block%Fi(i-1,j,k)%BC%adj%i  = i-block%dims%Ni
+        block%Fi(i-1,j,k)%BC%adj%j  = j
+        block%Fi(i-1,j,k)%BC%adj%k  = k
       elseif (block%BC%F(2)%is_in1()) then
         block%Fi(i-1,j,k)%BC%inf = block%BC%F(2)%inf
       endif
@@ -1064,10 +1065,11 @@ contains
     do k=1,Nk ; do i=1,Ni ; do j=1-gc(3),0
       block%Fj(i,j,k)%BC%tp = block%BC%F(3)%tp ; call block%Fj(i,j,k)%BC%alloc
       if (block%BC%F(3)%is_adj()) then
-        block%Fj(i,j,k)%BC%adj%b = block%BC%F(3)%adj%b
-        block%Fj(i,j,k)%BC%adj%i = i
-        block%Fj(i,j,k)%BC%adj%j = mesh_dims%block_dims(block%BC%F(3)%adj%b,l)%Nj/(2**(l-1))+j
-        block%Fj(i,j,k)%BC%adj%k = k
+        blkdims => block_dims%dat(ID=block%BC%F(3)%adj%ID)
+        block%Fj(i,j,k)%BC%adj%ID = block%BC%F(3)%adj%ID
+        block%Fj(i,j,k)%BC%adj%i  = i
+        block%Fj(i,j,k)%BC%adj%j  = blkdims%Nj+j
+        block%Fj(i,j,k)%BC%adj%k  = k
       elseif (block%BC%F(3)%is_in1()) then
         block%Fj(i,j,k)%BC%inf = block%BC%F(3)%inf
       endif
@@ -1076,10 +1078,10 @@ contains
     do k=1,Nk ; do i=1,Ni ; do j=Nj+1,Nj+gc(4)
       block%Fj(i,j-1,k)%BC%tp = block%BC%F(4)%tp ; call block%Fj(i,j-1,k)%BC%alloc
       if (block%BC%F(4)%is_adj()) then
-        block%Fj(i,j-1,k)%BC%adj%b = block%BC%F(4)%adj%b
-        block%Fj(i,j-1,k)%BC%adj%i = i
-        block%Fj(i,j-1,k)%BC%adj%j = j-block%dims%Nj/(2**(l-1))
-        block%Fj(i,j-1,k)%BC%adj%k = k
+        block%Fj(i,j-1,k)%BC%adj%ID = block%BC%F(4)%adj%ID
+        block%Fj(i,j-1,k)%BC%adj%i  = i
+        block%Fj(i,j-1,k)%BC%adj%j  = j-block%dims%Nj
+        block%Fj(i,j-1,k)%BC%adj%k  = k
       elseif (block%BC%F(4)%is_in1()) then
         block%Fj(i,j-1,k)%BC%inf = block%BC%F(4)%inf
       endif
@@ -1088,10 +1090,11 @@ contains
     do j=1,Nj ; do i=1,Ni ; do k=1-gc(5),0
       block%Fk(i,j,k)%BC%tp = block%BC%F(5)%tp ; call block%Fk(i,j,k)%BC%alloc
       if (block%BC%F(5)%is_adj()) then
-        block%Fk(i,j,k)%BC%adj%b = block%BC%F(5)%adj%b
-        block%Fk(i,j,k)%BC%adj%i = i
-        block%Fk(i,j,k)%BC%adj%j = j
-        block%Fk(i,j,k)%BC%adj%k = mesh_dims%block_dims(block%BC%F(5)%adj%b,l)%Nk/(2**(l-1))+k
+        blkdims => block_dims%dat(ID=block%BC%F(5)%adj%ID)
+        block%Fk(i,j,k)%BC%adj%ID = block%BC%F(5)%adj%ID
+        block%Fk(i,j,k)%BC%adj%i  = i
+        block%Fk(i,j,k)%BC%adj%j  = j
+        block%Fk(i,j,k)%BC%adj%k  = blkdims%Nk+k
       elseif (block%BC%F(5)%is_in1()) then
         block%Fk(i,j,k)%BC%inf = block%BC%F(5)%inf
       endif
@@ -1100,10 +1103,10 @@ contains
     do j=1,Nj ; do i=1,Ni ; do k=Nk+1,Nk+gc(6)
       block%Fk(i,j,k-1)%BC%tp = block%BC%F(6)%tp ; call block%Fk(i,j,k-1)%BC%alloc
       if (block%BC%F(6)%is_adj()) then
-        block%Fk(i,j,k-1)%BC%adj%b = block%BC%F(6)%adj%b
-        block%Fk(i,j,k-1)%BC%adj%i = i
-        block%Fk(i,j,k-1)%BC%adj%j = j
-        block%Fk(i,j,k-1)%BC%adj%k = k-block%dims%Nk/(2**(l-1))
+        block%Fk(i,j,k-1)%BC%adj%ID = block%BC%F(6)%adj%ID
+        block%Fk(i,j,k-1)%BC%adj%i  = i
+        block%Fk(i,j,k-1)%BC%adj%j  = j
+        block%Fk(i,j,k-1)%BC%adj%k  = k-block%dims%Nk
       elseif (block%BC%F(6)%is_in1()) then
         block%Fk(i,j,k-1)%BC%inf = block%BC%F(6)%inf
       endif

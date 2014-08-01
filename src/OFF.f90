@@ -96,7 +96,10 @@ program OFF
 USE IR_Precision                                              ! Integers and reals precision definition.
 USE Data_Type_Files,       only: Type_Files                   ! Definition of Type_Files.
 USE Data_Type_Global,      only: Type_Global                  ! Definition of Type_Global.
+USE Data_Type_Hash_Table,  only: Type_Hash_Table              ! Definition of Type_Hash_Table.
 USE Data_Type_Time,        only: Type_Time                    ! Definition of Type_Time.
+USE Data_Type_Tree,        only: Type_Tree                    ! Definition of Type_Tree.
+USE Data_Type_SBlock,      only: Type_SBlock                  ! Definition of Type_SBlock.
 USE Lib_IO_Misc                                               ! Procedures for IO and strings operations.
 USE Lib_Fluxes_Convective, only: set_interface_reconstruction ! Procedure for initializing reconstruction algorithm.
 USE Lib_Riemann_Solvers,   only: set_riemann_solver           ! Procedure for initializing Riemann solver.
@@ -135,7 +138,7 @@ Temporal_Loop: do
   call IOFile%prof%profile(p=1,pstart=.true.,&
                            myrank=global%parallel%myrank,Nthreads=global%parallel%Nthreads,Nproc=global%parallel%Nproc)
 #endif
-  call global%solve_grl(l=1,prof=IOFile%prof)
+  call global%solve(prof=IOFile%prof)
 #ifdef PROFILING
   call IOFile%prof%profile(p=1,pstop=.true.,&
                            myrank=global%parallel%myrank,Nthreads=global%parallel%Nthreads,Nproc=global%parallel%Nproc)
@@ -183,11 +186,12 @@ contains
   subroutine off_init()
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P)::  Nca = 0_I4P    !< Number of command line arguments.
-  character(99):: File_Option    !< Options file name.
-  integer(I4P)::  err            !< Error traping flag.
-  real(R8P)::     min_space_step !< Minimum space step.
-  integer(I4P)::  b,l            !< Counters.
+  integer(I4P)::               Nca = 0_I4P    !< Number of command line arguments.
+  character(99)::              File_Option    !< Options file name.
+  integer(I4P)::               err            !< Error traping flag.
+  real(R8P)::                  min_space_step !< Minimum space step.
+  type(Type_SBlock), pointer:: block          !< Pointer for scanning global%block tree.
+  integer(I8P)::               ID             !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -196,24 +200,10 @@ contains
   ! initialzing timing
   call time%chronos(start=.true.)
   ! initializing parallel environments
-  associate(myrank=>global%parallel%myrank,Nproc=>global%parallel%Nproc,Nthreads=>global%parallel%Nthreads)
-#ifdef _MPI
-  call MPI_INIT(err)
-  call MPI_COMM_RANK(MPI_COMM_WORLD,myrank,err)
-  call MPI_COMM_SIZE(MPI_COMM_WORLD,Nproc,err)
-#endif
-#ifdef OPENMP
-  !$OMP PARALLEL      &
-  !$OMP DEFAULT(none) &
-  !$OMP SHARED(Nthreads)
-  Nthreads = OMP_GET_NUM_THREADS()
-  !$OMP END PARALLEL
-#endif
-  endassociate
-  call global%parallel%set_rks
+  call global%parallel%init
   associate(rks=>global%parallel%rks)
     ! checking/creating lockfile
-    if (global%parallel%myrank==0) then
+    if (global%parallel%is_master()) then
       call IOFile%lockfile%lock
       if (IOFile%lockfile%iostat/=0) then
         write(stderr,'(A)')'+-'//rks//'-> '//IOFile%lockfile%iomsg
@@ -233,7 +223,7 @@ contains
       File_Option = global%OS%string_separator_fix(string=trim(adjustl(File_Option)))
     endif
     ! printing architecture informations
-    if (global%parallel%myrank==0) then
+    if (global%parallel%is_master()) then
       write(stdout,'(A)')'+-'//rks//'-> Running architecture general informations'
       call global%OS%print(pref='|-'//rks//'->  ',unit=stdout)
       write(stdout,'(A)')'+-'//rks//'-> Precision of running architecture'
@@ -244,13 +234,13 @@ contains
     ! setting OFF options file structures
     call IOFile%off_opts%set(name=trim(File_Option),path_in='')
     ! loading OFF options file
-    associate(OS=>global%OS,myrank=>global%parallel%myrank,off_opts=>IOFile%off_opts)
+    associate(OS=>global%OS,off_opts=>IOFile%off_opts)
       call off_opts%load(OS=OS)
       if (off_opts%iostat/=0) then
         write(stderr,'(A)')'+-'//rks//'-> '//off_opts%iomsg
         call off_stop
       endif
-      if (myrank==0) then
+      if (global%parallel%is_master()) then
         write(stdout,'(A)')'+-'//rks//'-> OFF options'
         call off_opts%print(pref='|-'//rks//'->  ',unit=stdout)
       endif
@@ -258,17 +248,18 @@ contains
     endassociate
     ! setting files strucutures
     associate(off_opts=>IOFile%off_opts,solv_opts=>IOFile%solv_opts,mesh=>IOFile%mesh,bc=>IOFile%bc,init=>IOFile%init,&
-              sol=>IOFile%sol,proc=>IOFile%proc,prof=>IOFile%prof)
+              !sol=>IOFile%sol,proc=>IOFile%proc,prof=>IOFile%prof)
+              sol=>IOFile%sol,prof=>IOFile%prof)
       call solv_opts%set(name=off_opts%fn_solv,path_in=off_opts%path_in,path_out=off_opts%path_out)
       call mesh%set(     name=off_opts%fn_mesh,path_in=off_opts%path_in,path_out=off_opts%path_out)
       call bc%set(       name=off_opts%fn_bc  ,path_in=off_opts%path_in,path_out=off_opts%path_out)
       call init%set(     name=off_opts%fn_init,path_in=off_opts%path_in,path_out=off_opts%path_out)
       call sol%set(      name=off_opts%fn_sol ,path_in=off_opts%path_in,path_out=off_opts%path_out,fout=off_opts%sol_out)
-      call proc%set(     name=off_opts%fn_proc,path_in=off_opts%path_in,path_out=off_opts%path_out)
+      !call proc%set(     name=off_opts%fn_proc,path_in=off_opts%path_in,path_out=off_opts%path_out)
       call prof%set(     name=off_opts%fn_prof,path_in=off_opts%path_in,path_out=off_opts%path_out)
     endassociate
     ! loading input files
-    if (global%parallel%myrank==0) then
+    if (global%parallel%is_master()) then
       write(stdout,'(A)')'+-'//rks//'-> Loading input files'
     endif
     call IOFile%solv_opts%load
@@ -276,7 +267,7 @@ contains
       write(stderr,'(A)')'+-'//rks//'-> '//IOFile%solv_opts%iomsg
       call off_stop
     endif
-    if (global%parallel%myrank==0) then
+    if (global%parallel%is_master()) then
       write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%solv_opts%name
       call IOFile%solv_opts%print(pref='|-'//rks//'->    ',unit=stdout)
     endif
@@ -287,32 +278,32 @@ contains
     global%adim       = IOFile%solv_opts%adim
     ! initializing Runge-Kutta coefficients
     call rk_init(global%time_step%rk_ord)
-    ! loading processes/blocks map and computing the number global/local blocks
-    if (global%parallel%myrank==0) then
-      write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%proc%name
-    endif
-    call IOFile%proc%load(mesh_dims=global%mesh_dims,parallel=global%parallel)
-    if (IOFile%proc%iostat/=0) then
-      write(stderr,'(A)')'+-'//rks//'-> '//IOFile%proc%iomsg
-      call off_stop
-    endif
-    call global%parallel%print(pref='|-'//rks//'->    ',unit=stdout)
+   !! loading processes/blocks map and computing the number global/local blocks
+   !if (global%parallel%myrank==0) then
+   !  write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%proc%name
+   !endif
+   !call IOFile%proc%load(mesh_dims=global%mesh_dims,parallel=global%parallel)
+   !if (IOFile%proc%iostat/=0) then
+   !  write(stderr,'(A)')'+-'//rks//'-> '//IOFile%proc%iomsg
+   !  call off_stop
+   !endif
+   !call global%parallel%print(pref='|-'//rks//'->    ',unit=stdout)
     ! loading mesh file
-    if (global%parallel%myrank==0) write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%mesh%name
+    if (global%parallel%is_master()) write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%mesh%name
     call IOFile%mesh%load(global=global)
     if (IOFile%mesh%iostat/=0) then
       write(stderr,'(A)')'+-'//rks//'-> '//IOFile%mesh%iomsg
       call off_stop
     endif
     ! loading bc file
-    if (global%parallel%myrank==0) write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%bc%name
+    if (global%parallel%is_master()) write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%bc%name
     call IOFile%bc%load(global=global)
     if (IOFile%bc%iostat/=0) then
       write(stderr,'(A)')'+-'//rks//'-> '//IOFile%bc%iomsg
       call off_stop
     endif
     ! loading init file
-    if (global%parallel%myrank==0) write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%init%name
+    if (global%parallel%is_master()) write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%init%name
     call IOFile%init%load(global=global)
     if (IOFile%init%iostat/=0) then
       write(stderr,'(A)')'+-'//rks//'-> '//IOFile%init%iomsg
@@ -320,34 +311,36 @@ contains
     endif
     ! computing the mesh variables that are not loaded from input files
     min_space_step = MaxR8P
-    do l=1,global%mesh_dims%Nl ; do b=1,global%mesh_dims%Nb
-        call global%block(b,l)%metrics
-        call global%block(b,l)%metrics_correction
-        min_space_step = min(min_space_step,global%block(b,l)%min_space_step())
-    enddo ; enddo
+    do while(global%block%loopID(ID=ID))
+      block => global%block%dat(ID=ID)
+      call block%metrics
+      call block%metrics_correction
+      min_space_step = min(min_space_step,block%min_space_step())
+    enddo
     ! initializing WENO coefficients
     call weno_init(S=global%space_step%gco,min_space_step=min_space_step)
-    if (global%parallel%myrank==0) then
+    if (global%parallel%is_master()) then
       write(stdout,'(A)')'+-'//rks//'->   WENO settings'
       call weno_print(unit=stdout,pref='|-'//rks//'->     ')
     endif
     ! printing block infos
-    if (global%parallel%myrank==0) then
+    if (global%parallel%is_master()) then
       write(stdout,'(A)')'+-'//rks//'->   Blocks infos'
-      do l=1,global%mesh_dims%Nl ; do b=1,global%mesh_dims%Nb
-        write(stdout,'(A)')'+-'//rks//'->     Block b='//trim(str(n=b))//' level l='//trim(str(n=l))
-        call global%block(b,l)%print(unit=stdout,pref='|-'//rks//'->      ')
-      enddo ; enddo
+      do while(global%block%loopID(ID=ID))
+        block => global%block%dat(ID=ID)
+        write(stdout,'(A)')'+-'//rks//'->     Block ID='//trim(str(n=ID))
+        call block%print(unit=stdout,pref='|-'//rks//'->      ')
+      enddo
     endif
     ! coping input files in output path
 #ifdef _MPI
     ! syncronizing MPI processes
     call MPI_BARRIER(MPI_COMM_WORLD,err)
 #endif
-    if (global%parallel%myrank==0) then
+    if (global%parallel%is_master()) then
       call IOFile%off_opts%backup(OS=global%OS)
       call IOFile%solv_opts%backup(OS=global%OS)
-      call IOFile%proc%backup(OS=global%OS)
+      !call IOFile%proc%backup(OS=global%OS)
       call IOFile%mesh%backup(OS=global%OS)
       call IOFile%bc%backup(OS=global%OS)
       call IOFile%init%backup(OS=global%OS)
@@ -461,7 +454,7 @@ contains
  !  enddo
  !enddo
   ! the simulation is done: safe finalizing the simulation
-  if (global%parallel%myrank==0) then
+  if (global%parallel%is_master()) then
     call IOFile%lockfile%unlock
  !  close(global%dfile%unit_res)     ! close log residuals file
   endif

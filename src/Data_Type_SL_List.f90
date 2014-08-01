@@ -472,11 +472,11 @@ contains
   subroutine del_link(l,n)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_SL_Link), target, intent(INOUT):: l  !< List.
-  integer(I4P),                intent(IN)::    n  !< Element of the list to be deleted.
-  type(Type_SL_Link), pointer::                ln !< Pointer to "n-th" link of the list.
+  class(Type_SL_Link), target, intent(INOUT):: l   !< List.
+  integer(I4P),                intent(IN)::    n   !< Element of the list to be deleted.
+  type(Type_SL_Link), pointer::                ln  !< Pointer to "n-th" link of the list.
   type(Type_SL_Link), pointer::                tmp !< Temporary link of the list.
-  integer(I4P)::                               e  !< Counter.
+  integer(I4P)::                               e   !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -505,7 +505,6 @@ contains
       endif
     endif
   endif
-
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine del_link

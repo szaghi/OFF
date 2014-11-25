@@ -120,6 +120,7 @@ contains
     enddo Read_Loop
     20 call file_d%close
   endassociate
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine load_header_file_fluid
@@ -159,6 +160,7 @@ contains
     write(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg)'</Fluid_Header>'//cr
     call file_d%close
   endassociate
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine save_header_file_fluid
@@ -217,7 +219,7 @@ contains
   enddo Fluid_Cells_Tag_Search
   10 continue
   call tag%set(tag_name='block_fluid_cells')
-  call tag%alloc(att_name=.true.,Na=3)
+  call tag%alloc(att_name=.true.,Na=2)
   tag%att_name(1)%vs = 'ID'
   tag%att_name(2)%vs = 'encoding'
   Tag_Block_Fluid_Cells_Parsing: do
@@ -252,6 +254,7 @@ contains
     endif
   enddo Tag_Block_Fluid_Cells_Parsing
   20 call file_d%close
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine load_block_cells_file_fluid
@@ -303,6 +306,7 @@ contains
     endassociate
   endif
   call file_d%close
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine save_block_cells_file_fluid

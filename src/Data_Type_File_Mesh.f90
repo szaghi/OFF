@@ -122,6 +122,7 @@ contains
     endif
   enddo Mesh_Dims_Read
   20 call file_d%close
+  call file_d%fallback
   call global%block_dims%update
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -142,7 +143,8 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   call file_d%open(replace=.true.,action='WRITE') ; if (file_d%iostat/=0) return
   write(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg)'<?xml version="1.0"?>'//cr
-  write(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg)'<Mesh_Header '//global%block_dims%str_Na_ref_ratio()//'>'//cr
+  write(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg)'<Mesh_Header '//trim(global%block_dims%str_Na_ref_ratio())//'>'//&
+                                                                 cr
   do while(global%block_dims%loopID(ID=ID))
     blkdims => global%block_dims%dat(ID=ID)
     write(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg)'  <block_dims ID="'//trim(str(n=ID))//'">'//&
@@ -150,6 +152,7 @@ contains
   enddo
   write(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg)'</Mesh_Header>'//cr
   call file_d%close
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine save_header_file_mesh
@@ -205,7 +208,7 @@ contains
   enddo Mesh_Nodes_Tag_Search
   10 continue
   call tag%set(tag_name='block_nodes')
-  call tag%alloc(att_name=.true.,Na=3)
+  call tag%alloc(att_name=.true.,Na=2)
   tag%att_name(1)%vs = 'ID'
   tag%att_name(2)%vs = 'encoding'
   Tag_Block_Nodes_Parsing: do
@@ -218,7 +221,8 @@ contains
         if (c1=='>') exit Tag_Block_Nodes_End_Serch
       enddo Tag_Block_Nodes_End_Serch
       if     (index(string=c2,substring='<block_nodes')>0) then
-        call tag%set(string=c2) ; call tag%get_attributes
+        call tag%set(string=c2)
+        call tag%get_attributes
         ib = cton(str=tag%att_val(1)%vs,knd=1_I8P)
         if (ib==ID) then
           associate(gc => block%dims%gc,Ni => block%dims%Ni,Nj => block%dims%Nj,Nk => block%dims%Nk)
@@ -240,6 +244,7 @@ contains
     endif
   enddo Tag_Block_Nodes_Parsing
   20 call file_d%close
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine load_block_nodes_file_mesh
@@ -288,6 +293,7 @@ contains
       write(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg)'</block_nodes>'//cr
     call file_d%close
   endif
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine save_block_nodes_file_mesh

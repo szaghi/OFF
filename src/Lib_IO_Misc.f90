@@ -24,7 +24,7 @@
 module Lib_IO_Misc
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                                                                  ! Integers and reals precision definition.
-USE Lib_Math, only: digit                                                         ! Procedure for computing the significant digits
+!USE Lib_Math, only: digit                                                         ! Procedure for computing the significant digits
                                                                                   ! of a number.
 USE, intrinsic:: ISO_FORTRAN_ENV, only: stdout=>OUTPUT_UNIT, stderr=>ERROR_UNIT,& ! Standard output/error logical units.
                                         IOSTAT_END, IOSTAT_EOR                    ! Standard end-of-file/end-of record parameters.
@@ -38,6 +38,8 @@ public:: stdout,stderr,iostat_end,iostat_eor
 public:: Get_Unit
 public:: get_extension,set_extension
 public:: inquire_dir
+public:: re_match
+public:: read_file_as_stream
 public:: lc_file
 public:: File_Not_Found
 public:: Dir_Not_Found
@@ -137,7 +139,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction set_extension
 
-  !> @brief Function for inquiring the presence of a directory.
+  !> @brief Procedure for inquiring the presence of a directory.
   !> @return \b err integer(I_P) variable for error trapping.
   !> @note The leading and trealing spaces are removed from the directory name.
   function inquire_dir(myrank,errmsg,directory) result(err)
@@ -176,6 +178,189 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction inquire_dir
+
+  !> @brief Procedure for regular expression mathcing. Tries to match the given string with the pattern and give .true. if the
+  !> entire string matches the pattern, .false. otherwise.
+  !> @note Trailing blanks are ignored.
+  recursive function re_match(string,pattern) result(match)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(len=*), intent(in):: string  !< Input string.
+  character(len=*), intent(in):: pattern !< Pattern to search for.
+  logical::                      match   !< Match or not.
+  character(len=len(pattern))::  literal
+  integer::                      ptrim
+  integer::                      p
+  integer::                      k
+  integer::                      ll
+  integer::                      method
+  integer::                      start
+  integer::                      strim
+  character(len=1), parameter::  backslash = '\\'
+  character(len=1), parameter::  star      = '*'
+  character(len=1), parameter::  question  = '?'
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  match  = .false.
+  method = 0
+  ptrim  = len_trim( pattern )
+  strim  = len_trim( string )
+  p      = 1
+  ll     = 0
+  start  = 1
+  ! Split off a piece of the pattern
+  do while (p <= ptrim)
+    select case (pattern(p:p))
+      case(star)
+        if (ll.ne.0) exit
+        method = 1
+      case(question)
+        if (ll.ne.0) exit
+        method = 2
+        start  = start + 1
+      case(backslash)
+        p  = p + 1
+        ll = ll + 1
+        literal(ll:ll) = pattern(p:p)
+      case default
+        ll = ll + 1
+        literal(ll:ll) = pattern(p:p)
+    endselect
+    p = p + 1
+  enddo
+  ! Now look for the literal string (if any!)
+  if (method==0) then
+    ! We are at the end of the pattern, and of the string?
+    if (strim==0.and.ptrim==0) then
+      match = .true.
+    else
+      ! The string matches a literal part?
+      if (ll>0) then
+        if (string(start:min(strim,start+ll-1))==literal(1:ll)) then
+          start = start + ll
+          match = re_match(string(start:),pattern(p:))
+        endif
+      endif
+    endif
+  endif
+  if (method==1) then
+    ! Scan the whole of the remaining string ...
+    if (ll==0) then
+      match = .true.
+    else
+      do while (start <= strim)
+        k = index(string(start:),literal(1:ll))
+        if ( k > 0 ) then
+          start = start + k + ll - 1
+          match = re_match(string(start:),pattern(p:))
+          if (match) then
+            exit
+          endif
+        endif
+        start = start + 1
+      enddo
+    endif
+  endif
+  if ( method == 2 .and. ll > 0 ) then
+    ! Scan the whole of the remaining string ...
+    if (string(start:min(strim,start+ll-1)) == literal(1:ll)) then
+      match = re_match(string(start+ll:),pattern(p:))
+    endif
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction re_match
+
+  !> @brief Procedure for reading a file as single characters stream.
+  subroutine read_file_as_stream(pref,iostat,iomsg,delimiter_start,delimiter_end,filename,stream)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(*), optional,        intent(IN)::  pref            !< Prefixing string.
+  integer(I4P), optional,        intent(OUT):: iostat          !< IO error.
+  character(*), optional,        intent(OUT):: iomsg           !< IO error message.
+  character(*), optional,        intent(IN)::  delimiter_start !< Delimiter from which start the stream.
+  character(*), optional,        intent(IN)::  delimiter_end   !< Delimiter to which end the stream.
+  character(*),                  intent(IN)::  filename        !< File name.
+  character(len=:), allocatable, intent(OUT):: stream          !< Output string containing the file data as a single stream.
+  logical::                                    is_file         !< Flag for inquiring the presence of the file.
+  integer(I4P)::                               unit            !< Unit file.
+  integer(I4P)::                               iostatd         !< IO error.
+  character(500)::                             iomsgd          !< IO error message.
+  character(len=:), allocatable::              prefd           !< Prefixing string.
+  character(1)::                               c1              !< Single character.
+  character(len=:), allocatable::              string          !< Dummy string.
+  logical::                                    cstart,cend     !< Flag for stream capturing trigging.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  prefd = '' ; if (present(pref)) prefd = pref
+  inquire(file=adjustl(trim(filename)),exist=is_file,iostat=iostatd)
+  if (.not.is_file) then
+    iostat = File_Not_Found(filename=adjustl(trim(filename)),cpn=prefd//'read_file_as_stream')
+    return
+  endif
+  open(unit=Get_Unit(unit),file=adjustl(trim(filename)),access='STREAM',form='UNFORMATTED',iostat=iostatd,iomsg=iomsgd)
+  if (iostatd/=0) then
+    write(stderr,'(A)')prefd//' Opening file '//adjustl(trim(filename))//' some errors occurs!'
+    write(stderr,'(A)')prefd//iomsgd
+    write(stderr,'(A)')prefd//' IOSTAT '//str(n=iostatd)
+    return
+  endif
+  stream = ''
+  if (present(delimiter_start).and.present(delimiter_end)) then
+    string = ''
+    Main_Read_Loop: do
+      read(unit=unit,iostat=iostatd,iomsg=iomsgd,end=10)c1
+      if (c1==delimiter_start(1:1)) then
+        cstart = .true.
+        string = c1
+        Start_Read_Loop: do while(len(string)<len(delimiter_start))
+          read(unit=unit,iostat=iostatd,iomsg=iomsgd,end=10)c1
+          string = string//c1
+          if (.not.(index(string=delimiter_start,substring=string)>0)) then
+            cstart = .false.
+            exit Start_Read_Loop
+          endif
+        enddo Start_Read_Loop
+        if (cstart) then
+          cend = .false.
+          stream = string
+          do while(.not.cend)
+            read(unit=unit,iostat=iostatd,iomsg=iomsgd,end=10)c1
+            if (c1==delimiter_end(1:1)) then ! maybe the end
+              string = c1
+              End_Read_Loop: do while(len(string)<len(delimiter_end))
+                read(unit=unit,iostat=iostatd,iomsg=iomsgd,end=10)c1
+                string = string//c1
+                if (.not.(index(string=delimiter_end,substring=string)>0)) then
+                  stream = stream//string
+                  exit End_Read_Loop
+                elseif (len(string)==len(delimiter_end)) then
+                  cend = .true.
+                  stream = stream//string
+                  exit Main_Read_Loop
+                endif
+              enddo End_Read_Loop
+            else
+              stream = stream//c1
+            endif
+          enddo
+        endif
+      endif
+    enddo Main_Read_Loop
+  else
+    Read_Loop: do
+      read(unit=unit,iostat=iostatd,iomsg=iomsgd,end=10)c1
+      stream = stream//c1
+    enddo Read_Loop
+  endif
+  10 close(unit)
+  if (present(iostat)) iostat = iostatd
+  if (present(iomsg))  iomsg  = iomsgd
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine read_file_as_stream
 
   !> @brief Function for calculating the number of lines (records) of a sequential file.
   !>@return \b n integer(I4P) variable
@@ -458,7 +643,7 @@ endfunction count_substring
   !---------------------------------------------------------------------------------------------------------------------------------
   rank = 0 ; if (present(myrank)) rank = myrank
   Np   = 1 ; if (present(Nproc )) Np   = Nproc
-  rks = 'rank'//trim(strz(digit(Np),rank))
+  rks = 'rank'!//trim(strz(digit(Np),rank))
   write(stderr,'(A)')trim(rks)//' Directory '//adjustl(trim(dirname))//' Not Found!'
   write(stderr,'(A)')trim(rks)//' Calling procedure "'//adjustl(trim(cpn))//'"'
   return

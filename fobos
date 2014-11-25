@@ -1,1 +1,218 @@
-_fobos/fobos.OFF.serial.nulk.intel
+[modes]
+modes = OFF-debug-1D-x  OFF-release-1D-x 
+        OFF-debug-2D-xy OFF-release-2D-xy 
+        OFF-debug-3D    OFF-release-3D
+        POG-debug-1D-x  POG-release-1D-x   
+        POG-debug-2D-xy POG-release-2D-xy  
+        POG-debug-3D    POG-release-3D     
+        IBM-debug       IBM-release
+
+[common-variables]
+$CLFLAGS  = -assume protect_parens -assume realloc_lhs -fp-model source
+$CFLAGS   = -cpp -c -D_OSYSTEMuix
+$DEBUG    = -O0 -debug all -check all -warn all -traceback
+$OPTIMIZE = -O3
+
+# main modes
+[OFF-debug-1D-x]
+template = template-debug-1D-x
+target   = src/OFF.f90
+output   = OFF
+
+[OFF-release-1D-x]
+template = template-release-1D-x
+target   = src/OFF.f90
+output   = OFF
+
+[OFF-debug-2D-xy]
+template = template-debug-2D-xy
+target   = src/OFF.f90
+output   = OFF
+
+[OFF-release-2D-xy]
+template = template-release-2D-xy
+target   = src/OFF.f90
+output   = OFF
+
+[OFF-debug-3D]
+template = template-debug-3D
+target   = src/OFF.f90
+output   = OFF
+
+[OFF-release-3D]
+template = template-release-3D
+target   = src/OFF.f90
+output   = OFF
+
+[POG-debug-1D-x]
+template = template-debug-1D-x
+libs     = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
+target   = src/POG.f90
+output   = POG
+
+[POG-release-1D-x]
+template = template-release-1D-x-TECIO
+libs     = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
+target   = src/POG.f90
+output   = POG
+
+[POG-debug-2D-xy]
+template = template-debug-2D-xy
+libs     = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
+target   = src/POG.f90
+output   = POG
+
+[POG-release-2D-xy]
+template = template-release-2D-xy
+libs     = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
+target   = src/POG.f90
+output   = POG
+
+[POG-debug-3D]
+template = template-debug-3D
+libs     = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
+target   = src/POG.f90
+output   = POG
+
+[POG-release-3D]
+template = template-release-3D
+libs     = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
+target   = src/POG.f90
+output   = POG
+
+[IBM-debug]
+template = template-debug-3D
+target   = src/IBM.f90
+output   = IBM
+
+[IBM-release]
+template = template-release-3D
+target   = src/IBM.f90
+output   = IBM
+
+#templates
+[template-debug-1D-x]
+help      = Debug mode, 1D along X
+compiler  = intel
+cflags    = $CLFLAGS $DEBUG $CFLAGS
+lflags    = $CLFLAGS $DEBUG
+preproc   = -DNULj -DNULk -DSMSWz
+mod_dir   = ./mod/
+obj_dir   = ./obj/
+build_dir = ./
+src       = ./src/
+colors    = True
+quiet     = False
+log       = True
+jobs      = 10
+
+[template-release-1D-x]
+help      = Release mode, 1D along X
+compiler  = intel
+cflags    = $CLFLAGS $OPTIMIZE $CFLAGS
+lflags    = $CLFLAGS $OPTIMIZE
+preproc   = -DNULj -DNULk -DSMSWz
+mod_dir   = ./mod/
+obj_dir   = ./obj/
+build_dir = ./
+src       = ./src/
+colors    = True
+quiet     = False
+log       = False
+jobs      = 10
+
+[template-release-1D-x-TECIO]
+help      = Release mode, 1D along X
+compiler  = intel
+cflags    = $CLFLAGS $OPTIMIZE $CFLAGS
+lflags    = $CLFLAGS $OPTIMIZE
+preproc   = -DNULj -DNULk -DSMSWz -DTECIO
+mod_dir   = ./mod/
+obj_dir   = ./obj/
+build_dir = ./
+src       = ./src/
+colors    = True
+quiet     = False
+log       = False
+jobs      = 10
+
+[template-debug-2D-xy]
+help      = Debug mode, 2D along XY
+compiler  = intel
+cflags    = $CLFLAGS $DEBUG $CFLAGS
+lflags    = $CLFLAGS $DEBUG
+preproc   = -DNULk -DSMSWz -D_COMPFLAG='$CLFLAGS $DEBUG $CFLAGS' -D_COMPILER='intel'
+mod_dir   = ./mod/
+obj_dir   = ./obj/
+build_dir = ./
+src       = ./src/
+colors    = True
+quiet     = False
+log       = True
+jobs      = 10
+
+[template-release-2D-xy]
+help      = Release mode, 2D along XY
+compiler  = intel
+cflags    = $CLFLAGS $OPTIMIZE $CFLAGS
+lflags    = $CLFLAGS $OPTIMIZE
+preproc   = -DNULk -DSMSWz
+mod_dir   = ./mod/
+obj_dir   = ./obj/
+build_dir = ./
+src       = ./src/
+colors    = True
+quiet     = False
+log       = False
+jobs      = 10
+
+[template-debug-3D]
+help      = Debug mode, 3D
+compiler  = intel
+cflags    = $CLFLAGS $DEBUG $CFLAGS
+lflags    = $CLFLAGS $DEBUG
+preproc   = -DSMSWz
+mod_dir   = ./mod/
+obj_dir   = ./obj/
+build_dir = ./
+src       = ./src/
+colors    = True
+quiet     = False
+log       = True
+jobs      = 10
+
+[template-release-3D]
+help      = Release mode, 3D
+compiler  = intel
+cflags    = $CLFLAGS $OPTIMIZE $CFLAGS
+lflags    = $CLFLAGS $OPTIMIZE
+preproc   = -DSMSWz
+mod_dir   = ./mod/
+obj_dir   = ./obj/
+build_dir = ./
+src       = ./src/
+colors    = True
+quiet     = False
+log       = False
+jobs      = 10
+
+[rule-remakeall-release-1D-x]
+help = Rule for re-building OFF, POG and IBM in mode release-1D-x
+rule_clean_OFF = FoBiS.py clean -mode OFF-release-1D-x
+rule_build_OFF = FoBiS.py build -mode OFF-release-1D-x
+rule_clean_POG = FoBiS.py clean -mode POG-release-1D-x
+rule_build_POG = FoBiS.py build -mode POG-release-1D-x
+rule_clean_IBM = FoBiS.py clean -mode IBM-release
+rule_build_IBM = FoBiS.py build -mode IBM-release
+
+[rule-makedoc]
+help = Rule for building documentation from source files
+rule = doxygen .doxygenconfig
+
+[rule-deldoc]
+help = Rule for deleting documentation
+rule = rm -rf doc/html/*
+
+[rule-maketar]
+help = Rule for making tar archive of the project
+rule = rm -rf OFF ; mkdir -p OFF ; cp -r EXAMPLE.md examples inputs-template lib makefile README.md util .doxygenconfig .gitignore OFF/ ; cp -rL src OFF/ ; tar czf OFF.tgz OFF ; rm -rf OFF

@@ -6,7 +6,7 @@
     <blocks_description type="blocks"> blocks_description.opt </blocks_description>
   </inputs>
   <outputs>
-    <grid_levels> 1 </grid_levels>
+    <refinement_ratio> 1 </refinement_ratio>
     <path> ./output/ </path>
     <mesh_file_name>  sod.geo </mesh_file_name>
     <bc_file_name>    sod.bco </bc_file_name>

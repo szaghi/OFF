@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Solver_Options>
   <timing>                     unsteady                      </timing>
-  <max_time_iterations>        0                             </max_time_iterations>
+  <max_time_iterations>        1                             </max_time_iterations>
   <final_time>                 2.00d0                        </final_time>
   <time_integration_accuracy>  5                             </time_integration_accuracy>
   <space_integration_accuracy> 5                             </space_integration_accuracy>

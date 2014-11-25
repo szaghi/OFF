@@ -29,8 +29,43 @@ save
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @brief Derived type containing the definition of Type_File_IBM_Options.
+!> @note This options file is a very simple XML file that drives the running of IBM program.
+!> @note This options file is formatted by means of XML syntax. A validated file should be formatted as following:
+!> @code
+!>   <?xml version="1.0"?>
+!>   <IBM_Options>
+!>     <inputs>
+!>       <path> ... </path>
+!>       <species_file_name> ... </species_file_name>
+!>       <blocks_description type="blocks(or icemcfd)"> ... </blocks_description>
+!>     </inputs>
+!>     <outputs>
+!>       <path> ... </path>
+!>       <refinement_ratio> ... </refinement_ratio>
+!>       <mesh_file_name> ... </mesh_file_name>
+!>       <bc_file_name> ... </bc_file_name>
+!>       <init_file_name> ... </init_file_name>
+!>     </outputs>
+!>   </IBM_Options>
+!> @endcode
+!> The main tag is 'IBM_Options' that contains the the 'inputs' and 'outputs' tags. The tags can appear in any order. The 'inputs'
+!> tag is composed by 3 nested tags, namely 'path', 'species_file_name' and 'blocks_description', whereas 'outputs' tag has 5
+!> nested tags, namely 'path', 'refinement_ratio', 'mesh_file_name', 'bc_file_name' and 'init_file_name'.
+!> The IBM options file contains the following data:
+!>   - file_d%path_in;
+!>   - file_d%path_out;
+!>   - file_d%fn_spec;
+!>   - file_d%fn_mesh;
+!>   - file_d%fn_bc;
+!>   - file_d%fn_init;
+!>   - file_d%desc_type;
+!>   - file_d%fn_blk_desc;
+!>   - file_d%ref_ratio.
+!> It is worth nothing that the syntax of tag names and attributes is case sensitive, whereas the syntax of their values is case
+!> insensitive.
 !> @ingroup Data_Type_File_IBM_OptionsDerivedType
 type, public, extends(Type_File_Base):: Type_File_IBM_Options
+  type(Type_XML_Tag)::                     IBM_Options    !< Main XML tag.
   character(len=:), allocatable::          fn_spec        !< File name of species file.
   character(len=:), allocatable::          fn_mesh        !< File name of mesh file.
   character(len=:), allocatable::          fn_bc          !< File name of boundary conditions file.
@@ -38,7 +73,7 @@ type, public, extends(Type_File_Base):: Type_File_IBM_Options
   character(len=:), allocatable::          desc_type      !< Blocks description type: 'BLOCKS' for simple (Cartesian descriptions),
                                                           !< 'ICEMCFD' for complex grids.
   type(Type_Varying_String), allocatable:: fn_blk_desc(:) !< File names of blocks description.
-  integer(I4P)::                           Nl             !< Number of grid levels.
+  integer(I4P)::                           ref_ratio      !< Refinement ratio.
   contains
     procedure:: free  => free_ibm_options  ! Procedure for freeing dynamic memory.
     procedure:: alloc => alloc_ibm_options ! Procedure for allocating dynamic memory.
@@ -52,14 +87,17 @@ contains
   !> @ingroup Data_Type_File_IBM_OptionsPrivateProcedure
   !> @{
   !> @brief Procedure for freeing dynamic memory.
-  elemental subroutine free_ibm_options(file_d)
+  elemental subroutine free_ibm_options(file_d,also_base)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_File_IBM_Options), intent(INOUT):: file_d !< File data.
+  class(Type_File_IBM_Options), intent(INOUT):: file_d    !< File data.
+  logical, optional,            intent(IN)::    also_base !< Flag for freeing also file_base dynamic memory.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call file_d%free_base
+  if (present(also_base)) then
+    if (also_base) call file_d%free_base
+  endif
   if (allocated(file_d%fn_spec    )) deallocate(file_d%fn_spec  )
   if (allocated(file_d%fn_mesh    )) deallocate(file_d%fn_mesh  )
   if (allocated(file_d%fn_bc      )) deallocate(file_d%fn_bc    )
@@ -80,7 +118,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call file_d%free
+  call file_d%free(also_base=.true.)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine finalize_ibm_options
@@ -100,149 +138,92 @@ contains
   endsubroutine alloc_ibm_options
 
   !> @brief Procedure for loading IBM options.
-  !> @note This options file is a very simple XML file that drives the running of IBM program.
-  !> @note This options file is formatted by means of XML syntax. A validated file should be formatted as following:
-  !> @code
-  !>   <?xml version="1.0"?>
-  !>   <IBM_Options>
-  !>     <inputs>
-  !>       <path> ... </path>
-  !>       <species_file_name> ... </species_file_name>
-  !>       <blocks_description type="blocks(or icemcfd)"> ... </blocks_description>
-  !>     </inputs>
-  !>     <outputs>
-  !>       <path> ... </path>
-  !>       <grid_levels> ... </grid_levels>
-  !>       <mesh_file_name> ... </mesh_file_name>
-  !>       <bc_file_name> ... </bc_file_name>
-  !>       <init_file_name> ... </init_file_name>
-  !>     </outputs>
-  !>   </IBM_Options>
-  !> @endcode
-  !> The main tag is 'IBM_Options' that contains the the 'inputs' and 'outputs' tags. The tags can appear in any order. The 'inputs'
-  !> tag is composed by 3 nested tags, namely 'path', 'species_file_name' and 'blocks_description', whereas 'outputs' tag has 5
-  !> nested tags, namely 'path', 'grid_levels', 'mesh_file_name', 'bc_file_name' and 'init_file_name'.
-  !> The IBM options file contains the following data:
-  !>   - file_d%path_in;
-  !>   - file_d%path_out;
-  !>   - file_d%fn_spec;
-  !>   - file_d%fn_mesh;
-  !>   - file_d%fn_bc;
-  !>   - file_d%fn_init;
-  !>   - file_d%desc_type;
-  !>   - file_d%fn_blk_desc;
-  !>   - file_d%Nl.
-  !> It is worth nothing that the syntax of tag names and attributes is case sensitive, whereas the syntax of their values is case
-  !> insensitive.
   subroutine load_ibm_options(file_d,OS)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_File_IBM_Options), intent(INOUT):: file_d   !< File data.
-  type(Type_OS),                intent(IN)::    OS       !< Running architecture.
-  character(len=:), allocatable::               line     !< Dummy string for parsing option file.
-  type(Type_XML_Tag)::                          tag      !< Tag parsing data.
-  integer(I4P)::                                t,f,c,Nf !< Counters.
+  class(Type_File_IBM_Options), intent(INOUT):: file_d  !< File data.
+  type(Type_OS),                intent(IN)::    OS      !< Running architecture.
+  type(Type_XML_Tag)::                          inputs  !< Inputs  XML tag.
+  type(Type_XML_Tag)::                          outputs !< Outputs XML tag.
+  type(Type_XML_Tag)::                          tag     !< Generic XML tag.
+  character(len=:), allocatable::               stream  !< String containing the file data as a single stream.
+  integer(I4P)::                                f,c,Nf  !< Counters.
   !--------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  associate(unit=>file_d%unit,iostat=>file_d%iostat,iomsg=>file_d%iomsg,Nl=>file_d%Nl)
-    call file_d%open(ascii=.true.,action='READ') ; if (iostat/=0) return
-    allocate(character(len=1000):: tag%string%vs,line)
-    Read_Loop: do
-      read(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg,end=10)line ; if (iostat/=0.and.iostat/=iostat_eor) return
-      if     (index(string=line,substring='<inputs')>0) then
-        do t=1,3
-          read(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg,end=10)tag%string%vs ; if (iostat/=0.and.iostat/=iostat_eor) return
-          if     (index(string=tag%string%vs,substring='<path')>0) then
-            call tag%set(tag_name='path') ; call tag%get_value
-            tag%tag_val%vs=OS%string_separator_fix(string=trim(tag%tag_val%vs))
-            c = len_trim(tag%tag_val%vs) ; if (tag%tag_val%vs(c:c)/=OS%sep) tag%tag_val%vs = trim(tag%tag_val%vs)//OS%sep
-            call file_d%set(path_in=tag%tag_val%vs)
-          elseif (index(string=tag%string%vs,substring='<species_file_name')>0) then
-            call tag%set(tag_name='species_file_name') ; call tag%get_value
-            file_d%fn_spec = OS%string_separator_fix(string=trim(tag%tag_val%vs))
-          elseif (index(string=tag%string%vs,substring='<blocks_description')>0) then
-            call tag%set(tag_name='blocks_description',att_name=['type']) ; call tag%get_value ; call tag%get_attributes
-            file_d%desc_type = Upper_Case(trim(tag%att_val(1)%vs))
-            tag%tag_val%vs = trim(unique(string=tag%tag_val%vs,substring=' '))
-            Nf = count(string=trim(tag%tag_val%vs),substring=' ')+1
-            call file_d%alloc(Nf=Nf)
-            do f=1,Nf
-              c = index(string=tag%tag_val%vs,substring=' ')
-              if (c>0) then
-                file_d%fn_blk_desc(f)%vs = OS%string_separator_fix(string=trim(tag%tag_val%vs(1:c)))
-              else
-                file_d%fn_blk_desc(f)%vs = OS%string_separator_fix(string=trim(tag%tag_val%vs))
-              endif
-              tag%tag_val%vs = trim(tag%tag_val%vs(c+1:))
-            enddo
-          endif
-        enddo
-      elseif (index(string=line,substring='<outputs')>0) then
-        do t=1,5
-          read(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg,end=10)tag%string%vs ; if (iostat/=0.and.iostat/=iostat_eor) return
-          if     (index(string=tag%string%vs,substring='<path')>0) then
-            call tag%set(tag_name='path') ; call tag%get_value
-            tag%tag_val%vs=OS%string_separator_fix(string=trim(tag%tag_val%vs))
-            c = len_trim(tag%tag_val%vs) ; if (tag%tag_val%vs(c:c)/=OS%sep) tag%tag_val%vs = trim(tag%tag_val%vs)//OS%sep
-            call file_d%set(path_out=tag%tag_val%vs)
-          elseif (index(string=tag%string%vs,substring='<grid_levels')>0) then
-            call tag%set(tag_name='grid_levels') ; call tag%get_value
-            Nl = cton(str=tag%tag_val%vs,knd=1_I4P)
-          elseif (index(string=tag%string%vs,substring='<mesh_file_name')>0) then
-            call tag%set(tag_name='mesh_file_name') ; call tag%get_value
-            file_d%fn_mesh = OS%string_separator_fix(string=trim(tag%tag_val%vs))
-          elseif (index(string=tag%string%vs,substring='<bc_file_name')>0) then
-            call tag%set(tag_name='bc_file_name') ; call tag%get_value
-            file_d%fn_bc = OS%string_separator_fix(string=trim(tag%tag_val%vs))
-          elseif (index(string=tag%string%vs,substring='<init_file_name')>0) then
-            call tag%set(tag_name='init_file_name') ; call tag%get_value
-            file_d%fn_init = OS%string_separator_fix(string=trim(tag%tag_val%vs))
-          endif
-        enddo
+  associate(unit=>file_d%unit,iostat=>file_d%iostat,iomsg=>file_d%iomsg,ref_ratio=>file_d%ref_ratio)
+    call file_d%get_stream(stream=stream)!; if (iostat/=0) return
+    call file_d%IBM_Options%set(tag_name='IBM_Options',search_into_string=stream)
+
+    call inputs%set( tag_name='inputs', search_into_other_tag=file_d%IBM_Options)
+    call outputs%set(tag_name='outputs',search_into_other_tag=file_d%IBM_Options)
+
+    ! inputs tags
+    ! path
+    call tag%set(tag_name='path',search_into_other_tag=inputs)
+    tag%tag_val%vs=OS%string_separator_fix(string=trim(tag%tag_val%vs))
+    c = len_trim(tag%tag_val%vs) ; if (tag%tag_val%vs(c:c)/=OS%sep) tag%tag_val%vs = trim(tag%tag_val%vs)//OS%sep
+    call file_d%set(path_in=tag%tag_val%vs)
+    ! species_file_name
+    call tag%set(tag_name='species_file_name',search_into_other_tag=inputs)
+    file_d%fn_spec = OS%string_separator_fix(string=trim(tag%tag_val%vs))
+    ! blocks_description
+    call tag%set(tag_name='blocks_description',search_into_other_tag=inputs)
+    file_d%desc_type = Upper_Case(trim(tag%att_val(1)%vs))
+    tag%tag_val%vs = trim(unique(string=tag%tag_val%vs,substring=' '))
+    Nf = count(string=trim(tag%tag_val%vs),substring=' ')+1
+    call file_d%alloc(Nf=Nf)
+    do f=1,Nf
+      c = index(string=tag%tag_val%vs,substring=' ')
+      if (c>0) then
+        file_d%fn_blk_desc(f)%vs = OS%string_separator_fix(string=trim(tag%tag_val%vs(1:c)))
+      else
+        file_d%fn_blk_desc(f)%vs = OS%string_separator_fix(string=trim(tag%tag_val%vs))
       endif
-    enddo Read_Loop
-    10 call file_d%close
+      tag%tag_val%vs = trim(tag%tag_val%vs(c+1:))
+    enddo
+
+    ! outputs tags
+    ! path
+    call tag%set(tag_name='path',search_into_other_tag=outputs)
+    tag%tag_val%vs=OS%string_separator_fix(string=trim(tag%tag_val%vs))
+    c = len_trim(tag%tag_val%vs) ; if (tag%tag_val%vs(c:c)/=OS%sep) tag%tag_val%vs = trim(tag%tag_val%vs)//OS%sep
+    call file_d%set(path_out=tag%tag_val%vs)
+    ! refinement_ratio
+    call tag%set(tag_name='refinement_ratio',search_into_other_tag=outputs)
+    ref_ratio = cton(str=tag%tag_val%vs,knd=1_I4P)
+    ! mesh_file_name
+    call tag%set(tag_name='mesh_file_name',search_into_other_tag=outputs)
+    file_d%fn_mesh = OS%string_separator_fix(string=trim(tag%tag_val%vs))
+    ! bc_file_name
+    call tag%set(tag_name='bc_file_name',search_into_other_tag=outputs)
+    file_d%fn_bc = OS%string_separator_fix(string=trim(tag%tag_val%vs))
+    ! init_file_name
+    call tag%set(tag_name='init_file_name',search_into_other_tag=outputs)
+    file_d%fn_init = OS%string_separator_fix(string=trim(tag%tag_val%vs))
   endassociate
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine load_ibm_options
 
   !> @brief Procedure for saving IBM options file.
-  !> @note The definition of the IBM options file syntax is described in the 'load_ibm_options' documentation.
   subroutine save_ibm_options(file_d)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_File_IBM_Options), intent(INOUT):: file_d !< File data.
   character(len=:), allocatable::               string !< Dummy string.
-  integer(I4P)::                                f      !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  associate(unit=>file_d%unit,iostat=>file_d%iostat,iomsg=>file_d%iomsg,Nl=>file_d%Nl)
+  associate(unit=>file_d%unit,iostat=>file_d%iostat,iomsg=>file_d%iomsg)
     call file_d%open(ascii=.true.,action='WRITE') ; if (iostat/=0) return
     write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'<?xml version="1.0"?>'
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'<IBM_Options>'
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'  <inputs>'
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'    <path>'//trim(file_d%path_in)//'</path>'
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'    <species_file_name>'//trim(file_d%fn_spec)//'</species_file_name>'
-    string = '    <blocks_description type="'//trim(Upper_Case(file_d%desc_type))//'">'
-    do f=1,size(file_d%fn_blk_desc,dim=1)
-      string = trim(string)//' '//trim(file_d%fn_blk_desc(f)%vs)
-    enddo
-    string = trim(string)//'</blocks_description>'
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)trim(string)
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'  </inputs>'
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'  <outputs>'
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'    <path>'//trim(file_d%path_out)//'</path>'
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'    <grid_levels>'//trim(str(n=Nl))//'</grid_levels>'
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'    <mesh_file_name>'//trim(file_d%fn_mesh)//'</mesh_file_name>'
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'    <bc_file_name>'//trim(file_d%fn_bc)//'</bc_file_name>'
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'    <init_file_name>'//trim(file_d%fn_init)//'</init_file_name>'
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'  </outputs>'
-    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'</IBM_Options>'
+    call file_d%IBM_Options%stringify(string=string)
+    write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)string
     call file_d%close
   endassociate
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine save_ibm_options

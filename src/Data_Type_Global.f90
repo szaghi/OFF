@@ -179,6 +179,7 @@ contains
       call global%block%put(ID=ID,d=block)
     endif
   enddo
+  call global%block%update
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine blocks_init
@@ -415,7 +416,7 @@ contains
 #endif
     do while(global%block%loopID(ID=ID))
       block => global%block%dat(ID=ID)
-      call block%compute_time(time_step=global%time_step,Dtmin=Dtmin(b))
+      call block%compute_time(time_step=global%time_step,Dtmin=Dtmin(global%block%linearID(ID)))
     enddo
 #ifdef PROFILING
     call prof%profile(p=4,pstop=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
@@ -478,7 +479,7 @@ contains
 #endif
     do while(global%block%loopID(ID=ID))
       block => global%block%dat(ID=ID)
-      call block%rk_time_integration(RU=RU(:,b))
+      call block%rk_time_integration(RU=RU(:,global%block%linearID(ID)))
     enddo
 #ifdef PROFILING
     call prof%profile(p=6,pstop=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)

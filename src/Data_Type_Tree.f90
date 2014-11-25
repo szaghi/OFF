@@ -155,6 +155,7 @@ type, public:: Type_Tree
     procedure:: first_ID      => first_ID_tree      ! Procedure for computing first ID of a given level.
     procedure:: last_ID       => last_ID_tree       ! Procedure for computing last  ID of a given level.
     procedure:: get_max_level => get_max_level_tree ! Procedure for computing the maximum refinement level of the list.
+    procedure:: linearID      => linearID_tree      ! Procedure for getting the linear ID (1:length <=> minID:maxID) of nodes.
     procedure:: str_Na_ref_ratio                    ! Procedure for casting Na and ref_ratio to string.
     final::     finalize_tree                       ! Procedure for freeing dynamic memory when finalizing.
     ! private procedures
@@ -1147,6 +1148,21 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine get_max_level_tree
+
+  !> @brief Procedure for getting the linear ID (1:length <=> minID:maxID) of nodes.
+  elemental function linearID_tree(tree,ID) result(lID)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Tree), intent(IN):: tree !< Tree.
+  integer(I8P),     intent(IN):: ID   !< ID (unique) of the node.
+  integer(I4P)::                 lID  !< Linear ID into the range [1:length] equivalent to [minID:maxID].
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  lID = minloc(array=tree%IDs,mask=tree%IDs==ID,dim=1)
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction linearID_tree
 
   !> @brief Procedure for casting Na and ref_ratio to string.
   elemental function str_Na_ref_ratio(tree) result(string)

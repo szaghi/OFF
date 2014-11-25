@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <IBM_Blocks>
   <Blocks_Cartesian>
-    <block b="1">
+    <block ID="1">
       <dimensions gc="4 4 4 4 1 1" Ni="550" Nj="100" Nk="1"/>
       <extents xmin="0.d0" ymin="0.d0" zmin="0.d0" xmax="275.d0" ymax="44.5d0" zmax="1.d0"/>
       <boundaryconditions imin="EXT" imax="ADJ 2" jmin="REF" jmax="REF" kmin="EXT" kmax="EXT"/>
       <primitives u="0.d0" v="0.d0" w="0.d0" p="101.325d0" r="1.225d0 0.d0"/>
     </block>
-    <block b="2">
+    <block ID="2">
       <dimensions gc="4 4 4 4 1 1" Ni="340" Nj="100" Nk="1"/>
       <extents xmin="275.d0" ymin="0.d0" zmin="0.d0" xmax="445.d0" ymax="44.5d0" zmax="1.d0"/>
       <boundaryconditions imin="ADJ 1" imax="EXT" jmin="REF" jmax="REF" kmin="EXT" kmax="EXT"/>

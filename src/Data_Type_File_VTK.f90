@@ -157,6 +157,7 @@ contains
       endassociate
     endassociate
   endassociate
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine save_block_vtk
@@ -195,6 +196,7 @@ contains
     iostat = VTM_BLK_XML(block_action='close')
     iostat = VTM_END_XML()
   endassociate
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
 

@@ -36,24 +36,29 @@ contains
   !> @ingroup Data_Type_File_LockPrivateProcedure
   !> @{
   !> @brief Procedure for locking, namely creating a lockfile.
-  subroutine lock(file_d)
+  subroutine lock(file_d,errpref,outpref)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_File_Lock), intent(INOUT):: file_d  !< File data.
-  logical::                              is_file !< Inquiring flag.
+  class(Type_File_Lock),  intent(INOUT):: file_d   !< File data.
+  character(*), optional, intent(IN)::    errpref  !< Prefixing string for stderr outputs.
+  character(*), optional, intent(IN)::    outpref  !< Prefixing string for stdout outputs.
+  logical::                               is_file  !< Inquiring flag.
+  character(len=:), allocatable::         errprefd !< Prefixing string for stderr outputs.
+  character(len=:), allocatable::         outprefd !< Prefixing string for stdout outputs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call file_d%set(name='lockfile',path_in='',path_out='')
-
+  errprefd = '' ; if (present(errpref)) errprefd = errpref
+  outprefd = '' ; if (present(outpref)) outprefd = outpref
+  call file_d%set(name='lockfile',path_in='',path_out='',errpref=errprefd,outpref=outprefd)
   associate(unit=>file_d%unit,iostat=>file_d%iostat,iomsg=>file_d%iomsg)
     inquire(file=file_d%name,exist=is_file,iostat=iostat)
     if (is_file) then
       call file_d%raise_error(errtype=err_locked)
     else
       call file_d%open(ascii=.true.,action='WRITE') ; if (iostat/=0) return
-      write(unit,'(A)')' Simulation started on'
-      write(unit,'(A)')' '//Get_Date_String()
+      write(unit,'(A)')file_d%outpref//' Simulation started on'
+      write(unit,'(A)')file_d%outpref//' '//Get_Date_String()
     endif
   endassociate
   return

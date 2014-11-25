@@ -52,14 +52,17 @@ contains
   !> @ingroup Data_Type_File_TecPrivateProcedure
   !> @{
   !> @brief Procedure for freeing dynamic memory.
-  elemental subroutine free_file_tec(file_d)
+  elemental subroutine free_file_tec(file_d,also_base)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_File_Tec), intent(INOUT):: file_d !< File data.
+  class(Type_File_Tec), intent(INOUT):: file_d    !< File data.
+  logical, optional,    intent(IN)::    also_base !< Flag for freeing also file_base dynamic memory.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call file_d%free_base
+  if (present(also_base)) then
+    if (also_base) call file_d%free_base
+  endif
   if (allocated(file_d%tecvarname   )) deallocate(file_d%tecvarname   )
   if (allocated(file_d%tecvarloc    )) deallocate(file_d%tecvarloc    )
   if (allocated(file_d%tecvarlocstr )) deallocate(file_d%tecvarlocstr )
@@ -76,7 +79,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call file_d%free
+  call file_d%free(also_base=.true.)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine finalize
@@ -174,6 +177,7 @@ contains
     call save_block(zname=zname,blk=blockmir,t=global%time_step%t)
     call blockmir%free
   endif
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   contains
@@ -377,7 +381,8 @@ contains
       file_d%iostat = tecini112(tecendrec,trim(tecvarname)//tecendrec,trim(file_d%name)//tecendrec,'.'//tecendrec,0,0,1)
       file_d%iostat = tecauxstr112("Time"//tecendrec,trim(str(n=global%time_step%t))//tecendrec)
 #else
-      call file_d%raise_error(errtype=err_not_tecio) ; return
+      call file_d%raise_error(errtype=err_not_tecio)
+      call file_d%fallback
 #endif
     else
       call file_d%open(ascii=.true.,replace=.true.,action='WRITE') ; if (file_d%iostat/=0) return
@@ -398,6 +403,7 @@ contains
       call file_d%close()
     endif
   endassociate
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine save_file_tec

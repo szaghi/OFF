@@ -27,17 +27,6 @@ private
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @brief Derived type containing the definition of Type_File_Species.
-!> @ingroup Data_Type_File_SpeciesDerivedType
-type, public, extends(Type_File_Base):: Type_File_Species
-  contains
-    procedure:: load  => load_species ! Procedure for loading species file.
-    procedure:: save  => save_species ! Procedure for saving species file.
-endtype Type_File_Species
-!-----------------------------------------------------------------------------------------------------------------------------------
-contains
-  !> @ingroup Data_Type_File_SpeciesPrivateProcedure
-  !> @{
-  !> @brief Procedure for loading species file.
   !> @note This options file is formatted by means of XML syntax. A validated file should be formatted as following:
   !> @code
   !>   <?xml version="1.0"?>
@@ -55,45 +44,48 @@ contains
   !> The tag 'specie' is defined into 'Data_Type_Specie' module.
   !> It is worth nothing that the syntax of tag attributes is case sensitive, whereas the syntax of their values is case
   !> insensitive.
+!> @ingroup Data_Type_File_SpeciesDerivedType
+type, public, extends(Type_File_Base):: Type_File_Species
+  contains
+    procedure:: load  => load_species ! Procedure for loading species file.
+    procedure:: save  => save_species ! Procedure for saving species file.
+endtype Type_File_Species
+!-----------------------------------------------------------------------------------------------------------------------------------
+contains
+  !> @ingroup Data_Type_File_SpeciesPrivateProcedure
+  !> @{
+  !> @brief Procedure for loading species file.
   subroutine load_species(file_d,species)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_File_Species), intent(INOUT):: file_d  !< File data.
   type(Type_Species),       intent(INOUT):: species !< Species.
-  type(Type_XML_Tag)::                      tag     !< Tag parsing data.
-  integer(I4P)::                            s       !< Counter.
+  character(len=:), allocatable::           stream  !< String containing the file data as a single stream.
+  type(Type_XML_Tag)::                      tag     !< Main XML tag.
+  integer(I4P)::                            s,ss    !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   associate(unit=>file_d%unit,iostat=>file_d%iostat,iomsg=>file_d%iomsg)
-    allocate(character(len=1000):: tag%string%vs)
-    call file_d%open(ascii=.true.,action='READ') ; if (iostat/=0) return
-    species%Ns = 0
-    Species_Count: do
-      read(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg,end=10)tag%string%vs ; if (iostat/=0.and.iostat/=iostat_eor) return
-      if (index(string=tag%string%vs,substring='<Specie ')>0) then
-        species%Ns = species%Ns + 1
-      endif
-    enddo Species_Count
-    10 rewind(unit=unit) ; call species%alloc
-    call tag%set(tag_name='Specie',att_name=['s'])
-    Read_Loop: do
-      read(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg,end=20)tag%string%vs ; if (iostat/=0.and.iostat/=iostat_eor) return
-      if (index(string=tag%string%vs,substring='<Specie ')>0) then
-        call tag%get_attributes ; call tag%get_value
-        s = cton(str=trim(adjustl(tag%att_val(1)%vs)),knd=1_I4P)
-        call species%heats(s)%load_str_xml(str_xml=tag%tag_val%vs)
-      endif
-    enddo Read_Loop
-    20 call file_d%close
+    call file_d%get_stream(stream=stream)!; if (iostat/=0) return
+    call tag%set(tag_name='Species',search_into_string=stream)
+    call tag%get_nested
+    if (associated(tag%nested)) then
+      species%Ns = size(tag%nested) ; call species%alloc
+      do s=1,size(tag%nested)
+        call tag%nested(s)%get_nested
+        ss = cton(str=tag%nested(s)%att_val(1)%vs,knd=1_I4P)
+        call species%heats(s)%load_str_xml(str_xml=tag%nested(s)%nested(1)%string%vs)
+      enddo
+    endif
     call species%compute_Npc
   endassociate
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine load_species
 
   !> @brief Procedure for saving species file.
-  !> @note The definition of the species file syntax is described in the 'load_species' documentation.
   subroutine save_species(file_d,species)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
@@ -114,6 +106,7 @@ contains
     write(unit=unit,fmt='(A)',iostat=iostat,iomsg=iomsg)'</Species>'
     call file_d%close
   endassociate
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine save_species

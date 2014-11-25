@@ -165,6 +165,7 @@ contains
       endassociate
     endassociate
   endassociate
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine save_block_gnu
@@ -188,6 +189,7 @@ contains
                              global=global,ID=ID)
     enddo
   endassociate
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
 

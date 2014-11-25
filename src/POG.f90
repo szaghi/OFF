@@ -34,39 +34,49 @@ USE Lib_IO_Misc                                                         ! Proced
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 implicit none
-type(Type_Global)::      global !< Global-level data.
-type(Type_Files)::       IOFile !< Input/Output files.
-type(Type_PostProcess):: pp     !< Post-process data.
+type(Type_Global)          :: global !< Global-level data.
+type(Type_Files)           :: IOFile !< Input/Output files.
+type(Type_PostProcess)     :: pp     !< Post-process data.
+type(Type_SBlock), pointer :: block  !< Pointer for scanning global%block tree.
+integer(I8P)               :: ID     !< Counter.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 ! initializing the post-processing
 call pog_init
-! saving output files
-if (pp%tec) then
-  write(stdout,'(A)')'+--> Saving '//IOFile%tec%name
-  call IOFile%tec%save(global=global)
-  if (IOFile%tec%iostat/=0) then
-    write(stderr,'(A)')'+--> '//IOFile%tec%iomsg
-    stop
-  endif
-endif
-if (pp%vtk) then
-  write(stdout,'(A)')'+--> Saving '//IOFile%vtk%name
-  call IOFile%vtk%save(global=global)
-  if (IOFile%vtk%iostat/=0) then
-    write(stderr,'(A)')'+--> '//IOFile%vtk%iomsg
-    stop
-  endif
-endif
-if (pp%gnu) then
-  write(stdout,'(A)')'+--> Saving '//IOFile%gnu%name
-  call IOFile%gnu%save(global=global)
-  if (IOFile%gnu%iostat/=0) then
-    write(stderr,'(A)')'+--> '//IOFile%gnu%iomsg
-    stop
-  endif
-endif
+associate(rks=>global%parallel%rks)
+    write(stdout,'(A)')'+-'//rks//'-> Loading input files'
+    write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%mesh%name
+    ! call IOFile%mesh%load_header(global=global)
+    call IOFile%mesh%load(global=global)
+    if (.not.pp%meshonly) then
+      write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%sol%name
+      call IOFile%sol%load(global=global)
+    endif
+    ! computing the mesh variables that are not loaded from input files
+    print*,'Cazzo'
+    do while(global%block%loopID(ID=ID))
+      block => global%block%dat(ID=ID)
+      call block%metrics
+      call block%metrics_correction
+      write(stdout,'(A)')'+-'//rks//'->     Block b='//trim(str(n=ID))
+      call block%print(unit=stdout,pref='|-'//rks//'->      ')
+    enddo
+    print*,'Cazzo finale'
+    ! saving output files
+    if (pp%tec) then
+      write(stdout,'(A)')'+-'//rks//'-> Saving '//IOFile%tec%name
+      call IOFile%tec%save(global=global)
+    endif
+    if (pp%vtk) then
+      write(stdout,'(A)')'+-'//rks//'-> Saving '//IOFile%vtk%name
+      call IOFile%vtk%save(global=global)
+    endif
+    if (pp%gnu) then
+      write(stdout,'(A)')'+-'//rks//'-> Saving '//IOFile%gnu%name
+      call IOFile%gnu%save(global=global)
+    endif
+endassociate
 stop
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
@@ -102,52 +112,41 @@ contains
   call cli%add(switch='-tec',    help='Save output in Tecplot format',required=.false.,act='store',     def='yes'    ,error=error)
   call cli%add(switch='-vtk',    help='Save output in VTK format',    required=.false.,act='store',     def='no'     ,error=error)
   call cli%add(switch='-gnu',    help='Save output in VTK format',    required=.false.,act='store',     def='no'     ,error=error)
-  ! parsing CLI
-  write(stdout,'(A)')'+--> Parsing Command Line Arguments'
-  call cli%parse(error=error,pref='|-->')
-  if (error/=0) stop
-  ! using CLI data to set POG behaviour
-  call cli%get(switch='-m',val=filename,pref='|-->',error=error)
-  call IOFile%mesh%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
-  if (cli%passed(switch='-o')) then
-    call cli%get(switch='-o',val=filename,pref='|-->',error=error)
-    outfname=global%OS%string_separator_fix(string=trim(adjustl(filename)))
-  endif
-  if (cli%passed(switch='-s')) then
-    call cli%get(switch='-s',val=filename,pref='|-->',error=error)
-    call IOFile%sol%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
-  endif
-  if (cli%passed(switch='-proc')) then
-    call cli%get(switch='-proc',val=filename,pref='|-->',error=error)
-    call IOFile%proc%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))))
-  endif
-  call cli%get(switch='-bc',val=pp%bc,pref='|-->',error=error)
-  call cli%get(switch='-cell',val=pp%node,pref='|-->',error=error) ; pp%node = .not.pp%node
-  call cli%get(switch='-ascii',val=pp%binary,pref='|-->',error=error) ; pp%binary = .not.pp%binary
-  call cli%get(switch='-schl',val=pp%schlieren,pref='|-->',error=error)
-  call cli%get(switch='-mirrorX',val=pp%mirrorX,pref='|-->',error=error)
-  call cli%get(switch='-mirrorY',val=pp%mirrorY,pref='|-->',error=error)
-  call cli%get(switch='-mirrorZ',val=pp%mirrorZ,pref='|-->',error=error)
-  call cli%get(switch='-tec',val=yes,pref='|-->',error=error) ; pp%tec = (Upper_Case(trim(adjustl(yes)))=='YES')
-  call cli%get(switch='-vtk',val=yes,pref='|-->',error=error) ; pp%vtk = (Upper_Case(trim(adjustl(yes)))=='YES')
-  call cli%get(switch='-gnu',val=yes,pref='|-->',error=error) ; pp%gnu = (Upper_Case(trim(adjustl(yes)))=='YES')
-  if (allocated(outfname)) then
-    if (pp%tec) call IOFile%tec%set(name=trim(adjustl(outfname)))
-    if (pp%vtk) call IOFile%vtk%set(name=trim(adjustl(outfname)))
-    if (pp%gnu) call IOFile%gnu%set(name=trim(adjustl(outfname)))
-  endif
-  if (pp%node.and.pp%bc) then
-    write(stderr,'(A)')' It is not possible to save bc ghost cells and node-centered interpolated variables!'
-    stop
-  endif
-  ! the name of mesh file is used as output file base name if output file name has been exeplicitely declared
-  if (.not.allocated(IOFile%tec%name)) call IOFile%tec%set(name=IOFile%mesh%name)
-  if (.not.allocated(IOFile%vtk%name)) call IOFile%vtk%set(name=IOFile%mesh%name)
-  if (.not.allocated(IOFile%gnu%name)) call IOFile%gnu%set(name=IOFile%mesh%name)
-  pp%meshonly=.true. ; if (allocated(IOFile%sol%name)) pp%meshonly = .false. ! a solution file name has been passed
-  IOFile%tec%pp = pp
-  IOFile%vtk%pp = pp
-  IOFile%gnu%pp = pp
+  associate(rks=>global%parallel%rks)
+    ! parsing CLI
+    write(stdout,'(A)')'+-'//rks//'-> Parsing Command Line Arguments'
+    call cli%parse(error=error,pref='|-'//rks//'->') ; if (error/=0) stop
+    ! using CLI data to set POG behaviour
+    call cli%get(switch='-m',val=filename,pref='|-'//rks//'->',error=error)
+    call IOFile%mesh%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))),errpref='+-'//rks//'->')
+    if (cli%passed(switch='-o')) then
+      call cli%get(switch='-o',val=filename,pref='|-'//rks//'->',error=error)
+      outfname=global%OS%string_separator_fix(string=trim(adjustl(filename)))
+    endif
+    if (cli%passed(switch='-s')) then
+      call cli%get(switch='-s',val=filename,pref='|-'//rks//'->',error=error)
+      call IOFile%sol%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))),errpref='+-'//rks//'->')
+    endif
+    if (cli%passed(switch='-proc')) then
+      call cli%get(switch='-proc',val=filename,pref='|-'//rks//'->',error=error)
+      ! call IOFile%proc%set(name=global%OS%string_separator_fix(string=trim(adjustl(filename))),errpref='+-'//rks//'->')
+    endif
+    call cli%get(switch='-bc'     ,val=pp%bc       ,pref='|-'//rks//'->',error=error)
+    call cli%get(switch='-cell'   ,val=pp%node     ,pref='|-'//rks//'->',error=error);pp%node = .not.pp%node
+    call cli%get(switch='-ascii'  ,val=pp%binary   ,pref='|-'//rks//'->',error=error);pp%binary = .not.pp%binary
+    call cli%get(switch='-schl'   ,val=pp%schlieren,pref='|-'//rks//'->',error=error)
+    call cli%get(switch='-mirrorX',val=pp%mirrorX  ,pref='|-'//rks//'->',error=error)
+    call cli%get(switch='-mirrorY',val=pp%mirrorY  ,pref='|-'//rks//'->',error=error)
+    call cli%get(switch='-mirrorZ',val=pp%mirrorZ  ,pref='|-'//rks//'->',error=error)
+    call cli%get(switch='-tec'    ,val=yes         ,pref='|-'//rks//'->',error=error);pp%tec=(Upper_Case(trim(adjustl(yes)))=='YES')
+    call cli%get(switch='-vtk'    ,val=yes         ,pref='|-'//rks//'->',error=error);pp%vtk=(Upper_Case(trim(adjustl(yes)))=='YES')
+    call cli%get(switch='-gnu'    ,val=yes         ,pref='|-'//rks//'->',error=error);pp%gnu=(Upper_Case(trim(adjustl(yes)))=='YES')
+    if (allocated(outfname)) then
+      if (pp%tec) call IOFile%tec%set(name=trim(adjustl(outfname)),errpref='+-'//rks//'->')
+      if (pp%vtk) call IOFile%vtk%set(name=trim(adjustl(outfname)),errpref='+-'//rks//'->')
+      if (pp%gnu) call IOFile%gnu%set(name=trim(adjustl(outfname)),errpref='+-'//rks//'->')
+    endif
+  endassociate
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine parsing_command_line
@@ -156,75 +155,40 @@ contains
   subroutine pog_init()
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  integer(I4P):: b,l !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   ! initializing IR_Precision module constants
   call IR_init
+  ! initializing parallel environments
+  call global%parallel%init
   ! initializing compiled code options collection
   call global%cco%init
-  write(stdout,'(A)')'+--> Compiled code used options'
-  call global%cco%print(unit=stdout,pref='|-->')
-  ! parsing command line for getting global option file name
+  ! parsing command line
   call parsing_command_line
- ! setting files paths: the command line arguments have full paths
-  if (pp%tec) call IOFile%tec%set( path_in='',path_out='')
-  if (pp%vtk) call IOFile%vtk%set( path_in='',path_out='')
-  if (pp%gnu) call IOFile%gnu%set( path_in='',path_out='')
-              call IOFile%mesh%set(path_in='',path_out='')
-              call IOFile%sol%set( path_in='',path_out='')
-              call IOFile%proc%set(path_in='',path_out='')
-  ! loading input files
-  write(stdout,'(A)')'+--> Loading input files'
-  if (allocated(IOFile%proc%name)) then
-    call IOFile%proc%load(mesh_dims=global%mesh_dims,parallel=global%parallel)
-    if (IOFile%proc%iostat/=0) then
-      write(stderr,'(A)')'+--> '//IOFile%proc%iomsg
+  associate(rks=>global%parallel%rks)
+    write(stdout,'(A)')'+-'//rks//'-> Compiled code used options'
+    call global%cco%print(unit=stdout,pref='|-'//rks//'->')
+    if (pp%node.and.pp%bc) then
+      write(stderr,'(A)')'+-'//rks//'-> It is not possible to save bc ghost cells and node-centered interpolated variables!'
       stop
     endif
-    call IOFile%mesh%load_header(mesh_dims=global%mesh_dims)
-    if (IOFile%mesh%iostat/=0) then
-      write(stderr,'(A)')'+--> '//IOFile%mesh%iomsg
-      stop
-    endif
-  else
-    call IOFile%mesh%load_header(mesh_dims=global%mesh_dims)
-    if (IOFile%mesh%iostat/=0) then
-      write(stderr,'(A)')'+--> '//IOFile%mesh%iomsg
-      stop
-    endif
-    global%mesh_dims%Nb = global%mesh_dims%Nb_tot
-    call global%parallel%set_serial(Nb_tot=global%mesh_dims%Nb_tot)
-  endif
-  call global%parallel%print(pref='|-->    ',unit=stdout)
-  ! loading mesh file
-  write(stdout,'(A)')'+-->   Loading '//IOFile%mesh%name
-  call IOFile%mesh%load(global=global)
-  if (IOFile%mesh%iostat/=0) then
-    write(stderr,'(A)')'+--> '//IOFile%mesh%iomsg
-    stop
-  endif
-  ! loading solution file
-  if (.not.pp%meshonly) then
-    write(stdout,'(A)')'+-->   Loading '//IOFile%sol%name
-    call IOFile%sol%load(global=global)
-    if (IOFile%sol%iostat/=0) then
-      write(stderr,'(A)')'+--> '//IOFile%init%iomsg
-      stop
-    endif
-  endif
-  ! computing the mesh variables that are not loaded from input files
-  do l=1,global%mesh_dims%Nl ; do b=1,global%mesh_dims%Nb
-      call global%block(b,l)%metrics
-      call global%block(b,l)%metrics_correction
-  enddo ; enddo
-  ! printing block infos
-  write(stdout,'(A)')'+-->   Blocks infos'
-  do l=1,global%mesh_dims%Nl ; do b=1,global%mesh_dims%Nb
-    write(stdout,'(A)')'+-->     Block b='//trim(str(n=b))//' level l='//trim(str(n=l))
-    call global%block(b,l)%print(unit=stdout,pref='|-->      ')
-  enddo ; enddo
+    ! the name of mesh file is used as output file base name if output file name has been exeplicitely declared
+    if (.not.allocated(IOFile%tec%name)) call IOFile%tec%set(name=IOFile%mesh%name,errpref='+-'//rks//'->')
+    if (.not.allocated(IOFile%vtk%name)) call IOFile%vtk%set(name=IOFile%mesh%name,errpref='+-'//rks//'->')
+    if (.not.allocated(IOFile%gnu%name)) call IOFile%gnu%set(name=IOFile%mesh%name,errpref='+-'//rks//'->')
+    pp%meshonly=.true. ; if (allocated(IOFile%sol%name)) pp%meshonly = .false. ! a solution file name has been passed
+    IOFile%tec%pp = pp
+    IOFile%vtk%pp = pp
+    IOFile%gnu%pp = pp
+    ! setting files paths: the command line arguments have full paths
+    if (pp%tec) call IOFile%tec%set( path_in='',path_out='',errpref='+-'//rks//'->')
+    if (pp%vtk) call IOFile%vtk%set( path_in='',path_out='',errpref='+-'//rks//'->')
+    if (pp%gnu) call IOFile%gnu%set( path_in='',path_out='',errpref='+-'//rks//'->')
+                call IOFile%mesh%set(path_in='',path_out='',errpref='+-'//rks//'->')
+                call IOFile%sol%set( path_in='',path_out='',errpref='+-'//rks//'->')
+                ! call IOFile%proc%set(path_in='',path_out='',errpref='+-'//rks//'->')
+  endassociate
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine pog_init

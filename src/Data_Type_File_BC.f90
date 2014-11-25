@@ -100,7 +100,7 @@ contains
   enddo Boundary_Conditions_Tag_Search
   10 continue
   call tag%set(tag_name='block_bc')
-  call tag%alloc(att_name=.true.,Na=3)
+  call tag%alloc(att_name=.true.,Na=2)
   tag%att_name(1)%vs = 'ID'
   tag%att_name(2)%vs = 'encoding'
   Tag_Block_BC_Parsing: do
@@ -149,6 +149,7 @@ contains
     endif
   enddo Tag_Block_BC_Parsing
   20 call file_d%close
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine load_block_bc_file_bc
@@ -212,6 +213,7 @@ contains
     write(unit=file_d%unit,iostat=file_d%iostat,iomsg=file_d%iomsg)'</block_bc>'//cr
     call file_d%close
   endif
+  call file_d%fallback
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine save_block_bc_file_bc

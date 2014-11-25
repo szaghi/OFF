@@ -93,24 +93,25 @@
 !> @ingroup OFFProgram
 program OFF
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                              ! Integers and reals precision definition.
-USE Data_Type_Files,       only: Type_Files                   ! Definition of Type_Files.
-USE Data_Type_Global,      only: Type_Global                  ! Definition of Type_Global.
-USE Data_Type_Hash_Table,  only: Type_Hash_Table              ! Definition of Type_Hash_Table.
-USE Data_Type_Time,        only: Type_Time                    ! Definition of Type_Time.
-USE Data_Type_Tree,        only: Type_Tree                    ! Definition of Type_Tree.
-USE Data_Type_SBlock,      only: Type_SBlock                  ! Definition of Type_SBlock.
-USE Lib_IO_Misc                                               ! Procedures for IO and strings operations.
-USE Lib_Fluxes_Convective, only: set_interface_reconstruction ! Procedure for initializing reconstruction algorithm.
-USE Lib_Riemann_Solvers,   only: set_riemann_solver           ! Procedure for initializing Riemann solver.
-USE Lib_Runge_Kutta,       only: rk_init                      ! Procedure for initializing Runge-Kutta coefficients.
-USE Lib_WENO,              only: weno_init,weno_print         ! Procedure for initializing WENO coefficients.
+USE IR_Precision                                                         ! Integers and reals precision definition.
+USE Data_Type_Command_Line_Interface, only: Type_Command_Line_Interface  ! Definition of Type_Command_Line_Interface.
+USE Data_Type_Files,                  only: Type_Files                   ! Definition of Type_Files.
+USE Data_Type_Global,                 only: Type_Global                  ! Definition of Type_Global.
+USE Data_Type_Hash_Table,             only: Type_Hash_Table              ! Definition of Type_Hash_Table.
+USE Data_Type_Time,                   only: Type_Time                    ! Definition of Type_Time.
+USE Data_Type_Tree,                   only: Type_Tree                    ! Definition of Type_Tree.
+USE Data_Type_SBlock,                 only: Type_SBlock                  ! Definition of Type_SBlock.
+USE Lib_IO_Misc                                                          ! Procedures for IO and strings operations.
+USE Lib_Fluxes_Convective,            only: set_interface_reconstruction ! Procedure for initializing reconstruction algorithm.
+USE Lib_Riemann_Solvers,              only: set_riemann_solver           ! Procedure for initializing Riemann solver.
+USE Lib_Runge_Kutta,                  only: rk_init                      ! Procedure for initializing Runge-Kutta coefficients.
+USE Lib_WENO,                         only: weno_init,weno_print         ! Procedure for initializing WENO coefficients.
 #ifdef OPENMP
-USE OMP_LIB                                                   ! OpenMP runtime library.
+USE OMP_LIB                                                              ! OpenMP runtime library.
 #endif
 #ifdef _MPI
-USE MPI                                                       ! MPI runtime library.
-USE Lib_Parallel,          only: init_MPI_maps,print_MPI_maps ! Library for send/receive data for parallel (MPI) operations.
+USE MPI                                                                  ! MPI runtime library.
+USE Lib_Parallel,                     only: init_MPI_maps,print_MPI_maps ! Library for send/receive data for parallel MPI.
 #endif
 !-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -182,6 +183,32 @@ call off_stop
 contains
   !> @ingroup OFFPrivateProcedure
   !> @{
+  !> @brief Procedure for parsing Command Line Arguments (CLA) implementing OFF Command Line Interface (CLI).
+  function parsing_command_line(File_Option) result(error)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(*), intent(OUT)::         File_Option !< Options file name.
+  type(Type_Command_Line_Interface):: cli         !< Command Line Interface (CLI).
+  integer(I4P)::                      error       !< Error trapping flag.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  associate(rks=>global%parallel%rks)
+    ! initializing CLI
+    call cli%init(progname='OFF',examples=['OFF OFF_options_file'])
+    ! setting CLAs
+    call cli%add(pref='|-'//rks//'-> ',positional=.true.,position=1,help='OFF options file',required=.true.,error=error)
+    if (error/=0) return
+    ! parsing CLI
+    write(stdout,'(A)')'+-'//rks//'-> Parsing Command Line Arguments'
+    call cli%parse(error=error,pref='|-'//rks//'-> ') ; if (error/=0) return
+    ! using CLI data to set POG behaviour
+    call cli%get(position=1_I4P, val=File_Option, error=error,pref='|-'//rks//'-> ')
+  endassociate
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction parsing_command_line
+
   !> @brief Procedure for initializing the simulation.
   subroutine off_init()
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -204,24 +231,16 @@ contains
   associate(rks=>global%parallel%rks)
     ! checking/creating lockfile
     if (global%parallel%is_master()) then
-      call IOFile%lockfile%lock
+      call IOFile%lockfile%lock(errpref='+-'//rks//'->',outpref='+-'//rks//'->')
       if (IOFile%lockfile%iostat/=0) then
-        write(stderr,'(A)')'+-'//rks//'-> '//IOFile%lockfile%iomsg
+        write(stderr,'(A)')'+-'//rks//'->'//IOFile%lockfile%iomsg
         call off_stop
       endif
     endif
     ! parsing command line for getting global option file name
-    Nca = command_argument_count()
-    if (Nca==0) then
-      write(stderr,'(A)')'+-'//rks//'-> A valid file name of the options file must be provided as command line argument'
-      write(stderr,'(A)')'|-'//rks//'-> No argument has been passed to command line'
-      write(stderr,'(A)')'|-'//rks//'-> Correct use is:'
-      write(stderr,'(A)')'|-'//rks//'->   OFF "valid_option_file_name"'
-      call off_stop
-    else
-      call get_command_argument(1, File_Option)
-      File_Option = global%OS%string_separator_fix(string=trim(adjustl(File_Option)))
-    endif
+    err = parsing_command_line(File_Option=File_Option) ; if (err/=0) call off_stop
+    write(stdout,'(A)')'+-'//rks//'-> Compiled code used options'
+    call global%cco%print(unit=stdout,pref='|-'//rks//'->')
     ! printing architecture informations
     if (global%parallel%is_master()) then
       write(stdout,'(A)')'+-'//rks//'-> Running architecture general informations'
@@ -232,14 +251,10 @@ contains
       write(stdout,'(A)')'+-'//rks//'-> Number of OpenMP threads: '//trim(str(.true.,global%parallel%Nthreads))
     endif
     ! setting OFF options file structures
-    call IOFile%off_opts%set(name=trim(File_Option),path_in='')
+    call IOFile%off_opts%set(name=trim(File_Option),path_in='',errpref='+-'//rks//'->',outpref='+-'//rks//'->')
     ! loading OFF options file
     associate(OS=>global%OS,off_opts=>IOFile%off_opts)
       call off_opts%load(OS=OS)
-      if (off_opts%iostat/=0) then
-        write(stderr,'(A)')'+-'//rks//'-> '//off_opts%iomsg
-        call off_stop
-      endif
       if (global%parallel%is_master()) then
         write(stdout,'(A)')'+-'//rks//'-> OFF options'
         call off_opts%print(pref='|-'//rks//'->  ',unit=stdout)
@@ -250,23 +265,25 @@ contains
     associate(off_opts=>IOFile%off_opts,solv_opts=>IOFile%solv_opts,mesh=>IOFile%mesh,bc=>IOFile%bc,init=>IOFile%init,&
               !sol=>IOFile%sol,proc=>IOFile%proc,prof=>IOFile%prof)
               sol=>IOFile%sol,prof=>IOFile%prof)
-      call solv_opts%set(name=off_opts%fn_solv,path_in=off_opts%path_in,path_out=off_opts%path_out)
-      call mesh%set(     name=off_opts%fn_mesh,path_in=off_opts%path_in,path_out=off_opts%path_out)
-      call bc%set(       name=off_opts%fn_bc  ,path_in=off_opts%path_in,path_out=off_opts%path_out)
-      call init%set(     name=off_opts%fn_init,path_in=off_opts%path_in,path_out=off_opts%path_out)
-      call sol%set(      name=off_opts%fn_sol ,path_in=off_opts%path_in,path_out=off_opts%path_out,fout=off_opts%sol_out)
+      call solv_opts%set(name=off_opts%fn_solv,path_in=off_opts%path_in,path_out=off_opts%path_out,errpref='+-'//rks//'->',&
+                         final_call=off_stop)
+      call mesh%set(     name=off_opts%fn_mesh,path_in=off_opts%path_in,path_out=off_opts%path_out,errpref='+-'//rks//'->',&
+                         final_call=off_stop)
+      call bc%set(       name=off_opts%fn_bc  ,path_in=off_opts%path_in,path_out=off_opts%path_out,errpref='+-'//rks//'->',&
+                         final_call=off_stop)
+      call init%set(     name=off_opts%fn_init,path_in=off_opts%path_in,path_out=off_opts%path_out,errpref='+-'//rks//'->',&
+                         final_call=off_stop)
+      call sol%set(      name=off_opts%fn_sol ,path_in=off_opts%path_in,path_out=off_opts%path_out,errpref='+-'//rks//'->',&
+                         final_call=off_stop,fout=off_opts%sol_out)
       !call proc%set(     name=off_opts%fn_proc,path_in=off_opts%path_in,path_out=off_opts%path_out)
-      call prof%set(     name=off_opts%fn_prof,path_in=off_opts%path_in,path_out=off_opts%path_out)
+      call prof%set(     name=off_opts%fn_prof,path_in=off_opts%path_in,path_out=off_opts%path_out,errpref='+-'//rks//'->',&
+                         final_call=off_stop)
     endassociate
     ! loading input files
     if (global%parallel%is_master()) then
       write(stdout,'(A)')'+-'//rks//'-> Loading input files'
     endif
     call IOFile%solv_opts%load
-    if (IOFile%solv_opts%iostat/=0) then
-      write(stderr,'(A)')'+-'//rks//'-> '//IOFile%solv_opts%iomsg
-      call off_stop
-    endif
     if (global%parallel%is_master()) then
       write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%solv_opts%name
       call IOFile%solv_opts%print(pref='|-'//rks//'->    ',unit=stdout)
@@ -288,27 +305,12 @@ contains
    !  call off_stop
    !endif
    !call global%parallel%print(pref='|-'//rks//'->    ',unit=stdout)
-    ! loading mesh file
     if (global%parallel%is_master()) write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%mesh%name
     call IOFile%mesh%load(global=global)
-    if (IOFile%mesh%iostat/=0) then
-      write(stderr,'(A)')'+-'//rks//'-> '//IOFile%mesh%iomsg
-      call off_stop
-    endif
-    ! loading bc file
     if (global%parallel%is_master()) write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%bc%name
     call IOFile%bc%load(global=global)
-    if (IOFile%bc%iostat/=0) then
-      write(stderr,'(A)')'+-'//rks//'-> '//IOFile%bc%iomsg
-      call off_stop
-    endif
-    ! loading init file
     if (global%parallel%is_master()) write(stdout,'(A)')'+-'//rks//'->   Loading '//IOFile%init%name
     call IOFile%init%load(global=global)
-    if (IOFile%init%iostat/=0) then
-      write(stderr,'(A)')'+-'//rks//'-> '//IOFile%init%iomsg
-      call off_stop
-    endif
     ! computing the mesh variables that are not loaded from input files
     min_space_step = MaxR8P
     do while(global%block%loopID(ID=ID))
@@ -316,6 +318,7 @@ contains
       call block%metrics
       call block%metrics_correction
       min_space_step = min(min_space_step,block%min_space_step())
+      call block%print(unit=stdout,pref='|-'//rks//'->  ')
     enddo
     ! initializing WENO coefficients
     call weno_init(S=global%space_step%gco,min_space_step=min_space_step)
@@ -470,7 +473,9 @@ contains
   subroutine off_stop
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
+#ifdef _MPI
   integer(I4P):: err !< Error traping flag.
+#endif
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------

@@ -1025,7 +1025,8 @@ contains
 
   !> @brief Procedure for setting cells boundary conditions from block ones.
   !> @note This procedure is useful only for Cartesian grids.
-  elemental subroutine set_cells_bc(block,block_dims)
+  !elemental subroutine set_cells_bc(block,block_dims)
+  subroutine set_cells_bc(block,block_dims)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_SBlock), intent(INOUT)::    block      !< Block-level data.

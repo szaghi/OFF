@@ -13,12 +13,13 @@
 !> @brief Module Data_Type_File_IBM_Options contains the definition of Type_File_IBM_Options, that is the main IBM options file.
 module Data_Type_File_IBM_Options
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                        ! Integers and reals precision definition.
-USE Data_Type_File_Base,      only: Type_File_Base      ! Definition of Type_File_Base.
-USE Data_Type_OS,             only: Type_OS             ! Definition of Type_OS.
-USE Data_Type_Varying_String, only: Type_Varying_String ! Definition of Type_XML_Tag.
-USE Data_Type_XML_Tag,        only: Type_XML_Tag        ! Definition of Type_XML_Tag.
-USE Lib_IO_Misc                                         ! Procedures for IO and strings operations.
+USE IR_Precision                                            ! Integers and reals precision definition.
+USE Data_Type_File_Base,      only: Type_File_Base          ! Definition of Type_File_Base.
+USE Data_Type_OS,             only: Type_OS                 ! Definition of Type_OS.
+USE Data_Type_Varying_String, only: Type_Varying_String     ! Definition of Type_XML_Tag.
+USE Data_Type_XML_Tag,        only: Type_XML_Tag            ! Definition of Type_XML_Tag.
+! USE Lib_IO_Misc                                         ! Procedures for IO and strings operations.
+USE Lib_Strings,              only: count,unique,Upper_Case ! Library for strings operations.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------

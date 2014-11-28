@@ -22,7 +22,7 @@ module Data_Type_Block_Dimensions
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision                          ! Integers and reals precision definition.
 USE Data_Type_XML_Tag, only: Type_XML_Tag ! Definition of Type_XML_Tag.
-USE Lib_IO_Misc,       only: unique       ! Procedures for IO and strings operations.
+USE Lib_Strings,       only: unique       ! Library for strings operations.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------

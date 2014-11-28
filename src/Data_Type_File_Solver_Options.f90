@@ -26,13 +26,14 @@
 !> dynamic solver options.
 module Data_Type_File_Solver_Options
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                                        ! Integers and reals precision definition.
-USE Data_Type_Adimensional, only: Type_Adimensional     ! Definition of Type_Adimensional.
-USE Data_Type_File_Base,    only: Type_File_Base        ! Definition of Type_File_Base.
-USE Data_Type_Space_Step,   only: Type_Space_Step       ! Definition of Type_Space_Step.
-USE Data_Type_Time_Step,    only: Type_Time_Step        ! Definition of Type_Time_Step.
-USE Data_Type_XML_Tag,      only: Type_XML_Tag          ! Definition of Type_XML_Tag.
-USE Lib_IO_Misc,            only: iostat_eor,Upper_Case ! Procedures for IO and strings operations.
+USE IR_Precision                                    ! Integers and reals precision definition.
+USE Data_Type_Adimensional, only: Type_Adimensional ! Definition of Type_Adimensional.
+USE Data_Type_File_Base,    only: Type_File_Base    ! Definition of Type_File_Base.
+USE Data_Type_Space_Step,   only: Type_Space_Step   ! Definition of Type_Space_Step.
+USE Data_Type_Time_Step,    only: Type_Time_Step    ! Definition of Type_Time_Step.
+USE Data_Type_XML_Tag,      only: Type_XML_Tag      ! Definition of Type_XML_Tag.
+USE Lib_IO_Misc,            only: iostat_eor        ! Procedures for IO and strings operations.
+USE Lib_Strings,            only: Upper_Case        ! Library for strings operations.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------

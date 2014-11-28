@@ -16,9 +16,10 @@
 !> file structure.
 module Data_Type_File_Base
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision                ! Integers and reals precision definition.
-USE Data_Type_OS, only: Type_OS ! Definition of Type_OS.
-USE Lib_IO_Misc                 ! Procedures for IO and strings operations.
+USE IR_Precision                   ! Integers and reals precision definition.
+USE Data_Type_OS, only: Type_OS    ! Definition of Type_OS.
+USE Lib_IO_Misc                    ! Procedures for IO and strings operations.
+USE Lib_Strings,  only: Upper_Case ! Library for strings operations.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------

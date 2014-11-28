@@ -175,6 +175,7 @@ contains
       mesh_weight = mesh_weight + blkdims%Ncells()
     enddo
     ideal_prc_weight = mesh_weight / Nproc
+    print*,'cazzo parallel',ideal_prc_weight , mesh_weight
     ! cazzo inserire load balance
     do while(block_dims%loopID(ID=ID))
       call BPmap%put(ID=ID,d=0_I4P) ! cazzo tutti i blocchi sul proc 0... seriale

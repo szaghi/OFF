@@ -20,10 +20,10 @@
 !> Type_Block_BC contains all the data defining the block-face boundary conditions of a block.
 module Data_Type_Block_BC
 !-----------------------------------------------------------------------------------------------------------------------------------
-USE IR_Precision      ! Integers and reals precision definition.
-USE Data_Type_BC      ! Definition of Type_BC.
-USE Data_Type_XML_Tag ! Definition of Type_XML_Tag.
-USE Lib_IO_Misc       ! Procedures for IO and strings operations.
+USE IR_Precision                         ! Integers and reals precision definition.
+USE Data_Type_BC                         ! Definition of Type_BC.
+USE Data_Type_XML_Tag                    ! Definition of Type_XML_Tag.
+USE Lib_Strings, only: Upper_Case,unique ! Library for strings operations.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------

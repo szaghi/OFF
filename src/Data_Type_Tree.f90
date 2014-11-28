@@ -18,9 +18,9 @@
 
 !> @brief Module Data_Type_Tree contains the definition of Type_Tree type and useful procedures for its
 !> handling.
-!> Type_Tree contains generic data stored as a dynamic Hierarchical Data Structure, namely Octree or Quadtree. The data are stored by
-!> means of a generic Hash Table structure. To retrieve a specific data (identified by a unique key, ID) a hash function is used.
-!> The unique ID is computed by means of Morton filling curve, namely the Z-ordering.
+!> Type_Tree contains generic data stored as a dynamic Hierarchical Data Structure, namely Octree, Quadtree or Dualtree. The data
+!> are stored by means of a generic Hash Table structure. To retrieve a specific data (identified by a unique key, ID) a hash
+!> function is used. The unique ID is computed by means of Morton filling curve, namely the Z-ordering.
 !> In order to resolve the "keys collisions" the "chaining" (based on single linked list) technique is used.
 !> @note The hierarchical tree data structure is a dynamic n-tree (typically an octree in 3D or quadtree in 2D). In the following
 !> a quadtree is used as an example. Let us assume to have initially 3 nodes (number of ancestor nodes), \f$Na=3\f$. The tree
@@ -29,8 +29,8 @@
 !> be computed by the equation \f$ ID_{child} = ref_ratio*ID_{node}+i+Na-ref_{ratio}\f$ where \f$i\f$ is the index of child node
 !> considered in the children numbering \f$i \in [1,ref_ratio]\f$. Conversely, the parent of a node is computed by the equation
 !> \f$ID_{parent} = int(\frac{ID_{node}-1-(Na-ref_{ratio})}{ref_{ratio}})\f$.
-!> In the following sketch the tree represented has 3 ancestor nodes and
-!> 3 levels of refinement. Node 1 and 3 at level are refined at level 2 where nodes 4 and 13 are refined again at level 3.
+!> In the following sketch the tree represented has 3 ancestor nodes and 3 levels of refinement. Node 1 and 3 at level are refined
+!> at level 2 where nodes 4 and 13 are refined again at level 3.
 !> @code
 !>
 !>                     +---+          +---+             +---+
@@ -49,7 +49,7 @@
 !>   | 16| | 17| | 18| | 19|                | 52| | 53| | 54| | 55|       LEVEL 3: first-last IDs=16-63
 !>   +---+ +---+ +---+ +---+                +---+ +---+ +---+ +---+
 !> @endcode
-!> The previous representation is equivalent to the following quadtree sketch where only leaf nodes are represented.
+!> The previous tree representation is equivalent to the following quadtree sketch where only leaf nodes are represented.
 !> @code
 !>   +-------------------+
 !>   |         |         |
@@ -77,9 +77,63 @@
 !>   |    |    |         |                   |
 !>   +-------------------+-------------------+
 !> @endcode
+!> In the following a 1D example of a dualtree (refinement ratio 2) is reported:
+!> @code
+!>                     +---+          +---+             +---+
+!>  Ancestor nodes =>  | 1 |          | 2 |             | 3 |             LEVEL 1: first-last IDs=1-3
+!>                     +---+          +---+             +---+
+!>                     /   \                            /   \
+!>                  +---+ +---+                      +---+ +---+
+!>                  | 4 | | 5 |                      | 8 | | 9 |          LEVEL 2: first-last IDs=4-9
+!>                  +---+ +---+                      +---+ +---+
+!>                  /   \                                  /   \
+!>               +---+ +---+                            +---+ +---+
+!>               | 10| | 11|                            | 20| | 21|       LEVEL 3: first-last IDs=10-21
+!>               +---+ +---+                            +---+ +---+
+!> @endcode
+!> The previous tree representation is equivalent to the following dualtree sketch where only leaf nodes are represented.
+!> @code
+!>   |-10-|-11-|----5----|---------2---------|----8----|-20-|-21-|
+!> @endcode
+!> The numeration of ancestors blocks must osserv the following convention:
+!> @code
+!> /|\Z
+!>  |
+!>  |                            *----------*----------*
+!>  |                           /|         /|         /|
+!>  |                          / |        / |        / |
+!>  |                         /  |       /  |       /  |
+!>  |                        /   |      /   |      /   |
+!>  |                       /    *-----/----*-----/----*
+!>  |            7 <-------/--+ /|    /    /|    /   +---------> 8
+!>  |                     *----------*----------*    / |
+!>  |                    /|   /  |  /|   /  |  /|   /  |
+!>  |                   / |  /   | / |  /   | / |  /   |
+!>  |                  /  | /    */--|-/----*/--|-/----*
+!>  |         3 <-----/---|/--+ //   |/    //   |/  +---------> 4
+!>  |                /    *-----/----*-----/----*    /
+!>  |    5 <--------/--+ /|   //    /|   //   +------------> 6
+!>  |              *----------*----------*    / |  /
+!>  |              |   /  | / |   /  | / |   /  | /
+!>  |              |  /   |/  |  /   |/  |  /   |/
+!>  |              | /    *---|-/----*---|-/----*
+!>  |      1 <-----|/--+ /    |/    /    |/  +------------> 2
+!>  |              *----------*----------*    /
+!>  |              |   /      |   /      |   /
+!>  |              |  /       |  /       |  /
+!>  |   _ Y        | /        | /        | /
+!>  |   /|         |/         |/         |/
+!>  |  /           *----------*----------*
+!>  | /
+!>  |/                                                    X
+!>  o----------------------------------------------------->
+!> @endcode
 module Data_Type_Tree
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision ! Integers and reals precision definition.
+#ifdef _MPI
+USE MPI          ! MPI runtime library.
+#endif
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -90,8 +144,10 @@ save
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 integer(I4P), parameter:: ht_leng_def   = 9973_I4P !< Default length of hash table.
-integer(I4P), parameter:: ref_ratio_def = 8_I4P    !< Default refinement ratio.
+integer(I4P), parameter:: ref_ratio_def = 8_I4P    !< Default refinement ratio {8,4,2}.
 integer(I4P), parameter:: Na_def        = 8_I4P    !< Default ancestor nodes.
+integer(I4P), parameter:: myrank_def    = 0_I4P    !< Default MPI partition (process).
+integer(I4P), parameter:: parts_def     = 1_I4P    !< Default MPI partitions.
 !> @brief Derived type containing the node of the Tree. It implements a generic single linked list.
 !> @ingroup Data_Type_TreeDerivedType
 type, public:: Type_Tree_Node
@@ -123,6 +179,8 @@ endtype Type_Tree_Node
 !> @brief Derived type defining a generic dynamic Hierarchical Data Structure, namely Octree or Quadtree. The data are stored by
 !> means of a generic Hash Table structure. To retrieve a specific data (identified by a unique key, ID) a hash function is used.
 !> In order to resolve the "keys collisions" the "chaining" (based on single linked list) technique is used.
+!> @note The Tree can be "partizioned" in order to enable MPI parallelism capabilities. To this aim, a set off additional members
+!> area dded to the base tree.
 !> @ingroup Data_Type_TreeDerivedType
 type, public:: Type_Tree
   private
@@ -131,7 +189,12 @@ type, public:: Type_Tree
   integer(I4P)::                      Na        = 0_I4P !< Number of ancestor nodes (refinement level 1).
   integer(I4P)::                      ref_ratio = 0_I4P !< Refinement ratio.
   integer(I4P)::                      ref_max   = 0_I4P !< Maximum refinement level.
-  integer(I8P), allocatable, public:: IDs(:)            !< List of actually stored IDs.
+  integer(I8P), allocatable, public:: IDs(:)            !< List of actually stored IDs [1:tree%length()] of the current part.
+  ! parallel enabling data
+  integer(I4P), public::              myrank    = 0_I4P !< Current MPI partition (process).
+  integer(I4P), public::              parts     = 0_I4P !< Number of MPI partitions into which the Tree is partitioned.
+  integer(I8P), allocatable, public:: First_IDs(:)      !< List of IDs of the first node on each partition [1:tree%parts].
+  integer(I8P), allocatable, public:: Last_IDs(:)       !< List of IDs of the last  node on each partition [1:tree%parts].
   contains
     procedure:: hash                                ! Procedure for performing the hashing of the ID (unique key).
     procedure:: init          => init_tree          ! Procedure for initializing the tree.
@@ -694,7 +757,7 @@ contains
   endfunction hash
 
   !> @brief Procedure for initializing the Tree.
-  elemental subroutine init_tree(tree,source,leng,Na,ref_ratio)
+  elemental subroutine init_tree(tree,source,leng,Na,ref_ratio,myrank,parts)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tree),          intent(INOUT):: tree      !< Tree.
@@ -702,6 +765,8 @@ contains
   integer(I4P),    optional, intent(IN)::    leng      !< Length of the Tree.
   integer(I4P),    optional, intent(IN)::    Na        !< Number of ancestor nodes.
   integer(I4P),    optional, intent(IN)::    ref_ratio !< Refinement ratio.
+  integer(I4P),    optional, intent(IN)::    myrank    !< Current MPI partition (process).
+  integer(I4P),    optional, intent(IN)::    parts     !< MPI partitions into which the tree is partitioned.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -710,12 +775,18 @@ contains
     tree%leng      = source%leng
     tree%Na        = source%Na
     tree%ref_ratio = source%ref_ratio
+    tree%myrank    = source%myrank
+    tree%parts     = source%parts
   else
     tree%leng      = ht_leng_def   ; if (present(leng     )) tree%leng      = leng
     tree%Na        = Na_def        ; if (present(Na       )) tree%Na        = Na
     tree%ref_ratio = ref_ratio_def ; if (present(ref_ratio)) tree%ref_ratio = ref_ratio
+    tree%myrank    = myrank_def    ; if (present(myrank   )) tree%myrank    = myrank
+    tree%parts     = parts_def     ; if (present(parts    )) tree%parts     = parts
   endif
   allocate(tree%ht(0:tree%leng-1))
+  allocate(tree%First_IDs(0:tree%parts-1))
+  allocate(tree%Last_IDs( 0:tree%parts-1))
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine init_tree
@@ -884,9 +955,38 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   call tree%getIDs
   call tree%get_max_level
+  if (tree%parts>1) then
+    tree%First_IDs(tree%myrank) = minval(tree%IDs)
+    tree%Last_IDs( tree%myrank) = maxval(tree%IDs)
+  endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine update_tree
+
+#ifdef _MPI
+  pure subroutine communicateIDs(tree)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Tree), intent(INOUT):: tree                      !< Tree.
+  integer(I4P)::                    part                      !< Partitions (processes) counter.
+  integer(I4P)::                    err,stat(MPI_STATUS_SIZE) !< MPI error flags.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  do part=0,tree%parts-1
+    call MPI_SENDRECV(tree%First_IDs(tree%myrank),1,I8P_MPI,part,tree%parts*(tree%myrank+1), &
+                      tree%First_IDs(part       ),1,I8P_MPI,part,tree%parts*(part       +1), &
+                      MPI_COMM_WORLD,stat,err)
+  enddo
+  do part=0,tree%parts-1
+    call MPI_SENDRECV(tree%Last_IDs(tree%myrank),1,I8P_MPI,part,2*tree%parts*(tree%myrank+1), &
+                      tree%Last_IDs(part       ),1,I8P_MPI,part,2*tree%parts*(part       +1), &
+                      MPI_COMM_WORLD,stat,err)
+  enddo
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine communicateIDs
+#endif
 
   !> @brief Procedure for performing a while loop returning the ID value defined into IDs (for ID looping).
   function loopID_tree(tree,ID) result(again)
@@ -1127,6 +1227,41 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction last_ID_tree
 
+  !> @brief Procedure for computing coordinate of ID.
+  pure function coord_ID_tree(node) result(coord)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Tree), intent(IN)::  tree       !< Tree.
+  integer(I8P),     intent(IN)::  ID         !< ID (unique) of the node.
+  integer(I4P)::                  coord(1:4) !< Coordinates, x,y,z,l.
+  type(Type_Tree_Node), pointer:: n          !< Pointer to "ID-th" node of the tree.
+  integer(I8P)::                  IDd        !< Dummy ID.
+  integer(I8P)::                  fak(1:3)
+  integer(I4P)::                  bitlevel
+  integer(I4P)::                  i
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  coord = 0_I4P
+  n => tree%node(ID=ID)
+  if (associated(n)) then
+    coord(4) = tree%ref_level(ID=ID)
+    fak(1)   = 1
+    fak(2)   = 2
+    fak(3)   = 4
+    bitlevel = 1
+    IDd = ID - tree%first_ID(level=coord(4))
+    do while ((IDd / fak(1)) > 0)
+      do i=1,3
+        coord(i) = coord(i) + bitlevel * int(mod(IDd / fak(i), 2_I8P))
+      enddo
+      bitlevel = bitlevel * 2
+      fak = fak * 8
+    enddo
+  endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction coord_ID_tree
   !> @brief Procedure for computing the maximum refinement level of the tree.
   elemental subroutine get_max_level_tree(tree)
   !---------------------------------------------------------------------------------------------------------------------------------

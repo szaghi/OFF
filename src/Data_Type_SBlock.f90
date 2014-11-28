@@ -36,7 +36,7 @@ USE Data_Type_Time_Step,          only: Type_Time_Step         ! Definition of T
 USE Data_Type_Tree,               only: Type_Tree              ! Definition of Type_Tree.
 USE Data_Type_Vector,             only: Type_Vector,ex,ey,ez   ! Definition of Type_Vector.
 USE Lib_Fluxes_Convective,        only: fluxes_convective      ! Procedure for convective fluxes.
-USE Lib_IO_Misc,                  only: Upper_Case             ! Procedures for IO and strings operations.
+USE Lib_Strings,                  only: Upper_Case             ! Library for strings operations.
 USE Lib_Math,                     only: abs_grad               ! Procedures for computing the absolute value of gradient.
 USE Lib_Runge_Kutta,              only: rk_stage,rk_time_integ ! Runge-Kutta time integration library.
 USE Lib_Thermodynamic_Laws_Ideal, only: a                      ! Procedure for computing speed of sound.

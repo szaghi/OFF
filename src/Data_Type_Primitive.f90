@@ -29,7 +29,7 @@ USE IR_Precision                                     ! Integers and reals precis
 USE Data_Type_Species,            only: Type_Species ! Definition of Type_Species.
 USE Data_Type_Vector,             only: Type_Vector  ! Definition of Type_Vector.
 USE Data_Type_XML_Tag,            only: Type_XML_Tag ! Definition of Type_XML_Tag.
-USE Lib_IO_Misc,                  only: count,unique ! Procedures for IO and strings operations.
+USE Lib_Strings,                  only: count,unique ! Library for strings operations.
 USE Lib_Thermodynamic_Laws_Ideal, only: a,E,H        ! Library for thermodynamic laws for ideal calorically perfect gas.
 !-----------------------------------------------------------------------------------------------------------------------------------
 

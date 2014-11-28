@@ -57,6 +57,9 @@
 module IR_Precision
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE, intrinsic:: ISO_FORTRAN_ENV, only: stdout => OUTPUT_UNIT, stderr => ERROR_UNIT ! Standard output/error logical units.
+#ifdef _MPI
+USE MPI                                                                             ! MPI runtime library.
+#endif
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
@@ -100,12 +103,25 @@ integer, parameter:: R16P = selected_real_kind(15,307)  !< Defined as R8P; 64 bi
 integer, parameter:: R8P  = selected_real_kind(15,307)  !< 15  digits, range \f$[10^{-307} , 10^{+307}  - 1]\f$; 64 bits.
 integer, parameter:: R4P  = selected_real_kind(6,37)    !< 6   digits, range \f$[10^{-37}  , 10^{+37}   - 1]\f$; 32 bits.
 integer, parameter:: R_P  = R8P                         !< Default real precision.
+#ifdef _MPI
+integer::            R16P_MPI = 0                       !< Equivalent MPI type for R16P real.
+integer::            R8P_MPI  = 0                       !< Equivalent MPI type for R8P  real.
+integer::            R4P_MPI  = 0                       !< Equivalent MPI type for R4P  real.
+integer::            R_P_MPI  = 0                       !< Equivalent MPI type for R_P  real.
+#endif
 ! Integer precision definitions:
 integer, parameter:: I8P  = selected_int_kind(18) !< Range \f$[-2^{63},+2^{63} - 1]\f$, 19 digits plus sign; 64 bits.
 integer, parameter:: I4P  = selected_int_kind(9)  !< Range \f$[-2^{31},+2^{31} - 1]\f$, 10 digits plus sign; 32 bits.
 integer, parameter:: I2P  = selected_int_kind(4)  !< Range \f$[-2^{15},+2^{15} - 1]\f$, 5  digits plus sign; 16 bits.
 integer, parameter:: I1P  = selected_int_kind(2)  !< Range \f$[-2^{7} ,+2^{7}  - 1]\f$, 3  digits plus sign; 8  bits.
 integer, parameter:: I_P  = I4P                   !< Default integer precision.
+#ifdef _MPI
+integer::            I8P_MPI = 0                  !< Equivalent MPI type for I8P integer.
+integer::            I4P_MPI = 0                  !< Equivalent MPI type for I4P integer.
+integer::            I2P_MPI = 0                  !< Equivalent MPI type for I2P integer.
+integer::            I1P_MPI = 0                  !< Equivalent MPI type for I1P integer.
+integer::            I_P_MPI = 0                  !< Equivalent MPI type for I_P integer.
+#endif
 
 ! Format parameters useful for writing in a well-ascii-format numeric variables.
 ! Real output formats:
@@ -1153,6 +1169,9 @@ contains
   subroutine IR_init()
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
+#ifdef _MPI
+  integer:: ierror !< Error traping flag.
+#endif
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1166,6 +1185,17 @@ contains
   BIR16P = bit_size(r=MaxR16P) ; BYR16P = BIR16P/8_I2P
 #else
   BIR16P = int(BIR8P,kind=I2P) ; BYR16P = BIR16P/8_I2P
+#endif
+#ifdef _MPI
+  call MPI_TYPE_CREATE_F90_REAL(precision(1._R16P), range(1._R16P), R16P_MPI, ierror)
+  call MPI_TYPE_CREATE_F90_REAL(precision(1._R8P ), range(1._R8P ), R8P_MPI,  ierror)
+  call MPI_TYPE_CREATE_F90_REAL(precision(1._R4P ), range(1._R4P ), R4P_MPI,  ierror)
+  call MPI_TYPE_CREATE_F90_REAL(precision(1._R_P ), range(1._R_P ), R_P_MPI,  ierror)
+  call MPI_TYPE_CREATE_F90_INTEGER(range(1_I8P), I8P_MPI, ierror)
+  call MPI_TYPE_CREATE_F90_INTEGER(range(1_I4P), I4P_MPI, ierror)
+  call MPI_TYPE_CREATE_F90_INTEGER(range(1_I2P), I2P_MPI, ierror)
+  call MPI_TYPE_CREATE_F90_INTEGER(range(1_I1P), I1P_MPI, ierror)
+  call MPI_TYPE_CREATE_F90_INTEGER(range(1_I_P), I_P_MPI, ierror)
 #endif
   ir_initialized = .true.
   return

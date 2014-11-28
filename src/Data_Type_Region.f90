@@ -23,7 +23,7 @@ USE IR_Precision                              ! Integers and reals precision def
 USE Data_Type_Primitive, only: Type_Primitive ! Definition of Type_Primitive.
 USE Data_Type_Vector,    only: Type_Vector    ! Definition of Type_Vector.
 USE Data_Type_XML_Tag,   only: Type_XML_Tag   ! Definition of Type_XML_Tag.
-USE Lib_IO_Misc,         only: Upper_Case     ! Procedures for IO and strings operations.
+USE Lib_Strings,         only: Upper_Case     ! Library for strings operations.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------

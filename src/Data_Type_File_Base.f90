@@ -220,7 +220,6 @@ contains
   logical,      optional, intent(IN)::    append  !< Flag for inquiring the file open position.
   logical,      optional, intent(IN)::    replace !< Flag for inquiring the file open replace status.
   character(*),           intent(IN)::    action  !< Action to be perfomed on file: "READ" or "WRITE".
-  logical::                               is_file !< Flag for inquiring the presence of mesh file.
   character(len=:), allocatable::         fname   !< Temporary variable for creating file name.
   character(len=:), allocatable::         acc     !< File access.
   character(len=:), allocatable::         frm     !< File format.
@@ -256,11 +255,8 @@ contains
   endif
   ! in the case of READ action inquiring the existance of the file
   if (act=='READ') then
-    inquire(file=trim(fname),exist=is_file,iostat=file_d%iostat)
-    if (.not.is_file) then
-      file_d%iostat = File_Not_Found(stderrpref=file_d%errpref,filename=trim(fname),cpn='open_file_base')
-      return
-    endif
+    call inquire_file(cpn='open_file_base',pref=file_d%errpref,iostat=file_d%iostat,iomsg=file_d%iomsg,file=trim(fname))
+    if (file_d%iostat/=0) return
   endif
   ! opening the file
   open(unit=Get_Unit(file_d%unit),file=trim(fname),&

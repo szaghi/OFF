@@ -16,86 +16,74 @@
 !> Module definition of Type_Tree
 !> @}
 
-!> @brief Module Data_Type_Tree contains the definition of Type_Tree type and useful procedures for its
-!> handling.
+!> @brief Module Data_Type_Tree contains the definition of Type_Tree type and useful procedures for its handling.
 !> Type_Tree contains generic data stored as a dynamic Hierarchical Data Structure, namely Octree, Quadtree or Dualtree. The data
 !> are stored by means of a generic Hash Table structure. To retrieve a specific data (identified by a unique key, ID) a hash
 !> function is used. The unique ID is computed by means of Morton filling curve, namely the Z-ordering.
 !> In order to resolve the "keys collisions" the "chaining" (based on single linked list) technique is used.
-!> @note The hierarchical tree data structure is a dynamic n-tree (typically an octree in 3D or quadtree in 2D). In the following
-!> a quadtree is used as an example. Let us assume to have initially 3 nodes (number of ancestor nodes), \f$Na=3\f$. The tree
-!> refinement ratio is 4, \f$ref_ratio=4\f$, a quadtree being considered. Let us use the Morton order (or Z-order) to apply
-!> a unique ID-key to each node of each level, ID=1,2,3 being the ancestor nodes. Consequently the ID of each child of any nodes can
-!> be computed by the equation \f$ ID_{child} = ref_ratio*ID_{node}+i+Na-ref_{ratio}\f$ where \f$i\f$ is the index of child node
-!> considered in the children numbering \f$i \in [1,ref_ratio]\f$. Conversely, the parent of a node is computed by the equation
-!> \f$ID_{parent} = int(\frac{ID_{node}-1-(Na-ref_{ratio})}{ref_{ratio}})\f$.
-!> In the following sketch the tree represented has 3 ancestor nodes and 3 levels of refinement. Node 1 and 3 at level are refined
-!> at level 2 where nodes 4 and 13 are refined again at level 3.
+!> @note The hierarchical tree data structure is a dynamic n-tree (typically an octree in 3D, quadtree in 2D or dualtree in 1D).
+!> The tree can be refined dynamically storing an unlimited number of branches (indicated as node in the following).
+!> Topologically a tree can be viewed as a hexadron or a quadrilateral or a segment in 3D, 2D or 1D , respectively. The nodes
+!> connectivity (mutual relationship) is consequently driven by this topological assumption.
+!> In the following a quadtree is used as an example. The tree refinement ratio is 4, \f$ref_ratio=4\f$, a quadtree being
+!> considered. Let us use the Morton order (or Z-order) to apply a unique ID-key to each node of each level. Consequently the ID of
+!> each child of any nodes can be computed by the equation \f$ ID_{child} = ref_ratio*ID_{node}+i+1-ref_{ratio}\f$ where \f$i\f$ is
+!> the index of child node considered in the children numbering \f$i \in [1,ref_ratio]\f$. Conversely, the parent of a node is
+!> computed by the equation \f$ID_{parent} = int(\frac{ID_{node}-1-(1-ref_{ratio})}{ref_{ratio}})\f$.
+!> In the following sketch the tree represented has 3 levels of refinement.
 !> @code
 !>
-!>                     +---+          +---+             +---+
-!>  Ancestor nodes =>  | 1 |          | 2 |             | 3 |             LEVEL 1: first-last IDs=1-3
-!>                     +---+          +---+             +---+
-!>                   _/ | | \_                        _/ | | \_
-!>                 _/   | |   \_                    _/   | |   \_
-!>                /    /   \    \                  /    /   \    \
-!>            +---+ +---+ +---+ +---+          +---+ +---+ +---+ +---+
-!>            | 4 | | 5 | | 6 | | 7 |          | 12| | 13| | 14| | 15|    LEVEL 2: first-last IDs=4-15
-!>            +---+ +---+ +---+ +---+          +---+ +---+ +---+ +---+
-!>          _/ | | \_                              _/ | | \_
-!>        _/   | |   \_                          _/   | |   \_
-!>       /    /   \    \                        /    /   \    \
-!>   +---+ +---+ +---+ +---+                +---+ +---+ +---+ +---+
-!>   | 16| | 17| | 18| | 19|                | 52| | 53| | 54| | 55|       LEVEL 3: first-last IDs=16-63
-!>   +---+ +---+ +---+ +---+                +---+ +---+ +---+ +---+
+!>                            +---+
+!>         Ancestor node  =>  | 1 |                 LEVEL 1: first-last IDs=1-1
+!>                            +---+
+!>                        ___/ | | \___
+!>                    ___/     | |     \___
+!>                   /        /   \        \
+!>               +---+    +---+    +---+    +---+
+!>               | 2 |    | 3 |    | 4 |    | 5 |   LEVEL 2: first-last IDs=2-5
+!>               +---+    +---+    +---+    +---+
+!>           ___/ | | \___
+!>       ___/     | |     \___
+!>      /        /   \        \
+!>  +---+    +---+    +---+    +---+
+!>  | 6 |    | 7 |    | 8 |    | 9 |                LEVEL 3: first-last IDs=6-21
+!>  +---+    +---+    +---+    +---+
 !> @endcode
 !> The previous tree representation is equivalent to the following quadtree sketch where only leaf nodes are represented.
 !> @code
 !>   +-------------------+
 !>   |         |         |
 !>   |         |         |
-!>   |   14    |   15    |
+!>   |   4     |   5     |
 !>   |         |         |
 !>   |         |         |
-!>   |---------3---------|
-!>   |         | 54 | 55 |
-!>   |         |    |    |
-!>   |   12    |---13----|
-!>   |         | 52 | 53 |
-!>   |         |    |    |
-!>   +-------------------+-------------------+
-!>   |         |         |                   |
-!>   |         |         |                   |
-!>   |   6     |   7     |                   |
-!>   |         |         |                   |
-!>   |         |         |                   |
-!>   |---------1---------|        2          |
-!>   | 18 | 19 |         |                   |
-!>   |    |    |         |                   |
-!>   |----4----|   5     |                   |
-!>   | 16 | 17 |         |                   |
-!>   |    |    |         |                   |
-!>   +-------------------+-------------------+
+!>   |---------1---------|
+!>   |  8 |  9 |         |
+!>   |    |    |         |
+!>   |----2----|   3     |
+!>   |  6 |  7 |         |
+!>   |    |    |         |
+!>   +-------------------+
 !> @endcode
 !> In the following a 1D example of a dualtree (refinement ratio 2) is reported:
 !> @code
-!>                     +---+          +---+             +---+
-!>  Ancestor nodes =>  | 1 |          | 2 |             | 3 |             LEVEL 1: first-last IDs=1-3
-!>                     +---+          +---+             +---+
-!>                     /   \                            /   \
-!>                  +---+ +---+                      +---+ +---+
-!>                  | 4 | | 5 |                      | 8 | | 9 |          LEVEL 2: first-last IDs=4-9
-!>                  +---+ +---+                      +---+ +---+
-!>                  /   \                                  /   \
-!>               +---+ +---+                            +---+ +---+
-!>               | 10| | 11|                            | 20| | 21|       LEVEL 3: first-last IDs=10-21
-!>               +---+ +---+                            +---+ +---+
+!>                     +---+
+!>  Ancestor nodes =>  | 1 |     LEVEL 1: first-last IDs=1-1
+!>                     +---+
+!>                     /   \
+!>                  +---+ +---+
+!>                  | 2 | | 3 |  LEVEL 2: first-last IDs=2-3
+!>                  +---+ +---+
+!>                  /   \
+!>               +---+ +---+
+!>               | 4 | | 5 |     LEVEL 3: first-last IDs=4-7
+!>               +---+ +---+
 !> @endcode
 !> The previous tree representation is equivalent to the following dualtree sketch where only leaf nodes are represented.
 !> @code
-!>   |-10-|-11-|----5----|---------2---------|----8----|-20-|-21-|
+!>   |--4-|--5-|----3----|
 !> @endcode
-!> The numeration of ancestors blocks must osserv the following convention:
+!> The numeration of ancestors blocks must osserve the following convention:
 !> @code
 !> /|\Z
 !>  |
@@ -128,6 +116,65 @@
 !>  |/                                                    X
 !>  o----------------------------------------------------->
 !> @endcode
+!> Different trees can be interconnected.
+!> As an example a forest of 2 trees can be represented (in 2D) as:
+!> @code
+!>
+!>                     Face 2/1
+!> Y                     |
+!>/|\                   \|/
+!> |
+!> | +-------------------+-------------------+
+!> | |         |         | 16 | 17 |         |
+!> | |         |         |    |    |         |
+!> | |   4     |   5     |----4----|   5     |
+!> | |         |         | 14 | 15 |         |
+!> | |         |         |    |    |         |
+!> | |------ tree 1 -----|------ tree 2 -----|
+!> | |  8 |  9 |         |         |         |
+!> | |    |    |         |         |         |
+!> | |----2----|   3     |    2    |   3     |
+!> | |  6 |  7 |         |         |         |
+!> | |    |    |         |         |         |
+!> | +-------------------+-------------------+
+!> |
+!> |
+!> o----------------------------------------------->X
+!> @endcode
+!> Note that in the above example the nodes of each tree have been indicated with the local (to the tree) ID. To define the
+!> connection between different trees of a forest it is necessary to define the face/line along witch they are connected and their
+!> relative orientation. In the above example the tree 1 and 2 are connected along the face 2 for tree 1 and face 1 for tree 1 and
+!> their relative orientation is " x y z" meaning that the tree2 1 and 2 have x, y and z axis with the same orientation.
+!> On the contrary the following example has inverted orientations:
+!> @code
+!>
+!>                     Face 2/4
+!> Y1                    |
+!>/|\                   \|/
+!> |                                           /|\ X2
+!> | +-------------------+-------------------+  |
+!> | |         |         | 21 | 19 |         |  |
+!> | |         |         |    |    |         |  |
+!> | |   4     |   5     |----5----|   3     |  |
+!> | |         |         | 20 | 18 |         |  |
+!> | |         |         |    |    |         |  |
+!> | |------ tree 1 -----|------ tree 2 -----|  |
+!> | |  8 |  9 |         |         |         |  |
+!> | |    |    |         |         |         |  |
+!> | |----2----|   3     |    4    |   2     |  |
+!> | |  6 |  7 |         |         |         |  |
+!> | |    |    |         |         |         |  |
+!> | +-------------------+-------------------+  |
+!> |                                            |
+!> |                  Y2<-----------------------o
+!> |
+!> o----------------------------------------------->X1
+!> @endcode
+!> In the above example tree 1 has oX1Y1 reference system, while tree 2 has oX2Y2 system. The two trees are connected along the face
+!> 2 for tree 1 and face 4 for tree 2. Their relative orientation is "-y x z" meaning that x axis of tree 1 is parallel to axis y of
+!> tree 2 with inverted direction, y axis of tree 1 is parallel to x axis of tree 2 with the same direction, and z axis are the
+!> same. Once the relative orientation of connected trees is defined it is possible to compute the siblings nodes of node connected
+!> to the nodes of a different tree of the forest.
 module Data_Type_Tree
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision ! Integers and reals precision definition.
@@ -143,9 +190,16 @@ save
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
+character(6), parameter:: _orientation(1:48) = (/'-i j k','-i j-k','-i k j','-i k-j','-i-j k','-i-j-k',&
+                                                 '-i-k j','-i-k-j','-j i k','-j i-k','-j k i','-j k-i',&
+                                                 '-j-i k','-j-i-k','-j-k i','-j-k-i','-k i j','-k i-j',&
+                                                 '-k j i','-k j-i','-k-i j','-k-i-j','-k-j i','-k-j-i',&
+                                                 ' i j k',' i j-k',' i k j',' i k-j',' i-j k',' i-j-k',&
+                                                 ' i-k j',' i-k-j',' j i k',' j i-k',' j k i',' j k-i',&
+                                                 ' j-i k',' j-i-k',' j-k i',' j-k-i',' k i j',' k i-j',&
+                                                 ' k j i',' k j-i',' k-i j',' k-i-j',' k-j i',' k-j-i'/) ! Orientation list.
 integer(I4P), parameter:: ht_leng_def   = 9973_I4P !< Default length of hash table.
 integer(I4P), parameter:: ref_ratio_def = 8_I4P    !< Default refinement ratio {8,4,2}.
-integer(I4P), parameter:: Na_def        = 8_I4P    !< Default ancestor nodes.
 integer(I4P), parameter:: myrank_def    = 0_I4P    !< Default MPI partition (process).
 integer(I4P), parameter:: parts_def     = 1_I4P    !< Default MPI partitions.
 !> @brief Derived type containing the node of the Tree. It implements a generic single linked list.
@@ -176,6 +230,13 @@ type, public:: Type_Tree_Node
     ! private procedures
     procedure:: assign_tree_node                  ! Procedure for assignment.
 endtype Type_Tree_Node
+!> @brief Derived type defining the connectivity between different trees.
+!> @ingroup Data_Type_TreeDerivedType
+type, public:: Type_Tree_Connectivity
+  integer(I8P):: tree        = 0_I8P
+  integer(I1P):: face        = 0_I1P
+  character(6):: orientation = ''
+endtype Type_Tree_Connectivity
 !> @brief Derived type defining a generic dynamic Hierarchical Data Structure, namely Octree or Quadtree. The data are stored by
 !> means of a generic Hash Table structure. To retrieve a specific data (identified by a unique key, ID) a hash function is used.
 !> In order to resolve the "keys collisions" the "chaining" (based on single linked list) technique is used.
@@ -184,17 +245,18 @@ endtype Type_Tree_Node
 !> @ingroup Data_Type_TreeDerivedType
 type, public:: Type_Tree
   private
-  type(Type_Tree_Node), allocatable:: ht(:)             !< Hash table.
-  integer(I4P)::                      leng      = 0_I4P !< Length of the hash table.
-  integer(I4P)::                      Na        = 0_I4P !< Number of ancestor nodes (refinement level 1).
-  integer(I4P)::                      ref_ratio = 0_I4P !< Refinement ratio.
-  integer(I4P)::                      ref_max   = 0_I4P !< Maximum refinement level.
-  integer(I8P), allocatable, public:: IDs(:)            !< List of actually stored IDs [1:tree%length()] of the current part.
+  type(Type_Tree_Node), allocatable::    ht(:)             !< Hash table.
+  integer(I4P)::                         leng      = 0_I4P !< Length of the hash table.
+  integer(I4P)::                         ref_ratio = 0_I4P !< Refinement ratio.
+  integer(I4P)::                         ref_max   = 0_I4P !< Maximum refinement level.
+  integer(I8P), allocatable,    public:: IDs(:)            !< List of actually stored IDs [1:tree%length()] of the current part.
+  integer(I8P),                 public:: ID        = 0_I8P !< ID of the tree for forest of trees handling.
+  type(Type_Tree_Connectivity), public:: connectivity      !< Inter-trees connectivity.
   ! parallel enabling data
-  integer(I4P), public::              myrank    = 0_I4P !< Current MPI partition (process).
-  integer(I4P), public::              parts     = 0_I4P !< Number of MPI partitions into which the Tree is partitioned.
-  integer(I8P), allocatable, public:: First_IDs(:)      !< List of IDs of the first node on each partition [1:tree%parts].
-  integer(I8P), allocatable, public:: Last_IDs(:)       !< List of IDs of the last  node on each partition [1:tree%parts].
+  integer(I4P),                 public:: myrank    = 0_I4P !< Current MPI partition (process).
+  integer(I4P),                 public:: parts     = 0_I4P !< Number of MPI partitions into which the Tree is partitioned.
+  integer(I8P), allocatable,    public:: First_IDs(:)      !< List of IDs of the first node on each partition [0:tree%parts-1].
+  integer(I8P), allocatable,    public:: Last_IDs(:)       !< List of IDs of the last  node on each partition [0:tree%parts-1].
   contains
     procedure:: hash                                ! Procedure for performing the hashing of the ID (unique key).
     procedure:: init          => init_tree          ! Procedure for initializing the tree.
@@ -219,7 +281,8 @@ type, public:: Type_Tree
     procedure:: last_ID       => last_ID_tree       ! Procedure for computing last  ID of a given level.
     procedure:: get_max_level => get_max_level_tree ! Procedure for computing the maximum refinement level of the list.
     procedure:: linearID      => linearID_tree      ! Procedure for getting the linear ID (1:length <=> minID:maxID) of nodes.
-    procedure:: str_Na_ref_ratio                    ! Procedure for casting Na and ref_ratio to string.
+    procedure:: exist_ID      => exist_ID_tree      ! Procedure for inquiring the existance of an ID.
+    procedure:: str_ref_ratio                       ! Procedure for casting ref_ratio to string.
     final::     finalize_tree                       ! Procedure for freeing dynamic memory when finalizing.
     ! private procedures
     procedure:: assign_tree                         ! Procedure for assignment.
@@ -228,37 +291,37 @@ endtype Type_Tree
 contains
   !> @ingroup Data_Type_TreePrivateProcedure
   !> @{
-  !> @brief Procedure for freeing (destroying) the list.
-  recursive subroutine free_node_rec(list)
+  !> @brief Procedure for freeing (destroying) the node (list).
+  recursive subroutine free_node_rec(node)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Tree_Node), intent(INOUT):: list !< List.
+  class(Type_Tree_Node), intent(INOUT):: node !< Node.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (associated(list%next)) then
-    call free_node(list=list%next)
-    deallocate(list%next)
+  if (associated(node%next)) then
+    call free_node(node=node%next)
+    deallocate(node%next)
   endif
-  if (allocated( list%ID)) deallocate(list%ID)
-  if (associated(list%d )) deallocate(list%d )
-  list%d    => null()
-  list%next => null()
+  if (allocated( node%ID)) deallocate(node%ID)
+  if (associated(node%d )) deallocate(node%d )
+  node%d    => null()
+  node%next => null()
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine free_node_rec
 
-  !> @brief Procedure for freeing (destroying) the list.
-  elemental subroutine free_node(list)
+  !> @brief Procedure for freeing (destroying) the node (list).
+  elemental subroutine free_node(node)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Tree_Node), intent(INOUT):: list !< List.
-  class(Type_Tree_Node), pointer::       n,c  !< Pointers for scanning the list.
+  class(Type_Tree_Node), intent(INOUT):: node !< Node.
+  class(Type_Tree_Node), pointer::       n,c  !< Pointers for scanning the node list.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  do while(associated(list%next))
-    c => list%next
+  do while(associated(node%next))
+    c => node%next
     if (associated(c%next)) then
       ! list has at least 3 nodes
       n => c%next
@@ -279,68 +342,68 @@ contains
       if (allocated( c%ID)) deallocate(c%ID)
       if (associated(c%d )) deallocate(c%d )
       deallocate(c)
-      list%next => null()
+      node%next => null()
     endif
   enddo
-  if (allocated( list%ID)) deallocate(list%ID)
-  if (associated(list%d )) deallocate(list%d )
-  list%d    => null()
+  if (allocated( node%ID)) deallocate(node%ID)
+  if (associated(node%d )) deallocate(node%d )
+  node%d => null()
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine free_node
 
   !> @brief Procedure for freeing dynamic memory when finalizing.
-  elemental subroutine finalize_node(list)
+  elemental subroutine finalize_node(node)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  type(Type_Tree_Node), intent(INOUT):: list !< List.
+  type(Type_Tree_Node), intent(INOUT):: node !< Node.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  call list%free
+  call node%free
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine finalize_node
 
-  !> @brief Procedure for returning the ID-th node pointer of the list.
+  !> @brief Procedure for returning the ID-th node pointer of the node list.
   !> @note If ID key is not present a null pointer is returned.
-  function node_node(list,ID) result(n)
+  function node_node(node,ID) result(n)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Tree_Node), target, intent(IN):: list !< List.
+  class(Type_Tree_Node), target, intent(IN):: node !< Node.
   integer(I8P),                  intent(IN):: ID   !< Unique key of the node of the list to be found.
   type(Type_Tree_Node), pointer::             n    !< Pointer to "ID-th" node of the list.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  n => list
-  scan_list: do
+  n => node
+  scan_node: do
     if (allocated(n%ID)) then
-      if (n%ID==ID) exit scan_list
+      if (n%ID==ID) exit scan_node
     elseif (associated(n%next)) then
       n => n%next
     else
       n => null()
-      exit scan_list
+      exit scan_node
     endif
-  enddo scan_list
+  enddo scan_node
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction node_node
 
-  !> @brief Procedure for returning the data pointer of the ID-th node of the list.
+  !> @brief Procedure for returning the data pointer of the ID-th node of the node list.
   !> @note If ID key is not present a null pointer is returned.
-  function dat_node(list,ID) result(d)
+  function dat_node(node,ID) result(d)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Tree_Node), target, intent(IN):: list  !< List.
+  class(Type_Tree_Node), target, intent(IN):: node  !< Node.
   integer(I8P),                  intent(IN):: ID    !< Unique key of the node of the list to be found.
   class(*), pointer::                         d     !< Pointer to the data of the "ID-th" node of the list.
   type(Type_Tree_Node), pointer::             n     !< Pointer to "ID-th" node of the list.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  n=>list%node(ID=ID)
+  n=>node%node(ID=ID)
   if (associated(n)) then
     d=>n%d
   else
@@ -350,70 +413,70 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction dat_node
 
-  !> @brief Procedure for inserting data into the ID-th node of the list. If a node with the provided ID is not present into the
-  !> list a new one is created.
-  recursive subroutine put_node(list,ID,d)
+  !> @brief Procedure for inserting data into the ID-th node of the node list. If a node with the provided ID is not present into
+  !> the list a new one is created.
+  recursive subroutine put_node(node,ID,d)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Tree_Node), intent(INOUT):: list !< List.
+  class(Type_Tree_Node), intent(INOUT):: node !< Node.
   integer(I8P),          intent(IN)::    ID   !< ID (unique) of the current node.
   class(*),              intent(IN)::    d    !< Data of the ID-th node.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (.not.allocated(list%ID)) then
-    allocate(list%ID,source=ID)
-    if (associated(list%d)) deallocate(list%d) ; allocate(list%d,source=d)
+  if (.not.allocated(node%ID)) then
+    allocate(node%ID,source=ID)
+    if (associated(node%d)) deallocate(node%d) ; allocate(node%d,source=d)
     return
   endif
-  if (list%ID==ID) then
-    if (associated(list%d)) deallocate(list%d) ; allocate(list%d,source=d)
+  if (node%ID==ID) then
+    if (associated(node%d)) deallocate(node%d) ; allocate(node%d,source=d)
     return
   endif
   ! tail recursion
-  if (.not.associated(list%next)) allocate(list%next)
-  call put_node(list=list%next,ID=ID,d=d)
+  if (.not.associated(node%next)) allocate(node%next)
+  call put_node(node=node%next,ID=ID,d=d)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine put_node
 
-  !> @brief Procedure for getting data from the ID-th node of the list. If the requested node ID is not present, the output data
-  !> is returned in deallocated form.
-  recursive subroutine get_node(list,ID,d)
+  !> @brief Procedure for getting data from the ID-th node of the node list. If the requested node ID is not present, the output
+  !> data is returned in deallocated form.
+  recursive subroutine get_node(node,ID,d)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Tree_Node), intent(IN)::  list !< Llist.
+  class(Type_Tree_Node), intent(IN)::  node !< Node.
   integer(I8P),          intent(IN)::  ID   !< ID (unique) of the current node.
   class(*), allocatable, intent(OUT):: d    !< Data of the ID-th node.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   if (allocated(d)) deallocate(d)
-  if (allocated(list%ID)) then
-    if (list%ID==ID) then
-      allocate(d,source=list%d)
+  if (allocated(node%ID)) then
+    if (node%ID==ID) then
+      allocate(d,source=node%d)
       return
     endif
   endif
-  if (associated(list%next)) then
-    call get_node(list=list%next,ID=ID,d=d)
+  if (associated(node%next)) then
+    call get_node(node=node%next,ID=ID,d=d)
   endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine get_node
 
-  !> @brief Procedure for deleting the ID-th node of the list.
-  subroutine del_node(list,ID)
+  !> @brief Procedure for deleting the ID-th node of the node list.
+  subroutine del_node(node,ID)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Tree_Node), target, intent(INOUT):: list !< List.
+  class(Type_Tree_Node), target, intent(INOUT):: node !< Node.
   integer(I8P),                  intent(IN)::    ID   !< ID (unique) of the node.
   type(Type_Tree_Node), pointer::                c,n  !< Pointers for scanning the list.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  c => list
-  scan_list: do while(associated(c))
+  c => node
+  scan_node: do while(associated(c))
     n => c%next
     if (allocated(c%ID)) then
       if (c%ID==ID) then
@@ -433,27 +496,27 @@ contains
           deallocate(c%ID)
           c%next => null()
         endif
-        exit scan_list
+        exit scan_node
       endif
     endif
     c => n
-  enddo scan_list
+  enddo scan_node
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endsubroutine del_node
 
-  !> @brief Procedure for computing the length of the list.
-  function length_node(list) result(Nn)
+  !> @brief Procedure for computing the length of the node list.
+  function length_node(node) result(Nn)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Tree_Node), intent(IN):: list !< List.
+  class(Type_Tree_Node), intent(IN):: node !< Node.
   integer(I4P)::                      Nn   !< Nodes number.
   type(Type_Tree_Node), pointer::     n    !< Pointer for scanning the list.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  Nn = 0 ; if (associated(list%d)) Nn = 1
-  n => list%next
+  Nn = 0 ; if (associated(node%d)) Nn = 1
+  n => node%next
   do while (associated(n))
     if (associated(n%d)) then
       Nn = Nn + 1
@@ -466,19 +529,19 @@ contains
   endfunction length_node
 
   !> @brief Procedure for getting the list of actually stored IDs.
-  pure subroutine getIDs_node(list,IDs)
+  pure subroutine getIDs_node(node,IDs)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Tree_Node), intent(INOUT):: list    !< List.
+  class(Type_Tree_Node), intent(INOUT):: node    !< Node.
   integer(I8P),          intent(INOUT):: IDs(1:) !< List of actually stored IDs.
   type(Type_Tree_Node), pointer::        n       !< Pointer for list scanning.
   integer(I4P)::                         i       !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (allocated(list%ID)) IDs(1)=list%ID
+  if (allocated(node%ID)) IDs(1)=node%ID
   i=1
-  n=>list%next
+  n=>node%next
   do while(associated(n))
     if (allocated(n%ID)) then
       i=i+1
@@ -491,11 +554,10 @@ contains
   endsubroutine getIDs_node
 
   !> @brief Procedure for printing IDs list with a pretty format.
-  subroutine print_node(list,Na,ref_ratio,pref,iostat,iomsg,unit)
+  subroutine print_node(node,ref_ratio,pref,iostat,iomsg,unit)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Tree_Node), target, intent(IN)::  list               !< List.
-  integer(I4P),                  intent(IN)::  Na                 !< Number of ancestors.
+  class(Type_Tree_Node), target, intent(IN)::  node               !< Node.
   integer(I4P),                  intent(IN)::  ref_ratio          !< Refinement ratio.
   character(*), optional,        intent(IN)::  pref               !< Prefixing string.
   integer(I4P), optional,        intent(OUT):: iostat             !< IO error.
@@ -513,19 +575,19 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   prefd = '' ; if (present(pref)) prefd = pref
-  n => list
+  n => node
   do while(allocated(n%ID))
     write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//' ID: '//trim(str(.true.,n%ID))
     write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//'   Level:            '//&
-      trim(str(.true.,n%ref_level(Na=Na,ref_ratio=ref_ratio)))
+      trim(str(.true.,n%ref_level(ref_ratio=ref_ratio)))
     write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//'   Local index:      '//&
-      trim(str(.true.,n%child_number(Na=Na,ref_ratio=ref_ratio)))
+      trim(str(.true.,n%child_number(ref_ratio=ref_ratio)))
     write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//'   Parent-ID:        '//&
-      trim(str(.true.,n%parent_ID(Na=Na,ref_ratio=ref_ratio)))
+      trim(str(.true.,n%parent_ID(ref_ratio=ref_ratio)))
     write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//'   Children-IDs:     '//&
-      trim(str(.true.,n%child_ID(Na=Na,ref_ratio=ref_ratio,i=1)))//'-'//&
-      trim(str(.true.,n%child_ID(Na=Na,ref_ratio=ref_ratio,i=ref_ratio)))
-    path = n%path_IDs(Na=Na,ref_ratio=ref_ratio)
+      trim(str(.true.,n%child_ID(ref_ratio=ref_ratio,i=1)))//'-'//&
+      trim(str(.true.,n%child_ID(ref_ratio=ref_ratio,i=ref_ratio)))
+    path = n%path_IDs(ref_ratio=ref_ratio)
     string = trim(str(.true.,path(1)))
     if (size(path)>1) then
       do i=2,size(path)
@@ -533,7 +595,7 @@ contains
       enddo
     endif
     write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//'   Path-IDs-to-root: '//trim(string)
-    sib = n%siblings_IDs(Na=Na,ref_ratio=ref_ratio)
+    sib = n%siblings_IDs(ref_ratio=ref_ratio)
     string = trim(str(.true.,sib(1)))
     if (size(sib)>1) then
       do i=2,size(sib)
@@ -554,44 +616,41 @@ contains
   endsubroutine print_node
 
   !> @brief Procedure for computing the parent ID.
-  elemental function parent_ID_node(node,Na,ref_ratio) result(p)
+  elemental function parent_ID_node(node,ref_ratio) result(p)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tree_Node), intent(IN):: node      !< Node.
-  integer(I4P),          intent(IN):: Na        !< Number of ancestors.
   integer(I4P),          intent(IN):: ref_ratio !< Refinement ratio.
   integer(I8P)::                      p         !< Block-ID of block's parent.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  p = int(real(node%ID-1_I8P-(Na-ref_ratio))/ref_ratio,kind=I8P)
+  p = int(real(node%ID-1_I8P-(1_I8P-ref_ratio))/ref_ratio,kind=I8P)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction parent_ID_node
 
   !> @brief Procedure for computing the children IDs.
-  elemental function child_ID_node(node,Na,ref_ratio,i) result(c)
+  elemental function child_ID_node(node,ref_ratio,i) result(c)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tree_Node), intent(IN):: node      !< Node.
-  integer(I4P),          intent(IN):: Na        !< Number of ancestors.
   integer(I4P),          intent(IN):: ref_ratio !< Refinement ratio.
   integer(I4P),          intent(IN):: i         !< Index of i-th child [1,ref_ratio].
   integer(I8P)::                      c         !< ID of node's i-th child.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  c = ref_ratio*node%ID+i+Na-ref_ratio
+  c = ref_ratio*node%ID + i + 1_I8P - ref_ratio
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction child_ID_node
 
   !> @brief Procedure for computing the IDs of siblings nodes.
-  pure function siblings_IDs_node(node,Na,ref_ratio) result(sib)
+  pure function siblings_IDs_node(node,ref_ratio) result(sib)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tree_Node), intent(IN):: node               !< Node.
-  integer(I4P),          intent(IN):: Na                 !< Number of ancestors.
   integer(I4P),          intent(IN):: ref_ratio          !< Refinement ratio.
   integer(I8P)::                      sib(1:ref_ratio-1) !< Siblings IDs.
   integer(I4P)::                      local,start        !< Local number of node [1,ref_ratio].
@@ -599,7 +658,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  local = node%child_number(Na=Na,ref_ratio=ref_ratio)
+  local = node%child_number(ref_ratio=ref_ratio)
   start = node%ID-local+1
   s = 0
   do i = 1,ref_ratio
@@ -613,31 +672,29 @@ contains
   endfunction siblings_IDs_node
 
   !> @brief Procedure for computing the local number in the children numbering [1,ref_ratio].
-  elemental function child_number_node(node,Na,ref_ratio) result(c)
+  elemental function child_number_node(node,ref_ratio) result(c)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tree_Node), intent(IN):: node      !< Node.
-  integer(I4P),          intent(IN):: Na        !< Number of ancestors.
   integer(I4P),          intent(IN):: ref_ratio !< Refinement ratio.
   integer(I4P)::                      c         !< Index of child [1,ref_ratio].
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  if (node%ID<=Na) then
+  if (node%ID==1_I8P) then
     c = int(node%ID,I4P)
   else
-    c = int(node%ID-(Na-ref_ratio) - ((node%ID-1_I8P-(Na-ref_ratio))/ref_ratio)*ref_ratio,kind=I4P)
+    c = int(node%ID-(1_I8P-ref_ratio) - ((node%ID-1_I8P-(1_I8P-ref_ratio))/ref_ratio)*ref_ratio,kind=I4P)
   endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction child_number_node
 
   !> @brief Procedure for computing the refinement level.
-  elemental function ref_level_node(node,Na,ref_ratio) result(l)
+  elemental function ref_level_node(node,ref_ratio) result(l)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tree_Node), intent(IN):: node      !< Node.
-  integer(I4P),          intent(IN):: Na        !< Number of ancestors.
   integer(I4P),          intent(IN):: ref_ratio !< Refinement ratio.
   integer(I4P)::                      l         !< Refinement level.
   integer(I8P)::                      i         !< Counter.
@@ -648,18 +705,17 @@ contains
   i = node%ID
   do while (i>0)
     l = l + 1
-    i = (i-1-(Na-ref_ratio))/ref_ratio
+    i = (i-1-(1_I8P-ref_ratio))/ref_ratio
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ref_level_node
 
-  !> @brief Procedure for computing path-IDs through the list from node to its ancestor node (root level).
-  pure function path_IDs_node(node,Na,ref_ratio) result(path)
+  !> @brief Procedure for computing path-IDs through the nodes list from node to its ancestor node (root level).
+  pure function path_IDs_node(node,ref_ratio) result(path)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tree_Node), intent(IN):: node      !< Node.
-  integer(I4P),          intent(IN):: Na        !< Number of ancestors.
   integer(I4P),          intent(IN):: ref_ratio !< Refinement ratio.
   integer(I8P), allocatable::         path(:)   !< Path-IDs from node to root.
   integer(I8P), allocatable::         temp(:)   !< Temporary Path-IDs.
@@ -670,35 +726,34 @@ contains
   if (allocated(node%ID)) then
     n%ID = node%ID
     path = [node%ID]
-    do while(n%ref_level(Na=Na,ref_ratio=ref_ratio)>1)
+    do while(n%ref_level(ref_ratio=ref_ratio)>1)
       allocate(temp(1:size(path)+1))
       temp(1:size(path)) = path
-      temp(size(path)+1) = n%parent_ID(Na=Na,ref_ratio=ref_ratio)
+      temp(size(path)+1) = n%parent_ID(ref_ratio=ref_ratio)
       call move_alloc(from=temp,to=path)
-      n%ID = n%parent_ID(Na=Na,ref_ratio=ref_ratio)
+      n%ID = n%parent_ID(ref_ratio=ref_ratio)
     enddo
   endif
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction path_IDs_node
 
-  !> @brief Procedure for computing the maximum refinement level of the list.
-  elemental subroutine max_level_node(list,Na,ref_ratio,ref_max)
+  !> @brief Procedure for computing the maximum refinement level of the nodes list.
+  elemental subroutine max_level_node(node,ref_ratio,ref_max)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Tree_Node), intent(INOUT):: list      !< List.
-  integer(I4P),          intent(IN)::    Na        !< Number of ancestors.
+  class(Type_Tree_Node), intent(INOUT):: node      !< Node.
   integer(I4P),          intent(IN)::    ref_ratio !< Refinement ratio.
   integer(I4P),          intent(OUT)::   ref_max   !< Maximum refinement level.
   type(Type_Tree_Node), pointer::        n         !< Pointer for scanning the list.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  ref_max = 0 ; if (allocated(list%ID)) ref_max = list%ref_level(Na=Na,ref_ratio=ref_ratio)
-  n => list%next
+  ref_max = 0 ; if (allocated(node%ID)) ref_max = node%ref_level(ref_ratio=ref_ratio)
+  n => node%next
   do while (associated(n))
     if (allocated(n%ID)) then
-      ref_max = max(ref_max,n%ref_level(Na=Na,ref_ratio=ref_ratio))
+      ref_max = max(ref_max,n%ref_level(ref_ratio=ref_ratio))
     endif
     n => n%next
   enddo
@@ -757,32 +812,35 @@ contains
   endfunction hash
 
   !> @brief Procedure for initializing the Tree.
-  elemental subroutine init_tree(tree,source,leng,Na,ref_ratio,myrank,parts)
+  elemental subroutine init_tree(tree,source,leng,ref_ratio,myrank,parts,ID,connectivity)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_Tree),          intent(INOUT):: tree      !< Tree.
-  type(Type_Tree), optional, intent(IN)::    source    !< Source prototype for initialization.
-  integer(I4P),    optional, intent(IN)::    leng      !< Length of the Tree.
-  integer(I4P),    optional, intent(IN)::    Na        !< Number of ancestor nodes.
-  integer(I4P),    optional, intent(IN)::    ref_ratio !< Refinement ratio.
-  integer(I4P),    optional, intent(IN)::    myrank    !< Current MPI partition (process).
-  integer(I4P),    optional, intent(IN)::    parts     !< MPI partitions into which the tree is partitioned.
+  class(Type_Tree),                       intent(INOUT):: tree         !< Tree.
+  type(Type_Tree),              optional, intent(IN)::    source       !< Source prototype for initialization.
+  integer(I4P),                 optional, intent(IN)::    leng         !< Length of the Tree.
+  integer(I4P),                 optional, intent(IN)::    ref_ratio    !< Refinement ratio.
+  integer(I4P),                 optional, intent(IN)::    myrank       !< Current MPI partition (process).
+  integer(I4P),                 optional, intent(IN)::    parts        !< MPI partitions into which the tree is partitioned.
+  integer(I8P),                 optional, intent(IN)::    ID           !< ID of the tree for forest of trees handling.
+  type(Type_Tree,connectivity), optional, intent(IN)::    connectivity !< Inter-tree connectivity.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   call tree%free
   if (present(source)) then
-    tree%leng      = source%leng
-    tree%Na        = source%Na
-    tree%ref_ratio = source%ref_ratio
-    tree%myrank    = source%myrank
-    tree%parts     = source%parts
+    tree%leng         = source%leng
+    tree%ref_ratio    = source%ref_ratio
+    tree%myrank       = source%myrank
+    tree%parts        = source%parts
+    tree%ID           = source%ID
+    tree%connectivity = source%connectivity
   else
-    tree%leng      = ht_leng_def   ; if (present(leng     )) tree%leng      = leng
-    tree%Na        = Na_def        ; if (present(Na       )) tree%Na        = Na
-    tree%ref_ratio = ref_ratio_def ; if (present(ref_ratio)) tree%ref_ratio = ref_ratio
-    tree%myrank    = myrank_def    ; if (present(myrank   )) tree%myrank    = myrank
-    tree%parts     = parts_def     ; if (present(parts    )) tree%parts     = parts
+    tree%leng      = ht_leng_def   ; if (present(leng        )) tree%leng         = leng
+    tree%ref_ratio = ref_ratio_def ; if (present(ref_ratio   )) tree%ref_ratio    = ref_ratio
+    tree%myrank    = myrank_def    ; if (present(myrank      )) tree%myrank       = myrank
+    tree%parts     = parts_def     ; if (present(parts       )) tree%parts        = parts
+                                     if (present(ID          )) tree%ID           = ID
+                                     if (present(connectivity)) tree%connectivity = connectivity
   endif
   allocate(tree%ht(0:tree%leng-1))
   allocate(tree%First_IDs(0:tree%parts-1))
@@ -806,6 +864,8 @@ contains
     enddo
     deallocate(tree%ht)
   endif
+  if (allocated(tree%First_IDs)) deallocate(tree%First_IDs)
+  if (allocated(tree%Last_IDs )) deallocate(tree%Last_IDs )
   tree%leng = 0_I4P
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1044,8 +1104,7 @@ contains
   objnamed = 'nodes' ; if (present(objname)) objnamed = objname
   prefd = '' ; if (present(pref)) prefd = pref
   if (allocated(tree%ht)) then
-    write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//' Number of ancestor '//trim(objnamed)//' '//&
-      trim(str(.true.,tree%Na))
+    write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//' Tree ID '//trim(str(.true.,tree%ID))
     write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//' Refinement ratio '//trim(str(.true.,tree%ref_ratio))
     write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//' MAX refinement level '//trim(str(.true.,tree%ref_max))
     if (tree%ref_max>1) then
@@ -1066,7 +1125,7 @@ contains
     if (verb) then
       write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//' Stored '//trim(objnamed)//' topology'
       do b=lbound(tree%ht,dim=1),ubound(tree%ht,dim=1)
-        call tree%ht(b)%print(Na=tree%Na,ref_ratio=tree%ref_ratio,pref=prefd//"    ",iostat=iostatd,iomsg=iomsgd,unit=unit)
+        call tree%ht(b)%print(ref_ratio=tree%ref_ratio,pref=prefd//"    ",iostat=iostatd,iomsg=iomsgd,unit=unit)
       enddo
     endif
   else
@@ -1090,7 +1149,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   n => tree%node(ID=ID)
-  p = -1 ; if (associated(n)) p = n%parent_ID(Na=tree%Na,ref_ratio=tree%ref_ratio)
+  p = -1 ; if (associated(n)) p = n%parent_ID(ref_ratio=tree%ref_ratio)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction parent_ID_tree
@@ -1108,7 +1167,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   n => tree%node(ID=ID)
-  c = -1 ; if (associated(n)) c = n%child_ID(Na=tree%Na,ref_ratio=tree%ref_ratio,i=i)
+  c = -1 ; if (associated(n)) c = n%child_ID(ref_ratio=tree%ref_ratio,i=i)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction child_ID_tree
@@ -1125,7 +1184,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   n => tree%node(ID=ID)
-  sib = -1 ; if (associated(n)) sib = n%siblings_IDs(Na=tree%Na,ref_ratio=tree%ref_ratio)
+  sib = -1 ; if (associated(n)) sib = n%siblings_IDs(ref_ratio=tree%ref_ratio)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction siblings_IDs_tree
@@ -1142,7 +1201,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   n => tree%node(ID=ID)
-  c = -1 ; if (associated(n)) c = n%child_number(Na=tree%Na,ref_ratio=tree%ref_ratio)
+  c = -1 ; if (associated(n)) c = n%child_number(ref_ratio=tree%ref_ratio)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction child_number_tree
@@ -1159,7 +1218,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   n => tree%node(ID=ID)
-  l = -1 ; if (associated(n)) l = n%ref_level(Na=tree%Na,ref_ratio=tree%ref_ratio)
+  l = -1 ; if (associated(n)) l = n%ref_level(ref_ratio=tree%ref_ratio)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction ref_level_tree
@@ -1176,7 +1235,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   n => tree%node(ID=ID)
-  if (associated(n)) path = n%path_IDs(Na=tree%Na,ref_ratio=tree%ref_ratio)
+  if (associated(n)) path = n%path_IDs(ref_ratio=tree%ref_ratio)
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction path_IDs_tree
@@ -1197,7 +1256,7 @@ contains
   if (level>1) then
     do l=2,level
       node%ID = firstID
-      firstID = node%child_ID(Na=tree%Na,ref_ratio=tree%ref_ratio,i=1)
+      firstID = node%child_ID(ref_ratio=tree%ref_ratio,i=1)
     enddo
   endif
   return
@@ -1216,11 +1275,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  lastID = tree%Na
+  lastID = 1_I8P
   if (level>1) then
     do l=2,level
       node%ID = lastID
-      lastID = node%child_ID(Na=tree%Na,ref_ratio=tree%ref_ratio,i=tree%ref_ratio)
+      lastID = node%child_ID(ref_ratio=tree%ref_ratio,i=tree%ref_ratio)
     enddo
   endif
   return
@@ -1228,7 +1287,7 @@ contains
   endfunction last_ID_tree
 
   !> @brief Procedure for computing coordinate of ID.
-  pure function coord_ID_tree(node) result(coord)
+  pure function coord_ID_tree(tree,ID) result(coord)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tree), intent(IN)::  tree       !< Tree.
@@ -1242,26 +1301,28 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  coord = 0_I4P
-  n => tree%node(ID=ID)
-  if (associated(n)) then
-    coord(4) = tree%ref_level(ID=ID)
-    fak(1)   = 1
-    fak(2)   = 2
-    fak(3)   = 4
-    bitlevel = 1
-    IDd = ID - tree%first_ID(level=coord(4))
-    do while ((IDd / fak(1)) > 0)
-      do i=1,3
-        coord(i) = coord(i) + bitlevel * int(mod(IDd / fak(i), 2_I8P))
-      enddo
-      bitlevel = bitlevel * 2
-      fak = fak * 8
-    enddo
-  endif
+  ! coord = 0_I4P
+  ! n => tree%node(ID=ID)
+  ! if (associated(n)) then
+  !   coord(4) = tree%ref_level(ID=ID)
+  !   fak(1)   = 1
+  !   fak(2)   = 2
+  !   fak(3)   = 4
+  !   bitlevel = 1
+  !   IDd = ID - tree%first_ID(level=coord(4))
+  !   do while ((IDd / fak(1)) > 0)
+  !     do i=1,3
+  !       coord(i) = coord(i) + bitlevel * int(mod(IDd / fak(i), 2_I8P))
+  !     enddo
+  !     bitlevel = bitlevel * 2
+  !     fak = fak * 8
+  !   enddo
+  ! endif
+  coord = 1
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction coord_ID_tree
+
   !> @brief Procedure for computing the maximum refinement level of the tree.
   elemental subroutine get_max_level_tree(tree)
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1275,9 +1336,8 @@ contains
   tree%ref_max = 0
   if (allocated(tree%ht)) THEN
     do b=lbound(tree%ht,dim=1),ubound(tree%ht,dim=1)
-       call tree%ht(b)%max_level(Na=tree%Na,ref_ratio=tree%ref_ratio,ref_max=rm)
+       call tree%ht(b)%max_level(ref_ratio=tree%ref_ratio,ref_max=rm)
        tree%ref_max = max(tree%ref_max,rm)
-       !tree%ref_max = max(tree%ref_max,tree%ht(b)%max_level(Na=tree%Na,ref_ratio=tree%ref_ratio))
     enddo
   endif
   return
@@ -1299,8 +1359,54 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction linearID_tree
 
-  !> @brief Procedure for casting Na and ref_ratio to string.
-  elemental function str_Na_ref_ratio(tree) result(string)
+  !> @brief Procedure for
+  elemental function exist_ID_tree(tree,ID) result(exist)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Tree), intent(IN):: tree                      !< Tree.
+  integer(I8P),     intent(IN):: ID                        !< ID (unique) of the node which existance must be inquired.
+  logical::                      exist                     !< Inquiring flag.
+#ifdef _MPI
+  logical, allocatable::         exist_in_part(:)          !< Inquiring flags from other partitions [0:tree%parts-1].
+  integer(I4P)::                 part                      !< Partitions (processes) counter.
+  integer(I4P)::                 err,stat(MPI_STATUS_SIZE) !< MPI error flags.
+#endif
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  exist = .false.
+  if (allocated(tree%IDs)) exist = any(treeIDs==ID)
+#ifdef _MPI
+  allocate(exist_in_part(0:tree%parts-1))
+  exist_in_part(tree%myrank) = exist
+  do part=0,tree%parts-1
+    call MPI_SENDRECV(exist_in_part(tree%myrank),1,MPI_LOGICAL,part,tree%parts*(tree%myrank+1)*2, &
+                      exist_in_part(part       ),1,MPI_LOGICAL,part,tree%parts*(part       +1)*2, &
+                      MPI_COMM_WORLD,stat,err)
+  enddo
+  exist = any(exist_in_part)
+  deallocate(exist_in_part)
+#endif
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction exist_ID_tree
+
+  !> @brief Procedure for computing the IDs of neighbors nodes.
+  pure function neighbors_IDs_tree(tree,ID) result(neig)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  class(Type_Tree), intent(IN)::  tree                     !< Tree.
+  integer(I8P),     intent(IN)::  ID                       !< ID (unique) of the node.
+  integer(I8P)::                  neig(1:tree%ref_ratio-1) !< Neighbors IDs.
+  !----------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction neighbors_IDs_tree
+
+  !> @brief Procedure for casting ref_ratio to string.
+  elemental function str_ref_ratio(tree) result(string)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tree), intent(IN)::     tree   !< Tree.
@@ -1308,10 +1414,10 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
-  string = 'ancestors_number="'//trim(str(n=tree%Na))//'" refinement_ratio="'//trim(str(n=tree%ref_ratio))//'"'
+  string = 'refinement_ratio="'//trim(str(n=tree%ref_ratio))//'"'
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction str_Na_ref_ratio
+  endfunction str_ref_ratio
 
   ! Assignment (=)
   !> @brief Procedure for assignment between two trees variables.
@@ -1319,7 +1425,7 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Tree), intent(INOUT):: tree1 !< LHS.
-  type(Type_Tree),  intent(INOUT)::    tree2 !< RHS.
+  type(Type_Tree),  intent(INOUT):: tree2 !< RHS.
   integer(I4P)::                    b     !< Bucket counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -1332,7 +1438,6 @@ contains
     enddo
   endif
   tree1%leng      = tree2%leng
-  tree1%Na        = tree2%Na
   tree1%ref_ratio = tree2%ref_ratio
   tree1%ref_max   = tree2%ref_max
   if (allocated(tree2%IDs)) allocate(tree1%IDs,source=tree2%IDs)

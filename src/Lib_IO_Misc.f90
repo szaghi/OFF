@@ -40,16 +40,18 @@ private
 public:: stdout,stderr,iostat_end,iostat_eor
 public:: Get_Unit
 public:: get_extension,set_extension
-public:: inquire_dir
 public:: read_file_as_stream
 public:: lc_file
 public:: File_Not_Found
 public:: Dir_Not_Found
+public:: inquire_file
+public:: inquire_dir
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 !> @ingroup Lib_IO_MiscGlobalVarPar
-integer(I4P), public, parameter:: err_file_not_found = 10100 !< File not found error ID.
+integer(I4P), public, parameter:: err_file_not_found      = 20100 !< File not found error ID.
+integer(I4P), public, parameter:: err_directory_not_found = 20101 !< Directory not found error ID.
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
   !> @ingroup Lib_IO_MiscPublicProcedure
@@ -127,46 +129,6 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction set_extension
-
-  !> @brief Procedure for inquiring the presence of a directory.
-  !> @return \b err integer(I_P) variable for error trapping.
-  !> @note The leading and trealing spaces are removed from the directory name.
-  function inquire_dir(myrank,errmsg,directory) result(err)
-  !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  integer(I4P), intent(IN),  optional:: myrank    !< Actual rank process necessary for concurrent multi-processes calls.
-  character(*), intent(OUT), optional:: errmsg    !< Explanatory message if an I/O error occurs.
-  character(*), intent(IN)::            directory !< Name of the directory that must be created.
-  integer(I4P)::                        err       !< Error trapping flag: 0 no errors, >0 error occurs.
-  integer(I4P)::                        UnitFree  !< Free logic unit.
-  !---------------------------------------------------------------------------------------------------------------------------------
-
-  !---------------------------------------------------------------------------------------------------------------------------------
-  ! Creating a test file in the directory for inquiring its presence.
-  if (present(myrank)) then
-    if (present(errmsg)) then
-      open(unit=Get_Unit(UnitFree),file=adjustl(trim(directory))//'ExiSt.p'//trim(strz(5,myrank)),iostat=err,iomsg=errmsg)
-    else
-      open(unit=Get_Unit(UnitFree),file=adjustl(trim(directory))//'ExiSt.p'//trim(strz(5,myrank)),iostat=err)
-    endif
-  else
-    if (present(errmsg)) then
-      open(unit=Get_Unit(UnitFree),file=adjustl(trim(directory))//'ExiSt.p'//trim(strz(5,0)),iostat=err,iomsg=errmsg)
-    else
-      open(unit=Get_Unit(UnitFree),file=adjustl(trim(directory))//'ExiSt.p'//trim(strz(5,0)),iostat=err)
-    endif
-  endif
-  ! Deletig the test file if successfully created.
-  if (err==0_I4P) then
-    if (present(errmsg)) then
-      close(UnitFree,status='DELETE',iomsg=errmsg)
-    else
-      close(UnitFree,status='DELETE')
-    endif
-  endif
-  return
-  !---------------------------------------------------------------------------------------------------------------------------------
-  endfunction inquire_dir
 
   !> @brief Procedure for reading a file as single characters stream.
   subroutine read_file_as_stream(pref,iostat,iomsg,delimiter_start,delimiter_end,filename,stream)
@@ -323,12 +285,13 @@ contains
   endfunction File_Not_Found
 
   !> @brief Subroutine for printing to stderr a "directory not found error".
-  subroutine Dir_Not_Found(stderrpref,dirname,cpn)
+  function Dir_Not_Found(stderrpref,dirname,cpn) result(err)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   character(*), optional, intent(IN):: stderrpref !< Prefixing string for stderr outputs.
-  character(*), intent(IN)::           dirname    !< Name of directory.
-  character(*), intent(IN)::           cpn        !< Calling procedure name.
+  character(*),           intent(IN):: dirname    !< Name of directory.
+  character(*),           intent(IN):: cpn        !< Calling procedure name.
+  integer(I4P)::                       err        !< Error trapping flag: 0 no errors, >0 error occurs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -339,8 +302,73 @@ contains
     write(stderr,'(A)')            ' Directory '//adjustl(trim(dirname))//' Not Found!'
     write(stderr,'(A)')            ' Calling procedure "'//adjustl(trim(cpn))//'"'
   endif
+  err = err_directory_not_found
   return
   !---------------------------------------------------------------------------------------------------------------------------------
-  endsubroutine Dir_Not_Found
+  endfunction Dir_Not_Found
+
+  !> @brief Procedure for inquiring the presence of a file.
+  !> @note The leading and trealing spaces are removed from the directory name.
+  subroutine inquire_file(cpn,pref,iostat,iomsg,file)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(*), optional, intent(IN)::  cpn     !< Calling procedure name.
+  character(*), optional, intent(IN)::  pref    !< Prefixing string.
+  integer(I4P), optional, intent(OUT):: iostat  !< IO error.
+  character(*), optional, intent(OUT):: iomsg   !< IO error message.
+  character(*),           intent(IN)::  file    !< Name of the file.
+  integer(I4P)::                        iostatd !< IO error.
+  character(500)::                      iomsgd  !< IO error message.
+  character(len=:), allocatable::       prefd   !< Prefixing string.
+  character(len=:), allocatable::       cpnd    !< Calling procedure name.
+  logical::                             is_file !< Flag for inquiring the presence of file.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  cpnd  = 'inquire_file' ; if (present(cpn )) cpnd  = cpn
+  prefd = ''             ; if (present(pref)) prefd = pref
+  inquire(file=trim(file),exist=is_file,iomsg=iomsgd)
+  if (.not.is_file) then
+    iostatd = File_Not_Found(stderrpref=prefd,filename=file,cpn=cpnd)
+  endif
+  if (present(iostat)) iostat = iostatd
+  if (present(iomsg))  iomsg  = iomsgd
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine inquire_file
+
+  !> @brief Procedure for inquiring the presence of a directory.
+  !> @note The leading and trealing spaces are removed from the directory name.
+  subroutine inquire_dir(cpn,pref,iostat,iomsg,directory)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(*), optional, intent(IN)::  cpn       !< Calling procedure name.
+  character(*), optional, intent(IN)::  pref      !< Prefixing string.
+  integer(I4P), optional, intent(OUT):: iostat    !< IO error.
+  character(*), optional, intent(OUT):: iomsg     !< IO error message.
+  character(*),           intent(IN)::  directory !< Name of the directory.
+  integer(I4P)::                        iostatd   !< IO error.
+  character(500)::                      iomsgd    !< IO error message.
+  character(len=:), allocatable::       prefd     !< Prefixing string.
+  character(len=:), allocatable::       cpnd      !< Calling procedure name.
+  integer(I4P)::                        unit      !< Unit file.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  cpnd  = 'inquire_dir' ; if (present(cpn )) cpnd  = cpn
+  prefd = ''            ; if (present(pref)) prefd = pref
+  ! Creating a test file in the directory for inquiring its presence.
+  open(unit=Get_Unit(unit),file=adjustl(trim(directory))//'ExiSt.'//prefd,iostat=iostatd,iomsg=iomsgd)
+  ! Deletig the test file if successfully created.
+  if (iostatd==0_I4P) then
+    close(unit,status='DELETE',iomsg=iomsgd)
+  else
+    iostatd = Dir_Not_Found(stderrpref=prefd,dirname=directory,cpn=cpnd)
+  endif
+  if (present(iostat)) iostat = iostatd
+  if (present(iomsg))  iomsg  = iomsgd
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endsubroutine inquire_dir
   !> @}
 endmodule Lib_IO_Misc

@@ -1,10 +1,10 @@
 [modes]
-modes = OFF-debug-1D-x  OFF-release-1D-x 
-        OFF-debug-2D-xy OFF-release-2D-xy 
+modes = OFF-debug-1D-x  OFF-release-1D-x
+        OFF-debug-2D-xy OFF-release-2D-xy
         OFF-debug-3D    OFF-release-3D
-        POG-debug-1D-x  POG-release-1D-x   
-        POG-debug-2D-xy POG-release-2D-xy  
-        POG-debug-3D    POG-release-3D     
+        POG-debug-1D-x  POG-release-1D-x
+        POG-debug-2D-xy POG-release-2D-xy
+        POG-debug-3D    POG-release-3D
         IBM-debug       IBM-release
 
 [common-variables]
@@ -46,37 +46,31 @@ output   = OFF
 
 [POG-debug-1D-x]
 template = template-debug-1D-x
-libs     = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
 target   = src/POG.f90
 output   = POG
 
 [POG-release-1D-x]
 template = template-release-1D-x-TECIO
-libs     = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
 target   = src/POG.f90
 output   = POG
 
 [POG-debug-2D-xy]
 template = template-debug-2D-xy
-libs     = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
 target   = src/POG.f90
 output   = POG
 
 [POG-release-2D-xy]
-template = template-release-2D-xy
-libs     = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
+template = template-release-2D-xy-TECIO
 target   = src/POG.f90
 output   = POG
 
 [POG-debug-3D]
 template = template-debug-3D
-libs     = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
 target   = src/POG.f90
 output   = POG
 
 [POG-release-3D]
-template = template-release-3D
-libs     = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
+template = template-release-3D-TECIO
 target   = src/POG.f90
 output   = POG
 
@@ -122,7 +116,7 @@ log       = False
 jobs      = 10
 
 [template-release-1D-x-TECIO]
-help      = Release mode, 1D along X
+help      = Release mode, 1D along X, with Tecplot libraries
 compiler  = intel
 cflags    = $CLFLAGS $OPTIMIZE $CFLAGS
 lflags    = $CLFLAGS $OPTIMIZE
@@ -135,6 +129,7 @@ colors    = True
 quiet     = False
 log       = False
 jobs      = 10
+libs      = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
 
 [template-debug-2D-xy]
 help      = Debug mode, 2D along XY
@@ -166,6 +161,22 @@ quiet     = False
 log       = False
 jobs      = 10
 
+[template-release-2D-xy-TECIO]
+help      = Release mode, 2D along XY, with Tecplot libraries
+compiler  = intel
+cflags    = $CLFLAGS $OPTIMIZE $CFLAGS
+lflags    = $CLFLAGS $OPTIMIZE
+preproc   = -DNULk -DSMSWz -DTECIO
+mod_dir   = ./mod/
+obj_dir   = ./obj/
+build_dir = ./
+src       = ./src/
+colors    = True
+quiet     = False
+log       = False
+jobs      = 10
+libs      = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
+
 [template-debug-3D]
 help      = Debug mode, 3D
 compiler  = intel
@@ -195,6 +206,22 @@ colors    = True
 quiet     = False
 log       = False
 jobs      = 10
+
+[template-release-3D-TECIO]
+help      = Release mode, 3D, with Tecplot libraries
+compiler  = intel
+cflags    = $CLFLAGS $OPTIMIZE $CFLAGS
+lflags    = $CLFLAGS $OPTIMIZE
+preproc   = -DSMSWz -DTECIO
+mod_dir   = ./mod/
+obj_dir   = ./obj/
+build_dir = ./
+src       = ./src/
+colors    = True
+quiet     = False
+log       = False
+jobs      = 10
+libs      = lib/64bit/libstdc++64.5.0.7.so lib/64bit/tecio64.a
 
 [rule-remakeall-release-1D-x]
 help = Rule for re-building OFF, POG and IBM in mode release-1D-x

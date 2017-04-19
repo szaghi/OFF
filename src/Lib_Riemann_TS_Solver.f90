@@ -58,7 +58,7 @@ contains
   endsubroutine TS_up23
 
   !> @brief Procedure for evaluating the fastest (1,4) waves speed using TS (Two Shocks) approximation.
-  elemental subroutine TS_compute_waves14_up(state1,state4,state23)
+  pure subroutine TS_compute_waves14_up(state1,state4,state23)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Riemann_Primitive1D),  intent(IN)::    state1  !< State 1 (left).

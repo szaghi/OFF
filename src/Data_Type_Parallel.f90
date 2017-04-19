@@ -157,13 +157,12 @@ contains
   !> @brief Procedure for computing BPmap.
   subroutine compute_BPmap_parallel(parallel,block_dims)
   !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_Parallel), intent(INOUT)::  parallel         !< Parallel data.
-  type(Type_Tree),      intent(IN)::     block_dims       !< Mesh dimensions.
-  type(Type_Block_Dimensions), pointer:: blkdims          !< Block dimensions pointer for scanning block_dims tree.
-  integer(I8P)::                         ID               !< Counter.
-  integer(I8P)::                         mesh_weight      !< Weight of mesh, sum over all blocks.
-  integer(I8P)::                         ideal_prc_weight !< Ideal Weight of each processes, optimal balance.
+  class(Type_Parallel), intent(INOUT) :: parallel         !< Parallel data.
+  type(Type_Tree),      intent(IN)    :: block_dims       !< Mesh dimensions.
+  class(*), pointer                   :: blkdims          !< Block dimensions pointer for scanning block_dims tree.
+  integer(I8P)                        :: ID               !< Counter.
+  integer(I8P)                        :: mesh_weight      !< Weight of mesh, sum over all blocks.
+  integer(I8P)                        :: ideal_prc_weight !< Ideal Weight of each processes, optimal balance.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -172,7 +171,10 @@ contains
     mesh_weight = 0
     do while(block_dims%loopID(ID=ID))
       blkdims => block_dims%dat(ID=ID)
-      mesh_weight = mesh_weight + blkdims%Ncells()
+      select type(blkdims)
+      type is(Type_Block_Dimensions)
+         mesh_weight = mesh_weight + blkdims%Ncells()
+      endselect
     enddo
     ideal_prc_weight = mesh_weight / Nproc
     print*,'cazzo parallel',ideal_prc_weight , mesh_weight

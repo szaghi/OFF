@@ -37,7 +37,7 @@ contains
   !> @ingroup Lib_Riemann_Z_SolverPublicProcedure
   !> @{
   !> @brief Procedure for evaluating the fastest (1,4) waves speed using Z algorithm.
-  elemental subroutine Z_compute_waves14_up(state1,state4,state23)
+  pure subroutine Z_compute_waves14_up(state1,state4,state23)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Riemann_Primitive1D),  intent(IN)::    state1  !< State 1 (left).

@@ -247,7 +247,7 @@ contains
 
   !> @brief Procedure for saving block dimensions into a string formatted in XML syntax.
   !> @note The definition of the XML string syntax is described in the 'load_str_xml' documentation.
-  elemental function save_str_xml(block_dims) result(str_xml)
+  pure function save_str_xml(block_dims) result(str_xml)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Block_Dimensions), intent(IN):: block_dims !< Block dimensions.

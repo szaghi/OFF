@@ -81,7 +81,7 @@ contains
 
   !> @brief Procedure for evaluating the fastest (1,4) waves speed using CVL (Charactheristic Variables Linearization)
   !> This variant uses only the approximation of u provided by the CVL approximation for computing the waves speed (WSup algorithm).
-  elemental subroutine CVL_compute_waves14_u(state1,state4,state23)
+  pure subroutine CVL_compute_waves14_u(state1,state4,state23)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Riemann_Primitive1D),  intent(IN)::    state1  !< State 1 (left).
@@ -101,7 +101,7 @@ contains
   !> @brief Procedure for evaluating the fastest (1,4) waves speed using CVL (Charactheristic Variables Linearization)
   !> This variant uses both the approximations of u and p provided by the CVL approximation for computing the waves speed
   !> (WSup algorithm).
-  elemental subroutine CVL_compute_waves14_up(state1,state4,state23)
+  pure subroutine CVL_compute_waves14_up(state1,state4,state23)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Riemann_Primitive1D),  intent(IN)::    state1  !< State 1 (left).

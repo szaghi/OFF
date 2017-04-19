@@ -1028,11 +1028,10 @@ contains
   !elemental subroutine set_cells_bc(block,block_dims)
   subroutine set_cells_bc(block,block_dims)
   !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_SBlock), intent(INOUT)::    block      !< Block-level data.
-  type(Type_Tree),    intent(IN)::       block_dims !< Mesh dimensions.
-  type(Type_Block_Dimensions), pointer:: blkdims    !< Pointer for scanning block_dims tree.
-  integer(I4P)::                         i,j,k      !< Counters.
+  class(Type_SBlock), intent(INOUT) :: block      !< Block-level data.
+  type(Type_Tree),    intent(IN)    :: block_dims !< Mesh dimensions.
+  class(*), pointer                 :: blkdims    !< Pointer for scanning block_dims tree.
+  integer(I4P)                      :: i,j,k      !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1042,10 +1041,13 @@ contains
       block%Fi(i,j,k)%BC%tp = block%BC%F(1)%tp ; call block%Fi(i,j,k)%BC%alloc
       if (block%BC%F(1)%is_adj()) then
         blkdims => block_dims%dat(ID=block%BC%F(1)%adj%ID)
-        block%Fi(i,j,k)%BC%adj%ID = block%BC%F(1)%adj%ID
-        block%Fi(i,j,k)%BC%adj%i  = blkdims%Ni+i
-        block%Fi(i,j,k)%BC%adj%j  = j
-        block%Fi(i,j,k)%BC%adj%k  = k
+        select type(blkdims)
+        type is(Type_Block_Dimensions)
+          block%Fi(i,j,k)%BC%adj%ID = block%BC%F(1)%adj%ID
+          block%Fi(i,j,k)%BC%adj%i  = blkdims%Ni+i
+          block%Fi(i,j,k)%BC%adj%j  = j
+          block%Fi(i,j,k)%BC%adj%k  = k
+        endselect
       elseif (block%BC%F(1)%is_in1()) then
         block%Fi(i,j,k)%BC%inf = block%BC%F(1)%inf
       endif
@@ -1067,10 +1069,13 @@ contains
       block%Fj(i,j,k)%BC%tp = block%BC%F(3)%tp ; call block%Fj(i,j,k)%BC%alloc
       if (block%BC%F(3)%is_adj()) then
         blkdims => block_dims%dat(ID=block%BC%F(3)%adj%ID)
-        block%Fj(i,j,k)%BC%adj%ID = block%BC%F(3)%adj%ID
-        block%Fj(i,j,k)%BC%adj%i  = i
-        block%Fj(i,j,k)%BC%adj%j  = blkdims%Nj+j
-        block%Fj(i,j,k)%BC%adj%k  = k
+        select type(blkdims)
+        type is(Type_Block_Dimensions)
+           block%Fj(i,j,k)%BC%adj%ID = block%BC%F(3)%adj%ID
+           block%Fj(i,j,k)%BC%adj%i  = i
+           block%Fj(i,j,k)%BC%adj%j  = blkdims%Nj+j
+           block%Fj(i,j,k)%BC%adj%k  = k
+        endselect
       elseif (block%BC%F(3)%is_in1()) then
         block%Fj(i,j,k)%BC%inf = block%BC%F(3)%inf
       endif
@@ -1092,10 +1097,13 @@ contains
       block%Fk(i,j,k)%BC%tp = block%BC%F(5)%tp ; call block%Fk(i,j,k)%BC%alloc
       if (block%BC%F(5)%is_adj()) then
         blkdims => block_dims%dat(ID=block%BC%F(5)%adj%ID)
-        block%Fk(i,j,k)%BC%adj%ID = block%BC%F(5)%adj%ID
-        block%Fk(i,j,k)%BC%adj%i  = i
-        block%Fk(i,j,k)%BC%adj%j  = j
-        block%Fk(i,j,k)%BC%adj%k  = blkdims%Nk+k
+        select type(blkdims)
+        type is(Type_Block_Dimensions)
+           block%Fk(i,j,k)%BC%adj%ID = block%BC%F(5)%adj%ID
+           block%Fk(i,j,k)%BC%adj%i  = i
+           block%Fk(i,j,k)%BC%adj%j  = j
+           block%Fk(i,j,k)%BC%adj%k  = blkdims%Nk+k
+        endselect
       elseif (block%BC%F(5)%is_in1()) then
         block%Fk(i,j,k)%BC%inf = block%BC%F(5)%inf
       endif

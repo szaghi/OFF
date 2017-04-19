@@ -115,7 +115,7 @@ contains
 
   !> @brief Procedure for saving specie into a string formatted in XML syntax.
   !> @note The definition of the XML string syntax is described in the 'load_str_xml' documentation.
-  elemental function save_str_xml(specie) result(str_xml)
+  pure function save_str_xml(specie) result(str_xml)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Specie), intent(IN):: specie  !< Specie data.

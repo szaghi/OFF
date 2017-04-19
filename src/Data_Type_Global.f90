@@ -119,18 +119,20 @@ contains
   !> @brief Procedure for setting the number of species accordingly species0.
   subroutine set_Ns_from_species0(global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_Global), intent(INOUT)::    global  !< Global data.
-  type(Type_Block_Dimensions), pointer:: blkdims !< Pointer for scanning global%block_dims tree.
-  integer(I8P)::                         ID      !< Counter.
+  class(Type_Global), intent(INOUT) :: global  !< Global data.
+  class(*), pointer                 :: blkdims !< Pointer for scanning global%block_dims tree.
+  integer(I8P)                      :: ID      !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   do while(global%block_dims%loopID(ID=ID))
-  blkdims => global%block_dims%dat(ID=ID)
-    blkdims%Np = global%species0%Np
-    blkdims%Nc = global%species0%Nc
-    blkdims%Ns = global%species0%Ns
+    blkdims => global%block_dims%dat(ID=ID)
+    select type(blkdims)
+    type is(Type_Block_Dimensions)
+       blkdims%Np = global%species0%Np
+       blkdims%Nc = global%species0%Nc
+       blkdims%Ns = global%species0%Ns
+    endselect
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -139,16 +141,18 @@ contains
   !> @brief Procedure for setting the number of Runge-Kutta stages from time order accuracy, rk_ord.
   elemental subroutine set_Nrk_from_rk_ord(global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_Global), intent(INOUT)::    global  !< Global data.
-  type(Type_Block_Dimensions), pointer:: blkdims !< Pointer for scanning global%block_dims tree.
-  integer(I8P)::                         ID      !< Counter.
+  class(Type_Global), intent(INOUT) :: global  !< Global data.
+  class(*), pointer                 :: blkdims !< Pointer for scanning global%block_dims tree.
+  integer(I8P)                      :: ID      !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   do while(global%block_dims%loopID(ID=ID))
-  blkdims => global%block_dims%dat(ID=ID)
-    blkdims%Nrk = global%time_step%rk_ord
+    blkdims => global%block_dims%dat(ID=ID)
+    select type(blkdims)
+    type is(Type_Block_Dimensions)
+       blkdims%Nrk = global%time_step%rk_ord
+    endselect
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -158,12 +162,11 @@ contains
   !> @note Note that global%parallel and global%block_dims must be already initialized when invoking this procedure.
   subroutine blocks_init(global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_Global), intent(INOUT)::    global  !< Global data.
-  type(Type_Block_Dimensions), pointer:: blkdims !< Pointer for scanning global%block_dims tree.
-  integer(I4P),                pointer:: proc    !< Pointer for scanning global%parallel%BPmap      tree.
-  type(Type_SBlock)::                    block   !< Block prototype.
-  integer(I8P)::                         ID      !< Counter.
+  class(Type_Global), intent(INOUT) :: global  !< Global data.
+  class(*), pointer                 :: blkdims !< Pointer for scanning global%block_dims tree.
+  class(*), pointer                 :: proc    !< Pointer for scanning global%parallel%BPmap      tree.
+  type(Type_SBlock)                 :: block   !< Block prototype.
+  integer(I8P)                      :: ID      !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -171,13 +174,19 @@ contains
   call global%block%init(source=global%block_dims)
   do while(global%block_dims%loopID(ID=ID))
     proc => global%parallel%BPmap%dat(ID=ID)
-    if (global%parallel%is_process(p=proc)) then
-      call block%free
-      blkdims => global%block_dims%dat(ID=ID)
-      block%dims = blkdims
-      call block%alloc
-      call global%block%put(ID=ID,d=block)
-    endif
+    select type(proc)
+    type is(integer(I4P))
+       if (global%parallel%is_process(p=proc)) then
+         call block%free
+         blkdims => global%block_dims%dat(ID=ID)
+         select type(blkdims)
+         type is(Type_Block_Dimensions)
+            block%dims = blkdims
+         endselect
+         call block%alloc
+         call global%block%put(ID=ID,d=block)
+       endif
+    endselect
   enddo
   call global%block%update
   return
@@ -187,18 +196,23 @@ contains
   !> @brief Procedure for updating blocks dimensions form mesh ones.
   elemental subroutine blocks_dims_update(global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_Global), intent(INOUT)::    global  !< Global data.
-  type(Type_SBlock),           pointer:: block   !< Pointer for scanning global%block tree.
-  type(Type_Block_Dimensions), pointer:: blkdims !< Pointer for scanning global%block_dims tree.
-  integer(I8P)::                         ID      !< Counter.
+  class(Type_Global), intent(INOUT) :: global  !< Global data.
+  class(*),           pointer       :: block   !< Pointer for scanning global%block tree.
+  class(*), pointer                 :: blkdims !< Pointer for scanning global%block_dims tree.
+  integer(I8P)                      :: ID      !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   do while(global%block%loopID(ID=ID))
     block   => global%block%dat(ID=ID)
-    blkdims => global%block_dims%dat(ID=ID)
-    block%dims = blkdims
+    select type(block)
+    type is(Type_SBlock)
+       blkdims => global%block_dims%dat(ID=ID)
+       select type(blkdims)
+       type is(Type_Block_Dimensions)
+          block%dims = blkdims
+       endselect
+    endselect
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -254,12 +268,11 @@ contains
     !> properly remapped: in the section [1-gc:0] must be passed the actual section [N:N+gc-1] for F and [N+1:N+gc] for C.
     pure subroutine cells_bc_set_adj(gc,F,C)
     !-------------------------------------------------------------------------------------------------------------------------------
-    implicit none
-    integer(I1P),      intent(IN)::    gc       !< Number of ghost cells.
-    type(Type_Face),   intent(IN)::    F(1-gc:) !< Faces data [1-gc:0].
-    type(Type_Cell),   intent(INOUT):: C(1-gc:) !< Cells data [1-gc:0].
-    type(Type_SBlock), pointer::       block    !< Pointer for scanning global%block tree.
-    integer(I4P)::                     i        !< Counter.
+    integer(I1P),      intent(IN)    :: gc       !< Number of ghost cells.
+    type(Type_Face),   intent(IN)    :: F(1-gc:) !< Faces data [1-gc:0].
+    type(Type_Cell),   intent(INOUT) :: C(1-gc:) !< Cells data [1-gc:0].
+    class(*), pointer                :: block    !< Pointer for scanning global%block tree.
+    integer(I4P)                     :: i        !< Counter.
     !-------------------------------------------------------------------------------------------------------------------------------
 
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -270,7 +283,10 @@ contains
 #endif
     do i=1-gc,0
       block => global%block%dat(ID=F(i)%BC%adj%ID)
-      C(i)%P = block%C(F(i)%BC%adj%i,F(i)%BC%adj%j,F(i)%BC%adj%k)%P
+      select type(block)
+      type is(Type_SBlock)
+         C(i)%P = block%C(F(i)%BC%adj%i,F(i)%BC%adj%j,F(i)%BC%adj%k)%P
+      endselect
     enddo
     return
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -312,11 +328,10 @@ contains
   !> where \f$P\f$ are the primitive variables.
   subroutine boundary_conditions(global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_Global), intent(INOUT):: global !< Global-level data.
-  type(Type_SBlock), pointer::        block  !< Pointer for scanning global%block tree.
-  integer(I8P)::                      ID     !< Counter.
-  integer(I4P)::                      i,j,k  !< Counters.
+  class(Type_Global), intent(INOUT) :: global !< Global-level data.
+  class(*), pointer                 :: block  !< Pointer for scanning global%block tree.
+  integer(I8P)                      :: ID     !< Counter.
+  integer(I4P)                      :: i,j,k  !< Counters.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -328,36 +343,39 @@ contains
 #endif
   do while(global%block%loopID(ID=ID))
     block => global%block%dat(ID=ID)
-    associate(gc=>block%dims%gc,Ni=>block%dims%Ni,Nj=>block%dims%Nj,Nk=>block%dims%Nk)
-    !!$OMP PARALLEL DEFAULT(NONE) &
-    !!$OMP PRIVATE(i,j,k)         &
-    !!$OMP SHARED(Ni,Nj,Nk,gc,global)
-    !!$OMP DO
-    do k=1,Nk
-      do j=1,Nj
-        call set_bc(global=global,gc=gc(1:2),ic=0,N=Ni, &
-                    F=block%Fi(0-gc(1):Ni+gc(2),j,k),&
-                    C=block%C( 1-gc(1):Ni+gc(2),j,k))
-      enddo
-    enddo
-    !!$OMP DO
-    do k=1,Nk
-      do i=1,Ni
-        call set_bc(global=global,gc=gc(3:4),ic=0,N=Nj, &
-                    F=block%Fj(i,0-gc(3):Nj+gc(4),k),&
-                    C=block%C( i,1-gc(3):Nj+gc(4),k))
-      enddo
-    enddo
-    !!$OMP DO
-    do j=1,Nj
-      do i=1,Ni
-        call set_bc(global=global,gc=gc(5:6),ic=0,N=Nk, &
-                    F=block%Fk(i,j,0-gc(5):Nk+gc(6)),&
-                    C=block%C( i,j,1-gc(5):Nk+gc(6)))
-      enddo
-    enddo
-    !!$OMP END PARALLEL
-    endassociate
+    select type(block)
+    type is(Type_SBlock)
+       associate(gc=>block%dims%gc,Ni=>block%dims%Ni,Nj=>block%dims%Nj,Nk=>block%dims%Nk)
+       !!$OMP PARALLEL DEFAULT(NONE) &
+       !!$OMP PRIVATE(i,j,k)         &
+       !!$OMP SHARED(Ni,Nj,Nk,gc,global)
+       !!$OMP DO
+       do k=1,Nk
+         do j=1,Nj
+           call set_bc(global=global,gc=gc(1:2),ic=0,N=Ni, &
+                       F=block%Fi(0-gc(1):Ni+gc(2),j,k),&
+                       C=block%C( 1-gc(1):Ni+gc(2),j,k))
+         enddo
+       enddo
+       !!$OMP DO
+       do k=1,Nk
+         do i=1,Ni
+           call set_bc(global=global,gc=gc(3:4),ic=0,N=Nj, &
+                       F=block%Fj(i,0-gc(3):Nj+gc(4),k),&
+                       C=block%C( i,1-gc(3):Nj+gc(4),k))
+         enddo
+       enddo
+       !!$OMP DO
+       do j=1,Nj
+         do i=1,Ni
+           call set_bc(global=global,gc=gc(5:6),ic=0,N=Nk, &
+                       F=block%Fk(i,j,0-gc(5):Nk+gc(6)),&
+                       C=block%C( i,j,1-gc(5):Nk+gc(6)))
+         enddo
+       enddo
+       !!$OMP END PARALLEL
+       endassociate
+    endselect
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -366,20 +384,19 @@ contains
   !> @brief Procedure for solving (performing one time step integration) the conservation equations.
   subroutine solve(global,prof)
   !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_Global),      intent(INOUT):: global    !< Global data.
-  type(Type_File_Profile), intent(INOUT):: prof      !< Profiling file.
-  real(R8P), allocatable::                 Dtmin(:)  !< Min t step of actual process for each blk.
-  real(R8P)::                              DtminL    !< Min t step of actual process over all blks.
-  real(R8P)::                              gDtmin    !< Global (all processes/all blks) min t step.
-  real(R8P), allocatable::                 RU  (:,:) !< NormL2 of conservartive residuals.
-  real(R8P), allocatable::                 mRU (:)   !< Maximum of RU of actual process.
-  real(R8P), allocatable::                 gmRU(:)   !< Global (all processes) maximum of RU.
-  integer(I4P)::                           b,Nb      !< Blocks counters.
-  integer(I1P)::                           s1        !< Runge-Kutta stages counters.
-  integer(I4P)::                           i,j,k     !< Counters.
-  type(Type_SBlock), pointer::             block     !< Pointer for scanning global%block tree.
-  integer(I8P)::                           ID        !< Counter.
+  class(Type_Global),      intent(INOUT) :: global    !< Global data.
+  type(Type_File_Profile), intent(INOUT) :: prof      !< Profiling file.
+  real(R8P), allocatable                 :: Dtmin(:)  !< Min t step of actual process for each blk.
+  real(R8P)                              :: DtminL    !< Min t step of actual process over all blks.
+  real(R8P)                              :: gDtmin    !< Global (all processes/all blks) min t step.
+  real(R8P), allocatable                 :: RU  (:,:) !< NormL2 of conservartive residuals.
+  real(R8P), allocatable                 :: mRU (:)   !< Maximum of RU of actual process.
+  real(R8P), allocatable                 :: gmRU(:)   !< Global (all processes) maximum of RU.
+  integer(I4P)                           :: b,Nb      !< Blocks counters.
+  integer(I1P)                           :: s1        !< Runge-Kutta stages counters.
+  integer(I4P)                           :: i,j,k     !< Counters.
+  class(*), pointer                      :: block  !< Pointer for scanning global%block tree.
+  integer(I8P)                           :: ID        !< Counter.
 #ifdef _MPI
   integer(I4P)::                           err       !< Error trapping flag: 0 no errors, >0 errors.
 #endif
@@ -396,7 +413,10 @@ contains
 #endif
     do while(global%block%loopID(ID=ID))
       block => global%block%dat(ID=ID)
-      call block%conservative2primitive(species0=global%species0)
+      select type(block)
+      type is(Type_SBlock)
+         call block%conservative2primitive(species0=global%species0)
+      endselect
     enddo
 #ifdef PROFILING
     call prof%profile(p=2,pstop=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
@@ -416,7 +436,10 @@ contains
 #endif
     do while(global%block%loopID(ID=ID))
       block => global%block%dat(ID=ID)
-      call block%compute_time(time_step=global%time_step,Dtmin=Dtmin(global%block%linearID(ID)))
+      select type(block)
+      type is(Type_SBlock)
+         call block%compute_time(time_step=global%time_step,Dtmin=Dtmin(global%block%linearID(ID)))
+      endselect
     enddo
 #ifdef PROFILING
     call prof%profile(p=4,pstop=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
@@ -433,22 +456,28 @@ contains
       call global%time_step%update(gDtmin=gDtmin)
       do while(global%block%loopID(ID=ID))
         block => global%block%dat(ID=ID)
-        block%C%Dt = gDtmin
+        select type(block)
+        type is(Type_SBlock)
+           block%C%Dt = gDtmin
+        endselect
       enddo
     endif
     ! evaluating the Runge-Kutta stages
     ! Runge-Kutta stages initialization
     do while(global%block%loopID(ID=ID))
       block => global%block%dat(ID=ID)
-      associate(gc=>block%dims%gc,Ni=>block%dims%Ni,Nj=>block%dims%Nj,Nk=>block%dims%Nk)
-        do k=1-gc(5),Nk+gc(6)
-          do j=1-gc(3),Nj+gc(4)
-            do i=1-gc(1),Ni+gc(2)
-              block%C(i,j,k)%KS = 0._R8P
-            enddo
-          enddo
-        enddo
-      endassociate
+      select type(block)
+      type is(Type_SBlock)
+         associate(gc=>block%dims%gc,Ni=>block%dims%Ni,Nj=>block%dims%Nj,Nk=>block%dims%Nk)
+           do k=1-gc(5),Nk+gc(6)
+             do j=1-gc(3),Nj+gc(4)
+               do i=1-gc(1),Ni+gc(2)
+                 block%C(i,j,k)%KS = 0._R8P
+               enddo
+             enddo
+           enddo
+         endassociate
+      endselect
     enddo
     do s1=1,global%time_step%rk_ord
       if (s1>1) then
@@ -456,7 +485,10 @@ contains
         ! updating primitive variables: $P=conservative2primitive(K_{s1})$
         do while(global%block%loopID(ID=ID))
           block => global%block%dat(ID=ID)
-          call block%rk_stages_sum(s1=s1,species0=global%species0)
+          select type(block)
+          type is(Type_SBlock)
+             call block%rk_stages_sum(s1=s1,species0=global%species0)
+          endselect
         enddo
         ! imposing the boundary conditions
         call global%boundary_conditions
@@ -467,7 +499,10 @@ contains
 #endif
       do while(global%block%loopID(ID=ID))
         block => global%block%dat(ID=ID)
-        call block%residuals(s1=s1,space_step=global%space_step,species0=global%species0)
+        select type(block)
+        type is(Type_SBlock)
+           call block%residuals(s1=s1,space_step=global%space_step,species0=global%species0)
+        endselect
       enddo
 #ifdef PROFILING
       call prof%profile(p=5,pstop=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)
@@ -479,7 +514,10 @@ contains
 #endif
     do while(global%block%loopID(ID=ID))
       block => global%block%dat(ID=ID)
-      call block%rk_time_integration(RU=RU(:,global%block%linearID(ID)))
+      select type(block)
+      type is(Type_SBlock)
+         call block%rk_time_integration(RU=RU(:,global%block%linearID(ID)))
+      endselect
     enddo
 #ifdef PROFILING
     call prof%profile(p=6,pstop=.true.,myrank=myrank,Nthreads=Nthreads,Nproc=Nproc)

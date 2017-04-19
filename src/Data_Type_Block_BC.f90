@@ -198,7 +198,7 @@ contains
 
   !> @brief Procedure for saving block boundary conditions into a string formatted in XML syntax.
   !> @note The definition of the XML string syntax is described in the 'load_str_xml' documentation.
-  elemental function save_str_xml(block_bc) result(str_xml)
+  pure function save_str_xml(block_bc) result(str_xml)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Block_BC), intent(IN):: block_bc      !< Block boundary conditions.

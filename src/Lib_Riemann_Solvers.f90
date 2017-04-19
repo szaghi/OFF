@@ -48,9 +48,8 @@ public:: riemann_solver
 procedure(RS_interface), pointer:: riemann_solver  => null()
 !> Abstract interfaces for pointer procedures.
 abstract interface
-  elemental subroutine RS_interface(state1,state4,flux)
-  use Data_Type_Riemann_Conservative1D
-  use Data_Type_Riemann_Primitive1D
+  pure subroutine RS_interface(state1,state4,flux)
+  import :: Type_Riemann_Conservative1D, Type_Riemann_Primitive1D
   type(Type_Riemann_Primitive1D),    intent(IN)::  state1,state4
   type(Type_Riemann_Conservative1D), intent(OUT):: flux
   endsubroutine RS_interface

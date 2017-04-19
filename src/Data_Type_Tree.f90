@@ -190,7 +190,7 @@ save
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-character(6), parameter:: _orientation(1:48) = (/'-i j k','-i j-k','-i k j','-i k-j','-i-j k','-i-j-k',&
+character(6), parameter:: orientation_(1:48) = (/'-i j k','-i j-k','-i k j','-i k-j','-i-j k','-i-j-k',&
                                                  '-i-k j','-i-k-j','-j i k','-j i-k','-j k i','-j k-i',&
                                                  '-j-i k','-j-i-k','-j-k i','-j-k-i','-k i j','-k i-j',&
                                                  '-k j i','-k j-i','-k-i j','-k-i-j','-k-j i','-k-j-i',&
@@ -822,7 +822,7 @@ contains
   integer(I4P),                 optional, intent(IN)::    myrank       !< Current MPI partition (process).
   integer(I4P),                 optional, intent(IN)::    parts        !< MPI partitions into which the tree is partitioned.
   integer(I8P),                 optional, intent(IN)::    ID           !< ID of the tree for forest of trees handling.
-  type(Type_Tree,connectivity), optional, intent(IN)::    connectivity !< Inter-tree connectivity.
+  type(Type_Tree_connectivity), optional, intent(IN)::    connectivity !< Inter-tree connectivity.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -1375,7 +1375,7 @@ contains
 
   !---------------------------------------------------------------------------------------------------------------------------------
   exist = .false.
-  if (allocated(tree%IDs)) exist = any(treeIDs==ID)
+  if (allocated(tree%IDs)) exist = any(tree%IDs==ID)
 #ifdef _MPI
   allocate(exist_in_part(0:tree%parts-1))
   exist_in_part(tree%myrank) = exist

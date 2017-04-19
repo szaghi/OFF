@@ -82,7 +82,7 @@ contains
 
   !> @brief Procedure for saving block extents into a string formatted in XML syntax.
   !> @note The definition of the XML string syntax is described in the 'load_str_xml' documentation.
-  elemental function save_str_xml(block_exts) result(str_xml)
+  pure function save_str_xml(block_exts) result(str_xml)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Block_Extents), intent(IN):: block_exts !< Block extents.

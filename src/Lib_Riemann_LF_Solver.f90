@@ -35,9 +35,8 @@ public:: LF_solver
 procedure(CW_interface), pointer:: compute_waves14 => null()
 !> Abstract interfaces for pointer procedures.
 abstract interface
-  elemental subroutine CW_interface(state1,state4,state23)
-  use Data_Type_Riemann_Primitive1D
-  use Data_Type_Riemann_InterState1D
+  pure subroutine CW_interface(state1,state4,state23)
+  import :: Type_Riemann_InterState1D, Type_Riemann_Primitive1D
   type(Type_Riemann_Primitive1D),  intent(IN)::    state1,state4
   type(Type_Riemann_InterState1D), intent(INOUT):: state23
   endsubroutine CW_interface
@@ -68,7 +67,7 @@ contains
   endsubroutine LF_set_compute_waves14
 
   !> Approximate Riemann solver based on (local) Lax-Friedrichs (known also as Rusanov) algorithm.
-  elemental subroutine LF_solver(state1,state4,flux)
+  pure subroutine LF_solver(state1,state4,flux)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Riemann_Primitive1D),    intent(IN)::  state1  !< State 1 (left).

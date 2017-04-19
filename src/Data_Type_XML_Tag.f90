@@ -529,7 +529,7 @@ contains
   endsubroutine get_nested
 
   !> @brief Procedure for converting the whole tag insto a single string.
-  elemental subroutine stringify(tag,pref,string)
+  pure subroutine stringify(tag,pref,string)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_XML_Tag),           intent(IN)::  tag    !< XML tag.

@@ -237,17 +237,19 @@ contains
   !> the syntax of tag attributes is case sensitive, whereas the syntax of their values is case insensitive.
   subroutine load_file_bc(file_d,global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_File_BC), intent(INOUT):: file_d !< File data.
-  type(Type_Global),   intent(INOUT):: global !< Global data.
-  type(Type_SBlock), pointer::         block  !< Block pointer for scanning global%block tree.
-  integer(I8P)::                       ID     !< Counter.
+  class(Type_File_BC), intent(INOUT) :: file_d !< File data.
+  type(Type_Global),   intent(INOUT) :: global !< Global data.
+  class(*), pointer                  :: block  !< Block pointer for scanning global%block tree.
+  integer(I8P)                       :: ID     !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   do while(global%block%loopID(ID=ID))
     block => global%block%dat(ID=ID)
-    call file_d%load_block(block=block,ID=ID)
+    select type(block)
+    type is(Type_SBlock)
+       call file_d%load_block(block=block,ID=ID)
+    endselect
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -259,11 +261,10 @@ contains
   !> (in an parallel MPI framework) save their own blocks nodes.
   subroutine save_file_bc(file_d,global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_File_BC), intent(INOUT):: file_d !< File data.
-  type(Type_Global),   intent(IN)::    global !< Global data.
-  type(Type_SBlock), pointer::         block  !< Block pointer for scanning global%block tree.
-  integer(I8P)::                       ID     !< Counter.
+  class(Type_File_BC), intent(INOUT) :: file_d !< File data.
+  type(Type_Global),   intent(IN)    :: global !< Global data.
+  class(*), pointer                  :: block  !< Block pointer for scanning global%block tree.
+  integer(I8P)                       :: ID     !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -272,7 +273,10 @@ contains
 #else
   do while(global%block%loopID(ID=ID))
     block => global%block%dat(ID=ID)
-    call file_d%save_block(block=block,ID=ID)
+    select type(block)
+    type is(Type_SBlock)
+       call file_d%save_block(block=block,ID=ID)
+    endselect
   enddo
 #endif
   if (global%parallel%is_master()) call file_d%save_block(bc_tag_close=.true.)

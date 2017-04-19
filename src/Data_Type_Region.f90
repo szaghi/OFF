@@ -110,7 +110,7 @@ contains
 
   !> @brief Procedure for saving region shape into a string formatted in XML syntax.
   !> @note The definition of the XML string syntax is described in the 'load_shape_str_xml' documentation.
-  elemental function save_shape_str_xml(region) result(str_xml)
+  pure function save_shape_str_xml(region) result(str_xml)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Region), intent(IN):: region  !< Region data.

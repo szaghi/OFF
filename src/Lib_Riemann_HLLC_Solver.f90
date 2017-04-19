@@ -38,9 +38,10 @@ public:: HLLC_solver
 procedure(CW_interface), pointer:: compute_waves14 => null()
 !> Abstract interfaces for pointer procedures.
 abstract interface
-  elemental subroutine CW_interface(state1,state4,state23)
-  use Data_Type_Riemann_Primitive1D
-  use Data_Type_Riemann_InterState1D
+  pure subroutine CW_interface(state1,state4,state23)
+  import :: Type_Riemann_InterState1D, Type_Riemann_Primitive1D
+  ! use Data_Type_Riemann_Primitive1D
+  ! use Data_Type_Riemann_InterState1D
   type(Type_Riemann_Primitive1D),  intent(IN)::    state1,state4
   type(Type_Riemann_InterState1D), intent(INOUT):: state23
   endsubroutine CW_interface
@@ -89,7 +90,7 @@ contains
   !> Approximate Riemann solver based on HLLC algorithm.
   !> @note Five variants are provided: HLLCb, using BCLC estimation of waves speed, HLLCc using CVL algorithm, HLLCp using PVL
   !> algorithm, HLLCt using TR algorithm and HLLCz using Z one.
-  elemental subroutine HLLC_solver(state1,state4,flux)
+  pure subroutine HLLC_solver(state1,state4,flux)
   !--------------------------------------------------------------------------------------------------------------------------------
   implicit none
   type(Type_Riemann_Primitive1D),    intent(IN)::  state1  !< State 1 (left).

@@ -334,11 +334,10 @@ contains
   !> the syntax of tag attributes is case sensitive, whereas the syntax of their values is case insensitive.
   subroutine load_file_fluid(file_d,global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_File_Fluid), intent(INOUT):: file_d !< File data.
-  type(Type_Global),      intent(INOUT):: global !< Global data.
-  type(Type_SBlock), pointer::            block  !< Block pointer for scanning global%block tree.
-  integer(I8P)::                          ID     !< Counter.
+  class(Type_File_Fluid), intent(INOUT) :: file_d !< File data.
+  type(Type_Global),      intent(INOUT) :: global !< Global data.
+  class(*), pointer                     :: block  !< Block pointer for scanning global%block tree.
+  integer(I8P)                          :: ID     !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -348,10 +347,13 @@ contains
   call global%blocks_dims_update
   do while(global%block%loopID(ID=ID))
     block => global%block%dat(ID=ID)
-    call block%alloc(members=.true.)
-    call file_d%load_block(block=block,ID=ID)
-    call block%update_primitive(species0=global%species0)
-    call block%primitive2conservative
+    select type(block)
+    type is(Type_SBlock)
+       call block%alloc(members=.true.)
+       call file_d%load_block(block=block,ID=ID)
+       call block%update_primitive(species0=global%species0)
+       call block%primitive2conservative
+    endselect
   enddo
   return
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -361,13 +363,12 @@ contains
   !> @note The definition of fluid file syntax is described in the 'load_file_fluid' documentation.
   subroutine save_file_fluid(file_d,n,flip,global)
   !---------------------------------------------------------------------------------------------------------------------------------
-  implicit none
-  class(Type_File_Fluid), intent(INOUT):: file_d !< File data.
-  integer(I8P), optional, intent(IN)::    n      !< Time step number.
-  integer(I1P), optional, intent(IN)::    flip   !< Flip-flop number.
-  type(Type_Global),      intent(IN)::    global !< Global data.
-  type(Type_SBlock), pointer::            block  !< Block pointer for scanning global%block tree.
-  integer(I8P)::                          ID     !< Counter.
+  class(Type_File_Fluid), intent(INOUT) :: file_d !< File data.
+  integer(I8P), optional, intent(IN)    :: n      !< Time step number.
+  integer(I1P), optional, intent(IN)    :: flip   !< Flip-flop number.
+  type(Type_Global),      intent(IN)    :: global !< Global data.
+  class(*), pointer                     :: block  !< Block pointer for scanning global%block tree.
+  integer(I8P)                          :: ID     !< Counter.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -387,13 +388,16 @@ contains
 #else
   do while(global%block%loopID(ID=ID))
     block => global%block%dat(ID=ID)
-    if     (present(n)) then
-      call file_d%save_block(block=block,ID=ID,n=n)
-    elseif (present(flip)) then
-      call file_d%save_block(block=block,ID=ID,flip=flip)
-    else
-      call file_d%save_block(block=block,ID=ID)
-    endif
+    select type(block)
+    type is(Type_SBlock)
+       if     (present(n)) then
+         call file_d%save_block(block=block,ID=ID,n=n)
+       elseif (present(flip)) then
+         call file_d%save_block(block=block,ID=ID,flip=flip)
+       else
+         call file_d%save_block(block=block,ID=ID)
+       endif
+    endselect
   enddo
 #endif
   if (global%parallel%is_master()) then

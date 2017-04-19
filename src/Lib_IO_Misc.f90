@@ -105,7 +105,7 @@ contains
 
   !> @brief Procedure for setting the extension of a filename.
   !> @note The leading and trealing spaces are removed from the file name.
-  elemental function set_extension(filename,extension) result(newfilename)
+  pure function set_extension(filename,extension) result(newfilename)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   character(len=*), intent(IN)::  filename    !< File name.

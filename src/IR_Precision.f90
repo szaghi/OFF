@@ -815,8 +815,8 @@ contains
   elemental function bstr_R16P(n) result(bstr)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  real(R8P), intent(IN):: n    !< Real to be converted.
-  character(128)::        bstr !< Returned bit-string containing input number.
+  real(R16P), intent(IN):: n    !< Real to be converted.
+  character(128)        :: bstr !< Returned bit-string containing input number.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
@@ -914,6 +914,22 @@ contains
   return
   !---------------------------------------------------------------------------------------------------------------------------------
   endfunction bstr_I1P
+
+  !> @brief Function for converting bit-string to real. This function achieves casting of bit-string to real.
+  !> @note It is assumed that R16P is represented by means of 128 bits, but this is not ensured in all architectures.
+  elemental function bctor_R16P(bstr,knd) result(n)
+  !---------------------------------------------------------------------------------------------------------------------------------
+  implicit none
+  character(*),  intent(IN):: bstr !< String containing input number.
+  real(R16P),    intent(IN):: knd  !< Number kind.
+  real(R16P)::                n    !< Number returned.
+  !---------------------------------------------------------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------------------------------------------------------------
+  read(bstr,'(B'//trim(str(.true.,bit_size(knd)))//'.'//trim(str(.true.,bit_size(knd)))//')')n ! Casting of bstr to n.
+  return
+  !---------------------------------------------------------------------------------------------------------------------------------
+  endfunction bctor_R16P
 
   !> @brief Function for converting bit-string to real. This function achieves casting of bit-string to real.
   elemental function bctor_R8P(bstr,knd) result(n)

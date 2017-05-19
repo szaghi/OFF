@@ -62,6 +62,9 @@ type:: Type_SL_Link
     procedure:: delh => delh_link        ! Procedure for deleting head link of the list.
     procedure:: delt => delt_link        ! Procedure for deleting tail link of the list.
     generic::   get =>  &         ! Procedure for getting data from the n-th link of the list (generic interface).
+#ifdef r16p
+                get_link_R16,&
+#endif
                 get_link_R8,get_link_R4, &
                 get_link_I8,get_link_I4,get_link_I2,get_link_I1,get_link_ch,get_link_log
     generic::   geth =>  &        ! Procedure for getting data from the list head (generic interface).
@@ -2269,7 +2272,7 @@ contains
   subroutine geth_list_R16(l,d)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_SL_Liist, intent(IN)::  l !< List.
+  class(Type_SL_List), intent(IN) :: l !< List.
   real(R16P),          intent(OUT):: d !< Link data.
   !---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2415,7 +2418,7 @@ contains
   subroutine gett_list_R16(l,d)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
-  class(Type_SL_Liist, intent(IN)::  l !< List.
+  class(Type_SL_List), intent(IN) :: l !< List.
   real(R16P),          intent(OUT):: d !< Link data.
   !---------------------------------------------------------------------------------------------------------------------------------
 

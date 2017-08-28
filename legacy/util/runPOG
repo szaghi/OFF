@@ -1,0 +1,42 @@
+#!/bin/bash
+
+function print_usage {
+  echo "Usage"
+  echo "   1) runPOG -last 'npjobs'"
+  echo "        Postprocess the last iteration saved;"
+  echo "        'npjobs' is the number of concurrent parallel jobs"
+  echo "   2) runPOG 'nstart' 'nstop' 'nstep'"
+  echo "        Postprocess the iterations from 'nstart' to 'nstop'"
+  echo "        with the frequency 'nstep'; use only 1 job"
+  echo "   3) runPOG 'nstart' 'nstop' 'nstep' 'njobs'"
+  echo "        Postprocess the iterations from 'nstart' to 'nstop'"
+  echo "        with the frequency 'nstep'; use 'njobs' parallel jobs"
+  exit 1
+}
+
+if [ $# -eq 0 ] ; then
+  print_usage
+elif [ $# -eq 2 ] ; then
+    if [ "$1" = "-last"  ] ; then
+      n1=`ls -lt output/*N_*.sol.* | head -n 1 | awk -F . '{print $2}' | awk -F _ '{print $2}' | sed 's/^0*//'`
+      n2=$n1
+      ns=1
+      job=$2
+    else
+      print_usage
+    fi
+elif [ $# -eq 3 ] ; then
+  n1=$1
+  n2=$2
+  ns=$3
+  job=1
+elif [ $# -eq 4 ] ; then
+  n1=$1
+  n2=$2
+  ns=$3
+  job=$4
+else
+  print_usage
+fi
+
+./POG-ui -j $job -np 8 -m OJT -em .geo -s output/OJT -es .sol -o postprocessing/out -eo .plt -n1 $n1 -n2 $n2 -ns $ns -f yes yes no no -tec -grl 1"

@@ -1,0 +1,1 @@
+valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --track-origins=yes --partial-loads-ok=yes --xml-file=memcheck.xml --xml=yes OFF off_options.dat

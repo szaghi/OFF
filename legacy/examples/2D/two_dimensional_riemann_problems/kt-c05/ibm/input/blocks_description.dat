@@ -1,0 +1,77 @@
+-----------------------------------------------------------------------------------------------------------------------------------
+                                  BLOCKS BOUNDS
+1                                                            Ns = Number of species
+4                                                            Nb = number of blocks
+
+4 4 4 4 1 1                                                  gc(1:6)        = ghost cells of face boundary i,j,k
+200 200 1                                                    Ni,Nj,Nk       = number of cells in i,j,k directions
+0.5d0 0.5d0 0.d0                                             xmin,ymin,zmin = minimum abscissa coordinates of block nodes
+1.d0  1.d0  1.d0                                             xmax,ymax,zmax = maximum abscissa coordinates of block nodes
+'ADJ' 2                                                      face(1)        = left  i boundary condition
+'EXT' 0                                                      face(2)        = right i boundary condition
+'ADJ' 4                                                      face(3)        = left  j boundary condition
+'EXT' 0                                                      face(4)        = right j boundary condition
+'EXT' 0                                                      face(5)        = left  k boundary condition
+'EXT' 0                                                      face(6)        = right k boundary condition
+1.d0                                                         r1             = density of species 1
+-0.75d0                                                      u              = 1st velocity component
+-0.5d0                                                       v              = 2nd velocity component
+0.d0                                                         w              = 3rd velocity component
+1.d0                                                         p              = pressure
+1.d0                                                         r=sum(rs)      = density
+1.4d0                                                        g              = specific heats ratio
+
+4 4 4 4 1 1                                                  gc(1:6)        = ghost cells of face boundary i,j,k
+200 200 1                                                    Ni,Nj,Nk       = number of cells in i,j,k directions
+0.d0  0.5d0 0.d0                                             xmin,ymin,zmin = minimum abscissa coordinates of block nodes
+0.5d0 1.d0  1.d0                                             xmax,ymax,zmax = maximum abscissa coordinates of block nodes
+'EXT' 0                                                      face(1)        = left  i boundary condition
+'ADJ' 1                                                      face(2)        = right i boundary condition
+'ADJ' 3                                                      face(3)        = left  j boundary condition
+'EXT' 0                                                      face(4)        = right j boundary condition
+'EXT' 0                                                      face(5)        = left  k boundary condition
+'EXT' 0                                                      face(6)        = right k boundary condition
+2.d0                                                         r1             = density of species 1
+-0.75d0                                                      u              = 1st velocity component
+0.5d0                                                        v              = 2nd velocity component
+0.d0                                                         w              = 3rd velocity component
+1.d0                                                         p              = pressure
+2.d0                                                         r=sum(rs)      = density
+1.4d0                                                        g              = specific heats ratio
+
+4 4 4 4 1 1                                                  gc(1:6)        = ghost cells of face boundary i,j,k
+200 200 1                                                    Ni,Nj,Nk       = number of cells in i,j,k directions
+0.d0  0.d0  0.d0                                             xmin,ymin,zmin = minimum abscissa coordinates of block nodes
+0.5d0 0.5d0 1.d0                                             xmax,ymax,zmax = maximum abscissa coordinates of block nodes
+'EXT' 0                                                      face(1)        = left  i boundary condition
+'ADJ' 4                                                      face(2)        = right i boundary condition
+'EXT' 0                                                      face(3)        = left  j boundary condition
+'ADJ' 2                                                      face(4)        = right j boundary condition
+'EXT' 0                                                      face(5)        = left  k boundary condition
+'EXT' 0                                                      face(6)        = right k boundary condition
+1.d0                                                         r1             = density of species 1
+0.75d0                                                       u              = 1st velocity component
+0.5d0                                                        v              = 2nd velocity component
+0.d0                                                         w              = 3rd velocity component
+1.d0                                                         p              = pressure
+1.d0                                                         r=sum(rs)      = density
+1.4d0                                                        g              = specific heats ratio
+
+4 4 4 4 1 1                                                  gc(1:6)        = ghost cells of face boundary i,j,k
+200 200 1                                                    Ni,Nj,Nk       = number of cells in i,j,k directions
+0.5d0 0.d0  0.d0                                             xmin,ymin,zmin = minimum abscissa coordinates of block nodes
+1.d0  0.5d0 1.d0                                             xmax,ymax,zmax = maximum abscissa coordinates of block nodes
+'ADJ' 3                                                      face(1)        = left  i boundary condition
+'EXT' 0                                                      face(2)        = right i boundary condition
+'EXT' 0                                                      face(3)        = left  j boundary condition
+'ADJ' 1                                                      face(4)        = right j boundary condition
+'EXT' 0                                                      face(5)        = left  k boundary condition
+'EXT' 0                                                      face(6)        = right k boundary condition
+3.d0                                                         r1             = density of species 1
+0.75d0                                                       u              = 1st velocity component
+-0.5d0                                                       v              = 2nd velocity component
+0.d0                                                         w              = 3rd velocity component
+1.d0                                                         p              = pressure
+3.d0                                                         r=sum(rs)      = density
+1.4d0                                                        g              = specific heats ratio
+-----------------------------------------------------------------------------------------------------------------------------------

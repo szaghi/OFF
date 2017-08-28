@@ -1,0 +1,349 @@
+#!/bin/bash
+#-----------------------------------------------------------------------------------------------------------------------------------
+#  PROGRAM NAME:  fmake
+#          FILE:  fmake
+#
+#         USAGE:  ./fmake [options [args]]
+#
+#   DESCRIPTION:  Small script for the easy creation of makefile for Fortran (standard 90 or higher) projects
+#                 the aim is to easily create the compiling rules with the correct hierarchy for inter-dependent modules
+#                 the created makefile produce colorful output and save compilation errors and warnings on separate log files
+#
+#  REQUIREMENTS:  standard bash env
+#
+#        AUTHOR:  Stefano Zaghi,
+#       CREATED:  03/30/2011 05:54:24 PM CEST
+#       LICENSE:  This program is free software; you can redistribute it and/or modify it under the terms of version 3 of the
+#                 GNU General Public License published by the Free Software Foundation (http://www.gnu.org/licenses/gpl.html)
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+# options
+DSRC='./src/'
+MFILE='makefile'
+MHEAD='null'
+FC='gfortran'
+DOBJ='./obj/'
+DMOD='./mod/'
+DEXE='./'
+OPTSC='-c -J$(DMOD)'
+OPTSL=
+LIBS=
+SIMPLE=''
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+# some useful variables
+VERSION=0.1
+FSEP=$(printf "%131s")
+SEP=${FSEP// /-}
+SEP="#"$SEP
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+# functions definition
+function print_usage {
+  echo "`basename $0` $VERSION: a small script for the easy creation of makefile for Fortran (standard 90 or higher) projects"
+  echo "the aim is to easily create the compiling rules with the correct hierarchy for inter-dependent modules"
+  echo
+  echo "Usage: `basename $0` [options [args]]"
+  echo
+  echo "Options:"
+  echo "  -h"
+  echo "    print this help message"
+  echo
+  echo "  -s [dir]"
+  echo "    dir = directory containing source files .[fF][90,95,03,08,2k], default $DSRC"
+  echo
+  echo "  -m [makefile]"
+  echo "    makefile = file name of the output makefile, default $MFILE"
+  echo
+  echo "  -header or -hd [header]"
+  echo "    header = file containing the 'user defined header' of makefile, not used by default"
+  echo "    Note:"
+  echo "         if no header file is used a very basic header of the makefile is automatically created by `basename $0`"
+  echo "         and the user must check the makefile before use it"
+  echo
+  echo "  -fc [fortran_compiler]"
+  echo "    fortran_compiler = name of Fortran compiler, default $FC"
+  echo
+  echo "  -dobj [dir_obj]"
+  echo "    dir_obj = compiled objects directory name, default $DOBJ"
+  echo
+  echo "  -dmod [dir_mod]"
+  echo "    dir_mod = module interfaces directory name, default $DMOD"
+  echo
+  echo "  -dexe [dir_exe]"
+  echo "    dir_exe = executable programs directory name, default $DEXE"
+  echo
+  echo "  -optc ['compiling_options']"
+  echo "    compiling_options = compiling options, default $OPTSC"
+  echo
+  echo "  -optl ['linking_options']"
+  echo "    linking_options = linking options, default $OPTSL"
+  echo
+  echo "  -libs ['libraries_list']"
+  echo "    libraries_list = external libraries to be linked, default $LIBS"
+  echo
+  echo "  -simple"
+  echo "    produce a simple makefile without colorful output and compilation errors/warnings log files"
+  echo
+  echo "Note:"
+  echo "     The hierarchy of compiling rules is made up without the intrinsic modules, namely the 'OMP_LIB' and 'MPI' modules."
+}
+
+function write_crule {
+  # $1=$RULE, $2=$DEP
+  if [ "$2" = "" ] ; then
+    echo $1 >> $MFILE
+  else
+    echo "$1 \\" >> $MFILE
+    echo -e "	"$2 | sed "s/ / \\\\\n\t/g" > DEPFILE.tmp
+    uniq DEPFILE.tmp > DEPFILEuq.tmp
+    cat DEPFILEuq.tmp >> $MFILE
+    rm -f DEPFILE.tmp DEPFILEuq.tmp
+  fi
+  if [ "$SIMPLE" = "yes" ] ; then
+    echo "	@echo \$(COTEXT)" >> $MFILE
+    echo "	@\$(FC) \$(OPTSC) \$< -o \$@" >> $MFILE
+  else
+    echo "	@echo \$(COTEXT) | tee -a make.log" >> $MFILE
+    echo "	@\$(FC) \$(OPTSC) \$< -o \$@ 1>> diagnostic_messages 2>> error_messages" >> $MFILE
+  fi
+  echo >> $MFILE
+}
+
+function write_lrule {
+  # $1=$RULE, $2=$DEP, $3=$EXE
+  echo $1 >> $MFILE
+  echo "	@rm -f \$(filter-out $2,\$(EXESOBJ))" >> $MFILE
+  if [ "$SIMPLE" = "yes" ] ; then
+    echo "	@echo" >> $MFILE
+    echo "	@echo \$(LITEXT)" >> $MFILE
+    echo "	@\$(FC) \$(OPTSL) \$(DOBJ)*.o \$(LIBS) -o \$@" >> $MFILE
+  else
+    echo "	@echo | tee -a make.log" >> $MFILE
+    echo "	@echo \$(LITEXT) | tee -a make.log" >> $MFILE
+    echo "	@\$(FC) \$(OPTSL) \$(DOBJ)*.o \$(LIBS) -o \$@ 1>> diagnostic_messages 2>> error_messages" >> $MFILE
+  fi
+  echo "EXES := \$(EXES) $3" >> $MFILE
+  echo >> $MFILE
+}
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+# parsing command line
+if [ $# -eq 0 ] ; then
+  print_usage
+  exit 0
+fi
+while [ "$1" != "" ]; do
+  case $1 in
+    -s)
+      shift; DSRC=$1; shift
+      ;;
+    -m)
+      shift; MFILE=$1; shift
+      ;;
+    -header|-hd)
+      shift; MHEAD=$1; shift
+      ;;
+    -fc)
+      shift; FC=$1; shift
+      ;;
+    -dobj)
+      shift; DOBJ=$1; shift
+      ;;
+    -dmod)
+      shift; DMOD=$1; shift
+      ;;
+    -dexe)
+      shift; DEXE=$1; shift
+      ;;
+    -optc)
+      shift; OPTSC=$1; shift
+      ;;
+    -optl)
+      shift; OPTSL=$1; shift
+      ;;
+    -simple)
+      shift; SIMPLE='yes'
+      ;;
+    -h)
+      print_usage
+      exit 0
+      ;;
+    *)
+      echo 'Error:'
+      echo 'switch "'$1'" unknown'
+      print_usage
+      exit 1
+      ;;
+  esac
+done
+# makefile creation
+#header
+if [ -f $MHEAD ] ; then # user's header
+  cat $MHEAD > $MFILE
+else  # basic defualt header
+  echo '#!/usr/bin/make' > $MFILE
+  echo $SEP >> $MFILE
+  echo '# options' >> $MFILE
+  echo 'FC    = '$FC >> $MFILE
+  echo 'DSRC  = '$DSRC >> $MFILE
+  echo 'DOBJ  = '$DOBJ >> $MFILE
+  echo 'DMOD  = '$DMOD >> $MFILE
+  echo 'DEXE  = '$DEXE >> $MFILE
+  echo 'OPTSC = '$OPTSC >> $MFILE
+  echo 'OPTSL = '$OPTSL >> $MFILE
+  echo 'LIBS  = '$LIBS >> $MFILE
+  echo $SEP >> $MFILE
+  echo >> $MFILE
+  echo $SEP >> $MFILE
+  echo '# auxiliary variables' >> $MFILE
+  echo 'VPATH = $(DSRC) $(DOBJ) $(DMOD) $(DLIB)' >> $MFILE
+  echo 'MKDIRS = $(DOBJ) $(DMOD) $(DEXE)' >> $MFILE
+  echo 'WHICHFC = $(shell which $(FC))' >> $MFILE
+  if [ "$SIMPLE" = "yes" ] ; then
+    echo 'PRINTCHK = " Compiler used   $(FC) => $(WHICHFC) \n\' >> $MFILE
+    echo '            Sources dir     $(DSRC) \n\' >> $MFILE
+    echo '            Objects dir     $(DOBJ) \n\' >> $MFILE
+    echo '            Modules dir     $(DMOD) \n\' >> $MFILE
+    echo '            Executables dir $(DEXE) \n\' >> $MFILE
+    echo '            Libraries       $(LIBS)"' >> $MFILE
+  else
+    echo 'PRINTCHK = "\\033[1;31m Compiler used   \\033[0m\\033[1m $(FC) => $(WHICHFC)\\033[0m \n\' >> $MFILE
+    echo '            \\033[1;31mSources dir     \\033[0m\\033[1m $(DSRC)\\033[0m \n\' >> $MFILE
+    echo '            \\033[1;31mObjects dir     \\033[0m\\033[1m $(DOBJ)\\033[0m \n\' >> $MFILE
+    echo '            \\033[1;31mModules dir     \\033[0m\\033[1m $(DMOD)\\033[0m \n\' >> $MFILE
+    echo '            \\033[1;31mExecutables dir \\033[0m\\033[1m $(DEXE)\\033[0m \n\' >> $MFILE
+    echo '            \\033[1;31mLibraries       \\033[0m\\033[1m $(LIBS)\\033[0m"' >> $MFILE
+  fi
+  echo $SEP >> $MFILE
+  echo >> $MFILE
+  echo $SEP >> $MFILE
+  echo '# auxiliary rules' >> $MFILE
+  echo '.PHONY : PRINTINFO' >> $MFILE
+  echo '.NOTPARALLEL : PRINTINFO' >> $MFILE
+  echo 'PRINTINFO:' >> $MFILE
+  if [ "$SIMPLE" = "yes" ] ; then
+    echo '	@echo' >> $MFILE
+    echo '	@echo -e $(PRINTCHK)' >> $MFILE
+    echo '	@echo' >> $MFILE
+    echo '	@echo " Compiling options"' >> $MFILE
+    echo '	@echo " [$(OPTSC)]"' >> $MFILE
+    echo '	@echo' >> $MFILE
+    echo '	@echo " Linking options"' >> $MFILE
+    echo '	@echo " [$(OPTSL)]"' >> $MFILE
+    echo '	@echo' >> $MFILE
+  else
+    echo '	@echo | tee make.log' >> $MFILE
+    echo '	@echo -e $(PRINTCHK) | tee -a make.log' >> $MFILE
+    echo '	@echo | tee -a make.log' >> $MFILE
+    echo '	@echo -e "\033[1;31m Compiling options\033[0m" | tee -a make.log' >> $MFILE
+    echo '	@echo -e "\033[1m [$(OPTSC)]\033[0m" | tee -a make.log' >> $MFILE
+    echo '	@echo | tee -a make.log' >> $MFILE
+    echo '	@echo -e "\033[1;31m Linking options \033[0m" | tee -a make.log' >> $MFILE
+    echo '	@echo -e "\033[1m [$(OPTSL)]\033[0m" | tee -a make.log' >> $MFILE
+    echo '	@echo | tee -a make.log' >> $MFILE
+  fi
+  echo >> $MFILE
+  echo '.PHONY : $(MKDIRS)' >> $MFILE
+  echo '$(MKDIRS):' >> $MFILE
+  echo '	@mkdir -p $@' >> $MFILE
+  echo >> $MFILE
+  echo '.PHONY : cleanobj' >> $MFILE
+  echo 'cleanobj:' >> $MFILE
+  if [ "$SIMPLE" = "yes" ] ; then
+    echo '	@echo " deleting objects"' >> $MFILE
+  else
+    echo '	@echo -e "\033[1;31m deleting objects \033[0m" | tee make.log' >> $MFILE
+  fi
+  echo '	@rm -fr $(DOBJ)' >> $MFILE
+  echo >> $MFILE
+  echo '.PHONY : cleanmod' >> $MFILE
+  echo 'cleanmod:' >> $MFILE
+  if [ "$SIMPLE" = "yes" ] ; then
+    echo '	@echo " deleting mods"' >> $MFILE
+  else
+    echo '	@echo -e "\033[1;31m deleting mods \033[0m" | tee -a make.log' >> $MFILE
+  fi
+  echo '	@rm -fr $(DMOD)' >> $MFILE
+  echo >> $MFILE
+  echo '.PHONY : cleanexe' >> $MFILE
+  echo 'cleanexe:' >> $MFILE
+  if [ "$SIMPLE" = "yes" ] ; then
+    echo '	@echo " deleting exes"' >> $MFILE
+  else
+    echo '	@echo -e "\033[1;31m deleting exes \033[0m" | tee -a make.log' >> $MFILE
+  fi
+  echo '	@rm -f $(addprefix $(DEXE),$(EXES))' >> $MFILE
+  if [ "$SIMPLE" != "yes" ] ; then
+    echo >> $MFILE
+    echo '.PHONY : cleanmsg' >> $MFILE
+    echo 'cleanmsg:' >> $MFILE
+    echo '	@rm -f diagnostic_messages' >> $MFILE
+    echo '	@rm -f error_messages' >> $MFILE
+  fi
+  echo >> $MFILE
+  echo '.PHONY : clean' >> $MFILE
+  echo 'clean: cleanobj cleanmod cleanmsg' >> $MFILE
+  echo >> $MFILE
+  echo '.PHONY : cleanall' >> $MFILE
+  echo 'cleanall: clean cleanexe' >> $MFILE
+  echo $SEP >> $MFILE
+fi
+# rules
+echo >> $MFILE
+echo $SEP >> $MFILE
+echo '# rules of linking and compiling' >> $MFILE
+if [ "$SIMPLE" = "yes" ] ; then
+  echo 'COTEXT  = " Compiling $(<F)"' >> $MFILE
+  echo 'LITEXT  = " Assembling $@"' >> $MFILE
+else
+  echo 'COTEXT  = -e "\033[1;31m Compiling\033[0m\033[1m $(<F)\033[0m"' >> $MFILE
+  echo 'LITEXT  = -e "\033[1;31m Assembling\033[0m\033[1m $@\033[0m"' >> $MFILE
+fi
+echo 'LCEXES  = $(shell echo $(EXES) | tr '"'[:upper:]' '[:lower:]')" >> $MFILE
+echo 'EXESPO  = $(addsuffix .o,$(LCEXES))' >> $MFILE
+echo 'EXESOBJ = $(addprefix $(DOBJ),$(EXESPO))' >> $MFILE
+echo >> $MFILE
+# linking rules
+for f in $( ls $DSRC*.[fF] $DSRC*.[fF]9[05] $DSRC*.[fF]0[38] $DSRC*.[fF]2[kK] 2> /dev/null ) ; do
+  EXE=`grep -i '^ *program ' $f | awk '{print $2}'`
+  if [ "$EXE" != "" ] ; then
+    DEP=`echo $EXE | tr '[:upper:]' '[:lower:]' | sed s/$/\.o/ | awk  '{print "$(DOBJ)"$1}'`
+    RULE="\$(DEXE)$EXE : PRINTINFO \$(MKDIRS) $DEP"
+    write_lrule "$RULE" "$DEP" "$EXE"
+  fi
+done
+# compiling rules
+LEXTES=";"
+for f in $( ls $DSRC*.[fF] $DSRC*.[fF]9[05] $DSRC*.[fF]0[38] $DSRC*.[fF]2[kK] 2> /dev/null ) ; do
+  FF=`basename $f`
+  EXTE=`echo $FF | awk -F . '{print "."$NF}'`
+  LEXTES="$LEXTES$EXTE;"
+  DEP=`grep -i '^ *use *' $f | grep -vi 'omp_lib' | grep -vi 'mpi' | grep -vi ', *intrinsic::' | tr '[:upper:]' '[:lower:]' | sed s/'^ *use *'// | sed s/'^:: *'// | awk '{print $1}' | sed s/,// | sed s/$/\.o/ | awk  '{print "$(DOBJ)"$1}'`
+  RULE="\$(DOBJ)"`basename $f $EXTE | tr '[:upper:]' '[:lower:]'`.o" : $FF"
+  write_crule "$RULE" "$DEP"
+done
+# generic compiling rules for compiled object without explicit dependency
+case $LEXTES in
+  *";.f;"*) write_crule "\$(DOBJ)%.o : %.f" "" ;;
+  *";.F;"*) write_crule "\$(DOBJ)%.o : %.F" "" ;;
+  *";.f90;"*) write_crule "\$(DOBJ)%.o : %.f90" "" ;;
+  *";.F90;"*) write_crule "\$(DOBJ)%.o : %.F90" "" ;;
+  *";.f95;"*) write_crule "\$(DOBJ)%.o : %.f95" "" ;;
+  *";.F95;"*) write_crule "\$(DOBJ)%.o : %.F95" "" ;;
+  *";.f03;"*) write_crule "\$(DOBJ)%.o : %.f03" "" ;;
+  *";.F03;"*) write_crule "\$(DOBJ)%.o : %.F03" "" ;;
+  *";.f08;"*) write_crule "\$(DOBJ)%.o : %.f08" "" ;;
+  *";.F08;"*) write_crule "\$(DOBJ)%.o : %.F08" "" ;;
+  *";.f2k;"*) write_crule "\$(DOBJ)%.o : %.f2k" "" ;;
+  *";.F2k;"*) write_crule "\$(DOBJ)%.o : %.F2k" "" ;;
+  *";.f2K;"*) write_crule "\$(DOBJ)%.o : %.f2K" "" ;;
+  *";.F2K;"*) write_crule "\$(DOBJ)%.o : %.F2K" "" ;;
+esac
+echo $SEP >> $MFILE
+exit 0
+#-----------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,56 @@
+[submodule "src/third_party/FOODIE"]
+   path = src/third_party/FOODIE
+   url = https://github.com/Fortran-FOSS-Programmers/FOODIE
+   branch = master
+[submodule "src/third_party/PENF"]
+   path = src/third_party/PENF
+   url = https://github.com/szaghi/PENF
+   branch = master
+[submodule "src/third_party/BeFoR64"]
+   path = src/third_party/BeFoR64
+   url = https://github.com/szaghi/BeFoR64
+   branch = master
+[submodule "src/third_party/FACE"]
+   path = src/third_party/FACE
+   url = https://github.com/szaghi/FACE
+   branch = master
+[submodule "src/third_party/FiNeR"]
+   path = src/third_party/FiNeR
+   url = https://github.com/szaghi/FiNeR
+   branch = master
+[submodule "src/third_party/FLAP"]
+   path = src/third_party/FLAP
+   url = https://github.com/szaghi/FLAP
+   branch = master
+[submodule "src/third_party/FoXy"]
+   path = src/third_party/FoXy
+   url = https://github.com/Fortran-FOSS-Programmers/FoXy
+   branch = master
+[submodule "src/third_party/StringiFor"]
+   path = src/third_party/StringiFor
+   url = https://github.com/szaghi/StringiFor
+   branch = master
+[submodule "src/third_party/VecFor"]
+   path = src/third_party/VecFor
+   url = https://github.com/szaghi/VecFor
+   branch = master
+[submodule "src/third_party/VTKFortran"]
+   path = src/third_party/VTKFortran
+   url = https://github.com/szaghi/VTKFortran
+   branch = master
+[submodule "src/third_party/FORESEER"]
+   path = src/third_party/FORESEER
+   url = https://github.com/szaghi/FORESEER
+   branch = master
+[submodule "src/third_party/FLOw"]
+   path = src/third_party/FLOw
+   url = https://github.com/szaghi/FLOw
+   branch = master
+[submodule "src/third_party/WenOOF"]
+   path = src/third_party/WenOOF
+   url = https://github.com/Fortran-FOSS-Programmers/WenOOF
+   branch = master
+[submodule "src/third_party/FriVolous"]
+   path = src/third_party/FriVolous
+   url = https://github.com/szaghi/FriVolous
+   branch = master

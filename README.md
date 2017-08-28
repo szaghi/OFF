@@ -3,8 +3,6 @@
 # OFF [![Join the chat at https://gitter.im/szaghi/OFF](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/szaghi/OFF?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Status](https://img.shields.io/badge/status-unstable-orange.svg)]()
-[![Build Status](https://api.shippable.com/projects/58976ebe8be1080f00797c8f/badge?branch=master)]()
-[![Coverage Status](https://api.shippable.com/projects/58976ebe8be1080f00797c8f/coverageBadge?branch=master)]()
 
 ### OFF, Open source Finite volumes Fluid dynamics code
 

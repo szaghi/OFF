@@ -1,1 +1,0 @@
-../../common/run_POG.sh

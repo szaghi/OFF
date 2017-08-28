@@ -1,7 +1,0 @@
-1.d0                                                         r1             = density of species 1
-0.d0                                                         u              = 1st velocity component
-0.d0                                                         v              = 2nd velocity component            
-0.d0                                                         w              = 3rd velocity component            
-1.d0                                                         p              = pressure                          
-1.d0                                                         r=sum(rs)      = density                           
-1.4d0                                                        g              = specific heats ratio              

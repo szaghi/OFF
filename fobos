@@ -1,0 +1,136 @@
+[modes]
+modes = gnu gnu-debug
+        intel intel-debug
+
+[common-variables]
+$CSHARED_GNU = -c -fPIC -frealloc-lhs
+$CSHARED_INT = -c -fpic -assume realloc_lhs
+$LSHARED     = -shared
+$CSTATIC_GNU = -c -frealloc-lhs
+$CSTATIC_INT = -c -assume realloc_lhs
+$DEBUG_GNU   = -O0 -g3 -Warray-bounds -Wcharacter-truncation -Wline-truncation -Wimplicit-interface -Wimplicit-procedure -Wunderflow -fmodule-private -ffree-line-length-132 -fimplicit-none -fbacktrace -fdump-core -finit-real=nan -std=f2008 -fall-intrinsics
+$DEBUG_INT   = -O0 -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit -debug all -warn all -extend-source 132 -traceback
+$OPTIMIZE    = -O2
+$EXDIRS      = BeFoR64/src/third_party/ BeFoR64/src/tests/
+               FACE/src/third_party/ FACE/src/tests/
+               FiNeR/src/third_party/ FiNeR/src/tests/
+               FLAP/src/third_party/ FLAP/src/tests/
+               FLOw/src/third_party/ FLOw/src/tests/
+               FOODIE/src/third_party/ FOODIE/src/tests/
+               FORESEER/src/third_party/ FORESEER/src/tests/
+               FoXy/src/third_party/ FoXy/src/tests/
+               FriVolous/src/third_party/ FriVolous/src/tests/
+               PENF/src/third_party/ PENF/src/tests/
+               StringiFor/src/third_party/ StringiFor/src/tests/
+               VecFor/src/third_party/ VecFor/src/tests/
+               VTKFortran/src/third_party/ VTKFortran/src/tests/ VTKFortran/references/
+               WenOOF/src/third_party/ WenOOF/src/tests/ WenOOF/quarantena/
+
+# main modes
+[gnu]
+help      = Build OFF by means of GNU gfortran, release mode
+template  = template-static-gnu
+build_dir = ./exe/
+
+[gnu-debug]
+help      = Build OFF by means of GNU gfortran, debug mode
+template  = template-static-gnu-debug
+build_dir = ./exe/
+
+[intel]
+help      = Build OFF by means of Intel ifort, release mode
+template  = template-static-intel
+build_dir = ./exe/
+
+[intel-debug]
+help      = Build OFF by means of Intel ifort, debug mode
+template  = template-static-intel-debug
+build_dir = ./exe/
+
+#templates
+[template-static-gnu]
+compiler     = gnu
+cflags       = $CSTATIC_GNU $OPTIMIZE
+exclude_dirs = $EXDIRS
+mod_dir      = ./mod/
+obj_dir      = ./obj/
+src          = ./src/
+colors       = True
+quiet        = False
+log          = True
+jobs         = 2
+
+[template-static-gnu-debug]
+compiler     = gnu
+cflags       = $CSTATIC_GNU $DEBUG_GNU
+lflags       = $DEBUG_GNU
+exclude_dirs = $EXDIRS
+mod_dir      = ./mod/
+obj_dir      = ./obj/
+src          = ./src/
+colors       = True
+quiet        = False
+log          = True
+jobs         = 2
+
+[template-static-intel]
+compiler     = intel
+cflags       = $CSTATIC_INT $OPTIMIZE
+lflags       = $OPTIMIZE
+exclude_dirs = $EXDIRS
+mod_dir      = ./mod/
+obj_dir      = ./obj/
+src          = ./src/
+colors       = True
+quiet        = False
+log          = True
+jobs         = 2
+
+[template-static-intel-debug]
+compiler     = intel
+cflags       = $CSTATIC_INT $DEBUG_INT
+lflags       = $DEBUG_INT
+exclude_dirs = $EXDIRS
+mod_dir      = ./mod/
+obj_dir      = ./obj/
+src          = ./src/
+colors       = True
+quiet        = False
+log          = True
+jobs         = 2
+
+# rules
+[rule-makedoc]
+help   = Build documentation from source files
+rule_1 = rm -rf doc/html/*
+rule_2 = ford doc/main_page.md --debug
+rule_3 = cp -r doc/html/publish/* doc/html/
+rule_4 = rm -rf doc/html/publish
+
+[rule-deldoc]
+help = Delete documentation
+rule = rm -rf doc/html/*
+
+[rule-delexe]
+help = Delete exes
+rule = rm -rf exe/
+
+[rule-clean]
+help = Clean the project tree
+rule_1 = FoBiS.py rule -ex deldoc
+rule_2 = FoBiS.py rule -ex delexe
+rule_3 = rm -f *.gcov
+
+[rule-maketar]
+help = Make tar archive of the project
+rule = tar --xform="s%^%OFF/%" -czf OFF.tar.gz *
+
+[rule-makecoverage]
+help    = Perform coverage analysis
+rule_1  = FoBiS.py clean -mode gnu
+rule_2  = FoBiS.py build -mode gnu -coverage
+
+[rule-makecoverage-analysis]
+help    = Perform coverage analysis and saving reports in markdown
+rule_1  = FoBiS.py clean -mode gnu
+rule_2  = FoBiS.py build -mode gnu -coverage

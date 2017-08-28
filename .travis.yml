@@ -1,0 +1,72 @@
+language: generic
+
+sudo: false
+dist: trusty
+
+cache:
+  apt: true
+  pip: true
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/.local
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gfortran-7
+      - binutils
+      - python-pip
+      - graphviz
+
+env:
+  global:
+    - MAKECOVERAGE="FoBiS.py rule -ex makecoverage"
+    - MAKEDOC="./scripts/makedoc.sh szaghi/OFF"
+    - CLEAN="FoBiS.py rule -ex clean"
+    - MAKETAR="FoBiS.py rule -ex maketar"
+
+before_install:
+  - git submodule update --init
+
+install:
+  - |
+    if [[ ! -d "$HOME/.local/bin" ]]; then
+      mkdir "$HOME/.local/bin"
+    fi
+  - export PATH="$HOME/.local/bin:$PATH"
+  - export FC=/usr/bin/gfortran-7
+  - ln -fs /usr/bin/gfortran-7 "$HOME/.local/bin/gfortran" && gfortran --version
+  - ls -l /usr/bin/gfortran-7
+  - ln -fs /usr/bin/gcov-7 "$HOME/.local/bin/gcov" && gcov --version
+  - pip install --user --upgrade pygooglechart
+  - pip install --user --upgrade graphviz
+  - pip install --user --upgrade FoBiS.py
+  - pip install --user --upgrade markdown-checklist 
+  - pip install --user --upgrade ford
+
+script:
+  - $MAKECOVERAGE
+
+after_success:
+  - find . -name '*.gcno' -print
+  - bash <(curl -s https://codecov.io/bash)
+  - $MAKEDOC
+
+before_deploy:
+  - $CLEAN
+  - $MAKETAR
+  - mv OFF.tar.gz OFF-$TRAVIS_TAG.tar.gz
+
+# deploy:
+#   provider: releases
+#   api_key:
+#     secure: pd9T71AVuh54iQT1b2GVCQjnXUoqXPbv9cR0BmZSzUXSakcIoxi0nYuR91MlTQfpM9EUVzucD5oMIux+5/qh6kpC96Qq4JpSuknHVSaZJQV7mjoxHVFk7WDmYhrd5xd6uoyUGR/5t5YKN4WTXUk3kIgIOpWIZYtYGnmB6TkTAcs5ZnEz5KLyjfpUnRwEYJqgq4a3A6M1xl8w3hiUxjUg+T4Fyj4CK+t7m7L9cf9kmhWspM63RfkdFr2QeUt7npgMkfjoemwS7nz92RCyh7+T7nwOK3gsQBUdOh47BJ2susJ69Yv6oUIqlUFiJUiCqvbU/5EMC3/xZ+MCmU9mSEbniKKgKix3z/MCHTQQ7mjDiL3+0qHpqNexEsOSWttUnKNhzYiVN0Ss4jYWA3c9bvh5JbgZofLr8Yp6HoqTzL1/wtgsw/lJmv2LUqm3wGN+ckam5nKaE9KdZCkZO7uIGe+82NrkaLBbELB27bpFLfrdOX3+dXD12eiyjNe/vMRleUO/6k6F1a4Wve+rO2Mtsz7XeZ/le5PUYp7HXkK9xKiVSFhIDHyGwv461Avo1pfuCIBoJ2MEsyC0eYqkwWdgagRHuay3mQEqYw3jfHvtC56iZjdtWIqKYc7QnOUkff710v1efoWLWC4WfR1E8qeDXZIilpaS9EUD6nIOjAmwCBCmBsI=
+#   file: 
+#     - OFF-$TRAVIS_TAG.tar.gz
+#     - ./scripts/install.sh
+#   skip_cleanup: true
+#   overwrite: true
+#   on:
+#     tags: true

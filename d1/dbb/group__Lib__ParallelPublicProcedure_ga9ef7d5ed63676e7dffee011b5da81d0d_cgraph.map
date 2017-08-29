@@ -1,4 +1,0 @@
-<map id="lib_parallel::procmap_load" name="lib_parallel::procmap_load">
-<area shape="rect" id="node3" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga070c459fd5e26bcec905b7a2f2419ad3" title="Subroutine for printing to stderr a &quot;file not found error&quot;. " alt="" coords="229,5,365,51"/>
-<area shape="rect" id="node5" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga03b3d23e7eb885f6fb3c00f7a977b33d" title="The Get_Unit function returns a free logic unit for opening a file. " alt="" coords="227,75,368,104"/>
-</map>

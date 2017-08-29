@@ -1,7 +1,0 @@
-<map id="lib_base64::b64_encode_r8_a" name="lib_base64::b64_encode_r8_a">
-<area shape="rect" id="node3" href="$db/d1c/group__Lib__Base64PrivateProcedure.html#ga9018ec10f231c44a3fb5e6e8c66b8e1b" title="Subroutine for encoding bits (must be multiple of 24 bits) into base64 charcaters code (of length mul..." alt="" coords="248,44,411,73"/>
-<area shape="rect" id="node5" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga5d31eca5ba59325c74195eeb96a3e4c8" title="Function for computing the total specific energy (per unit of mass) for an ideal calorically perfect ..." alt="" coords="459,35,624,82"/>
-<area shape="rect" id="node7" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga72edfdd7b6205b7dc0fe8cfacb07d068" title="Function for computing the pressure for an ideal calorically perfect gas. " alt="" coords="672,65,837,111"/>
-<area shape="rect" id="node9" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#gafc7677510bfb5d5bfab4510107291d32" title="Function for computing the density for an ideal calorically perfect gas. " alt="" coords="885,5,1051,51"/>
-<area shape="rect" id="node12" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga82d4f5c7adace2fdffa51b872a3e80f9" title="Function for computing the speed of sound for an ideal calorically perfect gas. " alt="" coords="1099,41,1264,87"/>
-</map>

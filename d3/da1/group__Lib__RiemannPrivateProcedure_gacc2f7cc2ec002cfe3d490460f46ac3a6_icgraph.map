@@ -1,7 +1,0 @@
-<map id="lib_riemann::sampling_fluxes" name="lib_riemann::sampling_fluxes">
-<area shape="rect" id="node3" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga6e895bf473ec7bda2e33ba161c4171c1" title="Approximate Riemann solver based on Adaptive (non iterative) LF&#45;TR algorithm. " alt="" coords="204,5,391,35"/>
-<area shape="rect" id="node5" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#gad4a1301de7d450c64455260258670f29" title="Exact Riemann solver based on iterative solution of u&#45;function. " alt="" coords="216,58,379,105"/>
-<area shape="rect" id="node7" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#gad22f35c160871edcd8edf59ac9cd0d5f" title="Approximate Riemann solver based on Two Rarefactions algorithm. " alt="" coords="208,128,387,157"/>
-<area shape="rect" id="node11" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#gaf59030698bf09f9e92839a87c75a8f43" title="Approximate Riemann solver based on Two Shocks algorithm. " alt="" coords="207,181,388,211"/>
-<area shape="rect" id="node9" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga8ed95bd24286bc4b94bde0ae4efcc968" title="Approximate Riemann solver based on HLLC algorithm. " alt="" coords="441,128,631,157"/>
-</map>

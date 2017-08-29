@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="OFF, Open source Finite volumes Fluid dynamics code">
+    
+    <meta name="author" content="Giacomo Rossi
+Stefano Zaghi" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>off_block_signature_object.f90 &ndash; OFF</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">OFF </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>off_block_signature_object.f90
+    <small>Source File</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+	  data-placement="bottom" data-html="true"
+	  title=" 7.0% of total for source files.">147 statements</a>
+     </li> 
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/off_block_signature_object.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li class="active">off_block_signature_object.f90</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#mods-0">Modules</a></h3></div>
+  <div id="mods-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html">off_block_signature_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/off_block_signature_object.f90.html#src">off_block_signature_object.f90</a>
+  </div>
+</div>
+
+
+  <hr>
+  
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allfiles-0">All Source Files</a></h3></div>
+  <div id="allfiles-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../sourcefile/off_block_object.f90.html">off_block_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_block_signature_object.f90.html">off_block_signature_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_cell_object.f90.html">off_cell_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_error_object.f90.html">off_error_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_face_object.f90.html">off_face_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_file_grid_object.f90.html">off_file_grid_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_file_object.f90.html">off_file_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_files_collection_object.f90.html">off_files_collection_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_free_conditions_object.f90.html">off_free_conditions_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_grid_dimensions_object.f90.html">off_grid_dimensions_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_node_object.f90.html">off_node_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_non_dimensional_numbers_object.f90.html">off_non_dimensional_numbers_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_objects.f90.html">off_objects.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_os_object.f90.html">off_os_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_simulation_object.f90.html">off_simulation_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_solver_object.f90.html">off_solver_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_test_load_file_parameters.f90.html">off_test_load_file_parameters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_test_save_load_file_grid.f90.html">off_test_save_load_file_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_test_save_load_file_parameters.f90.html">off_test_save_load_file_parameters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_time_object.f90.html">off_time_object.f90</a>
+      
+    </div>
+  </div>
+</div>
+
+
+</div>  
+
+    </div>
+    <div class="col-md-9" id='text'>
+    <p>OFF block signature object definition and implementation.</p>
+    
+      
+      <h3>Files Dependent On This One</h3>
+      
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: sourcefile~~off_block_signature_object.f90~~AfferentGraph Pages: 1 -->
+<svg id="sourcefileoff_block_signature_objectf90AfferentGraph" width="641pt" height="79pt"
+ viewBox="0.00 0.00 641.00 78.77" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph" class="graph" transform="scale(0.612811 0.612811) rotate(0) translate(4 124.545)">
+<title>sourcefile~~off_block_signature_object.f90~~AfferentGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-124.545 1042,-124.545 1042,4 -4,4"/>
+<!-- sourcefile~off_block_signature_object.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_node1" class="node"><title>sourcefile~off_block_signature_object.f90</title>
+<polygon fill="none" stroke="black" points="158,-104 1.42109e-14,-104 1.42109e-14,-80 158,-80 158,-104"/>
+<text text-anchor="middle" x="79" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50">off_block_signature_object.f90</text>
+</g>
+<!-- sourcefile~off_block_object.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_node2" class="node"><title>sourcefile~off_block_object.f90</title>
+<g id="a_sourcefile~~off_block_signature_object.f90~~AfferentGraph_node2"><a xlink:href="../sourcefile/off_block_object.f90.html" xlink:title="off_block_object.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="329,-104 221,-104 221,-80 329,-80 329,-104"/>
+<text text-anchor="middle" x="275" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_block_object.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~off_block_signature_object.f90&#45;&gt;sourcefile~off_block_object.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge13" class="edge"><title>sourcefile~off_block_signature_object.f90&#45;&gt;sourcefile~off_block_object.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M158.069,-92C175.507,-92 193.795,-92 210.557,-92"/>
+<polygon fill="#000000" stroke="#000000" points="210.776,-95.5001 220.776,-92 210.776,-88.5001 210.776,-95.5001"/>
+</g>
+<!-- sourcefile~off_grid_dimensions_object.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_node3" class="node"><title>sourcefile~off_grid_dimensions_object.f90</title>
+<g id="a_sourcefile~~off_block_signature_object.f90~~AfferentGraph_node3"><a xlink:href="../sourcefile/off_grid_dimensions_object.f90.html" xlink:title="off_grid_dimensions_object.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="355.5,-62 194.5,-62 194.5,-38 355.5,-38 355.5,-62"/>
+<text text-anchor="middle" x="275" y="-47.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_grid_dimensions_object.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~off_block_signature_object.f90&#45;&gt;sourcefile~off_grid_dimensions_object.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge14" class="edge"><title>sourcefile~off_block_signature_object.f90&#45;&gt;sourcefile~off_grid_dimensions_object.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M135.593,-79.9645C158.322,-75.0437 184.785,-69.3146 208.448,-64.1916"/>
+<polygon fill="#000000" stroke="#000000" points="209.366,-67.574 218.399,-62.0373 207.885,-60.7325 209.366,-67.574"/>
+</g>
+<!-- sourcefile~off_objects.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_node4" class="node"><title>sourcefile~off_objects.f90</title>
+<g id="a_sourcefile~~off_block_signature_object.f90~~AfferentGraph_node4"><a xlink:href="../sourcefile/off_objects.f90.html" xlink:title="off_objects.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="800,-66 718,-66 718,-42 800,-42 800,-66"/>
+<text text-anchor="middle" x="759" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_objects.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~off_block_signature_object.f90&#45;&gt;sourcefile~off_objects.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge15" class="edge"><title>sourcefile~off_block_signature_object.f90&#45;&gt;sourcefile~off_objects.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M133.94,-104.018C152.833,-107.672 174.259,-111.197 194,-113 335.65,-125.938 372.27,-120.031 514,-108 559.156,-104.167 570.09,-100.069 615,-94"/>
+</g>
+<!-- sourcefile~off_block_object.f90&#45;&gt;sourcefile~off_objects.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge4" class="edge"><title>sourcefile~off_block_object.f90&#45;&gt;sourcefile~off_objects.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M454,-94C525.446,-90.0359 544.089,-103.583 615,-94"/>
+</g>
+<!-- sourcefile~off_file_grid_object.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_node5" class="node"><title>sourcefile~off_file_grid_object.f90</title>
+<g id="a_sourcefile~~off_block_signature_object.f90~~AfferentGraph_node5"><a xlink:href="../sourcefile/off_file_grid_object.f90.html" xlink:title="off_file_grid_object.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="513.5,-66 392.5,-66 392.5,-42 513.5,-42 513.5,-66"/>
+<text text-anchor="middle" x="453" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_file_grid_object.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~off_block_object.f90&#45;&gt;sourcefile~off_file_grid_object.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge5" class="edge"><title>sourcefile~off_block_object.f90&#45;&gt;sourcefile~off_file_grid_object.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M329.283,-80.4956C347.208,-76.6256 367.42,-72.2616 386.191,-68.2087"/>
+<polygon fill="#000000" stroke="#000000" points="387.115,-71.59 396.151,-66.0583 385.638,-64.7477 387.115,-71.59"/>
+</g>
+<!-- sourcefile~off_simulation_object.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_node6" class="node"><title>sourcefile~off_simulation_object.f90</title>
+<g id="a_sourcefile~~off_block_signature_object.f90~~AfferentGraph_node6"><a xlink:href="../sourcefile/off_simulation_object.f90.html" xlink:title="off_simulation_object.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="681.5,-66 550.5,-66 550.5,-42 681.5,-42 681.5,-66"/>
+<text text-anchor="middle" x="616" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_simulation_object.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~off_block_object.f90&#45;&gt;sourcefile~off_simulation_object.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge6" class="edge"><title>sourcefile~off_block_object.f90&#45;&gt;sourcefile~off_simulation_object.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M329.183,-94.4497C364.119,-95.6042 410.811,-96.2853 452,-94"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M454,-94C495.046,-91.7226 540.371,-79.55 572.443,-69.2244"/>
+<polygon fill="#000000" stroke="#000000" points="573.549,-72.5453 581.952,-66.0923 571.359,-65.8967 573.549,-72.5453"/>
+</g>
+<!-- sourcefile~off_grid_dimensions_object.f90&#45;&gt;sourcefile~off_objects.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge7" class="edge"><title>sourcefile~off_grid_dimensions_object.f90&#45;&gt;sourcefile~off_objects.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M316.086,-37.9121C351.465,-28.1829 404.629,-15.8357 452,-14"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M454,-14C555.608,-10.0624 581.893,-15.1592 682,-33 691.105,-34.6227 700.698,-36.8515 709.886,-39.2536"/>
+<polygon fill="#000000" stroke="#000000" points="709.089,-42.6636 719.656,-41.9076 710.924,-35.9084 709.089,-42.6636"/>
+</g>
+<!-- sourcefile~off_grid_dimensions_object.f90&#45;&gt;sourcefile~off_file_grid_object.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge8" class="edge"><title>sourcefile~off_grid_dimensions_object.f90&#45;&gt;sourcefile~off_file_grid_object.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M355.504,-51.8069C364.409,-52.0093 373.43,-52.2143 382.2,-52.4136"/>
+<polygon fill="#000000" stroke="#000000" points="382.28,-55.9163 392.357,-52.6445 382.439,-48.9181 382.28,-55.9163"/>
+</g>
+<!-- sourcefile~off_grid_dimensions_object.f90&#45;&gt;sourcefile~off_simulation_object.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge9" class="edge"><title>sourcefile~off_grid_dimensions_object.f90&#45;&gt;sourcefile~off_simulation_object.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M454,-14C497.295,-12.3222 545.304,-26.4294 577.535,-38.3491"/>
+<polygon fill="#000000" stroke="#000000" points="576.418,-41.6688 587.009,-41.9581 578.91,-35.1274 576.418,-41.6688"/>
+</g>
+<!-- sourcefile~off_test_save_load_file_grid.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_node7" class="node"><title>sourcefile~off_test_save_load_file_grid.f90</title>
+<g id="a_sourcefile~~off_block_signature_object.f90~~AfferentGraph_node7"><a xlink:href="../sourcefile/off_test_save_load_file_grid.f90.html" xlink:title="off_test_save_load_file_grid.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1019,-108 855,-108 855,-84 1019,-84 1019,-108"/>
+<text text-anchor="middle" x="937" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_test_save_load_file_grid.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~off_objects.f90&#45;&gt;sourcefile~off_test_save_load_file_grid.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge10" class="edge"><title>sourcefile~off_objects.f90&#45;&gt;sourcefile~off_test_save_load_file_grid.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M800.109,-65.588C811.656,-68.7866 824.294,-72.1566 836,-75 845.567,-77.324 855.686,-79.6273 865.668,-81.8097"/>
+<polygon fill="#000000" stroke="#000000" points="865.066,-85.2602 875.579,-83.9481 866.542,-78.4176 865.066,-85.2602"/>
+</g>
+<!-- sourcefile~off_test_load_file_parameters.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_node8" class="node"><title>sourcefile~off_test_load_file_parameters.f90</title>
+<g id="a_sourcefile~~off_block_signature_object.f90~~AfferentGraph_node8"><a xlink:href="../sourcefile/off_test_load_file_parameters.f90.html" xlink:title="off_test_load_file_parameters.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1023,-66 851,-66 851,-42 1023,-42 1023,-66"/>
+<text text-anchor="middle" x="937" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_test_load_file_parameters.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~off_objects.f90&#45;&gt;sourcefile~off_test_load_file_parameters.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge11" class="edge"><title>sourcefile~off_objects.f90&#45;&gt;sourcefile~off_test_load_file_parameters.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M800.378,-54C812.546,-54 826.453,-54 840.616,-54"/>
+<polygon fill="#000000" stroke="#000000" points="840.953,-57.5001 850.953,-54 840.953,-50.5001 840.953,-57.5001"/>
+</g>
+<!-- sourcefile~off_test_save_load_file_parameters.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_node9" class="node"><title>sourcefile~off_test_save_load_file_parameters.f90</title>
+<g id="a_sourcefile~~off_block_signature_object.f90~~AfferentGraph_node9"><a xlink:href="../sourcefile/off_test_save_load_file_parameters.f90.html" xlink:title="off_test_save_load_file_parameters.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1037.5,-24 836.5,-24 836.5,-0 1037.5,-0 1037.5,-24"/>
+<text text-anchor="middle" x="937" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_test_save_load_file_parameters.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~off_objects.f90&#45;&gt;sourcefile~off_test_save_load_file_parameters.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge12" class="edge"><title>sourcefile~off_objects.f90&#45;&gt;sourcefile~off_test_save_load_file_parameters.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M800.109,-42.412C811.656,-39.2134 824.294,-35.8434 836,-33 845.567,-30.676 855.686,-28.3727 865.668,-26.1903"/>
+<polygon fill="#000000" stroke="#000000" points="866.542,-29.5824 875.579,-24.0519 865.066,-22.7398 866.542,-29.5824"/>
+</g>
+<!-- sourcefile~off_file_grid_object.f90&#45;&gt;sourcefile~off_objects.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge1" class="edge"><title>sourcefile~off_file_grid_object.f90&#45;&gt;sourcefile~off_objects.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M489.495,-66.0788C529.18,-79.001 591.025,-97.2401 615,-94"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M617,-94C650.911,-89.4171 688.105,-78.6104 715.775,-69.3838"/>
+<polygon fill="#000000" stroke="#000000" points="717.174,-72.6048 725.514,-66.0704 714.919,-65.9778 717.174,-72.6048"/>
+</g>
+<!-- sourcefile~off_file_grid_object.f90&#45;&gt;sourcefile~off_simulation_object.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge2" class="edge"><title>sourcefile~off_file_grid_object.f90&#45;&gt;sourcefile~off_simulation_object.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M513.95,-54C522.497,-54 531.374,-54 540.162,-54"/>
+<polygon fill="#000000" stroke="#000000" points="540.41,-57.5001 550.41,-54 540.41,-50.5001 540.41,-57.5001"/>
+</g>
+<!-- sourcefile~off_simulation_object.f90&#45;&gt;sourcefile~off_objects.f90 -->
+<g id="sourcefile~~off_block_signature_object.f90~~AfferentGraph_edge3" class="edge"><title>sourcefile~off_simulation_object.f90&#45;&gt;sourcefile~off_objects.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M681.723,-54C690.472,-54 699.341,-54 707.786,-54"/>
+<polygon fill="#000000" stroke="#000000" points="707.84,-57.5001 717.84,-54 707.84,-50.5001 707.84,-57.5001"/>
+</g>
+</g>
+</svg>
+</div>
+                <script>var pansourcefileoff_block_signature_objectf90AfferentGraph = svgPanZoom('#sourcefileoff_block_signature_objectf90AfferentGraph', {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,});
+                    </script>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="189pt" height="32pt"
+ viewBox="0.00 0.00 189.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 185,-28 185,4 -4,4"/>
+<!-- Source File -->
+<g id="node1" class="node"><title>Source File</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="66.25,-24 -0.25,-24 -0.25,-0 66.25,-0 66.25,-24"/>
+<text text-anchor="middle" x="33" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Source File</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="181.25,-24 84.75,-24 84.75,-0 181.25,-0 181.25,-24"/>
+<text text-anchor="middle" x="133" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a file to a file which depends upon it. A file 
+    is dependent upon another if the latter must be compiled before the former
+    can be.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+      
+      <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#mods-1">Modules</a></h3></div>
+  <div id="mods-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html">off_block_signature_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/off_block_signature_object.f90.html#src">off_block_signature_object.f90</a>
+  </div>
+</div>
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    <section>
+      <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="c">!&lt; OFF block signature object definition and implementation.</span>
+<a name="ln-2"></a>
+<a name="ln-3"></a><span class="k">module </span><span class="n">off_block_signature_object</span>
+<a name="ln-4"></a><span class="c">!&lt; OFF block signature object definition and implementation.</span>
+<a name="ln-5"></a>
+<a name="ln-6"></a><span class="k">use </span><span class="n">penf</span><span class="p">,</span> <span class="n">only</span> <span class="p">:</span> <span class="n">I4P</span><span class="p">,</span> <span class="n">I8P</span><span class="p">,</span> <span class="n">str</span>
+<a name="ln-7"></a><span class="k">use </span><span class="n">vecfor</span><span class="p">,</span> <span class="n">only</span> <span class="p">:</span> <span class="n">vector</span>
+<a name="ln-8"></a>
+<a name="ln-9"></a><span class="k">implicit none</span>
+<a name="ln-10"></a><span class="k">private</span>
+<a name="ln-11"></a><span class="k">public</span> <span class="kd">::</span> <span class="n">block_signature_object</span>
+<a name="ln-12"></a>
+<a name="ln-13"></a><span class="k">type</span> <span class="kd">::</span> <span class="n">block_signature_object</span>
+<a name="ln-14"></a>   <span class="c">!&lt; Block signature object class.</span>
+<a name="ln-15"></a>   <span class="c">!&lt;</span>
+<a name="ln-16"></a>   <span class="c">!&lt; Define the block dimensions, id and level.</span>
+<a name="ln-17"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I8P</span><span class="p">)</span> <span class="kd">::</span> <span class="n">id</span><span class="o">=</span><span class="mi">0</span>                  <span class="c">!&lt; Unique (Morton) identification code.</span>
+<a name="ln-18"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span> <span class="kd">::</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span>               <span class="c">!&lt; block refinement level.</span>
+<a name="ln-19"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span> <span class="kd">::</span> <span class="n">gc</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="c">!&lt; Number of ghost cells along each frame.</span>
+<a name="ln-20"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ni</span><span class="o">=</span><span class="mi">0</span>                  <span class="c">!&lt; Number of cells in I direction.</span>
+<a name="ln-21"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nj</span><span class="o">=</span><span class="mi">0</span>                  <span class="c">!&lt; Number of cells in J direction.</span>
+<a name="ln-22"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nk</span><span class="o">=</span><span class="mi">0</span>                  <span class="c">!&lt; Number of cells in K direction.</span>
+<a name="ln-23"></a>   <span class="k">type</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span> <span class="kd">::</span> <span class="n">emin</span>                  <span class="c">!&lt; Coordinates of minimum abscissa (extent) of the block.</span>
+<a name="ln-24"></a>   <span class="k">type</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span> <span class="kd">::</span> <span class="n">emax</span>                  <span class="c">!&lt; Coordinates of maximum abscissa (extent) of the block.</span>
+<a name="ln-25"></a>   <span class="kt">logical</span>      <span class="kd">::</span> <span class="n">is_cartesian</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.</span>  <span class="c">!&lt; Flag for checking if the block is Cartesian.</span>
+<a name="ln-26"></a>   <span class="kt">logical</span>      <span class="kd">::</span> <span class="n">is_null_x</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.</span>     <span class="c">!&lt; Nullify X direction (2D yz, 1D y or z domain).</span>
+<a name="ln-27"></a>   <span class="kt">logical</span>      <span class="kd">::</span> <span class="n">is_null_y</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.</span>     <span class="c">!&lt; Nullify Y direction (2D xy, 1D x or y domain).</span>
+<a name="ln-28"></a>   <span class="kt">logical</span>      <span class="kd">::</span> <span class="n">is_null_z</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.</span>     <span class="c">!&lt; Nullify Z direction (2D xy, 1D x or y domain).</span>
+<a name="ln-29"></a>   <span class="k">contains</span>
+<a name="ln-30"></a>      <span class="c">! public methods</span>
+<a name="ln-31"></a>      <span class="k">procedure</span><span class="p">,</span> <span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="kd">::</span> <span class="n">cells_number</span>   <span class="c">!&lt; Return the number of cells.</span>
+<a name="ln-32"></a>      <span class="k">procedure</span><span class="p">,</span> <span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="kd">::</span> <span class="n">description</span>    <span class="c">!&lt; Return a pretty-formatted description of block signature.</span>
+<a name="ln-33"></a>      <span class="k">procedure</span><span class="p">,</span> <span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="kd">::</span> <span class="n">destroy</span>        <span class="c">!&lt; Destroy block signature.</span>
+<a name="ln-34"></a>      <span class="k">procedure</span><span class="p">,</span> <span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="kd">::</span> <span class="n">initialize</span>     <span class="c">!&lt; Initialize block signature.</span>
+<a name="ln-35"></a>      <span class="k">procedure</span><span class="p">,</span> <span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iolength</span>       <span class="c">!&lt; Return the IO length storage.</span>
+<a name="ln-36"></a>      <span class="k">procedure</span><span class="p">,</span> <span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="kd">::</span> <span class="n">load_from_file</span> <span class="c">!&lt; Load block signature from file.</span>
+<a name="ln-37"></a>      <span class="k">procedure</span><span class="p">,</span> <span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nodes_number</span>   <span class="c">!&lt; Return the number of nodes.</span>
+<a name="ln-38"></a>      <span class="k">procedure</span><span class="p">,</span> <span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="kd">::</span> <span class="n">save_into_file</span> <span class="c">!&lt; Save block signature into file.</span>
+<a name="ln-39"></a>      <span class="c">! operators</span>
+<a name="ln-40"></a>      <span class="k">generic</span> <span class="kd">::</span> <span class="n">assignment</span><span class="p">(</span><span class="o">=</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">block_d_assign_block_d</span> <span class="c">!&lt; Overload `=`.</span>
+<a name="ln-41"></a>      <span class="c">! private methods</span>
+<a name="ln-42"></a>      <span class="k">procedure</span><span class="p">,</span> <span class="k">pass</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">block_d_assign_block_d</span> <span class="c">!&lt; Operator `=`.</span>
+<a name="ln-43"></a><span class="n">endtype</span> <span class="n">block_signature_object</span>
+<a name="ln-44"></a>
+<a name="ln-45"></a><span class="k">contains</span>
+<a name="ln-46"></a>   <span class="c">! public methods</span>
+<a name="ln-47"></a>   <span class="k">elemental function </span><span class="n">cells_number</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">with_ghosts</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">cells_number_</span><span class="p">)</span>
+<a name="ln-48"></a>   <span class="c">!&lt; Return the number of cells.</span>
+<a name="ln-49"></a>   <span class="k">class</span><span class="p">(</span><span class="n">block_signature_object</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">self</span>          <span class="c">!&lt; Block.</span>
+<a name="ln-50"></a>   <span class="kt">logical</span><span class="p">,</span>                       <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">with_ghosts</span>   <span class="c">!&lt; Take into account ghost cells.</span>
+<a name="ln-51"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span>                                        <span class="kd">::</span> <span class="n">cells_number_</span> <span class="c">!&lt; Number of cells.</span>
+<a name="ln-52"></a>   <span class="kt">logical</span>                                             <span class="kd">::</span> <span class="n">with_ghosts_</span>  <span class="c">!&lt; Take into account ghost cells, local variable.</span>
+<a name="ln-53"></a>
+<a name="ln-54"></a>   <span class="n">with_ghosts_</span> <span class="o">=</span> <span class="p">.</span><span class="n">true</span><span class="p">.</span> <span class="p">;</span> <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">with_ghosts</span><span class="p">))</span> <span class="n">with_ghosts_</span> <span class="o">=</span> <span class="n">with_ghosts</span>
+<a name="ln-55"></a>   <span class="k">if</span> <span class="p">(</span><span class="n">with_ghosts_</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-56"></a><span class="k">      </span><span class="n">cells_number_</span> <span class="o">=</span> <span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ni</span> <span class="o">+</span> <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="p">&amp;</span>
+<a name="ln-57"></a>                    <span class="o">*</span> <span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">nj</span> <span class="o">+</span> <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span> <span class="p">&amp;</span>
+<a name="ln-58"></a>                    <span class="o">*</span> <span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">nk</span> <span class="o">+</span> <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+<a name="ln-59"></a>   <span class="k">else</span>
+<a name="ln-60"></a><span class="k">      </span><span class="n">cells_number_</span> <span class="o">=</span> <span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ni</span><span class="p">)</span> <span class="p">&amp;</span>
+<a name="ln-61"></a>                    <span class="o">*</span> <span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">nj</span><span class="p">)</span> <span class="p">&amp;</span>
+<a name="ln-62"></a>                    <span class="o">*</span> <span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">nk</span><span class="p">)</span>
+<a name="ln-63"></a>   <span class="n">endif</span>
+<a name="ln-64"></a>   <span class="n">endfunction</span> <span class="n">cells_number</span>
+<a name="ln-65"></a>
+<a name="ln-66"></a>   <span class="k">pure function </span><span class="n">description</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+<a name="ln-67"></a>   <span class="c">!&lt; Return a pretty-formatted description of the block signature.</span>
+<a name="ln-68"></a>   <span class="k">class</span><span class="p">(</span><span class="n">block_signature_object</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">self</span>             <span class="c">!&lt; Block signature object.</span>
+<a name="ln-69"></a>   <span class="kt">character</span><span class="p">(</span><span class="o">*</span><span class="p">),</span>                  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">prefix</span>           <span class="c">!&lt; Prefixing string.</span>
+<a name="ln-70"></a>   <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>                       <span class="kd">::</span> <span class="n">desc</span>             <span class="c">!&lt; Description.</span>
+<a name="ln-71"></a>   <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>                       <span class="kd">::</span> <span class="n">prefix_</span>          <span class="c">!&lt; Prefixing string, local variable.</span>
+<a name="ln-72"></a>   <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="k">parameter</span>                         <span class="kd">::</span> <span class="n">NL</span><span class="o">=</span><span class="nb">new_line</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="c">!&lt; New line character.</span>
+<a name="ln-73"></a>
+<a name="ln-74"></a>   <span class="n">prefix_</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="p">;</span> <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span> <span class="n">prefix_</span> <span class="o">=</span> <span class="n">prefix</span>
+<a name="ln-75"></a>   <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-76"></a>   <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">//</span><span class="n">prefix_</span><span class="o">//</span><span class="s1">&#39;id           : &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">str</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">id</span><span class="p">,</span>                                 <span class="n">no_sign</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.))</span><span class="o">//</span><span class="n">NL</span>
+<a name="ln-77"></a>   <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">//</span><span class="n">prefix_</span><span class="o">//</span><span class="s1">&#39;level        : &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">str</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">level</span><span class="p">,</span>                              <span class="n">no_sign</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.))</span><span class="o">//</span><span class="n">NL</span>
+<a name="ln-78"></a>   <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">//</span><span class="n">prefix_</span><span class="o">//</span><span class="s1">&#39;gc           : &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">str</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">,</span>                                 <span class="n">no_sign</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.))</span><span class="o">//</span><span class="n">NL</span>
+<a name="ln-79"></a>   <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">//</span><span class="n">prefix_</span><span class="o">//</span><span class="s1">&#39;ni           : &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">str</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ni</span><span class="p">,</span>                                 <span class="n">no_sign</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.))</span><span class="o">//</span><span class="n">NL</span>
+<a name="ln-80"></a>   <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">//</span><span class="n">prefix_</span><span class="o">//</span><span class="s1">&#39;nj           : &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">str</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">nj</span><span class="p">,</span>                                 <span class="n">no_sign</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.))</span><span class="o">//</span><span class="n">NL</span>
+<a name="ln-81"></a>   <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">//</span><span class="n">prefix_</span><span class="o">//</span><span class="s1">&#39;nk           : &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">str</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">nk</span><span class="p">,</span>                                 <span class="n">no_sign</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.))</span><span class="o">//</span><span class="n">NL</span>
+<a name="ln-82"></a>   <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">//</span><span class="n">prefix_</span><span class="o">//</span><span class="s1">&#39;emin         : &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">str</span><span class="p">([</span><span class="n">self</span><span class="p">%</span><span class="n">emin</span><span class="p">%</span><span class="n">x</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emin</span><span class="p">%</span><span class="n">y</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emin</span><span class="p">%</span><span class="n">z</span><span class="p">]</span>                <span class="p">))</span><span class="o">//</span><span class="n">NL</span>
+<a name="ln-83"></a>   <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">//</span><span class="n">prefix_</span><span class="o">//</span><span class="s1">&#39;emax         : &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">str</span><span class="p">([</span><span class="n">self</span><span class="p">%</span><span class="n">emax</span><span class="p">%</span><span class="n">x</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emax</span><span class="p">%</span><span class="n">y</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emax</span><span class="p">%</span><span class="n">z</span><span class="p">]</span>                <span class="p">))</span><span class="o">//</span><span class="n">NL</span>
+<a name="ln-84"></a>   <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">//</span><span class="n">prefix_</span><span class="o">//</span><span class="s1">&#39;is cartesian : &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">str</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">is_cartesian</span>                                      <span class="p">))</span><span class="o">//</span><span class="n">NL</span>
+<a name="ln-85"></a>   <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">//</span><span class="n">prefix_</span><span class="o">//</span><span class="s1">&#39;is null X    : &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">str</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">is_null_x</span>                                         <span class="p">))</span><span class="o">//</span><span class="n">NL</span>
+<a name="ln-86"></a>   <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">//</span><span class="n">prefix_</span><span class="o">//</span><span class="s1">&#39;is null Y    : &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">str</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">is_null_y</span>                                         <span class="p">))</span><span class="o">//</span><span class="n">NL</span>
+<a name="ln-87"></a>   <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">//</span><span class="n">prefix_</span><span class="o">//</span><span class="s1">&#39;is null Z    : &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">str</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">is_null_z</span>                                         <span class="p">))</span>
+<a name="ln-88"></a>   <span class="n">endfunction</span> <span class="n">description</span>
+<a name="ln-89"></a>
+<a name="ln-90"></a>   <span class="k">elemental subroutine </span><span class="n">destroy</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
+<a name="ln-91"></a>   <span class="c">!&lt; Destroy block signature.</span>
+<a name="ln-92"></a>   <span class="k">class</span><span class="p">(</span><span class="n">block_signature_object</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">self</span>  <span class="c">!&lt; Block signature object.</span>
+<a name="ln-93"></a>   <span class="k">type</span><span class="p">(</span><span class="n">block_signature_object</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">fresh</span> <span class="c">!&lt; Fresh instance of block signature object.</span>
+<a name="ln-94"></a>
+<a name="ln-95"></a>   <span class="n">self</span> <span class="o">=</span> <span class="n">fresh</span>
+<a name="ln-96"></a>   <span class="n">endsubroutine</span> <span class="n">destroy</span>
+<a name="ln-97"></a>
+<a name="ln-98"></a>   <span class="k">pure subroutine </span><span class="n">initialize</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span>           <span class="p">&amp;</span>
+<a name="ln-99"></a>                              <span class="n">id</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">gc</span><span class="p">,</span> <span class="n">ni</span><span class="p">,</span> <span class="n">nj</span><span class="p">,</span> <span class="n">nk</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-100"></a>                              <span class="n">emin</span><span class="p">,</span> <span class="n">emax</span><span class="p">,</span> <span class="n">is_cartesian</span><span class="p">,</span> <span class="n">is_null_x</span><span class="p">,</span> <span class="n">is_null_y</span><span class="p">,</span> <span class="n">is_null_z</span><span class="p">)</span>
+<a name="ln-101"></a>   <span class="c">!&lt; Initialize block signature.</span>
+<a name="ln-102"></a>   <span class="c">!&lt;</span>
+<a name="ln-103"></a>   <span class="c">!&lt; @note If both whole `signature` and single components like `id, level, gc...` are passed, the values of</span>
+<a name="ln-104"></a>   <span class="c">!&lt; `signature%id, signature%level, ...` are overridden.</span>
+<a name="ln-105"></a>   <span class="k">class</span><span class="p">(</span><span class="n">block_signature_object</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span>        <span class="kd">::</span> <span class="n">self</span>         <span class="c">!&lt; Block signature object.</span>
+<a name="ln-106"></a>   <span class="k">type</span><span class="p">(</span><span class="n">block_signature_object</span><span class="p">),</span>  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">signature</span>    <span class="c">!&lt; Block signature input.</span>
+<a name="ln-107"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I8P</span><span class="p">),</span>                  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">id</span>           <span class="c">!&lt; Unique (Morton) identification code.</span>
+<a name="ln-108"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">),</span>                  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">level</span>        <span class="c">!&lt; Grid refinement level.</span>
+<a name="ln-109"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">),</span>                  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">gc</span><span class="p">(</span><span class="mi">1</span><span class="p">:)</span>       <span class="c">!&lt; Number of ghost cells along each frame.</span>
+<a name="ln-110"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">),</span>                  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">ni</span>           <span class="c">!&lt; Number of cells in I direction.</span>
+<a name="ln-111"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">),</span>                  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">nj</span>           <span class="c">!&lt; Number of cells in J direction.</span>
+<a name="ln-112"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">),</span>                  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">nk</span>           <span class="c">!&lt; Number of cells in K direction.</span>
+<a name="ln-113"></a>   <span class="k">type</span><span class="p">(</span><span class="n">vector</span><span class="p">),</span>                  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">emin</span>         <span class="c">!&lt; Coordinates of minimum abscissa of the block.</span>
+<a name="ln-114"></a>   <span class="k">type</span><span class="p">(</span><span class="n">vector</span><span class="p">),</span>                  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">emax</span>         <span class="c">!&lt; Coordinates of maximum abscissa of the block.</span>
+<a name="ln-115"></a>   <span class="kt">logical</span><span class="p">,</span>                       <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">is_cartesian</span> <span class="c">!&lt; Flag for checking if the block is Cartesian.</span>
+<a name="ln-116"></a>   <span class="kt">logical</span><span class="p">,</span>                       <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">is_null_x</span>    <span class="c">!&lt; Nullify X direction (2D yz, 1D y or z domain).</span>
+<a name="ln-117"></a>   <span class="kt">logical</span><span class="p">,</span>                       <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">is_null_y</span>    <span class="c">!&lt; Nullify Y direction (2D xy, 1D x or y domain).</span>
+<a name="ln-118"></a>   <span class="kt">logical</span><span class="p">,</span>                       <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">is_null_z</span>    <span class="c">!&lt; Nullify Z direction (2D xy, 1D x or y domain).</span>
+<a name="ln-119"></a>
+<a name="ln-120"></a>   <span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">destroy</span>
+<a name="ln-121"></a>   <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">signature</span>   <span class="p">))</span> <span class="n">self</span>              <span class="o">=</span> <span class="n">signature</span>
+<a name="ln-122"></a>   <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">id</span>          <span class="p">))</span> <span class="n">self</span><span class="p">%</span><span class="n">id</span>           <span class="o">=</span> <span class="n">id</span>
+<a name="ln-123"></a>   <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">level</span>       <span class="p">))</span> <span class="n">self</span><span class="p">%</span><span class="n">level</span>        <span class="o">=</span> <span class="n">level</span>
+<a name="ln-124"></a>   <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">gc</span>          <span class="p">))</span> <span class="n">self</span><span class="p">%</span><span class="n">gc</span>           <span class="o">=</span> <span class="n">gc</span>
+<a name="ln-125"></a>   <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">ni</span>          <span class="p">))</span> <span class="n">self</span><span class="p">%</span><span class="n">ni</span>           <span class="o">=</span> <span class="n">ni</span>
+<a name="ln-126"></a>   <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">nj</span>          <span class="p">))</span> <span class="n">self</span><span class="p">%</span><span class="n">nj</span>           <span class="o">=</span> <span class="n">nj</span>
+<a name="ln-127"></a>   <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">nk</span>          <span class="p">))</span> <span class="n">self</span><span class="p">%</span><span class="n">nk</span>           <span class="o">=</span> <span class="n">nk</span>
+<a name="ln-128"></a>   <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">emin</span>        <span class="p">))</span> <span class="n">self</span><span class="p">%</span><span class="n">emin</span>         <span class="o">=</span> <span class="n">emin</span>
+<a name="ln-129"></a>   <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">emax</span>        <span class="p">))</span> <span class="n">self</span><span class="p">%</span><span class="n">emax</span>         <span class="o">=</span> <span class="n">emax</span>
+<a name="ln-130"></a>   <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">is_cartesian</span><span class="p">))</span> <span class="n">self</span><span class="p">%</span><span class="n">is_cartesian</span> <span class="o">=</span> <span class="n">is_cartesian</span>
+<a name="ln-131"></a>   <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">is_null_x</span>   <span class="p">))</span> <span class="n">self</span><span class="p">%</span><span class="n">is_null_x</span>    <span class="o">=</span> <span class="n">is_null_x</span>
+<a name="ln-132"></a>   <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">is_null_y</span>   <span class="p">))</span> <span class="n">self</span><span class="p">%</span><span class="n">is_null_y</span>    <span class="o">=</span> <span class="n">is_null_y</span>
+<a name="ln-133"></a>   <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">is_null_z</span>   <span class="p">))</span> <span class="n">self</span><span class="p">%</span><span class="n">is_null_z</span>    <span class="o">=</span> <span class="n">is_null_z</span>
+<a name="ln-134"></a>   <span class="n">endsubroutine</span> <span class="n">initialize</span>
+<a name="ln-135"></a>
+<a name="ln-136"></a>   <span class="k">function </span><span class="n">iolength</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
+<a name="ln-137"></a>   <span class="c">!&lt; Return the IO length storage.</span>
+<a name="ln-138"></a>   <span class="k">class</span><span class="p">(</span><span class="n">block_signature_object</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">self</span>     <span class="c">!&lt; Block signature object.</span>
+<a name="ln-139"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span>                              <span class="kd">::</span> <span class="n">iolength</span> <span class="c">!&lt; IO length storage.</span>
+<a name="ln-140"></a>
+<a name="ln-141"></a>   <span class="k">inquire</span><span class="p">(</span><span class="n">iolength</span><span class="o">=</span><span class="n">iolength</span><span class="p">)</span> <span class="n">self</span><span class="p">%</span><span class="n">id</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-142"></a>                              <span class="n">self</span><span class="p">%</span><span class="n">level</span><span class="p">,</span>                            <span class="p">&amp;</span>
+<a name="ln-143"></a>                              <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-144"></a>                              <span class="n">self</span><span class="p">%</span><span class="n">ni</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-145"></a>                              <span class="n">self</span><span class="p">%</span><span class="n">nj</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-146"></a>                              <span class="n">self</span><span class="p">%</span><span class="n">nk</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-147"></a>                              <span class="n">self</span><span class="p">%</span><span class="n">emin</span><span class="p">%</span><span class="n">x</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emin</span><span class="p">%</span><span class="n">y</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emin</span><span class="p">%</span><span class="n">z</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-148"></a>                              <span class="n">self</span><span class="p">%</span><span class="n">emax</span><span class="p">%</span><span class="n">x</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emax</span><span class="p">%</span><span class="n">y</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emax</span><span class="p">%</span><span class="n">z</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-149"></a>                              <span class="n">self</span><span class="p">%</span><span class="n">is_cartesian</span><span class="p">,</span>                     <span class="p">&amp;</span>
+<a name="ln-150"></a>                              <span class="n">self</span><span class="p">%</span><span class="n">is_null_x</span> <span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">is_null_y</span> <span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">is_null_z</span>
+<a name="ln-151"></a>   <span class="n">endfunction</span> <span class="n">iolength</span>
+<a name="ln-152"></a>
+<a name="ln-153"></a>   <span class="k">subroutine </span><span class="n">load_from_file</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">file_unit</span><span class="p">)</span>
+<a name="ln-154"></a>   <span class="c">!&lt; Load block signature from file.</span>
+<a name="ln-155"></a>   <span class="k">class</span><span class="p">(</span><span class="n">block_signature_object</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">self</span>      <span class="c">!&lt; Block signature object.</span>
+<a name="ln-156"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">),</span>                  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">file_unit</span> <span class="c">!&lt; File unit.</span>
+<a name="ln-157"></a>
+<a name="ln-158"></a>   <span class="k">read</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="n">file_unit</span><span class="p">)</span> <span class="n">self</span><span class="p">%</span><span class="n">id</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-159"></a>                        <span class="n">self</span><span class="p">%</span><span class="n">level</span><span class="p">,</span>                            <span class="p">&amp;</span>
+<a name="ln-160"></a>                        <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-161"></a>                        <span class="n">self</span><span class="p">%</span><span class="n">ni</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-162"></a>                        <span class="n">self</span><span class="p">%</span><span class="n">nj</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-163"></a>                        <span class="n">self</span><span class="p">%</span><span class="n">nk</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-164"></a>                        <span class="n">self</span><span class="p">%</span><span class="n">emin</span><span class="p">%</span><span class="n">x</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emin</span><span class="p">%</span><span class="n">y</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emin</span><span class="p">%</span><span class="n">z</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-165"></a>                        <span class="n">self</span><span class="p">%</span><span class="n">emax</span><span class="p">%</span><span class="n">x</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emax</span><span class="p">%</span><span class="n">y</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emax</span><span class="p">%</span><span class="n">z</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-166"></a>                        <span class="n">self</span><span class="p">%</span><span class="n">is_cartesian</span><span class="p">,</span>                     <span class="p">&amp;</span>
+<a name="ln-167"></a>                        <span class="n">self</span><span class="p">%</span><span class="n">is_null_x</span> <span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">is_null_y</span> <span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">is_null_z</span>
+<a name="ln-168"></a>   <span class="n">endsubroutine</span> <span class="n">load_from_file</span>
+<a name="ln-169"></a>
+<a name="ln-170"></a>   <span class="k">elemental function </span><span class="n">nodes_number</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">with_ghosts</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">nodes_number_</span><span class="p">)</span>
+<a name="ln-171"></a>   <span class="c">!&lt; Return the number of nodes.</span>
+<a name="ln-172"></a>   <span class="k">class</span><span class="p">(</span><span class="n">block_signature_object</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">self</span>          <span class="c">!&lt; Block.</span>
+<a name="ln-173"></a>   <span class="kt">logical</span><span class="p">,</span>                       <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">with_ghosts</span>   <span class="c">!&lt; Take into account ghost cells.</span>
+<a name="ln-174"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span>                                        <span class="kd">::</span> <span class="n">nodes_number_</span> <span class="c">!&lt; Number of nodes.</span>
+<a name="ln-175"></a>   <span class="kt">logical</span>                                             <span class="kd">::</span> <span class="n">with_ghosts_</span>  <span class="c">!&lt; Take into account ghost cells, local variable.</span>
+<a name="ln-176"></a>
+<a name="ln-177"></a>   <span class="n">with_ghosts_</span> <span class="o">=</span> <span class="p">.</span><span class="n">true</span><span class="p">.</span> <span class="p">;</span> <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">with_ghosts</span><span class="p">))</span> <span class="n">with_ghosts_</span> <span class="o">=</span> <span class="n">with_ghosts</span>
+<a name="ln-178"></a>   <span class="k">if</span> <span class="p">(</span><span class="n">with_ghosts_</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-179"></a><span class="k">      </span><span class="n">nodes_number_</span> <span class="o">=</span> <span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ni</span> <span class="o">+</span> <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="p">&amp;</span>
+<a name="ln-180"></a>                    <span class="o">*</span> <span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">nj</span> <span class="o">+</span> <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="p">&amp;</span>
+<a name="ln-181"></a>                    <span class="o">*</span> <span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">nk</span> <span class="o">+</span> <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<a name="ln-182"></a>   <span class="k">else</span>
+<a name="ln-183"></a><span class="k">      </span><span class="n">nodes_number_</span> <span class="o">=</span> <span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ni</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="p">&amp;</span>
+<a name="ln-184"></a>                    <span class="o">*</span> <span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">nj</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="p">&amp;</span>
+<a name="ln-185"></a>                    <span class="o">*</span> <span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">nk</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<a name="ln-186"></a>   <span class="n">endif</span>
+<a name="ln-187"></a>   <span class="n">endfunction</span> <span class="n">nodes_number</span>
+<a name="ln-188"></a>
+<a name="ln-189"></a>   <span class="k">subroutine </span><span class="n">save_into_file</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">file_unit</span><span class="p">)</span>
+<a name="ln-190"></a>   <span class="c">!&lt; Load the block signature of all blocks from file.</span>
+<a name="ln-191"></a>   <span class="k">class</span><span class="p">(</span><span class="n">block_signature_object</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">self</span>      <span class="c">!&lt; Block signature object.</span>
+<a name="ln-192"></a>   <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">),</span>                  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">file_unit</span> <span class="c">!&lt; File unit.</span>
+<a name="ln-193"></a>
+<a name="ln-194"></a>   <span class="k">write</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="n">file_unit</span><span class="p">)</span> <span class="n">self</span><span class="p">%</span><span class="n">id</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-195"></a>                         <span class="n">self</span><span class="p">%</span><span class="n">level</span><span class="p">,</span>                            <span class="p">&amp;</span>
+<a name="ln-196"></a>                         <span class="n">self</span><span class="p">%</span><span class="n">gc</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-197"></a>                         <span class="n">self</span><span class="p">%</span><span class="n">ni</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-198"></a>                         <span class="n">self</span><span class="p">%</span><span class="n">nj</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-199"></a>                         <span class="n">self</span><span class="p">%</span><span class="n">nk</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-200"></a>                         <span class="n">self</span><span class="p">%</span><span class="n">emin</span><span class="p">%</span><span class="n">x</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emin</span><span class="p">%</span><span class="n">y</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emin</span><span class="p">%</span><span class="n">z</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-201"></a>                         <span class="n">self</span><span class="p">%</span><span class="n">emax</span><span class="p">%</span><span class="n">x</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emax</span><span class="p">%</span><span class="n">y</span><span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">emax</span><span class="p">%</span><span class="n">z</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-202"></a>                         <span class="n">self</span><span class="p">%</span><span class="n">is_cartesian</span><span class="p">,</span>                     <span class="p">&amp;</span>
+<a name="ln-203"></a>                         <span class="n">self</span><span class="p">%</span><span class="n">is_null_x</span> <span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">is_null_y</span> <span class="p">,</span> <span class="n">self</span><span class="p">%</span><span class="n">is_null_z</span>
+<a name="ln-204"></a>   <span class="n">endsubroutine</span> <span class="n">save_into_file</span>
+<a name="ln-205"></a>
+<a name="ln-206"></a>   <span class="c">! private methods</span>
+<a name="ln-207"></a>   <span class="k">pure subroutine </span><span class="n">block_d_assign_block_d</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
+<a name="ln-208"></a>   <span class="c">!&lt; Operator `=`.</span>
+<a name="ln-209"></a>   <span class="k">class</span><span class="p">(</span><span class="n">block_signature_object</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lhs</span> <span class="c">!&lt; Left hand side.</span>
+<a name="ln-210"></a>   <span class="k">type</span><span class="p">(</span><span class="n">block_signature_object</span><span class="p">),</span>  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">rhs</span> <span class="c">!&lt; Right hand side.</span>
+<a name="ln-211"></a>
+<a name="ln-212"></a>   <span class="n">lhs</span><span class="p">%</span><span class="n">id</span>           <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">id</span>
+<a name="ln-213"></a>   <span class="n">lhs</span><span class="p">%</span><span class="n">level</span>        <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">level</span>
+<a name="ln-214"></a>   <span class="n">lhs</span><span class="p">%</span><span class="n">gc</span>           <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">gc</span>
+<a name="ln-215"></a>   <span class="n">lhs</span><span class="p">%</span><span class="n">ni</span>           <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">ni</span>
+<a name="ln-216"></a>   <span class="n">lhs</span><span class="p">%</span><span class="n">nj</span>           <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">nj</span>
+<a name="ln-217"></a>   <span class="n">lhs</span><span class="p">%</span><span class="n">nk</span>           <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">nk</span>
+<a name="ln-218"></a>   <span class="n">lhs</span><span class="p">%</span><span class="n">emin</span>         <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">emin</span>
+<a name="ln-219"></a>   <span class="n">lhs</span><span class="p">%</span><span class="n">emax</span>         <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">emax</span>
+<a name="ln-220"></a>   <span class="n">lhs</span><span class="p">%</span><span class="n">is_cartesian</span> <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">is_cartesian</span>
+<a name="ln-221"></a>   <span class="n">lhs</span><span class="p">%</span><span class="n">is_null_x</span>    <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">is_null_x</span>
+<a name="ln-222"></a>   <span class="n">lhs</span><span class="p">%</span><span class="n">is_null_y</span>    <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">is_null_y</span>
+<a name="ln-223"></a>   <span class="n">lhs</span><span class="p">%</span><span class="n">is_null_z</span>    <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">is_null_z</span>
+<a name="ln-224"></a>   <span class="n">endsubroutine</span> <span class="n">block_d_assign_block_d</span>
+<a name="ln-225"></a><span class="n">endmodule</span> <span class="n">off_block_signature_object</span>
+</pre></div>
+
+    </section>
+    </div>
+  </div>
+
+  <section class="visible-xs visible-sm hidden-md">
+    <hr>
+    
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allfiles-1">All Source Files</a></h3></div>
+  <div id="allfiles-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../sourcefile/off_block_object.f90.html">off_block_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_block_signature_object.f90.html">off_block_signature_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_cell_object.f90.html">off_cell_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_error_object.f90.html">off_error_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_face_object.f90.html">off_face_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_file_grid_object.f90.html">off_file_grid_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_file_object.f90.html">off_file_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_files_collection_object.f90.html">off_files_collection_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_free_conditions_object.f90.html">off_free_conditions_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_grid_dimensions_object.f90.html">off_grid_dimensions_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_node_object.f90.html">off_node_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_non_dimensional_numbers_object.f90.html">off_non_dimensional_numbers_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_objects.f90.html">off_objects.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_os_object.f90.html">off_os_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_simulation_object.f90.html">off_simulation_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_solver_object.f90.html">off_solver_object.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_test_load_file_parameters.f90.html">off_test_load_file_parameters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_test_save_load_file_grid.f90.html">off_test_save_load_file_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_test_save_load_file_parameters.f90.html">off_test_save_load_file_parameters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/off_time_object.f90.html">off_time_object.f90</a>
+      
+    </div>
+  </div>
+</div>
+
+
+  </section>
+  
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on 2017-08-29 12:30  
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> OFF was developed by Giacomo Rossi
+Stefano Zaghi</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

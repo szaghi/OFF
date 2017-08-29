@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="OFF, Open source Finite volumes Fluid dynamics code">
+    
+    <meta name="author" content="Giacomo Rossi
+Stefano Zaghi" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>off_file_object &ndash; OFF</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">OFF </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>off_file_object 
+    <small>Module</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+	  data-placement="bottom" data-html="true"
+	  title=" 6.9% of total for modules and submodules.">139 statements</a>
+     </li> 
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/off_file_object.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/off_file_object.f90.html'>off_file_object.f90</a></li>
+  
+     <li class="active">off_file_object</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-0">Variables</a></h3></div>
+  <div id="vars-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_file_object.html#variable-error_already_connected">ERROR_ALREADY_CONNECTED</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#variable-error_not_connected">ERROR_NOT_CONNECTED</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#variable-error_not_initialized">ERROR_NOT_INITIALIZED</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#variable-unset_file_name">UNSET_FILE_NAME</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#types-0">Derived Types</a></h3></div>
+  <div id="types-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_file_object.html#type-file_object">file_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#funcs-0">Functions</a></h3></div>
+  <div id="funcs-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-description%7E2">description</a>
+      
+    </div>
+  </div>
+</div>
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-0">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-0" class="panel-collapse collapse">
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-close">close</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-destroy%7E6">destroy</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-file_assign_file">file_assign_file</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-initialize%7E6">initialize</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-load_file_name_from_file">load_file_name_from_file</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-open">open</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-save_file_name_into_file">save_file_name_into_file</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+  <hr>
+  
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allmods-0">All Modules</a></h3></div>
+  <div id="allmods-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_block_object.html">off_block_object</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html">off_block_signature_object</a>
+      
+      <a class="list-group-item" href="../module/off_cell_object.html">off_cell_object</a>
+      
+      <a class="list-group-item" href="../module/off_error_object.html">off_error_object</a>
+      
+      <a class="list-group-item" href="../module/off_face_object.html">off_face_object</a>
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html">off_file_grid_object</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html">off_file_object</a>
+      
+      <a class="list-group-item" href="../module/off_files_collection_object.html">off_files_collection_object</a>
+      
+      <a class="list-group-item" href="../module/off_free_conditions_object.html">off_free_conditions_object</a>
+      
+      <a class="list-group-item" href="../module/off_grid_dimensions_object.html">off_grid_dimensions_object</a>
+      
+      <a class="list-group-item" href="../module/off_node_object.html">off_node_object</a>
+      
+      <a class="list-group-item" href="../module/off_non_dimensional_numbers_object.html">off_non_dimensional_numbers_object</a>
+      
+      <a class="list-group-item" href="../module/off_objects.html">off_objects</a>
+      
+      <a class="list-group-item" href="../module/off_os_object.html">off_os_object</a>
+      
+      <a class="list-group-item" href="../module/off_simulation_object.html">off_simulation_object</a>
+      
+      <a class="list-group-item" href="../module/off_solver_object.html">off_solver_object</a>
+      
+      <a class="list-group-item" href="../module/off_time_object.html">off_time_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+</div>  
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      
+    
+  
+    <ul class="list-inline">
+      <li><h4>Uses:</h4></li>
+      
+      <li><a href="https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html">iso_fortran_env</a></li>
+      
+      <li><a href='../module/off_error_object.html'>off_error_object</a></li>
+      
+      <li>finer</li>
+      
+      <li>penf</li>
+      
+    </ul>
+    
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: module~~off_file_object~~UsesGraph Pages: 1 -->
+<svg id="moduleoff_file_objectUsesGraph" width="336pt" height="142pt"
+ viewBox="0.00 0.00 336.00 142.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~off_file_object~~UsesGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 138)">
+<title>module~~off_file_object~~UsesGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-138 332,-138 332,4 -4,4"/>
+<!-- module~off_file_object -->
+<g id="module~~off_file_object~~UsesGraph_node1" class="node"><title>module~off_file_object</title>
+<polygon fill="none" stroke="black" points="327.5,-84 248.5,-84 248.5,-60 327.5,-60 327.5,-84"/>
+<text text-anchor="middle" x="288" y="-69.6" font-family="Helvetica,sans-Serif" font-size="10.50">off_file_object</text>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~off_file_object~~UsesGraph_node2" class="node"><title>iso_fortran_env</title>
+<g id="a_module~~off_file_object~~UsesGraph_node2"><a xlink:href="https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="87.5,-134 0.5,-134 0.5,-110 87.5,-110 87.5,-134"/>
+<text text-anchor="middle" x="44" y="-119.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~off_file_object -->
+<g id="module~~off_file_object~~UsesGraph_edge3" class="edge"><title>iso_fortran_env&#45;&gt;module~off_file_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M87.7168,-124.844C121.976,-125.909 170.946,-124.675 212,-113 229.563,-108.006 247.57,-98.3402 261.536,-89.6479"/>
+<polygon fill="#000000" stroke="#000000" points="263.577,-92.4961 270.085,-84.1353 259.784,-86.6131 263.577,-92.4961"/>
+</g>
+<!-- module~off_error_object -->
+<g id="module~~off_file_object~~UsesGraph_node5" class="node"><title>module~off_error_object</title>
+<g id="a_module~~off_file_object~~UsesGraph_node5"><a xlink:href="../module/off_error_object.html" xlink:title="off_error_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="212,-104 124,-104 124,-80 212,-80 212,-104"/>
+<text text-anchor="middle" x="168" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_error_object</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~off_error_object -->
+<g id="module~~off_file_object~~UsesGraph_edge1" class="edge"><title>iso_fortran_env&#45;&gt;module~off_error_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M87.6697,-111.507C96.1569,-109.42 105.166,-107.205 113.951,-105.045"/>
+<polygon fill="#000000" stroke="#000000" points="114.86,-108.426 123.735,-102.639 113.189,-101.628 114.86,-108.426"/>
+</g>
+<!-- finer -->
+<g id="module~~off_file_object~~UsesGraph_node3" class="node"><title>finer</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="195,-24 141,-24 141,-0 195,-0 195,-24"/>
+<text text-anchor="middle" x="168" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">finer</text>
+</g>
+<!-- finer&#45;&gt;module~off_file_object -->
+<g id="module~~off_file_object~~UsesGraph_edge4" class="edge"><title>finer&#45;&gt;module~off_file_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M192.879,-24.1419C210.473,-33.0878 234.617,-45.3646 254.046,-55.244"/>
+<polygon fill="#000000" stroke="#000000" points="252.656,-58.4635 263.156,-59.8762 255.829,-52.2238 252.656,-58.4635"/>
+</g>
+<!-- penf -->
+<g id="module~~off_file_object~~UsesGraph_node4" class="node"><title>penf</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="71,-73 17,-73 17,-49 71,-49 71,-73"/>
+<text text-anchor="middle" x="44" y="-58.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">penf</text>
+</g>
+<!-- penf&#45;&gt;module~off_file_object -->
+<g id="module~~off_file_object~~UsesGraph_edge5" class="edge"><title>penf&#45;&gt;module~off_file_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M71.3589,-62.1981C111.357,-64.0162 188.035,-67.5016 238.346,-69.7885"/>
+<polygon fill="#000000" stroke="#000000" points="238.199,-73.2853 248.348,-70.2431 238.517,-66.2925 238.199,-73.2853"/>
+</g>
+<!-- penf&#45;&gt;module~off_error_object -->
+<g id="module~~off_file_object~~UsesGraph_edge2" class="edge"><title>penf&#45;&gt;module~off_error_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M71.1721,-67.6503C83.5734,-70.8014 98.863,-74.6865 113.558,-78.4205"/>
+<polygon fill="#000000" stroke="#000000" points="113.04,-81.9001 123.594,-80.9706 114.764,-75.1156 113.04,-81.9001"/>
+</g>
+<!-- module~off_error_object&#45;&gt;module~off_file_object -->
+<g id="module~~off_file_object~~UsesGraph_edge6" class="edge"><title>module~off_error_object&#45;&gt;module~off_file_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M212.269,-84.6663C220.779,-83.224 229.759,-81.7018 238.43,-80.2323"/>
+<polygon fill="#000000" stroke="#000000" points="239.144,-83.6612 248.419,-78.5392 237.974,-76.7596 239.144,-83.6612"/>
+</g>
+</g>
+</svg>
+</div>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="489pt" height="32pt"
+ viewBox="0.00 0.00 489.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 485,-28 485,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node"><title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node"><title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="139.25,-24 72.75,-24 72.75,-0 139.25,-0 139.25,-24"/>
+<text text-anchor="middle" x="106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="222,-24 158,-24 158,-0 222,-0 222,-24"/>
+<text text-anchor="middle" x="190" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="294,-24 240,-24 240,-0 294,-0 294,-24"/>
+<text text-anchor="middle" x="267" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="366,-24 312,-24 312,-0 366,-0 366,-24"/>
+<text text-anchor="middle" x="339" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="481.25,-24 384.75,-24 384.75,-0 481.25,-0 481.25,-24"/>
+<text text-anchor="middle" x="433" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a parent (sub)module to the submodule which is
+    descended from it. Dashed arrows point from a module being used to the
+    module or program unit using it.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+    
+
+    
+    <p>OFF file object definition and implementation.</p>
+    
+    
+    <h3>Used By</h3>
+    
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: module~~off_file_object~~UsedByGraph Pages: 1 -->
+<svg id="moduleoff_file_objectUsedByGraph" width="641pt" height="120pt"
+ viewBox="0.00 0.00 641.00 119.91" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~off_file_object~~UsedByGraph" class="graph" transform="scale(0.892758 0.892758) rotate(0) translate(4 130.316)">
+<title>module~~off_file_object~~UsedByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-130.316 714,-130.316 714,4 -4,4"/>
+<!-- module~off_file_object -->
+<g id="module~~off_file_object~~UsedByGraph_node1" class="node"><title>module~off_file_object</title>
+<polygon fill="none" stroke="black" points="79.5,-56.3157 0.5,-56.3157 0.5,-32.3157 79.5,-32.3157 79.5,-56.3157"/>
+<text text-anchor="middle" x="40" y="-41.9157" font-family="Helvetica,sans-Serif" font-size="10.50">off_file_object</text>
+</g>
+<!-- module~off_files_collection_object -->
+<g id="module~~off_file_object~~UsedByGraph_node2" class="node"><title>module~off_files_collection_object</title>
+<g id="a_module~~off_file_object~~UsedByGraph_node2"><a xlink:href="../module/off_files_collection_object.html" xlink:title="off_files_collection_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="390,-126.316 256,-126.316 256,-102.316 390,-102.316 390,-126.316"/>
+<text text-anchor="middle" x="323" y="-111.916" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_files_collection_object</text>
+</a>
+</g>
+</g>
+<!-- module~off_file_object&#45;&gt;module~off_files_collection_object -->
+<g id="module~~off_file_object~~UsedByGraph_edge8" class="edge"><title>module~off_file_object&#45;&gt;module~off_files_collection_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M79.8476,-55.5078C91.4515,-58.7657 104.219,-62.2665 116,-65.3157 163.838,-77.6973 218.233,-90.5856 259.11,-100.035"/>
+<polygon fill="#000000" stroke="#000000" points="258.404,-103.464 268.934,-102.3 259.976,-96.6428 258.404,-103.464"/>
+</g>
+<!-- module~off_file_grid_object -->
+<g id="module~~off_file_object~~UsedByGraph_node3" class="node"><title>module~off_file_grid_object</title>
+<g id="a_module~~off_file_object~~UsedByGraph_node3"><a xlink:href="../module/off_file_grid_object.html" xlink:title="off_file_grid_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="219.5,-56.3157 116.5,-56.3157 116.5,-32.3157 219.5,-32.3157 219.5,-56.3157"/>
+<text text-anchor="middle" x="168" y="-41.9157" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_file_grid_object</text>
+</a>
+</g>
+</g>
+<!-- module~off_file_object&#45;&gt;module~off_file_grid_object -->
+<g id="module~~off_file_object~~UsedByGraph_edge9" class="edge"><title>module~off_file_object&#45;&gt;module~off_file_grid_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M79.8323,-44.3157C88.2381,-44.3157 97.3205,-44.3157 106.339,-44.3157"/>
+<polygon fill="#000000" stroke="#000000" points="106.454,-47.8158 116.454,-44.3157 106.454,-40.8158 106.454,-47.8158"/>
+</g>
+<!-- module~off_objects -->
+<g id="module~~off_file_object~~UsedByGraph_node4" class="node"><title>module~off_objects</title>
+<g id="a_module~~off_file_object~~UsedByGraph_node4"><a xlink:href="../module/off_objects.html" xlink:title="off_objects">
+<polygon fill="#337ab7" stroke="#337ab7" points="490,-66.3157 426,-66.3157 426,-42.3157 490,-42.3157 490,-66.3157"/>
+<text text-anchor="middle" x="458" y="-51.9157" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_objects</text>
+</a>
+</g>
+</g>
+<!-- module~off_file_object&#45;&gt;module~off_objects -->
+<g id="module~~off_file_object~~UsedByGraph_edge10" class="edge"><title>module~off_file_object&#45;&gt;module~off_objects</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M78.7507,-32.2777C143.668,-13.4788 280.072,17.65 390,-13.3157 406.055,-17.8383 422.063,-27.3986 434.404,-36.1503"/>
+<polygon fill="#000000" stroke="#000000" points="432.573,-39.1501 442.69,-42.2965 436.743,-33.5279 432.573,-39.1501"/>
+</g>
+<!-- module~off_files_collection_object&#45;&gt;module~off_objects -->
+<g id="module~~off_file_object~~UsedByGraph_edge1" class="edge"><title>module~off_files_collection_object&#45;&gt;module~off_objects</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M356.48,-102.223C367.239,-98.0309 379.217,-93.1629 390,-88.3157 401.804,-83.0097 414.523,-76.7094 425.674,-70.9825"/>
+<polygon fill="#000000" stroke="#000000" points="427.354,-74.0541 434.617,-66.3413 424.129,-67.8409 427.354,-74.0541"/>
+</g>
+<!-- module~off_file_grid_object&#45;&gt;module~off_objects -->
+<g id="module~~off_file_object~~UsedByGraph_edge4" class="edge"><title>module~off_file_grid_object&#45;&gt;module~off_objects</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M219.503,-51.7921C231.442,-53.2568 244.148,-54.5695 256,-55.3157 315.438,-59.0584 330.446,-55.7601 390,-55.3157 398.353,-55.2534 407.291,-55.1474 415.829,-55.027"/>
+<polygon fill="#000000" stroke="#000000" points="416.033,-58.5245 425.979,-54.8752 415.928,-51.5253 416.033,-58.5245"/>
+</g>
+<!-- module~off_simulation_object -->
+<g id="module~~off_file_object~~UsedByGraph_node5" class="node"><title>module~off_simulation_object</title>
+<g id="a_module~~off_file_object~~UsedByGraph_node5"><a xlink:href="../module/off_simulation_object.html" xlink:title="off_simulation_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="379.5,-46.3157 266.5,-46.3157 266.5,-22.3157 379.5,-22.3157 379.5,-46.3157"/>
+<text text-anchor="middle" x="323" y="-31.9157" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_simulation_object</text>
+</a>
+</g>
+</g>
+<!-- module~off_file_grid_object&#45;&gt;module~off_simulation_object -->
+<g id="module~~off_file_object~~UsedByGraph_edge3" class="edge"><title>module~off_file_grid_object&#45;&gt;module~off_simulation_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M219.522,-41.0136C231.218,-40.2492 243.834,-39.4246 256.081,-38.6242"/>
+<polygon fill="#000000" stroke="#000000" points="256.502,-42.1042 266.253,-37.9593 256.046,-35.1191 256.502,-42.1042"/>
+</g>
+<!-- program~off_test_save_load_file_parameters -->
+<g id="module~~off_file_object~~UsedByGraph_node6" class="node"><title>program~off_test_save_load_file_parameters</title>
+<g id="a_module~~off_file_object~~UsedByGraph_node6"><a xlink:href="../program/off_test_save_load_file_parameters.html" xlink:title="off_test_save_load_file_parameters">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="709.5,-108.316 526.5,-108.316 526.5,-84.3157 709.5,-84.3157 709.5,-108.316"/>
+<text text-anchor="middle" x="618" y="-93.9157" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_test_save_load_file_parameters</text>
+</a>
+</g>
+</g>
+<!-- module~off_objects&#45;&gt;program~off_test_save_load_file_parameters -->
+<g id="module~~off_file_object~~UsedByGraph_edge5" class="edge"><title>module~off_objects&#45;&gt;program~off_test_save_load_file_parameters</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M490.212,-64.6459C501.44,-68.2165 514.236,-72.1199 526,-75.3157 534.299,-77.5703 543.065,-79.792 551.749,-81.8978"/>
+<polygon fill="#000000" stroke="#000000" points="550.95,-85.3053 561.489,-84.2216 552.574,-78.4964 550.95,-85.3053"/>
+</g>
+<!-- program~off_test_load_file_parameters -->
+<g id="module~~off_file_object~~UsedByGraph_node7" class="node"><title>program~off_test_load_file_parameters</title>
+<g id="a_module~~off_file_object~~UsedByGraph_node7"><a xlink:href="../program/off_test_load_file_parameters.html" xlink:title="off_test_load_file_parameters">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="695,-66.3157 541,-66.3157 541,-42.3157 695,-42.3157 695,-66.3157"/>
+<text text-anchor="middle" x="618" y="-51.9157" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_test_load_file_parameters</text>
+</a>
+</g>
+</g>
+<!-- module~off_objects&#45;&gt;program~off_test_load_file_parameters -->
+<g id="module~~off_file_object~~UsedByGraph_edge6" class="edge"><title>module~off_objects&#45;&gt;program~off_test_load_file_parameters</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M490.216,-54.3157C502.053,-54.3157 516.184,-54.3157 530.645,-54.3157"/>
+<polygon fill="#000000" stroke="#000000" points="530.687,-57.8158 540.686,-54.3157 530.686,-50.8158 530.687,-57.8158"/>
+</g>
+<!-- program~off_test_save_load_file_grid -->
+<g id="module~~off_file_object~~UsedByGraph_node8" class="node"><title>program~off_test_save_load_file_grid</title>
+<g id="a_module~~off_file_object~~UsedByGraph_node8"><a xlink:href="../program/off_test_save_load_file_grid.html" xlink:title="off_test_save_load_file_grid">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="691,-24.3157 545,-24.3157 545,-0.31573 691,-0.31573 691,-24.3157"/>
+<text text-anchor="middle" x="618" y="-9.91573" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_test_save_load_file_grid</text>
+</a>
+</g>
+</g>
+<!-- module~off_objects&#45;&gt;program~off_test_save_load_file_grid -->
+<g id="module~~off_file_object~~UsedByGraph_edge7" class="edge"><title>module~off_objects&#45;&gt;program~off_test_save_load_file_grid</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M490.212,-43.9855C501.44,-40.4149 514.236,-36.5115 526,-33.3157 534.299,-31.0612 543.065,-28.8394 551.749,-26.7336"/>
+<polygon fill="#000000" stroke="#000000" points="552.574,-30.1351 561.489,-24.4098 550.95,-23.3262 552.574,-30.1351"/>
+</g>
+<!-- module~off_simulation_object&#45;&gt;module~off_objects -->
+<g id="module~~off_file_object~~UsedByGraph_edge2" class="edge"><title>module~off_simulation_object&#45;&gt;module~off_objects</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M379.633,-42.6816C391.732,-44.501 404.324,-46.3946 415.749,-48.1125"/>
+<polygon fill="#000000" stroke="#000000" points="415.455,-51.6077 425.865,-49.6337 416.496,-44.6855 415.455,-51.6077"/>
+</g>
+</g>
+</svg>
+</div>
+                <script>var panmoduleoff_file_objectUsedByGraph = svgPanZoom('#moduleoff_file_objectUsedByGraph', {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,});
+                    </script>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="489pt" height="32pt"
+ viewBox="0.00 0.00 489.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 485,-28 485,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node"><title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node"><title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="139.25,-24 72.75,-24 72.75,-0 139.25,-0 139.25,-24"/>
+<text text-anchor="middle" x="106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="222,-24 158,-24 158,-0 222,-0 222,-24"/>
+<text text-anchor="middle" x="190" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="294,-24 240,-24 240,-0 294,-0 294,-24"/>
+<text text-anchor="middle" x="267" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="366,-24 312,-24 312,-0 366,-0 366,-24"/>
+<text text-anchor="middle" x="339" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="481.25,-24 384.75,-24 384.75,-0 481.25,-0 481.25,-24"/>
+<text text-anchor="middle" x="433" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a parent (sub)module to the submodule which is
+    descended from it. Dashed arrows point from a module being used to the
+    module or program unit using it.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+    <br>
+    
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-1">Variables</a></h3></div>
+  <div id="vars-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_file_object.html#variable-error_already_connected">ERROR_ALREADY_CONNECTED</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#variable-error_not_connected">ERROR_NOT_CONNECTED</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#variable-error_not_initialized">ERROR_NOT_INITIALIZED</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#variable-unset_file_name">UNSET_FILE_NAME</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#types-1">Derived Types</a></h3></div>
+  <div id="types-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_file_object.html#type-file_object">file_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#funcs-1">Functions</a></h3></div>
+  <div id="funcs-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-description%7E2">description</a>
+      
+    </div>
+  </div>
+</div>
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-1">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-1" class="panel-collapse collapse">
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-close">close</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-destroy%7E6">destroy</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-file_assign_file">file_assign_file</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-initialize%7E6">initialize</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-load_file_name_from_file">load_file_name_from_file</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-open">open</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html#proc-save_file_name_into_file">save_file_name_into_file</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+
+    
+    <section>
+    <h2>Variables</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-error_already_connected"></span>integer(kind=I4P),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>ERROR_ALREADY_CONNECTED</strong></td><td> =</td><td>1</td><td><p>Already connected error code.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-error_not_connected"></span>integer(kind=I4P),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>ERROR_NOT_CONNECTED</strong></td><td> =</td><td>2</td><td><p>Not connected error code.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-error_not_initialized"></span>integer(kind=I4P),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>ERROR_NOT_INITIALIZED</strong></td><td> =</td><td>3</td><td><p>Not initialized error code.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-unset_file_name"></span>character(len=5),</td>
+  
+  <td>private,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>UNSET_FILE_NAME</strong></td><td> =</td><td>'unset'</td><td><p>Default, unset file name.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+    
+    
+    
+    
+
+    
+    
+    
+    <section>
+     <h2>Derived Types</h2>
+	 
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-file_object"></span><h3>type, public :: <a href='../type/file_object.html'>file_object</a>
+    
+  </h3></div>
+  <div class="panel-body">
+    
+    
+    <p>File object class.</p>
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-error%7E2"></span>type(<a href='../type/error_object.html'>error_object</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>error</strong></td><td></td><td></td><td><p>Errors handler.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-file_name"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>file_name</strong></td><td></td><td></td><td><p>File name.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-file_unit"></span>integer(kind=I4P),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>file_unit</strong></td><td> =</td><td>0</td><td><p>File unit.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-is_connected"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>is_connected</strong></td><td> =</td><td>.false.</td><td><p>Sentinel to check if file is connected.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-is_initialized"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>is_initialized</strong></td><td> =</td><td>.false.</td><td><p>Sentinel to check if file is initialized.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+     <h4>Type-Bound Procedures</h4>
+      <table class="table table-striped varlist">
+      <tbody>
+      
+       <tr><td>generic, public :: <strong><a href='../type/file_object.html#boundprocedure-assignment%28%3D%29%7E7'>assignment(=)</a></strong>  => file_assign_file </td>
+       <td><p>Overload <code>=</code>.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-close'>close</a></strong>  </td>
+       <td><p>Close file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-description%7E2'>description</a></strong>  </td>
+       <td><p>Return a pretty-formatted description of the file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-destroy%7E6'>destroy</a></strong>  </td>
+       <td><p>Destroy file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(lhs) :: <strong><a href='../type/file_object.html#boundprocedure-file_assign_file'>file_assign_file</a></strong>  </td>
+       <td><p>Operator <code>=</code>.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-initialize%7E6'>initialize</a></strong>  </td>
+       <td><p>Initialize file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-load_file_name_from_file'>load_file_name_from_file</a></strong>  </td>
+       <td><p>Load file name from file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-open'>open</a></strong>  </td>
+       <td><p>Open file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-save_file_name_into_file'>save_file_name_into_file</a></strong>  </td>
+       <td><p>Save file name into file.</p></td></tr>
+      
+       </tbody>
+       </table>
+     
+  </div>
+</div>
+
+     
+    </section>
+	<br>
+    
+    
+     
+    <section>
+    <h2>Functions</h2>
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-description%7E2"></span><h3>
+private pure function <a href='../proc/description%7E2.html'>description</a>(self, prefix) result(desc)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Return a pretty-formatted description of the file.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/file_object.html'>file_object</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>Files collection.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>prefix</strong></td><td><p>Prefixing string.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=:),
+  allocatable</small></h4>
+  <p>Description.</p>
+    
+
+  </div>
+  </div>
+
+    
+    </section>
+    <br>
+    
+
+    
+    <section>
+    <h2>Subroutines</h2>
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-close"></span><h3>
+private subroutine <a href='../proc/close.html'>close</a>(self)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Close file.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/file_object.html'>file_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>File object.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-destroy%7E6"></span><h3>
+private elemental subroutine <a href='../proc/destroy%7E6.html'>destroy</a>(self)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Destroy file.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/file_object.html'>file_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>File object.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-file_assign_file"></span><h3>
+private pure subroutine <a href='../proc/file_assign_file.html'>file_assign_file</a>(lhs, rhs)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Operator <code>=</code>.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/file_object.html'>file_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>lhs</strong></td><td><p>Left hand side.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/file_object.html'>file_object</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rhs</strong></td><td><p>Right hand side.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-initialize%7E6"></span><h3>
+private elemental subroutine <a href='../proc/initialize%7E6.html'>initialize</a>(self, file_name)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Initialize File.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/file_object.html'>file_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>File object.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>file_name</strong></td><td><p>File name.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-load_file_name_from_file"></span><h3>
+private subroutine <a href='../proc/load_file_name_from_file.html'>load_file_name_from_file</a>(self, fini, section_name, option_name, go_on_fail)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Load file name from file.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/file_object.html'>file_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>File object.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(file_ini),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fini</strong></td><td><p>Simulation parameters ini file handler.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>section_name</strong></td><td><p>Option name into the ini file.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>option_name</strong></td><td><p>Option name into the ini file.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>go_on_fail</strong></td><td><p>Go on if load fails.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-open"></span><h3>
+private subroutine <a href='../proc/open.html'>open</a>(self, file_name, format, action, access)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Open file.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/file_object.html'>file_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>File object.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>file_name</strong></td><td><p>File name.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>format</strong></td><td><p>File format.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>action</strong></td><td><p>File action.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>access</strong></td><td><p>File access.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-save_file_name_into_file"></span><h3>
+private subroutine <a href='../proc/save_file_name_into_file.html'>save_file_name_into_file</a>(self, fini, section_name, option_name)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Save file name into file.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/file_object.html'>file_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>File object.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(file_ini),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fini</strong></td><td><p>Simulation parameters ini file handler.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>section_name</strong></td><td><p>Option name into the ini file.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>option_name</strong></td><td><p>Option name into the ini file.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    </section>    
+    <br>
+    
+    
+    
+    </div>
+  </div>
+
+  <section class="visible-xs visible-sm hidden-md">
+    <hr>
+    
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allmods-1">All Modules</a></h3></div>
+  <div id="allmods-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_block_object.html">off_block_object</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html">off_block_signature_object</a>
+      
+      <a class="list-group-item" href="../module/off_cell_object.html">off_cell_object</a>
+      
+      <a class="list-group-item" href="../module/off_error_object.html">off_error_object</a>
+      
+      <a class="list-group-item" href="../module/off_face_object.html">off_face_object</a>
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html">off_file_grid_object</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html">off_file_object</a>
+      
+      <a class="list-group-item" href="../module/off_files_collection_object.html">off_files_collection_object</a>
+      
+      <a class="list-group-item" href="../module/off_free_conditions_object.html">off_free_conditions_object</a>
+      
+      <a class="list-group-item" href="../module/off_grid_dimensions_object.html">off_grid_dimensions_object</a>
+      
+      <a class="list-group-item" href="../module/off_node_object.html">off_node_object</a>
+      
+      <a class="list-group-item" href="../module/off_non_dimensional_numbers_object.html">off_non_dimensional_numbers_object</a>
+      
+      <a class="list-group-item" href="../module/off_objects.html">off_objects</a>
+      
+      <a class="list-group-item" href="../module/off_os_object.html">off_os_object</a>
+      
+      <a class="list-group-item" href="../module/off_simulation_object.html">off_simulation_object</a>
+      
+      <a class="list-group-item" href="../module/off_solver_object.html">off_solver_object</a>
+      
+      <a class="list-group-item" href="../module/off_time_object.html">off_time_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+  </section>
+  
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on 2017-08-29 12:30  
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> OFF was developed by Giacomo Rossi
+Stefano Zaghi</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

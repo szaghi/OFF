@@ -1,7 +1,0 @@
-<map id="lib_riemann::sampling_fluxes_vacuum" name="lib_riemann::sampling_fluxes_vacuum">
-<area shape="rect" id="node3" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga82d4f5c7adace2fdffa51b872a3e80f9" title="Function for computing the speed of sound for an ideal calorically perfect gas. " alt="" coords="381,29,547,76"/>
-<area shape="rect" id="node5" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga72edfdd7b6205b7dc0fe8cfacb07d068" title="Function for computing the pressure for an ideal calorically perfect gas. " alt="" coords="595,103,760,149"/>
-<area shape="rect" id="node7" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#gafc7677510bfb5d5bfab4510107291d32" title="Function for computing the density for an ideal calorically perfect gas. " alt="" coords="808,103,973,149"/>
-<area shape="rect" id="node13" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga3a681bc3b342b628e094aff4fa0bd3e8" title="lib_riemann::fluxes" alt="" coords="203,179,333,209"/>
-<area shape="rect" id="node15" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga97d5fe3d357ec9b7ef4b3ee24a15bd0e" title="Function for computing the total specific entalpy (per unit of mass) for an ideal calorically perfect..." alt="" coords="381,200,547,247"/>
-</map>

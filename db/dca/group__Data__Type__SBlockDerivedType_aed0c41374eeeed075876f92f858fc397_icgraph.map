@@ -1,5 +1,0 @@
-<map id="data_type_sblock::type_sblock::metrics_correction" name="data_type_sblock::type_sblock::metrics_correction">
-<area shape="rect" id="node3" href="$db/dca/group__Data__Type__SBlockDerivedType.html#a5583ddae8d2935b39711f15a1efdbfae" title="data_type_sblock::type\l_sblock::save_fluid" alt="" coords="237,5,395,51"/>
-<area shape="rect" id="node5" href="$db/dca/group__Data__Type__SBlockDerivedType.html#ab1dd191687987024b7eb891c67e97fde" title="data_type_sblock::type\l_sblock::load_mesh" alt="" coords="443,5,600,51"/>
-<area shape="rect" id="node7" href="$db/dca/group__Data__Type__SBlockDerivedType.html#a1e98c57e963472ad4973e53d9ea0812d" title="data_type_sblock::type\l_sblock::alloc" alt="" coords="648,5,805,51"/>
-</map>

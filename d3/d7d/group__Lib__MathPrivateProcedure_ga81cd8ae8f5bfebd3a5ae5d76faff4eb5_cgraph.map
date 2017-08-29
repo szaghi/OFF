@@ -1,8 +1,0 @@
-<map id="lib_math::spline3_r8" name="lib_math::spline3_r8">
-<area shape="rect" id="node3" href="$d7/df5/Lib__Math_8f90.html#ab140e10a943525806312d0f285146a44" title="compute_cd2" alt="" coords="337,5,436,35"/>
-<area shape="rect" id="node5" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga72edfdd7b6205b7dc0fe8cfacb07d068" title="Function for computing the pressure for an ideal calorically perfect gas. " alt="" coords="517,49,683,95"/>
-<area shape="rect" id="node15" href="$d7/df5/Lib__Math_8f90.html#aeb765dbc31ea370ee0f7753550ea8cb8" title="cspline" alt="" coords="193,117,255,147"/>
-<area shape="rect" id="node7" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#gafc7677510bfb5d5bfab4510107291d32" title="Function for computing the density for an ideal calorically perfect gas. " alt="" coords="731,109,896,155"/>
-<area shape="rect" id="node10" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga82d4f5c7adace2fdffa51b872a3e80f9" title="Function for computing the speed of sound for an ideal calorically perfect gas. " alt="" coords="944,109,1109,155"/>
-<area shape="rect" id="node18" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga97d5fe3d357ec9b7ef4b3ee24a15bd0e" title="Function for computing the total specific entalpy (per unit of mass) for an ideal calorically perfect..." alt="" coords="304,109,469,155"/>
-</map>

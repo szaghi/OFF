@@ -1,9 +1,0 @@
-<map id="data_type_global::type_global::alloc_bc" name="data_type_global::type_global::alloc_bc">
-<area shape="rect" id="node3" href="$da/d5f/structdata__type__global_1_1type__global.html#a74d5cd5d9915b451f33e9b21c8782e75" title="data_type_global::type\l_global::load_fluid_0species" alt="" coords="209,5,393,51"/>
-<area shape="rect" id="node5" href="$d2/db8/group__Data__Type__GlobalPrivateProcedure.html#gab4f023ddf5803c7e5ed11db345e12085" title="Function for loading initial species from ascii file. " alt="" coords="225,74,377,121"/>
-<area shape="rect" id="node7" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga070c459fd5e26bcec905b7a2f2419ad3" title="Subroutine for printing to stderr a &quot;file not found error&quot;. " alt="" coords="457,13,593,59"/>
-<area shape="rect" id="node9" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga03b3d23e7eb885f6fb3c00f7a977b33d" title="The Get_Unit function returns a free logic unit for opening a file. " alt="" coords="455,83,596,112"/>
-<area shape="rect" id="node11" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#gafc7677510bfb5d5bfab4510107291d32" title="Function for computing the density for an ideal calorically perfect gas. " alt="" coords="443,135,608,182"/>
-<area shape="rect" id="node13" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga82d4f5c7adace2fdffa51b872a3e80f9" title="Function for computing the speed of sound for an ideal calorically perfect gas. " alt="" coords="656,99,821,146"/>
-<area shape="rect" id="node15" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga72edfdd7b6205b7dc0fe8cfacb07d068" title="Function for computing the pressure for an ideal calorically perfect gas. " alt="" coords="869,135,1035,182"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="data_type_sblock::load_bbc" name="data_type_sblock::load_bbc">
-<area shape="rect" id="node3" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga070c459fd5e26bcec905b7a2f2419ad3" title="Subroutine for printing to stderr a &quot;file not found error&quot;. " alt="" coords="247,5,383,51"/>
-<area shape="rect" id="node5" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga03b3d23e7eb885f6fb3c00f7a977b33d" title="The Get_Unit function returns a free logic unit for opening a file. " alt="" coords="244,75,385,104"/>
-<area shape="rect" id="node7" href="$db/daa/group__Data__Type__BCPublicProcedure.html#ga50f305bddd1bf0f7443486ded11a8d0b" title="Function for reading Type_BC data. " alt="" coords="237,128,392,157"/>
-</map>

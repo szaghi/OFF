@@ -1,8 +1,0 @@
-<map id="lib_riemann::chk_smooth_limiter" name="lib_riemann::chk_smooth_limiter">
-<area shape="rect" id="node3" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#gafc81dfe580a2aadee9caa0ef508777e4" title="lib_riemann::harten\l_limiter" alt="" coords="233,5,364,51"/>
-<area shape="rect" id="node15" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga589ad6b3766ece3dc30d3087971007a1" title="lib_riemann::vanalbada\l_limiter" alt="" coords="221,74,376,121"/>
-<area shape="rect" id="node18" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga745a0a7f2dc8e1c7eebff7b25b3ad857" title="lib_riemann::vanleer\l_limiter" alt="" coords="229,143,368,190"/>
-<area shape="rect" id="node5" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#gafc7677510bfb5d5bfab4510107291d32" title="Function for computing the density for an ideal calorically perfect gas. " alt="" coords="424,74,589,121"/>
-<area shape="rect" id="node7" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga72edfdd7b6205b7dc0fe8cfacb07d068" title="Function for computing the pressure for an ideal calorically perfect gas. " alt="" coords="637,38,803,85"/>
-<area shape="rect" id="node10" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga82d4f5c7adace2fdffa51b872a3e80f9" title="Function for computing the speed of sound for an ideal calorically perfect gas. " alt="" coords="851,74,1016,121"/>
-</map>

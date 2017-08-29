@@ -1,4 +1,0 @@
-<map id="lib_riemann::roe_state" name="lib_riemann::roe_state">
-<area shape="rect" id="node3" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#gad4a1301de7d450c64455260258670f29" title="Exact Riemann solver based on iterative solution of u&#45;function. " alt="" coords="219,5,381,51"/>
-<area shape="rect" id="node5" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga39fc6b65a34187179c90685d10dc00f2" title="Approximate Riemann solver based on Roe linearization. " alt="" coords="207,75,393,104"/>
-</map>

@@ -1,9 +1,0 @@
-<map id="lib_fluidynamic::set_bc" name="lib_fluidynamic::set_bc">
-<area shape="rect" id="node3" href="$d3/d31/group__Lib__FluidynamicPublicProcedure.html#gab1d3e002bb143b4c01ca63116551d440" title="Subroutine for imposing the boundary conditions of blocks of grid level &quot;l&quot; updating the ghost cells..." alt="" coords="209,93,377,139"/>
-<area shape="rect" id="node16" href="$dd/d35/group__Lib__FluidynamicPrivateProcedure.html#ga6d2c678d7a1468e32dda943df8da70e4" title="Subroutine for summing Runge&#45;Kutta stages for updating primitive variables (blockP). " alt="" coords="231,162,356,209"/>
-<area shape="rect" id="node5" href="$d3/d69/group__Lib__MultigridLibrary.html#ab06b3bf4d5ccdfb95761eece5859dd09" title="lib_multigrid::correct" alt="" coords="441,13,580,43"/>
-<area shape="rect" id="node9" href="$d9/d99/group__OFFProgram.html#gab96c351668e50a49652d8e1afdacbd71" title="OFF is an Open source Finite volumes Fluid dynamics code. " alt="" coords="712,123,749,152"/>
-<area shape="rect" id="node11" href="$d3/d69/group__Lib__MultigridLibrary.html#af39c2828379a017afec42470cc48e648" title="lib_multigrid::restrict" alt="" coords="441,117,580,147"/>
-<area shape="rect" id="node13" href="$d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga79052c5d1303cf75c40df5cbee237589" title="Subroutine for solving (performing one time step integration) the conservation equations for grid lev..." alt="" coords="427,171,595,200"/>
-<area shape="rect" id="node7" href="$d0/d54/group__Data__Type__SBlockPrivateProcedure.html#ga2e5d4db0a5088d0560e286e405035297" title="Subroutine for correcting the metrics of natural (and negative volume) boundary conditions cells of s..." alt="" coords="644,5,817,51"/>
-</map>

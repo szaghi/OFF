@@ -1,6 +1,0 @@
-<map id="data_type_sblock::load_bfluid" name="data_type_sblock::load_bfluid">
-<area shape="rect" id="node3" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga070c459fd5e26bcec905b7a2f2419ad3" title="Subroutine for printing to stderr a &quot;file not found error&quot;. " alt="" coords="213,5,349,51"/>
-<area shape="rect" id="node5" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga03b3d23e7eb885f6fb3c00f7a977b33d" title="The Get_Unit function returns a free logic unit for opening a file. " alt="" coords="211,75,352,104"/>
-<area shape="rect" id="node7" href="$d2/d15/group__Data__Type__PrimitivePublicProcedure.html#gab4643adf91df82cf70ee18c199919737" title="Function for reading Type_Primitive data. " alt="" coords="215,127,348,174"/>
-<area shape="rect" id="node9" href="$db/daf/group__Data__Type__VectorPublicProcedure.html#ga5ad8dde22d27dbeedb6a9959bb37ffd0" title="Function for reading Type_Vector data. " alt="" coords="400,127,555,174"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="lib_riemann::interstates23u" name="lib_riemann::interstates23u">
-<area shape="rect" id="node3" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga55ca6dd8ee2d2ea7a13b34329ac84dff" title="lib_riemann::rarefaction" alt="" coords="232,57,389,87"/>
-<area shape="rect" id="node17" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga8abeb58bf726afa28cafe99d75a2a0e8" title="lib_riemann::shock" alt="" coords="245,139,376,168"/>
-<area shape="rect" id="node5" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga82d4f5c7adace2fdffa51b872a3e80f9" title="Function for computing the speed of sound for an ideal calorically perfect gas. " alt="" coords="437,34,603,81"/>
-<area shape="rect" id="node7" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga72edfdd7b6205b7dc0fe8cfacb07d068" title="Function for computing the pressure for an ideal calorically perfect gas. " alt="" coords="651,106,816,153"/>
-<area shape="rect" id="node9" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#gafc7677510bfb5d5bfab4510107291d32" title="Function for computing the density for an ideal calorically perfect gas. " alt="" coords="864,70,1029,117"/>
-</map>

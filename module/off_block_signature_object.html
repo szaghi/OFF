@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="OFF, Open source Finite volumes Fluid dynamics code">
+    
+    <meta name="author" content="Giacomo Rossi
+Stefano Zaghi" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>off_block_signature_object &ndash; OFF</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">OFF </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>off_block_signature_object 
+    <small>Module</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+	  data-placement="bottom" data-html="true"
+	  title=" 7.3% of total for modules and submodules.">147 statements</a>
+     </li> 
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/off_block_signature_object.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/off_block_signature_object.f90.html'>off_block_signature_object.f90</a></li>
+  
+     <li class="active">off_block_signature_object</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#types-0">Derived Types</a></h3></div>
+  <div id="types-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#type-block_signature_object">block_signature_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#funcs-0">Functions</a></h3></div>
+  <div id="funcs-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-cells_number%7E2">cells_number</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-description">description</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-iolength">iolength</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-nodes_number%7E2">nodes_number</a>
+      
+    </div>
+  </div>
+</div>
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-0">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-0" class="panel-collapse collapse">
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-block_d_assign_block_d">block_d_assign_block_d</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-destroy%7E2">destroy</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-initialize%7E2">initialize</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-load_from_file">load_from_file</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-save_into_file">save_into_file</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+  <hr>
+  
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allmods-0">All Modules</a></h3></div>
+  <div id="allmods-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_block_object.html">off_block_object</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html">off_block_signature_object</a>
+      
+      <a class="list-group-item" href="../module/off_cell_object.html">off_cell_object</a>
+      
+      <a class="list-group-item" href="../module/off_error_object.html">off_error_object</a>
+      
+      <a class="list-group-item" href="../module/off_face_object.html">off_face_object</a>
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html">off_file_grid_object</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html">off_file_object</a>
+      
+      <a class="list-group-item" href="../module/off_files_collection_object.html">off_files_collection_object</a>
+      
+      <a class="list-group-item" href="../module/off_free_conditions_object.html">off_free_conditions_object</a>
+      
+      <a class="list-group-item" href="../module/off_grid_dimensions_object.html">off_grid_dimensions_object</a>
+      
+      <a class="list-group-item" href="../module/off_node_object.html">off_node_object</a>
+      
+      <a class="list-group-item" href="../module/off_non_dimensional_numbers_object.html">off_non_dimensional_numbers_object</a>
+      
+      <a class="list-group-item" href="../module/off_objects.html">off_objects</a>
+      
+      <a class="list-group-item" href="../module/off_os_object.html">off_os_object</a>
+      
+      <a class="list-group-item" href="../module/off_simulation_object.html">off_simulation_object</a>
+      
+      <a class="list-group-item" href="../module/off_solver_object.html">off_solver_object</a>
+      
+      <a class="list-group-item" href="../module/off_time_object.html">off_time_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+</div>  
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      
+    
+  
+    <ul class="list-inline">
+      <li><h4>Uses:</h4></li>
+      
+      <li>penf</li>
+      
+      <li>vecfor</li>
+      
+    </ul>
+    
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: module~~off_block_signature_object~~UsesGraph Pages: 1 -->
+<svg id="moduleoff_block_signature_objectUsesGraph" width="238pt" height="74pt"
+ viewBox="0.00 0.00 238.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~off_block_signature_object~~UsesGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
+<title>module~~off_block_signature_object~~UsesGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-70 234,-70 234,4 -4,4"/>
+<!-- module~off_block_signature_object -->
+<g id="module~~off_block_signature_object~~UsesGraph_node1" class="node"><title>module~off_block_signature_object</title>
+<polygon fill="none" stroke="black" points="230,-45 90,-45 90,-21 230,-21 230,-45"/>
+<text text-anchor="middle" x="160" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">off_block_signature_object</text>
+</g>
+<!-- vecfor -->
+<g id="module~~off_block_signature_object~~UsesGraph_node2" class="node"><title>vecfor</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-66 0,-66 0,-42 54,-42 54,-66"/>
+<text text-anchor="middle" x="27" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vecfor</text>
+</g>
+<!-- vecfor&#45;&gt;module~off_block_signature_object -->
+<g id="module~~off_block_signature_object~~UsesGraph_edge1" class="edge"><title>vecfor&#45;&gt;module~off_block_signature_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.195,-49.8008C61.8716,-48.5702 70.6912,-47.1564 79.8853,-45.6825"/>
+<polygon fill="#000000" stroke="#000000" points="80.6525,-49.1043 89.9725,-44.0655 79.5445,-42.1925 80.6525,-49.1043"/>
+</g>
+<!-- penf -->
+<g id="module~~off_block_signature_object~~UsesGraph_node3" class="node"><title>penf</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">penf</text>
+</g>
+<!-- penf&#45;&gt;module~off_block_signature_object -->
+<g id="module~~off_block_signature_object~~UsesGraph_edge2" class="edge"><title>penf&#45;&gt;module~off_block_signature_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.195,-16.1992C61.8716,-17.4298 70.6912,-18.8436 79.8853,-20.3175"/>
+<polygon fill="#000000" stroke="#000000" points="79.5445,-23.8075 89.9725,-21.9345 80.6525,-16.8957 79.5445,-23.8075"/>
+</g>
+</g>
+</svg>
+</div>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="489pt" height="32pt"
+ viewBox="0.00 0.00 489.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 485,-28 485,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node"><title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node"><title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="139.25,-24 72.75,-24 72.75,-0 139.25,-0 139.25,-24"/>
+<text text-anchor="middle" x="106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="222,-24 158,-24 158,-0 222,-0 222,-24"/>
+<text text-anchor="middle" x="190" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="294,-24 240,-24 240,-0 294,-0 294,-24"/>
+<text text-anchor="middle" x="267" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="366,-24 312,-24 312,-0 366,-0 366,-24"/>
+<text text-anchor="middle" x="339" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="481.25,-24 384.75,-24 384.75,-0 481.25,-0 481.25,-24"/>
+<text text-anchor="middle" x="433" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a parent (sub)module to the submodule which is
+    descended from it. Dashed arrows point from a module being used to the
+    module or program unit using it.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+    
+
+    
+    <p>OFF block signature object definition and implementation.</p>
+    
+    
+    <h3>Used By</h3>
+    
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: module~~off_block_signature_object~~UsedByGraph Pages: 1 -->
+<svg id="moduleoff_block_signature_objectUsedByGraph" width="641pt" height="91pt"
+ viewBox="0.00 0.00 641.00 90.55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~off_block_signature_object~~UsedByGraph" class="graph" transform="scale(0.683369 0.683369) rotate(0) translate(4 128.499)">
+<title>module~~off_block_signature_object~~UsedByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-128.499 934,-128.499 934,4 -4,4"/>
+<!-- module~off_block_signature_object -->
+<g id="module~~off_block_signature_object~~UsedByGraph_node1" class="node"><title>module~off_block_signature_object</title>
+<polygon fill="none" stroke="black" points="140,-104 0,-104 0,-80 140,-80 140,-104"/>
+<text text-anchor="middle" x="70" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50">off_block_signature_object</text>
+</g>
+<!-- module~off_objects -->
+<g id="module~~off_block_signature_object~~UsedByGraph_node2" class="node"><title>module~off_objects</title>
+<g id="a_module~~off_block_signature_object~~UsedByGraph_node2"><a xlink:href="../module/off_objects.html" xlink:title="off_objects">
+<polygon fill="#337ab7" stroke="#337ab7" points="710,-66 646,-66 646,-42 710,-42 710,-66"/>
+<text text-anchor="middle" x="678" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_objects</text>
+</a>
+</g>
+</g>
+<!-- module~off_block_signature_object&#45;&gt;module~off_objects -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge13" class="edge"><title>module~off_block_signature_object&#45;&gt;module~off_objects</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M120.636,-104.017C138.033,-107.671 157.778,-111.196 176,-113 342.51,-129.488 388.709,-130.515 552,-94"/>
+</g>
+<!-- module~off_block_object -->
+<g id="module~~off_block_signature_object~~UsedByGraph_node3" class="node"><title>module~off_block_object</title>
+<g id="a_module~~off_block_signature_object~~UsedByGraph_node3"><a xlink:href="../module/off_block_object.html" xlink:title="off_block_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="293,-104 203,-104 203,-80 293,-80 293,-104"/>
+<text text-anchor="middle" x="248" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_block_object</text>
+</a>
+</g>
+</g>
+<!-- module~off_block_signature_object&#45;&gt;module~off_block_object -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge14" class="edge"><title>module~off_block_signature_object&#45;&gt;module~off_block_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M140.055,-92C157.6,-92 176.2,-92 192.883,-92"/>
+<polygon fill="#000000" stroke="#000000" points="192.996,-95.5001 202.996,-92 192.996,-88.5001 192.996,-95.5001"/>
+</g>
+<!-- module~off_grid_dimensions_object -->
+<g id="module~~off_block_signature_object~~UsedByGraph_node4" class="node"><title>module~off_grid_dimensions_object</title>
+<g id="a_module~~off_block_signature_object~~UsedByGraph_node4"><a xlink:href="../module/off_grid_dimensions_object.html" xlink:title="off_grid_dimensions_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="319.5,-62 176.5,-62 176.5,-38 319.5,-38 319.5,-62"/>
+<text text-anchor="middle" x="248" y="-47.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_grid_dimensions_object</text>
+</a>
+</g>
+</g>
+<!-- module~off_block_signature_object&#45;&gt;module~off_grid_dimensions_object -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge15" class="edge"><title>module~off_block_signature_object&#45;&gt;module~off_grid_dimensions_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M121.435,-79.9645C141.779,-75.1097 165.42,-69.4679 186.667,-64.3978"/>
+<polygon fill="#000000" stroke="#000000" points="187.644,-67.7629 196.558,-62.0373 186.019,-60.9541 187.644,-67.7629"/>
+</g>
+<!-- program~off_test_save_load_file_parameters -->
+<g id="module~~off_block_signature_object~~UsedByGraph_node5" class="node"><title>program~off_test_save_load_file_parameters</title>
+<g id="a_module~~off_block_signature_object~~UsedByGraph_node5"><a xlink:href="../program/off_test_save_load_file_parameters.html" xlink:title="off_test_save_load_file_parameters">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="929.5,-108 746.5,-108 746.5,-84 929.5,-84 929.5,-108"/>
+<text text-anchor="middle" x="838" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_test_save_load_file_parameters</text>
+</a>
+</g>
+</g>
+<!-- module~off_objects&#45;&gt;program~off_test_save_load_file_parameters -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge1" class="edge"><title>module~off_objects&#45;&gt;program~off_test_save_load_file_parameters</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M710.212,-64.3302C721.44,-67.9008 734.236,-71.8042 746,-75 754.299,-77.2545 763.065,-79.4763 771.749,-81.5821"/>
+<polygon fill="#000000" stroke="#000000" points="770.95,-84.9895 781.489,-83.9059 772.574,-78.1806 770.95,-84.9895"/>
+</g>
+<!-- program~off_test_load_file_parameters -->
+<g id="module~~off_block_signature_object~~UsedByGraph_node6" class="node"><title>program~off_test_load_file_parameters</title>
+<g id="a_module~~off_block_signature_object~~UsedByGraph_node6"><a xlink:href="../program/off_test_load_file_parameters.html" xlink:title="off_test_load_file_parameters">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="915,-66 761,-66 761,-42 915,-42 915,-66"/>
+<text text-anchor="middle" x="838" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_test_load_file_parameters</text>
+</a>
+</g>
+</g>
+<!-- module~off_objects&#45;&gt;program~off_test_load_file_parameters -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge2" class="edge"><title>module~off_objects&#45;&gt;program~off_test_load_file_parameters</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M710.216,-54C722.053,-54 736.184,-54 750.645,-54"/>
+<polygon fill="#000000" stroke="#000000" points="750.687,-57.5001 760.686,-54 750.686,-50.5001 750.687,-57.5001"/>
+</g>
+<!-- program~off_test_save_load_file_grid -->
+<g id="module~~off_block_signature_object~~UsedByGraph_node7" class="node"><title>program~off_test_save_load_file_grid</title>
+<g id="a_module~~off_block_signature_object~~UsedByGraph_node7"><a xlink:href="../program/off_test_save_load_file_grid.html" xlink:title="off_test_save_load_file_grid">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="911,-24 765,-24 765,-0 911,-0 911,-24"/>
+<text text-anchor="middle" x="838" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_test_save_load_file_grid</text>
+</a>
+</g>
+</g>
+<!-- module~off_objects&#45;&gt;program~off_test_save_load_file_grid -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge3" class="edge"><title>module~off_objects&#45;&gt;program~off_test_save_load_file_grid</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M710.212,-43.6698C721.44,-40.0992 734.236,-36.1958 746,-33 754.299,-30.7455 763.065,-28.5237 771.749,-26.4179"/>
+<polygon fill="#000000" stroke="#000000" points="772.574,-29.8194 781.489,-24.0941 770.95,-23.0105 772.574,-29.8194"/>
+</g>
+<!-- module~off_block_object&#45;&gt;module~off_objects -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge9" class="edge"><title>module~off_block_object&#45;&gt;module~off_objects</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M409,-94C472.432,-90.0441 489.976,-107.87 552,-94"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M554,-94C581.899,-87.7613 612.469,-77.8349 636.154,-69.4317"/>
+<polygon fill="#000000" stroke="#000000" points="637.632,-72.6195 645.855,-65.9388 635.261,-66.0334 637.632,-72.6195"/>
+</g>
+<!-- module~off_simulation_object -->
+<g id="module~~off_block_signature_object~~UsedByGraph_node8" class="node"><title>module~off_simulation_object</title>
+<g id="a_module~~off_block_signature_object~~UsedByGraph_node8"><a xlink:href="../module/off_simulation_object.html" xlink:title="off_simulation_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="609.5,-66 496.5,-66 496.5,-42 609.5,-42 609.5,-66"/>
+<text text-anchor="middle" x="553" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_simulation_object</text>
+</a>
+</g>
+</g>
+<!-- module~off_block_object&#45;&gt;module~off_simulation_object -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge7" class="edge"><title>module~off_block_object&#45;&gt;module~off_simulation_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M293.312,-94.3323C325.009,-95.5682 368.669,-96.3905 407,-94"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M409,-94C445.25,-91.7393 484.912,-79.8517 513.251,-69.6182"/>
+<polygon fill="#000000" stroke="#000000" points="514.618,-72.8439 522.778,-66.0859 512.185,-66.2805 514.618,-72.8439"/>
+</g>
+<!-- module~off_file_grid_object -->
+<g id="module~~off_block_signature_object~~UsedByGraph_node9" class="node"><title>module~off_file_grid_object</title>
+<g id="a_module~~off_block_signature_object~~UsedByGraph_node9"><a xlink:href="../module/off_file_grid_object.html" xlink:title="off_file_grid_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="459.5,-66 356.5,-66 356.5,-42 459.5,-42 459.5,-66"/>
+<text text-anchor="middle" x="408" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_file_grid_object</text>
+</a>
+</g>
+</g>
+<!-- module~off_block_object&#45;&gt;module~off_file_grid_object -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge8" class="edge"><title>module~off_block_object&#45;&gt;module~off_file_grid_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M293.012,-81.4149C309.807,-77.3755 329.247,-72.7002 347.263,-68.3672"/>
+<polygon fill="#000000" stroke="#000000" points="348.195,-71.7429 357.099,-66.0014 346.558,-64.9369 348.195,-71.7429"/>
+</g>
+<!-- module~off_grid_dimensions_object&#45;&gt;module~off_objects -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge12" class="edge"><title>module~off_grid_dimensions_object&#45;&gt;module~off_objects</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M284.575,-37.9908C316.271,-28.236 364.134,-15.8067 407,-14"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M409,-14C472.499,-11.3236 488.681,-8.5208 552,-14"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M554,-14C584.673,-16.6543 617.773,-27.9394 641.901,-37.8488"/>
+<polygon fill="#000000" stroke="#000000" points="640.76,-41.1664 651.333,-41.8403 643.488,-34.7198 640.76,-41.1664"/>
+</g>
+<!-- module~off_grid_dimensions_object&#45;&gt;module~off_simulation_object -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge10" class="edge"><title>module~off_grid_dimensions_object&#45;&gt;module~off_simulation_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M409,-14C447.246,-12.388 489.236,-26.1042 517.759,-37.9089"/>
+<polygon fill="#000000" stroke="#000000" points="516.687,-41.2574 527.258,-41.9764 519.443,-34.8225 516.687,-41.2574"/>
+</g>
+<!-- module~off_grid_dimensions_object&#45;&gt;module~off_file_grid_object -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge11" class="edge"><title>module~off_grid_dimensions_object&#45;&gt;module~off_file_grid_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M319.682,-51.7894C328.54,-52.0137 337.54,-52.2415 346.228,-52.4615"/>
+<polygon fill="#000000" stroke="#000000" points="346.172,-55.9611 356.257,-52.7154 346.349,-48.9633 346.172,-55.9611"/>
+</g>
+<!-- module~off_simulation_object&#45;&gt;module~off_objects -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge4" class="edge"><title>module~off_simulation_object&#45;&gt;module~off_objects</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M609.742,-54C618.412,-54 627.237,-54 635.518,-54"/>
+<polygon fill="#000000" stroke="#000000" points="635.664,-57.5001 645.664,-54 635.664,-50.5001 635.664,-57.5001"/>
+</g>
+<!-- module~off_file_grid_object&#45;&gt;module~off_objects -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge6" class="edge"><title>module~off_file_grid_object&#45;&gt;module~off_objects</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M432.282,-41.9794C460.178,-28.8794 508.595,-10.244 552,-14"/>
+</g>
+<!-- module~off_file_grid_object&#45;&gt;module~off_simulation_object -->
+<g id="module~~off_block_signature_object~~UsedByGraph_edge5" class="edge"><title>module~off_file_grid_object&#45;&gt;module~off_simulation_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M459.819,-54C468.451,-54 477.524,-54 486.471,-54"/>
+<polygon fill="#000000" stroke="#000000" points="486.489,-57.5001 496.489,-54 486.489,-50.5001 486.489,-57.5001"/>
+</g>
+</g>
+</svg>
+</div>
+                <script>var panmoduleoff_block_signature_objectUsedByGraph = svgPanZoom('#moduleoff_block_signature_objectUsedByGraph', {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,});
+                    </script>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="489pt" height="32pt"
+ viewBox="0.00 0.00 489.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 485,-28 485,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node"><title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node"><title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="139.25,-24 72.75,-24 72.75,-0 139.25,-0 139.25,-24"/>
+<text text-anchor="middle" x="106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="222,-24 158,-24 158,-0 222,-0 222,-24"/>
+<text text-anchor="middle" x="190" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="294,-24 240,-24 240,-0 294,-0 294,-24"/>
+<text text-anchor="middle" x="267" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="366,-24 312,-24 312,-0 366,-0 366,-24"/>
+<text text-anchor="middle" x="339" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="481.25,-24 384.75,-24 384.75,-0 481.25,-0 481.25,-24"/>
+<text text-anchor="middle" x="433" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a parent (sub)module to the submodule which is
+    descended from it. Dashed arrows point from a module being used to the
+    module or program unit using it.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+    <br>
+    
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#types-1">Derived Types</a></h3></div>
+  <div id="types-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#type-block_signature_object">block_signature_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#funcs-1">Functions</a></h3></div>
+  <div id="funcs-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-cells_number%7E2">cells_number</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-description">description</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-iolength">iolength</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-nodes_number%7E2">nodes_number</a>
+      
+    </div>
+  </div>
+</div>
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-1">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-1" class="panel-collapse collapse">
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-block_d_assign_block_d">block_d_assign_block_d</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-destroy%7E2">destroy</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-initialize%7E2">initialize</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-load_from_file">load_from_file</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html#proc-save_into_file">save_into_file</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    <section>
+     <h2>Derived Types</h2>
+	 
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-block_signature_object"></span><h3>type, public :: <a href='../type/block_signature_object.html'>block_signature_object</a>
+    
+  </h3></div>
+  <div class="panel-body">
+    
+    
+    <p>Block signature object class.</p>
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-emax"></span>type(vector),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>emax</strong></td><td></td><td></td><td><p>Coordinates of maximum abscissa (extent) of the block.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-emin"></span>type(vector),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>emin</strong></td><td></td><td></td><td><p>Coordinates of minimum abscissa (extent) of the block.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-gc"></span>integer(kind=I4P),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>gc</strong>(1:6)</td><td> =</td><td>[0, 0, 0, 0, 0, 0]</td><td><p>Number of ghost cells along each frame.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-id"></span>integer(kind=I8P),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>id</strong></td><td> =</td><td>0</td><td><p>Unique (Morton) identification code.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-is_cartesian"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>is_cartesian</strong></td><td> =</td><td>.false.</td><td><p>Flag for checking if the block is Cartesian.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-is_null_x"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>is_null_x</strong></td><td> =</td><td>.false.</td><td><p>Nullify X direction (2D yz, 1D y or z domain).</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-is_null_y"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>is_null_y</strong></td><td> =</td><td>.false.</td><td><p>Nullify Y direction (2D xy, 1D x or y domain).</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-is_null_z"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>is_null_z</strong></td><td> =</td><td>.false.</td><td><p>Nullify Z direction (2D xy, 1D x or y domain).</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-level"></span>integer(kind=I4P),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>level</strong></td><td> =</td><td>0</td><td><p>block refinement level.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ni"></span>integer(kind=I4P),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ni</strong></td><td> =</td><td>0</td><td><p>Number of cells in I direction.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nj"></span>integer(kind=I4P),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nj</strong></td><td> =</td><td>0</td><td><p>Number of cells in J direction.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nk"></span>integer(kind=I4P),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nk</strong></td><td> =</td><td>0</td><td><p>Number of cells in K direction.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+     <h4>Type-Bound Procedures</h4>
+      <table class="table table-striped varlist">
+      <tbody>
+      
+       <tr><td>generic, public :: <strong><a href='../type/block_signature_object.html#boundprocedure-assignment%28%3D%29%7E2'>assignment(=)</a></strong>  => block_d_assign_block_d </td>
+       <td><p>Overload <code>=</code>.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(lhs) :: <strong><a href='../type/block_signature_object.html#boundprocedure-block_d_assign_block_d'>block_d_assign_block_d</a></strong>  </td>
+       <td><p>Operator <code>=</code>.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/block_signature_object.html#boundprocedure-cells_number%7E2'>cells_number</a></strong>  </td>
+       <td><p>Return the number of cells.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/block_signature_object.html#boundprocedure-description'>description</a></strong>  </td>
+       <td><p>Return a pretty-formatted description of block signature.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/block_signature_object.html#boundprocedure-destroy%7E2'>destroy</a></strong>  </td>
+       <td><p>Destroy block signature.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/block_signature_object.html#boundprocedure-initialize%7E2'>initialize</a></strong>  </td>
+       <td><p>Initialize block signature.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/block_signature_object.html#boundprocedure-iolength'>iolength</a></strong>  </td>
+       <td><p>Return the IO length storage.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/block_signature_object.html#boundprocedure-load_from_file'>load_from_file</a></strong>  </td>
+       <td><p>Load block signature from file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/block_signature_object.html#boundprocedure-nodes_number%7E2'>nodes_number</a></strong>  </td>
+       <td><p>Return the number of nodes.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/block_signature_object.html#boundprocedure-save_into_file'>save_into_file</a></strong>  </td>
+       <td><p>Save block signature into file.</p></td></tr>
+      
+       </tbody>
+       </table>
+     
+  </div>
+</div>
+
+     
+    </section>
+	<br>
+    
+    
+     
+    <section>
+    <h2>Functions</h2>
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-cells_number%7E2"></span><h3>
+private elemental function <a href='../proc/cells_number%7E2.html'>cells_number</a>(self, with_ghosts) result(cells_number_)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Return the number of cells.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/block_signature_object.html'>block_signature_object</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>Block.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>with_ghosts</strong></td><td><p>Take into account ghost cells.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=I4P)
+  </small></h4>
+  <p>Number of cells.</p>
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-description"></span><h3>
+private pure function <a href='../proc/description.html'>description</a>(self, prefix) result(desc)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Return a pretty-formatted description of the block signature.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/block_signature_object.html'>block_signature_object</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>Block signature object.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>prefix</strong></td><td><p>Prefixing string.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=:),
+  allocatable</small></h4>
+  <p>Description.</p>
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-iolength"></span><h3>
+private function <a href='../proc/iolength.html'>iolength</a>(self)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Return the IO length storage.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/block_signature_object.html'>block_signature_object</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>Block signature object.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=I4P)
+  </small></h4>
+  <p>IO length storage.</p>
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-nodes_number%7E2"></span><h3>
+private elemental function <a href='../proc/nodes_number%7E2.html'>nodes_number</a>(self, with_ghosts) result(nodes_number_)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Return the number of nodes.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/block_signature_object.html'>block_signature_object</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>Block.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>with_ghosts</strong></td><td><p>Take into account ghost cells.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=I4P)
+  </small></h4>
+  <p>Number of nodes.</p>
+    
+
+  </div>
+  </div>
+
+    
+    </section>
+    <br>
+    
+
+    
+    <section>
+    <h2>Subroutines</h2>
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-block_d_assign_block_d"></span><h3>
+private pure subroutine <a href='../proc/block_d_assign_block_d.html'>block_d_assign_block_d</a>(lhs, rhs)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Operator <code>=</code>.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/block_signature_object.html'>block_signature_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>lhs</strong></td><td><p>Left hand side.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/block_signature_object.html'>block_signature_object</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rhs</strong></td><td><p>Right hand side.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-destroy%7E2"></span><h3>
+private elemental subroutine <a href='../proc/destroy%7E2.html'>destroy</a>(self)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Destroy block signature.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/block_signature_object.html'>block_signature_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>Block signature object.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-initialize%7E2"></span><h3>
+private pure subroutine <a href='../proc/initialize%7E2.html'>initialize</a>(self, signature, id, level, gc, ni, nj, nk, emin, emax, is_cartesian, is_null_x, is_null_y, is_null_z)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Initialize block signature.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/block_signature_object.html'>block_signature_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>Block signature object.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/block_signature_object.html'>block_signature_object</a>),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>signature</strong></td><td><p>Block signature input.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I8P),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>id</strong></td><td><p>Unique (Morton) identification code.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>level</strong></td><td><p>Grid refinement level.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>gc</strong>(1:)</td><td><p>Number of ghost cells along each frame.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>ni</strong></td><td><p>Number of cells in I direction.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>nj</strong></td><td><p>Number of cells in J direction.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>nk</strong></td><td><p>Number of cells in K direction.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(vector),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>emin</strong></td><td><p>Coordinates of minimum abscissa of the block.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(vector),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>emax</strong></td><td><p>Coordinates of maximum abscissa of the block.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>is_cartesian</strong></td><td><p>Flag for checking if the block is Cartesian.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>is_null_x</strong></td><td><p>Nullify X direction (2D yz, 1D y or z domain).</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>is_null_y</strong></td><td><p>Nullify Y direction (2D xy, 1D x or y domain).</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>is_null_z</strong></td><td><p>Nullify Z direction (2D xy, 1D x or y domain).</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-load_from_file"></span><h3>
+private subroutine <a href='../proc/load_from_file.html'>load_from_file</a>(self, file_unit)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Load block signature from file.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/block_signature_object.html'>block_signature_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>Block signature object.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>file_unit</strong></td><td><p>File unit.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-save_into_file"></span><h3>
+private subroutine <a href='../proc/save_into_file.html'>save_into_file</a>(self, file_unit)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Load the block signature of all blocks from file.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/block_signature_object.html'>block_signature_object</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>Block signature object.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>file_unit</strong></td><td><p>File unit.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    </section>    
+    <br>
+    
+    
+    
+    </div>
+  </div>
+
+  <section class="visible-xs visible-sm hidden-md">
+    <hr>
+    
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allmods-1">All Modules</a></h3></div>
+  <div id="allmods-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_block_object.html">off_block_object</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html">off_block_signature_object</a>
+      
+      <a class="list-group-item" href="../module/off_cell_object.html">off_cell_object</a>
+      
+      <a class="list-group-item" href="../module/off_error_object.html">off_error_object</a>
+      
+      <a class="list-group-item" href="../module/off_face_object.html">off_face_object</a>
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html">off_file_grid_object</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html">off_file_object</a>
+      
+      <a class="list-group-item" href="../module/off_files_collection_object.html">off_files_collection_object</a>
+      
+      <a class="list-group-item" href="../module/off_free_conditions_object.html">off_free_conditions_object</a>
+      
+      <a class="list-group-item" href="../module/off_grid_dimensions_object.html">off_grid_dimensions_object</a>
+      
+      <a class="list-group-item" href="../module/off_node_object.html">off_node_object</a>
+      
+      <a class="list-group-item" href="../module/off_non_dimensional_numbers_object.html">off_non_dimensional_numbers_object</a>
+      
+      <a class="list-group-item" href="../module/off_objects.html">off_objects</a>
+      
+      <a class="list-group-item" href="../module/off_os_object.html">off_os_object</a>
+      
+      <a class="list-group-item" href="../module/off_simulation_object.html">off_simulation_object</a>
+      
+      <a class="list-group-item" href="../module/off_solver_object.html">off_solver_object</a>
+      
+      <a class="list-group-item" href="../module/off_time_object.html">off_time_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+  </section>
+  
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on 2017-08-29 12:30  
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> OFF was developed by Giacomo Rossi
+Stefano Zaghi</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

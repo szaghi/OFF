@@ -1,7 +1,0 @@
-<map id="lib_io_misc::remove_file" name="lib_io_misc::remove_file">
-<area shape="rect" id="node3" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#gae74a205048c52d0ecbffe5de921e9dd4" title="Function for creating a directory if it doesn&#39;t exist. " alt="" coords="217,59,364,88"/>
-<area shape="rect" id="node11" href="$d9/d99/group__OFFProgram.html#gab96c351668e50a49652d8e1afdacbd71" title="OFF is an Open source Finite volumes Fluid dynamics code. " alt="" coords="587,84,624,113"/>
-<area shape="rect" id="node5" href="$d3/dc5/IBM_8f90.html#afb09e5e08113ba1c9c96f9845f77e7bb" title="load_option_file" alt="" coords="413,5,525,35"/>
-<area shape="rect" id="node9" href="$d7/d45/group__OFFPrivateProcedure.html#ga9dcb24129377de3118ee0766fc6a9594" title="Subroutine for initializing the simulation according to the input options. " alt="" coords="439,59,500,88"/>
-<area shape="rect" id="node7" href="$d3/dc5/IBM_8f90.html#ad22f94592343669004c9cf449566ddc0" title="icg_init" alt="" coords="575,5,636,35"/>
-</map>

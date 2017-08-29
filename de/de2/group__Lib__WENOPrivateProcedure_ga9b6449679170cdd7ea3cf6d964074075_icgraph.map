@@ -1,9 +1,0 @@
-<map id="lib_weno::weno_convolution" name="lib_weno::weno_convolution">
-<area shape="rect" id="node3" href="$db/d22/group__Lib__WENOPublicProcedure.html#ga1dd3408cb49b8f2eef25dc1a1c63ab6a" title="Subroutine for computing WENO reconstruction of &#160;order. " alt="" coords="265,101,377,131"/>
-<area shape="rect" id="node15" href="$db/d22/group__Lib__WENOPublicProcedure.html#ga22b42ac3ffb139046b81c9fdaf418d08" title="Subroutine for computing WENO reconstruction with optimal weights (without smoothness indicators comp..." alt="" coords="241,155,401,184"/>
-<area shape="rect" id="node5" href="$da/d1c/group__Lib__Fluxes__ConvectivePrivateProcedure.html#ga6e5a9436729a6f4361d19694db4e8d79" title="Function for computing left eigenvectors matrix (L) of the Jacobian fluxes matrix &#160;in primitive varia..." alt="" coords="452,101,489,131"/>
-<area shape="rect" id="node7" href="$da/d1c/group__Lib__Fluxes__ConvectivePrivateProcedure.html#ga9d808b664de53e363c8fce55e9ce562c" title="Subroutine for reconstructing primitive variables along direction &quot;NF&quot;. " alt="" coords="549,5,656,35"/>
-<area shape="rect" id="node9" href="$d0/d9b/group__Data__Type__SL__ListPrivateProcedure.html#gad0919762b27f8e92ba82901c2707f707" title="Subroutine for inserting a link into the n&#45;th link of list (R4P). " alt="" coords="539,58,667,105"/>
-<area shape="rect" id="node11" href="$d0/d9b/group__Data__Type__SL__ListPrivateProcedure.html#ga0df98f538d45a1786d314ca2a4cabb41" title="Subroutine for inserting a link data into the list head (I8P). " alt="" coords="539,127,667,174"/>
-<area shape="rect" id="node13" href="$d0/d9b/group__Data__Type__SL__ListPrivateProcedure.html#gaf8193a4a17db2141124e26eb2ba25e67" title="Subroutine for inserting a link data into the list head (R4P). " alt="" coords="539,197,667,243"/>
-</map>

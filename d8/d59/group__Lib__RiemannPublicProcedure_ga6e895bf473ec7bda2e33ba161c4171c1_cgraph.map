@@ -1,9 +1,0 @@
-<map id="lib_riemann::riem_solver_alfr" name="lib_riemann::riem_solver_alfr">
-<area shape="rect" id="node3" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga82d4f5c7adace2fdffa51b872a3e80f9" title="Function for computing the speed of sound for an ideal calorically perfect gas. " alt="" coords="645,93,811,139"/>
-<area shape="rect" id="node5" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga72edfdd7b6205b7dc0fe8cfacb07d068" title="Function for computing the pressure for an ideal calorically perfect gas. " alt="" coords="859,194,1024,241"/>
-<area shape="rect" id="node7" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#gafc7677510bfb5d5bfab4510107291d32" title="Function for computing the density for an ideal calorically perfect gas. " alt="" coords="1072,194,1237,241"/>
-<area shape="rect" id="node15" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga55ca6dd8ee2d2ea7a13b34329ac84dff" title="lib_riemann::rarefaction" alt="" coords="440,59,597,88"/>
-<area shape="rect" id="node20" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#gacc2f7cc2ec002cfe3d490460f46ac3a6" title="lib_riemann::sampling\l_fluxes" alt="" coords="244,263,391,310"/>
-<area shape="rect" id="node22" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga3a681bc3b342b628e094aff4fa0bd3e8" title="lib_riemann::fluxes" alt="" coords="453,344,584,373"/>
-<area shape="rect" id="node26" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga97d5fe3d357ec9b7ef4b3ee24a15bd0e" title="Function for computing the total specific entalpy (per unit of mass) for an ideal calorically perfect..." alt="" coords="645,365,811,411"/>
-</map>

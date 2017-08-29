@@ -1,6 +1,0 @@
-<map id="lib_postprocessing::compute_dimensions" name="lib_postprocessing::compute_dimensions">
-<area shape="rect" id="node3" href="$da/df8/Lib__PostProcessing_8f90.html#a564085868cf19245dd589e61dc85e116" title="gnu_blk_data" alt="" coords="208,5,307,35"/>
-<area shape="rect" id="node5" href="$da/df8/Lib__PostProcessing_8f90.html#a9bdd51c7af02b3a815758d2900d8dbe3" title="tec_blk_data" alt="" coords="209,59,305,88"/>
-<area shape="rect" id="node9" href="$da/df8/Lib__PostProcessing_8f90.html#a35e44a53c895b3974f372a57a3571dd4" title="vtk_blk_data" alt="" coords="209,112,305,141"/>
-<area shape="rect" id="node7" href="$da/df8/Lib__PostProcessing_8f90.html#a91d1c4626521c345bd7dbdc99b371870" title="tec_init" alt="" coords="355,59,419,88"/>
-</map>

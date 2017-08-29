@@ -1,8 +1,0 @@
-<map id="lib_fluidynamic::residuals" name="lib_fluidynamic::residuals">
-<area shape="rect" id="node3" href="$d7/d5a/group__Lib__Fluxes__ConvectivePublicProcedure.html#ga3d535e660c76060d523e5af81211b72c" title="Subroutine for computing interfaces convective fluxes (hyperbolic operator). " alt="" coords="221,5,368,51"/>
-<area shape="rect" id="node5" href="$d9/dc8/group__Lib__Fluxes__DiffusiveLibrary.html#a80e6616ae1180b2f10108e0f09bfb6a1" title="Subroutine for computing interfaces diffusive fluxes (parabolic operator). " alt="" coords="228,74,361,121"/>
-<area shape="rect" id="node7" href="$de/d10/Lib__Fluxes__Diffusive_8f90.html#a9414535b1f7fdfa3cea8caf234173cf1" title="Subroutine for computing the metrics (normals and interfaces area) of finite volume centered at inter..." alt="" coords="419,29,557,59"/>
-<area shape="rect" id="node9" href="$de/d10/Lib__Fluxes__Diffusive_8f90.html#a58df0a04159e35d79e1be2e0cca5af16" title="Subroutine for computing the velocity vector at interfaces of finite volume centered at interface i..." alt="" coords="417,83,559,112"/>
-<area shape="rect" id="node11" href="$de/d10/Lib__Fluxes__Diffusive_8f90.html#a08881dcc7c9d8e20716593cd12695430" title="Subroutine for computing the shear stress tensor at center of a finite volume. " alt="" coords="440,136,536,165"/>
-<area shape="rect" id="node13" href="$de/d10/Lib__Fluxes__Diffusive_8f90.html#a1b039456e07cdfbe3b6394d43e947688" title="Function for computing first partial derivative by means of Finite Volumes approach (Green&#39;s theorem)..." alt="" coords="608,136,672,165"/>
-</map>

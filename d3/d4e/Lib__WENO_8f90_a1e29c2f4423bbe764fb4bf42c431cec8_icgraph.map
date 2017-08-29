@@ -1,5 +1,0 @@
-<map id="get_min_sstep" name="get_min_sstep">
-<area shape="rect" id="node3" href="$db/d22/group__Lib__WENOPublicProcedure.html#ga1a5e0d343a16642c749d337839834cc8" title="Subroutine for initialization of WENO coefficients. " alt="" coords="160,5,296,35"/>
-<area shape="rect" id="node5" href="$d9/d99/group__OFFProgram.html#gab96c351668e50a49652d8e1afdacbd71" title="OFF is an Open source Finite volumes Fluid dynamics code. " alt="" coords="455,5,492,35"/>
-<area shape="rect" id="node7" href="$d7/d45/group__OFFPrivateProcedure.html#ga9dcb24129377de3118ee0766fc6a9594" title="Subroutine for initializing the simulation according to the input options. " alt="" coords="344,31,405,60"/>
-</map>

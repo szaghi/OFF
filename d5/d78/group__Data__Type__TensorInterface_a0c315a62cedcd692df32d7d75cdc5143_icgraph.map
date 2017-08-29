@@ -1,5 +1,0 @@
-<map id="data_type_tensor::norml2::norml2_ten" name="data_type_tensor::norml2::norml2_ten">
-<area shape="rect" id="node3" href="$d1/dff/group__Data__Type__TensorPrivateProcedure.html#gaa72ebe1f7407c19034513587ba64f485" title="Subroutine for normalizing a tensor. " alt="" coords="225,13,439,43"/>
-<area shape="rect" id="node7" href="$d1/dff/group__Data__Type__TensorPrivateProcedure.html#ga273eb1fd58f85709e15841a58c642f34" title="Function for normalizing a tensor. " alt="" coords="227,67,437,96"/>
-<area shape="rect" id="node5" href="$d2/dc1/group__Data__Type__VectorDerivedType.html#a8404fa15a648647c0f6d20a9b247ac32" title="data_type_vector::type\l_vector::set" alt="" coords="488,5,643,51"/>
-</map>

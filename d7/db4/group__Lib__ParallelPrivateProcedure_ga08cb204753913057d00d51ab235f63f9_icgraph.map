@@ -1,5 +1,0 @@
-<map id="lib_parallel::alloc_sendrecv" name="lib_parallel::alloc_sendrecv">
-<area shape="rect" id="node3" href="$d1/dbb/group__Lib__ParallelPublicProcedure.html#ga83bf079fae800cd22e30013013bdb6c2" title="Subroutine for initializing the send/receive communications data. " alt="" coords="175,5,281,51"/>
-<area shape="rect" id="node5" href="$d9/d99/group__OFFProgram.html#gab96c351668e50a49652d8e1afdacbd71" title="OFF is an Open source Finite volumes Fluid dynamics code. " alt="" coords="441,13,479,43"/>
-<area shape="rect" id="node7" href="$d7/d45/group__OFFPrivateProcedure.html#ga9dcb24129377de3118ee0766fc6a9594" title="Subroutine for initializing the simulation according to the input options. " alt="" coords="331,39,392,68"/>
-</map>

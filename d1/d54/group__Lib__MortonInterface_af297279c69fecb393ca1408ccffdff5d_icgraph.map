@@ -1,4 +1,0 @@
-<map id="lib_morton::dil::dil_i1p" name="lib_morton::dil::dil_i1p">
-<area shape="rect" id="node3" href="$dd/d6d/group__Lib__MortonPrivateProcedure.html#gae9a6562160b34e010b6243c41d792767" title="Function for encoding 2 integer(I1P) indexes into 1 integer(I8P) Morton&#39;s key. " alt="" coords="204,5,364,35"/>
-<area shape="rect" id="node5" href="$dd/d6d/group__Lib__MortonPrivateProcedure.html#ga6340f9b5f73ac81ff93794f8adacf5db" title="Function for encoding 3 integer(I1P) indexes into 1 integer(I8P) Morton&#39;s key. " alt="" coords="204,59,364,88"/>
-</map>

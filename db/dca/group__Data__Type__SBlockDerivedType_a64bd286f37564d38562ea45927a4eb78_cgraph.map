@@ -1,8 +1,0 @@
-<map id="data_type_sblock::type_sblock::load_mesh_dims" name="data_type_sblock::type_sblock::load_mesh_dims">
-<area shape="rect" id="node3" href="$d0/d54/group__Data__Type__SBlockPrivateProcedure.html#ga45e148ccbe238a20e235cc2ede0913c7" title="Function for loading block boundary conditions file. " alt="" coords="227,88,411,117"/>
-<area shape="rect" id="node11" href="$db/dca/group__Data__Type__SBlockDerivedType.html#a8a00a89fa9d2ba387504aaba5711c116" title="data_type_sblock::type\l_sblock::load_bc" alt="" coords="240,154,397,201"/>
-<area shape="rect" id="node5" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga070c459fd5e26bcec905b7a2f2419ad3" title="Subroutine for printing to stderr a &quot;file not found error&quot;. " alt="" coords="469,5,605,51"/>
-<area shape="rect" id="node7" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga03b3d23e7eb885f6fb3c00f7a977b33d" title="The Get_Unit function returns a free logic unit for opening a file. " alt="" coords="467,75,608,104"/>
-<area shape="rect" id="node9" href="$db/daa/group__Data__Type__BCPublicProcedure.html#ga50f305bddd1bf0f7443486ded11a8d0b" title="Function for reading Type_BC data. " alt="" coords="460,128,615,157"/>
-<area shape="rect" id="node13" href="$db/dca/group__Data__Type__SBlockDerivedType.html#ab022a68940030e5db83ba614b5203d76" title="data_type_sblock::type\l_sblock::metrics" alt="" coords="459,181,616,227"/>
-</map>

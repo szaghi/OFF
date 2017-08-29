@@ -1,5 +1,0 @@
-<map id="lib_riemann::pvl_states" name="lib_riemann::pvl_states">
-<area shape="rect" id="node3" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga3afc3a43501ad3070d2e945854fa8f34" title="Approximate Riemann solver based on Adaptive (non iterative) PVL&#45;TR&#45;TS algorithm. ..." alt="" coords="211,5,405,35"/>
-<area shape="rect" id="node5" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#gad22f35c160871edcd8edf59ac9cd0d5f" title="Approximate Riemann solver based on Two Rarefactions algorithm. " alt="" coords="219,59,397,88"/>
-<area shape="rect" id="node7" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga8ed95bd24286bc4b94bde0ae4efcc968" title="Approximate Riemann solver based on HLLC algorithm. " alt="" coords="455,59,644,88"/>
-</map>

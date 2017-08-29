@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="OFF, Open source Finite volumes Fluid dynamics code">
+    
+    <meta name="author" content="Giacomo Rossi
+Stefano Zaghi" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>off_file_grid_object &ndash; OFF</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">OFF </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>off_file_grid_object 
+    <small>Module</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+	  data-placement="bottom" data-html="true"
+	  title=" 2.8% of total for modules and submodules.">56 statements</a>
+     </li> 
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/off_file_grid_object.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/off_file_grid_object.f90.html'>off_file_grid_object.f90</a></li>
+  
+     <li class="active">off_file_grid_object</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#types-0">Derived Types</a></h3></div>
+  <div id="types-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html#type-file_grid_object">file_grid_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-0">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-0" class="panel-collapse collapse">
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html#proc-load_grid_dimensions_from_file">load_grid_dimensions_from_file</a>
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html#proc-load_nodes_from_file%7E2">load_nodes_from_file</a>
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html#proc-save_grid_dimensions_into_file">save_grid_dimensions_into_file</a>
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html#proc-save_nodes_into_file%7E2">save_nodes_into_file</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+  <hr>
+  
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allmods-0">All Modules</a></h3></div>
+  <div id="allmods-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_block_object.html">off_block_object</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html">off_block_signature_object</a>
+      
+      <a class="list-group-item" href="../module/off_cell_object.html">off_cell_object</a>
+      
+      <a class="list-group-item" href="../module/off_error_object.html">off_error_object</a>
+      
+      <a class="list-group-item" href="../module/off_face_object.html">off_face_object</a>
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html">off_file_grid_object</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html">off_file_object</a>
+      
+      <a class="list-group-item" href="../module/off_files_collection_object.html">off_files_collection_object</a>
+      
+      <a class="list-group-item" href="../module/off_free_conditions_object.html">off_free_conditions_object</a>
+      
+      <a class="list-group-item" href="../module/off_grid_dimensions_object.html">off_grid_dimensions_object</a>
+      
+      <a class="list-group-item" href="../module/off_node_object.html">off_node_object</a>
+      
+      <a class="list-group-item" href="../module/off_non_dimensional_numbers_object.html">off_non_dimensional_numbers_object</a>
+      
+      <a class="list-group-item" href="../module/off_objects.html">off_objects</a>
+      
+      <a class="list-group-item" href="../module/off_os_object.html">off_os_object</a>
+      
+      <a class="list-group-item" href="../module/off_simulation_object.html">off_simulation_object</a>
+      
+      <a class="list-group-item" href="../module/off_solver_object.html">off_solver_object</a>
+      
+      <a class="list-group-item" href="../module/off_time_object.html">off_time_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+</div>  
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      
+    
+  
+    <ul class="list-inline">
+      <li><h4>Uses:</h4></li>
+      
+      <li><a href="https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html">iso_fortran_env</a></li>
+      
+      <li><a href='../module/off_block_object.html'>off_block_object</a></li>
+      
+      <li><a href='../module/off_grid_dimensions_object.html'>off_grid_dimensions_object</a></li>
+      
+      <li><a href='../module/off_file_object.html'>off_file_object</a></li>
+      
+      <li>penf</li>
+      
+    </ul>
+    
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: module~~off_file_grid_object~~UsesGraph Pages: 1 -->
+<svg id="moduleoff_file_grid_objectUsesGraph" width="592pt" height="530pt"
+ viewBox="0.00 0.00 592.00 529.70" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~off_file_grid_object~~UsesGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 525.697)">
+<title>module~~off_file_grid_object~~UsesGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-525.697 588,-525.697 588,4 -4,4"/>
+<!-- module~off_file_grid_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_node1" class="node"><title>module~off_file_grid_object</title>
+<polygon fill="none" stroke="black" points="583.5,-334.953 480.5,-334.953 480.5,-310.953 583.5,-310.953 583.5,-334.953"/>
+<text text-anchor="middle" x="532" y="-320.553" font-family="Helvetica,sans-Serif" font-size="10.50">off_file_grid_object</text>
+</g>
+<!-- module~off_file_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_node2" class="node"><title>module~off_file_object</title>
+<g id="a_module~~off_file_grid_object~~UsesGraph_node2"><a xlink:href="../module/off_file_object.html" xlink:title="off_file_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="411.5,-414.953 332.5,-414.953 332.5,-390.953 411.5,-390.953 411.5,-414.953"/>
+<text text-anchor="middle" x="372" y="-400.553" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_file_object</text>
+</a>
+</g>
+</g>
+<!-- module~off_file_object&#45;&gt;module~off_file_grid_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge26" class="edge"><title>module~off_file_object&#45;&gt;module~off_file_grid_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M396.997,-390.803C423.949,-377.156 467.859,-354.923 498.023,-339.65"/>
+<polygon fill="#000000" stroke="#000000" points="499.955,-342.595 507.295,-334.955 496.792,-336.35 499.955,-342.595"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~off_file_grid_object~~UsesGraph_node3" class="node"><title>iso_fortran_env</title>
+<g id="a_module~~off_file_grid_object~~UsesGraph_node3"><a xlink:href="https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="87.5,-452.953 0.5,-452.953 0.5,-428.953 87.5,-428.953 87.5,-452.953"/>
+<text text-anchor="middle" x="44" y="-438.553" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~off_file_grid_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge27" class="edge"><title>iso_fortran_env&#45;&gt;module~off_file_grid_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M195,-520.953C257.562,-526.28 402.08,-454.796 444,-423.953 474.802,-401.291 502.086,-365.806 517.561,-343.493"/>
+<polygon fill="#000000" stroke="#000000" points="520.546,-345.328 523.264,-335.088 514.753,-341.398 520.546,-345.328"/>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~off_file_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge3" class="edge"><title>iso_fortran_env&#45;&gt;module~off_file_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M57.3544,-453.011C72.0718,-466.741 97.9552,-488.948 124,-501.953 152.458,-516.163 161.307,-518.254 193,-520.953"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M195,-520.953C264.948,-526.909 328.41,-458.418 356.188,-423.16"/>
+<polygon fill="#000000" stroke="#000000" points="359.155,-425.042 362.464,-414.977 353.601,-420.782 359.155,-425.042"/>
+</g>
+<!-- module~off_block_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_node4" class="node"><title>module~off_block_object</title>
+<g id="a_module~~off_file_grid_object~~UsesGraph_node4"><a xlink:href="../module/off_block_object.html" xlink:title="off_block_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="417,-254.953 327,-254.953 327,-230.953 417,-230.953 417,-254.953"/>
+<text text-anchor="middle" x="372" y="-240.553" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_block_object</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~off_block_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge16" class="edge"><title>iso_fortran_env&#45;&gt;module~off_block_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M87.8995,-438.1C134.68,-433.201 210.068,-419.918 264,-383.953 310.139,-353.184 344.401,-295.725 360.602,-264.497"/>
+<polygon fill="#000000" stroke="#000000" points="363.839,-265.852 365.22,-255.347 357.59,-262.698 363.839,-265.852"/>
+</g>
+<!-- module~off_error_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_node8" class="node"><title>module~off_error_object</title>
+<g id="a_module~~off_file_grid_object~~UsesGraph_node8"><a xlink:href="../module/off_error_object.html" xlink:title="off_error_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="238,-374.953 150,-374.953 150,-350.953 238,-350.953 238,-374.953"/>
+<text text-anchor="middle" x="194" y="-360.553" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_error_object</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~off_error_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge1" class="edge"><title>iso_fortran_env&#45;&gt;module~off_error_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M67.8007,-428.936C92.7151,-415.806 132.817,-394.671 160.904,-379.868"/>
+<polygon fill="#000000" stroke="#000000" points="162.715,-382.87 169.93,-375.112 159.451,-376.678 162.715,-382.87"/>
+</g>
+<!-- module~off_block_object&#45;&gt;module~off_file_grid_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge28" class="edge"><title>module~off_block_object&#45;&gt;module~off_file_grid_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M396.997,-255.103C423.949,-268.75 467.859,-290.983 498.023,-306.256"/>
+<polygon fill="#000000" stroke="#000000" points="496.792,-309.556 507.295,-310.95 499.955,-303.31 496.792,-309.556"/>
+</g>
+<!-- penf -->
+<g id="module~~off_file_grid_object~~UsesGraph_node5" class="node"><title>penf</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="71,-254.953 17,-254.953 17,-230.953 71,-230.953 71,-254.953"/>
+<text text-anchor="middle" x="44" y="-240.553" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">penf</text>
+</g>
+<!-- penf&#45;&gt;module~off_file_grid_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge29" class="edge"><title>penf&#45;&gt;module~off_file_grid_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M55.8989,-255.026C69.9789,-269.671 96.024,-293.675 124,-303.953 240.523,-346.763 388.554,-339.807 470.135,-331.199"/>
+<polygon fill="#000000" stroke="#000000" points="470.673,-334.661 480.231,-330.089 469.908,-327.703 470.673,-334.661"/>
+</g>
+<!-- penf&#45;&gt;module~off_file_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge5" class="edge"><title>penf&#45;&gt;module~off_file_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M47.6862,-255.055C54.6613,-283.291 76.2329,-353.441 124,-383.953 183.805,-422.154 269.126,-419.004 322.228,-411.938"/>
+<polygon fill="#000000" stroke="#000000" points="322.997,-415.364 332.401,-410.484 322.007,-408.434 322.997,-415.364"/>
+</g>
+<!-- penf&#45;&gt;module~off_block_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge19" class="edge"><title>penf&#45;&gt;module~off_block_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M195,-242.953C235.454,-236.161 281.88,-236.493 316.889,-238.344"/>
+<polygon fill="#000000" stroke="#000000" points="316.718,-241.84 326.906,-238.932 317.128,-234.852 316.718,-241.84"/>
+</g>
+<!-- module~off_grid_dimensions_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_node6" class="node"><title>module~off_grid_dimensions_object</title>
+<g id="a_module~~off_file_grid_object~~UsesGraph_node6"><a xlink:href="../module/off_grid_dimensions_object.html" xlink:title="off_grid_dimensions_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="443.5,-131.953 300.5,-131.953 300.5,-107.953 443.5,-107.953 443.5,-131.953"/>
+<text text-anchor="middle" x="372" y="-117.553" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_grid_dimensions_object</text>
+</a>
+</g>
+</g>
+<!-- penf&#45;&gt;module~off_grid_dimensions_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge25" class="edge"><title>penf&#45;&gt;module~off_grid_dimensions_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M71.1496,-245.55C100.894,-247.905 150.809,-250.036 193,-242.953"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M195,-242.953C226.369,-237.686 236.395,-239.756 264,-223.953 302.044,-202.173 336.545,-163.746 355.564,-140.195"/>
+<polygon fill="#000000" stroke="#000000" points="358.39,-142.264 361.849,-132.25 352.9,-137.922 358.39,-142.264"/>
+</g>
+<!-- penf&#45;&gt;module~off_error_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge2" class="edge"><title>penf&#45;&gt;module~off_error_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M52.2314,-255.054C64.5997,-274.8 91.6403,-314.04 124,-336.953 129.279,-340.691 135.163,-343.966 141.206,-346.816"/>
+<polygon fill="#000000" stroke="#000000" points="140.203,-350.195 150.771,-350.949 142.98,-343.77 140.203,-350.195"/>
+</g>
+<!-- module~off_cell_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_node9" class="node"><title>module~off_cell_object</title>
+<g id="a_module~~off_file_grid_object~~UsesGraph_node9"><a xlink:href="../module/off_cell_object.html" xlink:title="off_cell_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="234.5,-172.953 153.5,-172.953 153.5,-148.953 234.5,-148.953 234.5,-172.953"/>
+<text text-anchor="middle" x="194" y="-158.553" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_cell_object</text>
+</a>
+</g>
+</g>
+<!-- penf&#45;&gt;module~off_cell_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge8" class="edge"><title>penf&#45;&gt;module~off_cell_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M57.6819,-230.773C72.5017,-217.14 98.2854,-195.225 124,-181.953 130.13,-178.789 136.818,-176.014 143.539,-173.607"/>
+<polygon fill="#000000" stroke="#000000" points="144.965,-176.821 153.348,-170.342 142.755,-170.179 144.965,-176.821"/>
+</g>
+<!-- module~off_block_signature_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_node10" class="node"><title>module~off_block_signature_object</title>
+<g id="a_module~~off_file_grid_object~~UsesGraph_node10"><a xlink:href="../module/off_block_signature_object.html" xlink:title="off_block_signature_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="264,-50.9528 124,-50.9528 124,-26.9528 264,-26.9528 264,-50.9528"/>
+<text text-anchor="middle" x="194" y="-36.5528" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_block_signature_object</text>
+</a>
+</g>
+</g>
+<!-- penf&#45;&gt;module~off_block_signature_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge10" class="edge"><title>penf&#45;&gt;module~off_block_signature_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M48.7752,-230.759C60.4211,-193.855 96.6504,-84.3967 124,-59.9528 125.348,-58.7481 126.763,-57.6125 128.234,-56.542"/>
+<polygon fill="#000000" stroke="#000000" points="130.46,-59.2845 137.183,-51.0956 126.821,-53.305 130.46,-59.2845"/>
+</g>
+<!-- module~off_face_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_node12" class="node"><title>module~off_face_object</title>
+<g id="a_module~~off_file_grid_object~~UsesGraph_node12"><a xlink:href="../module/off_face_object.html" xlink:title="off_face_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="236.5,-214.953 151.5,-214.953 151.5,-190.953 236.5,-190.953 236.5,-214.953"/>
+<text text-anchor="middle" x="194" y="-200.553" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_face_object</text>
+</a>
+</g>
+</g>
+<!-- penf&#45;&gt;module~off_face_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge13" class="edge"><title>penf&#45;&gt;module~off_face_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M71.1187,-235.894C90.5785,-230.634 117.78,-223.283 141.55,-216.858"/>
+<polygon fill="#000000" stroke="#000000" points="142.753,-220.159 151.494,-214.171 140.927,-213.401 142.753,-220.159"/>
+</g>
+<!-- module~off_grid_dimensions_object&#45;&gt;module~off_file_grid_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge30" class="edge"><title>module~off_grid_dimensions_object&#45;&gt;module~off_file_grid_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M382.41,-132.043C408.646,-165.751 482.809,-261.036 515.357,-302.855"/>
+<polygon fill="#000000" stroke="#000000" points="512.735,-305.184 521.639,-310.926 518.259,-300.884 512.735,-305.184"/>
+</g>
+<!-- finer -->
+<g id="module~~off_file_grid_object~~UsesGraph_node7" class="node"><title>finer</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="221,-492.953 167,-492.953 167,-468.953 221,-468.953 221,-492.953"/>
+<text text-anchor="middle" x="194" y="-478.553" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">finer</text>
+</g>
+<!-- finer&#45;&gt;module~off_file_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge4" class="edge"><title>finer&#45;&gt;module~off_file_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M221.11,-471.757C234.114,-467.016 250.007,-460.974 264,-454.953 289.336,-444.05 317.357,-430.372 338.367,-419.78"/>
+<polygon fill="#000000" stroke="#000000" points="340.156,-422.797 347.491,-415.152 336.99,-416.554 340.156,-422.797"/>
+</g>
+<!-- module~off_error_object&#45;&gt;module~off_file_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge6" class="edge"><title>module~off_error_object&#45;&gt;module~off_file_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M238.054,-372.738C263.592,-378.542 296.032,-385.915 322.475,-391.924"/>
+<polygon fill="#000000" stroke="#000000" points="321.761,-395.351 332.288,-394.155 323.313,-388.525 321.761,-395.351"/>
+</g>
+<!-- module~off_error_object&#45;&gt;module~off_block_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge14" class="edge"><title>module~off_error_object&#45;&gt;module~off_block_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M212.844,-350.786C244.023,-329.528 308.541,-285.538 344.799,-260.817"/>
+<polygon fill="#000000" stroke="#000000" points="347.079,-263.498 353.37,-254.973 343.136,-257.715 347.079,-263.498"/>
+</g>
+<!-- module~off_cell_object&#45;&gt;module~off_block_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge15" class="edge"><title>module~off_cell_object&#45;&gt;module~off_block_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M234.589,-171.35C244.357,-174.364 254.685,-177.94 264,-181.953 292.524,-194.242 323.126,-212.223 344.265,-225.481"/>
+<polygon fill="#000000" stroke="#000000" points="342.393,-228.438 352.712,-230.843 346.145,-222.529 342.393,-228.438"/>
+</g>
+<!-- module~off_block_signature_object&#45;&gt;module~off_block_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge17" class="edge"><title>module~off_block_signature_object&#45;&gt;module~off_block_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M250.436,-50.9673C255.341,-53.4254 259.966,-56.3863 264,-59.9528 293.513,-86.048 280.66,-106.632 300,-140.953 316.793,-170.753 340.017,-202.763 355.265,-222.816"/>
+<polygon fill="#000000" stroke="#000000" points="352.597,-225.088 361.465,-230.887 358.149,-220.824 352.597,-225.088"/>
+</g>
+<!-- module~off_block_signature_object&#45;&gt;module~off_grid_dimensions_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge24" class="edge"><title>module~off_block_signature_object&#45;&gt;module~off_grid_dimensions_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M239.677,-51.0072C247.88,-53.6534 256.283,-56.6607 264,-59.9528 292.156,-71.9649 322.425,-89.4021 343.558,-102.386"/>
+<polygon fill="#000000" stroke="#000000" points="341.964,-105.516 352.304,-107.826 345.661,-99.572 341.964,-105.516"/>
+</g>
+<!-- module~off_node_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_node11" class="node"><title>module~off_node_object</title>
+<g id="a_module~~off_file_grid_object~~UsesGraph_node11"><a xlink:href="../module/off_node_object.html" xlink:title="off_node_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="238.5,-92.9528 149.5,-92.9528 149.5,-68.9528 238.5,-68.9528 238.5,-92.9528"/>
+<text text-anchor="middle" x="194" y="-78.5528" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_node_object</text>
+</a>
+</g>
+</g>
+<!-- module~off_node_object&#45;&gt;module~off_block_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge18" class="edge"><title>module~off_node_object&#45;&gt;module~off_block_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M238.088,-93.0564C247.126,-96.6979 256.255,-101.279 264,-106.953 286.692,-123.577 333.441,-188.654 356.909,-222.4"/>
+<polygon fill="#000000" stroke="#000000" points="354.041,-224.407 362.609,-230.64 359.798,-220.425 354.041,-224.407"/>
+</g>
+<!-- module~off_face_object&#45;&gt;module~off_block_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge20" class="edge"><title>module~off_face_object&#45;&gt;module~off_block_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M236.71,-212.432C260.67,-217.878 291.031,-224.778 316.821,-230.639"/>
+<polygon fill="#000000" stroke="#000000" points="316.297,-234.109 326.824,-232.913 317.848,-227.284 316.297,-234.109"/>
+</g>
+<!-- vecfor -->
+<g id="module~~off_file_grid_object~~UsesGraph_node13" class="node"><title>vecfor</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="71,-112.953 17,-112.953 17,-88.9528 71,-88.9528 71,-112.953"/>
+<text text-anchor="middle" x="44" y="-98.5528" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vecfor</text>
+</g>
+<!-- vecfor&#45;&gt;module~off_block_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge21" class="edge"><title>vecfor&#45;&gt;module~off_block_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M71.1567,-100.797C113.857,-101.56 200.172,-107.426 264,-139.953 303.08,-159.868 337.469,-198.796 356.146,-222.675"/>
+<polygon fill="#000000" stroke="#000000" points="353.445,-224.905 362.295,-230.729 359.008,-220.657 353.445,-224.905"/>
+</g>
+<!-- vecfor&#45;&gt;module~off_grid_dimensions_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge23" class="edge"><title>vecfor&#45;&gt;module~off_grid_dimensions_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M52.0539,-88.6877C63.9814,-69.3424 90.175,-32.4553 124,-17.9528 181.188,6.56632 206.234,5.16941 264,-17.9528 304.956,-34.3462 339.152,-74.7109 357.202,-99.4651"/>
+<polygon fill="#000000" stroke="#000000" points="354.47,-101.664 363.104,-107.805 360.185,-97.6208 354.47,-101.664"/>
+</g>
+<!-- vecfor&#45;&gt;module~off_cell_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge7" class="edge"><title>vecfor&#45;&gt;module~off_cell_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M71.2063,-112.591C86.5251,-119.304 106.275,-127.804 124,-134.953 132.453,-138.362 141.542,-141.887 150.259,-145.198"/>
+<polygon fill="#000000" stroke="#000000" points="149.297,-148.576 159.889,-148.829 151.767,-142.026 149.297,-148.576"/>
+</g>
+<!-- vecfor&#45;&gt;module~off_block_signature_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge9" class="edge"><title>vecfor&#45;&gt;module~off_block_signature_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M65.628,-88.9155C81.2857,-80.1097 103.538,-68.2941 124,-59.9528 129,-57.9144 134.274,-55.9668 139.587,-54.1373"/>
+<polygon fill="#000000" stroke="#000000" points="140.747,-57.4402 149.143,-50.9776 138.55,-50.7941 140.747,-57.4402"/>
+</g>
+<!-- vecfor&#45;&gt;module~off_node_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge11" class="edge"><title>vecfor&#45;&gt;module~off_node_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M71.1187,-97.4233C89.9856,-94.8737 116.13,-91.3407 139.368,-88.2004"/>
+<polygon fill="#000000" stroke="#000000" points="140.019,-91.6443 149.46,-86.8366 139.082,-84.7074 140.019,-91.6443"/>
+</g>
+<!-- vecfor&#45;&gt;module~off_face_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge12" class="edge"><title>vecfor&#45;&gt;module~off_face_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M53.5481,-112.977C66.7118,-130.632 93.6272,-163.47 124,-181.953 129.475,-185.285 135.52,-188.124 141.687,-190.534"/>
+<polygon fill="#000000" stroke="#000000" points="140.82,-193.94 151.415,-193.977 143.156,-187.341 140.82,-193.94"/>
+</g>
+<!-- vtk_fortran -->
+<g id="module~~off_file_grid_object~~UsesGraph_node14" class="node"><title>vtk_fortran</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="226,-294.953 162,-294.953 162,-270.953 226,-270.953 226,-294.953"/>
+<text text-anchor="middle" x="194" y="-280.553" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_fortran</text>
+</g>
+<!-- vtk_fortran&#45;&gt;module~off_block_object -->
+<g id="module~~off_file_grid_object~~UsesGraph_edge22" class="edge"><title>vtk_fortran&#45;&gt;module~off_block_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M226.06,-275.894C251.151,-270.191 287.065,-262.029 316.866,-255.256"/>
+<polygon fill="#000000" stroke="#000000" points="317.737,-258.647 326.713,-253.018 316.186,-251.821 317.737,-258.647"/>
+</g>
+</g>
+</svg>
+</div>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="489pt" height="32pt"
+ viewBox="0.00 0.00 489.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 485,-28 485,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node"><title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node"><title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="139.25,-24 72.75,-24 72.75,-0 139.25,-0 139.25,-24"/>
+<text text-anchor="middle" x="106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="222,-24 158,-24 158,-0 222,-0 222,-24"/>
+<text text-anchor="middle" x="190" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="294,-24 240,-24 240,-0 294,-0 294,-24"/>
+<text text-anchor="middle" x="267" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="366,-24 312,-24 312,-0 366,-0 366,-24"/>
+<text text-anchor="middle" x="339" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="481.25,-24 384.75,-24 384.75,-0 481.25,-0 481.25,-24"/>
+<text text-anchor="middle" x="433" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a parent (sub)module to the submodule which is
+    descended from it. Dashed arrows point from a module being used to the
+    module or program unit using it.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+    
+
+    
+    <p>OFF file grid object definition and implementation.</p>
+<p>The file grid is an unformatted, stream file containing the nodes coordinates of the whole grid.
+ It skeleton is the following</p>
+<div class="codehilite"><pre><span></span> # header
+ blocks_number
+ # for each block
+ id, level, gc, ni, nj, nk
+ # core
+ # for each block (for all nodes of block)
+ node%vertex%x, node%vertex%y, node%vertex%z
+</pre></div>
+
+
+<p><a href="../type/file_grid_object.html">file_grid_object</a> provides standard API for loading and saving this file.</p>
+    
+    
+    <h3>Used By</h3>
+    
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: module~~off_file_grid_object~~UsedByGraph Pages: 1 -->
+<svg id="moduleoff_file_grid_objectUsedByGraph" width="582pt" height="116pt"
+ viewBox="0.00 0.00 582.00 116.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~off_file_grid_object~~UsedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 112)">
+<title>module~~off_file_grid_object~~UsedByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-112 578,-112 578,4 -4,4"/>
+<!-- module~off_file_grid_object -->
+<g id="module~~off_file_grid_object~~UsedByGraph_node1" class="node"><title>module~off_file_grid_object</title>
+<polygon fill="none" stroke="black" points="103.5,-66 0.5,-66 0.5,-42 103.5,-42 103.5,-66"/>
+<text text-anchor="middle" x="52" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">off_file_grid_object</text>
+</g>
+<!-- module~off_simulation_object -->
+<g id="module~~off_file_grid_object~~UsedByGraph_node2" class="node"><title>module~off_simulation_object</title>
+<g id="a_module~~off_file_grid_object~~UsedByGraph_node2"><a xlink:href="../module/off_simulation_object.html" xlink:title="off_simulation_object">
+<polygon fill="#337ab7" stroke="#337ab7" points="253.5,-86 140.5,-86 140.5,-62 253.5,-62 253.5,-86"/>
+<text text-anchor="middle" x="197" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_simulation_object</text>
+</a>
+</g>
+</g>
+<!-- module~off_file_grid_object&#45;&gt;module~off_simulation_object -->
+<g id="module~~off_file_grid_object~~UsedByGraph_edge5" class="edge"><title>module~off_file_grid_object&#45;&gt;module~off_simulation_object</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M103.819,-61.1076C112.451,-62.3149 121.524,-63.5838 130.471,-64.8351"/>
+<polygon fill="#000000" stroke="#000000" points="130.1,-68.3172 140.489,-66.2362 131.07,-61.3847 130.1,-68.3172"/>
+</g>
+<!-- module~off_objects -->
+<g id="module~~off_file_grid_object~~UsedByGraph_node3" class="node"><title>module~off_objects</title>
+<g id="a_module~~off_file_grid_object~~UsedByGraph_node3"><a xlink:href="../module/off_objects.html" xlink:title="off_objects">
+<polygon fill="#337ab7" stroke="#337ab7" points="354,-66 290,-66 290,-42 354,-42 354,-66"/>
+<text text-anchor="middle" x="322" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_objects</text>
+</a>
+</g>
+</g>
+<!-- module~off_file_grid_object&#45;&gt;module~off_objects -->
+<g id="module~~off_file_grid_object~~UsedByGraph_edge6" class="edge"><title>module~off_file_grid_object&#45;&gt;module~off_objects</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M103.604,-53.3201C115.539,-53.187 128.218,-53.0677 140,-53 190.666,-52.7088 203.335,-52.6219 254,-53 262.353,-53.0623 271.291,-53.1684 279.829,-53.2887"/>
+<polygon fill="#000000" stroke="#000000" points="279.928,-56.7905 289.979,-53.4406 280.033,-49.7912 279.928,-56.7905"/>
+</g>
+<!-- module~off_simulation_object&#45;&gt;module~off_objects -->
+<g id="module~~off_file_grid_object~~UsedByGraph_edge1" class="edge"><title>module~off_simulation_object&#45;&gt;module~off_objects</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M253.742,-64.9363C262.412,-63.5265 271.237,-62.0916 279.518,-60.7451"/>
+<polygon fill="#000000" stroke="#000000" points="280.355,-64.155 289.664,-59.0954 279.231,-57.2457 280.355,-64.155"/>
+</g>
+<!-- program~off_test_save_load_file_parameters -->
+<g id="module~~off_file_grid_object~~UsedByGraph_node4" class="node"><title>program~off_test_save_load_file_parameters</title>
+<g id="a_module~~off_file_grid_object~~UsedByGraph_node4"><a xlink:href="../program/off_test_save_load_file_parameters.html" xlink:title="off_test_save_load_file_parameters">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="573.5,-108 390.5,-108 390.5,-84 573.5,-84 573.5,-108"/>
+<text text-anchor="middle" x="482" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_test_save_load_file_parameters</text>
+</a>
+</g>
+</g>
+<!-- module~off_objects&#45;&gt;program~off_test_save_load_file_parameters -->
+<g id="module~~off_file_grid_object~~UsedByGraph_edge2" class="edge"><title>module~off_objects&#45;&gt;program~off_test_save_load_file_parameters</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M354.212,-64.3302C365.44,-67.9008 378.236,-71.8042 390,-75 398.299,-77.2545 407.065,-79.4763 415.749,-81.5821"/>
+<polygon fill="#000000" stroke="#000000" points="414.95,-84.9895 425.489,-83.9059 416.574,-78.1806 414.95,-84.9895"/>
+</g>
+<!-- program~off_test_load_file_parameters -->
+<g id="module~~off_file_grid_object~~UsedByGraph_node5" class="node"><title>program~off_test_load_file_parameters</title>
+<g id="a_module~~off_file_grid_object~~UsedByGraph_node5"><a xlink:href="../program/off_test_load_file_parameters.html" xlink:title="off_test_load_file_parameters">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="559,-66 405,-66 405,-42 559,-42 559,-66"/>
+<text text-anchor="middle" x="482" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_test_load_file_parameters</text>
+</a>
+</g>
+</g>
+<!-- module~off_objects&#45;&gt;program~off_test_load_file_parameters -->
+<g id="module~~off_file_grid_object~~UsedByGraph_edge3" class="edge"><title>module~off_objects&#45;&gt;program~off_test_load_file_parameters</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M354.216,-54C366.053,-54 380.184,-54 394.645,-54"/>
+<polygon fill="#000000" stroke="#000000" points="394.687,-57.5001 404.686,-54 394.686,-50.5001 394.687,-57.5001"/>
+</g>
+<!-- program~off_test_save_load_file_grid -->
+<g id="module~~off_file_grid_object~~UsedByGraph_node6" class="node"><title>program~off_test_save_load_file_grid</title>
+<g id="a_module~~off_file_grid_object~~UsedByGraph_node6"><a xlink:href="../program/off_test_save_load_file_grid.html" xlink:title="off_test_save_load_file_grid">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="555,-24 409,-24 409,-0 555,-0 555,-24"/>
+<text text-anchor="middle" x="482" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">off_test_save_load_file_grid</text>
+</a>
+</g>
+</g>
+<!-- module~off_objects&#45;&gt;program~off_test_save_load_file_grid -->
+<g id="module~~off_file_grid_object~~UsedByGraph_edge4" class="edge"><title>module~off_objects&#45;&gt;program~off_test_save_load_file_grid</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M354.212,-43.6698C365.44,-40.0992 378.236,-36.1958 390,-33 398.299,-30.7455 407.065,-28.5237 415.749,-26.4179"/>
+<polygon fill="#000000" stroke="#000000" points="416.574,-29.8194 425.489,-24.0941 414.95,-23.0105 416.574,-29.8194"/>
+</g>
+</g>
+</svg>
+</div>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="489pt" height="32pt"
+ viewBox="0.00 0.00 489.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 485,-28 485,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node"><title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node"><title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="139.25,-24 72.75,-24 72.75,-0 139.25,-0 139.25,-24"/>
+<text text-anchor="middle" x="106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="222,-24 158,-24 158,-0 222,-0 222,-24"/>
+<text text-anchor="middle" x="190" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="294,-24 240,-24 240,-0 294,-0 294,-24"/>
+<text text-anchor="middle" x="267" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="366,-24 312,-24 312,-0 366,-0 366,-24"/>
+<text text-anchor="middle" x="339" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="481.25,-24 384.75,-24 384.75,-0 481.25,-0 481.25,-24"/>
+<text text-anchor="middle" x="433" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a parent (sub)module to the submodule which is
+    descended from it. Dashed arrows point from a module being used to the
+    module or program unit using it.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+    <br>
+    
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#types-1">Derived Types</a></h3></div>
+  <div id="types-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html#type-file_grid_object">file_grid_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-1">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-1" class="panel-collapse collapse">
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html#proc-load_grid_dimensions_from_file">load_grid_dimensions_from_file</a>
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html#proc-load_nodes_from_file%7E2">load_nodes_from_file</a>
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html#proc-save_grid_dimensions_into_file">save_grid_dimensions_into_file</a>
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html#proc-save_nodes_into_file%7E2">save_nodes_into_file</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    <section>
+     <h2>Derived Types</h2>
+	 
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-file_grid_object"></span><h3>type, public, extends(<a href='../type/file_object.html'>file_object</a>) :: <a href='../type/file_grid_object.html'>file_grid_object</a>
+    
+  </h3></div>
+  <div class="panel-body">
+    
+    
+    <p>File grid object class.</p>
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-error%7E2"></span>type(<a href='../type/error_object.html'>error_object</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>error</strong></td><td></td><td></td><td><p>Errors handler.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-file_name"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>file_name</strong></td><td></td><td></td><td><p>File name.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-file_unit"></span>integer(kind=I4P),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>file_unit</strong></td><td> =</td><td>0</td><td><p>File unit.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-is_connected"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>is_connected</strong></td><td> =</td><td>.false.</td><td><p>Sentinel to check if file is connected.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-is_initialized"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>is_initialized</strong></td><td> =</td><td>.false.</td><td><p>Sentinel to check if file is initialized.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+     <h4>Type-Bound Procedures</h4>
+      <table class="table table-striped varlist">
+      <tbody>
+      
+       <tr><td>generic, public :: <strong><a href='../type/file_grid_object.html#boundprocedure-assignment%28%3D%29%7E6'>assignment(=)</a></strong>  => file_assign_file </td>
+       <td><p>Overload <code>=</code>.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-close'>close</a></strong>  </td>
+       <td><p>Close file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-description%7E2'>description</a></strong>  </td>
+       <td><p>Return a pretty-formatted description of the file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-destroy%7E6'>destroy</a></strong>  </td>
+       <td><p>Destroy file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(lhs) :: <strong><a href='../type/file_object.html#boundprocedure-file_assign_file'>file_assign_file</a></strong>  </td>
+       <td><p>Operator <code>=</code>.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-initialize%7E6'>initialize</a></strong>  </td>
+       <td><p>Initialize file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-load_file_name_from_file'>load_file_name_from_file</a></strong>  </td>
+       <td><p>Load file name from file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_grid_object.html#boundprocedure-load_grid_dimensions_from_file'>load_grid_dimensions_from_file</a></strong>  </td>
+       <td><p>Load the grid dimensions of all blocks from file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_grid_object.html#boundprocedure-load_nodes_from_file%7E2'>load_nodes_from_file</a></strong>  </td>
+       <td><p>Load nodes coordinates from file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-open'>open</a></strong>  </td>
+       <td><p>Open file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_object.html#boundprocedure-save_file_name_into_file'>save_file_name_into_file</a></strong>  </td>
+       <td><p>Save file name into file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_grid_object.html#boundprocedure-save_grid_dimensions_into_file'>save_grid_dimensions_into_file</a></strong>  </td>
+       <td><p>Save the grid dimensions of all blocks into file.</p></td></tr>
+      
+       <tr><td>procedure, public, pass(self) :: <strong><a href='../type/file_grid_object.html#boundprocedure-save_nodes_into_file%7E2'>save_nodes_into_file</a></strong>  </td>
+       <td><p>Save nodes coordinates into file.</p></td></tr>
+      
+       </tbody>
+       </table>
+     
+  </div>
+</div>
+
+     
+    </section>
+	<br>
+    
+    
+    
+
+    
+    <section>
+    <h2>Subroutines</h2>
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-load_grid_dimensions_from_file"></span><h3>
+private subroutine <a href='../proc/load_grid_dimensions_from_file.html'>load_grid_dimensions_from_file</a>(self, grid_dimensions, file_name)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Load the grid dimensions of all blocks from file.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/file_grid_object.html'>file_grid_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>File object.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/grid_dimensions_object.html'>grid_dimensions_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>grid_dimensions</strong></td><td><p>Grid dimensions off all blocks into file.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>file_name</strong></td><td><p>File name.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-load_nodes_from_file%7E2"></span><h3>
+private subroutine <a href='../proc/load_nodes_from_file%7E2.html'>load_nodes_from_file</a>(self, grid_dimensions, blocks, file_name)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Load nodes coordinates from file.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/file_grid_object.html'>file_grid_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>File object.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/grid_dimensions_object.html'>grid_dimensions_object</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>grid_dimensions</strong></td><td><p>Grid dimensions off all blocks into file.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/block_object.html'>block_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>blocks</strong>(1:)</td><td><p>Blocks storage.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>file_name</strong></td><td><p>File name.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-save_grid_dimensions_into_file"></span><h3>
+private subroutine <a href='../proc/save_grid_dimensions_into_file.html'>save_grid_dimensions_into_file</a>(self, grid_dimensions)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Load the grid dimensions of all blocks into file.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/file_grid_object.html'>file_grid_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>File object.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/grid_dimensions_object.html'>grid_dimensions_object</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>grid_dimensions</strong></td><td><p>Grid dimensions off all blocks into file.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-save_nodes_into_file%7E2"></span><h3>
+private subroutine <a href='../proc/save_nodes_into_file%7E2.html'>save_nodes_into_file</a>(self, grid_dimensions, blocks)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Save nodes coordinates into file.</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/file_grid_object.html'>file_grid_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>self</strong></td><td><p>File object.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/grid_dimensions_object.html'>grid_dimensions_object</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>grid_dimensions</strong></td><td><p>Grid dimensions off all blocks into file.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/block_object.html'>block_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>blocks</strong>(1:)</td><td><p>Blocks storage.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    </section>    
+    <br>
+    
+    
+    
+    </div>
+  </div>
+
+  <section class="visible-xs visible-sm hidden-md">
+    <hr>
+    
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allmods-1">All Modules</a></h3></div>
+  <div id="allmods-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/off_block_object.html">off_block_object</a>
+      
+      <a class="list-group-item" href="../module/off_block_signature_object.html">off_block_signature_object</a>
+      
+      <a class="list-group-item" href="../module/off_cell_object.html">off_cell_object</a>
+      
+      <a class="list-group-item" href="../module/off_error_object.html">off_error_object</a>
+      
+      <a class="list-group-item" href="../module/off_face_object.html">off_face_object</a>
+      
+      <a class="list-group-item" href="../module/off_file_grid_object.html">off_file_grid_object</a>
+      
+      <a class="list-group-item" href="../module/off_file_object.html">off_file_object</a>
+      
+      <a class="list-group-item" href="../module/off_files_collection_object.html">off_files_collection_object</a>
+      
+      <a class="list-group-item" href="../module/off_free_conditions_object.html">off_free_conditions_object</a>
+      
+      <a class="list-group-item" href="../module/off_grid_dimensions_object.html">off_grid_dimensions_object</a>
+      
+      <a class="list-group-item" href="../module/off_node_object.html">off_node_object</a>
+      
+      <a class="list-group-item" href="../module/off_non_dimensional_numbers_object.html">off_non_dimensional_numbers_object</a>
+      
+      <a class="list-group-item" href="../module/off_objects.html">off_objects</a>
+      
+      <a class="list-group-item" href="../module/off_os_object.html">off_os_object</a>
+      
+      <a class="list-group-item" href="../module/off_simulation_object.html">off_simulation_object</a>
+      
+      <a class="list-group-item" href="../module/off_solver_object.html">off_solver_object</a>
+      
+      <a class="list-group-item" href="../module/off_time_object.html">off_time_object</a>
+      
+    </div>
+  </div>
+</div>
+
+
+  </section>
+  
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on 2017-08-29 12:30  
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> OFF was developed by Giacomo Rossi
+Stefano Zaghi</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

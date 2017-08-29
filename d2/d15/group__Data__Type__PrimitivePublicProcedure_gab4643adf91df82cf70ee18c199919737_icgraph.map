@@ -1,6 +1,0 @@
-<map id="data_type_primitive::read_primitive" name="data_type_primitive::read_primitive">
-<area shape="rect" id="node3" href="$d0/d54/group__Data__Type__SBlockPrivateProcedure.html#ga45b5b31f2696eb0441473477dd0908a6" title="Function for loading fluid dynamic file. " alt="" coords="191,5,345,51"/>
-<area shape="rect" id="node9" href="$d2/db8/group__Data__Type__GlobalPrivateProcedure.html#gaa3a5d0f9bee6885b412e36e41357436d" title="Function for loading inflow 1 boundary conditions. " alt="" coords="192,74,344,121"/>
-<area shape="rect" id="node5" href="$db/dca/group__Data__Type__SBlockDerivedType.html#af29283f926379970a5464ef847d9bb0b" title="data_type_sblock::type\l_sblock::print_info_mesh" alt="" coords="396,5,561,51"/>
-<area shape="rect" id="node7" href="$db/dca/group__Data__Type__SBlockDerivedType.html#a6771c9dc2f262ff5c16b0749dac2fecd" title="data_type_sblock::type\l_sblock::free" alt="" coords="611,5,768,51"/>
-</map>

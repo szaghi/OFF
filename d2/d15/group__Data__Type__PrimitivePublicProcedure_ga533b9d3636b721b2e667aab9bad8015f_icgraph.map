@@ -1,8 +1,0 @@
-<map id="data_type_primitive::write_primitive" name="data_type_primitive::write_primitive">
-<area shape="rect" id="node3" href="$d3/dc5/IBM_8f90.html#ab525d4fcc810da4eec01fdb034549f6a" title="load_blocks" alt="" coords="224,5,315,35"/>
-<area shape="rect" id="node5" href="$d3/dc5/IBM_8f90.html#a0b39c34401040ee2638af9769b89280d" title="load_icemcfd" alt="" coords="220,59,319,88"/>
-<area shape="rect" id="node7" href="$d9/d99/group__OFFProgram.html#gab96c351668e50a49652d8e1afdacbd71" title="OFF is an Open source Finite volumes Fluid dynamics code. " alt="" coords="251,112,288,141"/>
-<area shape="rect" id="node9" href="$d0/d54/group__Data__Type__SBlockPrivateProcedure.html#gac96ba1666b44c9ce8bcf14f2599c9eb7" title="Function for saving fluid dynamic file. " alt="" coords="189,165,349,211"/>
-<area shape="rect" id="node11" href="$db/dca/group__Data__Type__SBlockDerivedType.html#ab1dd191687987024b7eb891c67e97fde" title="data_type_sblock::type\l_sblock::load_mesh" alt="" coords="397,165,555,211"/>
-<area shape="rect" id="node13" href="$db/dca/group__Data__Type__SBlockDerivedType.html#a1e98c57e963472ad4973e53d9ea0812d" title="data_type_sblock::type\l_sblock::alloc" alt="" coords="603,165,760,211"/>
-</map>

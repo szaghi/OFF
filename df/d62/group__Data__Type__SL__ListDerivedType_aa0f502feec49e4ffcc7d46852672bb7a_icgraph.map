@@ -1,9 +1,0 @@
-<map id="data_type_sl_list::type_sl_link::putt_link_r4" name="data_type_sl_list::type_sl_link::putt_link_r4">
-<area shape="rect" id="node3" href="$df/d62/group__Data__Type__SL__ListDerivedType.html#a566acf5cfae7849c569f627deb1a2dd7" title="data_type_sl_list::\ltype_sl_link::puth_link_log" alt="" coords="223,5,396,51"/>
-<area shape="rect" id="node5" href="$df/d62/group__Data__Type__SL__ListDerivedType.html#a9275171afbe9aafcdfd23db61c639f9a" title="data_type_sl_list::\ltype_sl_link::putt" alt="" coords="245,74,373,121"/>
-<area shape="rect" id="node15" href="$d0/d9b/group__Data__Type__SL__ListPrivateProcedure.html#ga9ca9ffa3174b4f290f4c31be18436e00" title="Recursive subroutine for inserting a link data into the list tail (logical). " alt="" coords="245,143,373,190"/>
-<area shape="rect" id="node7" href="$df/d62/group__Data__Type__SL__ListDerivedType.html#ac40594df5a97ddb0341b56a5108930f1" title="data_type_sl_list::\ltype_sl_link::puth" alt="" coords="445,39,573,86"/>
-<area shape="rect" id="node13" href="$df/d62/group__Data__Type__SL__ListDerivedType.html#afa3bfa50b9441abcdb9cd8373520a728" title="data_type_sl_list::\ltype_sl_list::puth" alt="" coords="445,109,573,155"/>
-<area shape="rect" id="node9" href="$df/d62/group__Data__Type__SL__ListDerivedType.html#a09c4523b97caadb11f419264cd682a79" title="data_type_sl_list::\ltype_sl_link::put" alt="" coords="621,5,749,51"/>
-<area shape="rect" id="node11" href="$df/d62/group__Data__Type__SL__ListDerivedType.html#a4accd37e7e18fdf5e3502b07f4424688" title="data_type_sl_list::\ltype_sl_list::put" alt="" coords="621,74,749,121"/>
-</map>

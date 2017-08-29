@@ -1,7 +1,0 @@
-<map id="data_type_sl_list::type_sl_link::delh" name="data_type_sl_list::type_sl_link::delh">
-<area shape="rect" id="node3" href="$df/d62/group__Data__Type__SL__ListDerivedType.html#aac0e8065c71b47d6a299b03fe92141bd" title="data_type_sl_list::\ltype_sl_list::free" alt="" coords="181,5,309,51"/>
-<area shape="rect" id="node5" href="$df/d62/group__Data__Type__SL__ListDerivedType.html#a01e525146afc6c683292d9613b2e36a1" title="data_type_sl_list::\ltype_sl_link::leng" alt="" coords="181,74,309,121"/>
-<area shape="rect" id="node7" href="$df/d1c/group__Data__Type__HashTCellPrivateProcedure.html#ga725475010fb5840aa9b9a51be07d6299" title="Subroutine for initializing the hash table. " alt="" coords="361,5,500,51"/>
-<area shape="rect" id="node9" href="$db/de1/group__Data__Type__HashTNodePrivateProcedure.html#ga32a86aa941088fbedd2145f537acaa03" title="Subroutine for initializing the hash table. " alt="" coords="357,74,504,121"/>
-<area shape="rect" id="node11" href="$de/dea/group__Data__Type__HashTFacePrivateProcedure.html#gaf00e3548db9a6559ced6d434db596ca6" title="Subroutine for initializing the hash table. " alt="" coords="360,143,501,190"/>
-</map>

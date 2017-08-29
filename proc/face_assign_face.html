@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="OFF, Open source Finite volumes Fluid dynamics code">
+    
+    <meta name="author" content="Giacomo Rossi
+Stefano Zaghi" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>face_assign_face &ndash; OFF</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">OFF </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>face_assign_face
+      <small>Subroutine</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+	  data-placement="bottom" data-html="true"
+	  title=" 0.4% of total for procedures.">6 statements</a>
+     </li> 
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/off_face_object.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/off_face_object.f90.html'>off_face_object.f90</a></li>
+  
+     <li><a href='../module/off_face_object.html'>off_face_object</a></li>
+  
+     <li class="active">face_assign_face</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/face_assign_face.html#src">face_assign_face</a>
+  </div>
+</div>
+
+
+  <hr>
+  
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs-0">All Procedures</a></h3></div>
+  <div id="allprocs-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../proc/adim_assign_adim.html">adim_assign_adim</a>
+      
+      <a class="list-group-item" href="../proc/allocate_blocks.html">allocate_blocks</a>
+      
+      <a class="list-group-item" href="../proc/block_assign_block.html">block_assign_block</a>
+      
+      <a class="list-group-item" href="../proc/block_d_assign_block_d.html">block_d_assign_block_d</a>
+      
+      <a class="list-group-item" href="../proc/cell_assign_cell.html">cell_assign_cell</a>
+      
+      <a class="list-group-item" href="../proc/cells_number.html">cells_number</a>
+      
+      <a class="list-group-item" href="../proc/cells_number%7E2.html">cells_number</a>
+      
+      <a class="list-group-item" href="../proc/check.html">check</a>
+      
+      <a class="list-group-item" href="../proc/cli_parse.html">cli_parse</a>
+      
+      <a class="list-group-item" href="../proc/cli_parse%7E2.html">cli_parse</a>
+      
+      <a class="list-group-item" href="../proc/cli_parse%7E3.html">cli_parse</a>
+      
+      <a class="list-group-item" href="../proc/close.html">close</a>
+      
+      <a class="list-group-item" href="../proc/compute_extents.html">compute_extents</a>
+      
+      <a class="list-group-item" href="../proc/compute_faces_metrics.html">compute_faces_metrics</a>
+      
+      <a class="list-group-item" href="../proc/compute_metrics.html">compute_metrics</a>
+      
+      <a class="list-group-item" href="../proc/compute_metrics%7E2.html">compute_metrics</a>
+      
+      <a class="list-group-item" href="../proc/compute_reference_values.html">compute_reference_values</a>
+      
+      <a class="list-group-item" href="../proc/compute_space_operator.html">compute_space_operator</a>
+      
+      <a class="list-group-item" href="../proc/compute_volumes.html">compute_volumes</a>
+      
+      <a class="list-group-item" href="../proc/correct_metrics.html">correct_metrics</a>
+      
+      <a class="list-group-item" href="../proc/cp.html">cp</a>
+      
+      <a class="list-group-item" href="../proc/create_linspace.html">create_linspace</a>
+      
+      <a class="list-group-item" href="../proc/description.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E2.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E3.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E4.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E5.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E6.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E7.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E8.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E9.html">description</a>
+      
+      <a class="list-group-item" href="../proc/destroy.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E2.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E3.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E4.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E5.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E6.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E7.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E8.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E9.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E10.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E11.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E12.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E13.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E14.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E15.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/err_assign_err.html">err_assign_err</a>
+      
+      <a class="list-group-item" href="../proc/face_assign_face.html">face_assign_face</a>
+      
+      <a class="list-group-item" href="../proc/file_assign_file.html">file_assign_file</a>
+      
+      <a class="list-group-item" href="../proc/free_assign_free.html">free_assign_free</a>
+      
+      <a class="list-group-item" href="../proc/grid_d_assign_grid_d.html">grid_d_assign_grid_d</a>
+      
+      <a class="list-group-item" href="../proc/initialize.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E2.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E3.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E4.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E5.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E6.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E7.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E8.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E9.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E10.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E11.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E12.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E13.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E14.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E15.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize_unix.html">initialize_unix</a>
+      
+      <a class="list-group-item" href="../proc/initialize_windows.html">initialize_windows</a>
+      
+      <a class="list-group-item" href="../proc/integrate.html">integrate</a>
+      
+      <a class="list-group-item" href="../proc/interpolate_at_nodes.html">interpolate_at_nodes</a>
+      
+      <a class="list-group-item" href="../proc/iolength.html">iolength</a>
+      
+      <a class="list-group-item" href="../proc/iolength%7E2.html">iolength</a>
+      
+      <a class="list-group-item" href="../proc/iopos_block_nodes.html">iopos_block_nodes</a>
+      
+      <a class="list-group-item" href="../proc/is_the_end.html">is_the_end</a>
+      
+      <a class="list-group-item" href="../proc/load_file_grid.html">load_file_grid</a>
+      
+      <a class="list-group-item" href="../proc/load_file_name_from_file.html">load_file_name_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_file_parameters.html">load_file_parameters</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file%7E2.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file%7E3.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file%7E4.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file%7E5.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file%7E6.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file%7E7.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_grid_dimensions_from_file.html">load_grid_dimensions_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_input_files.html">load_input_files</a>
+      
+      <a class="list-group-item" href="../proc/load_nodes_from_file.html">load_nodes_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_nodes_from_file%7E2.html">load_nodes_from_file</a>
+      
+      <a class="list-group-item" href="../proc/mkdir.html">mkdir</a>
+      
+      <a class="list-group-item" href="../proc/node_assign_node.html">node_assign_node</a>
+      
+      <a class="list-group-item" href="../proc/node_to_center.html">node_to_center</a>
+      
+      <a class="list-group-item" href="../proc/nodes_number.html">nodes_number</a>
+      
+      <a class="list-group-item" href="../proc/nodes_number%7E2.html">nodes_number</a>
+      
+      <a class="list-group-item" href="../proc/nullify_normals.html">nullify_normals</a>
+      
+      <a class="list-group-item" href="../proc/open.html">open</a>
+      
+      <a class="list-group-item" href="../proc/os_assign_os.html">os_assign_os</a>
+      
+      <a class="list-group-item" href="../proc/parse_command_line_interface.html">parse_command_line_interface</a>
+      
+      <a class="list-group-item" href="../proc/progress.html">progress</a>
+      
+      <a class="list-group-item" href="../proc/rm.html">rm</a>
+      
+      <a class="list-group-item" href="../proc/save_file_grid.html">save_file_grid</a>
+      
+      <a class="list-group-item" href="../proc/save_file_grid%7E2.html">save_file_grid</a>
+      
+      <a class="list-group-item" href="../proc/save_file_grid_tec.html">save_file_grid_tec</a>
+      
+      <a class="list-group-item" href="../proc/save_file_grid_vtk.html">save_file_grid_vtk</a>
+      
+      <a class="list-group-item" href="../proc/save_file_name_into_file.html">save_file_name_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_file_parameters.html">save_file_parameters</a>
+      
+      <a class="list-group-item" href="../proc/save_grid_dimensions_into_file.html">save_grid_dimensions_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file%7E2.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file%7E3.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file%7E4.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file%7E5.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file%7E6.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file%7E7.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_nodes_into_file.html">save_nodes_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_nodes_into_file%7E2.html">save_nodes_into_file</a>
+      
+      <a class="list-group-item" href="../proc/set_command_line_interface.html">set_command_line_interface</a>
+      
+      <a class="list-group-item" href="../proc/set_stop.html">set_stop</a>
+      
+      <a class="list-group-item" href="../proc/solver_assign_solver.html">solver_assign_solver</a>
+      
+      <a class="list-group-item" href="../proc/time_assign_time.html">time_assign_time</a>
+      
+      <a class="list-group-item" href="../proc/update.html">update</a>
+      
+    </div>
+  </div>
+</div>
+
+
+</div>  
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>
+private pure subroutine face_assign_face(lhs, rhs)
+    
+    
+	 
+</h2>
+    
+  
+
+
+    
+    <p>Operator <code>=</code>.</p>
+    
+
+    <h3>Arguments</h3>
+    
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lhs%7E5"></span>class(<a href='../type/face_object.html'>face_object</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>lhs</strong></td><td><p>Left hand side.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rhs%7E5"></span>type(<a href='../type/face_object.html'>face_object</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rhs</strong></td><td><p>Right hand side.</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    
+    
+    
+     
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/face_assign_face.html#src">face_assign_face</a>
+  </div>
+</div>
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span>   <span class="k">pure subroutine </span><span class="n">face_assign_face</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
+   <span class="c">!&lt; Operator `=`.</span>
+   <span class="k">class</span><span class="p">(</span><span class="n">face_object</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lhs</span> <span class="c">!&lt; Left hand side.</span>
+   <span class="k">type</span><span class="p">(</span><span class="n">face_object</span><span class="p">),</span>  <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">rhs</span> <span class="c">!&lt; Right hand side.</span>
+
+   <span class="n">lhs</span><span class="p">%</span><span class="n">area</span>   <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">area</span>
+   <span class="n">lhs</span><span class="p">%</span><span class="n">normal</span> <span class="o">=</span> <span class="n">rhs</span><span class="p">%</span><span class="n">normal</span>
+   <span class="n">endsubroutine</span> <span class="n">face_assign_face</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    
+    </div>
+  </div>
+
+  <section class="visible-xs visible-sm hidden-md">
+    <hr>
+    
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs-1">All Procedures</a></h3></div>
+  <div id="allprocs-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../proc/adim_assign_adim.html">adim_assign_adim</a>
+      
+      <a class="list-group-item" href="../proc/allocate_blocks.html">allocate_blocks</a>
+      
+      <a class="list-group-item" href="../proc/block_assign_block.html">block_assign_block</a>
+      
+      <a class="list-group-item" href="../proc/block_d_assign_block_d.html">block_d_assign_block_d</a>
+      
+      <a class="list-group-item" href="../proc/cell_assign_cell.html">cell_assign_cell</a>
+      
+      <a class="list-group-item" href="../proc/cells_number.html">cells_number</a>
+      
+      <a class="list-group-item" href="../proc/cells_number%7E2.html">cells_number</a>
+      
+      <a class="list-group-item" href="../proc/check.html">check</a>
+      
+      <a class="list-group-item" href="../proc/cli_parse.html">cli_parse</a>
+      
+      <a class="list-group-item" href="../proc/cli_parse%7E2.html">cli_parse</a>
+      
+      <a class="list-group-item" href="../proc/cli_parse%7E3.html">cli_parse</a>
+      
+      <a class="list-group-item" href="../proc/close.html">close</a>
+      
+      <a class="list-group-item" href="../proc/compute_extents.html">compute_extents</a>
+      
+      <a class="list-group-item" href="../proc/compute_faces_metrics.html">compute_faces_metrics</a>
+      
+      <a class="list-group-item" href="../proc/compute_metrics.html">compute_metrics</a>
+      
+      <a class="list-group-item" href="../proc/compute_metrics%7E2.html">compute_metrics</a>
+      
+      <a class="list-group-item" href="../proc/compute_reference_values.html">compute_reference_values</a>
+      
+      <a class="list-group-item" href="../proc/compute_space_operator.html">compute_space_operator</a>
+      
+      <a class="list-group-item" href="../proc/compute_volumes.html">compute_volumes</a>
+      
+      <a class="list-group-item" href="../proc/correct_metrics.html">correct_metrics</a>
+      
+      <a class="list-group-item" href="../proc/cp.html">cp</a>
+      
+      <a class="list-group-item" href="../proc/create_linspace.html">create_linspace</a>
+      
+      <a class="list-group-item" href="../proc/description.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E2.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E3.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E4.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E5.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E6.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E7.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E8.html">description</a>
+      
+      <a class="list-group-item" href="../proc/description%7E9.html">description</a>
+      
+      <a class="list-group-item" href="../proc/destroy.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E2.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E3.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E4.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E5.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E6.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E7.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E8.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E9.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E10.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E11.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E12.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E13.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E14.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/destroy%7E15.html">destroy</a>
+      
+      <a class="list-group-item" href="../proc/err_assign_err.html">err_assign_err</a>
+      
+      <a class="list-group-item" href="../proc/face_assign_face.html">face_assign_face</a>
+      
+      <a class="list-group-item" href="../proc/file_assign_file.html">file_assign_file</a>
+      
+      <a class="list-group-item" href="../proc/free_assign_free.html">free_assign_free</a>
+      
+      <a class="list-group-item" href="../proc/grid_d_assign_grid_d.html">grid_d_assign_grid_d</a>
+      
+      <a class="list-group-item" href="../proc/initialize.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E2.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E3.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E4.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E5.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E6.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E7.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E8.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E9.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E10.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E11.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E12.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E13.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E14.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize%7E15.html">initialize</a>
+      
+      <a class="list-group-item" href="../proc/initialize_unix.html">initialize_unix</a>
+      
+      <a class="list-group-item" href="../proc/initialize_windows.html">initialize_windows</a>
+      
+      <a class="list-group-item" href="../proc/integrate.html">integrate</a>
+      
+      <a class="list-group-item" href="../proc/interpolate_at_nodes.html">interpolate_at_nodes</a>
+      
+      <a class="list-group-item" href="../proc/iolength.html">iolength</a>
+      
+      <a class="list-group-item" href="../proc/iolength%7E2.html">iolength</a>
+      
+      <a class="list-group-item" href="../proc/iopos_block_nodes.html">iopos_block_nodes</a>
+      
+      <a class="list-group-item" href="../proc/is_the_end.html">is_the_end</a>
+      
+      <a class="list-group-item" href="../proc/load_file_grid.html">load_file_grid</a>
+      
+      <a class="list-group-item" href="../proc/load_file_name_from_file.html">load_file_name_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_file_parameters.html">load_file_parameters</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file%7E2.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file%7E3.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file%7E4.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file%7E5.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file%7E6.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_from_file%7E7.html">load_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_grid_dimensions_from_file.html">load_grid_dimensions_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_input_files.html">load_input_files</a>
+      
+      <a class="list-group-item" href="../proc/load_nodes_from_file.html">load_nodes_from_file</a>
+      
+      <a class="list-group-item" href="../proc/load_nodes_from_file%7E2.html">load_nodes_from_file</a>
+      
+      <a class="list-group-item" href="../proc/mkdir.html">mkdir</a>
+      
+      <a class="list-group-item" href="../proc/node_assign_node.html">node_assign_node</a>
+      
+      <a class="list-group-item" href="../proc/node_to_center.html">node_to_center</a>
+      
+      <a class="list-group-item" href="../proc/nodes_number.html">nodes_number</a>
+      
+      <a class="list-group-item" href="../proc/nodes_number%7E2.html">nodes_number</a>
+      
+      <a class="list-group-item" href="../proc/nullify_normals.html">nullify_normals</a>
+      
+      <a class="list-group-item" href="../proc/open.html">open</a>
+      
+      <a class="list-group-item" href="../proc/os_assign_os.html">os_assign_os</a>
+      
+      <a class="list-group-item" href="../proc/parse_command_line_interface.html">parse_command_line_interface</a>
+      
+      <a class="list-group-item" href="../proc/progress.html">progress</a>
+      
+      <a class="list-group-item" href="../proc/rm.html">rm</a>
+      
+      <a class="list-group-item" href="../proc/save_file_grid.html">save_file_grid</a>
+      
+      <a class="list-group-item" href="../proc/save_file_grid%7E2.html">save_file_grid</a>
+      
+      <a class="list-group-item" href="../proc/save_file_grid_tec.html">save_file_grid_tec</a>
+      
+      <a class="list-group-item" href="../proc/save_file_grid_vtk.html">save_file_grid_vtk</a>
+      
+      <a class="list-group-item" href="../proc/save_file_name_into_file.html">save_file_name_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_file_parameters.html">save_file_parameters</a>
+      
+      <a class="list-group-item" href="../proc/save_grid_dimensions_into_file.html">save_grid_dimensions_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file%7E2.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file%7E3.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file%7E4.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file%7E5.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file%7E6.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_into_file%7E7.html">save_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_nodes_into_file.html">save_nodes_into_file</a>
+      
+      <a class="list-group-item" href="../proc/save_nodes_into_file%7E2.html">save_nodes_into_file</a>
+      
+      <a class="list-group-item" href="../proc/set_command_line_interface.html">set_command_line_interface</a>
+      
+      <a class="list-group-item" href="../proc/set_stop.html">set_stop</a>
+      
+      <a class="list-group-item" href="../proc/solver_assign_solver.html">solver_assign_solver</a>
+      
+      <a class="list-group-item" href="../proc/time_assign_time.html">time_assign_time</a>
+      
+      <a class="list-group-item" href="../proc/update.html">update</a>
+      
+    </div>
+  </div>
+</div>
+
+
+  </section>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on 2017-08-29 12:30  
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> OFF was developed by Giacomo Rossi
+Stefano Zaghi</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

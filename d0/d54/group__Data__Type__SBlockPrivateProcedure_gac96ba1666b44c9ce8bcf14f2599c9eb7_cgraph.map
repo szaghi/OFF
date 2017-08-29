@@ -1,5 +1,0 @@
-<map id="data_type_sblock::save_bfluid" name="data_type_sblock::save_bfluid">
-<area shape="rect" id="node3" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga03b3d23e7eb885f6fb3c00f7a977b33d" title="The Get_Unit function returns a free logic unit for opening a file. " alt="" coords="213,5,355,35"/>
-<area shape="rect" id="node5" href="$d2/d15/group__Data__Type__PrimitivePublicProcedure.html#ga533b9d3636b721b2e667aab9bad8015f" title="Function for writing Type_Primitive data. " alt="" coords="217,58,351,105"/>
-<area shape="rect" id="node7" href="$db/daf/group__Data__Type__VectorPublicProcedure.html#gad0238e2130eb5d2b22bad2a05e1d4f28" title="Function for writing Type_Vector data. " alt="" coords="404,58,561,105"/>
-</map>

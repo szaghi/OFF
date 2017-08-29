@@ -1,7 +1,0 @@
-<map id="data_type_vector::type_vector::set" name="data_type_vector::type_vector::set">
-<area shape="rect" id="node3" href="$d4/d1b/group__Data__Type__TensorDerivedType.html#aca54c77f551353c39e0788f618ea6536" title="data_type_tensor::type\l_tensor::normalize" alt="" coords="239,7,393,54"/>
-<area shape="rect" id="node9" href="$d1/dff/group__Data__Type__TensorPrivateProcedure.html#gaa72ebe1f7407c19034513587ba64f485" title="Subroutine for normalizing a tensor. " alt="" coords="209,79,423,108"/>
-<area shape="rect" id="node5" href="$d4/d1b/group__Data__Type__TensorDerivedType.html#ae54c44161c6726cd9f3a630d03b6adba" title="data_type_tensor::type\l_tensor::invertible" alt="" coords="480,5,635,51"/>
-<area shape="rect" id="node7" href="$d4/d1b/group__Data__Type__TensorDerivedType.html#a03ee09062c543dc997c72ca513232b4a" title="data_type_tensor::type\l_tensor::rotou" alt="" coords="691,5,845,51"/>
-<area shape="rect" id="node11" href="$d5/d78/group__Data__Type__TensorInterface.html#a0c315a62cedcd692df32d7d75cdc5143" title="Function for computing the norm L2 of a tensor. " alt="" coords="473,74,641,121"/>
-</map>

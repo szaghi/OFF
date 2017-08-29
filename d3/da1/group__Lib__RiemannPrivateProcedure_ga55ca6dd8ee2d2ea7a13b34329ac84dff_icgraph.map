@@ -1,5 +1,0 @@
-<map id="lib_riemann::rarefaction" name="lib_riemann::rarefaction">
-<area shape="rect" id="node3" href="$d3/da1/group__Lib__RiemannPrivateProcedure.html#ga751af5d233456a38674a2c6d5af3df62" title="lib_riemann::interstates23u" alt="" coords="216,13,395,43"/>
-<area shape="rect" id="node7" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#ga6e895bf473ec7bda2e33ba161c4171c1" title="Approximate Riemann solver based on Adaptive (non iterative) LF&#45;TR algorithm. " alt="" coords="212,67,399,96"/>
-<area shape="rect" id="node5" href="$d8/d59/group__Lib__RiemannPublicProcedure.html#gad4a1301de7d450c64455260258670f29" title="Exact Riemann solver based on iterative solution of u&#45;function. " alt="" coords="448,5,611,51"/>
-</map>

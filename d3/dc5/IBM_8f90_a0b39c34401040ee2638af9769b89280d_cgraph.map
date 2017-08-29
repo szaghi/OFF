@@ -1,7 +1,0 @@
-<map id="load_icemcfd" name="load_icemcfd">
-<area shape="rect" id="node3" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga070c459fd5e26bcec905b7a2f2419ad3" title="Subroutine for printing to stderr a &quot;file not found error&quot;. " alt="" coords="163,5,299,51"/>
-<area shape="rect" id="node5" href="$d9/d16/group__Lib__IO__MiscPublicProcedure.html#ga03b3d23e7eb885f6fb3c00f7a977b33d" title="The Get_Unit function returns a free logic unit for opening a file. " alt="" coords="160,75,301,104"/>
-<area shape="rect" id="node7" href="$db/daa/group__Data__Type__BCPublicProcedure.html#gaba6e21c0152b1027f9a82d38fe22e753" title="Function for writing Type_BC data. " alt="" coords="152,128,309,157"/>
-<area shape="rect" id="node9" href="$d2/d15/group__Data__Type__PrimitivePublicProcedure.html#ga533b9d3636b721b2e667aab9bad8015f" title="Function for writing Type_Primitive data. " alt="" coords="164,181,297,227"/>
-<area shape="rect" id="node11" href="$db/daf/group__Data__Type__VectorPublicProcedure.html#gad0238e2130eb5d2b22bad2a05e1d4f28" title="Function for writing Type_Vector data. " alt="" coords="359,211,516,258"/>
-</map>

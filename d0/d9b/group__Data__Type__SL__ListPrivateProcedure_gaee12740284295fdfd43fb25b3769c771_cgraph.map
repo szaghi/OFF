@@ -1,6 +1,0 @@
-<map id="data_type_sl_list::link" name="data_type_sl_list::link">
-<area shape="rect" id="node3" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga5d31eca5ba59325c74195eeb96a3e4c8" title="Function for computing the total specific energy (per unit of mass) for an ideal calorically perfect ..." alt="" coords="203,35,368,82"/>
-<area shape="rect" id="node5" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga72edfdd7b6205b7dc0fe8cfacb07d068" title="Function for computing the pressure for an ideal calorically perfect gas. " alt="" coords="416,65,581,111"/>
-<area shape="rect" id="node7" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#gafc7677510bfb5d5bfab4510107291d32" title="Function for computing the density for an ideal calorically perfect gas. " alt="" coords="629,5,795,51"/>
-<area shape="rect" id="node10" href="$dc/d17/group__Lib__Thermodynamic__Laws__IdealPublicProcedure.html#ga82d4f5c7adace2fdffa51b872a3e80f9" title="Function for computing the speed of sound for an ideal calorically perfect gas. " alt="" coords="843,41,1008,87"/>
-</map>

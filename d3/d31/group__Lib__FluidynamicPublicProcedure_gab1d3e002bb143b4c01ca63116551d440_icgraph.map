@@ -1,7 +1,0 @@
-<map id="lib_fluidynamic::boundary_conditions" name="lib_fluidynamic::boundary_conditions">
-<area shape="rect" id="node3" href="$d3/d69/group__Lib__MultigridLibrary.html#ab06b3bf4d5ccdfb95761eece5859dd09" title="lib_multigrid::correct" alt="" coords="239,13,377,43"/>
-<area shape="rect" id="node7" href="$d9/d99/group__OFFProgram.html#gab96c351668e50a49652d8e1afdacbd71" title="OFF is an Open source Finite volumes Fluid dynamics code. " alt="" coords="509,123,547,152"/>
-<area shape="rect" id="node9" href="$d3/d69/group__Lib__MultigridLibrary.html#af39c2828379a017afec42470cc48e648" title="lib_multigrid::restrict" alt="" coords="239,117,377,147"/>
-<area shape="rect" id="node11" href="$d3/d31/group__Lib__FluidynamicPublicProcedure.html#ga79052c5d1303cf75c40df5cbee237589" title="Subroutine for solving (performing one time step integration) the conservation equations for grid lev..." alt="" coords="224,171,392,200"/>
-<area shape="rect" id="node5" href="$d0/d54/group__Data__Type__SBlockPrivateProcedure.html#ga2e5d4db0a5088d0560e286e405035297" title="Subroutine for correcting the metrics of natural (and negative volume) boundary conditions cells of s..." alt="" coords="441,5,615,51"/>
-</map>

@@ -7,6 +7,6 @@ use off_objects, only : simulation_object
 implicit none
 type(simulation_object) :: simulations !< Simulation data.
 
-call simulations%initialize
+call simulations%initialize()
 
 endprogram off

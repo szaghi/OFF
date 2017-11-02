@@ -76,10 +76,11 @@ contains
   if (allocated(self%rm_file_command)) deallocate(self%rm_file_command)
   endsubroutine destroy
 
-  elemental subroutine initialize(self, system)
+  elemental subroutine initialize(self, system, os)
   !< Initialize OS.
   class(os_object), intent(inout)        :: self    !< OS.
   character(*),     intent(in), optional :: system  !< System name, valid [unix, windows].
+  type(os_object),  intent(in), optional :: os      !< Running Operating System.
   type(string)                           :: system_ !< System name.
 
   self%error%status = 0
@@ -97,6 +98,7 @@ contains
      call self%initialize_unix
      self%error%status = ERROR_FALLBACK_INIT
   endselect
+  if (present(os)) self = os
   endsubroutine initialize
 
   subroutine mkdir(self, dir_name)

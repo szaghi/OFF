@@ -73,11 +73,13 @@ contains
    if (allocated(self%turbulence_model)) deallocate(self%turbulence_model)
    endsubroutine destroy
 
-   elemental subroutine initialize(self)
+   elemental subroutine initialize(self, solver)
    !< Initialize solver.
-   class(solver_object), intent(inout) :: self !< Solver object.
+   class(solver_object), intent(inout)        :: self   !< Solver object.
+   type(solver_object),  intent(in), optional :: solver !< Solver object.
 
    call self%destroy
+   if (present(solver)) self = solver
    endsubroutine initialize
 
    subroutine load_from_file(self, fini, go_on_fail)

@@ -2,6 +2,11 @@
 
 program off_test_load_file_parameters
 !< OFF test: load file of simulation parameters.
+!<
+!< @note Execute test with `file-skeletons/simulation_parameters.ini` input:
+!<```bash
+!< off_test_load_file_parameters -par file-skeletons/simulation_parameters.ini
+!<```
 
 use off_objects, only : simulation_object
 use flap, only : command_line_interface
@@ -17,7 +22,7 @@ are_tests_passed = .false.
 
 call cli_parse
 
-call simulation%load_file_parameters(file_name=file_parameters, go_on_fail=go_on_fail)
+call simulation%load_file_parameters(file_name=file_parameters)
 
 are_tests_passed(1) = simulation%solver%time_integrator == 'rk5'
 

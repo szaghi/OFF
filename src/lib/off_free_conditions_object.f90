@@ -57,11 +57,13 @@ contains
    self = fresh
    endsubroutine destroy
 
-   elemental subroutine initialize(self)
+   elemental subroutine initialize(self, free_conditions)
    !< Initialize free conditions.
-   class(free_conditions_object), intent(inout) :: self !< Free conditions.
+   class(free_conditions_object), intent(inout)        :: self            !< Free conditions.
+   type(free_conditions_object),  intent(in), optional :: free_conditions !< Free conditions values.
 
    call self%destroy
+   if (present(free_conditions)) self = free_conditions
    endsubroutine initialize
 
    subroutine load_from_file(self, fini, go_on_fail)

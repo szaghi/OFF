@@ -73,11 +73,13 @@ contains
    self = fresh
    endsubroutine destroy
 
-   elemental subroutine initialize(self)
+   elemental subroutine initialize(self, time)
    !< Initialize time.
-   class(time_object), intent(inout) :: self !< Time object.
+   class(time_object), intent(inout)        :: self !< Time object.
+   type(time_object),  intent(in), optional :: time !< Time object.
 
    call self%destroy
+   if (present(time)) self = time
    endsubroutine initialize
 
    elemental function  is_the_end(self) result(yes)

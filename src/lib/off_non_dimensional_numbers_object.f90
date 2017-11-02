@@ -118,11 +118,13 @@ contains
    self = fresh
    endsubroutine destroy
 
-   elemental subroutine initialize(self)
+   elemental subroutine initialize(self, adimensionals)
    !< Initialize numbers value.
-   class(non_dimensional_numbers_object), intent(inout) :: self !< Non dimensional numbers.
+   class(non_dimensional_numbers_object), intent(inout)        :: self          !< Non dimensional numbers.
+   type(non_dimensional_numbers_object),  intent(in), optional :: adimensionals !< Non dimensional numbers values.
 
    call self%destroy
+   if (present(adimensionals)) self = adimensionals
    endsubroutine initialize
 
    subroutine load_from_file(self, fini, go_on_fail)

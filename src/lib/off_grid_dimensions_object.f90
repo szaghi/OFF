@@ -17,6 +17,7 @@ type :: grid_dimensions_object
    type(block_signature_object), allocatable :: block_signature(:) !< Signature of each block.
    contains
       ! public methods
+      procedure, pass(self) :: alloc             !< Allocate blocks.
       procedure, pass(self) :: description       !< Return a pretty-formatted description of grid dimensions.
       procedure, pass(self) :: destroy           !< Destroy grid dimensions.
       procedure, pass(self) :: initialize        !< Initialize grid dimensions.
@@ -32,6 +33,17 @@ endtype grid_dimensions_object
 
 contains
    ! public methods
+   elemental subroutine alloc(self, blocks_number)
+   !< Allocate blocks.
+   class(grid_dimensions_object), intent(inout)        :: self          !< Grid dimensions object.
+   integer(I4P),                  intent(in), optional :: blocks_number !< Number of blocks.
+
+   if (.not.allocated(self%block_signature)) then
+      if (present(blocks_number)) self%blocks_number = blocks_number
+      if (self%blocks_number > 0) allocate(self%block_signature(1:self%blocks_number))
+   endif
+   endsubroutine alloc
+
    pure function description(self, prefix) result(desc)
    !< Return a pretty-formatted description of the grid dimensions.
    class(grid_dimensions_object), intent(in)           :: self             !< Grid dimensions object.
@@ -63,8 +75,8 @@ contains
 
    pure subroutine initialize(self, block_signature)
    !< Initialize grid dimensions.
-   class(grid_dimensions_object), intent(inout)       :: self                !< Grid dimensions object.
-   type(block_signature_object), intent(in), optional :: block_signature(1:) !< Dimensions of each block.
+   class(grid_dimensions_object), intent(inout)        :: self                !< Grid dimensions object.
+   type(block_signature_object),  intent(in), optional :: block_signature(1:) !< Dimensions of each block.
 
    call self%destroy
    if (present(block_signature)) then
@@ -116,7 +128,7 @@ contains
    call self%destroy
    read(unit=file_unit) self%blocks_number
    if (self%blocks_number > 0) then
-      allocate(self%block_signature(1:self%blocks_number))
+      call self%alloc
       do b=1, self%blocks_number
          call self%block_signature(b)%load_from_file(file_unit=file_unit)
       enddo

@@ -46,9 +46,9 @@ contains
    type(grid_dimensions_object), intent(inout)        :: grid_dimensions !< Grid dimensions off all blocks into file.
    character(*),                 intent(in), optional :: file_name       !< File name.
 
-   call self%open(file_name=file_name, action='read')
+   call self%open_file(file_name=file_name, action='read')
    call grid_dimensions%load_from_file(file_unit=self%file_unit)
-   call self%close
+   call self%close_file
    endsubroutine load_grid_dimensions_from_file
 
    subroutine load_nodes_from_file(self, grid_dimensions, blocks, file_name)
@@ -59,34 +59,36 @@ contains
    character(*),                 intent(in), optional :: file_name       !< File name.
    integer(I4P)                                       :: b               !< Counter.
 
-   call self%open(file_name=file_name, action='read')
+   call self%open_file(file_name=file_name, action='read')
    do b=1, size(blocks, dim=1)
       call blocks(b)%load_nodes_from_file(file_unit=self%file_unit, pos=grid_dimensions%iopos_block_nodes(b=b))
    enddo
-   call self%close
+   call self%close_file
    endsubroutine load_nodes_from_file
 
-   subroutine save_grid_dimensions_into_file(self, grid_dimensions)
+   subroutine save_grid_dimensions_into_file(self, grid_dimensions, file_name)
    !< Load the grid dimensions of all blocks into file.
-   class(file_grid_object),      intent(inout) :: self            !< File object.
-   type(grid_dimensions_object), intent(in)    :: grid_dimensions !< Grid dimensions off all blocks into file.
+   class(file_grid_object),      intent(inout)        :: self            !< File object.
+   type(grid_dimensions_object), intent(in)           :: grid_dimensions !< Grid dimensions off all blocks into file.
+   character(*),                 intent(in), optional :: file_name       !< File name.
 
-   call self%open(action='write')
+   call self%open_file(file_name=file_name, action='write')
    call grid_dimensions%save_into_file(file_unit=self%file_unit)
-   call self%close
+   call self%close_file
    endsubroutine save_grid_dimensions_into_file
 
-   subroutine save_nodes_into_file(self, grid_dimensions, blocks)
+   subroutine save_nodes_into_file(self, grid_dimensions, blocks, file_name)
    !< Save nodes coordinates into file.
-   class(file_grid_object),      intent(inout) :: self            !< File object.
-   type(grid_dimensions_object), intent(in)    :: grid_dimensions !< Grid dimensions off all blocks into file.
-   type(block_object),           intent(inout) :: blocks(1:)      !< Blocks storage.
-   integer(I4P)                                :: b               !< Counter.
+   class(file_grid_object),      intent(inout)        :: self            !< File object.
+   type(grid_dimensions_object), intent(in)           :: grid_dimensions !< Grid dimensions off all blocks into file.
+   type(block_object),           intent(inout)        :: blocks(1:)      !< Blocks storage.
+   character(*),                 intent(in), optional :: file_name       !< File name.
+   integer(I4P)                                       :: b               !< Counter.
 
-   call self%open(action='write')
+   call self%open_file(file_name=file_name, action='write')
    do b=1, size(blocks, dim=1)
       call blocks(b)%save_nodes_into_file(file_unit=self%file_unit, pos=grid_dimensions%iopos_block_nodes(b=b))
    enddo
-   call self%close
+   call self%close_file
    endsubroutine save_nodes_into_file
 endmodule off_file_grid_object

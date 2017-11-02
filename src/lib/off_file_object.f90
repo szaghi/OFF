@@ -27,14 +27,15 @@ type :: file_object
    integer(I4P)                  :: file_unit=0            !< File unit.
    logical                       :: is_initialized=.false. !< Sentinel to check if file is initialized.
    logical                       :: is_connected=.false.   !< Sentinel to check if file is connected.
+   logical                       :: is_loaded=.false.      !< Sentinel to check if file is loaded.
    contains
       ! public methods
-      procedure, pass(self) :: close                    !< Close file.
+      procedure, pass(self) :: close_file               !< Close file.
       procedure, pass(self) :: description              !< Return a pretty-formatted description of the file.
       procedure, pass(self) :: destroy                  !< Destroy file.
       procedure, pass(self) :: initialize               !< Initialize file.
       procedure, pass(self) :: load_file_name_from_file !< Load file name from file.
-      procedure, pass(self) :: open                     !< Open file.
+      procedure, pass(self) :: open_file                !< Open file.
       procedure, pass(self) :: save_file_name_into_file !< Save file name into file.
       ! operators
       generic :: assignment(=) => file_assign_file !< Overload `=`.
@@ -44,7 +45,7 @@ endtype file_object
 
 contains
    ! public methods
-   subroutine close(self)
+   subroutine close_file(self)
    !< Close file.
    class(file_object), intent(inout) :: self !< File object.
 
@@ -53,6 +54,7 @@ contains
          close(unit=self%file_unit)
          self%file_unit = 0
          self%is_connected = .false.
+         self%is_loaded = .false.
       else
          write(stderr, '(A)') 'error: file "'//self%file_name//'" is not connected, thus its unit cannot be closed'
          self%error%status = ERROR_NOT_CONNECTED
@@ -61,7 +63,7 @@ contains
       write(stderr, '(A)') 'error: file is not initialized, thus its unit cannot be closed'
       self%error%status = ERROR_NOT_INITIALIZED
    endif
-   endsubroutine close
+   endsubroutine close_file
 
    pure function description(self, prefix) result(desc)
    !< Return a pretty-formatted description of the file.
@@ -119,7 +121,7 @@ contains
    if (self%error%status <= 0) self%file_name = trim(adjustl(buffer))
    endsubroutine load_file_name_from_file
 
-   subroutine open(self, file_name, format, action, access)
+   subroutine open_file(self, file_name, format, action, access)
    !< Open file.
    class(file_object), intent(inout)        :: self       !< File object.
    character(len=*),   intent(in), optional :: file_name  !< File name.
@@ -148,7 +150,7 @@ contains
       write(stderr, '(A)') 'error: file is not initialized, thus it cannot be open'
       self%error%status = ERROR_NOT_INITIALIZED
    endif
-   endsubroutine open
+   endsubroutine open_file
 
    subroutine save_file_name_into_file(self, fini, section_name, option_name)
    !< Save file name into file.
@@ -171,5 +173,6 @@ contains
                                  lhs%file_unit      = rhs%file_unit
                                  lhs%is_initialized = rhs%is_initialized
                                  lhs%is_connected   = rhs%is_connected
+                                 lhs%is_loaded      = rhs%is_loaded
    endsubroutine file_assign_file
 endmodule off_file_object

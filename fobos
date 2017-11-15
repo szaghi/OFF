@@ -51,6 +51,9 @@ build_dir = ./exe/
 [template-static-gnu]
 compiler     = gnu
 cflags       = $CSTATIC_GNU $OPTIMIZE
+lflags       = $OPTIMIZE
+ext_libs     = stdc++ CGAL
+libs         = libs/cc_cgal_polyhedra.o
 exclude_dirs = $EXDIRS
 mod_dir      = ./mod/
 obj_dir      = ./obj/
@@ -64,6 +67,8 @@ jobs         = 2
 compiler     = gnu
 cflags       = $CSTATIC_GNU $DEBUG_GNU
 lflags       = $DEBUG_GNU
+ext_libs     = stdc++ CGAL
+libs         = libs/cc_cgal_polyhedra.o
 exclude_dirs = $EXDIRS
 mod_dir      = ./mod/
 obj_dir      = ./obj/
@@ -77,6 +82,8 @@ jobs         = 2
 compiler     = intel
 cflags       = $CSTATIC_INT $OPTIMIZE
 lflags       = $OPTIMIZE
+ext_libs     = stdc++ CGAL
+libs         = libs/cc_cgal_polyhedra.o
 exclude_dirs = $EXDIRS
 mod_dir      = ./mod/
 obj_dir      = ./obj/
@@ -90,6 +97,8 @@ jobs         = 2
 compiler     = intel
 cflags       = $CSTATIC_INT $DEBUG_INT
 lflags       = $DEBUG_INT
+ext_libs     = stdc++ CGAL
+libs         = libs/cc_cgal_polyhedra.o
 exclude_dirs = $EXDIRS
 mod_dir      = ./mod/
 obj_dir      = ./obj/
@@ -100,6 +109,11 @@ log          = True
 jobs         = 2
 
 # rules
+[rule-makecgal-binding]
+help   = Build CGAL Fortran binding
+rule_1 = mkdir -p libs
+rule_2 = g++ src/third_party/Fortran---CGAL-polyhedra/cgal_polyhedra.cc -std=c++11 -o libs/cc_cgal_polyhedra.o -c -frounding-math
+
 [rule-makedoc]
 help   = Build documentation from source files
 rule_1 = rm -rf doc/html/*

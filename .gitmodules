@@ -54,3 +54,6 @@
    path = src/third_party/FriVolous
    url = https://github.com/szaghi/FriVolous
    branch = master
+[submodule "src/third_party/Fortran---CGAL-polyhedra"]
+	path = src/third_party/Fortran---CGAL-polyhedra
+	url = https://github.com/LadaF/Fortran---CGAL-polyhedra

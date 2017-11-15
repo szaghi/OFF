@@ -81,13 +81,15 @@ module off_block_object
 !< The nodes of cells are not required to be on the Cartesian coordinates, thus allowing a general
 !< curvilinear mesh: the are 3 implicit coordinate lines, *i*, *j* and *k* that are not required to be orthogonal.
 
+use, intrinsic :: iso_c_binding, only : c_ptr
 use, intrinsic :: iso_fortran_env, only : stderr=>error_unit
 use off_block_signature_object, only : block_signature_object
 use off_cell_object, only : cell_object
 use off_error_object, only : error_object
 use off_face_object, only : face_object
 use off_node_object, only : node_object
-use penf, only : FR8P, FI4P, I4P, I8P, R8P
+use cgal_polyhedra, only : cgal_polyhedron_closest, cgal_polyhedron_finalize, cgal_polyhedron_inside, cgal_polyhedron_read
+use penf, only : FR8P, FI4P, I1P, I4P, I8P, R8P
 use vecfor, only : vector, ex, ey, ez
 use vtk_fortran, only : vtk_file
 
@@ -103,29 +105,32 @@ integer(I4P), parameter :: ERROR_BLOCK_CREATE_LINSPACE_FAILED = 4 !< Failed to c
 
 type :: block_object
    !< Block object class.
-   type(error_object)             :: error                !< Errors handler.
-   type(block_signature_object)   :: signature            !< Signature, namely id, level, dimensions, etc...
-   type(cell_object), allocatable :: cell(:,:,:)          !< Cell.
-   type(face_object), allocatable :: face_i(:,:,:)        !< Faces along I direction.
-   type(face_object), allocatable :: face_j(:,:,:)        !< Faces along I direction.
-   type(face_object), allocatable :: face_k(:,:,:)        !< Faces along I direction.
-   type(node_object), allocatable :: node(:,:,:)          !< Cell.
+   type(error_object)             :: error         !< Errors handler.
+   type(block_signature_object)   :: signature     !< Signature, namely id, level, dimensions, etc...
+   type(cell_object), allocatable :: cell(:,:,:)   !< Cell.
+   type(face_object), allocatable :: face_i(:,:,:) !< Faces along I direction.
+   type(face_object), allocatable :: face_j(:,:,:) !< Faces along I direction.
+   type(face_object), allocatable :: face_k(:,:,:) !< Faces along I direction.
+   type(node_object), allocatable :: node(:,:,:)   !< Cell.
    contains
       ! public methods
-      procedure, pass(self) :: cells_number           !< Return the number of cells.
-      procedure, pass(self) :: compute_space_operator !< Compute space operator.
-      procedure, pass(self) :: create_linspace        !< Create a Cartesian block with linearly spaced nodes.
-      procedure, pass(self) :: destroy                !< Destroy block.
-      procedure, pass(self) :: interpolate_at_nodes   !< Interpolate cell-centered variable at nodes.
-      procedure, pass(self) :: initialize             !< Initialize block.
-      procedure, pass(self) :: load_nodes_from_file   !< Load nodes from file.
-      procedure, pass(self) :: nodes_number           !< Return the number of nodes.
-      procedure, pass(self) :: save_file_grid         !< Save gird file.
-      procedure, pass(self) :: save_nodes_into_file   !< Save nodes into file.
+      procedure, pass(self) :: cells_number              !< Return the number of cells.
+      procedure, pass(self) :: compute_space_operator    !< Compute space operator.
+      procedure, pass(self) :: create_linspace           !< Create a Cartesian block with linearly spaced nodes.
+      procedure, pass(self) :: destroy                   !< Destroy block.
+      procedure, pass(self) :: immerge_off_geometry      !< "Immerge" geometry (described into a OFF file) into the block grid.
+      procedure, pass(self) :: interpolate_at_nodes      !< Interpolate cell-centered variable at nodes.
+      procedure, pass(self) :: initialize                !< Initialize block.
+      procedure, pass(self) :: load_nodes_from_file      !< Load nodes from file.
+      procedure, pass(self) :: nodes_number              !< Return the number of nodes.
+      procedure, pass(self) :: save_file_grid            !< Save gird file.
+      procedure, pass(self) :: save_nodes_into_file      !< Save nodes into file.
+      procedure, pass(self) :: update_level_set_distance !< Update level set distance.
       ! operators
       generic :: assignment(=) => block_assign_block !< Overload `=`.
       ! private methods
       procedure, pass(lhs),  private :: block_assign_block    !< Operator `=`.
+      procedure, pass(self), private :: compute_cells_center  !< Compute cells center.
       procedure, pass(self), private :: compute_extents       !< Compute block extents.
       procedure, pass(self), private :: compute_faces_metrics !< Compute block faces metrics.
       procedure, pass(self), private :: compute_metrics       !< Compute block metrics.
@@ -229,26 +234,73 @@ contains
    endif
    endsubroutine destroy
 
-   subroutine initialize(self, signature,           &
-                         id, level, gc, ni, nj, nk, &
-                         emin, emax, is_cartesian, is_null_x, is_null_y, is_null_z)
+   subroutine immerge_off_geometry(self, file_name, n, outside_reference)
+   !< "Immerge" geometry (described into a OFF file) into the block grid.
+   !<
+   !< @note OFF file format (Object File Format) is a geometry definition file format containing the description
+   !< of the composing polygons of the 3D object used by CGAL.
+   class(block_object), intent(inout) :: self              !< Block.
+   character(*),        intent(in)    :: file_name         !< Name of OFF file.
+   integer(I4P),        intent(in)    :: n                 !< Number of geometry in the global numbering.
+   type(vector),        intent(in)    :: outside_reference !< A reference point outside the body.
+   type(c_ptr)                        :: geometry_ptr      !< Geometry tree pointer.
+   type(vector)                       :: closest           !< Closest point coordinates.
+   logical                            :: is_inside         !< Logical dummy.
+   integer(I4P)                       :: i, j, k           !< Counter.
+
+   if (allocated(self%cell)) then
+      call cgal_polyhedron_read(ptree=geometry_ptr, fname=trim(adjustl(file_name)))
+      do k=1, self%signature%nk
+         do j=1, self%signature%nj
+            do i=1, self%signature%ni
+               call cgal_polyhedron_closest(ptree=geometry_ptr,           &
+                                            xq=self%cell(i,j,k)%center%x, &
+                                            yq=self%cell(i,j,k)%center%y, &
+                                            zq=self%cell(i,j,k)%center%z, &
+                                            xn=closest%x, yn=closest%y, zn=closest%z)
+               self%cell(i,j,k)%level_set%distances(n) = sqrt((self%cell(i,j,k)%center%x - closest%x)**2 + &
+                                                              (self%cell(i,j,k)%center%y - closest%y)**2 + &
+                                                              (self%cell(i,j,k)%center%z - closest%z)**2)
+               is_inside = cgal_polyhedron_inside(ptree=geometry_ptr,           &
+                                                  xq=self%cell(i,j,k)%center%x, &
+                                                  yq=self%cell(i,j,k)%center%y, &
+                                                  zq=self%cell(i,j,k)%center%z, &
+                                                  xr=outside_reference%x,       &
+                                                  yr=outside_reference%y,       &
+                                                  zr=outside_reference%z)
+               if (is_inside) self%cell(i,j,k)%level_set%distances(n) = -self%cell(i,j,k)%level_set%distances(n)
+            enddo
+         enddo
+      enddo
+   endif
+   endsubroutine immerge_off_geometry
+
+   subroutine initialize(self, signature,                                           &
+                         id, level, gc, ni, nj, nk,                                 &
+                         emin, emax, is_cartesian, is_null_x, is_null_y, is_null_z, &
+                         interfaces_number, distances)
    !< Initialize block.
    !<
    !< Assign block signature, allocate dynamic memory and set block features.
-   class(block_object),          intent(inout)        :: self         !< Block.
-   type(block_signature_object), intent(in), optional :: signature    !< Signature, namely id, level, dimensions, etc...
-   integer(I8P),                 intent(in), optional :: id           !< Unique (Morton) identification code.
-   integer(I4P),                 intent(in), optional :: level        !< Grid refinement level.
-   integer(I4P),                 intent(in), optional :: gc(1:)       !< Number of ghost cells along each frame.
-   integer(I4P),                 intent(in), optional :: ni           !< Number of cells in I direction.
-   integer(I4P),                 intent(in), optional :: nj           !< Number of cells in J direction.
-   integer(I4P),                 intent(in), optional :: nk           !< Number of cells in K direction.
-   type(vector),                 intent(in), optional :: emin         !< Coordinates of minimum abscissa of the block.
-   type(vector),                 intent(in), optional :: emax         !< Coordinates of maximum abscissa of the block.
-   logical,                      intent(in), optional :: is_cartesian !< Flag for checking if the block is Cartesian.
-   logical,                      intent(in), optional :: is_null_x    !< Nullify X direction (2D yz, 1D y or z domain).
-   logical,                      intent(in), optional :: is_null_y    !< Nullify Y direction (2D xy, 1D x or y domain).
-   logical,                      intent(in), optional :: is_null_z    !< Nullify Z direction (2D xy, 1D x or y domain).
+   class(block_object),          intent(inout)        :: self              !< Block.
+   type(block_signature_object), intent(in), optional :: signature         !< Signature, namely id, level, dimensions, etc...
+   integer(I8P),                 intent(in), optional :: id                !< Unique (Morton) identification code.
+   integer(I4P),                 intent(in), optional :: level             !< Grid refinement level.
+   integer(I4P),                 intent(in), optional :: gc(1:)            !< Number of ghost cells along each frame.
+   integer(I4P),                 intent(in), optional :: ni                !< Number of cells in I direction.
+   integer(I4P),                 intent(in), optional :: nj                !< Number of cells in J direction.
+   integer(I4P),                 intent(in), optional :: nk                !< Number of cells in K direction.
+   type(vector),                 intent(in), optional :: emin              !< Coordinates of minimum abscissa of the block.
+   type(vector),                 intent(in), optional :: emax              !< Coordinates of maximum abscissa of the block.
+   logical,                      intent(in), optional :: is_cartesian      !< Flag for checking if the block is Cartesian.
+   logical,                      intent(in), optional :: is_null_x         !< Nullify X direction (2D yz, 1D y or z domain).
+   logical,                      intent(in), optional :: is_null_y         !< Nullify Y direction (2D xy, 1D x or y domain).
+   logical,                      intent(in), optional :: is_null_z         !< Nullify Z direction (2D xy, 1D x or y domain).
+   integer(I4P),                 intent(in), optional :: interfaces_number !< Number of different interfaces.
+   real(R8P),                    intent(in), optional :: distances(:)      !< Distance from all interfaces.
+   integer(I4P)                                       :: i                 !< Counter.
+   integer(I4P)                                       :: j                 !< Counter.
+   integer(I4P)                                       :: k                 !< Counter.
 
    self%error%status = ERROR_BLOCK_CREATE_FAILED
 
@@ -271,6 +323,20 @@ contains
       allocate(self%face_k(1 - gc_(1) : ni_ + gc_(2), 1 - gc_(3) : nj_ + gc_(4), 0 - gc_(5) : nk_ + gc_(6)))
       allocate(self%node(  0 - gc_(1) : ni_ + gc_(2), 0 - gc_(3) : nj_ + gc_(4), 0 - gc_(5) : nk_ + gc_(6)))
    endassociate
+
+   associate(gc=>self%signature%gc, ni=>self%signature%ni, nj=>self%signature%nj, nk=>self%signature%nk)
+      do k=1 - gc(5), nk + gc(6)
+         do j=1 - gc(3), nj + gc(4)
+            do i=1 - gc(1), ni + gc(2)
+               call self%cell(i,j,k)%initialize(interfaces_number=interfaces_number, distances=distances)
+            enddo
+         enddo
+      enddo
+   endassociate
+
+   call self%face_i%initialize
+   call self%face_j%initialize
+   call self%face_k%initialize
 
    self%error%status = NO_ERROR
    endsubroutine initialize
@@ -389,6 +455,22 @@ contains
    write(file_unit, pos=pos, iostat=self%error%status) self%node%vertex%x, self%node%vertex%y, self%node%vertex%z
    endsubroutine save_nodes_into_file
 
+   elemental subroutine update_level_set_distance(self)
+   !< Update level set distance.
+   class(block_object), intent(inout) :: self    !< Block.
+   integer(I4P)                       :: i, j, k !< Counter.
+
+   if (allocated(self%cell)) then
+      do k=1, self%signature%nk
+         do j=1, self%signature%nj
+            do i=1, self%signature%ni
+               call self%cell(i,j,k)%level_set%update_distance
+            enddo
+         enddo
+      enddo
+   endif
+   endsubroutine update_level_set_distance
+
    ! private methods
    pure subroutine block_assign_block(lhs, rhs)
    !< Operator `=`.
@@ -433,6 +515,31 @@ contains
       lhs%node = rhs%node
    endif
    endsubroutine block_assign_block
+
+   elemental subroutine compute_cells_center(self)
+   !< Compute cells center.
+   class(block_object), intent(inout) :: self !< Block.
+   integer(I4P)                       :: i    !< Counter.
+   integer(I4P)                       :: j    !< Counter.
+   integer(I4P)                       :: k    !< Counter.
+
+   associate(gc=>self%signature%gc, ni=>self%signature%ni, nj=>self%signature%nj, nk=>self%signature%nk)
+      do k=1 - gc(5), nk + gc(6)
+         do j=1 - gc(3), nj + gc(4)
+            do i=1 - gc(1), ni + gc(2)
+               self%cell(i, j, k)%center = (self%node(i,   j,   k  )%vertex + &
+                                            self%node(i-1, j,   k  )%vertex + &
+                                            self%node(i  , j-1, k  )%vertex + &
+                                            self%node(i  , j  , k-1)%vertex + &
+                                            self%node(i-1, j-1, k-1)%vertex + &
+                                            self%node(i  , j-1, k-1)%vertex + &
+                                            self%node(i-1, j  , k-1)%vertex + &
+                                            self%node(i-1, j-1, k  )%vertex) * 0.125_R8P
+            enddo
+         enddo
+      enddo
+   endassociate
+   endsubroutine compute_cells_center
 
    elemental subroutine compute_extents(self)
    !< Compute block extents.
@@ -540,6 +647,7 @@ contains
    !< @TODO re-add metrics correction call.
    class(block_object), intent(inout) :: self !< Block.
 
+   call self%compute_cells_center
    call self%compute_faces_metrics
    call self%compute_volumes
    ! call self%correct_metrics
@@ -710,6 +818,9 @@ contains
          self%error%status = vtk%xml_writer%write_dataarray(data_name='normals_k', x=self%face_k(1:ni, 1:nj, 1:nk)%normal%x, &
                                                                                    y=self%face_k(1:ni, 1:nj, 1:nk)%normal%y, &
                                                                                    z=self%face_k(1:ni, 1:nj, 1:nk)%normal%z)
+         self%error%status = vtk%xml_writer%write_dataarray(data_name='distance',                             &
+                                                            x=self%cell(1:ni, 1:nj, 1:nk)%level_set%distance, &
+                                                            one_component=.true.)
          self%error%status = vtk%xml_writer%write_dataarray(location='cell', action='close')
       endif
       self%error%status = vtk%xml_writer%write_piece()

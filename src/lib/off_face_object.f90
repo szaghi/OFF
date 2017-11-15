@@ -49,7 +49,7 @@ contains
    self = fresh
    endsubroutine destroy
 
-   pure subroutine initialize(self)
+   elemental subroutine initialize(self)
    !< Initialize face.
    class(face_object), intent(inout) :: self !< Face object.
 

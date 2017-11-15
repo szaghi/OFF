@@ -135,7 +135,7 @@ contains
       error stop 'error: grid_object%save_into_file(is_parametric=.true., ...) to be implemented'
    else
       off_ = .true.  ; if (present(off)) off_ = off
-      vtk_    = .false. ; if (present(vtk   )) vtk_    = vtk
+      vtk_ = .false. ; if (present(vtk)) vtk_ = vtk
 
       if (off_) then
          if (present(file_name)) call self%file_grid%initialize(file_name=file_name)
@@ -146,7 +146,7 @@ contains
       if (vtk_) then
          do b=1, self%grid_dimensions%blocks_number
             file_name_ = trim(adjustl(file_name))
-            file_name_ = file_name_%basename(strip_last_extension=.true.)
+            if (file_name_%basename(strip_last_extension=.true.)/='') file_name_ = file_name_%basename(strip_last_extension=.true.)
             file_name_ = file_name_//'-block'//                                             &
                          '-id_'//trim(str(n=self%blocks(b)%signature%id, no_sign=.true.))// &
                          '-lv_'//trim(str(n=self%blocks(b)%signature%level, no_sign=.true.))//'.vts'

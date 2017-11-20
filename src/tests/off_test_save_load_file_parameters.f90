@@ -44,10 +44,10 @@ contains
                 examples=["off_test_save_load_file_parameters --parameters sim_parameters.ini"], &
                 epilog=new_line('a')//"all done")
 
-  call cli%add(switch='--parameters-file',                &
-               switch_ab='-par',                          &
-               help='name of simulation parameters file', &
-               required=.true.,                           &
+  call cli%add(switch='--parameters-file',                                                     &
+               switch_ab='-par',                                                               &
+               help='name of simulation parameters file (the file will be removed after use)', &
+               required=.true.,                                                                &
                act='store')
 
   call cli%parse(error=error) ; if (error/=0) stop

@@ -89,6 +89,10 @@ use off_error_object, only : error_object
 use off_face_object, only : face_object
 use off_node_object, only : node_object
 use cgal_polyhedra, only : cgal_polyhedron_closest, cgal_polyhedron_finalize, cgal_polyhedron_inside, cgal_polyhedron_read
+use foodie, only : integrand_object
+use foreseer, only : conservative_compressible, primitive_compressible,                              &
+                     conservative_to_primitive_compressible, primitive_to_conservative_compressible, &
+                     eos_compressible
 use penf, only : FR8P, FI4P, I1P, I4P, I8P, R8P
 use vecfor, only : vector, ex, ey, ez
 use vtk_fortran, only : vtk_file
@@ -103,7 +107,7 @@ integer(I4P), parameter :: ERROR_BLOCK_CREATE_FAILED          = 2 !< Failed to c
 integer(I4P), parameter :: ERROR_BLOCK_DESTROY_FAILED         = 3 !< Failed to destroy block.
 integer(I4P), parameter :: ERROR_BLOCK_CREATE_LINSPACE_FAILED = 4 !< Failed to create a uniform-spaced linear block.
 
-type :: block_object
+type, extends(integrand_object) :: block_object
    !< Block object class.
    type(error_object)             :: error         !< Errors handler.
    type(block_signature_object)   :: signature     !< Signature, namely id, level, dimensions, etc...
@@ -112,6 +116,8 @@ type :: block_object
    type(face_object), allocatable :: face_j(:,:,:) !< Faces along I direction.
    type(face_object), allocatable :: face_k(:,:,:) !< Faces along I direction.
    type(node_object), allocatable :: node(:,:,:)   !< Cell.
+   ! fluid dynamic data
+   type(eos_compressible) :: eos !< Equation of state.
    contains
       ! public methods
       procedure, pass(self) :: cells_number              !< Return the number of cells.
@@ -126,10 +132,37 @@ type :: block_object
       procedure, pass(self) :: save_file_grid            !< Save gird file.
       procedure, pass(self) :: save_nodes_into_file      !< Save nodes into file.
       procedure, pass(self) :: update_level_set_distance !< Update level set distance.
+
+      ! integrand_object deferred methods
+      procedure, pass(self) :: integrand_dimension !< Return integrand dimension.
+      procedure, pass(self) :: t => residuals      !< Time derivative, residuals.
       ! operators
-      generic :: assignment(=) => block_assign_block !< Overload `=`.
+      procedure, pass(lhs) :: local_error !<`||integrand - integrand||` operator.
+      ! +
+      procedure, pass(lhs) :: integrand_add_integrand !< `+` operator.
+      procedure, pass(lhs) :: integrand_add_real      !< `+ real` operator.
+      procedure, pass(rhs) :: real_add_integrand      !< `real +` operator.
+      ! *
+      procedure, pass(lhs) :: integrand_multiply_integrand   !< `*` operator.
+      procedure, pass(lhs) :: integrand_multiply_real        !< `* real` operator.
+      procedure, pass(rhs) :: real_multiply_integrand        !< `real *` operator.
+      procedure, pass(lhs) :: integrand_multiply_real_scalar !< `* real_scalar` operator.
+      procedure, pass(rhs) :: real_scalar_multiply_integrand !< `real_scalar *` operator.
+      ! -
+      procedure, pass(lhs) :: integrand_sub_integrand !< `-` operator.
+      procedure, pass(lhs) :: integrand_sub_real      !< `- real` operator.
+      procedure, pass(rhs) :: real_sub_integrand      !< `real -` operator.
+      ! =
+      procedure, pass(lhs) :: assign_integrand !< `=` operator.
+      procedure, pass(lhs) :: assign_real      !< `= real` operator.
+      ! override fast operators
+      procedure, pass(self) :: t_fast                              !< Time derivative, residuals, fast mode.
+      procedure, pass(opr)  :: integrand_add_integrand_fast        !< `+` fast operator.
+      procedure, pass(opr)  :: integrand_multiply_integrand_fast   !< `*` fast operator.
+      procedure, pass(opr)  :: integrand_multiply_real_scalar_fast !< `* real_scalar` fast operator.
+      procedure, pass(opr)  :: integrand_subtract_integrand_fast   !< `-` fast operator.
+
       ! private methods
-      procedure, pass(lhs),  private :: block_assign_block    !< Operator `=`.
       procedure, pass(self), private :: compute_cells_center  !< Compute cells center.
       procedure, pass(self), private :: compute_extents       !< Compute block extents.
       procedure, pass(self), private :: compute_faces_metrics !< Compute block faces metrics.
@@ -208,10 +241,11 @@ contains
 
    elemental subroutine destroy(self)
    !< Destroy block.
-   class(block_object), intent(inout) :: self  !< Block.
-   type(block_object)                 :: fresh !< Fresh instance of block object.
+   class(block_object), intent(inout) :: self      !< Block.
+   type(eos_compressible)             :: eos_fresh !< Fresh EOS state.
 
-   self = fresh
+   call self%error%destroy
+   call self%signature%destroy
    if (allocated(self%cell)) then
       call self%cell%destroy
       deallocate(self%cell)
@@ -232,6 +266,7 @@ contains
       call self%node%destroy
       deallocate(self%node)
    endif
+   self%eos = eos_fresh
    endsubroutine destroy
 
    subroutine immerge_off_geometry(self, file_name, n, outside_reference)
@@ -278,7 +313,7 @@ contains
    subroutine initialize(self, signature,                                           &
                          id, level, gc, ni, nj, nk,                                 &
                          emin, emax, is_cartesian, is_null_x, is_null_y, is_null_z, &
-                         interfaces_number, distances)
+                         interfaces_number, distances, eos)
    !< Initialize block.
    !<
    !< Assign block signature, allocate dynamic memory and set block features.
@@ -298,6 +333,7 @@ contains
    logical,                      intent(in), optional :: is_null_z         !< Nullify Z direction (2D xy, 1D x or y domain).
    integer(I4P),                 intent(in), optional :: interfaces_number !< Number of different interfaces.
    real(R8P),                    intent(in), optional :: distances(:)      !< Distance from all interfaces.
+   type(eos_compressible),       intent(in), optional :: eos               !< EOS data.
    integer(I4P)                                       :: i                 !< Counter.
    integer(I4P)                                       :: j                 !< Counter.
    integer(I4P)                                       :: k                 !< Counter.
@@ -337,6 +373,8 @@ contains
    call self%face_i%initialize
    call self%face_j%initialize
    call self%face_k%initialize
+
+   if (present(eos)) self%eos = eos
 
    self%error%status = NO_ERROR
    endsubroutine initialize
@@ -471,51 +509,241 @@ contains
    endif
    endsubroutine update_level_set_distance
 
+   ! integrand_object deferred methods
+   pure function integrand_dimension(self)
+   !< Return integrand dimension.
+   class(block_object), intent(in) :: self                !< Integrand.
+   integer(I4P)                    :: integrand_dimension !< Integrand dimension.
+
+   integrand_dimension = self%signature%cells_number()
+   endfunction integrand_dimension
+
+   pure function residuals(self, t) result(dState_dt)
+   !< Time derivative of block integrand, residuals function.
+   class(block_object), intent(in)           :: self         !< Block.
+   real(R8P),           intent(in), optional :: t            !< Time.
+   real(R8P), allocatable                    :: dState_dt(:) !< Block time derivative.
+
+   ! error residuals function to be implemented
+   endfunction residuals
+
+   pure function local_error(lhs, rhs) result(error)
+   !< Estimate local truncation error between 2 integrand approximations.
+   class(block_object),     intent(in) :: lhs   !< Left hand side.
+   class(integrand_object), intent(in) :: rhs   !< Right hand side.
+   real(R8P)                           :: error !< Error estimation.
+
+   ! error local error function to be implemented
+   endfunction local_error
+
+   ! +
+   pure function integrand_add_integrand(lhs, rhs) result(opr)
+   !< `+` operator.
+   class(block_object),     intent(in) :: lhs    !< Left hand side.
+   class(integrand_object), intent(in) :: rhs    !< Right hand side.
+   real(R8P), allocatable              :: opr(:) !< Operator result.
+
+   ! error add operator to be implemented
+   endfunction integrand_add_integrand
+
+   pure function integrand_add_real(lhs, rhs) result(opr)
+   !< `+ real` operator.
+   class(block_object),   intent(in) :: lhs     !< Left hand side.
+   real(R8P),             intent(in) :: rhs(1:) !< Right hand side.
+   real(R8P), allocatable            :: opr(:)  !< Operator result.
+
+   ! error add operator to be implemented
+   endfunction integrand_add_real
+
+   pure function real_add_integrand(lhs, rhs) result(opr)
+   !< `real +` operator.
+   real(R8P),             intent(in) :: lhs(1:) !< Left hand side.
+   class(block_object),   intent(in) :: rhs     !< Right hand side.
+   real(R8P), allocatable            :: opr(:)  !< Operator result.
+
+   ! error add operator to be implemented
+   endfunction real_add_integrand
+
+   ! *
+   pure function integrand_multiply_integrand(lhs, rhs) result(opr)
+   !< `*` operator.
+   class(block_object),     intent(in) :: lhs    !< Left hand side.
+   class(integrand_object), intent(in) :: rhs    !< Right hand side.
+   real(R8P), allocatable              :: opr(:) !< Operator result.
+
+   ! error multiply operator to be implemented
+   endfunction integrand_multiply_integrand
+
+   pure function integrand_multiply_real(lhs, rhs) result(opr)
+   !< `* real_scalar` operator.
+   class(block_object),   intent(in) :: lhs     !< Left hand side.
+   real(R8P),             intent(in) :: rhs(1:) !< Right hand side.
+   real(R8P), allocatable            :: opr(:)  !< Operator result.
+
+   ! error multiply operator to be implemented
+   endfunction integrand_multiply_real
+
+   pure function real_multiply_integrand(lhs, rhs) result(opr)
+   !< `real_scalar *` operator.
+   real(R8P),           intent(in) :: lhs(1:) !< Left hand side.
+   class(block_object), intent(in) :: rhs     !< Right hand side.
+   real(R8P), allocatable          :: opr(:)  !< Operator result.
+
+   ! error multiply operator to be implemented
+   endfunction real_multiply_integrand
+
+   pure function integrand_multiply_real_scalar(lhs, rhs) result(opr)
+   !< `* real_scalar` operator.
+   class(block_object), intent(in) :: lhs    !< Left hand side.
+   real(R8P),           intent(in) :: rhs    !< Right hand side.
+   real(R8P), allocatable          :: opr(:) !< Operator result.
+
+   ! error multiply operator to be implemented
+   endfunction integrand_multiply_real_scalar
+
+   pure function real_scalar_multiply_integrand(lhs, rhs) result(opr)
+   !< `real_scalar *` operator.
+   real(R8P),           intent(in) :: lhs    !< Left hand side.
+   class(block_object), intent(in) :: rhs    !< Right hand side.
+   real(R8P), allocatable          :: opr(:) !< Operator result.
+
+   ! error multiply operator to be implemented
+   endfunction real_scalar_multiply_integrand
+
+   ! -
+   pure function integrand_sub_integrand(lhs, rhs) result(opr)
+   !< `-` operator.
+   class(block_object),     intent(in) :: lhs    !< Left hand side.
+   class(integrand_object), intent(in) :: rhs    !< Right hand side.
+   real(R8P), allocatable              :: opr(:) !< Operator result.
+
+   ! error subtract operator to be implemented
+   endfunction integrand_sub_integrand
+
+   pure function integrand_sub_real(lhs, rhs) result(opr)
+   !< `- real` operator.
+   class(block_object), intent(in) :: lhs     !< Left hand side.
+   real(R8P),           intent(in) :: rhs(1:) !< Right hand side.
+   real(R8P), allocatable          :: opr(:)  !< Operator result.
+
+   ! error subtract operator to be implemented
+   endfunction integrand_sub_real
+
+   pure function real_sub_integrand(lhs, rhs) result(opr)
+   !< `real -` operator.
+   real(R8P),           intent(in) :: lhs(1:) !< Left hand side.
+   class(block_object), intent(in) :: rhs     !< Left hand side.
+   real(R8P), allocatable          :: opr(:)  !< Operator result.
+
+   ! error subtract operator to be implemented
+   endfunction real_sub_integrand
+
+   ! =
+   pure subroutine assign_integrand(lhs, rhs)
+   !< `=` operator.
+   class(block_object),     intent(inout) :: lhs !< Left hand side.
+   class(integrand_object), intent(in)    :: rhs !< Right hand side.
+
+   select type(rhs)
+   class is(block_object)
+      lhs%error        = rhs%error
+      lhs%signature    = rhs%signature
+      if (allocated(rhs%cell)) then
+         if (allocated(lhs%cell)) then
+            call lhs%cell%destroy
+            deallocate(lhs%cell)
+         endif
+         lhs%cell = rhs%cell
+      endif
+      if (allocated(rhs%face_i)) then
+         if (allocated(lhs%face_i)) then
+            call lhs%face_i%destroy
+            deallocate(lhs%face_i)
+         endif
+         lhs%face_i = rhs%face_i
+      endif
+      if (allocated(rhs%face_j)) then
+         if (allocated(lhs%face_j)) then
+            call lhs%face_j%destroy
+            deallocate(lhs%face_j)
+         endif
+         lhs%face_j = rhs%face_j
+      endif
+      if (allocated(rhs%face_k)) then
+         if (allocated(lhs%face_k)) then
+            call lhs%face_k%destroy
+            deallocate(lhs%face_k)
+         endif
+         lhs%face_k = rhs%face_k
+      endif
+      if (allocated(rhs%node)) then
+         if (allocated(lhs%node)) then
+            call lhs%node%destroy
+            deallocate(lhs%node)
+         endif
+         lhs%node = rhs%node
+      endif
+   endselect
+   endsubroutine assign_integrand
+
+   pure subroutine assign_real(lhs, rhs)
+   !< `= real` operator.
+   class(block_object), intent(inout) :: lhs     !< Left hand side.
+   real(R8P),           intent(in)    :: rhs(1:) !< Right hand side.
+
+   ! error assign operator to be implemented
+   endsubroutine assign_real
+
+   ! fast operators
+   ! time derivative
+   subroutine t_fast(self, t)
+   !< Time derivative function of integrand class, i.e. the residuals function. Fast mode acting directly on self.
+   class(block_object), intent(inout)        :: self !< Integrand.
+   real(R8P),           intent(in), optional :: t    !< Time.
+
+   ! error time derivate fast to be implemented
+   endsubroutine t_fast
+
+   ! +
+   pure subroutine integrand_add_integrand_fast(opr, lhs, rhs)
+   !< `+` fast operator.
+   class(block_object),     intent(inout) :: opr !< Operator result.
+   class(integrand_object), intent(in)    :: lhs !< Left hand side.
+   class(integrand_object), intent(in)    :: rhs !< Right hand side.
+
+   ! error add operator fast to be implemented
+   endsubroutine integrand_add_integrand_fast
+
+   ! *
+   pure subroutine integrand_multiply_integrand_fast(opr, lhs, rhs)
+   !< `*` fast operator.
+   class(block_object),     intent(inout) :: opr !< Operator result.
+   class(integrand_object), intent(in)    :: lhs !< Left hand side.
+   class(integrand_object), intent(in)    :: rhs !< Right hand side.
+
+   ! error multiply operator fast to be implemented
+   endsubroutine integrand_multiply_integrand_fast
+
+   pure subroutine integrand_multiply_real_scalar_fast(opr, lhs, rhs)
+   !< `* real_scalar` fast operator.
+   class(block_object),     intent(inout) :: opr !< Operator result.
+   class(integrand_object), intent(in)    :: lhs !< Left hand side.
+   real(R8P),               intent(in)    :: rhs !< Right hand side.
+
+   ! error multiply operator fast to be implemented
+   endsubroutine integrand_multiply_real_scalar_fast
+
+   ! -
+   pure subroutine integrand_subtract_integrand_fast(opr, lhs, rhs)
+   !< `-` fast operator.
+   class(block_object),     intent(inout) :: opr !< Operator result.
+   class(integrand_object), intent(in)    :: lhs !< Left hand side.
+   class(integrand_object), intent(in)    :: rhs !< Right hand side.
+
+   ! error subtract operator fast to be implemented
+   endsubroutine integrand_subtract_integrand_fast
+
    ! private methods
-   pure subroutine block_assign_block(lhs, rhs)
-   !< Operator `=`.
-   class(block_object), intent(inout) :: lhs !< Left hand side.
-   type(block_object),  intent(in)    :: rhs !< Right hand side.
-
-   lhs%error        = rhs%error
-   lhs%signature    = rhs%signature
-   if (allocated(rhs%cell)) then
-      if (allocated(lhs%cell)) then
-         call lhs%cell%destroy
-         deallocate(lhs%cell)
-      endif
-      lhs%cell = rhs%cell
-   endif
-   if (allocated(rhs%face_i)) then
-      if (allocated(lhs%face_i)) then
-         call lhs%face_i%destroy
-         deallocate(lhs%face_i)
-      endif
-      lhs%face_i = rhs%face_i
-   endif
-   if (allocated(rhs%face_j)) then
-      if (allocated(lhs%face_j)) then
-         call lhs%face_j%destroy
-         deallocate(lhs%face_j)
-      endif
-      lhs%face_j = rhs%face_j
-   endif
-   if (allocated(rhs%face_k)) then
-      if (allocated(lhs%face_k)) then
-         call lhs%face_k%destroy
-         deallocate(lhs%face_k)
-      endif
-      lhs%face_k = rhs%face_k
-   endif
-   if (allocated(rhs%node)) then
-      if (allocated(lhs%node)) then
-         call lhs%node%destroy
-         deallocate(lhs%node)
-      endif
-      lhs%node = rhs%node
-   endif
-   endsubroutine block_assign_block
-
    elemental subroutine compute_cells_center(self)
    !< Compute cells center.
    class(block_object), intent(inout) :: self !< Block.

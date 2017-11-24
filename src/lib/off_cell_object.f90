@@ -4,6 +4,7 @@ module off_cell_object
 !< OFF cell object definition and implementation.
 
 use off_level_set_object, only : level_set_object
+use foreseer, only : conservative_compressible
 use penf, only : I4P, R8P
 use vecfor, only : vector
 
@@ -13,9 +14,10 @@ public :: cell_object
 
 type :: cell_object
    !< Cell object class.
-   type(vector)           :: center        !< Cell center.
-   real(R8P)              :: volume=0._R8P !< Cell volume.
-   type(level_set_object) :: level_set     !< Level set cell data.
+   type(vector)                    :: center        !< Cell center.
+   real(R8P)                       :: volume=0._R8P !< Cell volume.
+   type(level_set_object)          :: level_set     !< Level set cell data.
+   type(conservative_compressible) :: U             !< Integrand (state) variables.
    contains
       ! public methods
       procedure, pass(self) :: destroy    !< Destroy cell.
@@ -36,14 +38,16 @@ contains
    self = fresh
    endsubroutine destroy
 
-   pure subroutine initialize(self, interfaces_number, distances)
+   pure subroutine initialize(self, interfaces_number, distances, U)
    !< Initialize cell.
-   class(cell_object), intent(inout)        :: self              !< Cell object.
-   integer(I4P),       intent(in), optional :: interfaces_number !< Number of different interfaces.
-   real(R8P),          intent(in), optional :: distances(:)      !< Distance from all interfaces.
+   class(cell_object),              intent(inout)        :: self              !< Cell object.
+   integer(I4P),                    intent(in), optional :: interfaces_number !< Number of different interfaces.
+   real(R8P),                       intent(in), optional :: distances(:)      !< Distance from all interfaces.
+   type(conservative_compressible), intent(in), optional :: U                 !< Conservative variables.
 
    call self%destroy
    call self%level_set%initialize(interfaces_number=interfaces_number, distances=distances)
+   if (present(U)) self%U = U
    endsubroutine initialize
 
    ! private methods
@@ -55,5 +59,6 @@ contains
    lhs%center = rhs%center
    lhs%volume = rhs%volume
    lhs%level_set = rhs%level_set
+   lhs%U = rhs%U
    endsubroutine cell_assign_cell
 endmodule off_cell_object

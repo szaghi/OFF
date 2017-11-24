@@ -102,10 +102,18 @@ contains
    logical,            intent(in), optional :: is_parametric  !< Sentinel to load grid parametric grid file.
    character(*),       intent(in), optional :: file_name      !< File name.
    logical                                  :: is_parametric_ !< Sentinel to load grid parametric grid file, local variable.
+   integer(I4P)                             :: b              !< Counter.
 
    is_parametric_ = .false. ;  if (present(is_parametric)) is_parametric_ = is_parametric
    if (is_parametric_) then
-      call self%file_parametric_grid%initialize(file_name=file_name)
+      call self%file_parametric_grid%load_file(file_name=file_name)
+      call self%file_parametric_grid%get_grid_dimensions(grid_dimensions=self%grid_dimensions)
+      if (self%grid_dimensions%blocks_number>0) then
+         call self%allocate_blocks
+         do b=1, self%grid_dimensions%blocks_number
+            call self%blocks(b)%create_linspace
+         enddo
+      endif
    else
       call self%file_grid%initialize(file_name=file_name)
       call self%file_grid%load_grid_dimensions_from_file(grid_dimensions=self%grid_dimensions)

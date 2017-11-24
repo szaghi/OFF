@@ -39,10 +39,6 @@ print '(A)', simulation%description()
 
 print '(A,L1)', 'Are all tests passed? ', all(are_tests_passed)
 
-! remove temporary files grid
-call simulation%os%rm(file_name=trim(adjustl(file_name))//'.grd')
-call simulation%os%rm(file_name=trim(adjustl(file_name))//'*.vts')
-
 contains
   subroutine cli_parse()
   !< Build and parse test cli.
@@ -59,7 +55,7 @@ contains
                switch_ab='-g',           &
                help='name of grid file', &
                required=.false.,         &
-               def='grid',               &
+               def='grid.grd',           &
                act='store')
 
   call cli%parse(error=error) ; if (error/=0) stop

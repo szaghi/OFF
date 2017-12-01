@@ -3,6 +3,7 @@
 module off_block_signature_object
 !< OFF block signature object definition and implementation.
 
+use foreseer, only : conservative_compressible
 use penf, only : I4P, I8P, str
 use vecfor, only : vector
 
@@ -20,6 +21,7 @@ type :: block_signature_object
    integer(I4P) :: ni=0                  !< Number of cells in I direction.
    integer(I4P) :: nj=0                  !< Number of cells in J direction.
    integer(I4P) :: nk=0                  !< Number of cells in K direction.
+   integer(I4P) :: nc=0                  !< Number of conservative variables.
    type(vector) :: emin                  !< Coordinates of minimum abscissa (extent) of the block.
    type(vector) :: emax                  !< Coordinates of maximum abscissa (extent) of the block.
    logical      :: is_cartesian=.false.  !< Flag for checking if the block is Cartesian.
@@ -79,6 +81,7 @@ contains
    desc = desc//prefix_//'ni           : '//trim(str(self%ni,                                 no_sign=.true.))//NL
    desc = desc//prefix_//'nj           : '//trim(str(self%nj,                                 no_sign=.true.))//NL
    desc = desc//prefix_//'nk           : '//trim(str(self%nk,                                 no_sign=.true.))//NL
+   desc = desc//prefix_//'nc           : '//trim(str(self%nc,                                 no_sign=.true.))//NL
    desc = desc//prefix_//'emin         : '//trim(str([self%emin%x, self%emin%y, self%emin%z]                ))//NL
    desc = desc//prefix_//'emax         : '//trim(str([self%emax%x, self%emax%y, self%emax%z]                ))//NL
    desc = desc//prefix_//'is cartesian : '//trim(str(self%is_cartesian                                      ))//NL
@@ -97,40 +100,42 @@ contains
 
    pure subroutine initialize(self, signature,           &
                               id, level, gc, ni, nj, nk, &
-                              emin, emax, is_cartesian, is_null_x, is_null_y, is_null_z)
+                              emin, emax, is_cartesian, is_null_x, is_null_y, is_null_z, initial_state)
    !< Initialize block signature.
    !<
    !< @note If both whole `signature` and single components like `id, level, gc...` are passed, the values of
    !< `signature%id, signature%level, ...` are overridden.
-   class(block_signature_object), intent(inout)        :: self         !< Block signature object.
-   type(block_signature_object),  intent(in), optional :: signature    !< Block signature input.
-   integer(I8P),                  intent(in), optional :: id           !< Unique (Morton) identification code.
-   integer(I4P),                  intent(in), optional :: level        !< Grid refinement level.
-   integer(I4P),                  intent(in), optional :: gc(1:)       !< Number of ghost cells along each frame.
-   integer(I4P),                  intent(in), optional :: ni           !< Number of cells in I direction.
-   integer(I4P),                  intent(in), optional :: nj           !< Number of cells in J direction.
-   integer(I4P),                  intent(in), optional :: nk           !< Number of cells in K direction.
-   type(vector),                  intent(in), optional :: emin         !< Coordinates of minimum abscissa of the block.
-   type(vector),                  intent(in), optional :: emax         !< Coordinates of maximum abscissa of the block.
-   logical,                       intent(in), optional :: is_cartesian !< Flag for checking if the block is Cartesian.
-   logical,                       intent(in), optional :: is_null_x    !< Nullify X direction (2D yz, 1D y or z domain).
-   logical,                       intent(in), optional :: is_null_y    !< Nullify Y direction (2D xy, 1D x or y domain).
-   logical,                       intent(in), optional :: is_null_z    !< Nullify Z direction (2D xy, 1D x or y domain).
+   class(block_signature_object),   intent(inout)        :: self          !< Block signature object.
+   type(block_signature_object),    intent(in), optional :: signature     !< Block signature input.
+   integer(I8P),                    intent(in), optional :: id            !< Unique (Morton) identification code.
+   integer(I4P),                    intent(in), optional :: level         !< Grid refinement level.
+   integer(I4P),                    intent(in), optional :: gc(1:)        !< Number of ghost cells along each frame.
+   integer(I4P),                    intent(in), optional :: ni            !< Number of cells in I direction.
+   integer(I4P),                    intent(in), optional :: nj            !< Number of cells in J direction.
+   integer(I4P),                    intent(in), optional :: nk            !< Number of cells in K direction.
+   type(vector),                    intent(in), optional :: emin          !< Coordinates of minimum abscissa of the block.
+   type(vector),                    intent(in), optional :: emax          !< Coordinates of maximum abscissa of the block.
+   logical,                         intent(in), optional :: is_cartesian  !< Flag for checking if the block is Cartesian.
+   logical,                         intent(in), optional :: is_null_x     !< Nullify X direction (2D yz, 1D y or z domain).
+   logical,                         intent(in), optional :: is_null_y     !< Nullify Y direction (2D xy, 1D x or y domain).
+   logical,                         intent(in), optional :: is_null_z     !< Nullify Z direction (2D xy, 1D x or y domain).
+   type(conservative_compressible), intent(in), optional :: initial_state !< Initial state of conservative variables.
 
    call self%destroy
-   if (present(signature   )) self              = signature
-   if (present(id          )) self%id           = id
-   if (present(level       )) self%level        = level
-   if (present(gc          )) self%gc           = gc
-   if (present(ni          )) self%ni           = ni
-   if (present(nj          )) self%nj           = nj
-   if (present(nk          )) self%nk           = nk
-   if (present(emin        )) self%emin         = emin
-   if (present(emax        )) self%emax         = emax
-   if (present(is_cartesian)) self%is_cartesian = is_cartesian
-   if (present(is_null_x   )) self%is_null_x    = is_null_x
-   if (present(is_null_y   )) self%is_null_y    = is_null_y
-   if (present(is_null_z   )) self%is_null_z    = is_null_z
+   if (present(signature    )) self              = signature
+   if (present(id           )) self%id           = id
+   if (present(level        )) self%level        = level
+   if (present(gc           )) self%gc           = gc
+   if (present(ni           )) self%ni           = ni
+   if (present(nj           )) self%nj           = nj
+   if (present(nk           )) self%nk           = nk
+   if (present(emin         )) self%emin         = emin
+   if (present(emax         )) self%emax         = emax
+   if (present(is_cartesian )) self%is_cartesian = is_cartesian
+   if (present(is_null_x    )) self%is_null_x    = is_null_x
+   if (present(is_null_y    )) self%is_null_y    = is_null_y
+   if (present(is_null_z    )) self%is_null_z    = is_null_z
+   if (present(initial_state)) self%nc           = size(initial_state%array(), dim=1)
    endsubroutine initialize
 
    function iolength(self)
@@ -144,6 +149,7 @@ contains
                               self%ni,                               &
                               self%nj,                               &
                               self%nk,                               &
+                              self%nc,                               &
                               self%emin%x, self%emin%y, self%emin%z, &
                               self%emax%x, self%emax%y, self%emax%z, &
                               self%is_cartesian,                     &
@@ -161,6 +167,7 @@ contains
                         self%ni,                               &
                         self%nj,                               &
                         self%nk,                               &
+                        self%nc,                               &
                         self%emin%x, self%emin%y, self%emin%z, &
                         self%emax%x, self%emax%y, self%emax%z, &
                         self%is_cartesian,                     &
@@ -197,6 +204,7 @@ contains
                          self%ni,                               &
                          self%nj,                               &
                          self%nk,                               &
+                         self%nc,                               &
                          self%emin%x, self%emin%y, self%emin%z, &
                          self%emax%x, self%emax%y, self%emax%z, &
                          self%is_cartesian,                     &
@@ -215,6 +223,7 @@ contains
    lhs%ni           = rhs%ni
    lhs%nj           = rhs%nj
    lhs%nk           = rhs%nk
+   lhs%nc           = rhs%nc
    lhs%emin         = rhs%emin
    lhs%emax         = rhs%emax
    lhs%is_cartesian = rhs%is_cartesian

@@ -3,9 +3,13 @@
 module off_solver_object
 !< OFF solver object definition and implementation.
 
+use, intrinsic :: iso_fortran_env, only : stderr=>error_unit
 use off_error_object, only : error_object
 use finer, only : file_ini
+use foreseer, only : eos_compressible, riemann_solver_object, riemann_solver_compressible_hllc_id, foreseer_factory
 use penf, only : R8P, str
+use stringifor, only : string
+use wenoof, only : interpolator_object
 
 implicit none
 private
@@ -17,15 +21,19 @@ type :: solver_object
    !< Solver object class.
    !<
    !< Class designed to handle the general solver models parameters.
-   type(error_object)            :: error                         !< Errors handler.
-   character(len=:), allocatable :: time_integrator               !< Time integrator model: euler, rk2(3-10), ab2(3-12)...
-   character(len=:), allocatable :: convective_operator           !< Convective operator model: tvd, eno3, weno3(5-17)...
-   character(len=:), allocatable :: diffusive_operator            !< Diffusive operator model: centered2(4-10)...
-   character(len=:), allocatable :: turbulence_model              !< Turbulence_model: k-e, k-w, less...
-   real(R8P)                     :: artificial_viscosity=0._R8P   !< Artifiical viscosity.
-   real(R8P)                     :: residuals_tolerance=0._R8P    !< Tolerance on residuals value.
-   real(R8P)                     :: pseudo_compressibility=0._R8P !< Pseudo compressibility.
-   real(R8P)                     :: chimera_forcing=0._R8P        !< Chimera forcing coefficient.
+   type(error_object)                        :: error                         !< Errors handler.
+   character(len=:),             allocatable :: time_integrator               !< Time integrator model: euler, rk2(3-10)...
+   character(len=:),             allocatable :: convective_operator           !< Convective operator model: tvd, eno3, weno3...
+   character(len=:),             allocatable :: diffusive_operator            !< Diffusive operator model: centered2...
+   character(len=:),             allocatable :: turbulence_model              !< Turbulence_model: k-e, k-w, LES...
+   type(string)                              :: riemann_solver_scheme         !< Riemann solver scheme: LLF, HLLC, Roe...
+   real(R8P)                                 :: artificial_viscosity=0._R8P   !< Artifiical viscosity.
+   real(R8P)                                 :: residuals_tolerance=0._R8P    !< Tolerance on residuals value.
+   real(R8P)                                 :: pseudo_compressibility=0._R8P !< Pseudo compressibility.
+   real(R8P)                                 :: chimera_forcing=0._R8P        !< Chimera forcing coefficient.
+   type(eos_compressible)                    :: eos                           !< Equation of state.
+   class(interpolator_object),   allocatable :: interpolator                  !< WENO interpolator.
+   class(riemann_solver_object), allocatable :: riemann_solver                !< Riemann solver.
    contains
       ! public methods
       procedure, pass(self) :: description    !< Return a pretty-formatted description of solver parameters.
@@ -51,14 +59,15 @@ contains
 
    prefix_ = '' ; if (present(prefix)) prefix_ = prefix
    desc = ''
-   if(allocated(self%time_integrator    ))desc=desc//prefix_//'time integrator       : '//self%time_integrator//NL
-   if(allocated(self%convective_operator))desc=desc//prefix_//'convective operator   : '//self%convective_operator//NL
-   if(allocated(self%diffusive_operator ))desc=desc//prefix_//'diffusive operator    : '//self%diffusive_operator//NL
-   if(allocated(self%turbulence_model   ))desc=desc//prefix_//'turbulence model      : '//self%turbulence_model//NL
-                                          desc=desc//prefix_//'artificial viscosity  : '//trim(str(self%artificial_viscosity))//NL
-                                          desc=desc//prefix_//'residuals tolerance   : '//trim(str(self%residuals_tolerance))//NL
-                                          desc=desc//prefix_//'pseudo compressibility: '//trim(str(self%pseudo_compressibility))//NL
-                                          desc=desc//prefix_//'chimera forcing       : '//trim(str(self%chimera_forcing))
+   if(allocated(self%time_integrator      )) desc=desc//prefix_//'time integrator       : '//self%time_integrator//NL
+   if(allocated(self%convective_operator  )) desc=desc//prefix_//'convective operator   : '//self%convective_operator//NL
+   if(allocated(self%diffusive_operator   )) desc=desc//prefix_//'diffusive operator    : '//self%diffusive_operator//NL
+   if(allocated(self%turbulence_model     )) desc=desc//prefix_//'turbulence model      : '//self%turbulence_model//NL
+                                             desc=desc//prefix_//'Riemann solver        : '//self%riemann_solver_scheme%chars()//NL
+   desc=desc//prefix_//'artificial viscosity  : '//trim(str(self%artificial_viscosity))//NL
+   desc=desc//prefix_//'residuals tolerance   : '//trim(str(self%residuals_tolerance))//NL
+   desc=desc//prefix_//'pseudo compressibility: '//trim(str(self%pseudo_compressibility))//NL
+   desc=desc//prefix_//'chimera forcing       : '//trim(str(self%chimera_forcing))
    endfunction description
 
    elemental subroutine destroy(self)
@@ -71,6 +80,15 @@ contains
    if (allocated(self%convective_operator)) deallocate(self%convective_operator)
    if (allocated(self%diffusive_operator)) deallocate(self%diffusive_operator)
    if (allocated(self%turbulence_model)) deallocate(self%turbulence_model)
+   self%riemann_solver_scheme = ''
+   if (allocated(self%interpolator)) then
+      call self%interpolator%destroy
+      deallocate(self%interpolator)
+   endif
+   if (allocated(self%riemann_solver)) then
+      call self%riemann_solver%destroy
+      deallocate(self%riemann_solver)
+   endif
    endsubroutine destroy
 
    elemental subroutine initialize(self, solver)
@@ -123,6 +141,21 @@ contains
    if (.not.go_on_fail_) &
       call self%error%check(message='failed to load ['//INI_SECTION_NAME//'].(turbulence_model)', is_severe=.not.go_on_fail_)
    if (self%error%status <= 0) self%turbulence_model = trim(adjustl(buffer))
+
+   call fini%get(section_name=INI_SECTION_NAME, &
+                 option_name='riemann_solver',  &
+                 val=buffer,                    &
+                 error=self%error%status)
+   if (.not.go_on_fail_) &
+      call self%error%check(message='failed to load ['//INI_SECTION_NAME//'].(riemann_solver)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) then
+      self%riemann_solver_scheme = trim(adjustl(buffer))
+   else
+      write(stderr, '(A)') 'warning: Riemann Solver not speciefied, set by default as LLF'
+      self%riemann_solver_scheme = riemann_solver_compressible_hllc_id
+   endif
+   self%riemann_solver_scheme = self%riemann_solver_scheme%upper()
+   call foreseer_factory(riemann_solver_scheme=self%riemann_solver_scheme%chars(), riemann_solver=self%riemann_solver)
 
    call fini%get(section_name=INI_SECTION_NAME,      &
                  option_name='artificial_viscosity', &

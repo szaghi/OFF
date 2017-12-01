@@ -313,30 +313,31 @@ contains
    subroutine initialize(self, signature,                                           &
                          id, level, gc, ni, nj, nk,                                 &
                          emin, emax, is_cartesian, is_null_x, is_null_y, is_null_z, &
-                         interfaces_number, distances, eos)
+                         interfaces_number, distances, eos, initial_state)
    !< Initialize block.
    !<
    !< Assign block signature, allocate dynamic memory and set block features.
-   class(block_object),          intent(inout)        :: self              !< Block.
-   type(block_signature_object), intent(in), optional :: signature         !< Signature, namely id, level, dimensions, etc...
-   integer(I8P),                 intent(in), optional :: id                !< Unique (Morton) identification code.
-   integer(I4P),                 intent(in), optional :: level             !< Grid refinement level.
-   integer(I4P),                 intent(in), optional :: gc(1:)            !< Number of ghost cells along each frame.
-   integer(I4P),                 intent(in), optional :: ni                !< Number of cells in I direction.
-   integer(I4P),                 intent(in), optional :: nj                !< Number of cells in J direction.
-   integer(I4P),                 intent(in), optional :: nk                !< Number of cells in K direction.
-   type(vector),                 intent(in), optional :: emin              !< Coordinates of minimum abscissa of the block.
-   type(vector),                 intent(in), optional :: emax              !< Coordinates of maximum abscissa of the block.
-   logical,                      intent(in), optional :: is_cartesian      !< Flag for checking if the block is Cartesian.
-   logical,                      intent(in), optional :: is_null_x         !< Nullify X direction (2D yz, 1D y or z domain).
-   logical,                      intent(in), optional :: is_null_y         !< Nullify Y direction (2D xy, 1D x or y domain).
-   logical,                      intent(in), optional :: is_null_z         !< Nullify Z direction (2D xy, 1D x or y domain).
-   integer(I4P),                 intent(in), optional :: interfaces_number !< Number of different interfaces.
-   real(R8P),                    intent(in), optional :: distances(:)      !< Distance from all interfaces.
-   type(eos_compressible),       intent(in), optional :: eos               !< EOS data.
-   integer(I4P)                                       :: i                 !< Counter.
-   integer(I4P)                                       :: j                 !< Counter.
-   integer(I4P)                                       :: k                 !< Counter.
+   class(block_object),             intent(inout)        :: self                    !< Block.
+   type(block_signature_object),    intent(in), optional :: signature               !< Signature, namely id, level, dimensions, etc.
+   integer(I8P),                    intent(in), optional :: id                      !< Unique (Morton) identification code.
+   integer(I4P),                    intent(in), optional :: level                   !< Grid refinement level.
+   integer(I4P),                    intent(in), optional :: gc(1:)                  !< Number of ghost cells along each frame.
+   integer(I4P),                    intent(in), optional :: ni                      !< Number of cells in I direction.
+   integer(I4P),                    intent(in), optional :: nj                      !< Number of cells in J direction.
+   integer(I4P),                    intent(in), optional :: nk                      !< Number of cells in K direction.
+   type(vector),                    intent(in), optional :: emin                    !< Coordinates of minimum abscissa of the block.
+   type(vector),                    intent(in), optional :: emax                    !< Coordinates of maximum abscissa of the block.
+   logical,                         intent(in), optional :: is_cartesian            !< Flag for checking if the block is Cartesian.
+   logical,                         intent(in), optional :: is_null_x               !< Nullify X direction (2D yz, 1D y/z domain).
+   logical,                         intent(in), optional :: is_null_y               !< Nullify Y direction (2D xy, 1D x/y domain).
+   logical,                         intent(in), optional :: is_null_z               !< Nullify Z direction (2D xy, 1D x/y domain).
+   integer(I4P),                    intent(in), optional :: interfaces_number       !< Number of different interfaces.
+   real(R8P),                       intent(in), optional :: distances(:)            !< Distance from all interfaces.
+   type(eos_compressible),          intent(in), optional :: eos                     !< EOS data.
+   type(conservative_compressible), intent(in), optional :: initial_state           !< Initial state of conservative variables.
+   integer(I4P)                                          :: i                       !< Counter.
+   integer(I4P)                                          :: j                       !< Counter.
+   integer(I4P)                                          :: k                       !< Counter.
 
    self%error%status = ERROR_BLOCK_CREATE_FAILED
 
@@ -349,6 +350,7 @@ contains
 
    call self%signature%initialize(signature=signature,                             &
                                   id=id, level=level, gc=gc, ni=ni, nj=nj, nk=nk,  &
+                                  initial_state=initial_state,                     &
                                   emin=emin, emax=emax, is_cartesian=is_cartesian, &
                                   is_null_x=is_null_x, is_null_y=is_null_y, is_null_z=is_null_z)
 
@@ -364,7 +366,7 @@ contains
       do k=1 - gc(5), nk + gc(6)
          do j=1 - gc(3), nj + gc(4)
             do i=1 - gc(1), ni + gc(2)
-               call self%cell(i,j,k)%initialize(interfaces_number=interfaces_number, distances=distances)
+               call self%cell(i,j,k)%initialize(interfaces_number=interfaces_number, distances=distances, U=initial_state)
             enddo
          enddo
       enddo

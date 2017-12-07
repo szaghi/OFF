@@ -6,13 +6,14 @@ module off_simulation_object
 use, intrinsic :: iso_fortran_env, only : stderr=>error_unit
 use off_error_object, only : error_object
 use off_free_conditions_object, only : free_conditions_object
-use off_grid_object, only : grid_object
+use off_mesh_object, only : mesh_object
 use off_non_dimensional_numbers_object, only : non_dimensional_numbers_object
 use off_os_object, only : os_object
 use off_solver_object, only : solver_object
 use off_time_object, only : time_object
 use finer, only : file_ini
 use flap, only : command_line_interface
+use flow, only : eos_compressible
 use penf, only : I4P, str
 
 implicit none
@@ -29,9 +30,10 @@ type :: simulation_object
    type(file_ini)                       :: file_parameters           !< Simulation parameters file handler.
    type(non_dimensional_numbers_object) :: adimensionals             !< Non dimensional numbers.
    type(free_conditions_object)         :: free_conditions           !< Free stream conditions.
+   type(eos_compressible)               :: eos                       !< Equation of state.
    type(solver_object)                  :: solver                    !< solver models parameters.
    type(time_object)                    :: time                      !< Timing conditions.
-   type(grid_object)                    :: grid                      !< Grid data.
+   type(mesh_object)                    :: mesh                      !< Mesh data.
    logical                              :: is_cli_parsed=.false.     !< Sentinel of CLI parsing.
    logical                              :: is_output_verbose=.false. !< Verbose output.
    logical                              :: go_on_fail=.false.        !< Allow/disallow parameters loading failure.
@@ -64,12 +66,14 @@ contains
    desc = desc//prefix_//self%adimensionals%description(prefix=prefix_//'  ')//NL
    desc = desc//prefix_//'Free stream conditions:'//NL
    desc = desc//prefix_//self%free_conditions%description(prefix=prefix_//'  ')//NL
+   desc = desc//prefix_//'Equation of state:'//NL
+   desc = desc//prefix_//self%eos%description(prefix=prefix_//'  ')//NL
    desc = desc//prefix_//'Solver models:'//NL
    desc = desc//prefix_//self%solver%description(prefix=prefix_//'  ')//NL
    desc = desc//prefix_//'Time:'//NL
    desc = desc//prefix_//self%time%description(prefix=prefix_//'  ')//NL
-   desc = desc//prefix_//'Grid:'//NL
-   desc = desc//prefix_//self%grid%description(prefix=prefix_//'  ')
+   desc = desc//prefix_//'Mesh:'//NL
+   desc = desc//prefix_//self%mesh%description(prefix=prefix_//'  ')
    endfunction description
 
    elemental subroutine destroy(self)
@@ -82,9 +86,10 @@ contains
    call self%file_parameters%free
    call self%adimensionals%destroy
    call self%free_conditions%destroy
+   call self%eos%destroy
    call self%solver%destroy
    call self%time%destroy
-   call self%grid%destroy
+   call self%mesh%destroy
    self%is_cli_parsed = .false.
    self%is_output_verbose = .false.
    self%go_on_fail = .false.
@@ -104,22 +109,24 @@ contains
       write(stderr, '(A)') 'Using default simulation parameters values'
       return
    endif
-   call self%grid%file_grid%load_file_name_from_file(fini=self%file_parameters, &
+   call self%mesh%file_grid%load_file_name_from_file(fini=self%file_parameters, &
                                                      section_name='files', option_name='grid', go_on_fail=self%go_on_fail)
    call self%adimensionals%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
    call self%free_conditions%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
+   call self%eos%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
    call self%solver%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
    call self%time%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
    endsubroutine load_file_parameters
 
-   subroutine initialize(self, os, file_parameters, adimensionals, free_conditions, grid, solver, time)
+   subroutine initialize(self, os, file_parameters, adimensionals, free_conditions, eos, mesh, solver, time)
    !< Initialize simulation.
    class(simulation_object),             intent(inout)        :: self            !< simulation data.
    type(os_object),                      intent(in), optional :: os              !< Running Operating System.
    character(*),                         intent(in), optional :: file_parameters !< File name of simulation parameters file.
    type(non_dimensional_numbers_object), intent(in), optional :: adimensionals   !< Non dimensional numbers values.
    type(free_conditions_object),         intent(in), optional :: free_conditions !< Free conditions values.
-   type(grid_object),                    intent(in), optional :: grid            !< Grid data.
+   type(eos_compressible),               intent(in), optional :: eos             !< Equation of state.
+   type(mesh_object),                    intent(in), optional :: mesh            !< Mesh data.
    type(solver_object),                  intent(in), optional :: solver          !< Solver data.
    type(time_object),                    intent(in), optional :: time            !< Time data.
 
@@ -130,7 +137,8 @@ contains
    call self%file_parameters%initialize(filename=file_parameters)
    call self%adimensionals%initialize(adimensionals=adimensionals)
    call self%free_conditions%initialize(free_conditions=free_conditions)
-   call self%grid%initialize(grid=grid)
+   call self%eos%initialize(eos=eos)
+   call self%mesh%initialize(mesh=mesh)
    call self%solver%initialize(solver=solver)
    call self%time%initialize(time=time)
    endsubroutine initialize
@@ -170,6 +178,7 @@ contains
 
    call self%adimensionals%save_into_file(fini=fini)
    call self%free_conditions%save_into_file(fini=fini)
+   call self%eos%save_into_file(fini=fini)
    call self%solver%save_into_file(fini=fini)
    call self%time%save_into_file(fini=fini)
    call fini%save(filename=trim(adjustl(file_name)))

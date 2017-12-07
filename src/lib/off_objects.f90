@@ -5,6 +5,7 @@ module off_objects
 !<
 !< This is convenient entry point to access all OFF objects.
 
+use off_bc_object, only : bc_object
 use off_block_object, only : block_object
 use off_block_signature_object, only : block_signature_object
 use off_cell_object, only : cell_object
@@ -16,7 +17,7 @@ use off_file_parametric_grid_object, only : file_parametric_grid_object
 use off_files_collection_object, only : files_collection_object
 use off_free_conditions_object, only : free_conditions_object
 use off_grid_dimensions_object, only : grid_dimensions_object
-use off_grid_object, only : grid_object
+use off_mesh_object, only : mesh_object
 use off_node_object, only : node_object
 use off_non_dimensional_numbers_object, only : non_dimensional_numbers_object
 use off_os_object, only : os_object
@@ -26,6 +27,7 @@ use off_time_object, only : time_object
 
 implicit none
 private
+public :: bc_object
 public :: block_object
 public :: block_signature_object
 public :: cell_object
@@ -37,7 +39,7 @@ public :: file_parametric_grid_object
 public :: files_collection_object
 public :: free_conditions_object
 public :: grid_dimensions_object
-public :: grid_object
+public :: mesh_object
 public :: node_object
 public :: non_dimensional_numbers_object
 public :: os_object

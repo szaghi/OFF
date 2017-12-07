@@ -6,7 +6,7 @@ module off_solver_object
 use, intrinsic :: iso_fortran_env, only : stderr=>error_unit
 use off_error_object, only : error_object
 use finer, only : file_ini
-use foreseer, only : eos_compressible, riemann_solver_object, riemann_solver_compressible_hllc_id, foreseer_factory
+use foreseer, only : riemann_solver_object, riemann_solver_compressible_hllc_id, foreseer_factory
 use penf, only : R8P, str
 use stringifor, only : string
 use wenoof, only : interpolator_object
@@ -31,7 +31,6 @@ type :: solver_object
    real(R8P)                                 :: residuals_tolerance=0._R8P    !< Tolerance on residuals value.
    real(R8P)                                 :: pseudo_compressibility=0._R8P !< Pseudo compressibility.
    real(R8P)                                 :: chimera_forcing=0._R8P        !< Chimera forcing coefficient.
-   type(eos_compressible)                    :: eos                           !< Equation of state.
    class(interpolator_object),   allocatable :: interpolator                  !< WENO interpolator.
    class(riemann_solver_object), allocatable :: riemann_solver                !< Riemann solver.
    contains

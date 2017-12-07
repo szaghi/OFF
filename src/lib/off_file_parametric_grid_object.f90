@@ -54,54 +54,54 @@ type, extends(file_object) :: file_parametric_grid_object
    type(file_ini) :: fini !< Parametric grid ini file handler.
    contains
       ! public methods
-      procedure, pass(self) :: get_grid_dimensions !< Return grid dimensions from loaded paramters.
+      procedure, pass(self) :: get_grid_dimensions !< Return grid dimensions from loaded parameters.
       procedure, pass(self) :: load_file           !< Load file.
       procedure, pass(self) :: save_file           !< Save file.
 endtype file_parametric_grid_object
 
 contains
    ! public methods
-   subroutine get_grid_dimensions(self, grid_dimensions)
+   subroutine get_grid_dimensions(self, file_name, grid_dimensions)
    !< Return grid dimensions from loaded paramters.
-   class(file_parametric_grid_object), intent(inout) :: self            !< File object.
-   type(grid_dimensions_object),       intent(out)   :: grid_dimensions !< Grid dimensions off all blocks.
-   integer(I4P)                                      :: dimensions_(3)  !< Block dimensions buffer.
-   real(R8P)                                         :: extents_(6)     !< Block extents buffer.
-   integer(I8P)                                      :: id_             !< Block ID.
-   integer(I4P)                                      :: level_          !< Block refinement level.
-   integer(I4P)                                      :: b               !< Counter.
+   class(file_parametric_grid_object), intent(inout)        :: self            !< File object.
+   character(*),                       intent(in), optional :: file_name       !< File name.
+   type(grid_dimensions_object),       intent(out)          :: grid_dimensions !< Grid dimensions off all blocks.
+   integer(I4P)                                             :: dimensions_(3)  !< Block dimensions buffer.
+   real(R8P)                                                :: extents_(6)     !< Block extents buffer.
+   integer(I8P)                                             :: id_             !< Block ID.
+   integer(I4P)                                             :: level_          !< Block refinement level.
+   integer(I4P)                                             :: b               !< Counter.
 
-   if (self%is_loaded) then
-      call self%fini%get(section_name='dimensions', option_name='blocks_number', val=grid_dimensions%blocks_number, &
-                         error=self%error%status)
-      call self%error%check(message='failed to load [dimensions].(blocks_number)', is_severe=.true.)
-      if (grid_dimensions%blocks_number>0) then
-         call grid_dimensions%alloc
-         do b=1, grid_dimensions%blocks_number
-            call self%fini%get(section_name='dimensions', option_name='ghost_cells_number', &
-                               val=grid_dimensions%block_signature(b)%gc, error=self%error%status)
-            call self%error%check(message='failed to load [dimensions].(ghost_cells_number)', is_severe=.true.)
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='id', &
-                               val=id_, error=self%error%status)
-            call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(id)', is_severe=.true.)
-            grid_dimensions%block_signature(b)%id = id_
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='level', &
-                               val=level_, error=self%error%status)
-            call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(level)', is_severe=.true.)
-            grid_dimensions%block_signature(b)%level = level_
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='dimensions', &
-                               val=dimensions_, error=self%error%status)
-            call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(dimensions)', is_severe=.true.)
-            grid_dimensions%block_signature(b)%ni = dimensions_(1)
-            grid_dimensions%block_signature(b)%nj = dimensions_(2)
-            grid_dimensions%block_signature(b)%nk = dimensions_(3)
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='extents', &
-                               val=extents_, error=self%error%status)
-            call self%error%check(message='failed to load [block_'//trim(str(b, no_sign=.true.))//'].(extents)', is_severe=.true.)
-            grid_dimensions%block_signature(b)%emin = extents_(1) * ex +  extents_(2) * ey + extents_(3) * ez
-            grid_dimensions%block_signature(b)%emax = extents_(4) * ex +  extents_(5) * ey + extents_(6) * ez
-         enddo
-      endif
+   if (.not.self%is_loaded) call self%load_file(file_name=file_name)
+   call self%fini%get(section_name='dimensions', option_name='blocks_number', val=grid_dimensions%blocks_number, &
+                      error=self%error%status)
+   call self%error%check(message='failed to load [dimensions].(blocks_number)', is_severe=.true.)
+   if (grid_dimensions%blocks_number>0) then
+      call grid_dimensions%alloc
+      do b=1, grid_dimensions%blocks_number
+         call self%fini%get(section_name='dimensions', option_name='ghost_cells_number', &
+                            val=grid_dimensions%block_signature(b)%gc, error=self%error%status)
+         call self%error%check(message='failed to load [dimensions].(ghost_cells_number)', is_severe=.true.)
+         call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='id', &
+                            val=id_, error=self%error%status)
+         call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(id)', is_severe=.true.)
+         grid_dimensions%block_signature(b)%id = id_
+         call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='level', &
+                            val=level_, error=self%error%status)
+         call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(level)', is_severe=.true.)
+         grid_dimensions%block_signature(b)%level = level_
+         call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='dimensions', &
+                            val=dimensions_, error=self%error%status)
+         call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(dimensions)', is_severe=.true.)
+         grid_dimensions%block_signature(b)%ni = dimensions_(1)
+         grid_dimensions%block_signature(b)%nj = dimensions_(2)
+         grid_dimensions%block_signature(b)%nk = dimensions_(3)
+         call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='extents', &
+                            val=extents_, error=self%error%status)
+         call self%error%check(message='failed to load [block_'//trim(str(b, no_sign=.true.))//'].(extents)', is_severe=.true.)
+         grid_dimensions%block_signature(b)%emin = extents_(1) * ex +  extents_(2) * ey + extents_(3) * ez
+         grid_dimensions%block_signature(b)%emax = extents_(4) * ex +  extents_(5) * ey + extents_(6) * ez
+      enddo
    endif
    endsubroutine get_grid_dimensions
 

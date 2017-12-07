@@ -4,7 +4,7 @@ module off_cell_object
 !< OFF cell object definition and implementation.
 
 use off_level_set_object, only : level_set_object
-use foreseer, only : conservative_compressible
+use flow, only : conservative_compressible
 use penf, only : I4P, R8P
 use vecfor, only : vector
 
@@ -32,7 +32,7 @@ contains
    ! public methods
    elemental subroutine destroy(self)
    !< Destroy cell.
-   class(cell_object), intent(inout) :: self !< Cell object.
+   class(cell_object), intent(inout) :: self  !< Cell object.
    type(cell_object)                 :: fresh !< Fresh instance of cell object.
 
    self = fresh

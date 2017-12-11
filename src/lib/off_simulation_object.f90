@@ -14,13 +14,14 @@ use off_time_object, only : time_object
 use finer, only : file_ini
 use flap, only : command_line_interface
 use flow, only : eos_compressible
-use penf, only : I4P, str
+use foodie, only : integrand_object
+use penf, only : I4P, MaxR8P, R8P, str
 
 implicit none
 private
 public :: simulation_object
 
-type :: simulation_object
+type, extends(integrand_object) :: simulation_object
    !< Simulation object class.
    !<
    !< [[simulation_object]] is a container for all simulation data for each processor/image.
@@ -46,8 +47,40 @@ type :: simulation_object
       procedure, pass(self) :: load_file_parameters         !< Load file parameters.
       procedure, pass(self) :: parse_command_line_interface !< Parse command line interface.
       procedure, pass(self) :: save_file_parameters         !< Save file parameters.
+
+      ! integrand_object deferred methods
+      procedure, pass(self) :: integrand_dimension !< Return integrand dimension.
+      procedure, pass(self) :: t => residuals      !< Time derivative, residuals.
+      ! operators
+      procedure, pass(lhs) :: local_error !<`||integrand - integrand||` operator.
+      ! +
+      procedure, pass(lhs) :: integrand_add_integrand !< `+` operator.
+      procedure, pass(lhs) :: integrand_add_real      !< `+ real` operator.
+      procedure, pass(rhs) :: real_add_integrand      !< `real +` operator.
+      ! *
+      procedure, pass(lhs) :: integrand_multiply_integrand   !< `*` operator.
+      procedure, pass(lhs) :: integrand_multiply_real        !< `* real` operator.
+      procedure, pass(rhs) :: real_multiply_integrand        !< `real *` operator.
+      procedure, pass(lhs) :: integrand_multiply_real_scalar !< `* real_scalar` operator.
+      procedure, pass(rhs) :: real_scalar_multiply_integrand !< `real_scalar *` operator.
+      ! -
+      procedure, pass(lhs) :: integrand_sub_integrand !< `-` operator.
+      procedure, pass(lhs) :: integrand_sub_real      !< `- real` operator.
+      procedure, pass(rhs) :: real_sub_integrand      !< `real -` operator.
+      ! =
+      procedure, pass(lhs) :: assign_integrand !< `=` operator.
+      procedure, pass(lhs) :: assign_real      !< `= real` operator.
+      ! override fast operators
+      procedure, pass(self) :: t_fast                              !< Time derivative, residuals, fast mode.
+      procedure, pass(opr)  :: integrand_add_integrand_fast        !< `+` fast operator.
+      procedure, pass(opr)  :: integrand_multiply_integrand_fast   !< `*` fast operator.
+      procedure, pass(opr)  :: integrand_multiply_real_scalar_fast !< `* real_scalar` fast operator.
+      procedure, pass(opr)  :: integrand_subtract_integrand_fast   !< `-` fast operator.
+
       ! private methods
-      procedure, pass(self), private :: cli_initialize !< Initialize Command Line Interface.
+      procedure, pass(self), private :: cli_initialize             !< Initialize Command Line Interface.
+      procedure, pass(self), private :: compute_dt                 !< Compute the current time step by means of CFL condition.
+      procedure, pass(self), private :: impose_boundary_conditions !< Impose boundary conditions.
 endtype simulation_object
 
 contains
@@ -120,7 +153,7 @@ contains
 
    subroutine initialize(self, os, file_parameters, adimensionals, free_conditions, eos, mesh, solver, time)
    !< Initialize simulation.
-   class(simulation_object),             intent(inout)        :: self            !< simulation data.
+   class(simulation_object),             intent(inout)        :: self            !< Simulation data.
    type(os_object),                      intent(in), optional :: os              !< Running Operating System.
    character(*),                         intent(in), optional :: file_parameters !< File name of simulation parameters file.
    type(non_dimensional_numbers_object), intent(in), optional :: adimensionals   !< Non dimensional numbers values.
@@ -147,14 +180,14 @@ contains
    !< Integrate the equations.
    !<
    !< @TODO Implement this.
-   class(simulation_object), intent(inout) :: self !< simulation data.
+   class(simulation_object), intent(inout) :: self !< Simulation data.
 
    error stop 'error: simulation_object%integrate to be implemented'
    endsubroutine integrate
 
    subroutine parse_command_line_interface(self)
    !< Parse command line interface.
-   class(simulation_object), intent(inout) :: self            !< simulation data.
+   class(simulation_object), intent(inout) :: self            !< Simulation data.
    integer(I4P)                            :: error           !< Error trapping flag.
    character(999)                          :: file_parameters !< Name of simulation parameters file.
 
@@ -184,10 +217,209 @@ contains
    call fini%save(filename=trim(adjustl(file_name)))
    endsubroutine save_file_parameters
 
+   ! integrand_object deferred methods
+   pure function integrand_dimension(self)
+   !< Return integrand dimension.
+   !<
+   !< @TODO implement this.
+   class(simulation_object), intent(in) :: self                !< Integrand.
+   integer(I4P)                         :: integrand_dimension !< Integrand dimension.
+
+   integrand_dimension = self%mesh%grid_dimensions%blocks_number
+   endfunction integrand_dimension
+
+   pure function residuals(self, t) result(dState_dt)
+   !< Time derivative of block integrand, residuals function.
+   class(simulation_object), intent(in)           :: self         !< Block.
+   real(R8P),                intent(in), optional :: t            !< Time.
+   real(R8P), allocatable                         :: dState_dt(:) !< Block time derivative.
+
+   ! error residuals function to be implemented
+   endfunction residuals
+
+   pure function local_error(lhs, rhs) result(error)
+   !< Estimate local truncation error between 2 integrand approximations.
+   class(simulation_object), intent(in) :: lhs   !< Left hand side.
+   class(integrand_object),  intent(in) :: rhs   !< Right hand side.
+   real(R8P)                            :: error !< Error estimation.
+
+   ! error local error function to be implemented
+   endfunction local_error
+
+   ! +
+   pure function integrand_add_integrand(lhs, rhs) result(opr)
+   !< `+` operator.
+   class(simulation_object), intent(in) :: lhs    !< Left hand side.
+   class(integrand_object),  intent(in) :: rhs    !< Right hand side.
+   real(R8P), allocatable               :: opr(:) !< Operator result.
+
+   ! error add operator to be implemented
+   endfunction integrand_add_integrand
+
+   pure function integrand_add_real(lhs, rhs) result(opr)
+   !< `+ real` operator.
+   class(simulation_object), intent(in) :: lhs     !< Left hand side.
+   real(R8P),                intent(in) :: rhs(1:) !< Right hand side.
+   real(R8P), allocatable               :: opr(:)  !< Operator result.
+
+   ! error add operator to be implemented
+   endfunction integrand_add_real
+
+   pure function real_add_integrand(lhs, rhs) result(opr)
+   !< `real +` operator.
+   real(R8P),                intent(in) :: lhs(1:) !< Left hand side.
+   class(simulation_object), intent(in) :: rhs     !< Right hand side.
+   real(R8P), allocatable               :: opr(:)  !< Operator result.
+
+   ! error add operator to be implemented
+   endfunction real_add_integrand
+
+   ! *
+   pure function integrand_multiply_integrand(lhs, rhs) result(opr)
+   !< `*` operator.
+   class(simulation_object), intent(in) :: lhs    !< Left hand side.
+   class(integrand_object),  intent(in) :: rhs    !< Right hand side.
+   real(R8P), allocatable               :: opr(:) !< Operator result.
+
+   ! error multiply operator to be implemented
+   endfunction integrand_multiply_integrand
+
+   pure function integrand_multiply_real(lhs, rhs) result(opr)
+   !< `* real_scalar` operator.
+   class(simulation_object),   intent(in) :: lhs     !< Left hand side.
+   real(R8P),                  intent(in) :: rhs(1:) !< Right hand side.
+   real(R8P), allocatable                 :: opr(:)  !< Operator result.
+
+   ! error multiply operator to be implemented
+   endfunction integrand_multiply_real
+
+   pure function real_multiply_integrand(lhs, rhs) result(opr)
+   !< `real_scalar *` operator.
+   real(R8P),                intent(in) :: lhs(1:) !< Left hand side.
+   class(simulation_object), intent(in) :: rhs     !< Right hand side.
+   real(R8P), allocatable               :: opr(:)  !< Operator result.
+
+   ! error multiply operator to be implemented
+   endfunction real_multiply_integrand
+
+   pure function integrand_multiply_real_scalar(lhs, rhs) result(opr)
+   !< `* real_scalar` operator.
+   class(simulation_object), intent(in) :: lhs    !< Left hand side.
+   real(R8P),                intent(in) :: rhs    !< Right hand side.
+   real(R8P), allocatable               :: opr(:) !< Operator result.
+
+   ! error multiply operator to be implemented
+   endfunction integrand_multiply_real_scalar
+
+   pure function real_scalar_multiply_integrand(lhs, rhs) result(opr)
+   !< `real_scalar *` operator.
+   real(R8P),                intent(in) :: lhs    !< Left hand side.
+   class(simulation_object), intent(in) :: rhs    !< Right hand side.
+   real(R8P), allocatable               :: opr(:) !< Operator result.
+
+   ! error multiply operator to be implemented
+   endfunction real_scalar_multiply_integrand
+
+   ! -
+   pure function integrand_sub_integrand(lhs, rhs) result(opr)
+   !< `-` operator.
+   class(simulation_object), intent(in) :: lhs    !< Left hand side.
+   class(integrand_object),  intent(in) :: rhs    !< Right hand side.
+   real(R8P), allocatable               :: opr(:) !< Operator result.
+
+   ! error subtract operator to be implemented
+   endfunction integrand_sub_integrand
+
+   pure function integrand_sub_real(lhs, rhs) result(opr)
+   !< `- real` operator.
+   class(simulation_object), intent(in) :: lhs     !< Left hand side.
+   real(R8P),                intent(in) :: rhs(1:) !< Right hand side.
+   real(R8P), allocatable               :: opr(:)  !< Operator result.
+
+   ! error subtract operator to be implemented
+   endfunction integrand_sub_real
+
+   pure function real_sub_integrand(lhs, rhs) result(opr)
+   !< `real -` operator.
+   real(R8P),                intent(in) :: lhs(1:) !< Left hand side.
+   class(simulation_object), intent(in) :: rhs     !< Left hand side.
+   real(R8P), allocatable               :: opr(:)  !< Operator result.
+
+   ! error subtract operator to be implemented
+   endfunction real_sub_integrand
+
+   ! =
+   pure subroutine assign_integrand(lhs, rhs)
+   !< `=` operator.
+   class(simulation_object), intent(inout) :: lhs !< Left hand side.
+   class(integrand_object),  intent(in)    :: rhs !< Right hand side.
+
+   select type(rhs)
+   class is(simulation_object)
+   endselect
+   endsubroutine assign_integrand
+
+   pure subroutine assign_real(lhs, rhs)
+   !< `= real` operator.
+   class(simulation_object), intent(inout) :: lhs     !< Left hand side.
+   real(R8P),                intent(in)    :: rhs(1:) !< Right hand side.
+
+   ! error assign operator to be implemented
+   endsubroutine assign_real
+
+   ! fast operators
+   ! time derivative
+   subroutine t_fast(self, t)
+   !< Time derivative function of integrand class, i.e. the residuals function. Fast mode acting directly on self.
+   class(simulation_object), intent(inout)        :: self !< Integrand.
+   real(R8P),                intent(in), optional :: t    !< Time.
+
+   ! error time derivate fast to be implemented
+   endsubroutine t_fast
+
+   ! +
+   pure subroutine integrand_add_integrand_fast(opr, lhs, rhs)
+   !< `+` fast operator.
+   class(simulation_object), intent(inout) :: opr !< Operator result.
+   class(integrand_object),  intent(in)    :: lhs !< Left hand side.
+   class(integrand_object),  intent(in)    :: rhs !< Right hand side.
+
+   ! error add operator fast to be implemented
+   endsubroutine integrand_add_integrand_fast
+
+   ! *
+   pure subroutine integrand_multiply_integrand_fast(opr, lhs, rhs)
+   !< `*` fast operator.
+   class(simulation_object), intent(inout) :: opr !< Operator result.
+   class(integrand_object),  intent(in)    :: lhs !< Left hand side.
+   class(integrand_object),  intent(in)    :: rhs !< Right hand side.
+
+   ! error multiply operator fast to be implemented
+   endsubroutine integrand_multiply_integrand_fast
+
+   pure subroutine integrand_multiply_real_scalar_fast(opr, lhs, rhs)
+   !< `* real_scalar` fast operator.
+   class(simulation_object), intent(inout) :: opr !< Operator result.
+   class(integrand_object),  intent(in)    :: lhs !< Left hand side.
+   real(R8P),                intent(in)    :: rhs !< Right hand side.
+
+   ! error multiply operator fast to be implemented
+   endsubroutine integrand_multiply_real_scalar_fast
+
+   ! -
+   pure subroutine integrand_subtract_integrand_fast(opr, lhs, rhs)
+   !< `-` fast operator.
+   class(simulation_object), intent(inout) :: opr !< Operator result.
+   class(integrand_object),  intent(in)    :: lhs !< Left hand side.
+   class(integrand_object),  intent(in)    :: rhs !< Right hand side.
+
+   ! error subtract operator fast to be implemented
+   endsubroutine integrand_subtract_integrand_fast
+
    ! private methods
    subroutine cli_initialize(self)
    !< Initialize Command Line Interface.
-   class(simulation_object), intent(inout) :: self  !< simulation data.
+   class(simulation_object), intent(inout) :: self  !< Simulation data.
    integer(I4P)                            :: error !< Error trapping flag.
 
    associate(cli=>self%cli)
@@ -234,4 +466,20 @@ contains
       if (error/=0) stop
    endassociate
    endsubroutine cli_initialize
+
+   pure subroutine compute_dt(self)
+   !< Compute the current time step by means of CFL condition.
+   class(simulation_object), intent(inout) :: self !< Simulation data.
+   integer(I4P)                            :: b    !< Counter.
+
+   self%time%dt = MaxR8P
+   do b=1, self%mesh%grid_dimensions%blocks_number
+      self%time%dt = min(self%time%dt, minval(self%mesh%blocks(b)%cell%dt))
+   enddo
+   call self%time%update_dt
+   endsubroutine compute_dt
+
+   subroutine impose_boundary_conditions(self)
+   class(simulation_object), intent(inout) :: self !< Simulation data.
+   endsubroutine impose_boundary_conditions
 endmodule off_simulation_object

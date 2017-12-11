@@ -16,6 +16,7 @@ type :: cell_object
    !< Cell object class.
    type(vector)                    :: center        !< Cell center.
    real(R8P)                       :: volume=0._R8P !< Cell volume.
+   real(R8P)                       :: Dt=0._R8P     !< Local time step.
    type(level_set_object)          :: level_set     !< Level set cell data.
    type(conservative_compressible) :: U             !< Integrand (state) variables.
    contains
@@ -38,14 +39,16 @@ contains
    self = fresh
    endsubroutine destroy
 
-   pure subroutine initialize(self, interfaces_number, distances, U)
+   pure subroutine initialize(self, Dt, interfaces_number, distances, U)
    !< Initialize cell.
    class(cell_object),              intent(inout)        :: self              !< Cell object.
+   real(R8P),                       intent(in), optional :: Dt                !< Local time step.
    integer(I4P),                    intent(in), optional :: interfaces_number !< Number of different interfaces.
    real(R8P),                       intent(in), optional :: distances(:)      !< Distance from all interfaces.
    type(conservative_compressible), intent(in), optional :: U                 !< Conservative variables.
 
    call self%destroy
+   if (present(Dt)) self%Dt = Dt
    call self%level_set%initialize(interfaces_number=interfaces_number, distances=distances)
    if (present(U)) self%U = U
    endsubroutine initialize
@@ -58,6 +61,7 @@ contains
 
    lhs%center = rhs%center
    lhs%volume = rhs%volume
+   lhs%Dt = rhs%Dt
    lhs%level_set = rhs%level_set
    lhs%U = rhs%U
    endsubroutine cell_assign_cell

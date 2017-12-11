@@ -24,6 +24,7 @@ type :: time_object
    integer(I8P)       :: n_max=0            !< Maximum number of time steps computed.
    real(R8P)          :: t_max=0._R8P       !< Maximum time of integration, ignored if `n_max>0`.
    real(R8P)          :: CFL=0.3_R8P        !< Courant-Friedrichs-Lewy stability coefficient.
+   real(R8P)          :: dt=0._R8P          !< Global time step.
    contains
       ! public methods
       procedure, pass(self) :: description    !< Return a pretty-formatted description of time parameters.
@@ -34,7 +35,8 @@ type :: time_object
       procedure, pass(self) :: load_from_file !< Load from file.
       procedure, pass(self) :: save_into_file !< Save into file.
       procedure, pass(self) :: set_stop       !< Set simulation stop condition.
-      procedure, pass(self) :: update         !< Update time.
+      procedure, pass(self) :: update_dt      !< Update time step for the last iterate.
+      procedure, pass(self) :: update_t       !< Update time.
       ! operators
       generic :: assignment(=) => time_assign_time !< Overload `=`.
       ! private methods
@@ -63,6 +65,7 @@ contains
    desc = desc//prefix_//'n_max : '//trim(str(n=self%n_max))//NL
    desc = desc//prefix_//'t_max : '//trim(str(n=self%t_max))//NL
    desc = desc//prefix_//'CFL   : '//trim(str(n=self%CFL))
+   desc = desc//prefix_//'dt    : '//trim(str(n=self%dt))
    endfunction description
 
    elemental subroutine destroy(self)
@@ -73,12 +76,26 @@ contains
    self = fresh
    endsubroutine destroy
 
-   elemental subroutine initialize(self, time)
+   elemental subroutine initialize(self, is_unsteady, n, t, n_max, t_max, CFL, dt, time)
    !< Initialize time.
-   class(time_object), intent(inout)        :: self !< Time object.
-   type(time_object),  intent(in), optional :: time !< Time object.
+   class(time_object), intent(inout)        :: self        !< Time object.
+   logical,            intent(in), optional :: is_unsteady !< Type of simulation: unsteady or steady.
+   integer(I8P),       intent(in), optional :: n           !< Time steps counter.
+   real(R8P),          intent(in), optional :: t           !< Time.
+   integer(I8P),       intent(in), optional :: n_max       !< Maximum number of time steps computed.
+   real(R8P),          intent(in), optional :: t_max       !< Maximum time of integration, ignored if `n_max>0`.
+   real(R8P),          intent(in), optional :: CFL         !< Courant-Friedrichs-Lewy stability coefficient.
+   real(R8P),          intent(in), optional :: dt          !< Global time step.
+   type(time_object),  intent(in), optional :: time        !< Time object.
 
    call self%destroy
+   if (present(is_unsteady)) self%is_unsteady = is_unsteady
+   if (present(n)) self%n = n
+   if (present(t)) self%t = t
+   if (present(n_max)) self%n_max = n_max
+   if (present(t_max)) self%t_max = t_max
+   if (present(CFL)) self%CFL = CFL
+   if (present(dt)) self%dt = dt
    if (present(time)) self = time
    endsubroutine initialize
 
@@ -125,6 +142,9 @@ contains
 
    call fini%get(section_name=INI_SECTION_NAME, option_name='cfl', val=self%CFL, error=self%error%status)
    if (.not.go_on_fail_) call self%error%check(message='failed to load ['//INI_SECTION_NAME//'].(cfl)', is_severe=.not.go_on_fail_)
+
+   call fini%get(section_name=INI_SECTION_NAME, option_name='dt', val=self%dt, error=self%error%status)
+   if (.not.go_on_fail_) call self%error%check(message='failed to load ['//INI_SECTION_NAME//'].(dt)', is_severe=.not.go_on_fail_)
    endsubroutine load_from_file
 
    subroutine save_into_file(self, fini)
@@ -136,6 +156,7 @@ contains
    call fini%add(section_name=INI_SECTION_NAME, option_name='n_max', val=self%n_max, error=self%error%status)
    call fini%add(section_name=INI_SECTION_NAME, option_name='t_max', val=self%t_max, error=self%error%status)
    call fini%add(section_name=INI_SECTION_NAME, option_name='cfl', val=self%cfl, error=self%error%status)
+   call fini%add(section_name=INI_SECTION_NAME, option_name='dt', val=self%cfl, error=self%error%status)
    endsubroutine save_into_file
 
    elemental subroutine set_stop(self)
@@ -153,24 +174,29 @@ contains
    endif
    endsubroutine set_stop
 
-   elemental subroutine update(self, global_min_dt)
-   !< Update time.
-   class(time_object), intent(inout) :: self          !< Time object.
-   real(R8P),          intent(inout) :: global_min_dt !< Global (all processes/images, all blocks) minimum time step.
+   elemental subroutine update_dt(self)
+   !< Update time step for the last iterate.
+   class(time_object), intent(inout) :: self !< Time object.
 
    if (self%is_unsteady) then
       ! for an unsteady accurate simulation each cell is updated by means of global minimum time step
       ! control for the last iterate
       if (self%n_max <= 0) then
-         if ((self%t + global_min_dt) > self%t_max) then
+         if ((self%t + self%dt) > self%t_max) then
             ! the global minimum time step is so high that the last iteration will go over t_max
             ! it is decreased in order to achieve exactly t_max
-            global_min_dt = abs(self%t_max - self%t)
+            self%dt = abs(self%t_max - self%t)
          endif
       endif
-      self%t = self%t + global_min_dt
    endif
-   endsubroutine update
+   endsubroutine update_dt
+
+   elemental subroutine update_t(self)
+   !< Update time.
+   class(time_object), intent(inout) :: self !< Time object.
+
+   self%t = self%t + self%dt
+   endsubroutine update_t
 
    ! private methods
    pure subroutine time_assign_time(lhs, rhs)
@@ -179,11 +205,12 @@ contains
    type(time_object),  intent(in)    :: rhs !< Right hand side.
 
    lhs%error       = rhs%error
+   lhs%is_unsteady = rhs%is_unsteady
    lhs%n           = rhs%n
    lhs%t           = rhs%t
    lhs%n_max       = rhs%n_max
    lhs%t_max       = rhs%t_max
    lhs%CFL         = rhs%CFL
-   lhs%is_unsteady = rhs%is_unsteady
+   lhs%dt          = rhs%dt
    endsubroutine time_assign_time
 endmodule off_time_object

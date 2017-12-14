@@ -4,7 +4,9 @@ module off_mesh_object
 !< OFF mesh object definition and implementation.
 
 use, intrinsic :: iso_fortran_env, only : stderr=>error_unit
+use off_bc_object, only : BC_WALL, BC_PERIODIC, BC_EXTRAPOLATED, BC_ADJACENT
 use off_block_object, only : block_object
+use off_cell_object, only : cell_object
 use off_file_grid_object, only : file_grid_object
 use off_file_parametric_grid_object, only : file_parametric_grid_object
 use off_file_parametric_ic_object, only : file_parametric_ic_object
@@ -12,6 +14,7 @@ use off_grid_dimensions_object, only : grid_dimensions_object
 use flow, only : eos_compressible
 use penf, only : I4P, str
 use stringifor, only : string
+use vecfor, only : vector
 
 implicit none
 private
@@ -31,6 +34,7 @@ type :: mesh_object
       procedure, pass(self) :: allocate_blocks     !< Allocate blocks accordingly to grid dimensions.
       procedure, pass(self) :: description         !< Return a pretty-formatted description of the mesh.
       procedure, pass(self) :: destroy             !< Destroy mesh.
+      procedure, pass(self) :: impose_boundary_conditions !< Impose boundary conditions.
       procedure, pass(self) :: initialize          !< Initialize mesh.
       procedure, pass(self) :: load_grid_from_file !< Load grid from file.
       procedure, pass(self) :: load_ic_from_file   !< Load initial conditions from file.
@@ -81,6 +85,239 @@ contains
       deallocate(self%blocks)
    endif
    endsubroutine destroy
+
+   subroutine impose_boundary_conditions(self)
+   !< Impose boundary conditions on all blocks of the mesh.
+   class(mesh_object), intent(inout) :: self       !< Mesh.
+   integer(I4P)                      :: b, i, j, k !< Counter.
+
+   do b=1, self%grid_dimensions%blocks_number
+      associate(block_b=>self%blocks(b), gc=>self%blocks(b)%signature%gc,                                          &
+                Ni=>self%blocks(b)%signature%Ni, Nj=>self%blocks(b)%signature%Nj, Nk=>self%blocks(b)%signature%Nk)
+         ! i direction
+         do k=1, Nk
+            do j=1, Nj
+               ! left
+               if     (self%blocks(b)%cell(0,j,k)%bc%is(BC_WALL)) then
+                  call impose_boundary_conditions_wall(gc=gc(1:2), ic=gc(1), N=Ni, normal=block_b%face_i(0,j,k)%normal, &
+                                                       boundary='l', stride=block_b%cell(:,j,k))
+               elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_PERIODIC)) then
+                  call impose_boundary_conditions_periodic(gc=gc(1:2), ic=gc(1), N=Ni, boundary='l', stride=block_b%cell(:,j,k))
+               elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_EXTRAPOLATED)) then
+                  call impose_boundary_conditions_extrapolation(gc=gc(1:2), ic=gc(1), N=Ni, boundary='l', &
+                                                                stride=block_b%cell(:,j,k))
+               elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_ADJACENT)) then
+                  call impose_boundary_conditions_adjacent(gc=gc(1), frame=block_b%cell(1-gc(1):0,j,k))
+               endif
+               ! right
+               if     (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_WALL)) then
+                  call impose_boundary_conditions_wall(gc=gc(1:2), ic=gc(2), N=Ni, normal=block_b%face_i(Ni,j,k)%normal, &
+                                                       boundary='r', stride=block_b%cell(:,j,k))
+               elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_PERIODIC)) then
+                  call impose_boundary_conditions_periodic(gc=gc(1:2), ic=gc(2), N=Ni, boundary='r', stride=block_b%cell(:,j,k))
+               elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_EXTRAPOLATED)) then
+                  call impose_boundary_conditions_extrapolation(gc=gc(1:2), ic=gc(2), N=Ni, boundary='r', &
+                                                                stride=block_b%cell(:,j,k))
+               elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_ADJACENT)) then
+                  call impose_boundary_conditions_adjacent(gc=gc(2), frame=block_b%cell(Ni+1:Ni+gc(2),j,k))
+               endif
+            enddo
+         enddo
+         ! j direction
+         do k=1, Nk
+            do i=1, Ni
+               ! left
+               if     (self%blocks(b)%cell(i,0,k)%bc%is(BC_WALL)) then
+                  call impose_boundary_conditions_wall(gc=gc(3:4), ic=gc(3), N=Nj, normal=block_b%face_i(i,0,k)%normal, &
+                                                       boundary='l', stride=block_b%cell(i,:,k))
+               elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_PERIODIC)) then
+                  call impose_boundary_conditions_periodic(gc=gc(3:4), ic=gc(3), N=Nj, boundary='l', stride=block_b%cell(i,:,k))
+               elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_EXTRAPOLATED)) then
+                  call impose_boundary_conditions_extrapolation(gc=gc(3:4), ic=gc(3), N=Nj, boundary='l', &
+                                                                stride=block_b%cell(i,:,k))
+               elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_ADJACENT)) then
+                  call impose_boundary_conditions_adjacent(gc=gc(3), frame=block_b%cell(i,1-gc(3):0,k))
+               endif
+               ! right
+               if     (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_WALL)) then
+                  call impose_boundary_conditions_wall(gc=gc(3:4), ic=gc(4), N=Nj, normal=block_b%face_i(i,Nj,k)%normal, &
+                                                       boundary='r', stride=block_b%cell(i,:,k))
+               elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_PERIODIC)) then
+                  call impose_boundary_conditions_periodic(gc=gc(3:4), ic=gc(4), N=Nj, boundary='r', stride=block_b%cell(i,:,k))
+               elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_EXTRAPOLATED)) then
+                  call impose_boundary_conditions_extrapolation(gc=gc(3:4), ic=gc(4), N=Nj, boundary='r', &
+                                                                stride=block_b%cell(i,:,k))
+               elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_ADJACENT)) then
+                  call impose_boundary_conditions_adjacent(gc=gc(4), frame=block_b%cell(i,Nj+1:Nj+gc(4),k))
+               endif
+            enddo
+         enddo
+         ! k direction
+         do j=1, Nj
+            do i=1, Ni
+               ! left
+               if     (self%blocks(b)%cell(i,j,0)%bc%is(BC_WALL)) then
+                  call impose_boundary_conditions_wall(gc=gc(5:6), ic=gc(5), N=Nk, normal=block_b%face_i(i,j,0)%normal, &
+                                                       boundary='l', stride=block_b%cell(i,j,:))
+               elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_PERIODIC)) then
+                  call impose_boundary_conditions_periodic(gc=gc(5:6), ic=gc(5), N=Nk, boundary='l', stride=block_b%cell(i,j,:))
+               elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_EXTRAPOLATED)) then
+                  call impose_boundary_conditions_extrapolation(gc=gc(5:6), ic=gc(5), N=Nk, boundary='l', &
+                                                                stride=block_b%cell(i,j,:))
+               elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_ADJACENT)) then
+                  call impose_boundary_conditions_adjacent(gc=gc(5), frame=block_b%cell(i,j,1-gc(5):0))
+               endif
+               ! right
+               if     (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_WALL)) then
+                  call impose_boundary_conditions_wall(gc=gc(5:6), ic=gc(6), N=Nk, normal=block_b%face_i(i,Nj,k)%normal, &
+                                                       boundary='r', stride=block_b%cell(i,j,:))
+               elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_PERIODIC)) then
+                  call impose_boundary_conditions_periodic(gc=gc(5:6), ic=gc(6), N=Nk, boundary='r', stride=block_b%cell(i,j,:))
+               elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_EXTRAPOLATED)) then
+                  call impose_boundary_conditions_extrapolation(gc=gc(5:6), ic=gc(6), N=Nk, boundary='r', &
+                                                                stride=block_b%cell(i,j,:))
+               elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_ADJACENT)) then
+                  call impose_boundary_conditions_adjacent(gc=gc(6), frame=block_b%cell(i,j,Nk+1:Nk+gc(6)))
+               endif
+            enddo
+         enddo
+      endassociate
+   enddo
+   contains
+      pure subroutine impose_boundary_conditions_wall(gc, ic, N, normal, boundary, stride)
+      !< Impose wall boundary conditions on a stride of cells along a direction.
+      integer(I4P),      intent(in)    :: gc(1:2)          !< Number of ghost cells.
+      integer(I4P),      intent(in)    :: ic               !< Number of internal cells used for extrapolation (1 or gc).
+      integer(I4P),      intent(in)    :: N                !< Number of internal cells.
+      type(vector),      intent(in)    :: normal           !< Face normal.
+      character(1),      intent(in)    :: boundary         !< Boundary left ('l') or right ('r').
+      type(cell_object), intent(inout) :: stride(1-gc(1):) !< Cells stride [1-gc(1):N+gc(2)].
+      integer(I4P)                     :: i                !< Counter.
+      type(vector)                     :: vr               !< Reflected velocity vector.
+
+      if (boundary=='l') then
+         if (ic==1.or.N<gc(1)) then ! reflection using only the cell 1
+            ! vr = C(1)%P%v - (2._R_P*(C(1)%P%v.paral.NF)) ! reflected velocity
+            do i=1-gc(1), 0
+               ! C(i)%P%r = C(1)%P%r
+               ! C(i)%P%v = vr
+               ! C(i)%P%p = C(1)%P%p
+               ! C(i)%P%d = C(1)%P%d
+               ! C(i)%P%g = C(1)%P%g
+            enddo
+         else ! reflection using the cells 1,2,...,gc
+            do i=1-gc(1), 0
+               ! vr = C(-i+1)%P%v - (2._R_P*(C(-i+1)%P%v.paral.NF)) ! reflected velocity
+               ! C(i)%P%r = C(-i+1)%P%r
+               ! C(i)%P%v = vr
+               ! C(i)%P%p = C(-i+1)%P%p
+               ! C(i)%P%d = C(-i+1)%P%d
+               ! C(i)%P%g = C(-i+1)%P%g
+            enddo
+         endif
+      endif
+      if (boundary=='r') then
+         if (ic==1.or.N<gc(2)) then ! reflection using only the cell N
+            ! vr = C(N)%P%v - (2._R_P*(C(N)%P%v.paral.NF)) ! reflected velocity
+            do i=N+1, N+gc(2)
+               ! C(i)%P%r = C(N)%P%r
+               ! C(i)%P%v = vr
+               ! C(i)%P%p = C(N)%P%p
+               ! C(i)%P%d = C(N)%P%d
+               ! C(i)%P%g = C(N)%P%g
+            enddo
+         else ! reflection using the cells N-gc,N-gc+1,N-gc+2,...,N
+            do i=N+1, N+gc(2)
+               ! vr = C(N+1-(i-N))%P%v - (2._R_P*(C(N+1-(i-N))%P%v.paral.NF)) ! reflected velocity
+               ! C(i)%P%r = C(N+1-(i-N))%P%r
+               ! C(i)%P%v = vr
+               ! C(i)%P%p = C(N+1-(i-N))%P%p
+               ! C(i)%P%d = C(N+1-(i-N))%P%d
+               ! C(i)%P%g = C(N+1-(i-N))%P%g
+            enddo
+         endif
+      endif
+      endsubroutine impose_boundary_conditions_wall
+
+      pure subroutine impose_boundary_conditions_periodic(gc, ic, N, boundary, stride)
+      !< Impose periodic boundary conditions on a stride of cells along a direction.
+      integer(I4P),      intent(in)    :: gc(1:2)          !< Number of ghost cells.
+      integer(I4P),      intent(in)    :: ic               !< Number of internal cells used for extrapolation (1 or gc).
+      integer(I4P),      intent(in)    :: N                !< Number of internal cells.
+      character(1),      intent(in)    :: boundary         !< Boundary left ('l') or right ('r').
+      type(cell_object), intent(inout) :: stride(1-gc(1):) !< Cells stride [1-gc(1):N+gc(2)].
+      integer(I4P)                     :: i                !< Cell counter.
+
+      if (boundary=='l') then
+         if (ic==1.or.N<gc(1)) then ! extrapolation using only the cell N
+            do i=1-gc(1), 0
+               stride(i)%U = stride(N)%U
+            enddo
+         else ! extrapolation using the cells N-gc,N-gc+1,N-gc+2,...,N
+            do i=1-gc(1), 0
+               stride(i)%U = stride(i+N)%U
+            enddo
+         endif
+      endif
+      if (boundary=='r') then
+         if (ic==1.or.N<gc(2)) then ! extrapolation using only the cell 1
+            do i=N+1, N+gc(2)
+               stride(i)%U = stride(1)%U
+            enddo
+         else ! extrapolation using the cells 1,2,...,gc
+            do i=N+1, N+gc(2)
+               stride(i)%U = stride(i-N)%U
+            enddo
+         endif
+      endif
+      endsubroutine impose_boundary_conditions_periodic
+
+      pure subroutine impose_boundary_conditions_extrapolation(gc, ic, N, boundary, stride)
+      !< Impose boundary conditions of extrapolation on a stride of cells along a direction.
+      integer(I4P),      intent(in)    :: gc(1:2)          !< Number of ghost cells, 1 => left, 2 => right.
+      integer(I4P),      intent(in)    :: ic               !< Number of internal cells used for extrapolation (1 or gc).
+      integer(I4P),      intent(in)    :: N                !< Number of internal cells.
+      character(1),      intent(in)    :: boundary         !< Boundary left ('l') or right ('r').
+      type(cell_object), intent(inout) :: stride(1-gc(1):) !< Cells stride [1-gc(1):N+gc(2)].
+      integer(I4P)                     :: i                !< Counter.
+
+      if (boundary=='l') then
+         if (ic==1.or.N<gc(1)) then ! extrapolation using only the cell 1
+            do i=1-gc(1), 0
+               stride(i)%U = stride(1)%U
+            enddo
+         else ! extrapolation using the cells 1,2,...,gc
+            do i=1-gc(1), 0
+               stride(i)%U = stride(-i+1)%U
+            enddo
+         endif
+      endif
+      if (boundary=='r') then
+         if (ic==1.or.N<gc(2)) then ! extrapolation using only the cell N
+            do i=N+1, N+gc(2)
+              stride(i)%U = stride(N)%U
+            enddo
+         else ! extrapolation using the cells N-gc,N-gc+1,N-gc+2,...,N
+            do i=N+1, N+gc(2)
+              stride(i)%U = stride(N+1-(i-N))%U
+            enddo
+         endif
+      endif
+      endsubroutine impose_boundary_conditions_extrapolation
+
+      pure subroutine impose_boundary_conditions_adjacent(gc, frame)
+      !< Impose adjacent boundary conditions on a frmae of cells along a direction.
+      integer(I4P),      intent(in)    :: gc           !< Number of ghost cells.
+      type(cell_object), intent(inout) :: frame(1-gc:) !< Cells frame [1-gc:0].
+      integer(I4P)                     :: i            !< Counter.
+
+      do i=1-gc, 0
+         associate(adj_b=>frame(i)%bc%adj(1), adj_i=>frame(i)%bc%adj(2), adj_j=>frame(i)%bc%adj(3), adj_k=>frame(i)%bc%adj(4))
+            frame(i)%U = self%blocks(adj_b)%cell(adj_i, adj_j, adj_k)%U
+         endassociate
+      enddo
+      endsubroutine impose_boundary_conditions_adjacent
+   endsubroutine impose_boundary_conditions
 
    subroutine initialize(self, grid_file_name, is_grid_file_parametric, ic_file_name, is_ic_file_parametric, mesh)
    !< Initialize mesh.

@@ -480,6 +480,9 @@ contains
    endsubroutine compute_dt
 
    subroutine impose_boundary_conditions(self)
+   !< Impose boundary conditions on all blocks of the mesh.
    class(simulation_object), intent(inout) :: self !< Simulation data.
+
+   call self%mesh%impose_boundary_conditions
    endsubroutine impose_boundary_conditions
 endmodule off_simulation_object

@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<Species>
+  <Specie s="1"><specie Gamma="1.4d0" R="287.d0"/></Specie>
+  <Specie s="2"><specie Gamma="1.648d0" R="1578.d0"/></Specie>
+</Species>

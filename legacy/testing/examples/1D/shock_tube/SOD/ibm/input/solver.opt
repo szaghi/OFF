@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<Solver_Options>
+  <timing>                     unsteady </timing>
+  <max_time_iterations>        0        </max_time_iterations>
+  <final_time>                 0.2d0    </final_time>
+  <time_integration_accuracy>  5        </time_integration_accuracy>
+  <space_integration_accuracy> 7        </space_integration_accuracy>
+  <CFL>                        0.7d0    </CFL>
+  <residuals_tolerance>        0.01d0   </residuals_tolerance>
+  <riemann_solver>             HLLCz    </riemann_solver>
+  <reconstruction_type>        characteristic_reconstruction </reconstruction_type>
+</Solver_Options>
+<Non_Dimensional_Numbers>
+  <Re> 1.d0 </Re>
+  <Fr> 1.d0 </Fr>
+  <Pr> 1.d0 </Pr>
+</Non_Dimensional_Numbers>
+<Reference_Values>
+  <L0> 1.d0 </L0>
+  <r0> 1.d0 </r0>
+  <v0> 1.d0 </v0>
+  <c0> 1.d0 </c0>
+</Reference_Values>

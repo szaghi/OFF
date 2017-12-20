@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]
+then
+  echo "Usage: `basename $0` mylay.lay"
+  exit 1
+fi
+
+lay=`basename $1 .lay`
+
+sed s/MYLAY/$lay''/ lay_export.mcr > tmp.mcr
+tec360 -b tmp.mcr > /dev/null
+rm -f tmp.mcr
+
+exit 0

@@ -122,6 +122,7 @@ type :: block_object
       procedure, pass(self) :: cells_number              !< Return the number of cells.
       procedure, pass(self) :: compute_space_operator    !< Compute space operator.
       procedure, pass(self) :: compute_dt                !< Compute the current time step by means of CFL condition.
+      procedure, pass(self) :: conservative_to_primitive !< Convert conservative variables to primitive ones.
       procedure, pass(self) :: create_linspace           !< Create a Cartesian block with linearly spaced nodes.
       procedure, pass(self) :: destroy                   !< Destroy block.
       procedure, pass(self) :: immerge_off_geometry      !< "Immerge" geometry (described into a OFF file) into the block grid.
@@ -212,6 +213,20 @@ contains
 
    error stop 'error: block space operator to be implemented'
    endsubroutine compute_space_operator
+
+   elemental subroutine conservative_to_primitive(self)
+   !< Convert conservative variables to primitive one.
+   class(block_object), intent(inout) :: self    !< Block.
+   integer(I4P)                       :: i, j, k !< Counter.
+
+   do k=1-self%signature%gc(5), self%signature%Nk+self%signature%gc(6)
+      do j=1-self%signature%gc(3), self%signature%Nj+self%signature%gc(4)
+         do i=1-self%signature%gc(1), self%signature%Ni+self%signature%gc(2)
+            self%cell(i, j, k)%P = conservative_to_primitive_compressible(conservative=self%cell(i, j, k)%U, eos=self%eos)
+         enddo
+      enddo
+   enddo
+   endsubroutine conservative_to_primitive
 
    subroutine create_linspace(self, emin, emax)
    !< Create a Cartesian block with linearly spaced nodes.
@@ -328,7 +343,7 @@ contains
    subroutine initialize(self, signature,                                           &
                          id, level, gc, ni, nj, nk,                                 &
                          emin, emax, is_cartesian, is_null_x, is_null_y, is_null_z, &
-                         interfaces_number, distances, eos, initial_state)
+                         interfaces_number, distances, eos, U0, P0)
    !< Initialize block.
    !<
    !< Assign block signature, allocate dynamic memory and set block features.
@@ -349,7 +364,8 @@ contains
    integer(I4P),                    intent(in), optional :: interfaces_number       !< Number of different interfaces.
    real(R8P),                       intent(in), optional :: distances(:)            !< Distance from all interfaces.
    type(eos_compressible),          intent(in), optional :: eos                     !< EOS data.
-   type(conservative_compressible), intent(in), optional :: initial_state           !< Initial state of conservative variables.
+   type(conservative_compressible), intent(in), optional :: U0                      !< Initial state of conservative variables.
+   type(primitive_compressible),    intent(in), optional :: P0                      !< Initial state of primitive variables.
    integer(I4P)                                          :: i                       !< Counter.
    integer(I4P)                                          :: j                       !< Counter.
    integer(I4P)                                          :: k                       !< Counter.
@@ -365,7 +381,7 @@ contains
 
    call self%signature%initialize(signature=signature,                             &
                                   id=id, level=level, gc=gc, ni=ni, nj=nj, nk=nk,  &
-                                  initial_state=initial_state,                     &
+                                  U0=U0, P0=P0,                                    &
                                   emin=emin, emax=emax, is_cartesian=is_cartesian, &
                                   is_null_x=is_null_x, is_null_y=is_null_y, is_null_z=is_null_z)
 
@@ -381,7 +397,7 @@ contains
       do k=1 - gc(5), nk + gc(6)
          do j=1 - gc(3), nj + gc(4)
             do i=1 - gc(1), ni + gc(2)
-               call self%cell(i,j,k)%initialize(interfaces_number=interfaces_number, distances=distances, U=initial_state)
+               call self%cell(i,j,k)%initialize(interfaces_number=interfaces_number, distances=distances, U=U0, P=P0)
             enddo
          enddo
       enddo

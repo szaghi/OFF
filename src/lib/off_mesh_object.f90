@@ -12,7 +12,7 @@ use off_file_parametric_grid_object, only : file_parametric_grid_object
 use off_file_parametric_ic_object, only : file_parametric_ic_object
 use off_grid_dimensions_object, only : grid_dimensions_object
 use flow, only : eos_compressible
-use penf, only : I4P, str
+use penf, only : I4P, R8P, str
 use stringifor, only : string
 use vecfor, only : vector
 
@@ -31,14 +31,15 @@ type :: mesh_object
    type(block_object), allocatable   :: blocks(:)            !< Blocks list.
    contains
       ! public methods
-      procedure, pass(self) :: allocate_blocks     !< Allocate blocks accordingly to grid dimensions.
-      procedure, pass(self) :: description         !< Return a pretty-formatted description of the mesh.
-      procedure, pass(self) :: destroy             !< Destroy mesh.
+      procedure, pass(self) :: allocate_blocks            !< Allocate blocks accordingly to grid dimensions.
+      procedure, pass(self) :: conservative_to_primitive  !< Convert conservative variables to primitive ones.
+      procedure, pass(self) :: description                !< Return a pretty-formatted description of the mesh.
+      procedure, pass(self) :: destroy                    !< Destroy mesh.
       procedure, pass(self) :: impose_boundary_conditions !< Impose boundary conditions.
-      procedure, pass(self) :: initialize          !< Initialize mesh.
-      procedure, pass(self) :: load_grid_from_file !< Load grid from file.
-      procedure, pass(self) :: load_ic_from_file   !< Load initial conditions from file.
-      procedure, pass(self) :: save_grid_into_file !< Save grid into file.
+      procedure, pass(self) :: initialize                 !< Initialize mesh.
+      procedure, pass(self) :: load_grid_from_file        !< Load grid from file.
+      procedure, pass(self) :: load_ic_from_file          !< Load initial conditions from file.
+      procedure, pass(self) :: save_grid_into_file        !< Save grid into file.
 endtype mesh_object
 
 contains
@@ -59,6 +60,18 @@ contains
       enddo
    endif
    endsubroutine allocate_blocks
+
+   elemental subroutine conservative_to_primitive(self)
+   !< Convert conservative variables to primitive one.
+   class(mesh_object), intent(inout) :: self !< Mesh.
+   integer(I4P)                      :: b
+
+   if (self%grid_dimensions%blocks_number>0) then
+      do b=1,self%grid_dimensions%blocks_number
+         call self%blocks(b)%conservative_to_primitive
+      enddo
+   endif
+   endsubroutine conservative_to_primitive
 
    pure function description(self, prefix) result(desc)
    !< Return a pretty-formatted description of the mesh.
@@ -92,7 +105,7 @@ contains
    integer(I4P)                      :: b, i, j, k !< Counter.
 
    do b=1, self%grid_dimensions%blocks_number
-      associate(block_b=>self%blocks(b), gc=>self%blocks(b)%signature%gc,                                          &
+      associate(block_b=>self%blocks(b), gc=>self%blocks(b)%signature%gc, &
                 Ni=>self%blocks(b)%signature%Ni, Nj=>self%blocks(b)%signature%Nj, Nk=>self%blocks(b)%signature%Nk)
          ! i direction
          do k=1, Nk
@@ -197,43 +210,35 @@ contains
 
       if (boundary=='l') then
          if (ic==1.or.N<gc(1)) then ! reflection using only the cell 1
-            ! vr = C(1)%P%v - (2._R_P*(C(1)%P%v.paral.NF)) ! reflected velocity
+            vr = stride(1)%P%velocity - (2._R8P*(stride(1)%P%velocity.paral.normal)) ! reflected velocity
             do i=1-gc(1), 0
-               ! C(i)%P%r = C(1)%P%r
-               ! C(i)%P%v = vr
-               ! C(i)%P%p = C(1)%P%p
-               ! C(i)%P%d = C(1)%P%d
-               ! C(i)%P%g = C(1)%P%g
+               stride(i)%P%velocity = vr
+               stride(i)%P%pressure = stride(1)%P%pressure
+               stride(i)%P%density = stride(1)%P%density
             enddo
          else ! reflection using the cells 1,2,...,gc
             do i=1-gc(1), 0
-               ! vr = C(-i+1)%P%v - (2._R_P*(C(-i+1)%P%v.paral.NF)) ! reflected velocity
-               ! C(i)%P%r = C(-i+1)%P%r
-               ! C(i)%P%v = vr
-               ! C(i)%P%p = C(-i+1)%P%p
-               ! C(i)%P%d = C(-i+1)%P%d
-               ! C(i)%P%g = C(-i+1)%P%g
+               vr = stride(-i+1)%P%velocity - (2._R8P*(stride(-i+1)%P%velocity.paral.normal)) ! reflected velocity
+               stride(i)%P%velocity = vr
+               stride(i)%P%pressure = stride(-i+1)%P%pressure
+               stride(i)%P%density = stride(-i+1)%P%density
             enddo
          endif
       endif
       if (boundary=='r') then
          if (ic==1.or.N<gc(2)) then ! reflection using only the cell N
-            ! vr = C(N)%P%v - (2._R_P*(C(N)%P%v.paral.NF)) ! reflected velocity
+            vr = stride(N)%P%velocity - (2._R8P*(stride(N)%P%velocity.paral.normal)) ! reflected velocity
             do i=N+1, N+gc(2)
-               ! C(i)%P%r = C(N)%P%r
-               ! C(i)%P%v = vr
-               ! C(i)%P%p = C(N)%P%p
-               ! C(i)%P%d = C(N)%P%d
-               ! C(i)%P%g = C(N)%P%g
+               stride(i)%P%velocity = vr
+               stride(i)%P%pressure = stride(N)%P%pressure
+               stride(i)%P%density = stride(N)%P%density
             enddo
          else ! reflection using the cells N-gc,N-gc+1,N-gc+2,...,N
             do i=N+1, N+gc(2)
-               ! vr = C(N+1-(i-N))%P%v - (2._R_P*(C(N+1-(i-N))%P%v.paral.NF)) ! reflected velocity
-               ! C(i)%P%r = C(N+1-(i-N))%P%r
-               ! C(i)%P%v = vr
-               ! C(i)%P%p = C(N+1-(i-N))%P%p
-               ! C(i)%P%d = C(N+1-(i-N))%P%d
-               ! C(i)%P%g = C(N+1-(i-N))%P%g
+               vr = stride(N+1-(i-N))%P%velocity - (2._R8P*(stride(N+1-(i-N))%P%velocity.paral.normal)) ! reflected velocity
+               stride(i)%P%velocity = vr
+               stride(i)%P%pressure = stride(N+1-(i-N))%P%pressure
+               stride(i)%P%density = stride(N+1-(i-N))%P%density
             enddo
          endif
       endif
@@ -251,22 +256,22 @@ contains
       if (boundary=='l') then
          if (ic==1.or.N<gc(1)) then ! extrapolation using only the cell N
             do i=1-gc(1), 0
-               stride(i)%U = stride(N)%U
+               stride(i)%P = stride(N)%P
             enddo
          else ! extrapolation using the cells N-gc,N-gc+1,N-gc+2,...,N
             do i=1-gc(1), 0
-               stride(i)%U = stride(i+N)%U
+               stride(i)%P = stride(i+N)%P
             enddo
          endif
       endif
       if (boundary=='r') then
          if (ic==1.or.N<gc(2)) then ! extrapolation using only the cell 1
             do i=N+1, N+gc(2)
-               stride(i)%U = stride(1)%U
+               stride(i)%P = stride(1)%P
             enddo
          else ! extrapolation using the cells 1,2,...,gc
             do i=N+1, N+gc(2)
-               stride(i)%U = stride(i-N)%U
+               stride(i)%P = stride(i-N)%P
             enddo
          endif
       endif
@@ -284,22 +289,22 @@ contains
       if (boundary=='l') then
          if (ic==1.or.N<gc(1)) then ! extrapolation using only the cell 1
             do i=1-gc(1), 0
-               stride(i)%U = stride(1)%U
+               stride(i)%P = stride(1)%P
             enddo
          else ! extrapolation using the cells 1,2,...,gc
             do i=1-gc(1), 0
-               stride(i)%U = stride(-i+1)%U
+               stride(i)%P = stride(-i+1)%P
             enddo
          endif
       endif
       if (boundary=='r') then
          if (ic==1.or.N<gc(2)) then ! extrapolation using only the cell N
             do i=N+1, N+gc(2)
-              stride(i)%U = stride(N)%U
+              stride(i)%P = stride(N)%P
             enddo
          else ! extrapolation using the cells N-gc,N-gc+1,N-gc+2,...,N
             do i=N+1, N+gc(2)
-              stride(i)%U = stride(N+1-(i-N))%U
+              stride(i)%P = stride(N+1-(i-N))%P
             enddo
          endif
       endif
@@ -313,7 +318,7 @@ contains
 
       do i=1-gc, 0
          associate(adj_b=>frame(i)%bc%adj(1), adj_i=>frame(i)%bc%adj(2), adj_j=>frame(i)%bc%adj(3), adj_k=>frame(i)%bc%adj(4))
-            frame(i)%U = self%blocks(adj_b)%cell(adj_i, adj_j, adj_k)%U
+            frame(i)%P = self%blocks(adj_b)%cell(adj_i, adj_j, adj_k)%P
          endassociate
       enddo
       endsubroutine impose_boundary_conditions_adjacent

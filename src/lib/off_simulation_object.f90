@@ -80,6 +80,7 @@ type, extends(integrand_object) :: simulation_object
       ! private methods
       procedure, pass(self), private :: cli_initialize             !< Initialize Command Line Interface.
       procedure, pass(self), private :: compute_dt                 !< Compute the current time step by means of CFL condition.
+      procedure, pass(self), private :: conservative_to_primitive  !< Convert conservative variables to primitive ones.
       procedure, pass(self), private :: impose_boundary_conditions !< Impose boundary conditions.
 endtype simulation_object
 
@@ -478,6 +479,13 @@ contains
    enddo
    call self%time%update_dt
    endsubroutine compute_dt
+
+   elemental subroutine conservative_to_primitive(self)
+   !< Convert conservative variables to primitive one.
+   class(simulation_object), intent(inout) :: self !< Simulation data.
+
+   call self%conservative_to_primitive
+   endsubroutine conservative_to_primitive
 
    subroutine impose_boundary_conditions(self)
    !< Impose boundary conditions on all blocks of the mesh.

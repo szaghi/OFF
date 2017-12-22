@@ -3,7 +3,7 @@
 module off_block_signature_object
 !< OFF block signature object definition and implementation.
 
-use foreseer, only : conservative_compressible
+use foreseer, only : conservative_compressible, primitive_compressible
 use penf, only : I4P, I8P, str
 use vecfor, only : vector
 

@@ -7,7 +7,7 @@ use, intrinsic :: iso_fortran_env, only : stderr=>error_unit
 use off_error_object, only : error_object
 use finer, only : file_ini
 use foreseer, only : riemann_solver_object, riemann_solver_compressible_hllc_id, foreseer_factory
-use penf, only : R8P, str
+use penf, only : I4P, R8P, str
 use stringifor, only : string
 use wenoof, only : interpolator_object
 
@@ -33,6 +33,7 @@ type :: solver_object
    real(R8P)                                 :: chimera_forcing=0._R8P        !< Chimera forcing coefficient.
    class(interpolator_object),   allocatable :: interpolator                  !< WENO interpolator.
    class(riemann_solver_object), allocatable :: riemann_solver                !< Riemann solver.
+   integer(I4P)                              :: gcu=0_I4P                     !< Number of ghost cells used (space accuracy).
    contains
       ! public methods
       procedure, pass(self) :: description    !< Return a pretty-formatted description of solver parameters.
@@ -43,7 +44,8 @@ type :: solver_object
       ! operators
       generic :: assignment(=) => solver_assign_solver !< Overload `=`.
       ! private methods
-      procedure, pass(lhs) :: solver_assign_solver !< Operator `=`.
+      procedure, pass(self) :: set_gcu              !< Set the number of ghost cells used.
+      procedure, pass(lhs)  :: solver_assign_solver !< Operator `=`.
 endtype solver_object
 
 contains
@@ -124,6 +126,7 @@ contains
    if (.not.go_on_fail_) &
       call self%error%check(message='failed to load ['//INI_SECTION_NAME//'].(convective_operator)', is_severe=.not.go_on_fail_)
    if (self%error%status <= 0) self%convective_operator = trim(adjustl(buffer))
+   call self%set_gcu
 
    call fini%get(section_name=INI_SECTION_NAME,    &
                  option_name='diffusive_operator', &
@@ -206,6 +209,37 @@ contains
    endsubroutine save_into_file
 
    ! private methods
+   pure subroutine set_gcu(self)
+   !< Set the number of ghost cells used.
+   class(solver_object), intent(inout) :: self   !< Solver object.
+   type(string)                        :: buffer !< Buffer string.
+
+   if (allocated(self%convective_operator)) then
+      buffer = trim(adjustl(self%convective_operator))
+      buffer = buffer%upper()
+      select case(buffer%chars())
+      case('WENO1')
+         self%gcu = 1
+      case('WENO3')
+         self%gcu = 2
+      case('WENO5')
+         self%gcu = 3
+      case('WENO7')
+         self%gcu = 4
+      case('WENO9')
+         self%gcu = 5
+      case('WENO11')
+         self%gcu = 6
+      case('WENO13')
+         self%gcu = 7
+      case('WENO15')
+         self%gcu = 8
+      case('WENO17')
+         self%gcu = 9
+      endselect
+   endif
+   endsubroutine set_gcu
+
    pure subroutine solver_assign_solver(lhs, rhs)
    !< Operator `=`.
    class(solver_object), intent(inout) :: lhs !< Left hand side.
@@ -220,5 +254,6 @@ contains
                                            lhs%residuals_tolerance    = rhs%residuals_tolerance
                                            lhs%pseudo_compressibility = rhs%pseudo_compressibility
                                            lhs%chimera_forcing        = rhs%chimera_forcing
+                                           lhs%gcu                    = rhs%gcu
    endsubroutine solver_assign_solver
 endmodule off_solver_object

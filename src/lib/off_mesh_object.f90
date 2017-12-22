@@ -32,6 +32,7 @@ type :: mesh_object
    contains
       ! public methods
       procedure, pass(self) :: allocate_blocks            !< Allocate blocks accordingly to grid dimensions.
+      procedure, pass(self) :: compute_residuals          !< Compute residuals.
       procedure, pass(self) :: conservative_to_primitive  !< Convert conservative variables to primitive ones.
       procedure, pass(self) :: description                !< Return a pretty-formatted description of the mesh.
       procedure, pass(self) :: destroy                    !< Destroy mesh.
@@ -60,6 +61,17 @@ contains
       enddo
    endif
    endsubroutine allocate_blocks
+
+   subroutine compute_residuals(self, gcu)
+   !< Compute residuals.
+   class(mesh_object), intent(inout) :: self !< Mesh.
+   integer(I4P),       intent(in)    :: gcu  !< Number of ghost cells used (depend on space accuracy).
+   integer(I4P)                      :: b    !< Counter.
+
+   do b=1, self%grid_dimensions%blocks_number
+      call self%blocks(b)%compute_residuals(gcu=gcu)
+   enddo
+   endsubroutine compute_residuals
 
    elemental subroutine conservative_to_primitive(self)
    !< Convert conservative variables to primitive one.

@@ -78,10 +78,8 @@ type, extends(integrand_object) :: simulation_object
       procedure, pass(opr)  :: integrand_subtract_integrand_fast   !< `-` fast operator.
 
       ! private methods
-      procedure, pass(self), private :: cli_initialize             !< Initialize Command Line Interface.
-      procedure, pass(self), private :: compute_dt                 !< Compute the current time step by means of CFL condition.
-      procedure, pass(self), private :: conservative_to_primitive  !< Convert conservative variables to primitive ones.
-      procedure, pass(self), private :: impose_boundary_conditions !< Impose boundary conditions.
+      procedure, pass(self), private :: cli_initialize    !< Initialize Command Line Interface.
+      procedure, pass(self), private :: compute_dt        !< Compute the current time step by means of CFL condition.
 endtype simulation_object
 
 contains
@@ -375,7 +373,10 @@ contains
    class(simulation_object), intent(inout)        :: self !< Integrand.
    real(R8P),                intent(in), optional :: t    !< Time.
 
-   ! error time derivate fast to be implemented
+   call self%mesh%conservative_to_primitive
+   call self%mesh%impose_boundary_conditions
+   call self%compute_dt
+   call self%mesh%compute_residuals(gcu=self%solver%gcu)
    endsubroutine t_fast
 
    ! +
@@ -475,22 +476,9 @@ contains
 
    self%time%dt = MaxR8P
    do b=1, self%mesh%grid_dimensions%blocks_number
+      call self%mesh%blocks(b)%compute_dt(CFL=self%time%CFL)
       self%time%dt = min(self%time%dt, minval(self%mesh%blocks(b)%cell%dt))
    enddo
    call self%time%update_dt
    endsubroutine compute_dt
-
-   elemental subroutine conservative_to_primitive(self)
-   !< Convert conservative variables to primitive one.
-   class(simulation_object), intent(inout) :: self !< Simulation data.
-
-   call self%conservative_to_primitive
-   endsubroutine conservative_to_primitive
-
-   subroutine impose_boundary_conditions(self)
-   !< Impose boundary conditions on all blocks of the mesh.
-   class(simulation_object), intent(inout) :: self !< Simulation data.
-
-   call self%mesh%impose_boundary_conditions
-   endsubroutine impose_boundary_conditions
 endmodule off_simulation_object

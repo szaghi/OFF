@@ -122,6 +122,7 @@ type :: block_object
       procedure, pass(self) :: cells_number              !< Return the number of cells.
       procedure, pass(self) :: compute_space_operator    !< Compute space operator.
       procedure, pass(self) :: compute_dt                !< Compute the current time step by means of CFL condition.
+      procedure, pass(self) :: compute_residuals         !< Compute residuals.
       procedure, pass(self) :: conservative_to_primitive !< Convert conservative variables to primitive ones.
       procedure, pass(self) :: create_linspace           !< Create a Cartesian block with linearly spaced nodes.
       procedure, pass(self) :: destroy                   !< Destroy block.
@@ -201,6 +202,134 @@ contains
       enddo
    endassociate
    endsubroutine compute_dt
+
+   subroutine compute_residuals(self, gcu)
+   !< Compute residuals.
+   class(block_object), intent(inout)           :: self                !< Block.
+   integer(I4P),        intent(in)              :: gcu                 !< Number of ghost cells used (depend on space accuracy).
+   type(conservative_compressible), allocatable :: fluxes_con_i(:,:,:) !< Convective fluxes along i-direction.
+   type(conservative_compressible), allocatable :: fluxes_con_j(:,:,:) !< Convective fluxes along j-direction.
+   type(conservative_compressible), allocatable :: fluxes_con_k(:,:,:) !< Convective fluxes along k-direction.
+   type(conservative_compressible), allocatable :: fluxes_dif_i(:,:,:) !< Diffusive  fluxes along i-direction.
+   type(conservative_compressible), allocatable :: fluxes_dif_j(:,:,:) !< Diffusive  fluxes along j-direction.
+   type(conservative_compressible), allocatable :: fluxes_dif_k(:,:,:) !< Diffusive  fluxes along k-direction.
+   integer(I4P)                                 :: i, j, k             !< Counter.
+
+   associate(gc=>self%signature%gc, Ni=>self%signature%Ni, Nj=>self%signature%Nj, Nk=>self%signature%Nk)
+      allocate(fluxes_con_i(0:Ni,1:Nj,1:Nk))
+      allocate(fluxes_con_j(1:Ni,0:Nj,1:Nk))
+      allocate(fluxes_con_k(1:Ni,1:Nj,0:Nk))
+      ! allocate(fluxes_dif_i(0:Ni,1:Nj,1:Nk))
+      ! allocate(fluxes_dif_j(1:Ni,0:Nj,1:Nk))
+      ! allocate(fluxes_dif_k(1:Ni,1:Nj,0:Nk))
+      do k=1,Nk
+         do j=1,Nj
+            call compute_fluxes_convective(gc     = min(gcu, gc(1), gc(2)),           &
+                                           N      = Ni,                               &
+                                           faces  = self%face_i (0-gcu:Ni+gcu, j, k), &
+                                           cells  = self%cell   (1-gcu:Ni+gcu, j, k), &
+                                           fluxes = fluxes_con_i(    0:Ni    , j, k))
+         enddo
+      enddo
+      do k=1,Nk
+         do i=1,Ni
+            call compute_fluxes_convective(gc     = min(gcu, gc(3), gc(4)),           &
+                                           N      = Nj,                               &
+                                           faces  = self%face_j (i, 0-gcu:Nj+gcu, k), &
+                                           cells  = self%cell   (i, 1-gcu:Nj+gcu, k), &
+                                           fluxes = fluxes_con_j(i,     0:Nj    , k))
+         enddo
+      enddo
+      do j=1,Nj
+         do i=1,Ni
+            call compute_fluxes_convective(gc     = min(gcu, gc(5), gc(6)),           &
+                                           N      = Nk,                               &
+                                           faces  = self%face_k (i, j, 0-gcu:Nk+gcu), &
+                                           cells  = self%cell   (i, j, 1-gcu:Nk+gcu), &
+                                           fluxes = fluxes_con_k(i, j,     0:Nk    ))
+         enddo
+      enddo
+   endassociate
+   contains
+      subroutine compute_fluxes_convective(gc, N, faces, cells, fluxes)
+      integer(I4P),                    intent(in)    :: gc           !< Number of ghost cells used.
+      integer(I4P),                    intent(in)    :: N            !< Number of cells.
+      type(face_object),               intent(in)    :: faces(0-gc:) !< Faces data [0-gc:N+gc].
+      type(cell_object),               intent(in)    :: cells(1-gc:) !< Cells data [1-gc:N+gc].
+      type(conservative_compressible), intent(inout) :: fluxes(0:)   !< Convective fluxes of 3D conservative variables [0:N].
+      type(conservative_compressible), allocatable   :: UR(:,:)      !< Reconstructed conservative variables.
+      endsubroutine compute_fluxes_convective
+
+      subroutine reconstruct_interfaces_characteristic(gc, N, U, normal, UR)
+      !< Reconstruct interfaces states.
+      !<
+      !< The reconstruction is done in pseudo characteristic variables.
+      integer(I4P),                    intent(in)    :: gc                      !< Number of ghost cells used.
+      integer(I4P),                    intent(in)    :: N                       !< Number of cells.
+      type(conservative_compressible), intent(in)    :: U(1-gc:)                !< Conservative variables.
+      type(vector),                    intent(in)    :: normal(0:)              !< Face normals.
+      type(conservative_compressible), intent(inout) :: UR(1:, 0:)              !< Reconstructed conservative vars.
+      type(primitive_compressible)                   :: P(1-gc:N+gc)            !< Primitive variables.
+      type(primitive_compressible)                   :: PR(1:2, 0:N+1)          !< Reconstructed primitive variables.
+      type(primitive_compressible)                   :: Pm(1:2)                 !< Mean of primitive variables.
+      real(R8P)                                      :: LPm(1:3, 1:3, 1:2)      !< Mean left eigenvectors matrix.
+      real(R8P)                                      :: RPm(1:3, 1:3, 1:2)      !< Mean right eigenvectors matrix.
+      real(R8P)                                      :: C(1:2, 1-gc:-1+gc, 1:3) !< Pseudo characteristic variables.
+      real(R8P)                                      :: CR(1:2, 1:3)            !< Pseudo characteristic reconst.
+      real(R8P)                                      :: buffer(1:3)             !< Dummy buffer.
+      type(vector)                                   :: tangential              !< Tangential component of velocity.
+      integer(I4P)                                   :: i, j, f, v              !< Counter.
+
+      select case(gc)
+      case(1) ! 1st order piecewise constant reconstruction
+         do i=0, N+1
+            UR(1, i) = U(i)
+            UR(2, i) = UR(1, i)
+         enddo
+      case default ! 3rd-17th order WENO reconstruction
+         do i=1-gc, N+gc
+            P(i) = conservative_to_primitive_compressible(conservative=U(i), eos=self%eos)
+         enddo
+         do i=0, N+1
+            ! compute pseudo characteristic variables
+            do f=1, 2
+               Pm(f) = 0.5_R8P * (P(i+f-2) + P(i+f-1))
+            enddo
+            do f=1, 2
+               LPm(:, :, f) = Pm(f)%left_eigenvectors(eos=self%eos)
+               RPm(:, :, f) = Pm(f)%right_eigenvectors(eos=self%eos)
+            enddo
+            do j=i+1-gc, i-1+gc
+               do f=1, 2
+                  do v=1, 3
+                     C(f, j-i, v) = dot_product(LPm(v, :, f), [P(j)%density,                      &
+                                                               P(j)%velocity .dot. normal(i+f-1), &
+                                                               P(j)%pressure])
+                  enddo
+               enddo
+            enddo
+            ! compute WENO reconstruction of pseudo charteristic variables
+            ! do v=1, 3
+            !    call self%interpolator%interpolate(stencil=C(:, :, v), interpolation=CR(:, v))
+            ! enddo
+            ! trasform back reconstructed pseudo charteristic variables to primitive ones
+            do f=1, 2
+               tangential = P(i)%velocity - (P(i)%velocity .paral. normal(i+f-1))
+               do v=1, 3
+                  buffer(v) = dot_product(RPm(v, :, f), CR(f, :))
+               enddo
+               PR(f, i)%density  = buffer(1)
+               PR(f, i)%velocity = buffer(2) * normal(i+f-1) + tangential
+               PR(f, i)%pressure = buffer(3)
+            enddo
+         enddo
+         do i=0, N+1
+            UR(1, i) = primitive_to_conservative_compressible(primitive=PR(1, i), eos=self%eos)
+            UR(2, i) = primitive_to_conservative_compressible(primitive=PR(2, i), eos=self%eos)
+         enddo
+      endselect
+      endsubroutine reconstruct_interfaces_characteristic
+   endsubroutine compute_residuals
 
    subroutine compute_space_operator(self)!, space_operator)
    !< Compute space operator.

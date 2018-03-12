@@ -31,7 +31,7 @@ call simulation%mesh%save_grid_into_file(file_name=trim(adjustl(file_name)), met
 ! re-load for checking
 call simulation%initialize
 
-call simulation%mesh%load_grid_from_file(file_name=trim(adjustl(file_name)))
+! call simulation%mesh%load_grid_from_file(file_name=trim(adjustl(file_name)))
 
 are_tests_passed(1) = simulation%mesh%blocks(2)%cells_number(with_ghosts=.false.) == 16_I4P * 32_I4P * 64_I4P
 

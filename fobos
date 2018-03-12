@@ -1,6 +1,6 @@
 [modes]
-modes = gnu gnu-debug
-        intel intel-debug
+modes = gnu gnu-debug gnu-impure gnu-debug-impure
+        intel intel-debug intel-impure intel-debug-impure
 
 [common-variables]
 $CSHARED_GNU = -c -fPIC -frealloc-lhs
@@ -8,8 +8,8 @@ $CSHARED_INT = -c -fpic -assume realloc_lhs
 $LSHARED     = -shared
 $CSTATIC_GNU = -c -frealloc-lhs
 $CSTATIC_INT = -c -assume realloc_lhs
-$DEBUG_GNU   = -O0 -g3 -Warray-bounds -Wcharacter-truncation -Wline-truncation -Wimplicit-interface -Wimplicit-procedure -Wunderflow -fmodule-private -ffree-line-length-132 -fimplicit-none -fbacktrace -fdump-core -finit-real=nan -std=f2008 -fall-intrinsics
-$DEBUG_INT   = -O0 -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit -debug all -warn all -extend-source 132 -traceback
+$DEBUG_GNU   = -DDEBUG -O0 -g3 -Warray-bounds -Wcharacter-truncation -Wline-truncation -Wimplicit-interface -Wimplicit-procedure -Wunderflow -fmodule-private -ffree-line-length-132 -fimplicit-none -fbacktrace -fdump-core -finit-real=nan -std=f2008 -fall-intrinsics
+$DEBUG_INT   = -DDEBUG -O0 -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit -debug all -warn all -extend-source 132 -traceback
 $OPTIMIZE    = -O2
 $EXDIRS      = BeFoR64/src/third_party/ BeFoR64/src/tests/
                FACE/src/third_party/ FACE/src/tests/
@@ -37,6 +37,16 @@ help      = Build OFF by means of GNU gfortran, debug mode
 template  = template-static-gnu-debug
 build_dir = ./exe/
 
+[gnu-impure]
+help      = Build OFF by means of GNU gfortran, release mode
+template  = template-static-gnu-impure
+build_dir = ./exe/
+
+[gnu-debug-impure]
+help      = Build OFF by means of GNU gfortran, debug mode
+template  = template-static-gnu-debug-impure
+build_dir = ./exe/
+
 [intel]
 help      = Build OFF by means of Intel ifort, release mode
 template  = template-static-intel
@@ -45,6 +55,16 @@ build_dir = ./exe/
 [intel-debug]
 help      = Build OFF by means of Intel ifort, debug mode
 template  = template-static-intel-debug
+build_dir = ./exe/
+
+[intel-impure]
+help      = Build OFF by means of Intel ifort, release mode
+template  = template-static-intel-impure
+build_dir = ./exe/
+
+[intel-debug-impure]
+help      = Build OFF by means of Intel ifort, debug mode
+template  = template-static-intel-debug-impure
 build_dir = ./exe/
 
 #templates
@@ -78,6 +98,38 @@ quiet        = False
 log          = True
 jobs         = 2
 
+[template-static-gnu-impure]
+preproc      = -D_IMPURE_
+compiler     = gnu
+cflags       = $CSTATIC_GNU $OPTIMIZE
+lflags       = $OPTIMIZE
+ext_libs     = stdc++ CGAL boost_system
+libs         = libs/cc_cgal_polyhedra.o
+exclude_dirs = $EXDIRS
+mod_dir      = ./mod/
+obj_dir      = ./obj/
+src          = ./src/
+colors       = True
+quiet        = False
+log          = True
+jobs         = 2
+
+[template-static-gnu-debug-impure]
+preproc      = -D_IMPURE_
+compiler     = gnu
+cflags       = $CSTATIC_GNU $DEBUG_GNU
+lflags       = $DEBUG_GNU
+ext_libs     = stdc++ CGAL boost_system
+libs         = libs/cc_cgal_polyhedra.o
+exclude_dirs = $EXDIRS
+mod_dir      = ./mod/
+obj_dir      = ./obj/
+src          = ./src/
+colors       = True
+quiet        = False
+log          = True
+jobs         = 2
+
 [template-static-intel]
 compiler     = intel
 cflags       = $CSTATIC_INT $OPTIMIZE
@@ -94,6 +146,38 @@ log          = True
 jobs         = 2
 
 [template-static-intel-debug]
+compiler     = intel
+cflags       = $CSTATIC_INT $DEBUG_INT
+lflags       = $DEBUG_INT
+ext_libs     = stdc++ CGAL boost_system
+libs         = libs/cc_cgal_polyhedra.o
+exclude_dirs = $EXDIRS
+mod_dir      = ./mod/
+obj_dir      = ./obj/
+src          = ./src/
+colors       = True
+quiet        = False
+log          = True
+jobs         = 2
+
+[template-static-intel-impure]
+preproc      = -D_IMPURE_
+compiler     = intel
+cflags       = $CSTATIC_INT $OPTIMIZE
+lflags       = $OPTIMIZE
+ext_libs     = stdc++ CGAL boost_system
+libs         = libs/cc_cgal_polyhedra.o
+exclude_dirs = $EXDIRS
+mod_dir      = ./mod/
+obj_dir      = ./obj/
+src          = ./src/
+colors       = True
+quiet        = False
+log          = True
+jobs         = 2
+
+[template-static-intel-debug-impure]
+preproc      = -D_IMPURE_
 compiler     = intel
 cflags       = $CSTATIC_INT $DEBUG_INT
 lflags       = $DEBUG_INT

@@ -1,10 +1,13 @@
+#include "preprocessor_macros.h"
 !< OFF simulation object definition and implementation.
 
 module off_simulation_object
 !< OFF simulation object definition and implementation.
 
-use, intrinsic :: iso_fortran_env, only : stderr=>error_unit
+use, intrinsic :: iso_fortran_env, only : stderr=>error_unit, stdout=>output_unit
 use off_error_object, only : error_object
+use off_file_grid_object, only : file_grid_object
+use off_file_solution_object, only : file_solution_object
 use off_free_conditions_object, only : free_conditions_object
 use off_mesh_object, only : mesh_object
 use off_non_dimensional_numbers_object, only : non_dimensional_numbers_object
@@ -14,7 +17,7 @@ use off_time_object, only : time_object
 use finer, only : file_ini
 use flap, only : command_line_interface
 use flow, only : eos_compressible
-use foodie, only : integrand_object
+use foodie, only : integrand_object, integrator_multistage_object
 use penf, only : I4P, MaxR8P, R8P, str
 
 implicit none
@@ -29,6 +32,8 @@ type, extends(integrand_object) :: simulation_object
    type(command_line_interface)         :: cli                       !< Command line interface.
    type(os_object)                      :: os                        !< Running Operating System.
    type(file_ini)                       :: file_parameters           !< Simulation parameters file handler.
+   type(file_grid_object)               :: file_grid_input           !< Grid file (input) handler.
+   type(file_solution_object)           :: file_solution             !< Grid file handler.
    type(non_dimensional_numbers_object) :: adimensionals             !< Non dimensional numbers.
    type(free_conditions_object)         :: free_conditions           !< Free stream conditions.
    type(eos_compressible)               :: eos                       !< Equation of state.
@@ -78,8 +83,8 @@ type, extends(integrand_object) :: simulation_object
       procedure, pass(opr)  :: integrand_subtract_integrand_fast   !< `-` fast operator.
 
       ! private methods
-      procedure, pass(self), private :: cli_initialize    !< Initialize Command Line Interface.
-      procedure, pass(self), private :: compute_dt        !< Compute the current time step by means of CFL condition.
+      procedure, pass(self), private :: cli_initialize !< Initialize Command Line Interface.
+      procedure, pass(self), private :: compute_dt     !< Compute the current time step by means of CFL condition.
 endtype simulation_object
 
 contains
@@ -94,6 +99,10 @@ contains
 
    prefix_ = '' ; if (present(prefix)) prefix_ = prefix
    desc = ''
+   desc = desc//prefix_//'Grid file (input)'//NL
+   desc = desc//prefix_//self%file_grid_input%description(prefix=prefix_//'  ')//NL
+   desc = desc//prefix_//'Solution file'//NL
+   desc = desc//prefix_//self%file_solution%description(prefix=prefix_//'  ')//NL
    desc = desc//prefix_//'Non dimensional numbers:'//NL
    desc = desc//prefix_//self%adimensionals%description(prefix=prefix_//'  ')//NL
    desc = desc//prefix_//'Free stream conditions:'//NL
@@ -108,7 +117,7 @@ contains
    desc = desc//prefix_//self%mesh%description(prefix=prefix_//'  ')
    endfunction description
 
-   elemental subroutine destroy(self)
+   _ELEMENTAL_ subroutine destroy(self)
    !< Destroy simulation data.
    class(simulation_object), intent(inout) :: self !< Simulation data.
 
@@ -116,6 +125,8 @@ contains
    call self%cli%free
    call self%os%destroy
    call self%file_parameters%free
+   call self%file_grid_input%destroy
+   call self%file_solution%destroy
    call self%adimensionals%destroy
    call self%free_conditions%destroy
    call self%eos%destroy
@@ -141,12 +152,20 @@ contains
       write(stderr, '(A)') 'Using default simulation parameters values'
       return
    endif
-   call self%mesh%file_grid%load_file_name_from_file(fini=self%file_parameters, &
-                                                     section_name='files', option_name='grid', go_on_fail=self%go_on_fail)
+   call self%file_grid_input%load_file_name_from_file(fini=self%file_parameters, &
+                                                      section_name='files', option_name='grid', go_on_fail=self%go_on_fail)
+   call self%file_grid_input%load_is_parametric_from_file(fini=self%file_parameters,                                   &
+                                                          section_name='files', option_name='is_grid_file_parametric', &
+                                                          go_on_fail=self%go_on_fail)
+   call self%file_solution%load_file_name_from_file(fini=self%file_parameters, section_name='files', &
+                                                    option_name='initial_conditions', go_on_fail=self%go_on_fail)
+   call self%file_solution%load_is_parametric_from_file(fini=self%file_parameters,                                 &
+                                                        section_name='files', option_name='is_ic_file_parametric', &
+                                                        go_on_fail=self%go_on_fail)
    call self%adimensionals%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
    call self%free_conditions%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
    call self%eos%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
-   call self%solver%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
+   call self%solver%load_from_file(fini=self%file_parameters, integrand_0=self, go_on_fail=self%go_on_fail)
    call self%time%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
    endsubroutine load_file_parameters
 
@@ -163,6 +182,7 @@ contains
    type(time_object),                    intent(in), optional :: time            !< Time data.
 
    call self%destroy
+
    call self%error%initialize
    call self%cli_initialize
    call self%os%initialize(os=os)
@@ -170,18 +190,34 @@ contains
    call self%adimensionals%initialize(adimensionals=adimensionals)
    call self%free_conditions%initialize(free_conditions=free_conditions)
    call self%eos%initialize(eos=eos)
-   call self%mesh%initialize(mesh=mesh)
    call self%solver%initialize(solver=solver)
    call self%time%initialize(time=time)
+
+   call self%load_file_parameters
+
+   call self%mesh%initialize(eos=self%eos, mesh=mesh, file_grid=self%file_grid_input, file_ic=self%file_solution)
    endsubroutine initialize
 
    subroutine integrate(self)
    !< Integrate the equations.
-   !<
-   !< @TODO Implement this.
    class(simulation_object), intent(inout) :: self !< Simulation data.
 
-   error stop 'error: simulation_object%integrate to be implemented'
+   temporal_loop: do
+      call self%compute_dt
+      call self%time%update_dt
+      associate(integrator=>self%solver%integrator)
+         select type(integrator)
+         class is(integrator_multistage_object)
+            call integrator%integrate_fast(U=self, Dt=self%time%dt, t=self%time%t)
+         endselect
+      endassociate
+      write(stdout, '(A)')
+      write(stdout, '(A)') self%time%eta()
+      call self%time%update_n
+      call self%time%update_t
+      ! saving the actual solution
+      if (self%time%is_the_end()) exit temporal_loop
+   enddo temporal_loop
    endsubroutine integrate
 
    subroutine parse_command_line_interface(self)
@@ -348,13 +384,28 @@ contains
    endfunction real_sub_integrand
 
    ! =
-   pure subroutine assign_integrand(lhs, rhs)
+   _PURE_ subroutine assign_integrand(lhs, rhs)
    !< `=` operator.
    class(simulation_object), intent(inout) :: lhs !< Left hand side.
    class(integrand_object),  intent(in)    :: rhs !< Right hand side.
 
    select type(rhs)
    class is(simulation_object)
+      lhs%error             = rhs%error
+      lhs%cli               = rhs%cli
+      lhs%os                = rhs%os
+      lhs%file_parameters   = rhs%file_parameters
+      lhs%file_grid_input   = rhs%file_grid_input
+      lhs%file_solution     = rhs%file_solution
+      lhs%adimensionals     = rhs%adimensionals
+      lhs%free_conditions   = rhs%free_conditions
+      lhs%eos               = rhs%eos
+      lhs%solver            = rhs%solver
+      lhs%time              = rhs%time
+      lhs%mesh              = rhs%mesh
+      lhs%is_cli_parsed     = rhs%is_cli_parsed
+      lhs%is_output_verbose = rhs%is_output_verbose
+      lhs%go_on_fail        = rhs%go_on_fail
    endselect
    endsubroutine assign_integrand
 
@@ -367,16 +418,16 @@ contains
    endsubroutine assign_real
 
    ! fast operators
-   ! time derivative
    subroutine t_fast(self, t)
    !< Time derivative function of integrand class, i.e. the residuals function. Fast mode acting directly on self.
    class(simulation_object), intent(inout)        :: self !< Integrand.
    real(R8P),                intent(in), optional :: t    !< Time.
 
+   ! TODO impose boundary conditions in conservative variables to reduce unnecessary computations
    call self%mesh%conservative_to_primitive
    call self%mesh%impose_boundary_conditions
-   call self%compute_dt
-   call self%mesh%compute_residuals(gcu=self%solver%gcu)
+   call self%mesh%primitive_to_conservative
+   call self%mesh%compute_residuals(solver=self%solver, gcu=self%solver%gcu)
    endsubroutine t_fast
 
    ! +
@@ -386,7 +437,13 @@ contains
    class(integrand_object),  intent(in)    :: lhs !< Left hand side.
    class(integrand_object),  intent(in)    :: rhs !< Right hand side.
 
-   ! error add operator fast to be implemented
+   select type(lhs)
+   type is(simulation_object)
+      select type(rhs)
+      type is(simulation_object)
+         call opr%mesh%conservative_add_conservatives_fast(lhs=lhs%mesh, rhs=rhs%mesh)
+      endselect
+   endselect
    endsubroutine integrand_add_integrand_fast
 
    ! *
@@ -396,7 +453,13 @@ contains
    class(integrand_object),  intent(in)    :: lhs !< Left hand side.
    class(integrand_object),  intent(in)    :: rhs !< Right hand side.
 
-   ! error multiply operator fast to be implemented
+   select type(lhs)
+   type is(simulation_object)
+      select type(rhs)
+      type is(simulation_object)
+         call opr%mesh%conservative_multiply_conservatives_fast(lhs=lhs%mesh, rhs=rhs%mesh)
+      endselect
+   endselect
    endsubroutine integrand_multiply_integrand_fast
 
    pure subroutine integrand_multiply_real_scalar_fast(opr, lhs, rhs)
@@ -405,7 +468,10 @@ contains
    class(integrand_object),  intent(in)    :: lhs !< Left hand side.
    real(R8P),                intent(in)    :: rhs !< Right hand side.
 
-   ! error multiply operator fast to be implemented
+   select type(lhs)
+   type is(simulation_object)
+      call opr%mesh%conservative_multiply_real_scalar_fast(lhs=lhs%mesh, rhs=rhs)
+   endselect
    endsubroutine integrand_multiply_real_scalar_fast
 
    ! -
@@ -415,7 +481,13 @@ contains
    class(integrand_object),  intent(in)    :: lhs !< Left hand side.
    class(integrand_object),  intent(in)    :: rhs !< Right hand side.
 
-   ! error subtract operator fast to be implemented
+   select type(lhs)
+   type is(simulation_object)
+      select type(rhs)
+      type is(simulation_object)
+         call opr%mesh%conservative_subtract_conservatives_fast(lhs=lhs%mesh, rhs=rhs%mesh)
+      endselect
+   endselect
    endsubroutine integrand_subtract_integrand_fast
 
    ! private methods
@@ -469,7 +541,7 @@ contains
    endassociate
    endsubroutine cli_initialize
 
-   pure subroutine compute_dt(self)
+   _PURE_ subroutine compute_dt(self)
    !< Compute the current time step by means of CFL condition.
    class(simulation_object), intent(inout) :: self !< Simulation data.
    integer(I4P)                            :: b    !< Counter.
@@ -477,7 +549,7 @@ contains
    self%time%dt = MaxR8P
    do b=1, self%mesh%grid_dimensions%blocks_number
       call self%mesh%blocks(b)%compute_dt(CFL=self%time%CFL)
-      self%time%dt = min(self%time%dt, minval(self%mesh%blocks(b)%cell%dt))
+      self%time%dt = min(self%time%dt, self%mesh%blocks(b)%dt_min())
    enddo
    call self%time%update_dt
    endsubroutine compute_dt

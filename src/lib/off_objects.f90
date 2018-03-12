@@ -13,7 +13,6 @@ use off_error_object, only : error_object
 use off_face_object, only : face_object
 use off_file_object, only : file_object
 use off_file_grid_object, only : file_grid_object
-use off_file_parametric_grid_object, only : file_parametric_grid_object
 use off_files_collection_object, only : files_collection_object
 use off_free_conditions_object, only : free_conditions_object
 use off_grid_dimensions_object, only : grid_dimensions_object
@@ -35,7 +34,6 @@ public :: error_object
 public :: face_object
 public :: file_object
 public :: file_grid_object
-public :: file_parametric_grid_object
 public :: files_collection_object
 public :: free_conditions_object
 public :: grid_dimensions_object

@@ -29,6 +29,7 @@ type :: time_object
       ! public methods
       procedure, pass(self) :: description    !< Return a pretty-formatted description of time parameters.
       procedure, pass(self) :: destroy        !< Destroy time.
+      procedure, pass(self) :: eta            !< Return ETA-related informations string.
       procedure, pass(self) :: initialize     !< Initialize time.
       procedure, pass(self) :: is_the_end     !< Return true if the end of simulation is reached.
       procedure, pass(self) :: progress       !< Return the progress of simulation.
@@ -36,6 +37,7 @@ type :: time_object
       procedure, pass(self) :: save_into_file !< Save into file.
       procedure, pass(self) :: set_stop       !< Set simulation stop condition.
       procedure, pass(self) :: update_dt      !< Update time step for the last iterate.
+      procedure, pass(self) :: update_n       !< Update time step counter.
       procedure, pass(self) :: update_t       !< Update time.
       ! operators
       generic :: assignment(=) => time_assign_time !< Overload `=`.
@@ -64,7 +66,7 @@ contains
    desc = desc//prefix_//'t     : '//trim(str(n=self%t))//NL
    desc = desc//prefix_//'n_max : '//trim(str(n=self%n_max))//NL
    desc = desc//prefix_//'t_max : '//trim(str(n=self%t_max))//NL
-   desc = desc//prefix_//'CFL   : '//trim(str(n=self%CFL))
+   desc = desc//prefix_//'CFL   : '//trim(str(n=self%CFL))//NL
    desc = desc//prefix_//'dt    : '//trim(str(n=self%dt))
    endfunction description
 
@@ -75,6 +77,22 @@ contains
 
    self = fresh
    endsubroutine destroy
+
+   pure function eta(self, prefix)
+   !< Return ETA-related informations string.
+   class(time_object), intent(in)           :: self             !< Time object.
+   character(*),       intent(in), optional :: prefix           !< Prefixing string.
+   character(len=:), allocatable            :: eta              !< ETA-realted informations string.
+   character(len=:), allocatable            :: prefix_          !< Prefixing string, local variable.
+   character(len=1), parameter              :: NL=new_line('a') !< New line character.
+
+   prefix_ = '' ; if (present(prefix)) prefix_ = prefix
+   eta = ''
+   eta = eta//prefix_//'n         : '//trim(str(n=self%n))//NL
+   eta = eta//prefix_//'t         : '//trim(str(n=self%t))//NL
+   eta = eta//prefix_//'dt        : '//trim(str(n=self%dt))//NL
+   eta = eta//prefix_//'progress %: '//trim(str(fm='(F7.2)', n=self%progress()))
+   endfunction eta
 
    elemental subroutine initialize(self, is_unsteady, n, t, n_max, t_max, CFL, dt, time)
    !< Initialize time.
@@ -104,7 +122,11 @@ contains
    class(time_object), intent(in) :: self !< Time object.
    logical                        :: yes  !< Test result.
 
-   yes = ((self%t==self%t_max).or.(self%n==self%n_max))
+   if (self%n_max <= 0) then
+      yes = (self%t>=self%t_max)
+   else
+      yes = (self%n==self%n_max)
+   endif
    endfunction is_the_end
 
    elemental function progress(self) result(prog)
@@ -190,6 +212,13 @@ contains
       endif
    endif
    endsubroutine update_dt
+
+   elemental subroutine update_n(self)
+   !< Update time step counter.
+   class(time_object), intent(inout) :: self !< Time object.
+
+   self%n = self%n + 1
+   endsubroutine update_n
 
    elemental subroutine update_t(self)
    !< Update time.

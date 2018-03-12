@@ -1,3 +1,4 @@
+#include "preprocessor_macros.h"
 !< OFF solver object definition and implementation.
 
 module off_solver_object
@@ -6,10 +7,11 @@ module off_solver_object
 use, intrinsic :: iso_fortran_env, only : stderr=>error_unit
 use off_error_object, only : error_object
 use finer, only : file_ini
+use foodie, only : foodie_integrator_factory, integrand_object, integrator_object
 use foreseer, only : riemann_solver_object, riemann_solver_compressible_hllc_id, foreseer_factory
 use penf, only : I4P, R8P, str
 use stringifor, only : string
-use wenoof, only : interpolator_object
+use wenoof, only : interpolator_object, wenoof_create
 
 implicit none
 private
@@ -31,6 +33,7 @@ type :: solver_object
    real(R8P)                                 :: residuals_tolerance=0._R8P    !< Tolerance on residuals value.
    real(R8P)                                 :: pseudo_compressibility=0._R8P !< Pseudo compressibility.
    real(R8P)                                 :: chimera_forcing=0._R8P        !< Chimera forcing coefficient.
+   class(integrator_object),     allocatable :: integrator                    !< Time integrator.
    class(interpolator_object),   allocatable :: interpolator                  !< WENO interpolator.
    class(riemann_solver_object), allocatable :: riemann_solver                !< Riemann solver.
    integer(I4P)                              :: gcu=0_I4P                     !< Number of ghost cells used (space accuracy).
@@ -44,8 +47,8 @@ type :: solver_object
       ! operators
       generic :: assignment(=) => solver_assign_solver !< Overload `=`.
       ! private methods
-      procedure, pass(self) :: set_gcu              !< Set the number of ghost cells used.
-      procedure, pass(lhs)  :: solver_assign_solver !< Operator `=`.
+      procedure, pass(self) :: set_convective_operator !< Set data of convective operator (interpolator).
+      procedure, pass(lhs)  :: solver_assign_solver    !< Operator `=`.
 endtype solver_object
 
 contains
@@ -60,18 +63,28 @@ contains
 
    prefix_ = '' ; if (present(prefix)) prefix_ = prefix
    desc = ''
-   if(allocated(self%time_integrator      )) desc=desc//prefix_//'time integrator       : '//self%time_integrator//NL
-   if(allocated(self%convective_operator  )) desc=desc//prefix_//'convective operator   : '//self%convective_operator//NL
+   if (allocated(self%integrator)) then
+      desc=desc//prefix_//'Time integrator:'//NL
+      desc=desc//self%integrator%description(prefix=prefix_//' ')//NL
+   endif
+   if (allocated(self%interpolator)) then
+      desc=desc//prefix_//'Space interpolator:'//NL
+      desc=desc//self%interpolator%description(prefix=prefix_//' ')//NL
+   endif
    if(allocated(self%diffusive_operator   )) desc=desc//prefix_//'diffusive operator    : '//self%diffusive_operator//NL
    if(allocated(self%turbulence_model     )) desc=desc//prefix_//'turbulence model      : '//self%turbulence_model//NL
-                                             desc=desc//prefix_//'Riemann solver        : '//self%riemann_solver_scheme%chars()//NL
+   if (allocated(self%riemann_solver)) then
+      desc=desc//prefix_//'Riemann solver:'//NL
+      desc=desc//self%riemann_solver%description(prefix=prefix_//' ')//NL
+   endif
+
    desc=desc//prefix_//'artificial viscosity  : '//trim(str(self%artificial_viscosity))//NL
    desc=desc//prefix_//'residuals tolerance   : '//trim(str(self%residuals_tolerance))//NL
    desc=desc//prefix_//'pseudo compressibility: '//trim(str(self%pseudo_compressibility))//NL
    desc=desc//prefix_//'chimera forcing       : '//trim(str(self%chimera_forcing))
    endfunction description
 
-   elemental subroutine destroy(self)
+   _ELEMENTAL_ subroutine destroy(self)
    !< Destroy solver.
    class(solver_object), intent(inout) :: self  !< Solver object.
    type(solver_object)                 :: fresh !< Fresh instance of solver object.
@@ -92,7 +105,7 @@ contains
    endif
    endsubroutine destroy
 
-   elemental subroutine initialize(self, solver)
+   _ELEMENTAL_ subroutine initialize(self, solver)
    !< Initialize solver.
    class(solver_object), intent(inout)        :: self   !< Solver object.
    type(solver_object),  intent(in), optional :: solver !< Solver object.
@@ -101,13 +114,14 @@ contains
    if (present(solver)) self = solver
    endsubroutine initialize
 
-   subroutine load_from_file(self, fini, go_on_fail)
+   subroutine load_from_file(self, fini, integrand_0, go_on_fail)
    !< Load from file.
-   class(solver_object), intent(inout)        :: self        !< Solver object.
-   type(file_ini),       intent(in)           :: fini        !< Simulation parameters ini file handler.
-   logical,              intent(in), optional :: go_on_fail  !< Go on if load fails.
-   logical                                    :: go_on_fail_ !< Go on if load fails, local variable.
-   character(999)                             :: buffer      !< Buffer string.
+   class(solver_object),    intent(inout)        :: self        !< Solver object.
+   type(file_ini),          intent(in)           :: fini        !< Simulation parameters ini file handler.
+   class(integrand_object), intent(in)           :: integrand_0 !< Initial conditions.
+   logical,                 intent(in), optional :: go_on_fail  !< Go on if load fails.
+   logical                                       :: go_on_fail_ !< Go on if load fails, local variable.
+   character(999)                                :: buffer      !< Buffer string.
 
    go_on_fail_ = .true. ; if (present(go_on_fail)) go_on_fail_ = go_on_fail
 
@@ -118,6 +132,8 @@ contains
    if (.not.go_on_fail_) &
       call self%error%check(message='failed to load ['//INI_SECTION_NAME//'].(time_integrator)', is_severe=.not.go_on_fail_)
    if (self%error%status <= 0) self%time_integrator = trim(adjustl(buffer))
+   call foodie_integrator_factory(scheme=self%time_integrator, integrator=self%integrator, stages=1, &
+                                  tolerance=1e2_R8P, iterations=1, autoupdate=.true., U=integrand_0)
 
    call fini%get(section_name=INI_SECTION_NAME,     &
                  option_name='convective_operator', &
@@ -126,7 +142,7 @@ contains
    if (.not.go_on_fail_) &
       call self%error%check(message='failed to load ['//INI_SECTION_NAME//'].(convective_operator)', is_severe=.not.go_on_fail_)
    if (self%error%status <= 0) self%convective_operator = trim(adjustl(buffer))
-   call self%set_gcu
+   call self%set_convective_operator
 
    call fini%get(section_name=INI_SECTION_NAME,    &
                  option_name='diffusive_operator', &
@@ -209,8 +225,8 @@ contains
    endsubroutine save_into_file
 
    ! private methods
-   pure subroutine set_gcu(self)
-   !< Set the number of ghost cells used.
+   subroutine set_convective_operator(self)
+   !< Set data of convective operator (interpolator).
    class(solver_object), intent(inout) :: self   !< Solver object.
    type(string)                        :: buffer !< Buffer string.
 
@@ -236,11 +252,16 @@ contains
          self%gcu = 8
       case('WENO17')
          self%gcu = 9
+      case default
+         ! error stop 'error: unknown convervective operator'
       endselect
+   else
+      self%gcu = 1
    endif
-   endsubroutine set_gcu
+   call wenoof_create(interpolator_type='reconstructor-JS', S=self%gcu, interpolator=self%interpolator)
+   endsubroutine set_convective_operator
 
-   pure subroutine solver_assign_solver(lhs, rhs)
+   _PURE_ subroutine solver_assign_solver(lhs, rhs)
    !< Operator `=`.
    class(solver_object), intent(inout) :: lhs !< Left hand side.
    type(solver_object),  intent(in)    :: rhs !< Right hand side.
@@ -250,10 +271,38 @@ contains
    if (allocated(rhs%convective_operator)) lhs%convective_operator    = rhs%convective_operator
    if (allocated(rhs%diffusive_operator))  lhs%diffusive_operator     = rhs%diffusive_operator
    if (allocated(rhs%turbulence_model))    lhs%turbulence_model       = rhs%turbulence_model
+                                           lhs%riemann_solver_scheme  = rhs%riemann_solver_scheme
                                            lhs%artificial_viscosity   = rhs%artificial_viscosity
                                            lhs%residuals_tolerance    = rhs%residuals_tolerance
                                            lhs%pseudo_compressibility = rhs%pseudo_compressibility
                                            lhs%chimera_forcing        = rhs%chimera_forcing
-                                           lhs%gcu                    = rhs%gcu
+   if (allocated(rhs%integrator)) then
+      if (.not.allocated(lhs%integrator)) then
+         allocate(lhs%integrator, mold=rhs%integrator)
+      elseif (.not.same_type_as(lhs%integrator, rhs%integrator)) then
+         deallocate(lhs%integrator)
+         allocate(lhs%integrator, mold=rhs%integrator)
+      endif
+      lhs%integrator = rhs%integrator
+   endif
+   if (allocated(rhs%interpolator)) then
+      if (.not.allocated(lhs%interpolator)) then
+         allocate(lhs%interpolator, mold=rhs%interpolator)
+      elseif (.not.same_type_as(lhs%interpolator, rhs%interpolator)) then
+         deallocate(lhs%interpolator)
+         allocate(lhs%interpolator, mold=rhs%interpolator)
+      endif
+      lhs%interpolator = rhs%interpolator
+   endif
+   if (allocated(rhs%riemann_solver)) then
+      if (.not.allocated(lhs%riemann_solver)) then
+         allocate(lhs%riemann_solver, mold=rhs%riemann_solver)
+      elseif (.not.same_type_as(lhs%riemann_solver, rhs%riemann_solver)) then
+         deallocate(lhs%riemann_solver)
+         allocate(lhs%riemann_solver, mold=rhs%riemann_solver)
+      endif
+      lhs%riemann_solver = rhs%riemann_solver
+   endif
+   lhs%gcu = rhs%gcu
    endsubroutine solver_assign_solver
 endmodule off_solver_object

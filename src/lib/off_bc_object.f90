@@ -106,16 +106,17 @@ contains
    str_code = trim(adjustl(code))
    str_code = str_code%upper()
    select case(str_code%chars())
-   case('FREE')
+   case('FRE', 'FREE')
       self%id = BC_FREE
-   case('WALL')
+   case('WAL', 'WALL')
       self%id = BC_WALL
-   case('PERIODIC')
+   case('PER', 'PERIODIC')
       self%id = BC_PERIODIC
-   case('EXTRAPOLATED')
+   case('EXT', 'EXTRAPOLATED')
       self%id = BC_EXTRAPOLATED
-   case('ADJACENT')
+   case('ADJ', 'ADJACENT')
       self%id = BC_ADJACENT
+      if (.not.allocated(self%adj)) allocate(self%adj(4))
    endselect
    if (present(adj)) self%adj = adj
    endsubroutine set_from_code

@@ -25,11 +25,11 @@ are_tests_passed = .false.
 
 call cli_parse
 allocate(mesh%blocks(1))
-call mesh%blocks(1)%initialize(id=1_I8P, level=1, gc=[0, 0, 0, 0, 0, 0], ni=64, nj=64, nk=32, &
+call mesh%blocks(1)%initialize(id=1_I8P, level=1, gc=[0, 0, 0, 0, 0, 0], ni=128, nj=128, nk=64, &
                                interfaces_number=size(file_name, dim=1))
-call mesh%blocks(1)%create_linspace(emin=(-100*ex-100*ey-50*ez), emax=(100*ex+100*ey+50*ez))
+call mesh%blocks(1)%create_linspace(emin=(-180*ex-82*ey-53*ez), emax=(0*ex+100*ey+87*ez))
 do f=1, size(file_name, dim=1)
-   call mesh%blocks(1)%immerge_off_geometry(file_name=trim(adjustl(file_name(f))), n=f, outside_reference=(100*ex+100*ey+60*ez))
+   call mesh%blocks(1)%immerge_off_geometry(file_name=trim(adjustl(file_name(f))), n=f, outside_reference=(1000*ex+1000*ey+100*ez))
 enddo
 call mesh%blocks(1)%update_level_set_distance
 call simulation%initialize(mesh=mesh)

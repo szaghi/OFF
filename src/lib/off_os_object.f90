@@ -161,11 +161,11 @@ contains
    type(os_object),  intent(in)    :: rhs !< Right hand side.
 
    lhs%error = rhs%error
-  if (allocated(rhs%path_separator))  lhs%path_separator  = rhs%path_separator
-  if (allocated(rhs%cp_dir_command))  lhs%cp_dir_command  = rhs%cp_dir_command
-  if (allocated(rhs%cp_file_command)) lhs%cp_file_command = rhs%cp_file_command
-  if (allocated(rhs%mkdir_command))   lhs%mkdir_command   = rhs%mkdir_command
-  if (allocated(rhs%rm_dir_command))  lhs%rm_dir_command  = rhs%rm_dir_command
-  if (allocated(rhs%rm_file_command)) lhs%rm_file_command = rhs%rm_file_command
+   if (allocated(rhs%path_separator))  lhs%path_separator  = rhs%path_separator
+   if (allocated(rhs%cp_dir_command))  lhs%cp_dir_command  = rhs%cp_dir_command
+   if (allocated(rhs%cp_file_command)) lhs%cp_file_command = rhs%cp_file_command
+   if (allocated(rhs%mkdir_command))   lhs%mkdir_command   = rhs%mkdir_command
+   if (allocated(rhs%rm_dir_command))  lhs%rm_dir_command  = rhs%rm_dir_command
+   if (allocated(rhs%rm_file_command)) lhs%rm_file_command = rhs%rm_file_command
    endsubroutine os_assign_os
 endmodule off_os_object

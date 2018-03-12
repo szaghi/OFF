@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<IBM_Blocks>
+  <Initial_Species>
+    <Specie s="1"><specie Gamma="1.6d0" R="2000.d0"/></Specie>
+    <Specie s="2"><specie Gamma="1.2d0" R="280.d0"/></Specie>
+  </Initial_Species>
+  <IBM_Blocks_Description>
+    <block b="1">
+      <dimensions gc="4 4 1 1 1 1" Ni="50" Nj="1" Nk="1"/>
+      <extents xmin="0.d0" ymin="0.d0" zmin="0.d0" xmax="0.5d0" ymax="1.d0" zmax="1.d0"/>
+      <boundaryconditions imin="EXT" imax="ADJ 2" jmin="EXT" jmax="EXT" kmin="EXT" kmax="EXT"/>
+      <primitives u="0.d0" v="0.d0" w="0.d0" p="1.d0" r="1.d0 0.d0"/>
+    </block>
+    <block b="2">
+      <dimensions gc="4 4 1 1 1 1" Ni="50" Nj="1" Nk="1"/>
+      <extents xmin="0.5d0" ymin="0.d0" zmin="0.d0" xmax="1.d0" ymax="1.d0" zmax="1.d0"/>
+      <boundaryconditions imin="ADJ 1" imax="EXT" jmin="EXT" jmax="EXT" kmin="EXT" kmax="EXT"/>
+      <primitives u="0.d0" v="0.d0" w="0.d0" p="0.1d0" r="0.d0 0.125d0"/>
+    </block>
+  </IBM_Blocks_Description>
+  <Regions>
+    <region r="1">
+      <shape tp="circular" center="0.d0" radius="0.1d0"/>
+      <primitives u="0.d0" v="0.d0" w="0.d0" p="0.1d0" r="0.d0 0.125d0"/>
+    </region>
+  </Regions>
+</IBM_Blocks>

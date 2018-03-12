@@ -1,0 +1,20 @@
+------------------------------------------------------------------------------------------------------------------------------------
+                                  OS TYPE
+'uix'                                                        OS_type     = Operating System, UIX or WIN
+                                  INPUT OPTIONS
+'./input/'                                                   Path_InPut  = input path
+'solver.dat'                                                 File_Solver = name of solver options file
+1                                                            Nl          = number of grid levels used
+'2DRP'                                                       File_Mesh   = basename of mesh file
+'2DRP'                                                       File_BC     = basename of boundary conditions file
+'2DRP'                                                       File_Init   = basename of initial conditions file
+                                  OUTPUT OPTIONS
+'output/'                                                    Path_OutPut   = output path
+'2DRP'                                                       Title_out     = title of output file
+'.sol'                                                       Extension_out = extension of output file
+50                                                           screen_out    = console refresh frequency
+1000                                                         sol_out       = actual solution output frequency
+5000                                                         restart_out   = restart output frequency
+200                                                          probe_out     = probes output frequency
+'prof'                                                       File_Prof     = prefix of profiling file names
+------------------------------------------------------------------------------------------------------------------------------------

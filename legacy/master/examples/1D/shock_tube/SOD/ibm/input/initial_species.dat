@@ -1,0 +1,29 @@
+-----------------------------------------------------------------------------------------------------------------------------------
+                                  INITIAL SPECIES
+1                                                            Nspecies = number of initial species
+
+0.d0                                                         gamma    = cp/cv  specific heats ratio
+0.d0                                                         R        = cp-cv  specific heats difference
+1040.004d0                                                   cp       = specific heats at costant p
+742.860d0                                                    cv       = specific heats at costant v
+
+1.1385d0                                                     gamma    = cp/cv  specific heats ratio
+285.0168d0                                                   R        = cp-cv  specific heats difference
+0.d0                                                         cp       = specific heats at costant p
+0.d0                                                         cv       = specific heats at costant v
+
+1.4d0                                                        gamma    = cp/cv  specific heats ratio
+0.d0                                                         R        = cp-cv  specific heats difference
+1008.d0                                                      cp       = specific heats at costant p
+0.d0                                                         cv       = specific heats at costant v
+
+1.4d0                                                        gamma    = cp/cv  specific heats ratio
+0.d0                                                         R        = cp-cv  specific heats difference
+0.d0                                                         cp       = specific heats at costant p
+720.d0                                                       cv       = specific heats at costant v
+
+0.d0                                                         gamma    = cp/cv  specific heats ratio
+295.d0                                                       R        = cp-cv  specific heats difference
+1008.d0                                                      cp       = specific heats at costant p
+0.d0                                                         cv       = specific heats at costant v
+-----------------------------------------------------------------------------------------------------------------------------------

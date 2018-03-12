@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<IBM_Blocks>
+  <Blocks_Cartesian>
+    <block ID="1">
+      <dimensions gc="4 4 1 1 1 1" Ni="50" Nj="1" Nk="1"/>
+      <extents xmin="0.d0" ymin="0.d0" zmin="0.d0" xmax="0.5d0" ymax="1.d0" zmax="1.d0"/>
+      <boundaryconditions imin="EXT" imax="ADJ 2" jmin="EXT" jmax="EXT" kmin="EXT" kmax="EXT"/>
+      <primitives u="0.d0" v="0.d0" w="0.d0" p="1.d0" r="1.d0"/>
+    </block>
+    <block ID="2">
+      <dimensions gc="4 4 1 1 1 1" Ni="50" Nj="1" Nk="1"/>
+      <extents xmin="0.5d0" ymin="0.d0" zmin="0.d0" xmax="1.d0" ymax="1.d0" zmax="1.d0"/>
+      <boundaryconditions imin="ADJ 1" imax="EXT" jmin="EXT" jmax="EXT" kmin="EXT" kmax="EXT"/>
+      <primitives u="0.d0" v="0.d0" w="0.d0" p="0.1d0" r="0.125d0"/>
+    </block>
+  </Blocks_Cartesian>
+</IBM_Blocks>

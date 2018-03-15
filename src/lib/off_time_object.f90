@@ -3,6 +3,7 @@
 module off_time_object
 !< OFF time object definition and implementation.
 
+use, intrinsic :: iso_fortran_env, only : stdout=>output_unit
 use off_error_object, only : error_object
 use finer, only : file_ini
 use penf, only : I8P, R8P, str
@@ -32,6 +33,7 @@ type :: time_object
       procedure, pass(self) :: eta            !< Return ETA-related informations string.
       procedure, pass(self) :: initialize     !< Initialize time.
       procedure, pass(self) :: is_the_end     !< Return true if the end of simulation is reached.
+      procedure, pass(self) :: print_eta      !< Print to stdout ETA-related informations.
       procedure, pass(self) :: progress       !< Return the progress of simulation.
       procedure, pass(self) :: load_from_file !< Load from file.
       procedure, pass(self) :: save_into_file !< Save into file.
@@ -128,6 +130,20 @@ contains
       yes = (self%n==self%n_max)
    endif
    endfunction is_the_end
+
+   subroutine  print_eta(self, prefix, frequency)
+   !< Print to stdout ETA-related informations.
+   class(time_object), intent(in)           :: self       !< Time object.
+   character(*),       intent(in), optional :: prefix     !< Prefixing string.
+   integer(I8P),       intent(in), optional :: frequency  !< Print frequency (on time steps).
+   integer(I8P)                                frequency_ !< Print frequency (on time steps), local variable.
+
+   frequency_ = 1 ; if (present(frequency)) frequency_ = frequency
+   if (mod(self%n, frequency) == 0) then
+      write(stdout, '(A)')
+      write(stdout, '(A)') self%eta(prefix=prefix)
+   endif
+   endsubroutine  print_eta
 
    elemental function progress(self) result(prog)
    !< Return the progress of simulation.

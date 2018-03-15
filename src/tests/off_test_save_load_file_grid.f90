@@ -26,7 +26,7 @@ call mesh%blocks(2)%create_linspace(emin=(1*ex), emax=(2*ex+ey+ez))
 
 call simulation%initialize(mesh=mesh)
 
-call simulation%mesh%save_grid_into_file(file_name=trim(adjustl(file_name)), metrics=.true., off=.true., vtk=.true.)
+call simulation%mesh%save_file_grid(file_name=trim(adjustl(file_name)), metrics=.true., off=.true., vtk=.true.)
 
 ! re-load for checking
 call simulation%initialize

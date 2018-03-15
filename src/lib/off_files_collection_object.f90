@@ -84,26 +84,26 @@ contains
   type(file_ini),                 intent(in)           :: fini       !< Simulation parameters ini file handler.
   logical,                        intent(in), optional :: go_on_fail !< Go on if load fails..
 
-  call self%boundary_conditions%load_file_name_from_file(fini=fini,                         &
-                                                         section_name=INI_SECTION_NAME,     &
-                                                         option_name='boundary_conditions', &
-                                                         go_on_fail=go_on_fail)
-  call self%grid%load_file_name_from_file(fini=fini,                     &
-                                          section_name=INI_SECTION_NAME, &
-                                          option_name='grid',            &
-                                          go_on_fail=go_on_fail)
-  call self%initial_conditions%load_file_name_from_file(fini=fini,                        &
-                                                        section_name=INI_SECTION_NAME,    &
-                                                        option_name='initial_conditions', &
-                                                        go_on_fail=go_on_fail)
-  call self%logging%load_file_name_from_file(fini=fini,                     &
-                                             section_name=INI_SECTION_NAME, &
-                                             option_name='log',             &
-                                             go_on_fail=go_on_fail)
-  call self%solution%load_file_name_from_file(fini=fini,                     &
-                                              section_name=INI_SECTION_NAME, &
-                                              option_name='solution',        &
-                                              go_on_fail=go_on_fail)
+  ! call self%boundary_conditions%load_file_name_from_file(fini=fini,                         &
+  !                                                        section_name=INI_SECTION_NAME,     &
+  !                                                        option_name='boundary_conditions', &
+  !                                                        go_on_fail=go_on_fail)
+  ! call self%grid%load_file_name_from_file(fini=fini,                     &
+  !                                         section_name=INI_SECTION_NAME, &
+  !                                         option_name='grid',            &
+  !                                         go_on_fail=go_on_fail)
+  ! call self%initial_conditions%load_file_name_from_file(fini=fini,                        &
+  !                                                       section_name=INI_SECTION_NAME,    &
+  !                                                       option_name='initial_conditions', &
+  !                                                       go_on_fail=go_on_fail)
+  ! call self%logging%load_file_name_from_file(fini=fini,                     &
+  !                                            section_name=INI_SECTION_NAME, &
+  !                                            option_name='log',             &
+  !                                            go_on_fail=go_on_fail)
+  ! call self%solution%load_file_name_from_file(fini=fini,                     &
+  !                                             section_name=INI_SECTION_NAME, &
+  !                                             option_name='solution',        &
+  !                                             go_on_fail=go_on_fail)
   endsubroutine load_from_file
 
   subroutine save_into_file(self, fini)

@@ -96,7 +96,7 @@ use flow, only : conservative_compressible, primitive_compressible,             
                  eos_compressible
 use foreseer, only : riemann_solver_object
 use penf, only : FR8P, FI4P, I1P, I4P, I8P, MaxR8P, R8P, str
-use vecfor, only : vector, ex, ey, ez
+use vecfor, only : vector, ex, ey, ez, sq_norm
 use vtk_fortran, only : vtk_file
 
 implicit none
@@ -226,50 +226,47 @@ contains
    type(conservative_compressible), allocatable :: fluxes_con_i(:,:,:) !< Convective fluxes along i-direction.
    type(conservative_compressible), allocatable :: fluxes_con_j(:,:,:) !< Convective fluxes along j-direction.
    type(conservative_compressible), allocatable :: fluxes_con_k(:,:,:) !< Convective fluxes along k-direction.
-   ! type(conservative_compressible), allocatable :: fluxes_dif_i(:,:,:) !< Diffusive  fluxes along i-direction.
-   ! type(conservative_compressible), allocatable :: fluxes_dif_j(:,:,:) !< Diffusive  fluxes along j-direction.
-   ! type(conservative_compressible), allocatable :: fluxes_dif_k(:,:,:) !< Diffusive  fluxes along k-direction.
-   integer(I4P)                                 :: i, j, k             !< Counter.
+   integer(I4P)                                 :: i, j, k, gcm        !< Counter.
 
    associate(gc=>self%signature%gc, Ni=>self%signature%Ni, Nj=>self%signature%Nj, Nk=>self%signature%Nk, &
              cell=>self%cell, face_i=>self%face_i, face_j=>self%face_j, face_k=>self%face_k)
       allocate(fluxes_con_i(0:Ni,1:Nj,1:Nk))
       allocate(fluxes_con_j(1:Ni,0:Nj,1:Nk))
       allocate(fluxes_con_k(1:Ni,1:Nj,0:Nk))
-      ! allocate(fluxes_dif_i(0:Ni,1:Nj,1:Nk))
-      ! allocate(fluxes_dif_j(1:Ni,0:Nj,1:Nk))
-      ! allocate(fluxes_dif_k(1:Ni,1:Nj,0:Nk))
+      gcm = min(gcu, gc(1), gc(2))
       do k=1, Nk
          do j=1, Nj
-            call compute_fluxes_convective(solver = solver,                   &
-                                           eos            = self%eos,                         &
-                                           gc             = min(gcu, gc(1), gc(2)),           &
-                                           N              = Ni,                               &
-                                           faces          = self%face_i (0-gcu:Ni+gcu, j, k), &
-                                           cells          = self%cell   (1-gcu:Ni+gcu, j, k), &
-                                           fluxes         = fluxes_con_i(    0:Ni    , j, k))
+            call compute_fluxes_convective(solver = solver,                           &
+                                           eos    = self%eos,                         &
+                                           gc     = gcm,                              &
+                                           N      = Ni,                               &
+                                           faces  = self%face_i (0-gcm:Ni+gcm, j, k), &
+                                           cells  = self%cell   (1-gcm:Ni+gcm, j, k), &
+                                           fluxes = fluxes_con_i(   0:Ni   , j, k))
          enddo
       enddo
+      gcm = min(gcu, gc(3), gc(4))
       do k=1, Nk
          do i=1, Ni
-            call compute_fluxes_convective(solver = solver,                   &
-                                           eos            = self%eos,                         &
-                                           gc             = min(gcu, gc(3), gc(4)),           &
-                                           N              = Nj,                               &
-                                           faces          = self%face_j (i, 0-gcu:Nj+gcu, k), &
-                                           cells          = self%cell   (i, 1-gcu:Nj+gcu, k), &
-                                           fluxes         = fluxes_con_j(i,     0:Nj    , k))
+            call compute_fluxes_convective(solver = solver,                           &
+                                           eos    = self%eos,                         &
+                                           gc     = gcm,                              &
+                                           N      = Nj,                               &
+                                           faces  = self%face_j (i, 0-gcm:Nj+gcm, k), &
+                                           cells  = self%cell   (i, 1-gcm:Nj+gcm, k), &
+                                           fluxes = fluxes_con_j(i,    0:Nj   , k))
          enddo
       enddo
+      gcm = min(gcu, gc(5), gc(6))
       do j=1, Nj
          do i=1, Ni
-            call compute_fluxes_convective(solver = solver,                   &
-                                           eos            = self%eos,                         &
-                                           gc             = min(gcu, gc(5), gc(6)),           &
-                                           N              = Nk,                               &
-                                           faces          = self%face_k (i, j, 0-gcu:Nk+gcu), &
-                                           cells          = self%cell   (i, j, 1-gcu:Nk+gcu), &
-                                           fluxes         = fluxes_con_k(i, j,     0:Nk    ))
+            call compute_fluxes_convective(solver = solver,                           &
+                                           eos    = self%eos,                         &
+                                           gc     = gcm,                              &
+                                           N      = Nk,                               &
+                                           faces  = self%face_k (i, j, 0-gcm:Nk+gcm), &
+                                           cells  = self%cell   (i, j, 1-gcm:Nk+gcm), &
+                                           fluxes = fluxes_con_k(i, j,    0:Nk   ))
          enddo
       enddo
       do k=1, Nk
@@ -1183,25 +1180,37 @@ contains
    ! private non TBP
    subroutine compute_fluxes_convective(solver, eos, gc, N, faces, cells, fluxes)
    !< Compute the conservative fluxes.
-   class(solver_object),            intent(in)    :: solver         !< Solver.
-   type(eos_compressible),          intent(in)    :: eos            !< EOS data.
-   integer(I4P),                    intent(in)    :: gc             !< Number of ghost cells used.
-   integer(I4P),                    intent(in)    :: N              !< Number of cells.
-   type(face_object),               intent(in)    :: faces(0-gc:)   !< Faces data [0-gc:N+gc].
-   type(cell_object),               intent(in)    :: cells(1-gc:)   !< Cells data [1-gc:N+gc].
-   type(conservative_compressible), intent(inout) :: fluxes(0:)     !< Convective fluxes of 3D conservative variables [0:N].
-   type(conservative_compressible), allocatable   :: UR(:,:)        !< Reconstructed conservative variables.
-   integer(I4P)                                   :: i              !< Counter.
+   class(solver_object),            intent(in)    :: solver          !< Solver.
+   type(eos_compressible),          intent(in)    :: eos             !< EOS data.
+   integer(I4P),                    intent(in)    :: gc              !< Number of ghost cells used.
+   integer(I4P),                    intent(in)    :: N               !< Number of cells.
+   type(face_object),               intent(in)    :: faces(0-gc:)    !< Faces data [0-gc:N+gc].
+   type(cell_object),               intent(in)    :: cells(1-gc:)    !< Cells data [1-gc:N+gc].
+   type(conservative_compressible), intent(inout) :: fluxes(0:)      !< Convective fluxes of 3D conservative variables [0:N].
+   type(conservative_compressible), allocatable   :: UR(:,:)         !< Reconstructed conservative variables.
+   type(vector), allocatable                      :: tangential(:,:) !< Interface tangential component of velocity.
+   integer(I4P)                                   :: i               !< Counter.
 
    allocate(UR(1:2,0:N+1))
-   call reconstruct_interfaces_characteristic(solver=solver, eos=eos, gc=gc, N=N, U=cells%U, normal=faces%normal, UR=UR)
+   allocate(tangential(1:2,0:N+1))
+   call reconstruct_interfaces_characteristic(solver=solver, eos=eos, gc=gc, N=N, U=cells%U, normal=faces%normal, &
+                                              UR=UR, tangential=tangential)
    do i=0, N
+      ! computing normal fluxes
       call solver%riemann_solver%solve(eos_left=eos,  state_left=UR( 2, i  ), &
                                        eos_right=eos, state_right=UR(1, i+1), normal=faces(i)%normal, fluxes=fluxes(i))
+      ! uptdating fluxes with tangential components
+      if (fluxes(i)%density > 0._R8P) then
+         fluxes(i)%momentum = fluxes(i)%momentum + fluxes(i)%density *         tangential(2,i)
+         fluxes(i)%energy   = fluxes(i)%energy   + fluxes(i)%density * sq_norm(tangential(2,i)) * 0.5_R8P
+      else
+         fluxes(i)%momentum = fluxes(i)%momentum + fluxes(i)%density *         tangential(1,i+1)
+         fluxes(i)%energy   = fluxes(i)%energy   + fluxes(i)%density * sq_norm(tangential(1,i+1)) * 0.5_R8P
+      endif
    enddo
    endsubroutine compute_fluxes_convective
 
-   subroutine reconstruct_interfaces_characteristic(solver, eos, gc, N, U, normal, UR)
+   subroutine reconstruct_interfaces_characteristic(solver, eos, gc, N, U, normal, UR, tangential)
    !< Reconstruct interfaces states.
    !<
    !< The reconstruction is done in pseudo characteristic variables.
@@ -1212,6 +1221,7 @@ contains
    type(conservative_compressible), intent(in)    :: U(1-gc:)                !< Conservative variables.
    type(vector),                    intent(in)    :: normal(0:)              !< Face normals.
    type(conservative_compressible), intent(inout) :: UR(1:, 0:)              !< Reconstructed conservative vars.
+   type(vector),                    intent(inout) :: tangential(1:, 0:)      !< Interface tangential component of velocity.
    type(primitive_compressible)                   :: P(1-gc:N+gc)            !< Primitive variables.
    type(primitive_compressible)                   :: PR(1:2, 0:N+1)          !< Reconstructed primitive variables.
    type(primitive_compressible)                   :: Pm(1:2)                 !< Mean of primitive variables.
@@ -1220,7 +1230,6 @@ contains
    real(R8P)                                      :: C(1:2, 1-gc:-1+gc, 1:3) !< Pseudo characteristic variables.
    real(R8P)                                      :: CR(1:2, 1:3)            !< Pseudo characteristic reconst.
    real(R8P)                                      :: buffer(1:3)             !< Dummy buffer.
-   type(vector)                                   :: tangential              !< Tangential component of velocity.
    integer(I4P)                                   :: i, j, f, v              !< Counter.
 
    select case(gc)
@@ -1270,12 +1279,12 @@ contains
          do f=1, 2
             ! if (i==0  .and.f==1) cycle
             ! if (i==N+1.and.f==2) cycle
-            tangential = P(i)%velocity - (P(i)%velocity .paral. normal(i+f-1))
+            tangential(f,i) = P(i)%velocity - (P(i)%velocity .paral. normal(i+f-1))
             do v=1, 3
                buffer(v) = dot_product(RPm(v, :, f), CR(f, :))
             enddo
             PR(f, i)%density  = buffer(1)
-            PR(f, i)%velocity = buffer(2) * normal(i+f-1) + tangential
+            PR(f, i)%velocity = buffer(2) * normal(i+f-1) + tangential(f,i)
             PR(f, i)%pressure = buffer(3)
          enddo
          ! extrapolation of the reconstructed values for the non computed boundaries

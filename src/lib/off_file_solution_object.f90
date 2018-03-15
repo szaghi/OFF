@@ -62,20 +62,88 @@ public :: file_solution_object
 
 type, extends(file_object) :: file_solution_object
    !< File solution object class.
+   integer(I8P) :: save_frequency=1       !< Solution save frequency (on time steps).
+   logical      :: ascii_format=.false.   !< ASCII file format sentinel.
+   logical      :: off_format=.false.     !< OFF file format sentinel.
+   logical      :: tecplot_format=.false. !< Tecplot file format sentinel.
+   logical      :: vtk_format=.false.     !< VTK file format sentinel.
    contains
       ! public methods
+      procedure, pass(self) :: description                  !< Return a pretty-formatted description of the file.
+      procedure, pass(self) :: destroy                      !< Destroy file.
+      procedure, pass(self) :: load_parameters_from_file    !< Load file parameters from file.
       procedure, pass(self) :: load_conservatives_from_file !< Load conservative variables from file.
       procedure, pass(self) :: save_conservatives_into_file !< Save conservative variables into file.
+      ! operators
+      procedure, pass(lhs) :: file_assign_file !< Operator `=`.
 endtype file_solution_object
 
 contains
    ! public methods
+   pure function description(self, prefix) result(desc)
+   !< Return a pretty-formatted description of the file.
+   class(file_solution_object), intent(in)           :: self             !< File object.
+   character(*),                intent(in), optional :: prefix           !< Prefixing string.
+   character(len=:), allocatable                     :: desc             !< Description.
+   character(len=:), allocatable                     :: prefix_          !< Prefixing string, local variable.
+   character(len=1), parameter                       :: NL=new_line('a') !< New line character.
+
+   prefix_ = '' ; if (present(prefix)) prefix_ = prefix
+   desc = self%file_object%description(prefix=prefix_)//NL
+   desc = desc//prefix_//'save frequency: '//trim(str(no_sign=.true., n=self%save_frequency))//NL
+   desc = desc//prefix_//'ascii format: '//trim(str(self%off_format))//NL
+   desc = desc//prefix_//'off format: '//trim(str(self%off_format))//NL
+   desc = desc//prefix_//'tecplot format: '//trim(str(self%tecplot_format))//NL
+   desc = desc//prefix_//'vtk format: '//trim(str(self%vtk_format))//NL
+   endfunction description
+
+   elemental subroutine destroy(self)
+   !< Destroy file.
+   class(file_solution_object), intent(inout) :: self  !< File object.
+   type(file_object)                          :: fresh !< Fresh instance of file object.
+
+   self = fresh
+   endsubroutine destroy
+
+   subroutine load_parameters_from_file(self, fini, options_prefix, go_on_fail)
+   !< Load file parameters from file.
+   class(file_solution_object),  intent(inout)        :: self           !< File object.
+   type(file_ini),               intent(in)           :: fini           !< Solution parameters ini file handler.
+   character(len=*),             intent(in)           :: options_prefix !< Prefix string of file options names.
+   logical,                      intent(in), optional :: go_on_fail     !< Go on if load fails.
+   logical                                            :: go_on_fail_    !< Go on if load fails, local variable.
+   integer(I8P)                                       :: buffer_i       !< Buffer integer.
+   logical                                            :: buffer_l       !< Buffer logical.
+   character(999)                                     :: buffer_s       !< Buffer string.
+
+   go_on_fail_ = .false. ; if (present(go_on_fail)) go_on_fail_ = go_on_fail
+
+   call self%file_object%load_parameters_from_file(fini=fini, options_prefix=options_prefix, go_on_fail=go_on_fail_)
+
+   call fini%get(section_name='files', option_name=options_prefix//'_save_frequency', val=buffer_i, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_save_frequency)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%save_frequency = buffer_i
+
+   call fini%get(section_name='files', option_name=options_prefix//'_off_format', val=buffer_l, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_off_format)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%off_format = buffer_l
+
+   call fini%get(section_name='files', option_name=options_prefix//'_tecplot_format', val=buffer_l, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_tecplot_format)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%tecplot_format = buffer_l
+
+   call fini%get(section_name='files', option_name=options_prefix//'_vtk_format', val=buffer_l, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_vtk_format)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%vtk_format = buffer_l
+   endsubroutine load_parameters_from_file
+
    subroutine load_conservatives_from_file(self, grid_dimensions, blocks, file_name)
    !< Load conservative variables from file.
    class(file_solution_object),  intent(inout)        :: self            !< File object.
    type(grid_dimensions_object), intent(in)           :: grid_dimensions !< Grid dimensions off all blocks into file.
    type(block_object),           intent(inout)        :: blocks(1:)      !< Blocks storage.
    character(*),                 intent(in), optional :: file_name       !< File name.
+   type(file_ini)                                     :: fini            !< Solution parameters ini file handler.
    integer(I4P)                                       :: blocks_number   !< Blocks number.
    type(primitive_compressible)                       :: P               !< Primitive variables.
    real(R8P)                                          :: velocity_(3)    !< Velocity temporary array.
@@ -85,21 +153,21 @@ contains
    if (present(file_name)) self%file_name = trim(adjustl(file_name))
    emsg_suffix = ' from file "'//self%file_name//'" in procedure "file_solution_object%load_conservative_from_file"'
    if (self%is_parametric) then
-      call self%fini%load(filename=self%file_name, error=self%error%status)
-      call self%fini%get(section_name='dimensions', option_name='blocks_number', val=blocks_number, error=self%error%status)
+      call fini%load(filename=self%file_name, error=self%error%status)
+      call fini%get(section_name='dimensions', option_name='blocks_number', val=blocks_number, error=self%error%status)
       call self%error%check(message='failed to load [dimensions].(blocks_number)'//emsg_suffix, is_severe=.true.)
       if (blocks_number>0.and.size(blocks, dim=1)>=blocks_number) then
          do b=1, blocks_number
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='pressure', &
-                               val=P%pressure, error=self%error%status)
+            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='pressure', &
+                          val=P%pressure, error=self%error%status)
             call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(pressure)'//emsg_suffix, &
                                   is_severe=.true.)
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='density', &
-                               val=P%density, error=self%error%status)
+            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='density', &
+                          val=P%density, error=self%error%status)
             call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(density)'//emsg_suffix, &
                                   is_severe=.true.)
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='velocity', &
-                               val=velocity_, error=self%error%status)
+            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='velocity', &
+                          val=velocity_, error=self%error%status)
             call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(velocity)'//emsg_suffix, &
                                   is_severe=.true.)
             P%velocity%x = velocity_(1)
@@ -132,4 +200,21 @@ contains
    enddo
    call self%close_file
    endsubroutine save_conservatives_into_file
+
+   ! operators
+   pure subroutine file_assign_file(lhs, rhs)
+   !< Operator `=`.
+   class(file_solution_object), intent(inout) :: lhs !< Left hand side.
+   class(file_object),          intent(in)    :: rhs !< Right hand side.
+
+   call lhs%file_object%file_assign_file(rhs=rhs)
+   select type(rhs)
+   type is(file_solution_object)
+      lhs%save_frequency = rhs%save_frequency
+      lhs%ascii_format = rhs%ascii_format
+      lhs%off_format = rhs%off_format
+      lhs%tecplot_format = rhs%tecplot_format
+      lhs%vtk_format = rhs%vtk_format
+   endselect
+   endsubroutine file_assign_file
 endmodule off_file_solution_object

@@ -1,6 +1,6 @@
-!< OFF test: shock tube tester.
+!< OFF test: Kurganov and Tadmor tester.
 
-program off_test_shock_tube
+program off_test_kurganov_tadmor
 !< OFF test: shock tube tester.
 
 use off_objects, only : simulation_object
@@ -31,22 +31,22 @@ contains
   type(command_line_interface) :: cli   !< Test command line interface.
   integer(I4P)                 :: error !< Error trapping flag.
 
-  call cli%init(progname='off_test_shock_tube',   &
-                authors='S. Zaghi',               &
-                help='Usage: ',                   &
-                examples=["off_test_shock_tube"], &
+  call cli%init(progname='off_test_kurganov_tadmor',   &
+                authors='S. Zaghi',                    &
+                help='Usage: ',                        &
+                examples=["off_test_kurganov_tadmor"], &
                 epilog=new_line('a')//"all done")
 
-  call cli%add(switch='--input',                          &
-               help='input file name',                    &
-               required=.false.,                          &
-               def='src/tests/shock_tube_input/sodx.ini', &
+  call cli%add(switch='--input',                               &
+               help='input file name',                         &
+               required=.false.,                               &
+               def='src/tests/kurganov_tadmor_input/kt04.ini', &
                act='store')
 
-  call cli%add(switch='--output',              &
-               help='output file name',        &
-               required=.false.,               &
-               def='shock_tube_sodx_solution', &
+  call cli%add(switch='--output',                 &
+               help='output file name',           &
+               required=.false.,                  &
+               def='kurganov_tadmor_04_solution', &
                act='store')
 
   call cli%parse(error=error) ; if (error/=0) stop
@@ -54,4 +54,4 @@ contains
   call cli%get(switch='--input',  val=inf_name,  error=error) ; if (error/=0) stop
   call cli%get(switch='--output', val=outf_name, error=error) ; if (error/=0) stop
   endsubroutine cli_parse
-endprogram off_test_shock_tube
+endprogram off_test_kurganov_tadmor

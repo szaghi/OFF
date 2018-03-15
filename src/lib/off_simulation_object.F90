@@ -4,7 +4,7 @@
 module off_simulation_object
 !< OFF simulation object definition and implementation.
 
-use, intrinsic :: iso_fortran_env, only : stderr=>error_unit, stdout=>output_unit
+use, intrinsic :: iso_fortran_env, only : stderr=>error_unit
 use off_error_object, only : error_object
 use off_file_grid_object, only : file_grid_object
 use off_file_solution_object, only : file_solution_object
@@ -18,7 +18,7 @@ use finer, only : file_ini
 use flap, only : command_line_interface
 use flow, only : eos_compressible
 use foodie, only : integrand_object, integrator_multistage_object
-use penf, only : I4P, MaxR8P, R8P, str
+use penf, only : I4P, I8P, MaxR8P, R8P, str
 
 implicit none
 private
@@ -33,7 +33,8 @@ type, extends(integrand_object) :: simulation_object
    type(os_object)                      :: os                        !< Running Operating System.
    type(file_ini)                       :: file_parameters           !< Simulation parameters file handler.
    type(file_grid_object)               :: file_grid_input           !< Grid file (input) handler.
-   type(file_solution_object)           :: file_solution             !< Grid file handler.
+   type(file_solution_object)           :: file_initial_conditions   !< Intial conditions file handler.
+   type(file_solution_object)           :: file_solution             !< Solution file handler.
    type(non_dimensional_numbers_object) :: adimensionals             !< Non dimensional numbers.
    type(free_conditions_object)         :: free_conditions           !< Free stream conditions.
    type(eos_compressible)               :: eos                       !< Equation of state.
@@ -43,6 +44,7 @@ type, extends(integrand_object) :: simulation_object
    logical                              :: is_cli_parsed=.false.     !< Sentinel of CLI parsing.
    logical                              :: is_output_verbose=.false. !< Verbose output.
    logical                              :: go_on_fail=.false.        !< Allow/disallow parameters loading failure.
+   integer(I8P)                         :: shell_refresh_frequency=1 !< Output refresh frequency (on time steps).
    contains
       ! public methods
       procedure, pass(self) :: description                  !< Return a pretty-formatted description of the simulation.
@@ -51,7 +53,9 @@ type, extends(integrand_object) :: simulation_object
       procedure, pass(self) :: integrate                    !< Integrate the equations.
       procedure, pass(self) :: load_file_parameters         !< Load file parameters.
       procedure, pass(self) :: parse_command_line_interface !< Parse command line interface.
+      procedure, pass(self) :: save_file_grid               !< Save file grid.
       procedure, pass(self) :: save_file_parameters         !< Save file parameters.
+      procedure, pass(self) :: save_file_solution           !< Save file solution.
 
       ! integrand_object deferred methods
       procedure, pass(self) :: integrand_dimension !< Return integrand dimension.
@@ -101,6 +105,8 @@ contains
    desc = ''
    desc = desc//prefix_//'Grid file (input)'//NL
    desc = desc//prefix_//self%file_grid_input%description(prefix=prefix_//'  ')//NL
+   desc = desc//prefix_//'Initial conditions file'//NL
+   desc = desc//prefix_//self%file_solution%description(prefix=prefix_//'  ')//NL
    desc = desc//prefix_//'Solution file'//NL
    desc = desc//prefix_//self%file_solution%description(prefix=prefix_//'  ')//NL
    desc = desc//prefix_//'Non dimensional numbers:'//NL
@@ -126,6 +132,7 @@ contains
    call self%os%destroy
    call self%file_parameters%free
    call self%file_grid_input%destroy
+   call self%file_initial_conditions%destroy
    call self%file_solution%destroy
    call self%adimensionals%destroy
    call self%free_conditions%destroy
@@ -136,38 +143,8 @@ contains
    self%is_cli_parsed = .false.
    self%is_output_verbose = .false.
    self%go_on_fail = .false.
+   self%shell_refresh_frequency = 1
    endsubroutine destroy
-
-   subroutine load_file_parameters(self, file_name)
-   !< Load file parameters.
-   class(simulation_object), intent(inout)        :: self      !< Simulation object.
-   character(len=*),         intent(in), optional :: file_name !< File name.
-
-   if (present(file_name)) call self%file_parameters%initialize(filename=file_name)
-   if (self%is_output_verbose) print '(A)', 'load file "'//trim(adjustl(self%file_parameters%filename))//'"'
-   call self%file_parameters%load(error=self%error%status)
-   call self%error%check(message='failed to load "'//trim(adjustl(self%file_parameters%filename))//'"', &
-                         is_severe=.not.self%go_on_fail)
-   if (self%error%status /=0 ) then
-      write(stderr, '(A)') 'Using default simulation parameters values'
-      return
-   endif
-   call self%file_grid_input%load_file_name_from_file(fini=self%file_parameters, &
-                                                      section_name='files', option_name='grid', go_on_fail=self%go_on_fail)
-   call self%file_grid_input%load_is_parametric_from_file(fini=self%file_parameters,                                   &
-                                                          section_name='files', option_name='is_grid_file_parametric', &
-                                                          go_on_fail=self%go_on_fail)
-   call self%file_solution%load_file_name_from_file(fini=self%file_parameters, section_name='files', &
-                                                    option_name='initial_conditions', go_on_fail=self%go_on_fail)
-   call self%file_solution%load_is_parametric_from_file(fini=self%file_parameters,                                 &
-                                                        section_name='files', option_name='is_ic_file_parametric', &
-                                                        go_on_fail=self%go_on_fail)
-   call self%adimensionals%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
-   call self%free_conditions%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
-   call self%eos%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
-   call self%solver%load_from_file(fini=self%file_parameters, integrand_0=self, go_on_fail=self%go_on_fail)
-   call self%time%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
-   endsubroutine load_file_parameters
 
    subroutine initialize(self, os, file_parameters, adimensionals, free_conditions, eos, mesh, solver, time)
    !< Initialize simulation.
@@ -186,7 +163,12 @@ contains
    call self%error%initialize
    call self%cli_initialize
    call self%os%initialize(os=os)
+
    call self%file_parameters%initialize(filename=file_parameters)
+   call self%file_grid_input%initialize()
+   call self%file_initial_conditions%initialize()
+   call self%file_solution%initialize()
+
    call self%adimensionals%initialize(adimensionals=adimensionals)
    call self%free_conditions%initialize(free_conditions=free_conditions)
    call self%eos%initialize(eos=eos)
@@ -195,13 +177,14 @@ contains
 
    call self%load_file_parameters
 
-   call self%mesh%initialize(eos=self%eos, mesh=mesh, file_grid=self%file_grid_input, file_ic=self%file_solution)
+   call self%mesh%initialize(eos=self%eos, mesh=mesh, file_grid=self%file_grid_input, file_ic=self%file_initial_conditions)
    endsubroutine initialize
 
    subroutine integrate(self)
    !< Integrate the equations.
    class(simulation_object), intent(inout) :: self !< Simulation data.
 
+   if (self%is_output_verbose) print '(A)', self%description()
    temporal_loop: do
       call self%compute_dt
       call self%time%update_dt
@@ -211,14 +194,56 @@ contains
             call integrator%integrate_fast(U=self, Dt=self%time%dt, t=self%time%t)
          endselect
       endassociate
-      write(stdout, '(A)')
-      write(stdout, '(A)') self%time%eta()
+      call self%time%print_eta(frequency=self%shell_refresh_frequency)
       call self%time%update_n
       call self%time%update_t
-      ! saving the actual solution
+      call self%mesh%save_file_solution(file_solution=self%file_solution, n=self%time%n)
       if (self%time%is_the_end()) exit temporal_loop
    enddo temporal_loop
    endsubroutine integrate
+
+   subroutine load_file_parameters(self, file_name)
+   !< Load file parameters.
+   class(simulation_object), intent(inout)        :: self      !< Simulation object.
+   character(len=*),         intent(in), optional :: file_name !< File name.
+
+   if (present(file_name)) call self%file_parameters%initialize(filename=file_name)
+   if (self%is_output_verbose) print '(A)', 'load file "'//trim(adjustl(self%file_parameters%filename))//'"'
+   call self%file_parameters%load(error=self%error%status)
+   call self%error%check(message='failed to load "'//trim(adjustl(self%file_parameters%filename))// &
+                         '" from procesure "simulation_object%load_file_parameters"', is_severe=.not.self%go_on_fail)
+   if (self%error%status /=0) then
+      write(stderr, '(A)') 'Using default simulation parameters values'
+      return
+   endif
+   ! simulation miscellanea parameters
+   call self%file_parameters%get(section_name='miscellanea', option_name='is_output_verbose', val=self%is_output_verbose, &
+                                 error=self%error%status)
+   call self%error%check(message='failed to load [miscellanea].(is_output_verbose)', is_severe=self%go_on_fail)
+   call self%file_parameters%get(section_name='miscellanea', option_name='shell_refresh_frequency', &
+                                 val=self%shell_refresh_frequency, error=self%error%status)
+   call self%error%check(message='failed to load [miscellanea].(shell_refresh_frequency)', is_severe=self%go_on_fail)
+   call self%file_parameters%get(section_name='miscellanea', option_name='go_on_fail', &
+                                 val=self%go_on_fail, error=self%error%status)
+   call self%error%check(message='failed to load [miscellanea].(go_on_fail)', is_severe=self%go_on_fail)
+
+   ! files
+   call self%file_grid_input%load_parameters_from_file(fini=self%file_parameters, options_prefix='grid', go_on_fail=self%go_on_fail)
+   call self%file_initial_conditions%load_parameters_from_file(fini=self%file_parameters, options_prefix='initial_conditions', &
+                                                               go_on_fail=self%go_on_fail)
+   call self%file_solution%load_parameters_from_file(fini=self%file_parameters, options_prefix='solution', &
+                                                     go_on_fail=self%go_on_fail)
+
+   call self%adimensionals%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
+
+   call self%free_conditions%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
+
+   call self%eos%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
+
+   call self%solver%load_from_file(fini=self%file_parameters, integrand_0=self, go_on_fail=self%go_on_fail)
+
+   call self%time%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
+   endsubroutine load_file_parameters
 
    subroutine parse_command_line_interface(self)
    !< Parse command line interface.
@@ -237,6 +262,39 @@ contains
 
    self%is_cli_parsed = .true.
    endsubroutine parse_command_line_interface
+
+   subroutine save_file_grid(self, is_parametric, file_name, ascii, metrics, off, tecplot, vtk)
+   !< Save file grid.
+   class(simulation_object), intent(inout)        :: self          !< Simulation object.
+   logical,                  intent(in), optional :: is_parametric !< Sentinel to load grid parametric grid file.
+   character(*),             intent(in), optional :: file_name     !< File name.
+   logical,                  intent(in), optional :: ascii         !< Ascii/binary output.
+   logical,                  intent(in), optional :: metrics       !< Save also metrics data.
+   logical,                  intent(in), optional :: off           !< Save in OFF format sentinel.
+   logical,                  intent(in), optional :: tecplot       !< Tecplot output format sentinel.
+   logical,                  intent(in), optional :: vtk           !< VTK output format sentinel.
+
+   call self%mesh%save_file_grid(is_parametric=is_parametric, file_name=file_name, ascii=ascii, &
+                                 metrics=metrics,                                               &
+                                 off=off, tecplot=tecplot, vtk=vtk)
+   endsubroutine save_file_grid
+
+   subroutine save_file_solution(self, file_solution, file_name, is_parametric, ascii, off, tecplot, vtk, n, last)
+   !< Save file solution.
+   class(simulation_object),   intent(inout)        :: self          !< Simulation object.
+   type(file_solution_object), intent(in), optional :: file_solution !< File solution handler.
+   character(*),               intent(in), optional :: file_name     !< File name.
+   logical,                    intent(in), optional :: is_parametric !< Sentinel to load grid parametric grid file.
+   logical,                    intent(in), optional :: ascii         !< Ascii/binary output.
+   logical,                    intent(in), optional :: off           !< Save in OFF format sentinel.
+   logical,                    intent(in), optional :: tecplot       !< Tecplot output format sentinel.
+   logical,                    intent(in), optional :: vtk           !< VTK output format sentinel.
+   integer(I8P),               intent(in), optional :: n             !< Time step.
+   logical,                    intent(in), optional :: last          !< Sentinel to forcce saving of last step solution.
+
+   call self%mesh%save_file_solution(file_solution=file_solution, file_name=file_name, is_parametric=is_parametric, ascii=ascii, &
+                                     off=off, tecplot=tecplot, vtk=vtk, n=n, last=last)
+   endsubroutine save_file_solution
 
    subroutine save_file_parameters(self, file_name)
    !< Save file parameters.
@@ -391,21 +449,22 @@ contains
 
    select type(rhs)
    class is(simulation_object)
-      lhs%error             = rhs%error
-      lhs%cli               = rhs%cli
-      lhs%os                = rhs%os
-      lhs%file_parameters   = rhs%file_parameters
-      lhs%file_grid_input   = rhs%file_grid_input
-      lhs%file_solution     = rhs%file_solution
-      lhs%adimensionals     = rhs%adimensionals
-      lhs%free_conditions   = rhs%free_conditions
-      lhs%eos               = rhs%eos
-      lhs%solver            = rhs%solver
-      lhs%time              = rhs%time
-      lhs%mesh              = rhs%mesh
-      lhs%is_cli_parsed     = rhs%is_cli_parsed
-      lhs%is_output_verbose = rhs%is_output_verbose
-      lhs%go_on_fail        = rhs%go_on_fail
+      lhs%error                   = rhs%error
+      lhs%cli                     = rhs%cli
+      lhs%os                      = rhs%os
+      lhs%file_parameters         = rhs%file_parameters
+      lhs%file_grid_input         = rhs%file_grid_input
+      lhs%file_solution           = rhs%file_solution
+      lhs%adimensionals           = rhs%adimensionals
+      lhs%free_conditions         = rhs%free_conditions
+      lhs%eos                     = rhs%eos
+      lhs%solver                  = rhs%solver
+      lhs%time                    = rhs%time
+      lhs%mesh                    = rhs%mesh
+      lhs%is_cli_parsed           = rhs%is_cli_parsed
+      lhs%is_output_verbose       = rhs%is_output_verbose
+      lhs%go_on_fail              = rhs%go_on_fail
+      lhs%shell_refresh_frequency = rhs%shell_refresh_frequency
    endselect
    endsubroutine assign_integrand
 
@@ -423,10 +482,7 @@ contains
    class(simulation_object), intent(inout)        :: self !< Integrand.
    real(R8P),                intent(in), optional :: t    !< Time.
 
-   ! TODO impose boundary conditions in conservative variables to reduce unnecessary computations
-   call self%mesh%conservative_to_primitive
    call self%mesh%impose_boundary_conditions
-   call self%mesh%primitive_to_conservative
    call self%mesh%compute_residuals(solver=self%solver, gcu=self%solver%gcu)
    endsubroutine t_fast
 

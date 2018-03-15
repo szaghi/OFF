@@ -23,7 +23,6 @@ integer(I4P),     parameter :: ERROR_NOT_INITIALIZED   = 3 !< Not initialized er
 type :: file_object
    !< File object class.
    type(error_object)            :: error                  !< Errors handler.
-   type(file_ini)                :: fini                   !< Parametric (INI) file handler.
    character(len=:), allocatable :: file_name              !< File name.
    integer(I4P)                  :: file_unit=0            !< File unit.
    logical                       :: is_initialized=.false. !< Sentinel to check if file is initialized.
@@ -32,17 +31,15 @@ type :: file_object
    logical                       :: is_parametric=.false.  !< Sentinel to check if file is parametric.
    contains
       ! public methods
-      procedure, pass(self) :: close_file                   !< Close file.
-      procedure, pass(self) :: description                  !< Return a pretty-formatted description of the file.
-      procedure, pass(self) :: destroy                      !< Destroy file.
-      procedure, pass(self) :: initialize                   !< Initialize file.
-      procedure, pass(self) :: load_file_name_from_file     !< Load file name from file.
-      procedure, pass(self) :: load_is_parametric_from_file !< Load `is_parametric` flag from file.
-      procedure, pass(self) :: open_file                    !< Open file.
-      procedure, pass(self) :: save_file_name_into_file     !< Save file name into file.
+      procedure, pass(self) :: close_file                !< Close file.
+      procedure, pass(self) :: description               !< Return a pretty-formatted description of the file.
+      procedure, pass(self) :: destroy                   !< Destroy file.
+      procedure, pass(self) :: initialize                !< Initialize file.
+      procedure, pass(self) :: load_parameters_from_file !< Load file parameters from file.
+      procedure, pass(self) :: open_file                 !< Open file.
+      procedure, pass(self) :: save_file_name_into_file  !< Save file name into file.
       ! operators
       generic :: assignment(=) => file_assign_file !< Overload `=`.
-      ! private methods
       procedure, pass(lhs) :: file_assign_file !< Operator `=`.
 endtype file_object
 
@@ -99,12 +96,13 @@ contains
    if (allocated(self%file_name)) deallocate(self%file_name)
    endsubroutine destroy
 
-   elemental subroutine initialize(self, file_name)
+   elemental subroutine initialize(self, file_name, is_parametric)
    !< Initialize File.
    !<
    !< @note Leading and trailing white spaces are removed from file name.
-   class(file_object), intent(inout)        :: self      !< File object.
-   character(len=*),   intent(in), optional :: file_name !< File name.
+   class(file_object), intent(inout)        :: self           !< File object.
+   character(len=*),   intent(in), optional :: file_name      !< File name.
+   logical,            intent(in), optional :: is_parametric  !< Sentinel to check is file is parametric.
 
    call self%destroy
    call self%error%initialize
@@ -113,40 +111,29 @@ contains
    else
       self%file_name = UNSET_FILE_NAME
    endif
+   if (present(is_parametric)) self%is_parametric = is_parametric
    self%is_initialized = .true.
    endsubroutine initialize
 
-   subroutine load_file_name_from_file(self, fini, section_name, option_name, go_on_fail)
-   !< Load file name from file.
-   class(file_object), intent(inout)        :: self         !< File object.
-   type(file_ini),     intent(in)           :: fini         !< Simulation parameters ini file handler.
-   character(*),       intent(in)           :: section_name !< Option name into the ini file.
-   character(*),       intent(in)           :: option_name  !< Option name into the ini file.
-   logical,            intent(in), optional :: go_on_fail   !< Go on if load fails.
-   character(999)                           :: buffer       !< Buffer string.
+   subroutine load_parameters_from_file(self, fini, options_prefix, go_on_fail)
+   !< Load file parameters from file.
+   class(file_object), intent(inout)        :: self           !< File object.
+   type(file_ini),     intent(in)           :: fini           !< Solution parameters ini file handler.
+   character(len=*),   intent(in)           :: options_prefix !< Prefix string of file options names.
+   logical,            intent(in), optional :: go_on_fail     !< Go on if load fails.
+   logical                                  :: go_on_fail_    !< Go on if load fails, local variable.
+   character(999)                           :: buffer_s       !< Buffer string.
+   logical                                  :: buffer_l       !< Buffer logical.
 
-   call fini%get(section_name=section_name, option_name=option_name, val=buffer, error=self%error%status)
-   if (present(go_on_fail)) then
-      if (.not.go_on_fail) &
-         call self%error%check(message='failed to load ['//section_name//'].('//option_name//')', is_severe=.not.go_on_fail)
-   endif
-   if (self%error%status <= 0) self%file_name = trim(adjustl(buffer))
-   endsubroutine load_file_name_from_file
+   go_on_fail_ = .false. ; if (present(go_on_fail)) go_on_fail_ = go_on_fail
+   call fini%get(section_name='files', option_name=options_prefix, val=buffer_s, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//')', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%file_name = trim(adjustl(buffer_s))
 
-   subroutine load_is_parametric_from_file(self, fini, section_name, option_name, go_on_fail)
-   !< Load `is_parametric` flag from file.
-   class(file_object), intent(inout)        :: self         !< File object.
-   type(file_ini),     intent(in)           :: fini         !< Simulation parameters ini file handler.
-   character(*),       intent(in)           :: section_name !< Section name into the ini file.
-   character(*),       intent(in)           :: option_name  !< Option name into the ini file.
-   logical,            intent(in), optional :: go_on_fail   !< Go on if load fails.
-
-   call fini%get(section_name=section_name, option_name=option_name, val=self%is_parametric, error=self%error%status)
-   if (present(go_on_fail)) then
-      if (.not.go_on_fail) &
-         call self%error%check(message='failed to load ['//section_name//'].('//option_name//')', is_severe=.not.go_on_fail)
-   endif
-   endsubroutine load_is_parametric_from_file
+   call fini%get(section_name='files', option_name=options_prefix//'_is_parametric', val=buffer_l, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_is_parametric)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%is_parametric = buffer_l
+   endsubroutine load_parameters_from_file
 
    subroutine open_file(self, file_name, format, action, access)
    !< Open file.
@@ -189,19 +176,22 @@ contains
    call fini%add(section_name=section_name, option_name=option_name, val=self%file_name, error=self%error%status)
    endsubroutine save_file_name_into_file
 
-   ! private methods
+   ! operators
    pure subroutine file_assign_file(lhs, rhs)
    !< Operator `=`.
    class(file_object), intent(inout) :: lhs !< Left hand side.
    class(file_object), intent(in)    :: rhs !< Right hand side.
 
-                                 lhs%error          = rhs%error
-                                 lhs%fini           = rhs%fini
-   if (allocated(rhs%file_name)) lhs%file_name      = rhs%file_name
-                                 lhs%file_unit      = rhs%file_unit
-                                 lhs%is_initialized = rhs%is_initialized
-                                 lhs%is_connected   = rhs%is_connected
-                                 lhs%is_loaded      = rhs%is_loaded
-                                 lhs%is_parametric  = rhs%is_parametric
+   lhs%error = rhs%error
+   if (allocated(rhs%file_name)) then
+      lhs%file_name = rhs%file_name
+   else
+      if (allocated(lhs%file_name)) deallocate(lhs%file_name)
+   endif
+   lhs%file_unit = rhs%file_unit
+   lhs%is_initialized = rhs%is_initialized
+   lhs%is_connected = rhs%is_connected
+   lhs%is_loaded = rhs%is_loaded
+   lhs%is_parametric = rhs%is_parametric
    endsubroutine file_assign_file
 endmodule off_file_object

@@ -13,7 +13,7 @@ use off_file_solution_object, only : file_solution_object
 use off_grid_dimensions_object, only : grid_dimensions_object
 use flow, only : eos_compressible
 use off_solver_object, only : solver_object
-use penf, only : I4P, R8P, str
+use penf, only : I4P, I8P, R8P, str, strz
 use stringifor, only : string
 use vecfor, only : vector
 
@@ -39,8 +39,8 @@ type :: mesh_object
       procedure, pass(self) :: load_grid_from_file                !< Load grid from file.
       procedure, pass(self) :: load_ic_from_file                  !< Load initial conditions from file.
       procedure, pass(self) :: primitive_to_conservative          !< Convert primitive variables to conservative ones.
-      procedure, pass(self) :: save_grid_into_file                !< Save grid into file.
-      procedure, pass(self) :: save_solution_into_file            !< Save solution into file.
+      procedure, pass(self) :: save_file_grid                     !< Save file grid.
+      procedure, pass(self) :: save_file_solution                 !< Save file solution.
       procedure, pass(self) :: set_parametric_boundary_conditions !< Set boundary conditions from parametric input file.
       ! fast operators
       procedure, pass(opr) :: conservative_add_conservatives_fast      !< `+` fast operator.
@@ -136,6 +136,8 @@ contains
    class(mesh_object), intent(inout) :: self       !< Mesh.
    integer(I4P)                      :: b, i, j, k !< Counter.
 
+   ! TODO impose boundary conditions in conservative variables to reduce unnecessary computations
+   call self%conservative_to_primitive
    do b=1, self%grid_dimensions%blocks_number
       associate(block_b=>self%blocks(b), gc=>self%blocks(b)%signature%gc, &
                 Ni=>self%blocks(b)%signature%Ni, Nj=>self%blocks(b)%signature%Nj, Nk=>self%blocks(b)%signature%Nk)
@@ -228,6 +230,7 @@ contains
          enddo
       endassociate
    enddo
+   call self%primitive_to_conservative
    contains
       pure subroutine impose_boundary_conditions_wall(gc, ic, N, normal, boundary, stride)
       !< Impose wall boundary conditions on a stride of cells along a direction.
@@ -342,7 +345,7 @@ contains
       endif
       endsubroutine impose_boundary_conditions_extrapolation
 
-      pure subroutine impose_boundary_conditions_adjacent(gc, frame)
+      _PURE_ subroutine impose_boundary_conditions_adjacent(gc, frame)
       !< Impose adjacent boundary conditions on a frmae of cells along a direction.
       integer(I4P),      intent(in)    :: gc           !< Number of ghost cells.
       type(cell_object), intent(inout) :: frame(1-gc:) !< Cells frame [1-gc:0].
@@ -422,8 +425,8 @@ contains
    endif
    endsubroutine primitive_to_conservative
 
-   subroutine save_grid_into_file(self, is_parametric, file_name, ascii, metrics, off, tecplot, vtk)
-   !< Save grid into file.
+   subroutine save_file_grid(self, is_parametric, file_name, ascii, metrics, off, tecplot, vtk)
+   !< Save file grid.
    class(mesh_object), intent(inout)        :: self           !< Mesh.
    logical,            intent(in), optional :: is_parametric  !< Sentinel to load grid parametric grid file.
    character(*),       intent(in), optional :: file_name      !< File name.
@@ -440,7 +443,7 @@ contains
 
    is_parametric_ = .false. ;  if (present(is_parametric)) is_parametric_ = is_parametric
    if (is_parametric_) then
-      error stop 'error: mesh_object%save_grid_into_file(is_parametric=.true., ...) to be implemented'
+      error stop 'error: mesh_object%save_file_grid(is_parametric=.true., ...) to be implemented'
    else
       off_ = .true.  ; if (present(off)) off_ = off
       vtk_ = .false. ; if (present(vtk)) vtk_ = vtk
@@ -462,48 +465,84 @@ contains
          enddo
       endif
       endif
-   endsubroutine save_grid_into_file
+   endsubroutine save_file_grid
 
-   subroutine save_solution_into_file(self, is_parametric, file_name, ascii, off, tecplot, vtk)
-   !< Save solution into file.
-   class(mesh_object), intent(inout)        :: self           !< Mesh.
-   logical,            intent(in), optional :: is_parametric  !< Sentinel to load grid parametric grid file.
-   character(*),       intent(in), optional :: file_name      !< File name.
-   logical,            intent(in), optional :: ascii          !< Ascii/binary output.
-   logical,            intent(in), optional :: off            !< Save in OFF format sentinel.
-   logical,            intent(in), optional :: tecplot        !< Tecplot output format sentinel.
-   logical,            intent(in), optional :: vtk            !< VTK output format sentinel.
-   logical                                  :: is_parametric_ !< Sentinel to load grid parametric grid file, local variable.
-   logical                                  :: off_           !< OFF format sentinel, local variable.
-   logical                                  :: vtk_           !< VTK format sentinel, local variable.
-   type(string)                             :: file_name_     !< File name buffer.
-   integer(I4P)                             :: b              !< Counter.
+   subroutine save_file_solution(self, file_solution, file_name, is_parametric, ascii, off, tecplot, vtk, n, last)
+   !< Save file solution.
+   class(mesh_object),         intent(inout)        :: self           !< Mesh.
+   type(file_solution_object), intent(in), optional :: file_solution  !< File solution handler.
+   character(*),               intent(in), optional :: file_name      !< File name.
+   logical,                    intent(in), optional :: is_parametric  !< Sentinel to load grid parametric grid file.
+   logical,                    intent(in), optional :: ascii          !< Ascii/binary output.
+   logical,                    intent(in), optional :: off            !< Save in OFF format sentinel.
+   logical,                    intent(in), optional :: tecplot        !< Tecplot output format sentinel.
+   logical,                    intent(in), optional :: vtk            !< VTK output format sentinel.
+   integer(I8P),               intent(in), optional :: n              !< Time step.
+   logical,                    intent(in), optional :: last           !< Sentinel to forcce saving of last step solution.
+   logical                                          :: is_parametric_ !< Sentinel to load grid parametric grid file, local variable.
+   type(string)                                     :: base_name      !< Base file name.
+   type(string)                                     :: file_name_     !< File name, local variable.
+   logical                                          :: ascii_         !< Ascii/binary output, local variable.
+   logical                                          :: off_           !< OFF format sentinel, local variable.
+   logical                                          :: vtk_           !< VTK format sentinel, local variable.
+   type(string)                                     :: n_             !< Time step string.
+   logical                                          :: last_          !< Sentinel to forcce saving of last step solution, local v.
+   integer(I4P)                                     :: b              !< Counter.
 
-   is_parametric_ = .false. ;  if (present(is_parametric)) is_parametric_ = is_parametric
-   if (is_parametric_) then
-      error stop 'error: mesh_object%save_solution_into_file(is_parametric=.true., ...) to be implemented'
+   ! initialize sentinel for forcing saving of last step solution
+   last_ = .false. ; if (present(last)) last_ = last
+
+   ! check save frequency if it has a meaning
+   if (present(file_solution).and.present(n).and.(.not.last_)) then
+      if (file_solution%save_frequency <= 0) return
+      if (mod(n, file_solution%save_frequency) /= 0) return
+   endif
+
+   ! building file base name
+   if (present(file_name)) then
+      file_name_ = trim(adjustl(file_name))
    else
-      off_ = .true.  ; if (present(off)) off_ = off
-      vtk_ = .false. ; if (present(vtk)) vtk_ = vtk
-
-      if (off_) then
-         ! if (present(file_name)) call self%file_grid%initialize(file_name=file_name)
-         ! call self%file_grid%save_grid_dimensions_into_file(grid_dimensions=self%grid_dimensions)
-         ! call self%file_grid%save_nodes_into_file(grid_dimensions=self%grid_dimensions, blocks=self%blocks)
+      if (present(file_solution)) then
+         if (allocated(file_solution%file_name)) then
+            file_name_ = trim(adjustl(file_solution%file_name))
+         else
+            error stop 'error: mesh_object%save_file_solution needs a file name to be passed (explicitely or via file_solution)'
+         endif
+      else
+         error stop 'error: mesh_object%save_file_solution needs a file name to be passed (explicitely or via file_solution)'
       endif
+   endif
+   base_name = file_name_
+   if (base_name%basename(strip_last_extension=.true.)/='') base_name = base_name%basename(strip_last_extension=.true.)
+   n_ = '' ; if (present(n)) n_ = '-n_'//trim(strz(n=n, nz_pad=15))
+
+   if (present(file_solution)) then
+      is_parametric_ = file_solution%is_parametric
+      ascii_ = file_solution%ascii_format
+      off_ = file_solution%off_format
+      vtk_ = file_solution%vtk_format
+   else
+      is_parametric_ = .false. ; if (present(is_parametric)) is_parametric_ = is_parametric
+      ascii_ = .true.  ; if (present(ascii)) ascii_ = ascii
+      off_ = .true. ; if (present(off)) off_ = off
+      vtk_ = .false. ; if (present(vtk)) vtk_ = vtk
+   endif
+
+   if (is_parametric_) then
+      error stop 'error: mesh_object%save_file_solution(is_parametric=.true., ...) to be implemented'
+   else
+      if (off_) error stop 'error: mesh_object%save_file_solution(off=.true., ...) to be implemented'
 
       if (vtk_) then
          do b=1, self%grid_dimensions%blocks_number
-            file_name_ = trim(adjustl(file_name))
-            if (file_name_%basename(strip_last_extension=.true.)/='') file_name_ = file_name_%basename(strip_last_extension=.true.)
-            file_name_ = file_name_//'-solution-block'//                                    &
+            file_name_ = base_name//'-solution-block'//                                     &
                          '-id_'//trim(str(n=self%blocks(b)%signature%id, no_sign=.true.))// &
-                         '-lv_'//trim(str(n=self%blocks(b)%signature%level, no_sign=.true.))//'.vts'
+                         '-lv_'//trim(str(n=self%blocks(b)%signature%level, no_sign=.true.))//n_//'.vts'
             call self%blocks(b)%save_file_solution(file_name=file_name_%chars(), ascii=ascii, vtk=vtk_)
          enddo
       endif
-      endif
-   endsubroutine save_solution_into_file
+   endif
+   endsubroutine save_file_solution
 
    subroutine set_parametric_boundary_conditions(self)
    !< Set boundary conditions from parametric input file.

@@ -79,6 +79,7 @@ contains
    class(file_grid_object),      intent(inout)        :: self            !< File object.
    type(grid_dimensions_object), intent(inout)        :: grid_dimensions !< Grid dimensions off all blocks into file.
    character(*),                 intent(in), optional :: file_name       !< File name.
+   type(file_ini)                                     :: fini            !< Solution parameters ini file handler.
    integer(I4P)                                       :: dimensions_(3)  !< Block dimensions buffer.
    real(R8P)                                          :: extents_(6)     !< Block extents buffer.
    character(32)                                      :: faces_bc_(6)    !< Faces boundary conditions.
@@ -92,67 +93,67 @@ contains
    if (present(file_name)) self%file_name = trim(adjustl(file_name))
    emsg_suffix = ' from file "'//self%file_name//'" in procedure "file_grid_object%load_grid_dimensions_from_file"'
    if (self%is_parametric) then
-      call self%fini%load(filename=self%file_name, error=self%error%status)
-      call self%fini%get(section_name='dimensions', option_name='blocks_number', val=grid_dimensions%blocks_number, &
-                         error=self%error%status)
+      call fini%load(filename=self%file_name, error=self%error%status)
+      call fini%get(section_name='dimensions', option_name='blocks_number', val=grid_dimensions%blocks_number, &
+                    error=self%error%status)
       call self%error%check(message='failed to load [dimensions].(blocks_number)'//emsg_suffix, is_severe=.true.)
       if (grid_dimensions%blocks_number>0) then
          call grid_dimensions%alloc
          do b=1, grid_dimensions%blocks_number
-            call self%fini%get(section_name='dimensions', option_name='ghost_cells_number', &
-                               val=grid_dimensions%block_signature(b)%gc, error=self%error%status)
+            call fini%get(section_name='dimensions', option_name='ghost_cells_number', &
+                          val=grid_dimensions%block_signature(b)%gc, error=self%error%status)
             call self%error%check(message='failed to load [dimensions].(ghost_cells_number)'//emsg_suffix, is_severe=.true.)
 
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='id', &
-                               val=id_, error=self%error%status)
+            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='id', &
+                          val=id_, error=self%error%status)
             call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(id)'//emsg_suffix, &
                                   is_severe=.true.)
             grid_dimensions%block_signature(b)%id = id_
 
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='level', &
-                               val=level_, error=self%error%status)
+            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='level', &
+                          val=level_, error=self%error%status)
             call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(level)'//emsg_suffix, &
                                   is_severe=.true.)
             grid_dimensions%block_signature(b)%level = level_
 
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='dimensions', &
-                               val=dimensions_, error=self%error%status)
+            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='dimensions', &
+                          val=dimensions_, error=self%error%status)
             call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(dimensions)'//emsg_suffix, &
                                   is_severe=.true.)
             grid_dimensions%block_signature(b)%ni = dimensions_(1)
             grid_dimensions%block_signature(b)%nj = dimensions_(2)
             grid_dimensions%block_signature(b)%nk = dimensions_(3)
 
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='extents', &
-                               val=extents_, error=self%error%status)
+            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='extents', &
+                          val=extents_, error=self%error%status)
             call self%error%check(message='failed to load [block_'//trim(str(b, no_sign=.true.))//'].(extents)'//emsg_suffix, &
                                   is_severe=.true.)
             grid_dimensions%block_signature(b)%emin = extents_(1) * ex +  extents_(2) * ey + extents_(3) * ez
             grid_dimensions%block_signature(b)%emax = extents_(4) * ex +  extents_(5) * ey + extents_(6) * ez
 
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='boundary_conditions', &
-                               val=faces_bc_, error=self%error%status)
+            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='boundary_conditions', &
+                          val=faces_bc_, error=self%error%status)
             call self%error%check(message='failed to load [block_'//trim(str(b, no_sign=.true.))//'].(boundary_conditions)'// &
                                   emsg_suffix, is_severe=.false.)
             if (self%error%status==0) grid_dimensions%block_signature(b)%faces_bc = faces_bc_
 
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='is_cartesian', &
-                               val=is_cartesian_, error=self%error%status)
+            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='is_cartesian', &
+                          val=is_cartesian_, error=self%error%status)
             call self%error%check(message='failed to load [block_'//trim(str(b, no_sign=.true.))//'].(is_cartesian)'//emsg_suffix, &
                                   is_severe=.false.)
             if (self%error%status==0) grid_dimensions%block_signature(b)%is_cartesian = is_cartesian_
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='is_null_x', &
-                               val=is_null_xyz_, error=self%error%status)
+            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='is_null_x', &
+                          val=is_null_xyz_, error=self%error%status)
             call self%error%check(message='failed to load [block_'//trim(str(b, no_sign=.true.))//'].(is_null_x)'//emsg_suffix, &
                                   is_severe=.false.)
             if (self%error%status==0) grid_dimensions%block_signature(b)%is_null_x = is_null_xyz_
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='is_null_y', &
-                               val=is_null_xyz_, error=self%error%status)
+            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='is_null_y', &
+                          val=is_null_xyz_, error=self%error%status)
             call self%error%check(message='failed to load [block_'//trim(str(b, no_sign=.true.))//'].(is_null_y)'//emsg_suffix, &
                                   is_severe=.false.)
             if (self%error%status==0) grid_dimensions%block_signature(b)%is_null_y = is_null_xyz_
-            call self%fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='is_null_z', &
-                               val=is_null_xyz_, error=self%error%status)
+            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='is_null_z', &
+                          val=is_null_xyz_, error=self%error%status)
             call self%error%check(message='failed to load [block_'//trim(str(b, no_sign=.true.))//'].(is_null_z)'//emsg_suffix, &
                                   is_severe=.false.)
             if (self%error%status==0) grid_dimensions%block_signature(b)%is_null_z = is_null_xyz_

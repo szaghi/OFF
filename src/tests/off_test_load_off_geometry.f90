@@ -33,7 +33,7 @@ do f=1, size(file_name, dim=1)
 enddo
 call mesh%blocks(1)%update_level_set_distance
 call simulation%initialize(mesh=mesh)
-call simulation%mesh%save_grid_into_file(file_name=trim(adjustl(outf_name)), metrics=.true., off=.false., vtk=.true.)
+call simulation%mesh%save_file_grid(file_name=trim(adjustl(outf_name)), metrics=.true., off=.false., vtk=.true.)
 
 are_tests_passed(1) = simulation%mesh%blocks(1)%cell(1,1,1)%level_set%distance > 0._R8P
 

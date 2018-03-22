@@ -43,10 +43,10 @@ contains
                def='src/tests/shock_tube_input/sodx.ini', &
                act='store')
 
-  call cli%add(switch='--output',              &
-               help='output file name',        &
-               required=.false.,               &
-               def='shock_tube_sodx_solution', &
+  call cli%add(switch='--output',       &
+               help='output file name', &
+               required=.false.,        &
+               def='shock_tube_sodx',   &
                act='store')
 
   call cli%parse(error=error) ; if (error/=0) stop

@@ -1,3 +1,4 @@
+#include "preprocessor_macros.h"
 !< OFF level set object definition and implementation.
 
 module off_level_set_object
@@ -36,7 +37,7 @@ contains
    self = fresh
    endsubroutine destroy
 
-   pure subroutine initialize(self, interfaces_number, distances)
+   _PURE_ subroutine initialize(self, interfaces_number, distances)
    !< Initialize object.
    class(level_set_object), intent(inout)        :: self              !< Level set object.
    integer(I4P),            intent(in), optional :: interfaces_number !< Number of different interfaces.
@@ -44,8 +45,10 @@ contains
 
    call self%destroy
    if (present(interfaces_number)) then
-      allocate(self%distances(1:interfaces_number))
-      self%distances = 0._R8P
+      if (interfaces_number>0) then
+         allocate(self%distances(1:interfaces_number))
+         self%distances = 0._R8P
+      endif
    endif
    if (present(distances)) self%distances = distances
    call self%update_distance

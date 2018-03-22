@@ -148,15 +148,16 @@ contains
 
    subroutine initialize(self, os, file_parameters, adimensionals, free_conditions, eos, mesh, solver, time)
    !< Initialize simulation.
-   class(simulation_object),             intent(inout)        :: self            !< Simulation data.
-   type(os_object),                      intent(in), optional :: os              !< Running Operating System.
-   character(*),                         intent(in), optional :: file_parameters !< File name of simulation parameters file.
-   type(non_dimensional_numbers_object), intent(in), optional :: adimensionals   !< Non dimensional numbers values.
-   type(free_conditions_object),         intent(in), optional :: free_conditions !< Free conditions values.
-   type(eos_compressible),               intent(in), optional :: eos             !< Equation of state.
-   type(mesh_object),                    intent(in), optional :: mesh            !< Mesh data.
-   type(solver_object),                  intent(in), optional :: solver          !< Solver data.
-   type(time_object),                    intent(in), optional :: time            !< Time data.
+   class(simulation_object),             intent(inout)        :: self              !< Simulation data.
+   type(os_object),                      intent(in), optional :: os                !< Running Operating System.
+   character(*),                         intent(in), optional :: file_parameters   !< File name of simulation parameters file.
+   type(non_dimensional_numbers_object), intent(in), optional :: adimensionals     !< Non dimensional numbers values.
+   type(free_conditions_object),         intent(in), optional :: free_conditions   !< Free conditions values.
+   type(eos_compressible),               intent(in), optional :: eos               !< Equation of state.
+   type(mesh_object),                    intent(in), optional :: mesh              !< Mesh data.
+   type(solver_object),                  intent(in), optional :: solver            !< Solver data.
+   type(time_object),                    intent(in), optional :: time              !< Time data.
+   integer(I4P)                                               :: interfaces_number !< Number of different interfaces (level set).
 
    call self%destroy
 
@@ -175,9 +176,11 @@ contains
    call self%solver%initialize(solver=solver)
    call self%time%initialize(time=time)
 
-   call self%load_file_parameters
+   call self%load_file_parameters(interfaces_number=interfaces_number)
 
-   call self%mesh%initialize(eos=self%eos, mesh=mesh, file_grid=self%file_grid_input, file_ic=self%file_initial_conditions)
+   call self%mesh%initialize(eos=self%eos, mesh=mesh, file_grid=self%file_grid_input, file_ic=self%file_initial_conditions, &
+                             interfaces_number=interfaces_number)
+   call self%mesh%immerge_immersed_boundaries(fini=self%file_parameters, go_on_fail=self%go_on_fail)
    endsubroutine initialize
 
    subroutine integrate(self)
@@ -202,10 +205,11 @@ contains
    enddo temporal_loop
    endsubroutine integrate
 
-   subroutine load_file_parameters(self, file_name)
+   subroutine load_file_parameters(self, interfaces_number, file_name)
    !< Load file parameters.
-   class(simulation_object), intent(inout)        :: self      !< Simulation object.
-   character(len=*),         intent(in), optional :: file_name !< File name.
+   class(simulation_object), intent(inout)         :: self              !< Simulation object.
+   integer(I4P),             intent(out), optional :: interfaces_number !< Number of different interfaces (level set).
+   character(len=*),         intent(in),  optional :: file_name         !< File name.
 
    if (present(file_name)) call self%file_parameters%initialize(filename=file_name)
    if (self%is_output_verbose) print '(A)', 'load file "'//trim(adjustl(self%file_parameters%filename))//'"'
@@ -243,6 +247,13 @@ contains
    call self%solver%load_from_file(fini=self%file_parameters, integrand_0=self, go_on_fail=self%go_on_fail)
 
    call self%time%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
+
+   ! IB
+   if (present(interfaces_number)) then
+      call self%file_parameters%get(section_name='immersed_boundary_bodies', option_name='files_number', &
+                                    val=interfaces_number, error=self%error%status)
+      if (self%error%status/=0) interfaces_number=0
+   endif
    endsubroutine load_file_parameters
 
    subroutine parse_command_line_interface(self)
@@ -279,12 +290,13 @@ contains
                                  off=off, tecplot=tecplot, vtk=vtk)
    endsubroutine save_file_grid
 
-   subroutine save_file_solution(self, file_solution, file_name, is_parametric, ascii, off, tecplot, vtk, n, last)
+   subroutine save_file_solution(self, file_solution, file_name, is_parametric, metrics, ascii, off, tecplot, vtk, n, last)
    !< Save file solution.
    class(simulation_object),   intent(inout)        :: self          !< Simulation object.
    type(file_solution_object), intent(in), optional :: file_solution !< File solution handler.
    character(*),               intent(in), optional :: file_name     !< File name.
    logical,                    intent(in), optional :: is_parametric !< Sentinel to load grid parametric grid file.
+   logical,                    intent(in), optional :: metrics       !< Save metrics sentinel.
    logical,                    intent(in), optional :: ascii         !< Ascii/binary output.
    logical,                    intent(in), optional :: off           !< Save in OFF format sentinel.
    logical,                    intent(in), optional :: tecplot       !< Tecplot output format sentinel.
@@ -292,8 +304,8 @@ contains
    integer(I8P),               intent(in), optional :: n             !< Time step.
    logical,                    intent(in), optional :: last          !< Sentinel to forcce saving of last step solution.
 
-   call self%mesh%save_file_solution(file_solution=file_solution, file_name=file_name, is_parametric=is_parametric, ascii=ascii, &
-                                     off=off, tecplot=tecplot, vtk=vtk, n=n, last=last)
+   call self%mesh%save_file_solution(file_solution=file_solution, file_name=file_name, is_parametric=is_parametric, &
+                                     metrics=metrics, ascii=ascii, off=off, tecplot=tecplot, vtk=vtk, n=n, last=last)
    endsubroutine save_file_solution
 
    subroutine save_file_parameters(self, file_name)

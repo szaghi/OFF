@@ -62,11 +62,13 @@ public :: file_solution_object
 
 type, extends(file_object) :: file_solution_object
    !< File solution object class.
-   integer(I8P) :: save_frequency=1       !< Solution save frequency (on time steps).
-   logical      :: ascii_format=.false.   !< ASCII file format sentinel.
-   logical      :: off_format=.false.     !< OFF file format sentinel.
-   logical      :: tecplot_format=.false. !< Tecplot file format sentinel.
-   logical      :: vtk_format=.false.     !< VTK file format sentinel.
+   integer(I8P) :: save_frequency=1         !< Solution save frequency (on time steps).
+   logical      :: save_metrics=.false.     !< Save metrics sentinel.
+   logical      :: save_ghost_cells=.false. !< Save ghost cells sentinel.
+   logical      :: ascii_format=.false.     !< ASCII file format sentinel.
+   logical      :: off_format=.false.       !< OFF file format sentinel.
+   logical      :: tecplot_format=.false.   !< Tecplot file format sentinel.
+   logical      :: vtk_format=.false.       !< VTK file format sentinel.
    contains
       ! public methods
       procedure, pass(self) :: description                  !< Return a pretty-formatted description of the file.
@@ -91,6 +93,8 @@ contains
    prefix_ = '' ; if (present(prefix)) prefix_ = prefix
    desc = self%file_object%description(prefix=prefix_)//NL
    desc = desc//prefix_//'save frequency: '//trim(str(no_sign=.true., n=self%save_frequency))//NL
+   desc = desc//prefix_//'save metrics: '//trim(str(self%save_metrics))//NL
+   desc = desc//prefix_//'save ghost cells: '//trim(str(self%save_ghost_cells))//NL
    desc = desc//prefix_//'ascii format: '//trim(str(self%off_format))//NL
    desc = desc//prefix_//'off format: '//trim(str(self%off_format))//NL
    desc = desc//prefix_//'tecplot format: '//trim(str(self%tecplot_format))//NL
@@ -123,6 +127,18 @@ contains
    call fini%get(section_name='files', option_name=options_prefix//'_save_frequency', val=buffer_i, error=self%error%status)
    call self%error%check(message='failed to load [files].('//options_prefix//'_save_frequency)', is_severe=.not.go_on_fail_)
    if (self%error%status <= 0) self%save_frequency = buffer_i
+
+   call fini%get(section_name='files', option_name=options_prefix//'_save_metrics', val=buffer_l, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_save_metrics)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%save_metrics = buffer_l
+
+   call fini%get(section_name='files', option_name=options_prefix//'_save_ghost_cells', val=buffer_l, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_save_ghost_cells)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%save_ghost_cells = buffer_l
+
+   call fini%get(section_name='files', option_name=options_prefix//'_ascii_format', val=buffer_l, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_ascii_format)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%ascii_format = buffer_l
 
    call fini%get(section_name='files', option_name=options_prefix//'_off_format', val=buffer_l, error=self%error%status)
    call self%error%check(message='failed to load [files].('//options_prefix//'_off_format)', is_severe=.not.go_on_fail_)
@@ -211,6 +227,8 @@ contains
    select type(rhs)
    type is(file_solution_object)
       lhs%save_frequency = rhs%save_frequency
+      lhs%save_metrics = rhs%save_metrics
+      lhs%save_ghost_cells = rhs%save_ghost_cells
       lhs%ascii_format = rhs%ascii_format
       lhs%off_format = rhs%off_format
       lhs%tecplot_format = rhs%tecplot_format

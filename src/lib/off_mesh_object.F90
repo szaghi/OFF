@@ -5,17 +5,19 @@ module off_mesh_object
 !< OFF mesh object definition and implementation.
 
 use, intrinsic :: iso_fortran_env, only : stderr=>error_unit, stdout=>output_unit
-use off_bc_object, only : BC_WALL, BC_PERIODIC, BC_EXTRAPOLATED, BC_ADJACENT
+use off_bc_object, only : BC_WALL, BC_PERIODIC, BC_EXTRAPOLATED, BC_ADJACENT, BC_INLET_SUPERSONIC
 use off_block_object, only : block_object
 use off_cell_object, only : cell_object
+use off_error_object, only : error_object
 use off_file_grid_object, only : file_grid_object
 use off_file_solution_object, only : file_solution_object
 use off_grid_dimensions_object, only : grid_dimensions_object
-use flow, only : eos_compressible
+use finer, only : file_ini
+use flow, only : eos_compressible, primitive_compressible, primitive_to_conservative_compressible
 use off_solver_object, only : solver_object
 use penf, only : I4P, I8P, R8P, str, strz
 use stringifor, only : string
-use vecfor, only : vector
+use vecfor, only : vector, ex, ey, ez
 
 implicit none
 private
@@ -25,6 +27,7 @@ type :: mesh_object
    !< mesh object class.
    !<
    !< [[mesh_object]] is a container for all mesh data.
+   type(error_object)              :: error           !< Errors handler.
    type(grid_dimensions_object)    :: grid_dimensions !< Grid dimensions.
    type(block_object), allocatable :: blocks(:)       !< Blocks list.
    contains
@@ -34,6 +37,7 @@ type :: mesh_object
       procedure, pass(self) :: conservative_to_primitive          !< Convert conservative variables to primitive ones.
       procedure, pass(self) :: description                        !< Return a pretty-formatted description of the mesh.
       procedure, pass(self) :: destroy                            !< Destroy mesh.
+      procedure, pass(self) :: immerge_immersed_boundaries        !< Immerge Immersed Boundary bodies.
       procedure, pass(self) :: impose_boundary_conditions         !< Impose boundary conditions.
       procedure, pass(self) :: initialize                         !< Initialize mesh.
       procedure, pass(self) :: load_grid_from_file                !< Load grid from file.
@@ -50,15 +54,17 @@ type :: mesh_object
       ! operators
       generic :: assignment(=) => mesh_assign_mesh !< Overload `=`.
       ! private methods
-      procedure, pass(lhs) :: mesh_assign_mesh !< Operator `=`.
+      procedure, pass(lhs)  :: mesh_assign_mesh                          !< Operator `=`.
+      procedure, pass(self) :: set_parametric_boundary_conditions_custom !< Set boundary conditions from parametric custom file.
 endtype mesh_object
 
 contains
    ! public methods
-   _PURE_ subroutine allocate_blocks(self)
+   _PURE_ subroutine allocate_blocks(self, interfaces_number)
    !< Allocate blocks accordingly to grid dimensions.
-   class(mesh_object), intent(inout) :: self !< Mesh.
-   integer(I4P)                      :: b    !< Counter.
+   class(mesh_object), intent(inout)        :: self              !< Mesh.
+   integer(I4P),       intent(in), optional :: interfaces_number !< Number of different interfaces.
+   integer(I4P)                             :: b                 !< Counter.
 
    if (self%grid_dimensions%blocks_number > 0) then
       if (allocated(self%blocks)) then
@@ -67,7 +73,7 @@ contains
       endif
       allocate(self%blocks(1:self%grid_dimensions%blocks_number))
       do b=1, self%grid_dimensions%blocks_number
-         call self%blocks(b)%initialize(signature=self%grid_dimensions%block_signature(b))
+         call self%blocks(b)%initialize(signature=self%grid_dimensions%block_signature(b), interfaces_number=interfaces_number)
       enddo
    endif
    endsubroutine allocate_blocks
@@ -124,12 +130,57 @@ contains
    !< Destroy mesh.
    class(mesh_object), intent(inout) :: self !< Mesh.
 
+   call self%error%destroy
    call self%grid_dimensions%destroy
    if (allocated(self%blocks)) then
       call self%blocks%destroy
       deallocate(self%blocks)
    endif
    endsubroutine destroy
+
+   subroutine immerge_immersed_boundaries(self, fini, go_on_fail)
+   !< "Immerge" Immersed Boundary bodies (geometry described into OFF files) into the block grid.
+   !<
+   !< @note OFF file format (Object File Format) is a geometry definition file format containing the description
+   !< of the composing polygons of the 3D object used by CGAL.
+   class(mesh_object), intent(inout)        :: self         !< Mesh.
+   type(file_ini),     intent(in)           :: fini         !< Simulation parameters ini file handler.
+   logical,            intent(in), optional :: go_on_fail   !< Go on if load fails.
+   logical                                  :: go_on_fail_  !< Go on if load fails, local variable.
+   character(len=:), allocatable            :: section      !< Section of INI file containing IB files data.
+   integer(I4P)                             :: files_number !< Number of IB body files.
+   character(999)                           :: file_name    !< File name of IB body files.
+   real(R8P)                                :: or(1:3)      !< Outside point references for each body file.
+   integer(I4P)                             :: b, f         !< Counter.
+
+   if (self%grid_dimensions%blocks_number>0) then
+      go_on_fail_ = .false. ; if (present(go_on_fail)) go_on_fail_ = go_on_fail
+      section = 'immersed_boundary_bodies'
+      if (fini%has_section(section)) then
+         call fini%get(section_name=section, option_name='files_number', val=files_number, error=self%error%status)
+         call self%error%check(message='failed to load ['//section//'].(files_number)', is_severe=.not.go_on_fail_)
+         if (files_number>0) then
+            do f=1, files_number
+               call fini%get(section_name=section, option_name='file_ibb_'//trim(str(n=f, no_sign=.true.)), &
+                             val=file_name, error=self%error%status)
+               call self%error%check(message='failed to load ['//section//'].('//'file_ibb_'//trim(str(n=f, no_sign=.true.))//')', &
+                                     is_severe=.not.go_on_fail_)
+               call fini%get(section_name=section, option_name='outside_reference_ibb_'//trim(str(n=f, no_sign=.true.)), &
+                             val=or, error=self%error%status)
+               call self%error%check(message='failed to load ['//section//'].('//'outside_reference_ibb_'//&
+                                     trim(str(n=f, no_sign=.true.))//')', is_severe=.not.go_on_fail_)
+               do b=1, self%grid_dimensions%blocks_number
+                  call self%blocks(b)%immerge_off_geometry(file_name=trim(adjustl(file_name)), &
+                                                           n=f, outside_reference=(or(1)*ex+or(2)*ey+or(3)*ez))
+               enddo
+            enddo
+            do b=1, self%grid_dimensions%blocks_number
+               call self%blocks(b)%update_level_set_distance
+            enddo
+         endif
+      endif
+   endif
+   endsubroutine immerge_immersed_boundaries
 
    subroutine impose_boundary_conditions(self)
    !< Impose boundary conditions on all blocks of the mesh.
@@ -155,6 +206,8 @@ contains
                                                                 stride=block_b%cell(:,j,k))
                elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_ADJACENT)) then
                   call impose_boundary_conditions_adjacent(gc=gc(1), frame=block_b%cell(1-gc(1):0,j,k))
+               elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_INLET_SUPERSONIC)) then
+                  call impose_boundary_conditions_inlet_supersonic(gc=gc(1), frame=block_b%cell(1-gc(1):0,j,k))
                endif
                ! right
                if     (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_WALL)) then
@@ -167,6 +220,8 @@ contains
                                                                 stride=block_b%cell(:,j,k))
                elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_ADJACENT)) then
                   call impose_boundary_conditions_adjacent(gc=gc(2), frame=block_b%cell(Ni+1:Ni+gc(2),j,k))
+               elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_INLET_SUPERSONIC)) then
+                  call impose_boundary_conditions_inlet_supersonic(gc=gc(2), frame=block_b%cell(Ni+1:Ni+gc(2),j,k))
                endif
             enddo
          enddo
@@ -175,7 +230,7 @@ contains
             do i=1, Ni
                ! left
                if     (self%blocks(b)%cell(i,0,k)%bc%is(BC_WALL)) then
-                  call impose_boundary_conditions_wall(gc=gc(3:4), ic=gc(3), N=Nj, normal=block_b%face_i(i,0,k)%normal, &
+                  call impose_boundary_conditions_wall(gc=gc(3:4), ic=gc(3), N=Nj, normal=block_b%face_j(i,0,k)%normal, &
                                                        boundary='l', stride=block_b%cell(i,:,k))
                elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_PERIODIC)) then
                   call impose_boundary_conditions_periodic(gc=gc(3:4), ic=gc(3), N=Nj, boundary='l', stride=block_b%cell(i,:,k))
@@ -184,10 +239,12 @@ contains
                                                                 stride=block_b%cell(i,:,k))
                elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_ADJACENT)) then
                   call impose_boundary_conditions_adjacent(gc=gc(3), frame=block_b%cell(i,1-gc(3):0,k))
+               elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_INLET_SUPERSONIC)) then
+                  call impose_boundary_conditions_inlet_supersonic(gc=gc(3), frame=block_b%cell(i,1-gc(3):0,k))
                endif
                ! right
                if     (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_WALL)) then
-                  call impose_boundary_conditions_wall(gc=gc(3:4), ic=gc(4), N=Nj, normal=block_b%face_i(i,Nj,k)%normal, &
+                  call impose_boundary_conditions_wall(gc=gc(3:4), ic=gc(4), N=Nj, normal=block_b%face_j(i,Nj,k)%normal, &
                                                        boundary='r', stride=block_b%cell(i,:,k))
                elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_PERIODIC)) then
                   call impose_boundary_conditions_periodic(gc=gc(3:4), ic=gc(4), N=Nj, boundary='r', stride=block_b%cell(i,:,k))
@@ -196,6 +253,8 @@ contains
                                                                 stride=block_b%cell(i,:,k))
                elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_ADJACENT)) then
                   call impose_boundary_conditions_adjacent(gc=gc(4), frame=block_b%cell(i,Nj+1:Nj+gc(4),k))
+               elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_INLET_SUPERSONIC)) then
+                  call impose_boundary_conditions_inlet_supersonic(gc=gc(4), frame=block_b%cell(i,Nj+1:Nj+gc(4),k))
                endif
             enddo
          enddo
@@ -204,7 +263,7 @@ contains
             do i=1, Ni
                ! left
                if     (self%blocks(b)%cell(i,j,0)%bc%is(BC_WALL)) then
-                  call impose_boundary_conditions_wall(gc=gc(5:6), ic=gc(5), N=Nk, normal=block_b%face_i(i,j,0)%normal, &
+                  call impose_boundary_conditions_wall(gc=gc(5:6), ic=gc(5), N=Nk, normal=block_b%face_k(i,j,0)%normal, &
                                                        boundary='l', stride=block_b%cell(i,j,:))
                elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_PERIODIC)) then
                   call impose_boundary_conditions_periodic(gc=gc(5:6), ic=gc(5), N=Nk, boundary='l', stride=block_b%cell(i,j,:))
@@ -213,10 +272,12 @@ contains
                                                                 stride=block_b%cell(i,j,:))
                elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_ADJACENT)) then
                   call impose_boundary_conditions_adjacent(gc=gc(5), frame=block_b%cell(i,j,1-gc(5):0))
+               elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_INLET_SUPERSONIC)) then
+                  call impose_boundary_conditions_inlet_supersonic(gc=gc(5), frame=block_b%cell(i,j,1-gc(5):0))
                endif
                ! right
                if     (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_WALL)) then
-                  call impose_boundary_conditions_wall(gc=gc(5:6), ic=gc(6), N=Nk, normal=block_b%face_i(i,Nj,k)%normal, &
+                  call impose_boundary_conditions_wall(gc=gc(5:6), ic=gc(6), N=Nk, normal=block_b%face_k(i,j,Nk)%normal, &
                                                        boundary='r', stride=block_b%cell(i,j,:))
                elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_PERIODIC)) then
                   call impose_boundary_conditions_periodic(gc=gc(5:6), ic=gc(6), N=Nk, boundary='r', stride=block_b%cell(i,j,:))
@@ -225,6 +286,8 @@ contains
                                                                 stride=block_b%cell(i,j,:))
                elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_ADJACENT)) then
                   call impose_boundary_conditions_adjacent(gc=gc(6), frame=block_b%cell(i,j,Nk+1:Nk+gc(6)))
+               elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_INLET_SUPERSONIC)) then
+                  call impose_boundary_conditions_inlet_supersonic(gc=gc(6), frame=block_b%cell(i,j,Nk+1:Nk+gc(6)))
                endif
             enddo
          enddo
@@ -232,7 +295,7 @@ contains
    enddo
    call self%primitive_to_conservative
    contains
-      pure subroutine impose_boundary_conditions_wall(gc, ic, N, normal, boundary, stride)
+      _PURE_ subroutine impose_boundary_conditions_wall(gc, ic, N, normal, boundary, stride)
       !< Impose wall boundary conditions on a stride of cells along a direction.
       integer(I4P),      intent(in)    :: gc(1:2)          !< Number of ghost cells.
       integer(I4P),      intent(in)    :: ic               !< Number of internal cells used for extrapolation (1 or gc).
@@ -331,8 +394,7 @@ contains
                stride(i)%P = stride(-i+1)%P
             enddo
          endif
-      endif
-      if (boundary=='r') then
+      elseif (boundary=='r') then
          if (ic==1.or.N<gc(2)) then ! extrapolation using only the cell N
             do i=N+1, N+gc(2)
               stride(i)%P = stride(N)%P
@@ -357,17 +419,29 @@ contains
          endassociate
       enddo
       endsubroutine impose_boundary_conditions_adjacent
+
+      pure subroutine impose_boundary_conditions_inlet_supersonic(gc, frame)
+      !< Impose boundary conditions of extrapolation on a stride of cells along a direction.
+      integer(I4P),      intent(in)    :: gc           !< Number of ghost cells.
+      type(cell_object), intent(inout) :: frame(1-gc:) !< Cells frame [1-gc:0].
+      integer(I4P)                     :: i            !< Counter.
+
+      do i=1-gc, 0
+         frame(i)%U = frame(i)%bc%U
+      enddo
+      endsubroutine impose_boundary_conditions_inlet_supersonic
    endsubroutine impose_boundary_conditions
 
-   subroutine initialize(self, mesh, eos, file_grid, file_ic)
+   subroutine initialize(self, mesh, eos, interfaces_number, file_grid, file_ic)
    !< Initialize mesh.
    !<
    !< The initialization can be done also loading from files (standard or paramatric ones).
-   class(mesh_object),         intent(inout)           :: self      !< Mesh.
-   type(mesh_object),          intent(in),    optional :: mesh      !< mesh data.
-   type(eos_compressible),     intent(in),    optional :: eos       !< EOS data.
-   type(file_grid_object),     intent(inout), optional :: file_grid !< Grid file.
-   type(file_solution_object), intent(inout), optional :: file_ic   !< Initial conditions file.
+   class(mesh_object),         intent(inout)           :: self              !< Mesh.
+   type(mesh_object),          intent(in),    optional :: mesh              !< mesh data.
+   type(eos_compressible),     intent(in),    optional :: eos               !< EOS data.
+   integer(I4P),               intent(in),    optional :: interfaces_number !< Number of different interfaces.
+   type(file_grid_object),     intent(inout), optional :: file_grid         !< Grid file.
+   type(file_solution_object), intent(inout), optional :: file_ic           !< Initial conditions file.
 
    call self%destroy
    call self%grid_dimensions%initialize
@@ -375,21 +449,22 @@ contains
       call self%grid_dimensions%initialize(block_signature=mesh%blocks%signature)
       allocate(self%blocks(1:size(mesh%blocks, dim=1)), source=mesh%blocks)
    else
-      if (present(file_grid)) call self%load_grid_from_file(file_grid=file_grid)
+      if (present(file_grid)) call self%load_grid_from_file(file_grid=file_grid, interfaces_number=interfaces_number)
       if (present(eos).and.allocated(self%blocks)) call self%blocks%set_eos(eos=eos)
       if (present(file_ic)) call self%load_ic_from_file(file_ic=file_ic)
    endif
    endsubroutine initialize
 
-   subroutine load_grid_from_file(self, file_grid)
+   subroutine load_grid_from_file(self, interfaces_number, file_grid)
    !< Load grid from file.
-   class(mesh_object),     intent(inout) :: self      !< Mesh.
-   type(file_grid_object), intent(inout) :: file_grid !< Grid file.
-   integer(I4P)                          :: b         !< Counter.
+   class(mesh_object),     intent(inout)           :: self              !< Mesh.
+   integer(I4P),           intent(in),    optional :: interfaces_number !< Number of different interfaces.
+   type(file_grid_object), intent(inout)           :: file_grid         !< Grid file.
+   integer(I4P)                                    :: b                 !< Counter.
 
    call file_grid%load_grid_dimensions_from_file(grid_dimensions=self%grid_dimensions)
    if (self%grid_dimensions%blocks_number>0) then
-      call self%allocate_blocks
+      call self%allocate_blocks(interfaces_number=interfaces_number)
       if (file_grid%is_parametric) then
          do b=1, self%grid_dimensions%blocks_number
             if (self%blocks(b)%signature%is_cartesian) then
@@ -467,12 +542,14 @@ contains
       endif
    endsubroutine save_file_grid
 
-   subroutine save_file_solution(self, file_solution, file_name, is_parametric, ascii, off, tecplot, vtk, n, last)
+   subroutine save_file_solution(self, file_solution, file_name, is_parametric, metrics, ascii, gc, off, tecplot, vtk, n, last)
    !< Save file solution.
    class(mesh_object),         intent(inout)        :: self           !< Mesh.
    type(file_solution_object), intent(in), optional :: file_solution  !< File solution handler.
    character(*),               intent(in), optional :: file_name      !< File name.
    logical,                    intent(in), optional :: is_parametric  !< Sentinel to load grid parametric grid file.
+   logical,                    intent(in), optional :: metrics        !< Save metrics sentinel.
+   logical,                    intent(in), optional :: gc             !< Save ghost cells sentinel.
    logical,                    intent(in), optional :: ascii          !< Ascii/binary output.
    logical,                    intent(in), optional :: off            !< Save in OFF format sentinel.
    logical,                    intent(in), optional :: tecplot        !< Tecplot output format sentinel.
@@ -482,6 +559,8 @@ contains
    logical                                          :: is_parametric_ !< Sentinel to load grid parametric grid file, local variable.
    type(string)                                     :: base_name      !< Base file name.
    type(string)                                     :: file_name_     !< File name, local variable.
+   logical                                          :: metrics_       !< Save metrics sentinel, local variable.
+   logical                                          :: gc_            !< Save ghost cells sentinel, local variable.
    logical                                          :: ascii_         !< Ascii/binary output, local variable.
    logical                                          :: off_           !< OFF format sentinel, local variable.
    logical                                          :: vtk_           !< VTK format sentinel, local variable.
@@ -518,12 +597,16 @@ contains
 
    if (present(file_solution)) then
       is_parametric_ = file_solution%is_parametric
+      metrics_ = file_solution%save_metrics
+      gc_ = file_solution%save_ghost_cells
       ascii_ = file_solution%ascii_format
       off_ = file_solution%off_format
       vtk_ = file_solution%vtk_format
    else
       is_parametric_ = .false. ; if (present(is_parametric)) is_parametric_ = is_parametric
-      ascii_ = .true.  ; if (present(ascii)) ascii_ = ascii
+      metrics_ = .false. ; if (present(metrics)) metrics_ = metrics
+      gc_ = .false. ; if (present(gc)) gc_ = gc
+      ascii_ = .true. ; if (present(ascii)) ascii_ = ascii
       off_ = .true. ; if (present(off)) off_ = off
       vtk_ = .false. ; if (present(vtk)) vtk_ = vtk
    endif
@@ -538,7 +621,7 @@ contains
             file_name_ = base_name//'-solution-block'//                                     &
                          '-id_'//trim(str(n=self%blocks(b)%signature%id, no_sign=.true.))// &
                          '-lv_'//trim(str(n=self%blocks(b)%signature%level, no_sign=.true.))//n_//'.vts'
-            call self%blocks(b)%save_file_solution(file_name=file_name_%chars(), ascii=ascii, vtk=vtk_)
+            call self%blocks(b)%save_file_solution(file_name=file_name_%chars(), metrics=metrics_, gc=gc_, ascii=ascii_, vtk=vtk_)
          enddo
       endif
    endif
@@ -557,7 +640,8 @@ contains
          buffer_s = trim(block_c%signature%faces_bc(1))
          buffer_s = buffer_s%upper()
          buffer_c = buffer_s%chars()
-         if (buffer_c(1:3) == 'ADJ') then
+         select case(buffer_c(1:3))
+         case('ADJ')
             ba = adjacent_block_index(bc_code=buffer_c)
             associate(block_a=>self%blocks(ba)) ! adjacent block
                do k=1, block_c%signature%nk
@@ -573,7 +657,7 @@ contains
                   enddo
                enddo
             endassociate
-         else
+         case('FRE', 'WAL', 'PER', 'EXT')
             do k=1, block_c%signature%nk
                do j=1, block_c%signature%nj
                   do i=1 - block_c%signature%gc(1), 0
@@ -582,13 +666,17 @@ contains
                   enddo
                enddo
             enddo
-         endif
+         case default
+            ! bc is defined into a custom INI file
+            call self%set_parametric_boundary_conditions_custom(file_name=trim(block_c%signature%faces_bc(1)))
+         endselect
 
          ! i right frame
          buffer_s = trim(block_c%signature%faces_bc(2))
          buffer_s = buffer_s%upper()
          buffer_c = buffer_s%chars()
-         if (buffer_c(1:3) == 'ADJ') then
+         select case(buffer_c(1:3))
+         case('ADJ')
             ba = adjacent_block_index(bc_code=buffer_c)
             associate(block_a=>self%blocks(ba)) ! adjacent block
                do k=1, block_c%signature%nk
@@ -604,7 +692,7 @@ contains
                   enddo
                enddo
             endassociate
-         else
+         case('FRE', 'WAL', 'PER', 'EXT')
             do k=1, block_c%signature%nk
                do j=1, block_c%signature%nj
                   do i=block_c%signature%ni + 1, block_c%signature%ni + block_c%signature%gc(2)
@@ -613,13 +701,17 @@ contains
                   enddo
                enddo
             enddo
-         endif
+         case default
+            ! bc is defined into a custom INI file
+            call self%set_parametric_boundary_conditions_custom(file_name=trim(block_c%signature%faces_bc(2)))
+         endselect
 
          ! j left frame
          buffer_s = trim(block_c%signature%faces_bc(3))
          buffer_s = buffer_s%upper()
          buffer_c = buffer_s%chars()
-         if (buffer_c(1:3) == 'ADJ') then
+         select case(buffer_c(1:3))
+         case('ADJ')
             ba = adjacent_block_index(bc_code=buffer_c)
             associate(block_a=>self%blocks(ba)) ! adjacent block
                do k=1, block_c%signature%nk
@@ -635,22 +727,26 @@ contains
                   enddo
                enddo
             endassociate
-         else
-            do k=1, block_c%signature%nk
+         case('FRE', 'WAL', 'PER', 'EXT')
+            do k=1 - block_c%signature%gc(5), block_c%signature%nk + block_c%signature%gc(6)
                do j=1 - block_c%signature%gc(3), 0
-                  do i=1, block_c%signature%ni
+                  do i=1 - block_c%signature%gc(1), block_c%signature%ni + block_c%signature%gc(2)
                      if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                      call block_c%cell(i,j,k)%bc%initialize(code=buffer_c)
                   enddo
                enddo
             enddo
-         endif
+         case default
+            ! bc is defined into a custom INI file
+            call self%set_parametric_boundary_conditions_custom(file_name=trim(block_c%signature%faces_bc(3)))
+         endselect
 
          ! j right frame
          buffer_s = trim(block_c%signature%faces_bc(4))
          buffer_s = buffer_s%upper()
          buffer_c = buffer_s%chars()
-         if (buffer_c(1:3) == 'ADJ') then
+         select case(buffer_c(1:3))
+         case('ADJ')
             ba = adjacent_block_index(bc_code=buffer_c)
             associate(block_a=>self%blocks(ba)) ! adjacent block
                do k=1, block_c%signature%nk
@@ -666,22 +762,26 @@ contains
                   enddo
                enddo
             endassociate
-         else
-            do k=1, block_c%signature%nk
+         case('FRE', 'WAL', 'PER', 'EXT')
+            do k=1 - block_c%signature%gc(5), block_c%signature%nk + block_c%signature%gc(6)
                do j=block_c%signature%nj + 1, block_c%signature%nj + block_c%signature%gc(4)
-                  do i=1, block_c%signature%ni
+                  do i=1 - block_c%signature%gc(1), block_c%signature%ni + block_c%signature%gc(2)
                      if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                      call block_c%cell(i,j,k)%bc%initialize(code=buffer_c)
                   enddo
                enddo
             enddo
-         endif
+         case default
+            ! bc is defined into a custom INI file
+            call self%set_parametric_boundary_conditions_custom(file_name=trim(block_c%signature%faces_bc(4)))
+         endselect
 
          ! k left frame
          buffer_s = trim(block_c%signature%faces_bc(5))
          buffer_s = buffer_s%upper()
          buffer_c = buffer_s%chars()
-         if (buffer_c(1:3) == 'ADJ') then
+         select case(buffer_c(1:3))
+         case('ADJ')
             ba = adjacent_block_index(bc_code=buffer_c)
             associate(block_a=>self%blocks(ba)) ! adjacent block
                do k=1 - block_c%signature%gc(5), 0
@@ -697,7 +797,7 @@ contains
                   enddo
                enddo
             endassociate
-         else
+         case('FRE', 'WAL', 'PER', 'EXT')
             do k=1 - block_c%signature%gc(5), 0
                do j=1, block_c%signature%nj
                   do i=1, block_c%signature%ni
@@ -706,13 +806,17 @@ contains
                   enddo
                enddo
             enddo
-         endif
+         case default
+            ! bc is defined into a custom INI file
+            call self%set_parametric_boundary_conditions_custom(file_name=trim(block_c%signature%faces_bc(5)))
+         endselect
 
          ! k right frame
          buffer_s = trim(block_c%signature%faces_bc(6))
          buffer_s = buffer_s%upper()
          buffer_c = buffer_s%chars()
-         if (buffer_c(1:3) == 'ADJ') then
+         select case(buffer_c(1:3))
+         case('ADJ')
             ba = adjacent_block_index(bc_code=buffer_c)
             associate(block_a=>self%blocks(ba)) ! adjacent block
                do k=block_c%signature%nk + 1, block_c%signature%nk + block_c%signature%gc(6)
@@ -728,7 +832,7 @@ contains
                   enddo
                enddo
             endassociate
-         else
+         case('FRE', 'WAL', 'PER', 'EXT')
             do k=block_c%signature%nk + 1, block_c%signature%nk + block_c%signature%gc(6)
                do j=1, block_c%signature%nj
                   do i=1, block_c%signature%ni
@@ -737,7 +841,10 @@ contains
                   enddo
                enddo
             enddo
-         endif
+         case default
+            ! bc is defined into a custom INI file
+            call self%set_parametric_boundary_conditions_custom(file_name=trim(block_c%signature%faces_bc(6)))
+         endselect
       endassociate
    enddo
    contains
@@ -814,6 +921,7 @@ contains
    type(mesh_object),  intent(in)    :: rhs !< Right hand side.
    integer(I4P)                      :: b   !< Counter.
 
+   lhs%error = rhs%error
    if (lhs%grid_dimensions%blocks_number/=rhs%grid_dimensions%blocks_number) then
       call lhs%destroy
       lhs%grid_dimensions = rhs%grid_dimensions
@@ -823,4 +931,81 @@ contains
       lhs%blocks(b) = rhs%blocks(b)
    enddo
    endsubroutine mesh_assign_mesh
+
+   subroutine set_parametric_boundary_conditions_custom(self, file_name)
+   !< Set boundary conditions from parametric custom file.
+   !<
+   !< Blocks EOS must be already set entering this procedure.
+   class(mesh_object), intent(inout) :: self                   !< Mesh.
+   character(*),       intent(in)    :: file_name              !< File name of custom parametric bc.
+   character(99)                     :: code_c                 !< BC code character buffer.
+   type(string)                      :: code_s                 !< BC code string buffer.
+   character(99)                     :: frame                  !< Block frame to be set.
+   type(file_ini)                    :: fini                   !< Parametric file handler.
+   type(primitive_compressible)      :: P                      !< Primitive variables.
+   real(R8P)                         :: velocity(3)            !< Velocity temporary array.
+   integer(I4P)                      :: b, i, j, k             !< Counter.
+   integer(I4P)                      :: i1, i2, j1, j2, k1, k2 !< Counter.
+
+   call fini%initialize(filename=file_name)
+   call fini%load(error=self%error%status)
+   if (self%error%status==0) then
+      call fini%get(section_name='boundary_conditions', option_name='type', val=code_c, error=self%error%status)
+      call self%error%check(message='failed to load [boundary_conditions].(type)', is_severe=.true.)
+      code_s = trim(code_c)
+      code_s = code_s%upper()
+      call fini%get(section_name='boundary_conditions', option_name='block', val=b, error=self%error%status)
+      call self%error%check(message='failed to load [boundary_conditions].(block)', is_severe=.true.)
+      call fini%get(section_name='boundary_conditions', option_name='frame', val=frame, error=self%error%status)
+      call self%error%check(message='failed to load [boundary_conditions].(frame)', is_severe=.true.)
+      call fini%get(section_name='boundary_conditions', option_name='pressure', val=P%pressure, error=self%error%status)
+      call self%error%check(message='failed to load [boundary_conditions].(pressure)', is_severe=.false.)
+      call fini%get(section_name='boundary_conditions', option_name='density', val=P%density, error=self%error%status)
+      call self%error%check(message='failed to load [boundary_conditions].(density)', is_severe=.false.)
+      call fini%get(section_name='boundary_conditions', option_name='velocity', val=velocity, error=self%error%status)
+      call self%error%check(message='failed to load [boundary_conditions].(velocity)', is_severe=.false.)
+      P%velocity%x = velocity(1)
+      P%velocity%y = velocity(2)
+      P%velocity%z = velocity(3)
+      associate(block_c=>self%blocks(b)) ! current block
+         select case(trim(adjustl(frame)))
+         case('i_left')
+            i1 = 1 - block_c%signature%gc(1) ; i2 = 0
+            j1 = 1                           ; j2 = block_c%signature%nj
+            k1 = 1                           ; k2 = block_c%signature%nk
+         case('i_right')
+            i1 = block_c%signature%ni + 1    ; i2 = block_c%signature%ni + block_c%signature%gc(2)
+            j1 = 1                           ; j2 = block_c%signature%nj
+            k1 = 1                           ; k2 = block_c%signature%nk
+         case('j_left')
+            i1 = 1                           ; i2 = block_c%signature%ni
+            j1 = 1 - block_c%signature%gc(3) ; j2 = 0
+            k1 = 1                           ; k2 = block_c%signature%nk
+         case('j_right')
+            i1 = 1                           ; i2 = block_c%signature%ni
+            j1 = block_c%signature%nj + 1    ; j2 = block_c%signature%nj + block_c%signature%gc(4)
+            k1 = 1                           ; k2 = block_c%signature%nk
+         case('k_left')
+            i1 = 1                           ; i2 = block_c%signature%ni
+            j1 = 1                           ; j2 = block_c%signature%nj
+            k1 = 1 - block_c%signature%gc(5) ; k2 = 0
+         case('k_right')
+            i1 = 1                           ; i2 = block_c%signature%ni
+            j1 = 1                           ; j2 = block_c%signature%nj
+            k1 = block_c%signature%nk + 1    ; k2 = block_c%signature%nk + block_c%signature%gc(6)
+         endselect
+         do k=k1, k2
+            do j=j1, j2
+               do i=i1, i2
+                  if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                  call block_c%cell(i,j,k)%bc%initialize(code=code_s%chars())
+                  block_c%cell(i, j, k)%bc%U = primitive_to_conservative_compressible(primitive=P, eos=block_c%eos)
+               enddo
+            enddo
+         enddo
+      endassociate
+   else
+      error stop 'boundary conditions file "'//trim(adjustl(file_name))//'" not found!'
+   endif
+   endsubroutine set_parametric_boundary_conditions_custom
 endmodule off_mesh_object

@@ -82,7 +82,7 @@ contains
    type(file_ini)                                     :: fini            !< Solution parameters ini file handler.
    integer(I4P)                                       :: dimensions_(3)  !< Block dimensions buffer.
    real(R8P)                                          :: extents_(6)     !< Block extents buffer.
-   character(32)                                      :: faces_bc_(6)    !< Faces boundary conditions.
+   character(999)                                     :: faces_bc_(6)    !< Faces boundary conditions.
    integer(I8P)                                       :: id_             !< Block ID.
    integer(I4P)                                       :: level_          !< Block refinement level.
    logical                                            :: is_cartesian_   !< Cartesian block sentinel.

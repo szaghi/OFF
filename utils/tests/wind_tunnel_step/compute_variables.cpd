@@ -1,0 +1,301 @@
+<CustomFilterDefinitions>
+  <CustomProxyDefinition name="compute_variables" group="filters">
+    <CompoundSourceProxy id="10039" servers="1">
+      <Proxy group="filters" type="Calculator" id="6356" servers="1" compound_name="compute-a">
+        <Property name="AttributeMode" id="6356.AttributeMode" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="enum" id="6356.AttributeMode.enum">
+            <Entry value="1" text="Point Data"/>
+            <Entry value="2" text="Cell Data"/>
+          </Domain>
+        </Property>
+        <Property name="CoordinateResults" id="6356.CoordinateResults" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6356.CoordinateResults.bool"/>
+        </Property>
+        <Property name="Function" id="6356.Function" number_of_elements="1">
+          <Element index="0" value="sqrt(1.4*p/density)"/>
+        </Property>
+        <Property name="Input" id="6356.Input" number_of_elements="1">
+          <Proxy value="6115" output_port="0"/>
+          <Domain name="groups" id="6356.Input.groups"/>
+          <Domain name="input_array" id="6356.Input.input_array"/>
+          <Domain name="input_type" id="6356.Input.input_type"/>
+        </Property>
+        <Property name="ReplaceInvalidValues" id="6356.ReplaceInvalidValues" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="6356.ReplaceInvalidValues.bool"/>
+        </Property>
+        <Property name="ReplacementValue" id="6356.ReplacementValue" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="range" id="6356.ReplacementValue.range"/>
+        </Property>
+        <Property name="ResultArrayName" id="6356.ResultArrayName" number_of_elements="1">
+          <Element index="0" value="a"/>
+        </Property>
+        <Property name="ResultNormals" id="6356.ResultNormals" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6356.ResultNormals.bool"/>
+        </Property>
+        <Property name="ResultTCoords" id="6356.ResultTCoords" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6356.ResultTCoords.bool"/>
+        </Property>
+      </Proxy>
+      <Proxy group="filters" type="Calculator" id="6367" servers="1" compound_name="compute-mach">
+        <Property name="AttributeMode" id="6367.AttributeMode" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="enum" id="6367.AttributeMode.enum">
+            <Entry value="1" text="Point Data"/>
+            <Entry value="2" text="Cell Data"/>
+          </Domain>
+        </Property>
+        <Property name="CoordinateResults" id="6367.CoordinateResults" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6367.CoordinateResults.bool"/>
+        </Property>
+        <Property name="Function" id="6367.Function" number_of_elements="1">
+          <Element index="0" value="sqrt(u^2+v^2)/a"/>
+        </Property>
+        <Property name="Input" id="6367.Input" number_of_elements="1">
+          <Proxy value="6356" output_port="0"/>
+          <Domain name="groups" id="6367.Input.groups"/>
+          <Domain name="input_array" id="6367.Input.input_array"/>
+          <Domain name="input_type" id="6367.Input.input_type"/>
+        </Property>
+        <Property name="ReplaceInvalidValues" id="6367.ReplaceInvalidValues" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="6367.ReplaceInvalidValues.bool"/>
+        </Property>
+        <Property name="ReplacementValue" id="6367.ReplacementValue" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="range" id="6367.ReplacementValue.range"/>
+        </Property>
+        <Property name="ResultArrayName" id="6367.ResultArrayName" number_of_elements="1">
+          <Element index="0" value="Mach number"/>
+        </Property>
+        <Property name="ResultNormals" id="6367.ResultNormals" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6367.ResultNormals.bool"/>
+        </Property>
+        <Property name="ResultTCoords" id="6367.ResultTCoords" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6367.ResultTCoords.bool"/>
+        </Property>
+      </Proxy>
+      <Proxy group="filters" type="Calculator" id="6115" servers="1" compound_name="compute-p">
+        <Property name="AttributeMode" id="6115.AttributeMode" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="enum" id="6115.AttributeMode.enum">
+            <Entry value="1" text="Point Data"/>
+            <Entry value="2" text="Cell Data"/>
+          </Domain>
+        </Property>
+        <Property name="CoordinateResults" id="6115.CoordinateResults" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6115.CoordinateResults.bool"/>
+        </Property>
+        <Property name="Function" id="6115.Function" number_of_elements="1">
+          <Element index="0" value="0.4*(energy-0.5*density*(u^2+v^2))"/>
+        </Property>
+        <Property name="Input" id="6115.Input" number_of_elements="1">
+          <Proxy value="5878" output_port="0"/>
+          <Domain name="groups" id="6115.Input.groups"/>
+          <Domain name="input_array" id="6115.Input.input_array"/>
+          <Domain name="input_type" id="6115.Input.input_type"/>
+        </Property>
+        <Property name="ReplaceInvalidValues" id="6115.ReplaceInvalidValues" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="6115.ReplaceInvalidValues.bool"/>
+        </Property>
+        <Property name="ReplacementValue" id="6115.ReplacementValue" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="range" id="6115.ReplacementValue.range"/>
+        </Property>
+        <Property name="ResultArrayName" id="6115.ResultArrayName" number_of_elements="1">
+          <Element index="0" value="p"/>
+        </Property>
+        <Property name="ResultNormals" id="6115.ResultNormals" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6115.ResultNormals.bool"/>
+        </Property>
+        <Property name="ResultTCoords" id="6115.ResultTCoords" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6115.ResultTCoords.bool"/>
+        </Property>
+      </Proxy>
+      <Proxy group="filters" type="UnstructuredGradient" id="6378" servers="1" compound_name="compute-schlieren">
+        <Property name="ComputeDivergence" id="6378.ComputeDivergence" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6378.ComputeDivergence.bool"/>
+        </Property>
+        <Property name="ComputeGradient" id="6378.ComputeGradient" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="6378.ComputeGradient.bool"/>
+        </Property>
+        <Property name="ComputeQCriterion" id="6378.ComputeQCriterion" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6378.ComputeQCriterion.bool"/>
+        </Property>
+        <Property name="ComputeVorticity" id="6378.ComputeVorticity" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6378.ComputeVorticity.bool"/>
+        </Property>
+        <Property name="DivergenceArrayName" id="6378.DivergenceArrayName" number_of_elements="1">
+          <Element index="0" value="Divergence"/>
+        </Property>
+        <Property name="FasterApproximation" id="6378.FasterApproximation" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6378.FasterApproximation.bool"/>
+        </Property>
+        <Property name="Input" id="6378.Input" number_of_elements="1">
+          <Proxy value="6367" output_port="0"/>
+          <Domain name="groups" id="6378.Input.groups"/>
+          <Domain name="input_array" id="6378.Input.input_array"/>
+          <Domain name="input_type" id="6378.Input.input_type"/>
+        </Property>
+        <Property name="QCriterionArrayName" id="6378.QCriterionArrayName" number_of_elements="1">
+          <Element index="0" value="Q-criterion"/>
+        </Property>
+        <Property name="ResultArrayName" id="6378.ResultArrayName" number_of_elements="1">
+          <Element index="0" value="schlieren"/>
+        </Property>
+        <Property name="SelectInputScalars" id="6378.SelectInputScalars" number_of_elements="5">
+          <Element index="0" value=""/>
+          <Element index="1" value=""/>
+          <Element index="2" value=""/>
+          <Element index="3" value="0"/>
+          <Element index="4" value="density"/>
+          <Domain name="array_list" id="6378.SelectInputScalars.array_list">
+            <String text="Mach number"/>
+            <String text="a"/>
+            <String text="area_i"/>
+            <String text="area_j"/>
+            <String text="area_k"/>
+            <String text="density"/>
+            <String text="distance"/>
+            <String text="energy"/>
+            <String text="momentum"/>
+            <String text="normals_i"/>
+            <String text="normals_j"/>
+            <String text="normals_k"/>
+            <String text="p"/>
+            <String text="u"/>
+            <String text="v"/>
+            <String text="volume"/>
+          </Domain>
+          <Domain name="field_list" id="6378.SelectInputScalars.field_list">
+            <Entry value="0" text="Point Data"/>
+          </Domain>
+        </Property>
+        <Property name="VorticityArrayName" id="6378.VorticityArrayName" number_of_elements="1">
+          <Element index="0" value="Vorticity"/>
+        </Property>
+      </Proxy>
+      <Proxy group="filters" type="Calculator" id="5641" servers="1" compound_name="compute-u">
+        <Property name="AttributeMode" id="5641.AttributeMode" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="enum" id="5641.AttributeMode.enum">
+            <Entry value="1" text="Point Data"/>
+            <Entry value="2" text="Cell Data"/>
+          </Domain>
+        </Property>
+        <Property name="CoordinateResults" id="5641.CoordinateResults" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5641.CoordinateResults.bool"/>
+        </Property>
+        <Property name="Function" id="5641.Function" number_of_elements="1">
+          <Element index="0" value="momentum_X/density"/>
+        </Property>
+        <Property name="Input" id="5641.Input" number_of_elements="1">
+          <Proxy value="5412" output_port="0"/>
+          <Domain name="groups" id="5641.Input.groups"/>
+          <Domain name="input_array" id="5641.Input.input_array"/>
+          <Domain name="input_type" id="5641.Input.input_type"/>
+        </Property>
+        <Property name="ReplaceInvalidValues" id="5641.ReplaceInvalidValues" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="5641.ReplaceInvalidValues.bool"/>
+        </Property>
+        <Property name="ReplacementValue" id="5641.ReplacementValue" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="range" id="5641.ReplacementValue.range"/>
+        </Property>
+        <Property name="ResultArrayName" id="5641.ResultArrayName" number_of_elements="1">
+          <Element index="0" value="u"/>
+        </Property>
+        <Property name="ResultNormals" id="5641.ResultNormals" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5641.ResultNormals.bool"/>
+        </Property>
+        <Property name="ResultTCoords" id="5641.ResultTCoords" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5641.ResultTCoords.bool"/>
+        </Property>
+      </Proxy>
+      <Proxy group="filters" type="Calculator" id="5878" servers="1" compound_name="compute-v">
+        <Property name="AttributeMode" id="5878.AttributeMode" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="enum" id="5878.AttributeMode.enum">
+            <Entry value="1" text="Point Data"/>
+            <Entry value="2" text="Cell Data"/>
+          </Domain>
+        </Property>
+        <Property name="CoordinateResults" id="5878.CoordinateResults" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5878.CoordinateResults.bool"/>
+        </Property>
+        <Property name="Function" id="5878.Function" number_of_elements="1">
+          <Element index="0" value="momentum_Y/density"/>
+        </Property>
+        <Property name="Input" id="5878.Input" number_of_elements="1">
+          <Proxy value="5641" output_port="0"/>
+          <Domain name="groups" id="5878.Input.groups"/>
+          <Domain name="input_array" id="5878.Input.input_array"/>
+          <Domain name="input_type" id="5878.Input.input_type"/>
+        </Property>
+        <Property name="ReplaceInvalidValues" id="5878.ReplaceInvalidValues" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="5878.ReplaceInvalidValues.bool"/>
+        </Property>
+        <Property name="ReplacementValue" id="5878.ReplacementValue" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="range" id="5878.ReplacementValue.range"/>
+        </Property>
+        <Property name="ResultArrayName" id="5878.ResultArrayName" number_of_elements="1">
+          <Element index="0" value="v"/>
+        </Property>
+        <Property name="ResultNormals" id="5878.ResultNormals" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5878.ResultNormals.bool"/>
+        </Property>
+        <Property name="ResultTCoords" id="5878.ResultTCoords" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5878.ResultTCoords.bool"/>
+        </Property>
+      </Proxy>
+      <Proxy group="filters" type="CellDataToPointData" id="5412" servers="1" compound_name="interpolate">
+        <Property name="Input" id="5412.Input" number_of_elements="1">
+          <Domain name="groups" id="5412.Input.groups"/>
+          <Domain name="input_array" id="5412.Input.input_array"/>
+          <Domain name="input_type" id="5412.Input.input_type"/>
+        </Property>
+        <Property name="PassCellData" id="5412.PassCellData" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5412.PassCellData.bool"/>
+        </Property>
+        <Property name="PieceInvariant" id="5412.PieceInvariant" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5412.PieceInvariant.bool"/>
+        </Property>
+      </Proxy>
+      <ExposedProperties>
+        <Property name="Input" proxy_name="interpolate" exposed_name="Input"/>
+      </ExposedProperties>
+      <OutputPort name="Output" proxy="compute-schlieren" port_index="0"/>
+      <Hints>
+        <ShowInMenu/>
+      </Hints>
+    </CompoundSourceProxy>
+  </CustomProxyDefinition>
+</CustomFilterDefinitions>

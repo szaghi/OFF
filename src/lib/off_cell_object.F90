@@ -1,3 +1,4 @@
+#include "preprocessor_macros.h"
 !< OFF cell object definition and implementation.
 
 module off_cell_object
@@ -42,7 +43,7 @@ contains
    self = fresh
    endsubroutine destroy
 
-   pure subroutine initialize(self, bc, Dt, interfaces_number, distances, P, U)
+   _PURE_ subroutine initialize(self, bc, Dt, interfaces_number, distances, P, U)
    !< Initialize cell.
    class(cell_object),              intent(inout)        :: self              !< Cell object.
    type(bc_object),                 intent(in), optional :: bc                !< Boundary conditions.

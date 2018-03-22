@@ -88,6 +88,7 @@ use off_block_signature_object, only : block_signature_object
 use off_cell_object, only : cell_object
 use off_error_object, only : error_object
 use off_face_object, only : face_object
+use off_level_set_object, only : level_set_object
 use off_node_object, only : node_object
 use off_solver_object, only : solver_object
 use cgal_polyhedra, only : cgal_polyhedron_closest, cgal_polyhedron_finalize, cgal_polyhedron_inside, cgal_polyhedron_read
@@ -95,7 +96,7 @@ use flow, only : conservative_compressible, primitive_compressible,             
                  conservative_to_primitive_compressible, primitive_to_conservative_compressible, &
                  eos_compressible
 use foreseer, only : riemann_solver_object
-use penf, only : FR8P, FI4P, I1P, I4P, I8P, MaxR8P, R8P, str
+use penf, only : FR8P, FI4P, I1P, I4P, I8P, MaxR8P, MinR8P, R8P, str
 use vecfor, only : vector, ex, ey, ez, sq_norm
 use vtk_fortran, only : vtk_file
 
@@ -184,34 +185,50 @@ contains
    real(R8P)                          :: a         !< Speed of sound.
    real(R8P)                          :: umax(0:6) !< Maximum propagation speed of signals on faces and cell.
    integer(I4P)                       :: i, j, k   !< Counter.
+   real(R8P)                          :: dt_max    !< Maximum block time step.
 
+   dt_max = MinR8P
    associate(Ni=>self%signature%Ni, Nj=>self%signature%Nj, Nk=>self%signature%Nk)
       do k=1, Nk
          do j=1, Nj
             do i=1, Ni
-               a = self%eos%speed_of_sound(density=self%cell(i, j, k)%U%density, &
-                                           pressure=self%cell(i, j, k)%U%pressure(eos=self%eos))
+               if (self%cell(i, j, k)%level_set%distance<0._R8P) then
+                  ! cell into an immersed boundary
+                  self%cell(i, j, k)%Dt = 0._R8P
+               else
+                  a = self%eos%speed_of_sound(density=self%cell(i, j, k)%U%density, &
+                                              pressure=self%cell(i, j, k)%U%pressure(eos=self%eos))
 
-               ! velocity vector surrounding the cell
-               u(0) = self%cell(i  , j, k)%U%velocity()
-               u(1) = self%cell(i-1, j, k)%U%velocity()
-               u(2) = self%cell(i+1, j, k)%U%velocity()
-               u(3) = self%cell(i, j-1, k)%U%velocity()
-               u(4) = self%cell(i, j+1, k)%U%velocity()
-               u(5) = self%cell(i, j, k-1)%U%velocity()
-               u(6) = self%cell(i, j, k+1)%U%velocity()
+                  ! velocity vector surrounding the cell
+                  u(0) = self%cell(i  , j, k)%U%velocity()
+                  u(1) = self%cell(i-1, j, k)%U%velocity()
+                  u(2) = self%cell(i+1, j, k)%U%velocity()
+                  u(3) = self%cell(i, j-1, k)%U%velocity()
+                  u(4) = self%cell(i, j+1, k)%U%velocity()
+                  u(5) = self%cell(i, j, k-1)%U%velocity()
+                  u(6) = self%cell(i, j, k+1)%U%velocity()
 
-               ! maximum of normal velocities means
-               umax(1) = (abs((0.5_R8P * (u(1) + u(0))).dot.self%face_i(i-1, j,  k)%normal) + a) * self%face_i(i-1, j,  k)%area
-               umax(2) = (abs((0.5_R8P * (u(2) + u(0))).dot.self%face_i(i  , j,  k)%normal) + a) * self%face_i(i  , j,  k)%area
-               umax(3) = (abs((0.5_R8P * (u(3) + u(0))).dot.self%face_j(i ,j-1,  k)%normal) + a) * self%face_j(i ,j-1,  k)%area
-               umax(4) = (abs((0.5_R8P * (u(4) + u(0))).dot.self%face_j(i ,j  ,  k)%normal) + a) * self%face_j(i ,j  ,  k)%area
-               umax(5) = (abs((0.5_R8P * (u(5) + u(0))).dot.self%face_k(i ,j  ,k-1)%normal) + a) * self%face_k(i ,j  ,k-1)%area
-               umax(6) = (abs((0.5_R8P * (u(6) + u(0))).dot.self%face_k(i ,j  ,k  )%normal) + a) * self%face_k(i ,j  ,k  )%area
-               umax(0) = maxval(umax(1:6))
+                  ! maximum of normal velocities means
+                  umax(1) = (abs((0.5_R8P * (u(1) + u(0))).dot.self%face_i(i-1, j,  k)%normal) + a) * self%face_i(i-1, j,  k)%area
+                  umax(2) = (abs((0.5_R8P * (u(2) + u(0))).dot.self%face_i(i  , j,  k)%normal) + a) * self%face_i(i  , j,  k)%area
+                  umax(3) = (abs((0.5_R8P * (u(3) + u(0))).dot.self%face_j(i ,j-1,  k)%normal) + a) * self%face_j(i ,j-1,  k)%area
+                  umax(4) = (abs((0.5_R8P * (u(4) + u(0))).dot.self%face_j(i ,j  ,  k)%normal) + a) * self%face_j(i ,j  ,  k)%area
+                  umax(5) = (abs((0.5_R8P * (u(5) + u(0))).dot.self%face_k(i ,j  ,k-1)%normal) + a) * self%face_k(i ,j  ,k-1)%area
+                  umax(6) = (abs((0.5_R8P * (u(6) + u(0))).dot.self%face_k(i ,j  ,k  )%normal) + a) * self%face_k(i ,j  ,k  )%area
+                  umax(0) = maxval(umax(1:6))
 
-               ! time step
-               self%cell(i, j, k)%Dt = self%cell(i, j, k)%volume * CFL / umax(0)
+                  ! time step
+                  self%cell(i, j, k)%Dt = self%cell(i, j, k)%volume * CFL / umax(0)
+                  dt_max = max(dt_max, self%cell(i, j, k)%Dt)
+               endif
+            enddo
+         enddo
+      enddo
+      ! setting immersed boundary cell to maximum time step
+      do k=1, Nk
+         do j=1, Nj
+            do i=1, Ni
+               if (self%cell(i, j, k)%level_set%distance<0._R8P) self%cell(i, j, k)%Dt = dt_max
             enddo
          enddo
       enddo
@@ -242,7 +259,7 @@ contains
                                            N      = Ni,                               &
                                            faces  = self%face_i (0-gcm:Ni+gcm, j, k), &
                                            cells  = self%cell   (1-gcm:Ni+gcm, j, k), &
-                                           fluxes = fluxes_con_i(   0:Ni   , j, k))
+                                           fluxes = fluxes_con_i(    0:Ni    , j, k))
          enddo
       enddo
       gcm = min(gcu, gc(3), gc(4))
@@ -254,7 +271,7 @@ contains
                                            N      = Nj,                               &
                                            faces  = self%face_j (i, 0-gcm:Nj+gcm, k), &
                                            cells  = self%cell   (i, 1-gcm:Nj+gcm, k), &
-                                           fluxes = fluxes_con_j(i,    0:Nj   , k))
+                                           fluxes = fluxes_con_j(i,     0:Nj    , k))
          enddo
       enddo
       gcm = min(gcu, gc(5), gc(6))
@@ -266,12 +283,20 @@ contains
                                            N      = Nk,                               &
                                            faces  = self%face_k (i, j, 0-gcm:Nk+gcm), &
                                            cells  = self%cell   (i, j, 1-gcm:Nk+gcm), &
-                                           fluxes = fluxes_con_k(i, j,    0:Nk   ))
+                                           fluxes = fluxes_con_k(i, j,     0:Nk    ))
          enddo
       enddo
       do k=1, Nk
          do j=1, Nj
             do i=1, Ni
+
+               if (cell(i, j, k)%level_set%distance<0._R8P) then
+                  cell(i,j,k)%U%density = 0._R8P
+                  cell(i,j,k)%U%momentum = 0._R8P
+                  cell(i,j,k)%U%energy = 0._R8P
+                  cycle
+               endif
+
                cell(i,j,k)%U%density =                                          &
                (face_i(i-1,j,  k  )%area * fluxes_con_i(i-1,j,  k  )%density -  &
                 face_i(i,  j,  k  )%area * fluxes_con_i(i,  j,  k  )%density +  &
@@ -527,6 +552,7 @@ contains
 
    call self%signature%initialize(signature=signature,                             &
                                   id=id, level=level, gc=gc, ni=ni, nj=nj, nk=nk,  &
+                                  interfaces_number=interfaces_number,             &
                                   U0=U0, P0=P0,                                    &
                                   emin=emin, emax=emax, is_cartesian=is_cartesian, &
                                   is_null_x=is_null_x, is_null_y=is_null_y, is_null_z=is_null_z)
@@ -543,7 +569,7 @@ contains
       do k=1 - gc(5), nk + gc(6)
          do j=1 - gc(3), nj + gc(4)
             do i=1 - gc(1), ni + gc(2)
-               call self%cell(i,j,k)%initialize(interfaces_number=interfaces_number, distances=distances, U=U0, P=P0)
+               call self%cell(i,j,k)%initialize(interfaces_number=self%signature%interfaces_number, distances=distances, U=U0, P=P0)
             enddo
          enddo
       enddo
@@ -676,7 +702,7 @@ contains
    class(block_object), intent(inout)        :: self         !< Block.
    character(*),        intent(in)           :: file_name    !< File name.
    logical,             intent(in), optional :: ascii        !< Ascii/binary output.
-   logical,             intent(in), optional :: metrics      !< Save also metrics data.
+   logical,             intent(in), optional :: metrics      !< Save metrics sentinel.
    logical,             intent(in), optional :: tecplot      !< Tecplot output format sentinel.
    logical,             intent(in), optional :: vtk          !< VTK output format sentinel.
    logical                                   :: tecplot_     !< Tecplot format sentinel, local variable.
@@ -688,10 +714,12 @@ contains
    if (vtk_) call self%save_file_grid_vtk(file_name=file_name, ascii=ascii, metrics=metrics)
    endsubroutine save_file_grid
 
-   subroutine save_file_solution(self, file_name, ascii, tecplot, vtk)
+   subroutine save_file_solution(self, file_name, metrics, gc, ascii, tecplot, vtk)
    !< Save solution file.
    class(block_object), intent(inout)        :: self         !< Block.
    character(*),        intent(in)           :: file_name    !< File name.
+   logical,             intent(in), optional :: metrics      !< Save metrics sentinel.
+   logical,             intent(in), optional :: gc           !< Save ghost cells sentinel.
    logical,             intent(in), optional :: ascii        !< Ascii/binary output.
    logical,             intent(in), optional :: tecplot      !< Tecplot output format sentinel.
    logical,             intent(in), optional :: vtk          !< VTK output format sentinel.
@@ -701,7 +729,7 @@ contains
    tecplot_ = .false. ; if (present(tecplot)) tecplot_ = tecplot
    vtk_     = .false. ; if (present(vtk    )) vtk_     = vtk
 
-   if (vtk_) call self%save_file_solution_vtk(file_name=file_name, ascii=ascii)
+   if (vtk_) call self%save_file_solution_vtk(file_name=file_name, metrics=metrics, gc=gc, ascii=ascii)
    endsubroutine save_file_solution
 
    subroutine save_nodes_into_file(self, file_unit, pos)
@@ -1137,40 +1165,86 @@ contains
    endassociate
    endsubroutine save_file_grid_vtk
 
-   subroutine save_file_solution_vtk(self, file_name, ascii)
+   subroutine save_file_solution_vtk(self, file_name, metrics, gc, ascii)
    !< Save mesh solution into VTK file.
-   class(block_object), intent(inout)        :: self      !< Block.
-   character(*),        intent(in)           :: file_name !< Output file name.
-   logical,             intent(in), optional :: ascii     !< Ascii/binary output.
-   logical                                   :: ascii_    !< Ascii/binary output.
-   type(vtk_file)                            :: vtk       !< VTK file.
+   class(block_object), intent(inout)        :: self                   !< Block.
+   character(*),        intent(in)           :: file_name              !< Output file name.
+   logical,             intent(in), optional :: metrics                !< Save metrics sentinel.
+   logical,             intent(in), optional :: gc                     !< Save ghost cells sentinel.
+   logical,             intent(in), optional :: ascii                  !< Ascii/binary output.
+   logical                                   :: metrics_               !< Save metrics sentinel, local variable.
+   logical                                   :: gc_                    !< Save ghost cells sentinel, local variable.
+   logical                                   :: ascii_                 !< Ascii/binary output.
+   type(vtk_file)                            :: vtk                    !< VTK file.
+   integer(I4P)                              :: i1, i2, j1, j2, k1, k2 !< Counter.
 
+   metrics_ = .false. ; if (present(metrics)) metrics_ = metrics
+   gc_      = .false. ; if (present(gc     )) gc_      = gc
    ascii_   = .false. ; if (present(ascii  )) ascii_   = ascii
 
+   if (gc_) then
+      ! save also ghost cells frames
+      i1 = 1 - self%signature%gc(1) ; i2 = self%signature%ni + self%signature%gc(2)
+      j1 = 1 - self%signature%gc(3) ; j2 = self%signature%nj + self%signature%gc(4)
+      k1 = 1 - self%signature%gc(5) ; k2 = self%signature%nk + self%signature%gc(6)
+   else
+      ! save only internal cells
+      i1 = 1                        ; i2 = self%signature%ni
+      j1 = 1                        ; j2 = self%signature%nj
+      k1 = 1                        ; k2 = self%signature%nk
+   endif
+
    associate(node=>self%node, ni=>self%signature%ni, nj=>self%signature%nj, nk=>self%signature%nk, &
-             nn=>self%nodes_number(with_ghosts=.false.))
+             nn=>self%nodes_number(with_ghosts=gc_))
       if (ascii_) then
          self%error%status = vtk%initialize(format='ascii',                                                    &
                                             filename=trim(adjustl(file_name)), mesh_topology='StructuredGrid', &
-                                            nx1=0, nx2=ni, ny1=0, ny2=nj, nz1=0, nz2=nk)
+                                            nx1=i1-1, nx2=i2, ny1=j1-1, ny2=j2, nz1=k1-1, nz2=k2)
       else
          self%error%status = vtk%initialize(format='raw',                                                      &
                                             filename=trim(adjustl(file_name)), mesh_topology='StructuredGrid', &
-                                            nx1=0, nx2=ni, ny1=0, ny2=nj, nz1=0, nz2=nk)
+                                            nx1=i1-1, nx2=i2, ny1=j1-1, ny2=j2, nz1=k1-1, nz2=k2)
       endif
 
-      self%error%status = vtk%xml_writer%write_piece(nx1=0, nx2=ni, ny1=0, ny2=nj, nz1=0, nz2=nk)
-      self%error%status = vtk%xml_writer%write_geo(n=nn, x=node(0:ni, 0:nj, 0:nk)%vertex%x, &
-                                                         y=node(0:ni, 0:nj, 0:nk)%vertex%y, &
-                                                         z=node(0:ni, 0:nj, 0:nk)%vertex%z)
+      self%error%status = vtk%xml_writer%write_piece(nx1=i1-1, nx2=i2, ny1=j1-1, ny2=j2, nz1=k1-1, nz2=k2)
+
+      self%error%status = vtk%xml_writer%write_geo(n=nn, x=node(i1-1:i2, j1-1:j2, k1-1:k2)%vertex%x, &
+                                                         y=node(i1-1:i2, j1-1:j2, k1-1:k2)%vertex%y, &
+                                                         z=node(i1-1:i2, j1-1:j2, k1-1:k2)%vertex%z)
+
       self%error%status = vtk%xml_writer%write_dataarray(location='cell', action='open')
-      self%error%status = vtk%xml_writer%write_dataarray(data_name='density', x=self%cell(1:ni, 1:nj, 1:nk)%U%density, &
+
+      self%error%status = vtk%xml_writer%write_dataarray(data_name='density', x=self%cell(i1:i2,j1:j2,k1:k2)%U%density, &
                                                          one_component=.true.)
-      self%error%status = vtk%xml_writer%write_dataarray(data_name='energy', x=self%cell(1:ni, 1:nj, 1:nk)%U%energy, &
+      self%error%status = vtk%xml_writer%write_dataarray(data_name='energy', x=self%cell(i1:i2,j1:j2,k1:k2)%U%energy, &
                                                          one_component=.true.)
-      self%error%status = vtk%xml_writer%write_dataarray(data_name='momentum', x=self%cell(1:ni, 1:nj, 1:nk)%U%momentum%x, &
-                                                                               y=self%cell(1:ni, 1:nj, 1:nk)%U%momentum%y, &
-                                                                               z=self%cell(1:ni, 1:nj, 1:nk)%U%momentum%z)
+      self%error%status = vtk%xml_writer%write_dataarray(data_name='momentum', x=self%cell(i1:i2,j1:j2,k1:k2)%U%momentum%x, &
+                                                                               y=self%cell(i1:i2,j1:j2,k1:k2)%U%momentum%y, &
+                                                                               z=self%cell(i1:i2,j1:j2,k1:k2)%U%momentum%z)
+
+      if (metrics_) then
+         self%error%status = vtk%xml_writer%write_dataarray(data_name='volume', x=self%cell(i1:i2,j1:j2,k1:k2)%volume, &
+                                                            one_component=.true.)
+         self%error%status = vtk%xml_writer%write_dataarray(data_name='area_i', x=self%face_i(i1:i2,j1:j2,k1:k2)%area, &
+                                                            one_component=.true.)
+         self%error%status = vtk%xml_writer%write_dataarray(data_name='area_j', x=self%face_j(i1:i2,j1:j2,k1:k2)%area, &
+                                                            one_component=.true.)
+         self%error%status = vtk%xml_writer%write_dataarray(data_name='area_k', x=self%face_k(i1:i2,j1:j2,k1:k2)%area, &
+                                                            one_component=.true.)
+         self%error%status = vtk%xml_writer%write_dataarray(data_name='normals_i', x=self%face_i(i1:i2,j1:j2,k1:k2)%normal%x, &
+                                                                                   y=self%face_i(i1:i2,j1:j2,k1:k2)%normal%y, &
+                                                                                   z=self%face_i(i1:i2,j1:j2,k1:k2)%normal%z)
+         self%error%status = vtk%xml_writer%write_dataarray(data_name='normals_j', x=self%face_j(i1:i2,j1:j2,k1:k2)%normal%x, &
+                                                                                   y=self%face_j(i1:i2,j1:j2,k1:k2)%normal%y, &
+                                                                                   z=self%face_j(i1:i2,j1:j2,k1:k2)%normal%z)
+         self%error%status = vtk%xml_writer%write_dataarray(data_name='normals_k', x=self%face_k(i1:i2,j1:j2,k1:k2)%normal%x, &
+                                                                                   y=self%face_k(i1:i2,j1:j2,k1:k2)%normal%y, &
+                                                                                   z=self%face_k(i1:i2,j1:j2,k1:k2)%normal%z)
+         self%error%status = vtk%xml_writer%write_dataarray(data_name='distance',                             &
+                                                            x=self%cell(i1:i2,j1:j2,k1:k2)%level_set%distance, &
+                                                            one_component=.true.)
+      endif
+
       self%error%status = vtk%xml_writer%write_dataarray(location='cell', action='close')
       self%error%status = vtk%xml_writer%write_piece()
       self%error%status = vtk%finalize()
@@ -1193,8 +1267,8 @@ contains
 
    allocate(UR(1:2,0:N+1))
    allocate(tangential(1:2,0:N+1))
-   call reconstruct_interfaces_characteristic(solver=solver, eos=eos, gc=gc, N=N, U=cells%U, normal=faces%normal, &
-                                              UR=UR, tangential=tangential)
+   call reconstruct_interfaces_characteristic(solver=solver, eos=eos, gc=gc, N=N, U=cells%U, level_set=cells%level_set, &
+                                              normal=faces%normal, UR=UR, tangential=tangential)
    do i=0, N
       ! computing normal fluxes
       call solver%riemann_solver%solve(eos_left=eos,  state_left=UR( 2, i  ), &
@@ -1210,7 +1284,7 @@ contains
    enddo
    endsubroutine compute_fluxes_convective
 
-   subroutine reconstruct_interfaces_characteristic(solver, eos, gc, N, U, normal, UR, tangential)
+   subroutine reconstruct_interfaces_characteristic(solver, eos, gc, N, U, level_set, normal, UR, tangential)
    !< Reconstruct interfaces states.
    !<
    !< The reconstruction is done in pseudo characteristic variables.
@@ -1219,9 +1293,11 @@ contains
    integer(I4P),                    intent(in)    :: gc                      !< Number of ghost cells used.
    integer(I4P),                    intent(in)    :: N                       !< Number of cells.
    type(conservative_compressible), intent(in)    :: U(1-gc:)                !< Conservative variables.
+   type(level_set_object),          intent(in)    :: level_set(1-gc:)        !< Level set cells data.
    type(vector),                    intent(in)    :: normal(0:)              !< Face normals.
    type(conservative_compressible), intent(inout) :: UR(1:, 0:)              !< Reconstructed conservative vars.
    type(vector),                    intent(inout) :: tangential(1:, 0:)      !< Interface tangential component of velocity.
+   type(conservative_compressible)                :: U_(1-gc:N+gc)           !< Conservative variables, local.
    type(primitive_compressible)                   :: P(1-gc:N+gc)            !< Primitive variables.
    type(primitive_compressible)                   :: PR(1:2, 0:N+1)          !< Reconstructed primitive variables.
    type(primitive_compressible)                   :: Pm(1:2)                 !< Mean of primitive variables.
@@ -1232,38 +1308,69 @@ contains
    real(R8P)                                      :: buffer(1:3)             !< Dummy buffer.
    integer(I4P)                                   :: i, j, f, v              !< Counter.
 
+   ! store temporary conservative variables
+   U_ = U
+
+   ! impose immersed boundaries
+   !< @TODO generalize this
+   do i=0, N
+      if (level_set(i)%distance<0._R8P.and.level_set(i+1)%distance>0._R8P) then
+         ! left interface is an immersed boundary: note that there are necessary gc cells immersed to the left...
+         do j=i+1-gc, i
+            U_(j) = U_(i+(i-j)+1)
+            U_(j)%momentum = U_(j)%momentum - (2._R8P*(U_(j)%momentum.paral.normal(i)))
+         enddo
+      elseif (level_set(i)%distance>0._R8P.and.level_set(i+1)%distance<0._R8P) then
+         ! right interface is an immersed boundary: note that there are necessary gc cells immersed to the right...
+         do j=i+1, i+gc
+            U_(j) = U_(i+(i-j)+1)
+            U_(j)%momentum = U_(j)%momentum - (2._R8P*(U_(j)%momentum.paral.normal(i)))
+         enddo
+      endif
+   enddo
+
+   ! compute tangential component of velocity
+   do i=0, N+1
+      do f=1, 2
+         if (i==0  .and.f==1) cycle
+         if (i==N+1.and.f==2) cycle
+         tangential(f,i) = U_(i)%velocity() - (U_(i)%velocity().paral.normal(i+f-1))
+      enddo
+   enddo
+
+   ! compute reconstruction of conservative variables
    select case(gc)
    case(1) ! 1st order piecewise constant reconstruction
       do i=0, N+1
-         UR(1, i) = U(i)
+         UR(1, i) = U_(i)
          UR(2, i) = UR(1, i)
       enddo
    case default ! 3rd-17th order WENO reconstruction
+      ! compute primitive variables
       do i=1-gc, N+gc
-         P(i) = conservative_to_primitive_compressible(conservative=U(i), eos=eos)
+         P(i) = conservative_to_primitive_compressible(conservative=U_(i), eos=eos)
       enddo
+
+      ! compute WENO reconstruction
       do i=0, N+1
          ! compute pseudo characteristic variables
          do f=1, 2
-            ! if (i==0  .and.f==1) cycle
-            ! if (i==N+1.and.f==2) cycle
-! #ifdef __GFORTRAN__
+            if (i==0  .and.f==1) cycle
+            if (i==N+1.and.f==2) cycle
             ! Pm(f) = 0.5_R8P * (P(i+f-2) + P(i+f-1))
-! #else
             call Pm(f)%field_add_field_fast(lhs=P(i+f-2), rhs=P(i+f-1))
             call Pm(f)%field_multiply_real_scalar_fast(lhs=Pm(f), rhs=0.5_R8P)
-! #endif
          enddo
          do f=1, 2
-            ! if (i==0  .and.f==1) cycle
-            ! if (i==N+1.and.f==2) cycle
+            if (i==0  .and.f==1) cycle
+            if (i==N+1.and.f==2) cycle
             LPm(:, :, f) = Pm(f)%left_eigenvectors(eos=eos)
             RPm(:, :, f) = Pm(f)%right_eigenvectors(eos=eos)
          enddo
          do j=i+1-gc, i-1+gc
             do f=1, 2
-               ! if (i==0  .and.f==1) cycle
-               ! if (i==N+1.and.f==2) cycle
+               if (i==0  .and.f==1) cycle
+               if (i==N+1.and.f==2) cycle
                do v=1, 3
                   C(f, j-i, v) = dot_product(LPm(v, :, f), [P(j)%density,                      &
                                                             P(j)%velocity .dot. normal(i+f-1), &
@@ -1271,15 +1378,16 @@ contains
                enddo
             enddo
          enddo
+
          ! compute WENO reconstruction of pseudo charteristic variables
          do v=1, 3
             call solver%interpolator%interpolate(stencil=C(:, :, v), interpolation=CR(:, v))
          enddo
+
          ! trasform back reconstructed pseudo charteristic variables to primitive ones
          do f=1, 2
-            ! if (i==0  .and.f==1) cycle
-            ! if (i==N+1.and.f==2) cycle
-            tangential(f,i) = P(i)%velocity - (P(i)%velocity .paral. normal(i+f-1))
+            if (i==0  .and.f==1) cycle
+            if (i==N+1.and.f==2) cycle
             do v=1, 3
                buffer(v) = dot_product(RPm(v, :, f), CR(f, :))
             enddo
@@ -1287,10 +1395,9 @@ contains
             PR(f, i)%velocity = buffer(2) * normal(i+f-1) + tangential(f,i)
             PR(f, i)%pressure = buffer(3)
          enddo
-         ! extrapolation of the reconstructed values for the non computed boundaries
-         ! if (i==0  ) PR(1, i) = PR(2, i)
-         ! if (i==N+1) PR(2, i) = PR(1, i)
       enddo
+
+      ! compute reconstructed conservative variables
       do i=0, N+1
          UR(1, i) = primitive_to_conservative_compressible(primitive=PR(1, i), eos=eos)
          UR(2, i) = primitive_to_conservative_compressible(primitive=PR(2, i), eos=eos)

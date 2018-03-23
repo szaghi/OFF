@@ -106,7 +106,7 @@ contains
    desc = desc//prefix_//'Grid file (input)'//NL
    desc = desc//prefix_//self%file_grid_input%description(prefix=prefix_//'  ')//NL
    desc = desc//prefix_//'Initial conditions file'//NL
-   desc = desc//prefix_//self%file_solution%description(prefix=prefix_//'  ')//NL
+   desc = desc//prefix_//self%file_initial_conditions%description(prefix=prefix_//'  ')//NL
    desc = desc//prefix_//'Solution file'//NL
    desc = desc//prefix_//self%file_solution%description(prefix=prefix_//'  ')//NL
    desc = desc//prefix_//'Non dimensional numbers:'//NL

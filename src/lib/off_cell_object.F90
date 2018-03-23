@@ -21,7 +21,6 @@ type :: cell_object
    real(R8P)                       :: volume=0._R8P !< Cell volume.
    real(R8P)                       :: Dt=0._R8P     !< Local time step.
    type(level_set_object)          :: level_set     !< Level set cell data.
-   type(primitive_compressible)    :: P             !< Primitive variables.
    type(conservative_compressible) :: U             !< Conservative variables, Integrand (state) variables.
    contains
       ! public methods
@@ -43,14 +42,13 @@ contains
    self = fresh
    endsubroutine destroy
 
-   _PURE_ subroutine initialize(self, bc, Dt, interfaces_number, distances, P, U)
+   _PURE_ subroutine initialize(self, bc, Dt, interfaces_number, distances, U)
    !< Initialize cell.
    class(cell_object),              intent(inout)        :: self              !< Cell object.
    type(bc_object),                 intent(in), optional :: bc                !< Boundary conditions.
    real(R8P),                       intent(in), optional :: Dt                !< Local time step.
    integer(I4P),                    intent(in), optional :: interfaces_number !< Number of different interfaces.
    real(R8P),                       intent(in), optional :: distances(:)      !< Distance from all interfaces.
-   type(primitive_compressible),    intent(in), optional :: P                 !< Primitive variables.
    type(conservative_compressible), intent(in), optional :: U                 !< Conservative variables.
 
    call self%destroy
@@ -60,7 +58,6 @@ contains
    endif
    if (present(Dt)) self%Dt = Dt
    call self%level_set%initialize(interfaces_number=interfaces_number, distances=distances)
-   if (present(P)) self%P = P
    if (present(U)) self%U = U
    endsubroutine initialize
 
@@ -80,7 +77,6 @@ contains
    lhs%volume = rhs%volume
    lhs%Dt = rhs%Dt
    lhs%level_set = rhs%level_set
-   lhs%P = rhs%P
    lhs%U = rhs%U
    endsubroutine cell_assign_cell
 endmodule off_cell_object

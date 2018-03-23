@@ -109,7 +109,7 @@ contains
    pure subroutine initialize(self, signature,           &
                               id, level, gc, ni, nj, nk, &
                               interfaces_number,         &
-                              emin, emax, is_cartesian, is_null_x, is_null_y, is_null_z, U0, P0)
+                              emin, emax, is_cartesian, is_null_x, is_null_y, is_null_z, U0)
    !< Initialize block signature.
    !<
    !< @note If both whole `signature` and single components like `id, level, gc...` are passed, the values of
@@ -130,7 +130,7 @@ contains
    logical,                         intent(in), optional :: is_null_y         !< Nullify Y direction (2D xy, 1D x or y domain).
    logical,                         intent(in), optional :: is_null_z         !< Nullify Z direction (2D xy, 1D x or y domain).
    type(conservative_compressible), intent(in), optional :: U0                !< Initial state of conservative variables.
-   type(primitive_compressible),    intent(in), optional :: P0                !< Initial state of primitive variables.
+   type(primitive_compressible)                          :: P0                !< Initial state of primitive variables.
 
    call self%destroy
    if (present(signature        )) self                   = signature
@@ -147,8 +147,10 @@ contains
    if (present(is_null_x        )) self%is_null_x         = is_null_x
    if (present(is_null_y        )) self%is_null_y         = is_null_y
    if (present(is_null_z        )) self%is_null_z         = is_null_z
-   if (present(U0               )) self%nc                = size(U0%array(), dim=1)
-   if (present(P0               )) self%np                = size(P0%array(), dim=1)
+   if (present(U0               )) then
+      self%nc = size(U0%array(), dim=1)
+      self%np = size(P0%array(), dim=1)
+   endif
    endsubroutine initialize
 
    function iolength(self)

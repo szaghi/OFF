@@ -34,7 +34,6 @@ type :: mesh_object
       ! public methods
       procedure, pass(self) :: allocate_blocks                    !< Allocate blocks accordingly to grid dimensions.
       procedure, pass(self) :: compute_residuals                  !< Compute residuals.
-      procedure, pass(self) :: conservative_to_primitive          !< Convert conservative variables to primitive ones.
       procedure, pass(self) :: description                        !< Return a pretty-formatted description of the mesh.
       procedure, pass(self) :: destroy                            !< Destroy mesh.
       procedure, pass(self) :: immerge_immersed_boundaries        !< Immerge Immersed Boundary bodies.
@@ -42,7 +41,6 @@ type :: mesh_object
       procedure, pass(self) :: initialize                         !< Initialize mesh.
       procedure, pass(self) :: load_grid_from_file                !< Load grid from file.
       procedure, pass(self) :: load_ic_from_file                  !< Load initial conditions from file.
-      procedure, pass(self) :: primitive_to_conservative          !< Convert primitive variables to conservative ones.
       procedure, pass(self) :: save_file_grid                     !< Save file grid.
       procedure, pass(self) :: save_file_solution                 !< Save file solution.
       procedure, pass(self) :: set_parametric_boundary_conditions !< Set boundary conditions from parametric input file.
@@ -89,18 +87,6 @@ contains
       call self%blocks(b)%compute_residuals(solver=solver, gcu=gcu)
    enddo
    endsubroutine compute_residuals
-
-   _ELEMENTAL_ subroutine conservative_to_primitive(self)
-   !< Convert conservative variables to primitive one.
-   class(mesh_object), intent(inout) :: self !< Mesh.
-   integer(I4P)                      :: b    !< Counter.
-
-   if (self%grid_dimensions%blocks_number>0) then
-      do b=1,self%grid_dimensions%blocks_number
-         call self%blocks(b)%conservative_to_primitive
-      enddo
-   endif
-   endsubroutine conservative_to_primitive
 
    pure function description(self, prefix) result(desc)
    !< Return a pretty-formatted description of the mesh.
@@ -182,13 +168,12 @@ contains
    endif
    endsubroutine immerge_immersed_boundaries
 
-   subroutine impose_boundary_conditions(self)
+   _PURE_ subroutine impose_boundary_conditions(self)
    !< Impose boundary conditions on all blocks of the mesh.
    class(mesh_object), intent(inout) :: self       !< Mesh.
    integer(I4P)                      :: b, i, j, k !< Counter.
 
    ! TODO impose boundary conditions in conservative variables to reduce unnecessary computations
-   call self%conservative_to_primitive
    do b=1, self%grid_dimensions%blocks_number
       associate(block_b=>self%blocks(b), gc=>self%blocks(b)%signature%gc, &
                 Ni=>self%blocks(b)%signature%Ni, Nj=>self%blocks(b)%signature%Nj, Nk=>self%blocks(b)%signature%Nk)
@@ -293,7 +278,6 @@ contains
          enddo
       endassociate
    enddo
-   call self%primitive_to_conservative
    contains
       _PURE_ subroutine impose_boundary_conditions_wall(gc, ic, N, normal, boundary, stride)
       !< Impose wall boundary conditions on a stride of cells along a direction.
@@ -304,45 +288,36 @@ contains
       character(1),      intent(in)    :: boundary         !< Boundary left ('l') or right ('r').
       type(cell_object), intent(inout) :: stride(1-gc(1):) !< Cells stride [1-gc(1):N+gc(2)].
       integer(I4P)                     :: i                !< Counter.
-      type(vector)                     :: vr               !< Reflected velocity vector.
 
       if (boundary=='l') then
          if (ic==1.or.N<gc(1)) then ! reflection using only the cell 1
-            vr = stride(1)%P%velocity - (2._R8P*(stride(1)%P%velocity.paral.normal)) ! reflected velocity
             do i=1-gc(1), 0
-               stride(i)%P%velocity = vr
-               stride(i)%P%pressure = stride(1)%P%pressure
-               stride(i)%P%density = stride(1)%P%density
+               stride(i)%U = stride(1)%U
+               stride(i)%U%momentum = stride(i)%U%momentum - (2._R8P*(stride(i)%U%momentum.paral.normal))
             enddo
          else ! reflection using the cells 1,2,...,gc
             do i=1-gc(1), 0
-               vr = stride(-i+1)%P%velocity - (2._R8P*(stride(-i+1)%P%velocity.paral.normal)) ! reflected velocity
-               stride(i)%P%velocity = vr
-               stride(i)%P%pressure = stride(-i+1)%P%pressure
-               stride(i)%P%density = stride(-i+1)%P%density
+               stride(i)%U = stride(-i+1)%U
+               stride(i)%U%momentum = stride(i)%U%momentum - (2._R8P*(stride(i)%U%momentum.paral.normal))
             enddo
          endif
       endif
       if (boundary=='r') then
          if (ic==1.or.N<gc(2)) then ! reflection using only the cell N
-            vr = stride(N)%P%velocity - (2._R8P*(stride(N)%P%velocity.paral.normal)) ! reflected velocity
             do i=N+1, N+gc(2)
-               stride(i)%P%velocity = vr
-               stride(i)%P%pressure = stride(N)%P%pressure
-               stride(i)%P%density = stride(N)%P%density
+               stride(i)%U = stride(N)%U
+               stride(i)%U%momentum = stride(i)%U%momentum - (2._R8P*(stride(i)%U%momentum.paral.normal))
             enddo
          else ! reflection using the cells N-gc,N-gc+1,N-gc+2,...,N
             do i=N+1, N+gc(2)
-               vr = stride(N+1-(i-N))%P%velocity - (2._R8P*(stride(N+1-(i-N))%P%velocity.paral.normal)) ! reflected velocity
-               stride(i)%P%velocity = vr
-               stride(i)%P%pressure = stride(N+1-(i-N))%P%pressure
-               stride(i)%P%density = stride(N+1-(i-N))%P%density
+               stride(i)%U = stride(N+1-(i-N))%U
+               stride(i)%U%momentum = stride(i)%U%momentum - (2._R8P*(stride(i)%U%momentum.paral.normal))
             enddo
          endif
       endif
       endsubroutine impose_boundary_conditions_wall
 
-      pure subroutine impose_boundary_conditions_periodic(gc, ic, N, boundary, stride)
+      _PURE_ subroutine impose_boundary_conditions_periodic(gc, ic, N, boundary, stride)
       !< Impose periodic boundary conditions on a stride of cells along a direction.
       integer(I4P),      intent(in)    :: gc(1:2)          !< Number of ghost cells.
       integer(I4P),      intent(in)    :: ic               !< Number of internal cells used for extrapolation (1 or gc).
@@ -354,28 +329,28 @@ contains
       if (boundary=='l') then
          if (ic==1.or.N<gc(1)) then ! extrapolation using only the cell N
             do i=1-gc(1), 0
-               stride(i)%P = stride(N)%P
+               stride(i)%U = stride(N)%U
             enddo
          else ! extrapolation using the cells N-gc,N-gc+1,N-gc+2,...,N
             do i=1-gc(1), 0
-               stride(i)%P = stride(i+N)%P
+               stride(i)%U = stride(i+N)%U
             enddo
          endif
       endif
       if (boundary=='r') then
          if (ic==1.or.N<gc(2)) then ! extrapolation using only the cell 1
             do i=N+1, N+gc(2)
-               stride(i)%P = stride(1)%P
+               stride(i)%U = stride(1)%U
             enddo
          else ! extrapolation using the cells 1,2,...,gc
             do i=N+1, N+gc(2)
-               stride(i)%P = stride(i-N)%P
+               stride(i)%U = stride(i-N)%U
             enddo
          endif
       endif
       endsubroutine impose_boundary_conditions_periodic
 
-      pure subroutine impose_boundary_conditions_extrapolation(gc, ic, N, boundary, stride)
+      _PURE_ subroutine impose_boundary_conditions_extrapolation(gc, ic, N, boundary, stride)
       !< Impose boundary conditions of extrapolation on a stride of cells along a direction.
       integer(I4P),      intent(in)    :: gc(1:2)          !< Number of ghost cells, 1 => left, 2 => right.
       integer(I4P),      intent(in)    :: ic               !< Number of internal cells used for extrapolation (1 or gc).
@@ -387,21 +362,21 @@ contains
       if (boundary=='l') then
          if (ic==1.or.N<gc(1)) then ! extrapolation using only the cell 1
             do i=1-gc(1), 0
-               stride(i)%P = stride(1)%P
+               stride(i)%U = stride(1)%U
             enddo
          else ! extrapolation using the cells 1,2,...,gc
             do i=1-gc(1), 0
-               stride(i)%P = stride(-i+1)%P
+               stride(i)%U = stride(-i+1)%U
             enddo
          endif
       elseif (boundary=='r') then
          if (ic==1.or.N<gc(2)) then ! extrapolation using only the cell N
             do i=N+1, N+gc(2)
-              stride(i)%P = stride(N)%P
+              stride(i)%U = stride(N)%U
             enddo
          else ! extrapolation using the cells N-gc,N-gc+1,N-gc+2,...,N
             do i=N+1, N+gc(2)
-              stride(i)%P = stride(N+1-(i-N))%P
+              stride(i)%U = stride(N+1-(i-N))%U
             enddo
          endif
       endif
@@ -415,12 +390,12 @@ contains
 
       do i=1-gc, 0
          associate(adj_b=>frame(i)%bc%adj(1), adj_i=>frame(i)%bc%adj(2), adj_j=>frame(i)%bc%adj(3), adj_k=>frame(i)%bc%adj(4))
-            frame(i)%P = self%blocks(adj_b)%cell(adj_i, adj_j, adj_k)%P
+            frame(i)%U = self%blocks(adj_b)%cell(adj_i, adj_j, adj_k)%U
          endassociate
       enddo
       endsubroutine impose_boundary_conditions_adjacent
 
-      pure subroutine impose_boundary_conditions_inlet_supersonic(gc, frame)
+      _PURE_ subroutine impose_boundary_conditions_inlet_supersonic(gc, frame)
       !< Impose boundary conditions of extrapolation on a stride of cells along a direction.
       integer(I4P),      intent(in)    :: gc           !< Number of ghost cells.
       type(cell_object), intent(inout) :: frame(1-gc:) !< Cells frame [1-gc:0].
@@ -449,15 +424,15 @@ contains
       call self%grid_dimensions%initialize(block_signature=mesh%blocks%signature)
       allocate(self%blocks(1:size(mesh%blocks, dim=1)), source=mesh%blocks)
    else
-      if (present(file_grid)) call self%load_grid_from_file(file_grid=file_grid, interfaces_number=interfaces_number)
-      if (present(eos).and.allocated(self%blocks)) call self%blocks%set_eos(eos=eos)
+      if (present(file_grid)) call self%load_grid_from_file(file_grid=file_grid, eos=eos, interfaces_number=interfaces_number)
       if (present(file_ic)) call self%load_ic_from_file(file_ic=file_ic)
    endif
    endsubroutine initialize
 
-   subroutine load_grid_from_file(self, interfaces_number, file_grid)
+   subroutine load_grid_from_file(self, eos, interfaces_number, file_grid)
    !< Load grid from file.
    class(mesh_object),     intent(inout)           :: self              !< Mesh.
+   type(eos_compressible), intent(in),    optional :: eos               !< EOS data.
    integer(I4P),           intent(in),    optional :: interfaces_number !< Number of different interfaces.
    type(file_grid_object), intent(inout)           :: file_grid         !< Grid file.
    integer(I4P)                                    :: b                 !< Counter.
@@ -466,6 +441,7 @@ contains
    if (self%grid_dimensions%blocks_number>0) then
       call self%allocate_blocks(interfaces_number=interfaces_number)
       if (file_grid%is_parametric) then
+         if (present(eos).and.allocated(self%blocks)) call self%blocks%set_eos(eos=eos)
          do b=1, self%grid_dimensions%blocks_number
             if (self%blocks(b)%signature%is_cartesian) then
                write(stdout, '(A)') 'create linear-space-grid for [block-'//trim(str(self%blocks(b)%signature%id, no_sign=.true.)) &
@@ -487,18 +463,6 @@ contains
 
    call file_ic%load_conservatives_from_file(grid_dimensions=self%grid_dimensions, blocks=self%blocks)
    endsubroutine load_ic_from_file
-
-   _ELEMENTAL_ subroutine primitive_to_conservative(self)
-   !< Convert primitive variables to conservative one.
-   class(mesh_object), intent(inout) :: self !< Mesh.
-   integer(I4P)                      :: b    !< Counter.
-
-   if (self%grid_dimensions%blocks_number>0) then
-      do b=1,self%grid_dimensions%blocks_number
-         call self%blocks(b)%primitive_to_conservative
-      enddo
-   endif
-   endsubroutine primitive_to_conservative
 
    subroutine save_file_grid(self, is_parametric, file_name, ascii, metrics, off, tecplot, vtk)
    !< Save file grid.

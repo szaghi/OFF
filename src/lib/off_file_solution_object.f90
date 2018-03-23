@@ -164,7 +164,7 @@ contains
    type(primitive_compressible)                       :: P               !< Primitive variables.
    real(R8P)                                          :: velocity_(3)    !< Velocity temporary array.
    character(len=:), allocatable                      :: emsg_suffix     !< Error message.
-   integer(I4P)                                       :: b               !< Counter.
+   integer(I4P)                                       :: b, i, j, k      !< Counter.
 
    if (present(file_name)) self%file_name = trim(adjustl(file_name))
    emsg_suffix = ' from file "'//self%file_name//'" in procedure "file_solution_object%load_conservative_from_file"'
@@ -189,8 +189,15 @@ contains
             P%velocity%x = velocity_(1)
             P%velocity%y = velocity_(2)
             P%velocity%z = velocity_(3)
-            blocks(b)%cell%P = P
-            call blocks(b)%primitive_to_conservative
+            do k=1 - blocks(b)%signature%gc(5), blocks(b)%signature%nk + blocks(b)%signature%gc(6)
+               do j=1 - blocks(b)%signature%gc(3), blocks(b)%signature%nj + blocks(b)%signature%gc(4)
+                  do i=1 - blocks(b)%signature%gc(1), blocks(b)%signature%ni + blocks(b)%signature%gc(2)
+                     blocks(b)%cell(i,j,k)%U = primitive_to_conservative_compressible(primitive=P, eos=blocks(b)%eos)
+                  enddo
+               enddo
+            enddo
+            ! blocks(b)%cell%P = P
+            ! call blocks(b)%primitive_to_conservative
          enddo
       endif
    else

@@ -15,22 +15,22 @@ type :: block_signature_object
    !< Block signature object class.
    !<
    !< Define the block dimensions, id and level.
-   integer(I8P)   :: id=0                  !< Unique (Morton) identification code.
-   integer(I4P)   :: level=0               !< block refinement level.
-   integer(I4P)   :: gc(1:6)=[0,0,0,0,0,0] !< Number of ghost cells along each frame.
-   integer(I4P)   :: ni=0                  !< Number of cells in I direction.
-   integer(I4P)   :: nj=0                  !< Number of cells in J direction.
-   integer(I4P)   :: nk=0                  !< Number of cells in K direction.
-   integer(I4P)   :: nc=0                  !< Number of conservative variables.
-   integer(I4P)   :: np=0                  !< Number of primitive variables.
-   integer(I4P)   :: interfaces_number=0   !< Number of different interfaces (level set).
-   type(vector)   :: emin                  !< Coordinates of minimum abscissa (extent) of the block.
-   type(vector)   :: emax                  !< Coordinates of maximum abscissa (extent) of the block.
-   character(999) :: faces_bc(6)           !< Faces boundary conditions.
-   logical        :: is_cartesian=.false.  !< Flag for checking if the block is Cartesian.
-   logical        :: is_null_x=.false.     !< Nullify X direction (2D yz, 1D y or z domain).
-   logical        :: is_null_y=.false.     !< Nullify Y direction (2D xy, 1D x or y domain).
-   logical        :: is_null_z=.false.     !< Nullify Z direction (2D xy, 1D x or y domain).
+   integer(I8P)   :: id=0                            !< Unique (Morton) identification code.
+   integer(I4P)   :: level=0                         !< block refinement level.
+   integer(I4P)   :: gc(1:6)=[0,0,0,0,0,0]           !< Number of ghost cells along each frame.
+   integer(I4P)   :: ni=0                            !< Number of cells in I direction.
+   integer(I4P)   :: nj=0                            !< Number of cells in J direction.
+   integer(I4P)   :: nk=0                            !< Number of cells in K direction.
+   integer(I4P)   :: nc=0                            !< Number of conservative variables.
+   integer(I4P)   :: np=0                            !< Number of primitive variables.
+   integer(I4P)   :: interfaces_number=0             !< Number of different interfaces (level set).
+   type(vector)   :: emin                            !< Coordinates of minimum abscissa (extent) of the block.
+   type(vector)   :: emax                            !< Coordinates of maximum abscissa (extent) of the block.
+   character(999) :: faces_bc(6)=['','','','','',''] !< Faces boundary conditions.
+   logical        :: is_cartesian=.false.            !< Flag for checking if the block is Cartesian.
+   logical        :: is_null_x=.false.               !< Nullify X direction (2D yz, 1D y or z domain).
+   logical        :: is_null_y=.false.               !< Nullify Y direction (2D xy, 1D x or y domain).
+   logical        :: is_null_z=.false.               !< Nullify Z direction (2D xy, 1D x or y domain).
    contains
       ! public methods
       procedure, pass(self) :: cells_number   !< Return the number of cells.

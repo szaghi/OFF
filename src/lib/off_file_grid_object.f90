@@ -64,16 +64,82 @@ public :: file_grid_object
 
 type, extends(file_object) :: file_grid_object
    !< File grid object class.
+   integer(I8P) :: save_frequency=1         !< Solution save frequency (on time steps).
+   logical      :: save_metrics=.false.     !< Save metrics sentinel.
+   logical      :: save_ghost_cells=.false. !< Save ghost cells sentinel.
+   logical      :: ascii_format=.false.     !< ASCII file format sentinel.
+   logical      :: off_format=.false.       !< OFF file format sentinel.
+   logical      :: tecplot_format=.false.   !< Tecplot file format sentinel.
+   logical      :: vtk_format=.false.       !< VTK file format sentinel.
    contains
       ! public methods
+      procedure, pass(self) :: description                    !< Return a pretty-formatted description of the file.
+      procedure, pass(self) :: destroy                        !< Destroy file.
+      ! procedure, pass(self) :: initialize                     !< Initialize file.
       procedure, pass(self) :: load_grid_dimensions_from_file !< Load the grid dimensions of all blocks from file.
       procedure, pass(self) :: load_nodes_from_file           !< Load nodes coordinates from file.
+      procedure, pass(self) :: load_parameters_from_file      !< Load file parameters from file.
       procedure, pass(self) :: save_grid_dimensions_into_file !< Save the grid dimensions of all blocks into file.
       procedure, pass(self) :: save_nodes_into_file           !< Save nodes coordinates into file.
+      ! operators
+      procedure, pass(lhs) :: file_assign_file !< Operator `=`.
 endtype file_grid_object
 
 contains
    ! public methods
+   pure function description(self, prefix) result(desc)
+   !< Return a pretty-formatted description of the file.
+   class(file_grid_object), intent(in)           :: self             !< File object.
+   character(*),            intent(in), optional :: prefix           !< Prefixing string.
+   character(len=:), allocatable                 :: desc             !< Description.
+   character(len=:), allocatable                 :: prefix_          !< Prefixing string, local variable.
+   character(len=1), parameter                   :: NL=new_line('a') !< New line character.
+
+   prefix_ = '' ; if (present(prefix)) prefix_ = prefix
+   desc = self%file_object%description(prefix=prefix_)//NL
+   desc = desc//prefix_//'save frequency: '//trim(str(no_sign=.true., n=self%save_frequency))//NL
+   desc = desc//prefix_//'save metrics: '//trim(str(self%save_metrics))//NL
+   desc = desc//prefix_//'save ghost cells: '//trim(str(self%save_ghost_cells))//NL
+   desc = desc//prefix_//'ascii format: '//trim(str(self%off_format))//NL
+   desc = desc//prefix_//'off format: '//trim(str(self%off_format))//NL
+   desc = desc//prefix_//'tecplot format: '//trim(str(self%tecplot_format))//NL
+   desc = desc//prefix_//'vtk format: '//trim(str(self%vtk_format))//NL
+   endfunction description
+
+   elemental subroutine destroy(self)
+   !< Destroy file.
+   class(file_grid_object), intent(inout) :: self  !< File object.
+   type(file_grid_object)                 :: fresh !< Fresh instance of file object.
+
+   call self%file_object%destroy
+   self = fresh
+   endsubroutine destroy
+
+   !elemental subroutine initialize(self, file_name, is_parametric, save_frequency, save_metrics, save_ghost_cells, &
+   !                                ascii_format, off_format, tecplot_format, vtk_format)
+   !!< Initialize File.
+   !class(file_grid_object), intent(inout)        :: self             !< File object.
+   !character(len=*),        intent(in), optional :: file_name        !< File name.
+   !logical,                 intent(in), optional :: is_parametric    !< Sentinel to check is file is parametric.
+   ! integer(I8P),            intent(in), optional :: save_frequency   !< Solution save frequency (on time steps).
+   ! logical,                 intent(in), optional :: save_metrics     !< Save metrics sentinel.
+   ! logical,                 intent(in), optional :: save_ghost_cells !< Save ghost cells sentinel.
+   ! logical,                 intent(in), optional :: ascii_format     !< ASCII file format sentinel.
+   ! logical,                 intent(in), optional :: off_format       !< OFF file format sentinel.
+   ! logical,                 intent(in), optional :: tecplot_format   !< Tecplot file format sentinel.
+   ! logical,                 intent(in), optional :: vtk_format       !< VTK file format sentinel.
+
+   ! call self%destroy
+   ! call self%file_object%initialize(file_name=file_name, is_parametric=is_parametric)
+   ! if (present(save_frequency  )) self%save_frequency   = save_frequency
+   ! if (present(save_metrics    )) self%save_metrics     = save_metrics
+   ! if (present(save_ghost_cells)) self%save_ghost_cells = save_ghost_cells
+   ! if (present(ascii_format    )) self%ascii_format     = ascii_format
+   ! if (present(off_format      )) self%off_format       = off_format
+   ! if (present(tecplot_format  )) self%tecplot_format   = tecplot_format
+   ! if (present(vtk_format      )) self%vtk_format       = vtk_format
+   ! endsubroutine initialize
+
    subroutine load_grid_dimensions_from_file(self, grid_dimensions, file_name)
    !< Load the grid dimensions of all blocks from file.
    class(file_grid_object),      intent(inout)        :: self            !< File object.
@@ -181,6 +247,50 @@ contains
    call self%close_file
    endsubroutine load_nodes_from_file
 
+   subroutine load_parameters_from_file(self, fini, options_prefix, go_on_fail)
+   !< Load file parameters from file.
+   class(file_grid_object),  intent(inout)        :: self           !< File object.
+   type(file_ini),           intent(in)           :: fini           !< Solution parameters ini file handler.
+   character(len=*),         intent(in)           :: options_prefix !< Prefix string of file options names.
+   logical,                  intent(in), optional :: go_on_fail     !< Go on if load fails.
+   logical                                        :: go_on_fail_    !< Go on if load fails, local variable.
+   integer(I8P)                                   :: buffer_i       !< Buffer integer.
+   logical                                        :: buffer_l       !< Buffer logical.
+   character(999)                                 :: buffer_s       !< Buffer string.
+
+   go_on_fail_ = .false. ; if (present(go_on_fail)) go_on_fail_ = go_on_fail
+
+   call self%file_object%load_parameters_from_file(fini=fini, options_prefix=options_prefix, go_on_fail=go_on_fail_)
+
+   call fini%get(section_name='files', option_name=options_prefix//'_save_frequency', val=buffer_i, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_save_frequency)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%save_frequency = buffer_i
+
+   call fini%get(section_name='files', option_name=options_prefix//'_save_metrics', val=buffer_l, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_save_metrics)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%save_metrics = buffer_l
+
+   call fini%get(section_name='files', option_name=options_prefix//'_save_ghost_cells', val=buffer_l, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_save_ghost_cells)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%save_ghost_cells = buffer_l
+
+   call fini%get(section_name='files', option_name=options_prefix//'_ascii_format', val=buffer_l, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_ascii_format)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%ascii_format = buffer_l
+
+   call fini%get(section_name='files', option_name=options_prefix//'_off_format', val=buffer_l, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_off_format)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%off_format = buffer_l
+
+   call fini%get(section_name='files', option_name=options_prefix//'_tecplot_format', val=buffer_l, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_tecplot_format)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%tecplot_format = buffer_l
+
+   call fini%get(section_name='files', option_name=options_prefix//'_vtk_format', val=buffer_l, error=self%error%status)
+   call self%error%check(message='failed to load [files].('//options_prefix//'_vtk_format)', is_severe=.not.go_on_fail_)
+   if (self%error%status <= 0) self%vtk_format = buffer_l
+   endsubroutine load_parameters_from_file
+
    subroutine save_grid_dimensions_into_file(self, grid_dimensions, file_name)
    !< Load the grid dimensions of all blocks into file.
    class(file_grid_object),      intent(inout)        :: self            !< File object.
@@ -206,4 +316,23 @@ contains
    enddo
    call self%close_file
    endsubroutine save_nodes_into_file
+
+   ! operators
+   pure subroutine file_assign_file(lhs, rhs)
+   !< Operator `=`.
+   class(file_grid_object), intent(inout) :: lhs !< Left hand side.
+   class(file_object),      intent(in)    :: rhs !< Right hand side.
+
+   call lhs%file_object%file_assign_file(rhs=rhs)
+   select type(rhs)
+   type is(file_grid_object)
+      lhs%save_frequency = rhs%save_frequency
+      lhs%save_metrics = rhs%save_metrics
+      lhs%save_ghost_cells = rhs%save_ghost_cells
+      lhs%ascii_format = rhs%ascii_format
+      lhs%off_format = rhs%off_format
+      lhs%tecplot_format = rhs%tecplot_format
+      lhs%vtk_format = rhs%vtk_format
+   endselect
+   endsubroutine file_assign_file
 endmodule off_file_grid_object

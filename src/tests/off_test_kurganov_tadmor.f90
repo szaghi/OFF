@@ -21,7 +21,7 @@ call cli_parse
 call simulation%initialize(file_parameters=trim(adjustl(inf_name)))
 call simulation%integrate
 call simulation%save_file_solution(file_name=trim(adjustl(outf_name)), off=.false., vtk=.true., ascii=.true., &
-                                   n=simulation%time%n, last=.true.)
+                                   n=simulation%time%n, force=.true.)
 
 print '(A,L1)', 'Are all tests passed? ', all(are_tests_passed)
 

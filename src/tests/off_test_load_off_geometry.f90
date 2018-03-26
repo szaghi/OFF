@@ -32,7 +32,7 @@ do f=1, size(file_name, dim=1)
    call mesh%blocks(1)%immerge_off_geometry(file_name=trim(adjustl(file_name(f))), n=f, outside_reference=(1000*ex+1000*ey+100*ez))
 enddo
 call mesh%blocks(1)%update_level_set_distance
-call simulation%initialize(mesh=mesh)
+! call simulation%initialize(mesh=mesh)
 call simulation%mesh%save_file_grid(file_name=trim(adjustl(outf_name)), metrics=.true., off=.false., vtk=.true.)
 
 are_tests_passed(1) = simulation%mesh%blocks(1)%cell(1,1,1)%level_set%distance > 0._R8P

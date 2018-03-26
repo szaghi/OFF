@@ -138,6 +138,7 @@ type :: block_object
       procedure, pass(self) :: load_nodes_from_file               !< Load nodes from file.
       procedure, pass(self) :: nodes_number                       !< Return the number of nodes.
       procedure, pass(self) :: set_eos                            !< Set EOS.
+      procedure, pass(self) :: save_conservatives_into_file       !< Save conservatives into file.
       procedure, pass(self) :: save_file_grid                     !< Save grid file.
       procedure, pass(self) :: save_file_solution                 !< Save solution file.
       procedure, pass(self) :: save_nodes_into_file               !< Save nodes into file.
@@ -666,6 +667,17 @@ contains
    nodes_number_ = self%signature%nodes_number(with_ghosts=with_ghosts)
    endfunction nodes_number
 
+   subroutine save_conservatives_into_file(self, file_unit, pos)
+   !< Save conservative variables into file.
+   class(block_object), intent(inout) :: self      !< Block.
+   integer(I4P),        intent(in)    :: file_unit !< File unit.
+   integer(I4P),        intent(in)    :: pos       !< Position to start the loading.
+
+   write(file_unit, pos=pos, iostat=self%error%status) self%cell%U%density, &
+                                                       self%cell%U%momentum%x, self%cell%U%momentum%y, self%cell%U%momentum%z, &
+                                                       self%cell%U%energy
+   endsubroutine save_conservatives_into_file
+
    subroutine save_file_grid(self, file_name, ascii, metrics, tecplot, vtk)
    !< Save grid file.
    class(block_object), intent(inout)        :: self         !< Block.
@@ -700,6 +712,24 @@ contains
 
    if (vtk_) call self%save_file_solution_vtk(file_name=file_name, metrics=metrics, gc=gc, ascii=ascii)
    endsubroutine save_file_solution
+
+   subroutine save_bc_into_file(self, file_unit, pos)
+   !< Save bc into file.
+   class(block_object), intent(inout) :: self      !< Block.
+   integer(I4P),        intent(in)    :: file_unit !< File unit.
+   integer(I4P),        intent(in)    :: pos       !< Position to start the loading.
+   integer(I4P)                       :: i, j, k   !< Counter.
+
+   associate(gc=>self%signature%gc, ni=>self%signature%ni, nj=>self%signature%nj, nk=>self%signature%nk)
+      do k=1-gc(5), nk+gc(6)
+         do j=1-gc(3), nj+gc(4)
+            do i=1-gc(1), ni+gc(2)
+            error stop 'to be implemented'
+            enddo
+         enddo
+      enddo
+   endassociate
+   endsubroutine save_bc_into_file
 
    subroutine save_nodes_into_file(self, file_unit, pos)
    !< Save nodes into file.

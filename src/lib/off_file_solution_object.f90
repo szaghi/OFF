@@ -12,8 +12,8 @@ module off_file_solution_object
 !< # for each block
 !< id, level, gc, ni, nj, nk
 !< # core
-!< # for each block (for all nodes of block)
-!< node%vertex%x, node%vertex%y, node%vertex%z
+!< # for each block (for all cells of block)
+!< cell%U
 !<```
 !<
 !< Secondary, it can be used also in the *parametric* ascii mode, essentially for loading parametric initial conditions. Its
@@ -71,11 +71,13 @@ type, extends(file_object) :: file_solution_object
    logical      :: vtk_format=.false.       !< VTK file format sentinel.
    contains
       ! public methods
-      procedure, pass(self) :: description                  !< Return a pretty-formatted description of the file.
-      procedure, pass(self) :: destroy                      !< Destroy file.
-      procedure, pass(self) :: load_parameters_from_file    !< Load file parameters from file.
-      procedure, pass(self) :: load_conservatives_from_file !< Load conservative variables from file.
-      procedure, pass(self) :: save_conservatives_into_file !< Save conservative variables into file.
+      procedure, pass(self) :: description                    !< Return a pretty-formatted description of the file.
+      procedure, pass(self) :: destroy                        !< Destroy file.
+      procedure, pass(self) :: load_conservatives_from_file   !< Load conservative variables from file.
+      procedure, pass(self) :: load_grid_dimensions_from_file !< Load the grid dimensions of all blocks from file.
+      procedure, pass(self) :: load_parameters_from_file      !< Load file parameters from file.
+      procedure, pass(self) :: save_conservatives_into_file   !< Save conservative variables into file.
+      procedure, pass(self) :: save_grid_dimensions_into_file !< Save the grid dimensions of all blocks into file.
       ! operators
       procedure, pass(lhs) :: file_assign_file !< Operator `=`.
 endtype file_solution_object
@@ -108,6 +110,74 @@ contains
 
    self = fresh
    endsubroutine destroy
+
+   subroutine load_conservatives_from_file(self, grid_dimensions, blocks, file_name)
+   !< Load conservative variables from file.
+   class(file_solution_object),  intent(inout)        :: self            !< File object.
+   type(grid_dimensions_object), intent(in)           :: grid_dimensions !< Grid dimensions off all blocks into file.
+   type(block_object),           intent(inout)        :: blocks(1:)      !< Blocks storage.
+   character(*),                 intent(in), optional :: file_name       !< File name.
+   type(file_ini)                                     :: fini            !< Solution parameters ini file handler.
+   integer(I4P)                                       :: blocks_number   !< Blocks number.
+   type(primitive_compressible)                       :: P               !< Primitive variables.
+   real(R8P)                                          :: velocity_(3)    !< Velocity temporary array.
+   character(len=:), allocatable                      :: emsg_suffix     !< Error message.
+   integer(I4P)                                       :: b, i, j, k      !< Counter.
+
+   if (present(file_name)) self%file_name = trim(adjustl(file_name))
+   if (self%is_present()) then
+      emsg_suffix = ' from file "'//self%file_name//'" in procedure "file_solution_object%load_conservative_from_file"'
+      if (self%is_parametric) then
+         call fini%load(filename=self%file_name, error=self%error%status)
+         call fini%get(section_name='dimensions', option_name='blocks_number', val=blocks_number, error=self%error%status)
+         call self%error%check(message='failed to load [dimensions].(blocks_number)'//emsg_suffix, is_severe=.true.)
+         if (blocks_number>0.and.size(blocks, dim=1)>=blocks_number) then
+            do b=1, blocks_number
+               call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='pressure', &
+                             val=P%pressure, error=self%error%status)
+               call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(pressure)'//emsg_suffix, &
+                                     is_severe=.true.)
+               call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='density', &
+                             val=P%density, error=self%error%status)
+               call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(density)'//emsg_suffix, &
+                                     is_severe=.true.)
+               call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='velocity', &
+                             val=velocity_, error=self%error%status)
+               call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(velocity)'//emsg_suffix, &
+                                     is_severe=.true.)
+               P%velocity%x = velocity_(1)
+               P%velocity%y = velocity_(2)
+               P%velocity%z = velocity_(3)
+               do k=1 - blocks(b)%signature%gc(5), blocks(b)%signature%nk + blocks(b)%signature%gc(6)
+                  do j=1 - blocks(b)%signature%gc(3), blocks(b)%signature%nj + blocks(b)%signature%gc(4)
+                     do i=1 - blocks(b)%signature%gc(1), blocks(b)%signature%ni + blocks(b)%signature%gc(2)
+                        blocks(b)%cell(i,j,k)%U = primitive_to_conservative_compressible(primitive=P, eos=blocks(b)%eos)
+                     enddo
+                  enddo
+               enddo
+            enddo
+         endif
+      else
+         call self%open_file(action='read')
+         do b=1, size(blocks, dim=1)
+            call blocks(b)%load_conservatives_from_file(file_unit=self%file_unit, &
+                                                        pos=grid_dimensions%iopos_block_conservatives(b=b))
+         enddo
+         call self%close_file
+      endif
+   endif
+   endsubroutine load_conservatives_from_file
+
+   subroutine load_grid_dimensions_from_file(self, grid_dimensions, file_name)
+   !< Load the grid dimensions of all blocks from file.
+   class(file_solution_object),  intent(inout)        :: self            !< File object.
+   type(grid_dimensions_object), intent(inout)        :: grid_dimensions !< Grid dimensions off all blocks into file.
+   character(*),                 intent(in), optional :: file_name       !< File name.
+
+   call self%open_file(file_name=file_name, action='read')
+   call grid_dimensions%load_from_file(file_unit=self%file_unit)
+   call self%close_file
+   endsubroutine load_grid_dimensions_from_file
 
    subroutine load_parameters_from_file(self, fini, options_prefix, go_on_fail)
    !< Load file parameters from file.
@@ -153,62 +223,6 @@ contains
    if (self%error%status <= 0) self%vtk_format = buffer_l
    endsubroutine load_parameters_from_file
 
-   subroutine load_conservatives_from_file(self, grid_dimensions, blocks, file_name)
-   !< Load conservative variables from file.
-   class(file_solution_object),  intent(inout)        :: self            !< File object.
-   type(grid_dimensions_object), intent(in)           :: grid_dimensions !< Grid dimensions off all blocks into file.
-   type(block_object),           intent(inout)        :: blocks(1:)      !< Blocks storage.
-   character(*),                 intent(in), optional :: file_name       !< File name.
-   type(file_ini)                                     :: fini            !< Solution parameters ini file handler.
-   integer(I4P)                                       :: blocks_number   !< Blocks number.
-   type(primitive_compressible)                       :: P               !< Primitive variables.
-   real(R8P)                                          :: velocity_(3)    !< Velocity temporary array.
-   character(len=:), allocatable                      :: emsg_suffix     !< Error message.
-   integer(I4P)                                       :: b, i, j, k      !< Counter.
-
-   if (present(file_name)) self%file_name = trim(adjustl(file_name))
-   emsg_suffix = ' from file "'//self%file_name//'" in procedure "file_solution_object%load_conservative_from_file"'
-   if (self%is_parametric) then
-      call fini%load(filename=self%file_name, error=self%error%status)
-      call fini%get(section_name='dimensions', option_name='blocks_number', val=blocks_number, error=self%error%status)
-      call self%error%check(message='failed to load [dimensions].(blocks_number)'//emsg_suffix, is_severe=.true.)
-      if (blocks_number>0.and.size(blocks, dim=1)>=blocks_number) then
-         do b=1, blocks_number
-            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='pressure', &
-                          val=P%pressure, error=self%error%status)
-            call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(pressure)'//emsg_suffix, &
-                                  is_severe=.true.)
-            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='density', &
-                          val=P%density, error=self%error%status)
-            call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(density)'//emsg_suffix, &
-                                  is_severe=.true.)
-            call fini%get(section_name='block_'//trim(str(b, no_sign=.true.)), option_name='velocity', &
-                          val=velocity_, error=self%error%status)
-            call self%error%check(message='failed to load [block_'//trim(str(b,no_sign=.true.))//'].(velocity)'//emsg_suffix, &
-                                  is_severe=.true.)
-            P%velocity%x = velocity_(1)
-            P%velocity%y = velocity_(2)
-            P%velocity%z = velocity_(3)
-            do k=1 - blocks(b)%signature%gc(5), blocks(b)%signature%nk + blocks(b)%signature%gc(6)
-               do j=1 - blocks(b)%signature%gc(3), blocks(b)%signature%nj + blocks(b)%signature%gc(4)
-                  do i=1 - blocks(b)%signature%gc(1), blocks(b)%signature%ni + blocks(b)%signature%gc(2)
-                     blocks(b)%cell(i,j,k)%U = primitive_to_conservative_compressible(primitive=P, eos=blocks(b)%eos)
-                  enddo
-               enddo
-            enddo
-            ! blocks(b)%cell%P = P
-            ! call blocks(b)%primitive_to_conservative
-         enddo
-      endif
-   else
-      call self%open_file(action='read')
-      do b=1, size(blocks, dim=1)
-         ! call blocks(b)%load_conservatives_from_file(file_unit=self%file_unit, pos=grid_dimensions%iopos_block_nodes(b=b))
-      enddo
-      call self%close_file
-   endif
-   endsubroutine load_conservatives_from_file
-
    subroutine save_conservatives_into_file(self, grid_dimensions, blocks, file_name)
    !< Save conservative variables into file.
    class(file_solution_object),  intent(inout)        :: self            !< File object.
@@ -219,10 +233,22 @@ contains
 
    call self%open_file(file_name=file_name, action='write')
    do b=1, size(blocks, dim=1)
-      ! call blocks(b)%save_conservatives_into_file(file_unit=self%file_unit, pos=grid_dimensions%iopos_block_nodes(b=b))
+      call blocks(b)%save_conservatives_into_file(file_unit=self%file_unit, &
+                                                  pos=grid_dimensions%iopos_block_conservatives(b=b))
    enddo
    call self%close_file
    endsubroutine save_conservatives_into_file
+
+   subroutine save_grid_dimensions_into_file(self, grid_dimensions, file_name)
+   !< Load the grid dimensions of all blocks into file.
+   class(file_solution_object),  intent(inout)        :: self            !< File object.
+   type(grid_dimensions_object), intent(in)           :: grid_dimensions !< Grid dimensions off all blocks into file.
+   character(*),                 intent(in), optional :: file_name       !< File name.
+
+   call self%open_file(file_name=file_name, action='write')
+   call grid_dimensions%save_into_file(file_unit=self%file_unit)
+   call self%close_file
+   endsubroutine save_grid_dimensions_into_file
 
    ! operators
    pure subroutine file_assign_file(lhs, rhs)

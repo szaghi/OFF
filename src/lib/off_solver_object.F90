@@ -111,7 +111,13 @@ contains
    type(solver_object),  intent(in), optional :: solver !< Solver object.
 
    call self%destroy
-   if (present(solver)) self = solver
+   if (present(solver)) then
+      self = solver
+   else
+      self%time_integrator       = 'runge_kutta_ssp_stages_1_order_1'
+      self%convective_operator   = 'weno1'
+      self%riemann_solver_scheme = 'llf'
+   endif
    endsubroutine initialize
 
    subroutine load_from_file(self, fini, integrand_0, go_on_fail)
@@ -253,7 +259,7 @@ contains
       case('WENO17')
          self%gcu = 9
       case default
-         ! error stop 'error: unknown convervective operator'
+         error stop 'error: unknown convervective operator'
       endselect
    else
       self%gcu = 1

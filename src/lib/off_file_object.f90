@@ -35,6 +35,7 @@ type :: file_object
       procedure, pass(self) :: description               !< Return a pretty-formatted description of the file.
       procedure, pass(self) :: destroy                   !< Destroy file.
       procedure, pass(self) :: initialize                !< Initialize file.
+      procedure, pass(self) :: is_present                !< Verify if file is present (exist on memory).
       procedure, pass(self) :: load_parameters_from_file !< Load file parameters from file.
       procedure, pass(self) :: open_file                 !< Open file.
       procedure, pass(self) :: save_file_name_into_file  !< Save file name into file.
@@ -114,6 +115,14 @@ contains
    if (present(is_parametric)) self%is_parametric = is_parametric
    self%is_initialized = .true.
    endsubroutine initialize
+
+   function is_present(self)
+   !< Verify if file is present (exist on memory).
+   class(file_object), intent(in) :: self       !< Files collection.
+   logical                        :: is_present !< Check result.
+
+   inquire(file=self%file_name, exist=is_present)
+   endfunction is_present
 
    subroutine load_parameters_from_file(self, fini, options_prefix, go_on_fail)
    !< Load file parameters from file.

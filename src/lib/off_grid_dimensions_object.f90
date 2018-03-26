@@ -4,6 +4,7 @@ module off_grid_dimensions_object
 !< OFF grid dimensions object definition and implementation.
 
 use off_block_signature_object, only : block_signature_object
+use flow, only : conservative_compressible
 use penf, only : I4P, I8P
 use vecfor, only : vector
 
@@ -17,14 +18,15 @@ type :: grid_dimensions_object
    type(block_signature_object), allocatable :: block_signature(:) !< Signature of each block.
    contains
       ! public methods
-      procedure, pass(self) :: alloc             !< Allocate blocks.
-      procedure, pass(self) :: description       !< Return a pretty-formatted description of grid dimensions.
-      procedure, pass(self) :: destroy           !< Destroy grid dimensions.
-      procedure, pass(self) :: initialize        !< Initialize grid dimensions.
-      procedure, pass(self) :: iolength          !< Return the IO length storage.
-      procedure, pass(self) :: iopos_block_nodes !< Return the IO position where nodes of block b-th are stored.
-      procedure, pass(self) :: load_from_file    !< Load grid dimensions from file.
-      procedure, pass(self) :: save_into_file    !< Save grid dimensions into file.
+      procedure, pass(self) :: alloc                     !< Allocate blocks.
+      procedure, pass(self) :: description               !< Return a pretty-formatted description of grid dimensions.
+      procedure, pass(self) :: destroy                   !< Destroy grid dimensions.
+      procedure, pass(self) :: initialize                !< Initialize grid dimensions.
+      procedure, pass(self) :: iolength                  !< Return the IO length storage.
+      procedure, pass(self) :: iopos_block_nodes         !< Return the IO position where nodes of block b-th are stored.
+      procedure, pass(self) :: iopos_block_conservatives !< Return the IO position where conservatives of block b-th are stored.
+      procedure, pass(self) :: load_from_file            !< Load grid dimensions from file.
+      procedure, pass(self) :: save_into_file            !< Save grid dimensions into file.
       ! operators
       generic :: assignment(=) => grid_d_assign_grid_d !< Overload `=`.
       ! private methods
@@ -118,6 +120,31 @@ contains
       endif
    endif
    endfunction iopos_block_nodes
+
+   function iopos_block_conservatives(self, b) result(iopos)
+   !< Return the IO position where conservatives of block b-th are stored.
+   class(grid_dimensions_object), intent(in) :: self          !< Grid dimensions object.
+   integer(I4P),                  intent(in) :: b             !< Block index.
+   integer(I4P)                              :: iopos         !< IO position where conservatives of block b-th are stored.
+   type(conservative_compressible)           :: cons          !< A conservatives prototype.
+   integer(I4P)                              :: cons_iolength !< Node IO length storage.
+   integer(I4P)                              :: bb            !< Counter.
+
+   inquire(iolength=cons_iolength) cons%array()
+   iopos = self%iolength() ! file header length
+   if (self%blocks_number > 0) then
+      if (b > 1.and. b <= self%blocks_number) then
+         ! b-th block, there are the file header and [1:b-1] blocks before its nodes
+         do bb=1, b-1
+            iopos = iopos + self%block_signature(bb)%cells_number() * cons_iolength
+         enddo
+         iopos = iopos + 1
+      else
+         ! first block, there is only the file header before its nodes
+         iopos = iopos + 1
+      endif
+   endif
+   endfunction iopos_block_conservatives
 
    subroutine load_from_file(self, file_unit)
    !< Load grid dimensions from file.

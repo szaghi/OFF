@@ -196,7 +196,7 @@ jobs         = 2
 [rule-makecgal-binding]
 help   = Build CGAL Fortran binding
 rule_1 = mkdir -p libs
-rule_2 = g++ src/third_party/Fortran---CGAL-polyhedra/cgal_polyhedra.cc -std=c++11 -o libs/cc_cgal_polyhedra.o -c -frounding-math
+rule_2 = g++ -O3 src/third_party/Fortran---CGAL-polyhedra/cgal_polyhedra.cc -std=c++11 -o libs/cc_cgal_polyhedra.o -c -frounding-math
 
 [rule-makedoc]
 help   = Build documentation from source files

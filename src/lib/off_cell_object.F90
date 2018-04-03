@@ -16,7 +16,8 @@ public :: cell_object
 
 type :: cell_object
    !< Cell object class.
-   type(bc_object), allocatable    :: bc            !< Cell boundary conditions (if not allocated it is a free cell).
+   ! type(bc_object), allocatable    :: bc            !< Cell boundary conditions (if not allocated it is a free cell).
+   type(bc_object)                 :: bc            !< Cell boundary conditions (if not allocated it is a free cell).
    type(vector)                    :: center        !< Cell center.
    real(R8P)                       :: volume=0._R8P !< Cell volume.
    real(R8P)                       :: Dt=0._R8P     !< Local time step.
@@ -53,7 +54,7 @@ contains
 
    call self%destroy
    if (present(bc)) then
-      if (.not.allocated(self%bc)) allocate(self%bc)
+      ! if (.not.allocated(self%bc)) allocate(self%bc)
       self%bc = bc
    endif
    if (present(Dt)) self%Dt = Dt
@@ -67,12 +68,12 @@ contains
    class(cell_object), intent(inout) :: lhs !< Left hand side.
    type(cell_object),  intent(in)    :: rhs !< Right hand side.
 
-   if (allocated(rhs%bc)) then
-      if (.not.allocated(lhs%bc)) allocate(lhs%bc)
+   ! if (allocated(rhs%bc)) then
+      ! if (.not.allocated(lhs%bc)) allocate(lhs%bc)
       lhs%bc = rhs%bc
-   else
-      if (allocated(lhs%bc)) deallocate(lhs%bc)
-   endif
+   ! else
+      ! if (allocated(lhs%bc)) deallocate(lhs%bc)
+   ! endif
    lhs%center = rhs%center
    lhs%volume = rhs%volume
    lhs%Dt = rhs%Dt

@@ -28,6 +28,7 @@
 doc/html/
 exe/
 wiki/
+src/tests/stirling_input/
 
 # special files
 get_automatic_changelog.sh

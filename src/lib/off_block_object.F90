@@ -91,13 +91,14 @@ use off_face_object, only : face_object
 use off_level_set_object, only : level_set_object
 use off_node_object, only : node_object
 use off_solver_object, only : solver_object
-use cgal_polyhedra, only : cgal_polyhedron_closest, cgal_polyhedron_finalize, cgal_polyhedron_inside, cgal_polyhedron_read
+use cgal_polyhedra, only : cgal_polyhedron_closest, cgal_polyhedron_finalize, cgal_polyhedron_inside, &
+                           cgal_polyhedron_read, cgal_polyhedron_bbox
 use flow, only : conservative_compressible, primitive_compressible,                              &
                  conservative_to_primitive_compressible, primitive_to_conservative_compressible, &
                  eos_compressible
 use foreseer, only : riemann_solver_object
 use penf, only : FR8P, FI4P, I1P, I4P, I8P, MaxR8P, MinR8P, R8P, str
-use vecfor, only : vector, ex, ey, ez, sq_norm
+use vecfor, only : vector, ex, ey, ez, normL2, sq_norm
 use vtk_fortran, only : vtk_file
 
 implicit none
@@ -398,16 +399,16 @@ contains
          desc = desc//prefix_//'max momentum      : '//trim(str(n=maxval(self%cell%U%momentum%x)))//' '// &
                                                        trim(str(n=maxval(self%cell%U%momentum%y)))//' '// &
                                                        trim(str(n=maxval(self%cell%U%momentum%z)))//NL
-      if (allocated(self%cell(0,1,1)%bc).and.allocated(self%cell(self%signature%Ni+1,1,1)%bc).and. &
-          allocated(self%cell(1,0,1)%bc).and.allocated(self%cell(1,self%signature%Nj+1,1)%bc).and. &
-          allocated(self%cell(1,1,0)%bc).and.allocated(self%cell(1,1,self%signature%Nk+1)%bc)) then
+      ! if (allocated(self%cell(0,1,1)%bc).and.allocated(self%cell(self%signature%Ni+1,1,1)%bc).and. &
+      !     allocated(self%cell(1,0,1)%bc).and.allocated(self%cell(1,self%signature%Nj+1,1)%bc).and. &
+      !     allocated(self%cell(1,1,0)%bc).and.allocated(self%cell(1,1,self%signature%Nk+1)%bc)) then
          desc = desc//prefix_//'faces-i bc (L,R)  : '//trim(str(self%cell(0,1,1)%bc%id))//', '//&
                                                        trim(str(self%cell(self%signature%Ni+1,1,1)%bc%id))//NL
          desc = desc//prefix_//'faces-j bc (L,R)  : '//trim(str(self%cell(1,0,1)%bc%id))//', '//&
                                                        trim(str(self%cell(1,self%signature%Nj+1,1)%bc%id))//NL
          desc = desc//prefix_//'faces-k bc (L,R)  : '//trim(str(self%cell(1,1,0)%bc%id))//', '//&
                                                        trim(str(self%cell(1,1,self%signature%Nk+1)%bc%id))//NL
-      endif
+      ! endif
    endif
          desc = desc//prefix_//'equations of state: '//NL//self%eos%description(prefix=prefix_//'  ')
    endfunction description
@@ -472,32 +473,55 @@ contains
    type(c_ptr)                        :: geometry_ptr      !< Geometry tree pointer.
    type(vector)                       :: closest           !< Closest point coordinates.
    logical                            :: is_inside         !< Logical dummy.
+   type(vector)                       :: emin              !< Coordinates of minimum abscissa of the geometry.
+   type(vector)                       :: emax              !< Coordinates of maximum abscissa of the geometry.
    integer(I4P)                       :: i, j, k           !< Counter.
 
    if (allocated(self%cell)) then
       call cgal_polyhedron_read(ptree=geometry_ptr, fname=trim(adjustl(file_name)))
-      do k=1, self%signature%nk
-         do j=1, self%signature%nj
-            do i=1, self%signature%ni
-               call cgal_polyhedron_closest(ptree=geometry_ptr,           &
-                                            xq=self%cell(i,j,k)%center%x, &
-                                            yq=self%cell(i,j,k)%center%y, &
-                                            zq=self%cell(i,j,k)%center%z, &
-                                            xn=closest%x, yn=closest%y, zn=closest%z)
-               self%cell(i,j,k)%level_set%distances(n) = sqrt((self%cell(i,j,k)%center%x - closest%x)**2 + &
-                                                              (self%cell(i,j,k)%center%y - closest%y)**2 + &
-                                                              (self%cell(i,j,k)%center%z - closest%z)**2)
-               is_inside = cgal_polyhedron_inside(ptree=geometry_ptr,           &
-                                                  xq=self%cell(i,j,k)%center%x, &
-                                                  yq=self%cell(i,j,k)%center%y, &
-                                                  zq=self%cell(i,j,k)%center%z, &
-                                                  xr=outside_reference%x,       &
-                                                  yr=outside_reference%y,       &
-                                                  zr=outside_reference%z)
-               if (is_inside) self%cell(i,j,k)%level_set%distances(n) = -self%cell(i,j,k)%level_set%distances(n)
+      call cgal_polyhedron_bbox(ptree=geometry_ptr, xmin=emin%x, ymin=emin%y, zmin=emin%z, &
+                                                    xmax=emax%x, ymax=emax%y, zmax=emax%z)
+      ! do k=1, self%signature%nk
+      !    do j=1, self%signature%nj
+      !       do i=1, self%signature%ni
+      !          self%cell(i,j,k)%level_set%distances(n) = MaxR8P
+      !       enddo
+      !    enddo
+      ! enddo
+      if ((self%signature%emin%x >= emax%x).or.(self%signature%emax%x <= emin%x).or.&
+          (self%signature%emin%y >= emax%y).or.(self%signature%emax%y <= emin%y).or.&
+          (self%signature%emin%z >= emax%z).or.(self%signature%emax%z <= emin%z)) then
+         return
+      else
+         do k=1, self%signature%nk
+            do j=1, self%signature%nj
+               do i=1, self%signature%ni
+                  call cgal_polyhedron_closest(ptree=geometry_ptr,           &
+                                               xq=self%cell(i,j,k)%center%x, &
+                                               yq=self%cell(i,j,k)%center%y, &
+                                               zq=self%cell(i,j,k)%center%z, &
+                                               xn=closest%x, yn=closest%y, zn=closest%z)
+                  self%cell(i,j,k)%level_set%distances(n) = sqrt((self%cell(i,j,k)%center%x - closest%x)**2 + &
+                                                                 (self%cell(i,j,k)%center%y - closest%y)**2 + &
+                                                                 (self%cell(i,j,k)%center%z - closest%z)**2)
+                  if (self%cell(i,j,k)%level_set%distances(n) > &
+                      2*normL2(self%node(i,j,k)%vertex - self%node(i-1,j-1,k-1)%vertex)) then
+                     self%cell(i,j,k)%level_set%distances(n) = 1000._R8P ! cazzo rimuovere
+                     cycle
+                  endif
+                  is_inside = cgal_polyhedron_inside(ptree=geometry_ptr,           &
+                                                     xq=self%cell(i,j,k)%center%x, &
+                                                     yq=self%cell(i,j,k)%center%y, &
+                                                     zq=self%cell(i,j,k)%center%z, &
+                                                     xr=outside_reference%x,       &
+                                                     yr=outside_reference%y,       &
+                                                     zr=outside_reference%z)
+                  if (is_inside) self%cell(i,j,k)%level_set%distances(n) = -self%cell(i,j,k)%level_set%distances(n)
+               enddo
             enddo
          enddo
-      enddo
+      endif
+      call cgal_polyhedron_finalize(ptree=geometry_ptr)
    endif
    endsubroutine immerge_off_geometry
 
@@ -1166,16 +1190,18 @@ contains
 
    subroutine save_file_solution_vtk(self, file_name, metrics, gc, ascii)
    !< Save mesh solution into VTK file.
-   class(block_object), intent(inout)        :: self                   !< Block.
-   character(*),        intent(in)           :: file_name              !< Output file name.
-   logical,             intent(in), optional :: metrics                !< Save metrics sentinel.
-   logical,             intent(in), optional :: gc                     !< Save ghost cells sentinel.
-   logical,             intent(in), optional :: ascii                  !< Ascii/binary output.
-   logical                                   :: metrics_               !< Save metrics sentinel, local variable.
-   logical                                   :: gc_                    !< Save ghost cells sentinel, local variable.
-   logical                                   :: ascii_                 !< Ascii/binary output.
-   type(vtk_file)                            :: vtk                    !< VTK file.
-   integer(I4P)                              :: i1, i2, j1, j2, k1, k2 !< Counter.
+   class(block_object), intent(inout)        :: self                      !< Block.
+   character(*),        intent(in)           :: file_name                 !< Output file name.
+   logical,             intent(in), optional :: metrics                   !< Save metrics sentinel.
+   logical,             intent(in), optional :: gc                        !< Save ghost cells sentinel.
+   logical,             intent(in), optional :: ascii                     !< Ascii/binary output.
+   logical                                   :: metrics_                  !< Save metrics sentinel, local variable.
+   logical                                   :: gc_                       !< Save ghost cells sentinel, local variable.
+   logical                                   :: ascii_                    !< Ascii/binary output.
+   type(vtk_file)                            :: vtk                       !< VTK file.
+   real(R8P), allocatable                    :: distances(:,:,:)          !< Interfaces distances.
+   integer(I4P)                              :: i1, i2, j1, j2, k1, k2, d !< Counter.
+   integer(I4P)                              :: i, j, k                   !< Counter.
 
    metrics_ = .false. ; if (present(metrics)) metrics_ = metrics
    gc_      = .false. ; if (present(gc     )) gc_      = gc
@@ -1239,9 +1265,22 @@ contains
          self%error%status = vtk%xml_writer%write_dataarray(data_name='normals_k', x=self%face_k(i1:i2,j1:j2,k1:k2)%normal%x, &
                                                                                    y=self%face_k(i1:i2,j1:j2,k1:k2)%normal%y, &
                                                                                    z=self%face_k(i1:i2,j1:j2,k1:k2)%normal%z)
-         self%error%status = vtk%xml_writer%write_dataarray(data_name='distance',                             &
+         self%error%status = vtk%xml_writer%write_dataarray(data_name='distance',                              &
                                                             x=self%cell(i1:i2,j1:j2,k1:k2)%level_set%distance, &
                                                             one_component=.true.)
+         do d=1, self%signature%interfaces_number
+            allocate(distances(i1:i2,j1:j2,k1:k2))
+            do K=k1, k2
+               do j=j1, j2
+                  do i=i1, i2
+                     distances(i, j, k) = self%cell(i, j, k)%level_set%distances(d)
+                  enddo
+               enddo
+            enddo
+            self%error%status = vtk%xml_writer%write_dataarray(data_name='distance_'//trim(str(d,.true.)), &
+                                                               x=distances, one_component=.true.)
+            deallocate(distances)
+         enddo
       endif
 
       self%error%status = vtk%xml_writer%write_dataarray(location='cell', action='close')

@@ -4,7 +4,7 @@
 module off_level_set_object
 !< OFF level set object definition and implementation.
 
-use penf, only : I4P, R8P
+use penf, only : I4P, R8P, MaxR8P
 
 implicit none
 private
@@ -57,9 +57,17 @@ contains
    elemental subroutine update_distance(self)
    !< Update distance.
    class(level_set_object), intent(inout) :: self !< Level set object.
+   integer(I4P)                           :: d    !< Counter.
 
    if (allocated(self%distances)) then
-      self%distance = minval(self%distances)
+      if (any(self%distances<0._R8P)) then
+         self%distance = minval(self%distances)
+      else
+         self%distance = 1000._R8P ! cazzo rimuovere
+         do d=1, size(self%distances, dim=1)
+            if (self%distances(d)>0._R8P) self%distance = min(self%distance, self%distances(d))
+         enddo
+      endif
    endif
    endsubroutine update_distance
 

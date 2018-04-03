@@ -130,15 +130,17 @@ contains
    !<
    !< @note OFF file format (Object File Format) is a geometry definition file format containing the description
    !< of the composing polygons of the 3D object used by CGAL.
-   class(mesh_object), intent(inout)        :: self         !< Mesh.
-   type(file_ini),     intent(in)           :: fini         !< Simulation parameters ini file handler.
-   logical,            intent(in), optional :: go_on_fail   !< Go on if load fails.
-   logical                                  :: go_on_fail_  !< Go on if load fails, local variable.
-   character(len=:), allocatable            :: section      !< Section of INI file containing IB files data.
-   integer(I4P)                             :: files_number !< Number of IB body files.
-   character(999)                           :: file_name    !< File name of IB body files.
-   real(R8P)                                :: or(1:3)      !< Outside point references for each body file.
-   integer(I4P)                             :: b, f         !< Counter.
+   class(mesh_object), intent(inout)        :: self                    !< Mesh.
+   type(file_ini),     intent(in)           :: fini                    !< Simulation parameters ini file handler.
+   logical,            intent(in), optional :: go_on_fail              !< Go on if load fails.
+   logical                                  :: go_on_fail_             !< Go on if load fails, local variable.
+   character(len=:), allocatable            :: section                 !< Section of INI file containing IB files data.
+   integer(I4P)                             :: files_number            !< Number of IB body files.
+   character(999)                           :: file_name               !< File name of IB body files.
+   real(R8P)                                :: or(1:3)                 !< Outside point references for each body file.
+   integer(I4P)                             :: excluded_blocks_number  !< Excluded blocks number from geometry immerse.
+   integer(I4P), allocatable                :: excluded_blocks_list(:) !< Excluded blocks list.
+   integer(I4P)                             :: b, f                    !< Counter.
 
    if (self%grid_dimensions%blocks_number>0) then
       go_on_fail_ = .false. ; if (present(go_on_fail)) go_on_fail_ = go_on_fail
@@ -148,15 +150,30 @@ contains
          call self%error%check(message='failed to load ['//section//'].(files_number)', is_severe=.not.go_on_fail_)
          if (files_number>0) then
             do f=1, files_number
+
                call fini%get(section_name=section, option_name='file_ibb_'//trim(str(n=f, no_sign=.true.)), &
                              val=file_name, error=self%error%status)
                call self%error%check(message='failed to load ['//section//'].('//'file_ibb_'//trim(str(n=f, no_sign=.true.))//')', &
                                      is_severe=.not.go_on_fail_)
+
+               excluded_blocks_number = 0
+               if (allocated(excluded_blocks_list)) deallocate(excluded_blocks_list)
+               call fini%get(section_name=section, option_name='excluded_blocks_number_ibb_'//trim(str(n=f, no_sign=.true.)), &
+                             val=excluded_blocks_number, error=self%error%status)
+               if (excluded_blocks_number>0) then
+                  allocate(excluded_blocks_list(1:excluded_blocks_number))
+                  call fini%get(section_name=section, option_name='excluded_blocks_list_ibb_'//trim(str(n=f, no_sign=.true.)), &
+                                val=excluded_blocks_list, error=self%error%status)
+               endif
+
                call fini%get(section_name=section, option_name='outside_reference_ibb_'//trim(str(n=f, no_sign=.true.)), &
                              val=or, error=self%error%status)
                call self%error%check(message='failed to load ['//section//'].('//'outside_reference_ibb_'//&
                                      trim(str(n=f, no_sign=.true.))//')', is_severe=.not.go_on_fail_)
                do b=1, self%grid_dimensions%blocks_number
+                  if (allocated(excluded_blocks_list)) then
+                     if (any(excluded_blocks_list==b)) cycle
+                  endif
                   call self%blocks(b)%immerge_off_geometry(file_name=trim(adjustl(file_name)), &
                                                            n=f, outside_reference=(or(1)*ex+or(2)*ey+or(3)*ez))
                enddo
@@ -661,8 +678,8 @@ contains
       is_parametric_ = .false. ; if (present(is_parametric)) is_parametric_ = is_parametric
       metrics_ = .false. ; if (present(metrics)) metrics_ = metrics
       gc_ = .false. ; if (present(gc)) gc_ = gc
-      ascii_ = .true. ; if (present(ascii)) ascii_ = ascii
-      off_ = .true. ; if (present(off)) off_ = off
+      ascii_ = .false. ; if (present(ascii)) ascii_ = ascii
+      off_ = .false. ; if (present(off)) off_ = off
       vtk_ = .false. ; if (present(vtk)) vtk_ = vtk
       call file_solution_%initialize(file_name=file_name_%chars(), is_parametric=is_parametric_)
       file_solution_%save_metrics = metrics_
@@ -677,8 +694,6 @@ contains
       if (off_) then
          call file_solution_%save_grid_dimensions_into_file(grid_dimensions=self%grid_dimensions)
          call file_solution_%save_conservatives_into_file(grid_dimensions=self%grid_dimensions, blocks=self%blocks)
-      else
-         error stop 'error: mesh_object%save_file_solution(off=.true., ...) to be implemented'
       endif
 
       if (vtk_) then
@@ -712,7 +727,7 @@ contains
                do k=1, block_c%signature%nk
                   do j=1, block_c%signature%nj
                      do i=1 - block_c%signature%gc(1), 0
-                        if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                        ! if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                         call block_c%cell(i,j,k)%bc%initialize(code='ADJACENT')
                         block_c%cell(i,j,k)%bc%adj(1) = ba
                         block_c%cell(i,j,k)%bc%adj(2) = block_a%signature%ni + i
@@ -726,7 +741,7 @@ contains
             do k=1, block_c%signature%nk
                do j=1, block_c%signature%nj
                   do i=1 - block_c%signature%gc(1), 0
-                     if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                     ! if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                      call block_c%cell(i,j,k)%bc%initialize(code=buffer_c)
                   enddo
                enddo
@@ -747,7 +762,7 @@ contains
                do k=1, block_c%signature%nk
                   do j=1, block_c%signature%nj
                      do i=block_c%signature%ni + 1, block_c%signature%ni + block_c%signature%gc(2)
-                        if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                        ! if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                         call block_c%cell(i,j,k)%bc%initialize(code='ADJACENT')
                         block_c%cell(i,j,k)%bc%adj(1) = ba
                         block_c%cell(i,j,k)%bc%adj(2) = i - block_c%signature%ni
@@ -761,7 +776,7 @@ contains
             do k=1, block_c%signature%nk
                do j=1, block_c%signature%nj
                   do i=block_c%signature%ni + 1, block_c%signature%ni + block_c%signature%gc(2)
-                     if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                     ! if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                      call block_c%cell(i,j,k)%bc%initialize(code=buffer_c)
                   enddo
                enddo
@@ -782,7 +797,7 @@ contains
                do k=1, block_c%signature%nk
                   do j=1 - block_c%signature%gc(3), 0
                      do i=1, block_c%signature%ni
-                        if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                        ! if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                         call block_c%cell(i,j,k)%bc%initialize(code='ADJACENT')
                         block_c%cell(i,j,k)%bc%adj(1) = ba
                         block_c%cell(i,j,k)%bc%adj(2) = i
@@ -796,7 +811,7 @@ contains
             do k=1 - block_c%signature%gc(5), block_c%signature%nk + block_c%signature%gc(6)
                do j=1 - block_c%signature%gc(3), 0
                   do i=1 - block_c%signature%gc(1), block_c%signature%ni + block_c%signature%gc(2)
-                     if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                     ! if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                      call block_c%cell(i,j,k)%bc%initialize(code=buffer_c)
                   enddo
                enddo
@@ -817,7 +832,7 @@ contains
                do k=1, block_c%signature%nk
                   do j=block_c%signature%nj + 1, block_c%signature%nj + block_c%signature%gc(4)
                      do i=1, block_c%signature%ni
-                        if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                        ! if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                         call block_c%cell(i,j,k)%bc%initialize(code='ADJACENT')
                         block_c%cell(i,j,k)%bc%adj(1) = ba
                         block_c%cell(i,j,k)%bc%adj(2) = i
@@ -831,7 +846,7 @@ contains
             do k=1 - block_c%signature%gc(5), block_c%signature%nk + block_c%signature%gc(6)
                do j=block_c%signature%nj + 1, block_c%signature%nj + block_c%signature%gc(4)
                   do i=1 - block_c%signature%gc(1), block_c%signature%ni + block_c%signature%gc(2)
-                     if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                     ! if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                      call block_c%cell(i,j,k)%bc%initialize(code=buffer_c)
                   enddo
                enddo
@@ -852,7 +867,7 @@ contains
                do k=1 - block_c%signature%gc(5), 0
                   do j=1, block_c%signature%nj
                      do i=1, block_c%signature%ni
-                        if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                        ! if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                         call block_c%cell(i,j,k)%bc%initialize(code='ADJACENT')
                         block_c%cell(i,j,k)%bc%adj(1) = ba
                         block_c%cell(i,j,k)%bc%adj(2) = i
@@ -866,7 +881,7 @@ contains
             do k=1 - block_c%signature%gc(5), 0
                do j=1, block_c%signature%nj
                   do i=1, block_c%signature%ni
-                     if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                     ! if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                      call block_c%cell(i,j,k)%bc%initialize(code=buffer_c)
                   enddo
                enddo
@@ -887,7 +902,7 @@ contains
                do k=block_c%signature%nk + 1, block_c%signature%nk + block_c%signature%gc(6)
                   do j=1, block_c%signature%nj
                      do i=1, block_c%signature%ni
-                        if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                        ! if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                         call block_c%cell(i,j,k)%bc%initialize(code='ADJACENT')
                         block_c%cell(i,j,k)%bc%adj(1) = ba
                         block_c%cell(i,j,k)%bc%adj(2) = i
@@ -901,7 +916,7 @@ contains
             do k=block_c%signature%nk + 1, block_c%signature%nk + block_c%signature%gc(6)
                do j=1, block_c%signature%nj
                   do i=1, block_c%signature%ni
-                     if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                     ! if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                      call block_c%cell(i,j,k)%bc%initialize(code=buffer_c)
                   enddo
                enddo
@@ -1062,7 +1077,7 @@ contains
          do k=k1, k2
             do j=j1, j2
                do i=i1, i2
-                  if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
+                  ! if (.not.allocated(block_c%cell(i,j,k)%bc)) allocate(block_c%cell(i,j,k)%bc)
                   call block_c%cell(i,j,k)%bc%initialize(code=code_s%chars())
                   block_c%cell(i, j, k)%bc%U = primitive_to_conservative_compressible(primitive=P, eos=block_c%eos)
                enddo

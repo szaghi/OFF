@@ -5,7 +5,7 @@ module off_mesh_object
 !< OFF mesh object definition and implementation.
 
 use, intrinsic :: iso_fortran_env, only : stderr=>error_unit, stdout=>output_unit
-use off_bc_object, only : BC_WALL, BC_PERIODIC, BC_EXTRAPOLATED, BC_ADJACENT, BC_INLET_SUPERSONIC
+use off_bc_object, only : BC_WALL, BC_PERIODIC, BC_EXTRAPOLATED, BC_ADJACENT, BC_INLET_SUPERSONIC, BC_OUTLET_SUBSONIC
 use off_block_object, only : block_object
 use off_cell_object, only : cell_object
 use off_error_object, only : error_object
@@ -13,11 +13,13 @@ use off_file_grid_object, only : file_grid_object
 use off_file_solution_object, only : file_solution_object
 use off_grid_dimensions_object, only : grid_dimensions_object
 use finer, only : file_ini
-use flow, only : eos_compressible, primitive_compressible, primitive_to_conservative_compressible
+use flow, only : eos_compressible, primitive_compressible, primitive_to_conservative_compressible, &
+                 conservative_to_primitive_compressible
 use off_solver_object, only : solver_object
 use penf, only : I4P, I8P, R8P, str, strz
 use stringifor, only : string
 use vecfor, only : vector, ex, ey, ez
+use vtk_fortran, only : vtm_file
 
 implicit none
 private
@@ -137,9 +139,10 @@ contains
    character(len=:), allocatable            :: section                 !< Section of INI file containing IB files data.
    integer(I4P)                             :: files_number            !< Number of IB body files.
    character(999)                           :: file_name               !< File name of IB body files.
-   real(R8P)                                :: or(1:3)                 !< Outside point references for each body file.
+   real(R8P)                                :: or(1:9)                 !< Outside point references for each body file.
    integer(I4P)                             :: excluded_blocks_number  !< Excluded blocks number from geometry immerse.
    integer(I4P), allocatable                :: excluded_blocks_list(:) !< Excluded blocks list.
+   logical                                  :: distance_sign_inverse   !< Distance has inverse sign with respect CGAL convention.
    integer(I4P)                             :: b, f                    !< Counter.
 
    if (self%grid_dimensions%blocks_number>0) then
@@ -170,12 +173,20 @@ contains
                              val=or, error=self%error%status)
                call self%error%check(message='failed to load ['//section//'].('//'outside_reference_ibb_'//&
                                      trim(str(n=f, no_sign=.true.))//')', is_severe=.not.go_on_fail_)
+
+               call fini%get(section_name=section, option_name='distance_sign_inverse_ibb_'//trim(str(n=f, no_sign=.true.)), &
+                             val=distance_sign_inverse, error=self%error%status)
+               if (self%error%status /= 0) distance_sign_inverse = .false.
+
                do b=1, self%grid_dimensions%blocks_number
                   if (allocated(excluded_blocks_list)) then
                      if (any(excluded_blocks_list==b)) cycle
                   endif
-                  call self%blocks(b)%immerge_off_geometry(file_name=trim(adjustl(file_name)), &
-                                                           n=f, outside_reference=(or(1)*ex+or(2)*ey+or(3)*ez))
+                  call self%blocks(b)%immerge_off_geometry(file_name=trim(adjustl(file_name)),                 &
+                                                           n=f, outside_reference=[or(1)*ex+or(2)*ey+or(3)*ez, &
+                                                                                   or(4)*ex+or(5)*ey+or(6)*ez, &
+                                                                                   or(7)*ex+or(8)*ey+or(9)*ez],&
+                                                           distance_sign_inverse=distance_sign_inverse)
                enddo
             enddo
             do b=1, self%grid_dimensions%blocks_number
@@ -211,6 +222,9 @@ contains
                   call impose_boundary_conditions_adjacent(gc=gc(1), frame=block_b%cell(1-gc(1):0,j,k))
                elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_INLET_SUPERSONIC)) then
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(1), frame=block_b%cell(1-gc(1):0,j,k))
+               elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_OUTLET_SUBSONIC)) then
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(1:2), ic=gc(1), N=Ni, boundary='l', &
+                                                                  stride=block_b%cell(:,j,k))
                endif
                ! right
                if     (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_WALL)) then
@@ -225,6 +239,9 @@ contains
                   call impose_boundary_conditions_adjacent(gc=gc(2), frame=block_b%cell(Ni+1:Ni+gc(2),j,k))
                elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_INLET_SUPERSONIC)) then
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(2), frame=block_b%cell(Ni+1:Ni+gc(2),j,k))
+               elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_OUTLET_SUBSONIC)) then
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(1:2), ic=gc(2), N=Ni, boundary='r', &
+                                                                  stride=block_b%cell(:,j,k))
                endif
             enddo
          enddo
@@ -244,6 +261,9 @@ contains
                   call impose_boundary_conditions_adjacent(gc=gc(3), frame=block_b%cell(i,1-gc(3):0,k))
                elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_INLET_SUPERSONIC)) then
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(3), frame=block_b%cell(i,1-gc(3):0,k))
+               elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_OUTLET_SUBSONIC)) then
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(3:4), ic=gc(3), N=Nj, boundary='l', &
+                                                                  stride=block_b%cell(i,:,k))
                endif
                ! right
                if     (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_WALL)) then
@@ -258,6 +278,9 @@ contains
                   call impose_boundary_conditions_adjacent(gc=gc(4), frame=block_b%cell(i,Nj+1:Nj+gc(4),k))
                elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_INLET_SUPERSONIC)) then
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(4), frame=block_b%cell(i,Nj+1:Nj+gc(4),k))
+               elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_OUTLET_SUBSONIC)) then
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(3:4), ic=gc(4), N=Nj, boundary='r', &
+                                                                  stride=block_b%cell(i,:,k))
                endif
             enddo
          enddo
@@ -277,6 +300,9 @@ contains
                   call impose_boundary_conditions_adjacent(gc=gc(5), frame=block_b%cell(i,j,1-gc(5):0))
                elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_INLET_SUPERSONIC)) then
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(5), frame=block_b%cell(i,j,1-gc(5):0))
+               elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_OUTLET_SUBSONIC)) then
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(5:6), ic=gc(5), N=Nk, boundary='l', &
+                                                                  stride=block_b%cell(i,j,:))
                endif
                ! right
                if     (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_WALL)) then
@@ -291,6 +317,9 @@ contains
                   call impose_boundary_conditions_adjacent(gc=gc(6), frame=block_b%cell(i,j,Nk+1:Nk+gc(6)))
                elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_INLET_SUPERSONIC)) then
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(6), frame=block_b%cell(i,j,Nk+1:Nk+gc(6)))
+               elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_OUTLET_SUBSONIC)) then
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(5:6), ic=gc(6), N=Nk, boundary='r', &
+                                                                  stride=block_b%cell(i,j,:))
                endif
             enddo
          enddo
@@ -423,6 +452,51 @@ contains
          frame(i)%U = frame(i)%bc%U
       enddo
       endsubroutine impose_boundary_conditions_inlet_supersonic
+
+      _PURE_ subroutine impose_boundary_conditions_outlet_subsonic(gc, ic, N, boundary, stride)
+      !< Impose boundary conditions of fixed pressure on a stride of cells along a direction.
+      integer(I4P),      intent(in)    :: gc(1:2)          !< Number of ghost cells.
+      integer(I4P),      intent(in)    :: ic               !< Number of internal cells used for extrapolation (1 or gc).
+      integer(I4P),      intent(in)    :: N                !< Number of internal cells.
+      character(1),      intent(in)    :: boundary         !< Boundary left ('l') or right ('r').
+      type(cell_object), intent(inout) :: stride(1-gc(1):) !< Cells stride [1-gc(1):N+gc(2)].
+      integer(I4P)                     :: i                !< Counter.
+      type(primitive_compressible)     :: P                !< Primitive variables.
+
+      if (boundary=='l') then
+         if (ic==1.or.N<gc(1)) then ! extrapolation using only the cell 1
+            do i=1-gc(1), 0
+               P = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               P%density = stride(1)%U%density
+               P%velocity = stride(1)%U%velocity()
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P, eos=self%blocks(1)%eos)
+            enddo
+         else ! extrapolation using the cells 1,2,...,gc
+            do i=1-gc(1), 0
+               P = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               P%density = stride(-i+1)%U%density
+               P%velocity = stride(-i+1)%U%velocity()
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P, eos=self%blocks(1)%eos)
+            enddo
+         endif
+      elseif (boundary=='r') then
+         if (ic==1.or.N<gc(2)) then ! extrapolation using only the cell N
+            do i=N+1, N+gc(2)
+               P = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               P%density = stride(N)%U%density
+               P%velocity = stride(N)%U%velocity()
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P, eos=self%blocks(1)%eos)
+            enddo
+         else ! extrapolation using the cells N-gc,N-gc+1,N-gc+2,...,N
+            do i=N+1, N+gc(2)
+               P = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               P%density = stride(N+1-(i-N))%U%density
+               P%velocity = stride(N+1-(i-N))%U%velocity()
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P, eos=self%blocks(1)%eos)
+            enddo
+         endif
+      endif
+      endsubroutine impose_boundary_conditions_outlet_subsonic
    endsubroutine impose_boundary_conditions
 
    subroutine initialize(self, mesh, eos, interfaces_number, file_grid, file_ic)
@@ -630,6 +704,7 @@ contains
    logical                                          :: is_parametric_ !< Sentinel to load grid parametric grid file, local variable.
    type(string)                                     :: base_name      !< Base file name.
    type(string)                                     :: file_name_     !< File name, local variable.
+   type(string)                                     :: file_names_    !< List of file names
    logical                                          :: metrics_       !< Save metrics sentinel, local variable.
    logical                                          :: gc_            !< Save ghost cells sentinel, local variable.
    logical                                          :: ascii_         !< Ascii/binary output, local variable.
@@ -637,6 +712,7 @@ contains
    logical                                          :: vtk_           !< VTK format sentinel, local variable.
    type(string)                                     :: n_             !< Time step string.
    logical                                          :: force_         !< Sentinel to force saving, local variable.
+   type(vtm_file)                                   :: vtm_file_      !< VTM file handler.
    integer(I4P)                                     :: b              !< Counter.
 
    ! initialize sentinel for forcing saving
@@ -697,12 +773,17 @@ contains
       endif
 
       if (vtk_) then
+         file_names_ = ''
          do b=1, self%grid_dimensions%blocks_number
             file_name_ = base_name//'-solution-block'//                                     &
                          '-id_'//trim(str(n=self%blocks(b)%signature%id, no_sign=.true.))// &
                          '-lv_'//trim(str(n=self%blocks(b)%signature%level, no_sign=.true.))//n_//'.vts'
             call self%blocks(b)%save_file_solution(file_name=file_name_%chars(), metrics=metrics_, gc=gc_, ascii=ascii_, vtk=vtk_)
+            file_names_ = file_names_//' '//file_name_
          enddo
+         self%error%status = vtm_file_%initialize(filename=base_name//'-solution'//n_//'.vtm')
+         self%error%status = vtm_file_%write_block(filenames=trim(file_names_%chars()), name='blocks')
+         self%error%status = vtm_file_%finalize()
       endif
    endif
    endsubroutine save_file_solution

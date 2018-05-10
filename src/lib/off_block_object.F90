@@ -461,30 +461,34 @@ contains
    endassociate
    endfunction dt_min
 
-   subroutine immerge_off_geometry(self, file_name, n, outside_reference)
+   subroutine immerge_off_geometry(self, file_name, n, outside_reference, distance_sign_inverse)
    !< "Immerge" geometry (described into a OFF file) into the block grid.
    !<
    !< @note OFF file format (Object File Format) is a geometry definition file format containing the description
    !< of the composing polygons of the 3D object used by CGAL.
-   class(block_object), intent(inout) :: self              !< Block.
-   character(*),        intent(in)    :: file_name         !< Name of OFF file.
-   integer(I4P),        intent(in)    :: n                 !< Number of geometry in the global numbering.
-   type(vector),        intent(in)    :: outside_reference !< A reference point outside the body.
-   type(c_ptr)                        :: geometry_ptr      !< Geometry tree pointer.
-   type(vector)                       :: closest           !< Closest point coordinates.
-   logical                            :: is_inside         !< Logical dummy.
-   type(vector)                       :: emin              !< Coordinates of minimum abscissa of the geometry.
-   type(vector)                       :: emax              !< Coordinates of maximum abscissa of the geometry.
-   integer(I4P)                       :: i, j, k           !< Counter.
+   class(block_object), intent(inout) :: self                  !< Block.
+   character(*),        intent(in)    :: file_name             !< Name of OFF file.
+   integer(I4P),        intent(in)    :: n                     !< Number of geometry in the global numbering.
+   type(vector),        intent(in)    :: outside_reference(3)  !< A reference point outside the body.
+   logical,             intent(in)    :: distance_sign_inverse !< Distance has inverse sign with respect CGAL convention.
+   type(c_ptr)                        :: geometry_ptr          !< Geometry tree pointer.
+   type(vector)                       :: closest               !< Closest point coordinates.
+   logical                            :: is_inside(3)          !< Logical dummy.
+   type(vector)                       :: emin                  !< Coordinates of minimum abscissa of the geometry.
+   type(vector)                       :: emax                  !< Coordinates of maximum abscissa of the geometry.
+   integer(I4P)                       :: distance_sign         !< Distance sing.
+   integer(I4P)                       :: i, j, k, o            !< Counter.
 
    if (allocated(self%cell)) then
+      distance_sign = 1 ; if (distance_sign_inverse) distance_sign = -1
+
       call cgal_polyhedron_read(ptree=geometry_ptr, fname=trim(adjustl(file_name)))
       call cgal_polyhedron_bbox(ptree=geometry_ptr, xmin=emin%x, ymin=emin%y, zmin=emin%z, &
                                                     xmax=emax%x, ymax=emax%y, zmax=emax%z)
       ! do k=1, self%signature%nk
       !    do j=1, self%signature%nj
       !       do i=1, self%signature%ni
-      !          self%cell(i,j,k)%level_set%distances(n) = MaxR8P
+      !          self%cell(i,j,k)%level_set%distances(n) = MinR8P
       !       enddo
       !    enddo
       ! enddo
@@ -503,20 +507,22 @@ contains
                                                xn=closest%x, yn=closest%y, zn=closest%z)
                   self%cell(i,j,k)%level_set%distances(n) = sqrt((self%cell(i,j,k)%center%x - closest%x)**2 + &
                                                                  (self%cell(i,j,k)%center%y - closest%y)**2 + &
-                                                                 (self%cell(i,j,k)%center%z - closest%z)**2)
-                  if (self%cell(i,j,k)%level_set%distances(n) > &
-                      2*normL2(self%node(i,j,k)%vertex - self%node(i-1,j-1,k-1)%vertex)) then
-                     self%cell(i,j,k)%level_set%distances(n) = 1000._R8P ! cazzo rimuovere
-                     cycle
-                  endif
-                  is_inside = cgal_polyhedron_inside(ptree=geometry_ptr,           &
-                                                     xq=self%cell(i,j,k)%center%x, &
-                                                     yq=self%cell(i,j,k)%center%y, &
-                                                     zq=self%cell(i,j,k)%center%z, &
-                                                     xr=outside_reference%x,       &
-                                                     yr=outside_reference%y,       &
-                                                     zr=outside_reference%z)
-                  if (is_inside) self%cell(i,j,k)%level_set%distances(n) = -self%cell(i,j,k)%level_set%distances(n)
+                                                                 (self%cell(i,j,k)%center%z - closest%z)**2) * distance_sign
+                  ! if (self%cell(i,j,k)%level_set%distances(n) > &
+                  !     2*normL2(self%node(i,j,k)%vertex - self%node(i-1,j-1,k-1)%vertex)) then
+                  !    ! self%cell(i,j,k)%level_set%distances(n) = 1000._R8P ! cazzo rimuovere
+                  !    cycle
+                  ! endif
+                  do o=1, 3
+                     is_inside(o) = cgal_polyhedron_inside(ptree=geometry_ptr,           &
+                                                           xq=self%cell(i,j,k)%center%x, &
+                                                           yq=self%cell(i,j,k)%center%y, &
+                                                           zq=self%cell(i,j,k)%center%z, &
+                                                           xr=outside_reference(o)%x,    &
+                                                           yr=outside_reference(o)%y,    &
+                                                           zr=outside_reference(o)%z)
+                  enddo
+                  if (count(is_inside)>=2) self%cell(i,j,k)%level_set%distances(n) = -self%cell(i,j,k)%level_set%distances(n)
                enddo
             enddo
          enddo

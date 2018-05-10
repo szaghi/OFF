@@ -19,7 +19,7 @@ are_tests_passed = .false.
 
 call cli_parse
 call simulation%initialize(file_parameters=trim(adjustl(inf_name)))
-call simulation%integrate
+! call simulation%integrate
 call simulation%save_file_solution(file_name=trim(adjustl(outf_name)), metrics=.true., off=.false., vtk=.true., &
                                    n=simulation%time%n, force=.true.)
 
@@ -37,16 +37,16 @@ contains
                 examples=["off_test_stirling"], &
                 epilog=new_line('a')//"all done")
 
-  call cli%add(switch='--input',                                 &
-               help='input file name',                           &
-               required=.false.,                                 &
-               def='src/tests/stirling_input/stirling-bare.ini', &
+  call cli%add(switch='--input',                            &
+               help='input file name',                      &
+               required=.false.,                            &
+               def='src/tests/stirling_input/stirling.ini', &
                act='store')
 
   call cli%add(switch='--output',       &
                help='output file name', &
                required=.false.,        &
-               def='stirling-bare',     &
+               def='stirling',          &
                act='store')
 
   call cli%parse(error=error) ; if (error/=0) stop

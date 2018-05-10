@@ -29,7 +29,8 @@ call mesh%blocks(1)%initialize(id=1_I8P, level=1, gc=[0, 0, 0, 0, 0, 0], ni=128,
                                interfaces_number=size(file_name, dim=1))
 call mesh%blocks(1)%create_linspace(emin=(-180*ex-82*ey-53*ez), emax=(0*ex+100*ey+87*ez))
 do f=1, size(file_name, dim=1)
-   call mesh%blocks(1)%immerge_off_geometry(file_name=trim(adjustl(file_name(f))), n=f, outside_reference=(1000*ex+1000*ey+100*ez))
+   ! call mesh%blocks(1)%immerge_off_geometry(file_name=trim(adjustl(file_name(f))), n=f, &
+                                            ! outside_reference=(1000*ex+1000*ey+100*ez), distance_sign_inverse=.false.)
 enddo
 call mesh%blocks(1)%update_level_set_distance
 ! call simulation%initialize(mesh=mesh)

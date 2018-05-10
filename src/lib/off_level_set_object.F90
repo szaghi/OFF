@@ -4,7 +4,7 @@
 module off_level_set_object
 !< OFF level set object definition and implementation.
 
-use penf, only : I4P, R8P, MaxR8P
+use penf, only : I4P, R8P
 
 implicit none
 private
@@ -14,8 +14,8 @@ type :: level_set_object
    !< Level set object class.
    !<
    !< Level set technique is used to track interfaces by means of computed distances with sign.
-   real(R8P)              :: distance=0._R8P !< Distance from the closest interface.
-   real(R8P), allocatable :: distances(:)    !< Distance from all interfaces.
+   real(R8P)              :: distance=1e10_R8P !< Distance from the closest interface.
+   real(R8P), allocatable :: distances(:)      !< Distance from all interfaces.
    contains
       ! public methods
       procedure, pass(self) :: destroy         !< Destroy cell.
@@ -47,7 +47,7 @@ contains
    if (present(interfaces_number)) then
       if (interfaces_number>0) then
          allocate(self%distances(1:interfaces_number))
-         self%distances = 0._R8P
+         self%distances = 1e10_R8P
       endif
    endif
    if (present(distances)) self%distances = distances
@@ -61,12 +61,14 @@ contains
 
    if (allocated(self%distances)) then
       if (any(self%distances<0._R8P)) then
-         self%distance = minval(self%distances)
-      else
-         self%distance = 1000._R8P ! cazzo rimuovere
+         self%distance = -1e10_R8P
          do d=1, size(self%distances, dim=1)
-            if (self%distances(d)>0._R8P) self%distance = min(self%distance, self%distances(d))
+            if (self%distances(d)<0._R8P) then
+               self%distance = max(self%distance, self%distances(d))
+            endif
          enddo
+      else
+         self%distance = minval(self%distances)
       endif
    endif
    endsubroutine update_distance

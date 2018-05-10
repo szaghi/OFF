@@ -16,6 +16,7 @@ public :: BC_PERIODIC
 public :: BC_EXTRAPOLATED
 public :: BC_ADJACENT
 public :: BC_INLET_SUPERSONIC
+public :: BC_OUTLET_SUBSONIC
 
 integer(I1P), parameter :: BC_FREE             = 0_I1P !< Cell free boundary conditions.
 integer(I1P), parameter :: BC_WALL             = 1_I1P !< Solid (inviscid) wall boundary conditions.
@@ -23,6 +24,7 @@ integer(I1P), parameter :: BC_PERIODIC         = 2_I1P !< Periodic (circular) bo
 integer(I1P), parameter :: BC_EXTRAPOLATED     = 3_I1P !< Extrapolated boundary conditions.
 integer(I1P), parameter :: BC_ADJACENT         = 4_I1P !< Adjacent boundary conditions.
 integer(I1P), parameter :: BC_INLET_SUPERSONIC = 5_I1P !< Supersonic inlet boundary conditions.
+integer(I1P), parameter :: BC_OUTLET_SUBSONIC  = 6_I1P !< Subsonic outlet boundary conditions.
 
 type :: bc_object
    !< Boundary conditions object class.
@@ -130,6 +132,9 @@ contains
       if (.not.allocated(self%adj)) allocate(self%adj(4))
    case('INS', 'INLET_SUPERSONIC')
       self%id = BC_INLET_SUPERSONIC
+      if (.not.allocated(self%U)) allocate(self%U)
+   case('OSB', 'OUTLET_SUBSONIC')
+      self%id = BC_OUTLET_SUBSONIC
       if (.not.allocated(self%U)) allocate(self%U)
    endselect
    if (present(adj)) self%adj = adj

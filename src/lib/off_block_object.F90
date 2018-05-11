@@ -91,12 +91,11 @@ use off_face_object, only : face_object
 use off_level_set_object, only : level_set_object
 use off_node_object, only : node_object
 use off_solver_object, only : solver_object
-use cgal_polyhedra, only : cgal_polyhedron_closest, cgal_polyhedron_finalize, cgal_polyhedron_inside, &
-                           cgal_polyhedron_read, cgal_polyhedron_bbox
 use flow, only : conservative_compressible, primitive_compressible,                              &
                  conservative_to_primitive_compressible, primitive_to_conservative_compressible, &
                  eos_compressible
 use foreseer, only : riemann_solver_object
+use fossil, only : file_stl_object
 use penf, only : FR8P, FI4P, I1P, I4P, I8P, MaxR8P, MinR8P, R8P, str
 use vecfor, only : vector, ex, ey, ez, normL2, sq_norm
 use vtk_fortran, only : vtk_file
@@ -132,7 +131,7 @@ type :: block_object
       procedure, pass(self) :: description                        !< Return a pretty-formatted description of the block.
       procedure, pass(self) :: destroy                            !< Destroy block.
       procedure, pass(self) :: dt_min                             !< Return the minimum Dt into internal cells.
-      procedure, pass(self) :: immerge_off_geometry               !< "Immerge" geometry (described by OFF file) into the block grid.
+      procedure, pass(self) :: immerge_stl_geometry               !< *Immerge* geometry (described by STL file) into the block grid.
       procedure, pass(self) :: interpolate_at_nodes               !< Interpolate cell-centered variable at nodes.
       procedure, pass(self) :: initialize                         !< Initialize block.
       procedure, pass(self) :: load_conservatives_from_file       !< Load nodes from file.
@@ -461,75 +460,51 @@ contains
    endassociate
    endfunction dt_min
 
-   subroutine immerge_off_geometry(self, file_name, n, outside_reference, distance_sign_inverse)
-   !< "Immerge" geometry (described into a OFF file) into the block grid.
-   !<
-   !< @note OFF file format (Object File Format) is a geometry definition file format containing the description
-   !< of the composing polygons of the 3D object used by CGAL.
-   class(block_object), intent(inout) :: self                  !< Block.
-   character(*),        intent(in)    :: file_name             !< Name of OFF file.
-   integer(I4P),        intent(in)    :: n                     !< Number of geometry in the global numbering.
-   type(vector),        intent(in)    :: outside_reference(3)  !< A reference point outside the body.
-   logical,             intent(in)    :: distance_sign_inverse !< Distance has inverse sign with respect CGAL convention.
-   type(c_ptr)                        :: geometry_ptr          !< Geometry tree pointer.
-   type(vector)                       :: closest               !< Closest point coordinates.
-   logical                            :: is_inside(3)          !< Logical dummy.
-   type(vector)                       :: emin                  !< Coordinates of minimum abscissa of the geometry.
-   type(vector)                       :: emax                  !< Coordinates of maximum abscissa of the geometry.
-   integer(I4P)                       :: distance_sign         !< Distance sing.
-   integer(I4P)                       :: i, j, k, o            !< Counter.
+   subroutine immerge_stl_geometry(self, file_name, n, distance_sign_inverse, distance_sign_algorithm, aabb_ref_levels)
+   !< *Immerge* geometry (described into a STL file) into the block grid.
+   class(block_object), intent(inout)        :: self                     !< Block.
+   character(*),        intent(in)           :: file_name                !< Name of OFF file.
+   integer(I4P),        intent(in)           :: n                        !< Number of geometry in the global numbering.
+   logical,             intent(in), optional :: distance_sign_inverse    !< Invert sign distance.
+   character(*),        intent(in), optional :: distance_sign_algorithm  !< Algorithm used for *sign* of distance computation.
+   integer(I4P),        intent(in), optional :: aabb_ref_levels          !< AABB refinement levels used.
+   integer(I4P)                              :: distance_sign            !< Distance sing.
+   character(len=:), allocatable             :: distance_sign_algorithm_ !< Algorithm used for *sign* of distance computation.
+   integer(I4P)                              :: aabb_ref_levels_         !< AABB refinement levels used, local variable.
+   type(file_stl_object)                     :: stl                      !< STL file handler.
+   integer(I4P)                              :: i, j, k                  !< Counter.
 
    if (allocated(self%cell)) then
-      distance_sign = 1 ; if (distance_sign_inverse) distance_sign = -1
+      distance_sign = 1
+      if (present(distance_sign_inverse)) then
+         if (distance_sign_inverse) distance_sign = -1
+      endif
+      distance_sign_algorithm_ = 'ray_intersections'
+      if (present(distance_sign_algorithm)) distance_sign_algorithm_ = distance_sign_algorithm
+      aabb_ref_levels_ = 2 ; if (present(aabb_ref_levels)) aabb_ref_levels_ = aabb_ref_levels
 
-      call cgal_polyhedron_read(ptree=geometry_ptr, fname=trim(adjustl(file_name)))
-      call cgal_polyhedron_bbox(ptree=geometry_ptr, xmin=emin%x, ymin=emin%y, zmin=emin%z, &
-                                                    xmax=emax%x, ymax=emax%y, zmax=emax%z)
-      ! do k=1, self%signature%nk
-      !    do j=1, self%signature%nj
-      !       do i=1, self%signature%ni
-      !          self%cell(i,j,k)%level_set%distances(n) = MinR8P
-      !       enddo
-      !    enddo
-      ! enddo
-      if ((self%signature%emin%x >= emax%x).or.(self%signature%emax%x <= emin%x).or.&
-          (self%signature%emin%y >= emax%y).or.(self%signature%emax%y <= emin%y).or.&
-          (self%signature%emin%z >= emax%z).or.(self%signature%emax%z <= emin%z)) then
+      call stl%load_from_file(file_name=trim(adjustl(file_name)), guess_format=.true.)
+      call stl%sanitize_normals
+      if (aabb_ref_levels_ > 0) call stl%create_aabb_tree(refinement_levels=aabb_ref_levels_)
+
+      if ((self%signature%emin%x >= stl%bmax%x).or.(self%signature%emax%x <= stl%bmin%x).or.&
+          (self%signature%emin%y >= stl%bmax%y).or.(self%signature%emax%y <= stl%bmin%y).or.&
+          (self%signature%emin%z >= stl%bmax%z).or.(self%signature%emax%z <= stl%bmin%z)) then
          return
       else
          do k=1, self%signature%nk
             do j=1, self%signature%nj
                do i=1, self%signature%ni
-                  call cgal_polyhedron_closest(ptree=geometry_ptr,           &
-                                               xq=self%cell(i,j,k)%center%x, &
-                                               yq=self%cell(i,j,k)%center%y, &
-                                               zq=self%cell(i,j,k)%center%z, &
-                                               xn=closest%x, yn=closest%y, zn=closest%z)
-                  self%cell(i,j,k)%level_set%distances(n) = sqrt((self%cell(i,j,k)%center%x - closest%x)**2 + &
-                                                                 (self%cell(i,j,k)%center%y - closest%y)**2 + &
-                                                                 (self%cell(i,j,k)%center%z - closest%z)**2) * distance_sign
-                  ! if (self%cell(i,j,k)%level_set%distances(n) > &
-                  !     2*normL2(self%node(i,j,k)%vertex - self%node(i-1,j-1,k-1)%vertex)) then
-                  !    ! self%cell(i,j,k)%level_set%distances(n) = 1000._R8P ! cazzo rimuovere
-                  !    cycle
-                  ! endif
-                  do o=1, 3
-                     is_inside(o) = cgal_polyhedron_inside(ptree=geometry_ptr,           &
-                                                           xq=self%cell(i,j,k)%center%x, &
-                                                           yq=self%cell(i,j,k)%center%y, &
-                                                           zq=self%cell(i,j,k)%center%z, &
-                                                           xr=outside_reference(o)%x,    &
-                                                           yr=outside_reference(o)%y,    &
-                                                           zr=outside_reference(o)%z)
-                  enddo
-                  if (count(is_inside)>=2) self%cell(i,j,k)%level_set%distances(n) = -self%cell(i,j,k)%level_set%distances(n)
+                  self%cell(i,j,k)%level_set%distances(n) = distance_sign * &
+                                                            stl%distance(point=self%cell(i,j,k)%center, &
+                                                                         is_signed=.true.,              &
+                                                                         sign_algorithm=trim(distance_sign_algorithm_))
                enddo
             enddo
          enddo
       endif
-      call cgal_polyhedron_finalize(ptree=geometry_ptr)
    endif
-   endsubroutine immerge_off_geometry
+   endsubroutine immerge_stl_geometry
 
    _PURE_ subroutine initialize(self, signature,                                           &
                                 id, level, gc, ni, nj, nk,                                 &

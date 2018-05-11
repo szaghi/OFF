@@ -38,12 +38,12 @@ type :: mesh_object
       procedure, pass(self) :: compute_residuals                  !< Compute residuals.
       procedure, pass(self) :: description                        !< Return a pretty-formatted description of the mesh.
       procedure, pass(self) :: destroy                            !< Destroy mesh.
-      procedure, pass(self) :: immerge_immersed_boundaries        !< Immerge Immersed Boundary bodies.
       procedure, pass(self) :: impose_boundary_conditions         !< Impose boundary conditions.
       procedure, pass(self) :: initialize                         !< Initialize mesh.
       procedure, pass(self) :: load_file_solution                 !< Load file solution.
       procedure, pass(self) :: load_grid_from_file                !< Load grid from file.
       procedure, pass(self) :: load_ic_from_file                  !< Load initial conditions from file.
+      procedure, pass(self) :: load_stl_geometries                !< Load STL geometries and *immerge* them into the block grid.
       procedure, pass(self) :: save_file_grid                     !< Save file grid.
       procedure, pass(self) :: save_file_solution                 !< Save file solution.
       procedure, pass(self) :: set_parametric_boundary_conditions !< Set boundary conditions from parametric input file.
@@ -126,76 +126,6 @@ contains
       deallocate(self%blocks)
    endif
    endsubroutine destroy
-
-   subroutine immerge_immersed_boundaries(self, fini, go_on_fail)
-   !< "Immerge" Immersed Boundary bodies (geometry described into OFF files) into the block grid.
-   !<
-   !< @note OFF file format (Object File Format) is a geometry definition file format containing the description
-   !< of the composing polygons of the 3D object used by CGAL.
-   class(mesh_object), intent(inout)        :: self                    !< Mesh.
-   type(file_ini),     intent(in)           :: fini                    !< Simulation parameters ini file handler.
-   logical,            intent(in), optional :: go_on_fail              !< Go on if load fails.
-   logical                                  :: go_on_fail_             !< Go on if load fails, local variable.
-   character(len=:), allocatable            :: section                 !< Section of INI file containing IB files data.
-   integer(I4P)                             :: files_number            !< Number of IB body files.
-   character(999)                           :: file_name               !< File name of IB body files.
-   real(R8P)                                :: or(1:9)                 !< Outside point references for each body file.
-   integer(I4P)                             :: excluded_blocks_number  !< Excluded blocks number from geometry immerse.
-   integer(I4P), allocatable                :: excluded_blocks_list(:) !< Excluded blocks list.
-   logical                                  :: distance_sign_inverse   !< Distance has inverse sign with respect CGAL convention.
-   integer(I4P)                             :: b, f                    !< Counter.
-
-   if (self%grid_dimensions%blocks_number>0) then
-      go_on_fail_ = .false. ; if (present(go_on_fail)) go_on_fail_ = go_on_fail
-      section = 'immersed_boundary_bodies'
-      if (fini%has_section(section)) then
-         call fini%get(section_name=section, option_name='files_number', val=files_number, error=self%error%status)
-         call self%error%check(message='failed to load ['//section//'].(files_number)', is_severe=.not.go_on_fail_)
-         if (files_number>0) then
-            do f=1, files_number
-
-               call fini%get(section_name=section, option_name='file_ibb_'//trim(str(n=f, no_sign=.true.)), &
-                             val=file_name, error=self%error%status)
-               call self%error%check(message='failed to load ['//section//'].('//'file_ibb_'//trim(str(n=f, no_sign=.true.))//')', &
-                                     is_severe=.not.go_on_fail_)
-
-               excluded_blocks_number = 0
-               if (allocated(excluded_blocks_list)) deallocate(excluded_blocks_list)
-               call fini%get(section_name=section, option_name='excluded_blocks_number_ibb_'//trim(str(n=f, no_sign=.true.)), &
-                             val=excluded_blocks_number, error=self%error%status)
-               if (excluded_blocks_number>0) then
-                  allocate(excluded_blocks_list(1:excluded_blocks_number))
-                  call fini%get(section_name=section, option_name='excluded_blocks_list_ibb_'//trim(str(n=f, no_sign=.true.)), &
-                                val=excluded_blocks_list, error=self%error%status)
-               endif
-
-               call fini%get(section_name=section, option_name='outside_reference_ibb_'//trim(str(n=f, no_sign=.true.)), &
-                             val=or, error=self%error%status)
-               call self%error%check(message='failed to load ['//section//'].('//'outside_reference_ibb_'//&
-                                     trim(str(n=f, no_sign=.true.))//')', is_severe=.not.go_on_fail_)
-
-               call fini%get(section_name=section, option_name='distance_sign_inverse_ibb_'//trim(str(n=f, no_sign=.true.)), &
-                             val=distance_sign_inverse, error=self%error%status)
-               if (self%error%status /= 0) distance_sign_inverse = .false.
-
-               do b=1, self%grid_dimensions%blocks_number
-                  if (allocated(excluded_blocks_list)) then
-                     if (any(excluded_blocks_list==b)) cycle
-                  endif
-                  call self%blocks(b)%immerge_off_geometry(file_name=trim(adjustl(file_name)),                 &
-                                                           n=f, outside_reference=[or(1)*ex+or(2)*ey+or(3)*ez, &
-                                                                                   or(4)*ex+or(5)*ey+or(6)*ez, &
-                                                                                   or(7)*ex+or(8)*ey+or(9)*ez],&
-                                                           distance_sign_inverse=distance_sign_inverse)
-               enddo
-            enddo
-            do b=1, self%grid_dimensions%blocks_number
-               call self%blocks(b)%update_level_set_distance
-            enddo
-         endif
-      endif
-   endif
-   endsubroutine immerge_immersed_boundaries
 
    _PURE_ subroutine impose_boundary_conditions(self)
    !< Impose boundary conditions on all blocks of the mesh.
@@ -594,6 +524,63 @@ contains
 
    call file_ic%load_conservatives_from_file(grid_dimensions=self%grid_dimensions, blocks=self%blocks)
    endsubroutine load_ic_from_file
+
+   subroutine load_stl_geometries(self, fini, go_on_fail)
+   !< Load geometries described by STL triangulated surface and *immerge* them into the block grid.
+   class(mesh_object), intent(inout)        :: self                    !< Mesh.
+   type(file_ini),     intent(in)           :: fini                    !< Simulation parameters ini file handler.
+   logical,            intent(in), optional :: go_on_fail              !< Go on if load fails.
+   logical                                  :: go_on_fail_             !< Go on if load fails, local variable.
+   character(len=:), allocatable            :: section                 !< Section of INI file containing STL files data.
+   integer(I4P)                             :: files_number            !< Number of IB body files.
+   character(999)                           :: file_name               !< File name of IB body files.
+   integer(I4P)                             :: excluded_blocks_number  !< Excluded blocks number from geometry immerse.
+   integer(I4P), allocatable                :: excluded_blocks_list(:) !< Excluded blocks list.
+   logical                                  :: distance_sign_inverse   !< Flag to invert sign of geometries distances.
+   integer(I4P)                             :: b, f                    !< Counter.
+
+   if (self%grid_dimensions%blocks_number>0) then
+      go_on_fail_ = .false. ; if (present(go_on_fail)) go_on_fail_ = go_on_fail
+      section = 'stl_geometries'
+      if (fini%has_section(section)) then
+         call fini%get(section_name=section, option_name='files_number', val=files_number, error=self%error%status)
+         call self%error%check(message='failed to load ['//section//'].(files_number)', is_severe=.not.go_on_fail_)
+         if (files_number>0) then
+            do f=1, files_number
+               call fini%get(section_name=section, option_name='file_stl_'//trim(str(n=f, no_sign=.true.)), &
+                             val=file_name, error=self%error%status)
+               call self%error%check(message='failed to load ['//section//'].('//'file_stl_'//trim(str(n=f, no_sign=.true.))//')', &
+                                     is_severe=.not.go_on_fail_)
+
+               excluded_blocks_number = 0
+               if (allocated(excluded_blocks_list)) deallocate(excluded_blocks_list)
+               call fini%get(section_name=section, option_name='excluded_blocks_number_stl_'//trim(str(n=f, no_sign=.true.)), &
+                             val=excluded_blocks_number, error=self%error%status)
+               if (excluded_blocks_number>0) then
+                  allocate(excluded_blocks_list(1:excluded_blocks_number))
+                  call fini%get(section_name=section, option_name='excluded_blocks_list_stl_'//trim(str(n=f, no_sign=.true.)), &
+                                val=excluded_blocks_list, error=self%error%status)
+               endif
+
+               call fini%get(section_name=section, option_name='distance_sign_inverse_stl_'//trim(str(n=f, no_sign=.true.)), &
+                             val=distance_sign_inverse, error=self%error%status)
+               if (self%error%status /= 0) distance_sign_inverse = .false.
+
+               do b=1, self%grid_dimensions%blocks_number
+                  if (allocated(excluded_blocks_list)) then
+                     if (any(excluded_blocks_list==b)) cycle
+                  endif
+                  call self%blocks(b)%immerge_stl_geometry(file_name=trim(adjustl(file_name)), n=f, &
+                                                           distance_sign_inverse=distance_sign_inverse)
+               enddo
+            enddo
+            do b=1, self%grid_dimensions%blocks_number
+               call self%blocks(b)%update_level_set_distance
+            enddo
+         endif
+      endif
+   endif
+   endsubroutine load_stl_geometries
 
    subroutine save_file_grid(self, file_grid, file_name, is_parametric, metrics, ascii, off, tecplot, vtk, n, force)
    !< Save file grid.

@@ -180,7 +180,7 @@ contains
                              file_grid=self%file_grid_input,       &
                              file_ic=self%file_initial_conditions, &
                              interfaces_number=interfaces_number)
-   call self%mesh%immerge_immersed_boundaries(fini=self%file_parameters, go_on_fail=self%go_on_fail)
+   call self%mesh%load_stl_geometries(fini=self%file_parameters, go_on_fail=self%go_on_fail)
    endsubroutine initialize
 
    subroutine integrate(self)
@@ -252,9 +252,9 @@ contains
 
    call self%time%load_from_file(fini=self%file_parameters, go_on_fail=self%go_on_fail)
 
-   ! IB
+   ! STL
    if (present(interfaces_number)) then
-      call self%file_parameters%get(section_name='immersed_boundary_bodies', option_name='files_number', &
+      call self%file_parameters%get(section_name='stl_geometries', option_name='files_number', &
                                     val=interfaces_number, error=self%error%status)
       if (self%error%status/=0) interfaces_number=0
    endif

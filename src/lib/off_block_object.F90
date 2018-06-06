@@ -82,8 +82,8 @@ module off_block_object
 !< The nodes of cells are not required to be on the Cartesian coordinates, thus allowing a general
 !< curvilinear mesh: the are 3 implicit coordinate lines, *i*, *j* and *k* that are not required to be orthogonal.
 
-use, intrinsic :: iso_c_binding, only : c_ptr
 use, intrinsic :: iso_fortran_env, only : stderr=>error_unit
+use off_bc_object, only : BC_ADJACENT
 use off_block_signature_object, only : block_signature_object
 use off_cell_object, only : cell_object
 use off_error_object, only : error_object
@@ -95,7 +95,7 @@ use flow, only : conservative_compressible, primitive_compressible,             
                  conservative_to_primitive_compressible, primitive_to_conservative_compressible, &
                  eos_compressible
 use foreseer, only : riemann_solver_object
-use fossil, only : file_stl_object
+use fossil, only : file_stl_object, surface_stl_object
 use penf, only : FR8P, FI4P, I1P, I4P, I8P, MaxR8P, MinR8P, R8P, str
 use vecfor, only : vector, ex, ey, ez, normL2, sq_norm
 use vtk_fortran, only : vtk_file
@@ -126,6 +126,7 @@ type :: block_object
       procedure, pass(self) :: cells_number                       !< Return the number of cells.
       procedure, pass(self) :: compute_space_operator             !< Compute space operator.
       procedure, pass(self) :: compute_dt                         !< Compute the current time step by means of CFL condition.
+      procedure, pass(self) :: compute_recv_maps                  !< Compute querying and receiving maps.
       procedure, pass(self) :: compute_residuals                  !< Compute residuals.
       procedure, pass(self) :: create_linspace                    !< Create a Cartesian block with linearly spaced nodes.
       procedure, pass(self) :: description                        !< Return a pretty-formatted description of the block.
@@ -142,6 +143,7 @@ type :: block_object
       procedure, pass(self) :: save_file_grid                     !< Save grid file.
       procedure, pass(self) :: save_file_solution                 !< Save solution file.
       procedure, pass(self) :: save_nodes_into_file               !< Save nodes into file.
+      procedure, pass(self) :: update_recv_cells_number           !< Update receive cells number for multi-processes communication.
       procedure, pass(self) :: update_level_set_distance          !< Update level set distance.
       ! operators
       generic :: assignment(=) => block_assign_block !< Overload `=`.
@@ -233,6 +235,69 @@ contains
       enddo
    endassociate
    endsubroutine compute_dt
+
+   subroutine compute_recv_maps(self, b, process, block_to_process_map, c, reqs_map, recv_map)
+   !< Compute querying and receiving maps.
+   class(block_object), intent(in)    :: self                     !< Block.
+   integer(I4P),        intent(in)    :: b                        !< Block ID in local numeration.
+   integer(I4P),        intent(in)    :: process                  !< Other process than me to send/receive cells.
+   integer(I4P),        intent(in)    :: block_to_process_map(1:) !< Maps of processes ID for all blocks[1:blocks_global_number].
+   integer(I4P),        intent(inout) :: c                        !< Cells counter.
+   integer(I4P),        intent(out)   :: reqs_map(1:,1:)          !< Querying cells map  [1:4,1:recv_cells_number].
+   integer(I4P),        intent(out)   :: recv_map(1:,1:)          !< Receiving cells map [1:4,1:recv_cells_number].
+   integer(I4P)                       :: i, j, k                  !< Counter.
+
+   associate(gc=>self%signature%gc, ni=>self%signature%ni, nj=>self%signature%nj, nk=>self%signature%nk, cell=>self%cell)
+      do k=1, nk
+         do j=1, nj
+            if (cell(0   ,j,k)%bc%is(BC_ADJACENT)) call update_frame(gc=gc(1), frame=cell(1-gc(1):0    ,j,k), c=c, &
+                                                                     reqs_map=reqs_map, recv_map=recv_map)
+            if (cell(ni+1,j,k)%bc%is(BC_ADJACENT)) call update_frame(gc=gc(2), frame=cell(ni+1:ni+gc(2),j,k), c=c, &
+                                                                     reqs_map=reqs_map, recv_map=recv_map)
+         enddo
+      enddo
+      do k=1, nk
+         do i=1, ni
+            if (cell(i,0   ,k)%bc%is(BC_ADJACENT)) call update_frame(gc=gc(3), frame=cell(i,1-gc(3):0    ,k), c=c, &
+                                                                     reqs_map=reqs_map, recv_map=recv_map)
+            if (cell(i,nj+1,k)%bc%is(BC_ADJACENT)) call update_frame(gc=gc(4), frame=cell(i,nj+1:nj+gc(4),k), c=c, &
+                                                                     reqs_map=reqs_map, recv_map=recv_map)
+         enddo
+      enddo
+      do j=1, nj
+         do i=1, ni
+            if (cell(i,j,0   )%bc%is(BC_ADJACENT)) call update_frame(gc=gc(5), frame=cell(i,j,1-gc(5):0    ), c=c, &
+                                                                     reqs_map=reqs_map, recv_map=recv_map)
+            if (cell(i,j,nk+1)%bc%is(BC_ADJACENT)) call update_frame(gc=gc(6), frame=cell(i,j,nk+1:nk+gc(6)), c=c, &
+                                                                     reqs_map=reqs_map, recv_map=recv_map)
+         enddo
+      enddo
+   endassociate
+   contains
+      _PURE_ subroutine update_frame(gc, frame, c, reqs_map, recv_map)
+      !< Update maps for current frame.
+      integer(I4P),      intent(in)    :: gc              !< Number of ghost cells.
+      type(cell_object), intent(in)    :: frame(1-gc:)    !< Cells frame [1-gc:0].
+      integer(I4P),      intent(inout) :: c               !< Cells counter.
+      integer(I4P),      intent(out)   :: reqs_map(1:,1:) !< Querying cells map  [1:4,1:recv_cells_number].
+      integer(I4P),      intent(out)   :: recv_map(1:,1:) !< Receiving cells map [1:4,1:recv_cells_number].
+      integer(I4P)                     :: ii              !< Counter.
+      integer(I4P)                     :: proc            !< Processor ID.
+
+      do ii=1-gc, 0
+         associate(adj_b=>frame(ii)%bc%adj(1), adj_i=>frame(ii)%bc%adj(2), adj_j=>frame(ii)%bc%adj(3), adj_k=>frame(ii)%bc%adj(4))
+         proc = block_to_process_map(adj_b)
+         if ( proc == process) then
+            c = c + 1
+            reqs_map(1, c) = adj_b ; recv_map(1, c) = b
+            reqs_map(2, c) = adj_i ; recv_map(2, c) = i
+            reqs_map(3, c) = adj_j ; recv_map(3, c) = j
+            reqs_map(4, c) = adj_k ; recv_map(4, c) = k
+         endif
+         endassociate
+      enddo
+      endsubroutine update_frame
+  endsubroutine compute_recv_maps
 
    subroutine compute_residuals(self, solver, gcu)
    !< Compute residuals.
@@ -471,7 +536,8 @@ contains
    integer(I4P)                              :: distance_sign            !< Distance sing.
    character(len=:), allocatable             :: distance_sign_algorithm_ !< Algorithm used for *sign* of distance computation.
    integer(I4P)                              :: aabb_ref_levels_         !< AABB refinement levels used, local variable.
-   type(file_stl_object)                     :: stl                      !< STL file handler.
+   type(file_stl_object)                     :: file_stl                 !< STL file handler.
+   type(surface_stl_object)                  :: surface_stl              !< STL surface handler.
    integer(I4P)                              :: i, j, k                  !< Counter.
 
    if (allocated(self%cell)) then
@@ -483,22 +549,22 @@ contains
       if (present(distance_sign_algorithm)) distance_sign_algorithm_ = distance_sign_algorithm
       aabb_ref_levels_ = 2 ; if (present(aabb_ref_levels)) aabb_ref_levels_ = aabb_ref_levels
 
-      call stl%load_from_file(file_name=trim(adjustl(file_name)), guess_format=.true.)
-      call stl%sanitize_normals
-      if (aabb_ref_levels_ > 0) call stl%create_aabb_tree(refinement_levels=aabb_ref_levels_)
+      call file_stl%load_from_file(facet=surface_stl%facet, file_name=trim(adjustl(file_name)), guess_format=.true.)
+      call surface_stl%analize(aabb_refinement_levels=aabb_ref_levels_)
+      call surface_stl%sanitize
 
-      if ((self%signature%emin%x >= stl%bmax%x).or.(self%signature%emax%x <= stl%bmin%x).or.&
-          (self%signature%emin%y >= stl%bmax%y).or.(self%signature%emax%y <= stl%bmin%y).or.&
-          (self%signature%emin%z >= stl%bmax%z).or.(self%signature%emax%z <= stl%bmin%z)) then
+      if ((self%signature%emin%x >= surface_stl%bmax%x).or.(self%signature%emax%x <= surface_stl%bmin%x).or.&
+          (self%signature%emin%y >= surface_stl%bmax%y).or.(self%signature%emax%y <= surface_stl%bmin%y).or.&
+          (self%signature%emin%z >= surface_stl%bmax%z).or.(self%signature%emax%z <= surface_stl%bmin%z)) then
          return
       else
          do k=1, self%signature%nk
             do j=1, self%signature%nj
                do i=1, self%signature%ni
                   self%cell(i,j,k)%level_set%distances(n) = distance_sign * &
-                                                            stl%distance(point=self%cell(i,j,k)%center, &
-                                                                         is_signed=.true.,              &
-                                                                         sign_algorithm=trim(distance_sign_algorithm_))
+                                                            surface_stl%distance(point=self%cell(i,j,k)%center, &
+                                                                                 is_signed=.true.,              &
+                                                                                 sign_algorithm=trim(distance_sign_algorithm_))
                enddo
             enddo
          enddo
@@ -752,6 +818,54 @@ contains
 
    self%eos = eos
    endsubroutine set_eos
+
+   _PURE_ subroutine update_recv_cells_number(self, me, block_to_process_map, recv_cells_number)
+   !< Update receive cells number for multi-processes communication.
+   class(block_object), intent(in)    :: self                     !< Block.
+   integer(I4P),        intent(in)    :: me                       !< ID of current process.
+   integer(I4P),        intent(in)    :: block_to_process_map(1:) !< Maps of processes ID for all blocks, [1:blocks_global_number].
+   integer(I4P),        intent(inout) :: recv_cells_number(0:)    !< Number of receive cells from each process [0:procs_number-1].
+   integer(I4P)                       :: i, j, k                  !< Counter.
+
+   associate(gc=>self%signature%gc, ni=>self%signature%ni, nj=>self%signature%nj, nk=>self%signature%nk, cell=>self%cell)
+      do k=1, nk
+         do j=1, nj
+            if (cell(0   ,j,k)%bc%is(BC_ADJACENT)) call update_frame(gc=gc(1), frame=cell(1-gc(1):0    ,j,k), rcn=recv_cells_number)
+            if (cell(ni+1,j,k)%bc%is(BC_ADJACENT)) call update_frame(gc=gc(2), frame=cell(ni+1:ni+gc(2),j,k), rcn=recv_cells_number)
+         enddo
+      enddo
+      do k=1, nk
+         do i=1, ni
+            if (cell(i,0   ,k)%bc%is(BC_ADJACENT)) call update_frame(gc=gc(3), frame=cell(i,1-gc(3):0    ,k), rcn=recv_cells_number)
+            if (cell(i,nj+1,k)%bc%is(BC_ADJACENT)) call update_frame(gc=gc(4), frame=cell(i,nj+1:nj+gc(4),k), rcn=recv_cells_number)
+         enddo
+      enddo
+      do j=1, nj
+         do i=1, ni
+            if (cell(i,j,0   )%bc%is(BC_ADJACENT)) call update_frame(gc=gc(5), frame=cell(i,j,1-gc(5):0    ), rcn=recv_cells_number)
+            if (cell(i,j,nk+1)%bc%is(BC_ADJACENT)) call update_frame(gc=gc(6), frame=cell(i,j,nk+1:nk+gc(6)), rcn=recv_cells_number)
+         enddo
+      enddo
+   endassociate
+   contains
+      _PURE_ subroutine update_frame(gc, frame, rcn)
+      !< Update counter for current frame.
+      integer(I4P),      intent(in)    :: gc           !< Number of ghost cells.
+      type(cell_object), intent(in)    :: frame(1-gc:) !< Cells frame [1-gc:0].
+      integer(I4P),      intent(inout) :: rcn(0:)      !< Number of receive cells from each process [0:procs_number-1].
+      integer(I4P)                     :: ii           !< Counter.
+      integer(I4P)                     :: b            !< Block ID in the global numeration.
+      integer(I4P)                     :: proc         !< Processor ID.
+
+      do ii=1-gc, 0
+         b = frame(ii)%bc%adj(1)
+         proc = block_to_process_map(b)
+         if ( proc /= me) then ! check if proc/=me, me doesn't communicate with itself
+            rcn(proc) = rcn(proc) + 1
+         endif
+      enddo
+      endsubroutine update_frame
+   endsubroutine update_recv_cells_number
 
    elemental subroutine update_level_set_distance(self)
    !< Update level set distance.

@@ -12,6 +12,7 @@ use off_free_conditions_object, only : free_conditions_object
 use off_mesh_object, only : mesh_object
 use off_non_dimensional_numbers_object, only : non_dimensional_numbers_object
 use off_os_object, only : os_object
+use off_parallel_object, only : parallel_object
 use off_solver_object, only : solver_object
 use off_time_object, only : time_object
 use finer, only : file_ini
@@ -29,6 +30,7 @@ type, extends(integrand_object) :: simulation_object
    !<
    !< [[simulation_object]] is a container for all simulation data for each processor/image.
    type(error_object)                   :: error                     !< Errors handler.
+   type(parallel_object)                :: parallel                  !< Parallelism handler.
    type(command_line_interface)         :: cli                       !< Command line interface.
    type(os_object)                      :: os                        !< Running Operating System.
    type(file_ini)                       :: file_parameters           !< Simulation parameters file handler.
@@ -131,6 +133,7 @@ contains
    class(simulation_object), intent(inout) :: self !< Simulation data.
 
    call self%error%destroy
+   call self%parallel%destroy
    call self%cli%free
    call self%os%destroy
    call self%file_parameters%free
@@ -152,6 +155,8 @@ contains
 
    subroutine initialize(self, file_parameters)
    !< Initialize simulation.
+   !<
+   !< @TODO Add parallel initialization.
    class(simulation_object), intent(inout)        :: self              !< Simulation data.
    character(*),             intent(in), optional :: file_parameters   !< File name of simulation parameters file.
    integer(I4P)                                   :: interfaces_number !< Number of different interfaces (level set).
@@ -476,6 +481,7 @@ contains
    select type(rhs)
    class is(simulation_object)
       lhs%error                   = rhs%error
+      lhs%parallel                = rhs%parallel
       lhs%cli                     = rhs%cli
       lhs%os                      = rhs%os
       lhs%file_parameters         = rhs%file_parameters

@@ -18,6 +18,7 @@ $EXDIRS      = BeFoR64/src/third_party/ BeFoR64/src/tests/
                FLOw/src/third_party/ FLOw/src/tests/
                FOODIE/src/third_party/ FOODIE/src/tests/
                FORESEER/src/third_party/ FORESEER/src/tests/
+               FOSSIL/src/third_party/ FOSSIL/src/tests/ FOSSIL/docs/ FOSSIL/src/app/
                FoXy/src/third_party/ FoXy/src/tests/
                FriVolous/src/third_party/ FriVolous/src/tests/
                PENF/src/third_party/ PENF/src/tests/

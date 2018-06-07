@@ -381,57 +381,57 @@ contains
    if (allocated(rhs%recv_cells_number)) then
       lhs%recv_cells_number = rhs%recv_cells_number
    else
-      deallocate(lhs%recv_cells_number)
+      if (allocated(lhs%recv_cells_number)) deallocate(lhs%recv_cells_number)
    endif
    if (allocated(rhs%send_cells_number)) then
       lhs%send_cells_number = rhs%send_cells_number
    else
-      deallocate(lhs%send_cells_number)
+      if (allocated(lhs%send_cells_number)) deallocate(lhs%send_cells_number)
    endif
    if (allocated(rhs%recv_bb)) then
       lhs%recv_bb = rhs%recv_bb
    else
-      deallocate(lhs%recv_bb)
+      if (allocated(lhs%recv_bb)) deallocate(lhs%recv_bb)
    endif
    if (allocated(rhs%send_bb)) then
       lhs%send_bb = rhs%send_bb
    else
-      deallocate(lhs%send_bb)
+      if (allocated(lhs%send_bb)) deallocate(lhs%send_bb)
    endif
    if (allocated(rhs%block_to_process_map)) then
       lhs%block_to_process_map = rhs%block_to_process_map
    else
-      deallocate(lhs%block_to_process_map)
+      if (allocated(lhs%block_to_process_map)) deallocate(lhs%block_to_process_map)
    endif
    if (allocated(rhs%block_local_to_global_map)) then
       lhs%block_local_to_global_map = rhs%block_local_to_global_map
    else
-      deallocate(lhs%block_local_to_global_map)
+      if (allocated(lhs%block_local_to_global_map)) deallocate(lhs%block_local_to_global_map)
    endif
    if (allocated(rhs%recv_map)) then
       lhs%recv_map = rhs%recv_map
    else
-      deallocate(lhs%recv_map)
+      if (allocated(lhs%recv_map)) deallocate(lhs%recv_map)
    endif
    if (allocated(rhs%reqs_map)) then
       lhs%reqs_map = rhs%reqs_map
    else
-      deallocate(lhs%reqs_map)
+      if (allocated(lhs%reqs_map)) deallocate(lhs%reqs_map)
    endif
    if (allocated(rhs%send_map)) then
       lhs%send_map = rhs%send_map
    else
-      deallocate(lhs%send_map)
+      if (allocated(lhs%send_map)) deallocate(lhs%send_map)
    endif
    if (allocated(rhs%field_recv)) then
       lhs%field_recv = rhs%field_recv
    else
-      deallocate(lhs%field_recv)
+      if (allocated(lhs%field_recv)) deallocate(lhs%field_recv)
    endif
    if (allocated(rhs%field_send)) then
       lhs%field_send = rhs%field_send
    else
-      deallocate(lhs%field_send)
+      if (allocated(lhs%field_send)) deallocate(lhs%field_send)
    endif
    endsubroutine parallel_assign_parallel
 endmodule off_parallel_object

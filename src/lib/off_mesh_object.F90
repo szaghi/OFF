@@ -153,8 +153,8 @@ contains
                elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_INLET_SUPERSONIC)) then
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(1), frame=block_b%cell(1-gc(1):0,j,k))
                elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_OUTLET_SUBSONIC)) then
-                  call impose_boundary_conditions_outlet_subsonic(gc=gc(1:2), ic=gc(1), N=Ni, boundary='l', &
-                                                                  stride=block_b%cell(:,j,k))
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(1:2), ic=gc(1), N=Ni, normal=block_b%face_i(0,j,k)%normal, &
+                                                                  boundary='l', stride=block_b%cell(:,j,k))
                endif
                ! right
                if     (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_WALL)) then
@@ -170,8 +170,8 @@ contains
                elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_INLET_SUPERSONIC)) then
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(2), frame=block_b%cell(Ni+1:Ni+gc(2),j,k))
                elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_OUTLET_SUBSONIC)) then
-                  call impose_boundary_conditions_outlet_subsonic(gc=gc(1:2), ic=gc(2), N=Ni, boundary='r', &
-                                                                  stride=block_b%cell(:,j,k))
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(1:2), ic=gc(2), N=Ni, normal=block_b%face_i(Ni,j,k)%normal,&
+                                                                  boundary='r', stride=block_b%cell(:,j,k))
                endif
             enddo
          enddo
@@ -192,8 +192,8 @@ contains
                elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_INLET_SUPERSONIC)) then
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(3), frame=block_b%cell(i,1-gc(3):0,k))
                elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_OUTLET_SUBSONIC)) then
-                  call impose_boundary_conditions_outlet_subsonic(gc=gc(3:4), ic=gc(3), N=Nj, boundary='l', &
-                                                                  stride=block_b%cell(i,:,k))
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(3:4), ic=gc(3), N=Nj, normal=block_b%face_j(i,0,k)%normal, &
+                                                                  boundary='l', stride=block_b%cell(i,:,k))
                endif
                ! right
                if     (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_WALL)) then
@@ -209,8 +209,8 @@ contains
                elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_INLET_SUPERSONIC)) then
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(4), frame=block_b%cell(i,Nj+1:Nj+gc(4),k))
                elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_OUTLET_SUBSONIC)) then
-                  call impose_boundary_conditions_outlet_subsonic(gc=gc(3:4), ic=gc(4), N=Nj, boundary='r', &
-                                                                  stride=block_b%cell(i,:,k))
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(3:4), ic=gc(4), N=Nj, normal=block_b%face_j(i,Nj,k)%normal,&
+                                                                  boundary='r', stride=block_b%cell(i,:,k))
                endif
             enddo
          enddo
@@ -231,8 +231,8 @@ contains
                elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_INLET_SUPERSONIC)) then
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(5), frame=block_b%cell(i,j,1-gc(5):0))
                elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_OUTLET_SUBSONIC)) then
-                  call impose_boundary_conditions_outlet_subsonic(gc=gc(5:6), ic=gc(5), N=Nk, boundary='l', &
-                                                                  stride=block_b%cell(i,j,:))
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(5:6), ic=gc(5), N=Nk, normal=block_b%face_k(i,j,0)%normal, &
+                                                                  boundary='l', stride=block_b%cell(i,j,:))
                endif
                ! right
                if     (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_WALL)) then
@@ -248,8 +248,8 @@ contains
                elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_INLET_SUPERSONIC)) then
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(6), frame=block_b%cell(i,j,Nk+1:Nk+gc(6)))
                elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_OUTLET_SUBSONIC)) then
-                  call impose_boundary_conditions_outlet_subsonic(gc=gc(5:6), ic=gc(6), N=Nk, boundary='r', &
-                                                                  stride=block_b%cell(i,j,:))
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(5:6), ic=gc(6), N=Nk, normal=block_b%face_k(i,j,Nk)%normal,&
+                                                                  boundary='r', stride=block_b%cell(i,j,:))
                endif
             enddo
          enddo
@@ -383,46 +383,76 @@ contains
       enddo
       endsubroutine impose_boundary_conditions_inlet_supersonic
 
-      _PURE_ subroutine impose_boundary_conditions_outlet_subsonic(gc, ic, N, boundary, stride)
+      _PURE_ subroutine impose_boundary_conditions_outlet_subsonic(gc, ic, N, normal, boundary, stride)
       !< Impose boundary conditions of fixed pressure on a stride of cells along a direction.
       integer(I4P),      intent(in)    :: gc(1:2)          !< Number of ghost cells.
       integer(I4P),      intent(in)    :: ic               !< Number of internal cells used for extrapolation (1 or gc).
       integer(I4P),      intent(in)    :: N                !< Number of internal cells.
+      type(vector),      intent(in)    :: normal           !< Face normal.
       character(1),      intent(in)    :: boundary         !< Boundary left ('l') or right ('r').
       type(cell_object), intent(inout) :: stride(1-gc(1):) !< Cells stride [1-gc(1):N+gc(2)].
       integer(I4P)                     :: i                !< Counter.
-      type(primitive_compressible)     :: P                !< Primitive variables.
+      real(R8P)                        :: a_in             !< Speed of sound inside domain.
+      real(R8P)                        :: a_out            !< Speed of sound outside domain.
+      real(R8P)                        :: a_mean           !< Mean speed of sound.
+      real(R8P)                        :: rho_mean         !< Mean density.
+      type(primitive_compressible)     :: P_in             !< Primitive variables inside domain.
+      type(primitive_compressible)     :: P_out            !< Primitive variables outside domain.
 
       if (boundary=='l') then
          if (ic==1.or.N<gc(1)) then ! extrapolation using only the cell 1
             do i=1-gc(1), 0
-               P = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
-               P%density = stride(1)%U%density
-               P%velocity = stride(1)%U%velocity()
-               stride(i)%U = primitive_to_conservative_compressible(primitive=P, eos=self%blocks(1)%eos)
+               P_in  = conservative_to_primitive_compressible(conservative=stride(1)%U, eos=self%blocks(1)%eos)
+               P_out = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               a_in  = self%blocks(1)%eos%speed_of_sound(density=P_in%density,  pressure=P_in%pressure )
+               a_out = self%blocks(1)%eos%speed_of_sound(density=P_out%density, pressure=P_out%pressure)
+               a_mean   = 0.5_R8P * (a_in         + a_out        )
+               rho_mean = 0.5_R8P * (P_in%density + P_out%density)
+               P_out%density = P_in%density + (P_out%pressure - P_in%pressure) / (a_mean * a_mean)
+               P_out%velocity = P_in%velocity - normal * (P_out%pressure - P_in%pressure) / (rho_mean * a_mean)
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
+               stride(i)%bc%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
             enddo
          else ! extrapolation using the cells 1,2,...,gc
             do i=1-gc(1), 0
-               P = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
-               P%density = stride(-i+1)%U%density
-               P%velocity = stride(-i+1)%U%velocity()
-               stride(i)%U = primitive_to_conservative_compressible(primitive=P, eos=self%blocks(1)%eos)
+               P_in  = conservative_to_primitive_compressible(conservative=stride(-i+1)%U, eos=self%blocks(1)%eos)
+               P_out = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               a_in  = self%blocks(1)%eos%speed_of_sound(density=P_in%density,  pressure=P_in%pressure )
+               a_out = self%blocks(1)%eos%speed_of_sound(density=P_out%density, pressure=P_out%pressure)
+               a_mean   = 0.5_R8P * (a_in         + a_out        )
+               rho_mean = 0.5_R8P * (P_in%density + P_out%density)
+               P_out%density = P_in%density + (P_out%pressure - P_in%pressure) / (a_mean * a_mean)
+               P_out%velocity = P_in%velocity - normal * (P_out%pressure - P_in%pressure) / (rho_mean * a_mean)
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
+               stride(i)%bc%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
             enddo
          endif
       elseif (boundary=='r') then
          if (ic==1.or.N<gc(2)) then ! extrapolation using only the cell N
             do i=N+1, N+gc(2)
-               P = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
-               P%density = stride(N)%U%density
-               P%velocity = stride(N)%U%velocity()
-               stride(i)%U = primitive_to_conservative_compressible(primitive=P, eos=self%blocks(1)%eos)
+               P_in  = conservative_to_primitive_compressible(conservative=stride(N)%U, eos=self%blocks(1)%eos)
+               P_out = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               a_in  = self%blocks(1)%eos%speed_of_sound(density=P_in%density,  pressure=P_in%pressure )
+               a_out = self%blocks(1)%eos%speed_of_sound(density=P_out%density, pressure=P_out%pressure)
+               a_mean   = 0.5_R8P * (a_in         + a_out        )
+               rho_mean = 0.5_R8P * (P_in%density + P_out%density)
+               P_out%density = P_in%density + (P_out%pressure - P_in%pressure) / (a_mean * a_mean)
+               P_out%velocity = P_in%velocity - normal * (P_out%pressure - P_in%pressure) / (rho_mean * a_mean)
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
+               stride(i)%bc%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
             enddo
          else ! extrapolation using the cells N-gc,N-gc+1,N-gc+2,...,N
             do i=N+1, N+gc(2)
-               P = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
-               P%density = stride(N+1-(i-N))%U%density
-               P%velocity = stride(N+1-(i-N))%U%velocity()
-               stride(i)%U = primitive_to_conservative_compressible(primitive=P, eos=self%blocks(1)%eos)
+               P_in  = conservative_to_primitive_compressible(conservative=stride(N+1-(i-N))%U, eos=self%blocks(1)%eos)
+               P_out = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               a_in  = self%blocks(1)%eos%speed_of_sound(density=P_in%density,  pressure=P_in%pressure )
+               a_out = self%blocks(1)%eos%speed_of_sound(density=P_out%density, pressure=P_out%pressure)
+               a_mean   = 0.5_R8P * (a_in         + a_out        )
+               rho_mean = 0.5_R8P * (P_in%density + P_out%density)
+               P_out%density = P_in%density + (P_out%pressure - P_in%pressure) / (a_mean * a_mean)
+               P_out%velocity = P_in%velocity - normal * (P_out%pressure - P_in%pressure) / (rho_mean * a_mean)
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
+               stride(i)%bc%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
             enddo
          endif
       endif

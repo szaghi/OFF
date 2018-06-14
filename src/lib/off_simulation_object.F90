@@ -208,6 +208,7 @@ contains
       call self%mesh%save_file_solution(file_solution=self%file_solution, n=self%time%n)
       if (self%time%is_the_end()) exit temporal_loop
    enddo temporal_loop
+   if (self%is_output_verbose) call self%time%print_eta(frequency=1_I8P)
    endsubroutine integrate
 
    subroutine load_file_parameters(self, interfaces_number, file_name)

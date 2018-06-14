@@ -5,7 +5,8 @@ module off_mesh_object
 !< OFF mesh object definition and implementation.
 
 use, intrinsic :: iso_fortran_env, only : stderr=>error_unit, stdout=>output_unit
-use off_bc_object, only : BC_WALL, BC_PERIODIC, BC_EXTRAPOLATED, BC_ADJACENT, BC_INLET_SUPERSONIC, BC_OUTLET_SUBSONIC
+use off_bc_object, only : BC_WALL, BC_PERIODIC, BC_EXTRAPOLATED, BC_ADJACENT, BC_INLET_SUPERSONIC, &
+                          BC_OUTLET_SUBSONIC, BC_INLET_SUBSONIC
 use off_block_object, only : block_object
 use off_cell_object, only : cell_object
 use off_error_object, only : error_object
@@ -140,117 +141,141 @@ contains
          do k=1, Nk
             do j=1, Nj
                ! left
-               if     (self%blocks(b)%cell(0,j,k)%bc%is(BC_WALL)) then
+               select case(self%blocks(b)%cell(0,j,k)%bc%id)
+               case(BC_WALL)
                   call impose_boundary_conditions_wall(gc=gc(1:2), ic=gc(1), N=Ni, normal=block_b%face_i(0,j,k)%normal, &
                                                        boundary='l', stride=block_b%cell(:,j,k))
-               elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_PERIODIC)) then
+               case(BC_PERIODIC)
                   call impose_boundary_conditions_periodic(gc=gc(1:2), ic=gc(1), N=Ni, boundary='l', stride=block_b%cell(:,j,k))
-               elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_EXTRAPOLATED)) then
+               case(BC_EXTRAPOLATED)
                   call impose_boundary_conditions_extrapolation(gc=gc(1:2), ic=gc(1), N=Ni, boundary='l', &
                                                                 stride=block_b%cell(:,j,k))
-               elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_ADJACENT)) then
+               case(BC_ADJACENT)
                   call impose_boundary_conditions_adjacent(gc=gc(1), frame=block_b%cell(1-gc(1):0,j,k))
-               elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_INLET_SUPERSONIC)) then
+               case(BC_INLET_SUPERSONIC)
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(1), frame=block_b%cell(1-gc(1):0,j,k))
-               elseif (self%blocks(b)%cell(0,j,k)%bc%is(BC_OUTLET_SUBSONIC)) then
-                  call impose_boundary_conditions_outlet_subsonic(gc=gc(1:2), ic=gc(1), N=Ni, boundary='l', &
-                                                                  stride=block_b%cell(:,j,k))
-               endif
+               case(BC_OUTLET_SUBSONIC)
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(1:2), ic=gc(1), N=Ni, normal=block_b%face_i(0,j,k)%normal, &
+                                                                  boundary='l', stride=block_b%cell(:,j,k))
+               case(BC_INLET_SUBSONIC)
+                  call impose_boundary_conditions_inlet_subsonic(gc=gc(1:2), ic=gc(1), N=Ni, normal=block_b%face_i(0,j,k)%normal, &
+                                                                 boundary='l', stride=block_b%cell(:,j,k))
+               endselect
                ! right
-               if     (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_WALL)) then
+               select case(self%blocks(b)%cell(Ni+1,j,k)%bc%id)
+               case(BC_WALL)
                   call impose_boundary_conditions_wall(gc=gc(1:2), ic=gc(2), N=Ni, normal=block_b%face_i(Ni,j,k)%normal, &
                                                        boundary='r', stride=block_b%cell(:,j,k))
-               elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_PERIODIC)) then
+               case(BC_PERIODIC)
                   call impose_boundary_conditions_periodic(gc=gc(1:2), ic=gc(2), N=Ni, boundary='r', stride=block_b%cell(:,j,k))
-               elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_EXTRAPOLATED)) then
+               case(BC_EXTRAPOLATED)
                   call impose_boundary_conditions_extrapolation(gc=gc(1:2), ic=gc(2), N=Ni, boundary='r', &
                                                                 stride=block_b%cell(:,j,k))
-               elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_ADJACENT)) then
+               case(BC_ADJACENT)
                   call impose_boundary_conditions_adjacent(gc=gc(2), frame=block_b%cell(Ni+1:Ni+gc(2),j,k))
-               elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_INLET_SUPERSONIC)) then
+               case(BC_INLET_SUPERSONIC)
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(2), frame=block_b%cell(Ni+1:Ni+gc(2),j,k))
-               elseif (self%blocks(b)%cell(Ni+1,j,k)%bc%is(BC_OUTLET_SUBSONIC)) then
-                  call impose_boundary_conditions_outlet_subsonic(gc=gc(1:2), ic=gc(2), N=Ni, boundary='r', &
-                                                                  stride=block_b%cell(:,j,k))
-               endif
+               case(BC_OUTLET_SUBSONIC)
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(1:2), ic=gc(2), N=Ni, normal=block_b%face_i(Ni,j,k)%normal,&
+                                                                  boundary='r', stride=block_b%cell(:,j,k))
+               case(BC_INLET_SUBSONIC)
+                  call impose_boundary_conditions_inlet_subsonic(gc=gc(1:2), ic=gc(2), N=Ni, normal=block_b%face_i(Ni,j,k)%normal,&
+                                                                 boundary='r', stride=block_b%cell(:,j,k))
+               endselect
             enddo
          enddo
          ! j direction
          do k=1, Nk
             do i=1, Ni
                ! left
-               if     (self%blocks(b)%cell(i,0,k)%bc%is(BC_WALL)) then
+               select case(self%blocks(b)%cell(i,0,k)%bc%id)
+               case(BC_WALL)
                   call impose_boundary_conditions_wall(gc=gc(3:4), ic=gc(3), N=Nj, normal=block_b%face_j(i,0,k)%normal, &
                                                        boundary='l', stride=block_b%cell(i,:,k))
-               elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_PERIODIC)) then
+               case(BC_PERIODIC)
                   call impose_boundary_conditions_periodic(gc=gc(3:4), ic=gc(3), N=Nj, boundary='l', stride=block_b%cell(i,:,k))
-               elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_EXTRAPOLATED)) then
+               case(BC_EXTRAPOLATED)
                   call impose_boundary_conditions_extrapolation(gc=gc(3:4), ic=gc(3), N=Nj, boundary='l', &
                                                                 stride=block_b%cell(i,:,k))
-               elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_ADJACENT)) then
+               case(BC_ADJACENT)
                   call impose_boundary_conditions_adjacent(gc=gc(3), frame=block_b%cell(i,1-gc(3):0,k))
-               elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_INLET_SUPERSONIC)) then
+               case(BC_INLET_SUPERSONIC)
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(3), frame=block_b%cell(i,1-gc(3):0,k))
-               elseif (self%blocks(b)%cell(i,0,k)%bc%is(BC_OUTLET_SUBSONIC)) then
-                  call impose_boundary_conditions_outlet_subsonic(gc=gc(3:4), ic=gc(3), N=Nj, boundary='l', &
-                                                                  stride=block_b%cell(i,:,k))
-               endif
+               case(BC_OUTLET_SUBSONIC)
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(3:4), ic=gc(3), N=Nj, normal=block_b%face_j(i,0,k)%normal, &
+                                                                  boundary='l', stride=block_b%cell(i,:,k))
+               case(BC_INLET_SUBSONIC)
+                  call impose_boundary_conditions_inlet_subsonic(gc=gc(3:4), ic=gc(3), N=Nj, normal=block_b%face_j(i,0,k)%normal, &
+                                                                 boundary='l', stride=block_b%cell(i,:,k))
+               endselect
                ! right
-               if     (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_WALL)) then
+               select case(self%blocks(b)%cell(i,Nj+1,k)%bc%id)
+               case(BC_WALL)
                   call impose_boundary_conditions_wall(gc=gc(3:4), ic=gc(4), N=Nj, normal=block_b%face_j(i,Nj,k)%normal, &
                                                        boundary='r', stride=block_b%cell(i,:,k))
-               elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_PERIODIC)) then
+               case(BC_PERIODIC)
                   call impose_boundary_conditions_periodic(gc=gc(3:4), ic=gc(4), N=Nj, boundary='r', stride=block_b%cell(i,:,k))
-               elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_EXTRAPOLATED)) then
+               case(BC_EXTRAPOLATED)
                   call impose_boundary_conditions_extrapolation(gc=gc(3:4), ic=gc(4), N=Nj, boundary='r', &
                                                                 stride=block_b%cell(i,:,k))
-               elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_ADJACENT)) then
+               case(BC_ADJACENT)
                   call impose_boundary_conditions_adjacent(gc=gc(4), frame=block_b%cell(i,Nj+1:Nj+gc(4),k))
-               elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_INLET_SUPERSONIC)) then
+               case(BC_INLET_SUPERSONIC)
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(4), frame=block_b%cell(i,Nj+1:Nj+gc(4),k))
-               elseif (self%blocks(b)%cell(i,Nj+1,k)%bc%is(BC_OUTLET_SUBSONIC)) then
-                  call impose_boundary_conditions_outlet_subsonic(gc=gc(3:4), ic=gc(4), N=Nj, boundary='r', &
-                                                                  stride=block_b%cell(i,:,k))
-               endif
+               case(BC_OUTLET_SUBSONIC)
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(3:4), ic=gc(4), N=Nj, normal=block_b%face_j(i,Nj,k)%normal,&
+                                                                  boundary='r', stride=block_b%cell(i,:,k))
+               case(BC_INLET_SUBSONIC)
+                  call impose_boundary_conditions_inlet_subsonic(gc=gc(3:4), ic=gc(4), N=Nj, normal=block_b%face_j(i,Nj,k)%normal,&
+                                                                 boundary='r', stride=block_b%cell(i,:,k))
+               endselect
             enddo
          enddo
          ! k direction
          do j=1, Nj
             do i=1, Ni
                ! left
-               if     (self%blocks(b)%cell(i,j,0)%bc%is(BC_WALL)) then
+               select case(self%blocks(b)%cell(i,j,0)%bc%id)
+               case(BC_WALL)
                   call impose_boundary_conditions_wall(gc=gc(5:6), ic=gc(5), N=Nk, normal=block_b%face_k(i,j,0)%normal, &
                                                        boundary='l', stride=block_b%cell(i,j,:))
-               elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_PERIODIC)) then
+               case(BC_PERIODIC)
                   call impose_boundary_conditions_periodic(gc=gc(5:6), ic=gc(5), N=Nk, boundary='l', stride=block_b%cell(i,j,:))
-               elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_EXTRAPOLATED)) then
+               case(BC_EXTRAPOLATED)
                   call impose_boundary_conditions_extrapolation(gc=gc(5:6), ic=gc(5), N=Nk, boundary='l', &
                                                                 stride=block_b%cell(i,j,:))
-               elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_ADJACENT)) then
+               case(BC_ADJACENT)
                   call impose_boundary_conditions_adjacent(gc=gc(5), frame=block_b%cell(i,j,1-gc(5):0))
-               elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_INLET_SUPERSONIC)) then
+               case(BC_INLET_SUPERSONIC)
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(5), frame=block_b%cell(i,j,1-gc(5):0))
-               elseif (self%blocks(b)%cell(i,j,0)%bc%is(BC_OUTLET_SUBSONIC)) then
-                  call impose_boundary_conditions_outlet_subsonic(gc=gc(5:6), ic=gc(5), N=Nk, boundary='l', &
-                                                                  stride=block_b%cell(i,j,:))
-               endif
+               case(BC_OUTLET_SUBSONIC)
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(5:6), ic=gc(5), N=Nk, normal=block_b%face_k(i,j,0)%normal, &
+                                                                  boundary='l', stride=block_b%cell(i,j,:))
+               case(BC_INLET_SUBSONIC)
+                  call impose_boundary_conditions_inlet_subsonic(gc=gc(5:6), ic=gc(5), N=Nk, normal=block_b%face_k(i,j,0)%normal, &
+                                                                 boundary='l', stride=block_b%cell(i,j,:))
+               endselect
                ! right
-               if     (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_WALL)) then
+               select case(self%blocks(b)%cell(i,j,Nk+1)%bc%id)
+               case(BC_WALL)
                   call impose_boundary_conditions_wall(gc=gc(5:6), ic=gc(6), N=Nk, normal=block_b%face_k(i,j,Nk)%normal, &
                                                        boundary='r', stride=block_b%cell(i,j,:))
-               elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_PERIODIC)) then
+               case(BC_PERIODIC)
                   call impose_boundary_conditions_periodic(gc=gc(5:6), ic=gc(6), N=Nk, boundary='r', stride=block_b%cell(i,j,:))
-               elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_EXTRAPOLATED)) then
+               case(BC_EXTRAPOLATED)
                   call impose_boundary_conditions_extrapolation(gc=gc(5:6), ic=gc(6), N=Nk, boundary='r', &
                                                                 stride=block_b%cell(i,j,:))
-               elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_ADJACENT)) then
+               case(BC_ADJACENT)
                   call impose_boundary_conditions_adjacent(gc=gc(6), frame=block_b%cell(i,j,Nk+1:Nk+gc(6)))
-               elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_INLET_SUPERSONIC)) then
+               case(BC_INLET_SUPERSONIC)
                   call impose_boundary_conditions_inlet_supersonic(gc=gc(6), frame=block_b%cell(i,j,Nk+1:Nk+gc(6)))
-               elseif (self%blocks(b)%cell(i,j,Nk+1)%bc%is(BC_OUTLET_SUBSONIC)) then
-                  call impose_boundary_conditions_outlet_subsonic(gc=gc(5:6), ic=gc(6), N=Nk, boundary='r', &
-                                                                  stride=block_b%cell(i,j,:))
-               endif
+               case(BC_OUTLET_SUBSONIC)
+                  call impose_boundary_conditions_outlet_subsonic(gc=gc(5:6), ic=gc(6), N=Nk, normal=block_b%face_k(i,j,Nk)%normal,&
+                                                                  boundary='r', stride=block_b%cell(i,j,:))
+               case(BC_INLET_SUBSONIC)
+                  call impose_boundary_conditions_inlet_subsonic(gc=gc(5:6), ic=gc(6), N=Nk, normal=block_b%face_k(i,j,Nk)%normal,&
+                                                                 boundary='r', stride=block_b%cell(i,j,:))
+               endselect
             enddo
          enddo
       endassociate
@@ -383,50 +408,147 @@ contains
       enddo
       endsubroutine impose_boundary_conditions_inlet_supersonic
 
-      _PURE_ subroutine impose_boundary_conditions_outlet_subsonic(gc, ic, N, boundary, stride)
-      !< Impose boundary conditions of fixed pressure on a stride of cells along a direction.
+      _PURE_ subroutine impose_boundary_conditions_outlet_subsonic(gc, ic, N, normal, boundary, stride)
+      !< Impose boundary conditions of subsonice outlet (fixed pressure) on a stride of cells along a direction.
       integer(I4P),      intent(in)    :: gc(1:2)          !< Number of ghost cells.
       integer(I4P),      intent(in)    :: ic               !< Number of internal cells used for extrapolation (1 or gc).
       integer(I4P),      intent(in)    :: N                !< Number of internal cells.
+      type(vector),      intent(in)    :: normal           !< Face normal.
       character(1),      intent(in)    :: boundary         !< Boundary left ('l') or right ('r').
       type(cell_object), intent(inout) :: stride(1-gc(1):) !< Cells stride [1-gc(1):N+gc(2)].
       integer(I4P)                     :: i                !< Counter.
-      type(primitive_compressible)     :: P                !< Primitive variables.
+      type(primitive_compressible)     :: p_0              !< Primitive variables of free stream.
+      type(primitive_compressible)     :: p_in             !< Primitive variables inside domain.
+      type(primitive_compressible)     :: p_out            !< Primitive variables outside domain.
 
       if (boundary=='l') then
          if (ic==1.or.N<gc(1)) then ! extrapolation using only the cell 1
             do i=1-gc(1), 0
-               P = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
-               P%density = stride(1)%U%density
-               P%velocity = stride(1)%U%velocity()
-               stride(i)%U = primitive_to_conservative_compressible(primitive=P, eos=self%blocks(1)%eos)
+               p_in = conservative_to_primitive_compressible(conservative=stride(1)%U,    eos=self%blocks(1)%eos)
+               p_0  = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               call compute_p_out_outlet_subsonic(eos=self%blocks(1)%eos, normal=normal, p_0=p_0, p_in=p_in, p_out=p_out)
+               stride(i)%U = primitive_to_conservative_compressible(primitive=p_out, eos=self%blocks(1)%eos)
             enddo
          else ! extrapolation using the cells 1,2,...,gc
             do i=1-gc(1), 0
-               P = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
-               P%density = stride(-i+1)%U%density
-               P%velocity = stride(-i+1)%U%velocity()
-               stride(i)%U = primitive_to_conservative_compressible(primitive=P, eos=self%blocks(1)%eos)
+               p_in = conservative_to_primitive_compressible(conservative=stride(-i+1)%U, eos=self%blocks(1)%eos)
+               p_0  = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               call compute_p_out_outlet_subsonic(eos=self%blocks(1)%eos, normal=normal, p_0=p_0, p_in=p_in, p_out=p_out)
+               stride(i)%U = primitive_to_conservative_compressible(primitive=p_out, eos=self%blocks(1)%eos)
             enddo
          endif
       elseif (boundary=='r') then
          if (ic==1.or.N<gc(2)) then ! extrapolation using only the cell N
             do i=N+1, N+gc(2)
-               P = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
-               P%density = stride(N)%U%density
-               P%velocity = stride(N)%U%velocity()
-               stride(i)%U = primitive_to_conservative_compressible(primitive=P, eos=self%blocks(1)%eos)
+               p_in = conservative_to_primitive_compressible(conservative=stride(N)%U,    eos=self%blocks(1)%eos)
+               p_0  = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               call compute_p_out_outlet_subsonic(eos=self%blocks(1)%eos, normal=normal, p_0=p_0, p_in=p_in, p_out=p_out)
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
             enddo
          else ! extrapolation using the cells N-gc,N-gc+1,N-gc+2,...,N
             do i=N+1, N+gc(2)
-               P = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
-               P%density = stride(N+1-(i-N))%U%density
-               P%velocity = stride(N+1-(i-N))%U%velocity()
-               stride(i)%U = primitive_to_conservative_compressible(primitive=P, eos=self%blocks(1)%eos)
+               p_in = conservative_to_primitive_compressible(conservative=stride(N+1-(i-N))%U, eos=self%blocks(1)%eos)
+               p_0  = conservative_to_primitive_compressible(conservative=stride(i)%bc%U,      eos=self%blocks(1)%eos)
+               call compute_p_out_outlet_subsonic(eos=self%blocks(1)%eos, normal=normal, p_0=p_0, p_in=p_in, p_out=p_out)
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
             enddo
          endif
       endif
       endsubroutine impose_boundary_conditions_outlet_subsonic
+
+      _PURE_ subroutine compute_p_out_outlet_subsonic(eos, normal, p_0, p_in, p_out)
+      !< Compute primitive variables in the outside of domain for subsonic outlet.
+      type(eos_compressible),       intent(in)  :: eos      !< Equation of state.
+      type(vector),                 intent(in)  :: normal   !< Face normal.
+      type(primitive_compressible), intent(in)  :: p_0      !< Primitive variables of free stream.
+      type(primitive_compressible), intent(in)  :: p_in     !< Primitive variables inside domain.
+      type(primitive_compressible), intent(out) :: p_out    !< Primitive variables outside domain.
+      real(R8P)                                 :: a_in     !< Speed of sound inside domain.
+      real(R8P)                                 :: a_0      !< Speed of sound of free stream.
+      real(R8P)                                 :: a_mean   !< Mean speed of sound.
+      real(R8P)                                 :: rho_mean !< Mean density.
+      real(R8P)                                 :: delta    !< `(p_e-p_i)/a_mean`.
+
+      a_in = self%blocks(1)%eos%speed_of_sound(density=p_in%density, pressure=p_in%pressure )
+      a_0  = self%blocks(1)%eos%speed_of_sound(density=p_0%density,  pressure=p_0%pressure)
+      a_mean   = 0.5_R8P * (a_in         + a_0        )
+      rho_mean = 0.5_R8P * (p_in%density + p_0%density)
+      delta = (p_0%pressure - p_in%pressure) / a_mean
+      p_out%pressure = p_0%pressure
+      p_out%density  = p_in%density  +          delta / a_mean
+      p_out%velocity = p_in%velocity - normal * delta / rho_mean
+      endsubroutine compute_p_out_outlet_subsonic
+
+      _PURE_ subroutine impose_boundary_conditions_inlet_subsonic(gc, ic, N, normal, boundary, stride)
+      !< Impose boundary conditions of subsonic inlet (fixed velocity and density) on a stride of cells along a direction.
+      integer(I4P),      intent(in)    :: gc(1:2)          !< Number of ghost cells.
+      integer(I4P),      intent(in)    :: ic               !< Number of internal cells used for extrapolation (1 or gc).
+      integer(I4P),      intent(in)    :: N                !< Number of internal cells.
+      type(vector),      intent(in)    :: normal           !< Face normal.
+      character(1),      intent(in)    :: boundary         !< Boundary left ('l') or right ('r').
+      type(cell_object), intent(inout) :: stride(1-gc(1):) !< Cells stride [1-gc(1):N+gc(2)].
+      integer(I4P)                     :: i                !< Counter.
+      type(primitive_compressible)     :: p_0              !< Primitive variables of free stream.
+      type(primitive_compressible)     :: p_in             !< Primitive variables inside domain.
+      type(primitive_compressible)     :: p_out            !< Primitive variables outside domain.
+
+      if (boundary=='l') then
+         if (ic==1.or.N<gc(1)) then ! extrapolation using only the cell 1
+            do i=1-gc(1), 0
+               p_in = conservative_to_primitive_compressible(conservative=stride(1)%U,    eos=self%blocks(1)%eos)
+               p_0  = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               call compute_p_out_inlet_subsonic(eos=self%blocks(1)%eos, normal=normal, p_0=p_0, p_in=p_in, p_out=p_out)
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
+            enddo
+         else ! extrapolation using the cells 1,2,...,gc
+            do i=1-gc(1), 0
+               p_in = conservative_to_primitive_compressible(conservative=stride(-i+1)%U, eos=self%blocks(1)%eos)
+               p_0  = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               call compute_p_out_inlet_subsonic(eos=self%blocks(1)%eos, normal=normal, p_0=p_0, p_in=p_in, p_out=p_out)
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
+            enddo
+         endif
+      elseif (boundary=='r') then
+         if (ic==1.or.N<gc(2)) then ! extrapolation using only the cell N
+            do i=N+1, N+gc(2)
+               p_in  = conservative_to_primitive_compressible(conservative=stride(N)%U,    eos=self%blocks(1)%eos)
+               p_0   = conservative_to_primitive_compressible(conservative=stride(i)%bc%U, eos=self%blocks(1)%eos)
+               call compute_p_out_inlet_subsonic(eos=self%blocks(1)%eos, normal=normal, p_0=p_0, p_in=p_in, p_out=p_out)
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
+            enddo
+         else ! extrapolation using the cells N-gc,N-gc+1,N-gc+2,...,N
+            do i=N+1, N+gc(2)
+               p_in  = conservative_to_primitive_compressible(conservative=stride(N+1-(i-N))%U, eos=self%blocks(1)%eos)
+               p_0   = conservative_to_primitive_compressible(conservative=stride(i)%bc%U,      eos=self%blocks(1)%eos)
+               call compute_p_out_inlet_subsonic(eos=self%blocks(1)%eos, normal=normal, p_0=p_0, p_in=p_in, p_out=p_out)
+               stride(i)%U = primitive_to_conservative_compressible(primitive=P_out, eos=self%blocks(1)%eos)
+            enddo
+         endif
+      endif
+      endsubroutine impose_boundary_conditions_inlet_subsonic
+
+      _PURE_ subroutine compute_p_out_inlet_subsonic(eos, normal, p_0, p_in, p_out)
+      !< Compute primitive variables in the outside of domain for subsonic inlet.
+      type(eos_compressible),       intent(in)  :: eos      !< Equation of state.
+      type(vector),                 intent(in)  :: normal   !< Face normal.
+      type(primitive_compressible), intent(in)  :: p_0      !< Primitive variables of free stream.
+      type(primitive_compressible), intent(in)  :: p_in     !< Primitive variables inside domain.
+      type(primitive_compressible), intent(out) :: p_out    !< Primitive variables outside domain.
+      real(R8P)                                 :: a_in     !< Speed of sound inside domain.
+      real(R8P)                                 :: a_0      !< Speed of sound of free stream.
+      real(R8P)                                 :: a_mean   !< Mean speed of sound.
+      real(R8P)                                 :: rho_mean !< Mean density.
+      real(R8P)                                 :: delta    !< `(p_e-p_i)/a_mean`.
+
+      a_in  = eos%speed_of_sound(density=P_in%density,  pressure=P_in%pressure )
+      a_0 = eos%speed_of_sound(density=P_0%density, pressure=P_0%pressure)
+      a_mean   = 0.5_R8P * (a_in         + a_0        )
+      rho_mean = 0.5_R8P * (p_in%density + p_0%density)
+      p_out%pressure = 0.5_R8P * (p_0%pressure + p_in%pressure - rho_mean * a_mean * ((p_0%velocity - p_in%velocity).dot.normal))
+      delta = (p_out%pressure - p_0%pressure) / a_mean
+      p_out%density  = p_0%density  +          delta / a_mean
+      p_out%velocity = p_0%velocity + normal * delta / rho_mean
+      endsubroutine compute_p_out_inlet_subsonic
    endsubroutine impose_boundary_conditions
 
    subroutine initialize(self, mesh, eos, interfaces_number, file_grid, file_ic)

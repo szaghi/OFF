@@ -20,7 +20,7 @@ are_tests_passed = .false.
 call cli_parse
 call simulation%initialize(file_parameters=trim(adjustl(inf_name)))
 call simulation%integrate
-call simulation%save_file_solution(file_name=trim(adjustl(outf_name)), metrics=.true., off=.false., vtk=.true., ascii=.true., &
+call simulation%save_file_solution(file_name=trim(adjustl(outf_name)), metrics=.true., off=.false., vtk=.true., ascii=.false., &
                                    n=simulation%time%n, force=.true.)
 
 print '(A,L1)', 'Are all tests passed? ', all(are_tests_passed)

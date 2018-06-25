@@ -133,7 +133,6 @@ contains
    class(mesh_object), intent(inout) :: self       !< Mesh.
    integer(I4P)                      :: b, i, j, k !< Counter.
 
-   ! TODO impose boundary conditions in conservative variables to reduce unnecessary computations
    do b=1, self%grid_dimensions%blocks_number
       associate(block_b=>self%blocks(b), gc=>self%blocks(b)%signature%gc, &
                 Ni=>self%blocks(b)%signature%Ni, Nj=>self%blocks(b)%signature%Nj, Nk=>self%blocks(b)%signature%Nk)
@@ -277,6 +276,11 @@ contains
                                                                  boundary='r', stride=block_b%cell(i,j,:))
                endselect
             enddo
+         enddo
+
+         ! evolve immersed boundaries, if any
+         do i=1, 3!max(3, maxval(gc))
+            call block_b%evolve_immersed_boundary
          enddo
       endassociate
    enddo

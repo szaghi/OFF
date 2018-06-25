@@ -88,7 +88,7 @@ use off_block_signature_object, only : block_signature_object
 use off_cell_object, only : cell_object
 use off_error_object, only : error_object
 use off_face_object, only : face_object
-use off_level_set_object, only : level_set_object
+use off_level_set_object, only : level_set_object, level_set_normal
 use off_node_object, only : node_object
 use off_solver_object, only : solver_object
 use flow, only : conservative_compressible, primitive_compressible,                              &
@@ -123,28 +123,29 @@ type :: block_object
    type(eos_compressible) :: eos !< Equation of state.
    contains
       ! public methods
-      procedure, pass(self) :: cells_number                       !< Return the number of cells.
-      procedure, pass(self) :: compute_space_operator             !< Compute space operator.
-      procedure, pass(self) :: compute_dt                         !< Compute the current time step by means of CFL condition.
-      procedure, pass(self) :: compute_recv_maps                  !< Compute querying and receiving maps.
-      procedure, pass(self) :: compute_residuals                  !< Compute residuals.
-      procedure, pass(self) :: create_linspace                    !< Create a Cartesian block with linearly spaced nodes.
-      procedure, pass(self) :: description                        !< Return a pretty-formatted description of the block.
-      procedure, pass(self) :: destroy                            !< Destroy block.
-      procedure, pass(self) :: dt_min                             !< Return the minimum Dt into internal cells.
-      procedure, pass(self) :: immerge_stl_geometry               !< *Immerge* geometry (described by STL file) into the block grid.
-      procedure, pass(self) :: interpolate_at_nodes               !< Interpolate cell-centered variable at nodes.
-      procedure, pass(self) :: initialize                         !< Initialize block.
-      procedure, pass(self) :: load_conservatives_from_file       !< Load nodes from file.
-      procedure, pass(self) :: load_nodes_from_file               !< Load nodes from file.
-      procedure, pass(self) :: nodes_number                       !< Return the number of nodes.
-      procedure, pass(self) :: set_eos                            !< Set EOS.
-      procedure, pass(self) :: save_conservatives_into_file       !< Save conservatives into file.
-      procedure, pass(self) :: save_file_grid                     !< Save grid file.
-      procedure, pass(self) :: save_file_solution                 !< Save solution file.
-      procedure, pass(self) :: save_nodes_into_file               !< Save nodes into file.
-      procedure, pass(self) :: update_recv_cells_number           !< Update receive cells number for multi-processes communication.
-      procedure, pass(self) :: update_level_set_distance          !< Update level set distance.
+      procedure, pass(self) :: cells_number                 !< Return the number of cells.
+      procedure, pass(self) :: compute_space_operator       !< Compute space operator.
+      procedure, pass(self) :: compute_dt                   !< Compute the current time step by means of CFL condition.
+      procedure, pass(self) :: compute_recv_maps            !< Compute querying and receiving maps.
+      procedure, pass(self) :: compute_residuals            !< Compute residuals.
+      procedure, pass(self) :: create_linspace              !< Create a Cartesian block with linearly spaced nodes.
+      procedure, pass(self) :: description                  !< Return a pretty-formatted description of the block.
+      procedure, pass(self) :: destroy                      !< Destroy block.
+      procedure, pass(self) :: dt_min                       !< Return the minimum Dt into internal cells.
+      procedure, pass(self) :: evolve_immersed_boundary     !< Evolve immersed boundary from domain into the immersed boundary.
+      procedure, pass(self) :: immerge_stl_geometry         !< *Immerge* geometry (described by STL file) into the block grid.
+      procedure, pass(self) :: interpolate_at_nodes         !< Interpolate cell-centered variable at nodes.
+      procedure, pass(self) :: initialize                   !< Initialize block.
+      procedure, pass(self) :: load_conservatives_from_file !< Load nodes from file.
+      procedure, pass(self) :: load_nodes_from_file         !< Load nodes from file.
+      procedure, pass(self) :: nodes_number                 !< Return the number of nodes.
+      procedure, pass(self) :: set_eos                      !< Set EOS.
+      procedure, pass(self) :: save_conservatives_into_file !< Save conservatives into file.
+      procedure, pass(self) :: save_file_grid               !< Save grid file.
+      procedure, pass(self) :: save_file_solution           !< Save solution file.
+      procedure, pass(self) :: save_nodes_into_file         !< Save nodes into file.
+      procedure, pass(self) :: update_recv_cells_number     !< Update receive cells number for multi-processes communication.
+      procedure, pass(self) :: update_level_set_distance    !< Update level set distance.
       ! operators
       generic :: assignment(=) => block_assign_block !< Overload `=`.
       ! fast operators
@@ -525,6 +526,68 @@ contains
    endassociate
    endfunction dt_min
 
+   _PURE_ subroutine evolve_immersed_boundary(self)
+   !< Evolve immersed boundary from domain into the immersed boundary.
+   class(block_object), intent(inout)           :: self       !< Block.
+   type(conservative_compressible), allocatable :: U(:,:,:)   !< Conservative variables temporary buffer.
+   type(conservative_compressible)              :: Ux, Uy, Uz !< Conservative variables variations.
+   real(R8P)                                    :: dt         !< Pseudo-time step.
+   integer(I4P)                                 :: i, j, k    !< Counter.
+
+   associate(ni=>self%signature%ni, nj=>self%signature%nj, nk=>self%signature%nk, cell=>self%cell, &
+             is_null_x=>self%signature%is_null_x, is_null_y=>self%signature%is_null_y, is_null_z=>self%signature%is_null_z)
+      allocate(U(1:ni, 1:nj, 1:nk))
+      do k=1, nk
+         do j=1, nj
+            do i=1, ni
+               if (cell(i,j,k)%level_set%distance<0._R8P) then
+                  if (is_null_x) then
+                     Ux = 0._R8P * Ux
+                  else
+                     if (cell(i,j,k)%level_set%normal%x<0._R8P) then
+                        Ux = cell(i,j,k)%U - cell(i-1,j,k)%U
+                     else
+                        Ux = cell(i+1,j,k)%U - cell(i,j,k)%U
+                     endif
+                  endif
+                  if (is_null_y) then
+                     Uy = 0._R8P * Uy
+                  else
+                     if (cell(i,j,k)%level_set%normal%y<0._R8P) then
+                        Uy = cell(i,j,k)%U - cell(i-1,j,k)%U
+                     else
+                        Uy = cell(i,j+1,k)%U - cell(i,j,k)%U
+                     endif
+                  endif
+                  if (is_null_z) then
+                     Uz = 0._R8P * Uz
+                  else
+                     if (cell(i,j,k)%level_set%normal%z<0._R8P) then
+                        Uz = cell(i,j,k)%U - cell(i-1,j,k)%U
+                     else
+                        Uz = cell(i,j,k+1)%U - cell(i,j,k)%U
+                     endif
+                  endif
+                  dt = (1._R8P / (abs(cell(i,j,k)%level_set%normal%x) + &
+                                  abs(cell(i,j,k)%level_set%normal%y) + &
+                                  abs(cell(i,j,k)%level_set%normal%z))) * 0.3_R8P
+                  U(i,j,k) = cell(i,j,k)%U + dt * (Ux * cell(i,j,k)%level_set%normal%x + &
+                                                   Uy * cell(i,j,k)%level_set%normal%y + &
+                                                   Uz * cell(i,j,k)%level_set%normal%z)
+               endif
+            enddo
+         enddo
+      enddo
+      do k=1, nk
+         do j=1, nj
+            do i=1, ni
+               if (cell(i,j,k)%level_set%distance<0._R8P) cell(i,j,k)%U = U(i,j,k)
+            enddo
+         enddo
+      enddo
+   endassociate
+   endsubroutine evolve_immersed_boundary
+
    subroutine immerge_stl_geometry(self, file_name, n, distance_sign_inverse, distance_sign_algorithm, aabb_ref_levels)
    !< *Immerge* geometry (described into a STL file) into the block grid.
    class(block_object), intent(inout)        :: self                     !< Block.
@@ -869,18 +932,36 @@ contains
 
    elemental subroutine update_level_set_distance(self)
    !< Update level set distance.
+   !<
+   !< @note Also recompute level set normal.
    class(block_object), intent(inout) :: self    !< Block.
    integer(I4P)                       :: i, j, k !< Counter.
 
-   if (allocated(self%cell)) then
-      do k=1, self%signature%nk
-         do j=1, self%signature%nj
-            do i=1, self%signature%ni
-               call self%cell(i,j,k)%level_set%update_distance
+   associate(ni=>self%signature%ni, nj=>self%signature%nj, nk=>self%signature%nk, cell=>self%cell)
+      ! update level set distance
+      do k=1, nk
+         do j=1, nj
+            do i=1, ni
+               call cell(i,j,k)%level_set%update_distance
             enddo
          enddo
       enddo
-   endif
+      ! recompute level set normal
+      do k=1, nk
+         do j=1, nj
+            do i=1, ni
+               ! if (cell(i)%level_set%distance<0._R8P.and.cell(i+1)%level_set%distance>0._R8P) then
+                  cell(i,j,k)%level_set%normal = level_set_normal(cell=[cell(i-1,j  ,k  )%level_set, cell(i+1,j  ,k  )%level_set,  &
+                                                                        cell(i  ,j-1,k  )%level_set, cell(i  ,j+1,k  )%level_set,  &
+                                                                        cell(i  ,j  ,k-1)%level_set, cell(i  ,j  ,k+1)%level_set], &
+                                                                  dx=cell(i+1,j,k)%center%x-cell(i-1,j,k)%center%x,                &
+                                                                  dy=cell(i,j+1,k)%center%y-cell(i,j-1,k)%center%y,                &
+                                                                  dz=cell(i,j,k+1)%center%z-cell(i,j,k-1)%center%z)
+               ! endif
+            enddo
+         enddo
+      enddo
+   endassociate
    endsubroutine update_level_set_distance
 
    ! fast operators
@@ -895,7 +976,11 @@ contains
    do k=1, opr%signature%nk
       do j=1, opr%signature%nj
          do i=1, opr%signature%ni
-            call opr%cell(i,j,k)%U%field_add_field_fast(lhs=lhs%cell(i,j,k)%U, rhs=rhs%cell(i,j,k)%U)
+            if (opr%cell(i,j,k)%level_set%distance<0._R8P) then
+               cycle
+            else
+               call opr%cell(i,j,k)%U%field_add_field_fast(lhs=lhs%cell(i,j,k)%U, rhs=rhs%cell(i,j,k)%U)
+            endif
          enddo
       enddo
    enddo
@@ -912,7 +997,11 @@ contains
    do k=1, opr%signature%nk
       do j=1, opr%signature%nj
          do i=1, opr%signature%ni
-            opr%cell(i,j,k)%U = lhs%cell(i,j,k)%U * rhs%cell(i,j,k)%U
+            if (opr%cell(i,j,k)%level_set%distance<0._R8P) then
+               cycle
+            else
+               opr%cell(i,j,k)%U = lhs%cell(i,j,k)%U * rhs%cell(i,j,k)%U
+            endif
          enddo
       enddo
    enddo
@@ -928,7 +1017,11 @@ contains
    do k=1, opr%signature%nk
       do j=1, opr%signature%nj
          do i=1, opr%signature%ni
-            opr%cell(i,j,k)%U = lhs%cell(i,j,k)%U * rhs
+            if (opr%cell(i,j,k)%level_set%distance<0._R8P) then
+               cycle
+            else
+               opr%cell(i,j,k)%U = lhs%cell(i,j,k)%U * rhs
+            endif
          enddo
       enddo
    enddo
@@ -945,7 +1038,11 @@ contains
    do k=1, opr%signature%nk
       do j=1, opr%signature%nj
          do i=1, opr%signature%ni
-            call opr%cell(i,j,k)%U%field_subtract_field_fast(lhs=lhs%cell(i,j,k)%U, rhs=rhs%cell(i,j,k)%U)
+            if (opr%cell(i,j,k)%level_set%distance<0._R8P) then
+               cycle
+            else
+               call opr%cell(i,j,k)%U%field_subtract_field_fast(lhs=lhs%cell(i,j,k)%U, rhs=rhs%cell(i,j,k)%U)
+            endif
          enddo
       enddo
    enddo
@@ -1276,6 +1373,10 @@ contains
          self%error%status = vtk%xml_writer%write_dataarray(data_name='distance',                             &
                                                             x=self%cell(1:ni, 1:nj, 1:nk)%level_set%distance, &
                                                             one_component=.true.)
+         self%error%status = vtk%xml_writer%write_dataarray(data_name='ls_normal', &
+                                                            x=self%cell(1:ni, 1:nj, 1:nk)%level_set%normal%x, &
+                                                            y=self%cell(1:ni, 1:nj, 1:nk)%level_set%normal%y, &
+                                                            z=self%cell(1:ni, 1:nj, 1:nk)%level_set%normal%z)
          self%error%status = vtk%xml_writer%write_dataarray(location='cell', action='close')
       endif
       self%error%status = vtk%xml_writer%write_piece()
@@ -1363,6 +1464,10 @@ contains
          self%error%status = vtk%xml_writer%write_dataarray(data_name='distance',                              &
                                                             x=self%cell(i1:i2,j1:j2,k1:k2)%level_set%distance, &
                                                             one_component=.true.)
+         self%error%status = vtk%xml_writer%write_dataarray(data_name='ls_normal', &
+                                                            x=self%cell(1:ni, 1:nj, 1:nk)%level_set%normal%x, &
+                                                            y=self%cell(1:ni, 1:nj, 1:nk)%level_set%normal%y, &
+                                                            z=self%cell(1:ni, 1:nj, 1:nk)%level_set%normal%z)
          do d=1, self%signature%interfaces_number
             allocate(distances(i1:i2,j1:j2,k1:k2))
             do K=k1, k2
@@ -1450,14 +1555,20 @@ contains
       if (level_set(i)%distance<0._R8P.and.level_set(i+1)%distance>0._R8P) then
          ! left interface is an immersed boundary: note that there are necessary gc cells immersed to the left...
          do j=i+1-gc, i
-            U_(j) = U_(i+(i-j)+1)
-            U_(j)%momentum = U_(j)%momentum - (2._R8P*(U_(j)%momentum.paral.normal(i)))
+            if (level_set(j)%distance<0._R8P) then
+               ! U_(j) = U_(i+(i-j)+1)
+               U_(j)%momentum = U_(j)%momentum - (2._R8P*(U_(j)%momentum.paral.normal(i)))
+               ! U_(j)%momentum = U_(j)%momentum - (2._R8P*(U_(j)%momentum.paral.level_set(i+1)%normal))
+            endif
          enddo
       elseif (level_set(i)%distance>0._R8P.and.level_set(i+1)%distance<0._R8P) then
          ! right interface is an immersed boundary: note that there are necessary gc cells immersed to the right...
          do j=i+1, i+gc
-            U_(j) = U_(i+(i-j)+1)
-            U_(j)%momentum = U_(j)%momentum - (2._R8P*(U_(j)%momentum.paral.normal(i)))
+            if (level_set(j)%distance<0._R8P) then
+               ! U_(j) = U_(i+(i-j)+1)
+               U_(j)%momentum = U_(j)%momentum - (2._R8P*(U_(j)%momentum.paral.normal(i)))
+               ! U_(j)%momentum = U_(j)%momentum - (2._R8P*(U_(j)%momentum.paral.level_set(i)%normal))
+            endif
          enddo
       endif
    enddo

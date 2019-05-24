@@ -16,6 +16,7 @@ use off_grid_dimensions_object, only : grid_dimensions_object
 use finer, only : file_ini
 use flow, only : eos_compressible, primitive_compressible, primitive_to_conservative_compressible, &
                  conservative_to_primitive_compressible
+use fossil, only : file_stl_object, surface_stl_object
 use off_solver_object, only : solver_object
 use penf, only : I4P, I8P, R8P, str, strz
 use stringifor, only : string
@@ -657,12 +658,16 @@ contains
    type(file_ini),     intent(in)           :: fini                    !< Simulation parameters ini file handler.
    logical,            intent(in), optional :: go_on_fail              !< Go on if load fails.
    logical                                  :: go_on_fail_             !< Go on if load fails, local variable.
+   type(file_stl_object)                    :: file_stl                !< STL file handler.
+   type(surface_stl_object)                 :: surface_stl             !< STL surface handler.
    character(len=:), allocatable            :: section                 !< Section of INI file containing STL files data.
    integer(I4P)                             :: files_number            !< Number of IB body files.
    character(999)                           :: file_name               !< File name of IB body files.
    integer(I4P)                             :: excluded_blocks_number  !< Excluded blocks number from geometry immerse.
    integer(I4P), allocatable                :: excluded_blocks_list(:) !< Excluded blocks list.
+   real(R8P)                                :: resize_factor(3)        !< Resize factor.
    logical                                  :: distance_sign_inverse   !< Flag to invert sign of geometries distances.
+   integer(I4P)                             :: aabb_ref_levels         !< AABB refinement levels.
    integer(I4P)                             :: b, f                    !< Counter.
 
    if (self%grid_dimensions%blocks_number>0) then
@@ -692,11 +697,27 @@ contains
                              val=distance_sign_inverse, error=self%error%status)
                if (self%error%status /= 0) distance_sign_inverse = .false.
 
+               call fini%get(section_name=section, option_name='resize_factor_stl_'//trim(str(n=f, no_sign=.true.)), &
+                             val=resize_factor, error=self%error%status)
+               if (self%error%status /= 0) resize_factor = 1._R8P
+
+               call fini%get(section_name=section, option_name='aabb_ref_levels_stl_'//trim(str(n=f, no_sign=.true.)), &
+                             val=aabb_ref_levels, error=self%error%status)
+               if (self%error%status /= 0) aabb_ref_levels = 3
+
+               call file_stl%load_from_file(facet=surface_stl%facet, file_name=trim(adjustl(file_name)), guess_format=.true.)
+               print '(A)', file_stl%statistics()
+               call surface_stl%resize(factor=resize_factor(1) * ex + resize_factor(2) * ey + resize_factor(3) * ez)
+               ! call surface_stl%analize(aabb_refinement_levels=aabb_ref_levels)
+               ! call surface_stl%sanitize
+               call surface_stl%analize(aabb_refinement_levels=aabb_ref_levels)
+               print '(A)', surface_stl%statistics()
+
                do b=1, self%grid_dimensions%blocks_number
                   if (allocated(excluded_blocks_list)) then
                      if (any(excluded_blocks_list==b)) cycle
                   endif
-                  call self%blocks(b)%immerge_stl_geometry(file_name=trim(adjustl(file_name)), n=f, &
+                  call self%blocks(b)%immerge_stl_geometry(surface_stl=surface_stl, n=f,                &
                                                            distance_sign_inverse=distance_sign_inverse)
                enddo
             enddo

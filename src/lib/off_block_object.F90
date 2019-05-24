@@ -95,7 +95,7 @@ use flow, only : conservative_compressible, primitive_compressible,             
                  conservative_to_primitive_compressible, primitive_to_conservative_compressible, &
                  eos_compressible
 use foreseer, only : riemann_solver_object
-use fossil, only : file_stl_object, surface_stl_object
+use fossil, only : surface_stl_object
 use penf, only : FR8P, FI4P, I1P, I4P, I8P, MaxR8P, MinR8P, R8P, str
 use vecfor, only : vector, ex, ey, ez, normL2, sq_norm
 use vtk_fortran, only : vtk_file
@@ -588,20 +588,16 @@ contains
    endassociate
    endsubroutine evolve_immersed_boundary
 
-   subroutine immerge_stl_geometry(self, file_name, n, distance_sign_inverse, distance_sign_algorithm, aabb_ref_levels)
+   subroutine immerge_stl_geometry(self, surface_stl, n, distance_sign_inverse, distance_sign_algorithm)
    !< *Immerge* geometry (described into a STL file) into the block grid.
-   class(block_object), intent(inout)        :: self                     !< Block.
-   character(*),        intent(in)           :: file_name                !< Name of OFF file.
-   integer(I4P),        intent(in)           :: n                        !< Number of geometry in the global numbering.
-   logical,             intent(in), optional :: distance_sign_inverse    !< Invert sign distance.
-   character(*),        intent(in), optional :: distance_sign_algorithm  !< Algorithm used for *sign* of distance computation.
-   integer(I4P),        intent(in), optional :: aabb_ref_levels          !< AABB refinement levels used.
-   integer(I4P)                              :: distance_sign            !< Distance sing.
-   character(len=:), allocatable             :: distance_sign_algorithm_ !< Algorithm used for *sign* of distance computation.
-   integer(I4P)                              :: aabb_ref_levels_         !< AABB refinement levels used, local variable.
-   type(file_stl_object)                     :: file_stl                 !< STL file handler.
-   type(surface_stl_object)                  :: surface_stl              !< STL surface handler.
-   integer(I4P)                              :: i, j, k                  !< Counter.
+   class(block_object),      intent(inout)        :: self                     !< Block.
+   type(surface_stl_object), intent(in)           :: surface_stl              !< STL surface handler.
+   integer(I4P),             intent(in)           :: n                        !< Number of geometry in the global numbering.
+   logical,                  intent(in), optional :: distance_sign_inverse    !< Invert sign distance.
+   character(*),             intent(in), optional :: distance_sign_algorithm  !< Algorithm used for *sign* of distance computation.
+   integer(I4P)                                   :: distance_sign            !< Distance sing.
+   character(len=:), allocatable                  :: distance_sign_algorithm_ !< Algorithm used for *sign* of distance computation.
+   integer(I4P)                                   :: i, j, k                  !< Counter.
 
    if (allocated(self%cell)) then
       distance_sign = 1
@@ -610,11 +606,6 @@ contains
       endif
       distance_sign_algorithm_ = 'ray_intersections'
       if (present(distance_sign_algorithm)) distance_sign_algorithm_ = distance_sign_algorithm
-      aabb_ref_levels_ = 2 ; if (present(aabb_ref_levels)) aabb_ref_levels_ = aabb_ref_levels
-
-      call file_stl%load_from_file(facet=surface_stl%facet, file_name=trim(adjustl(file_name)), guess_format=.true.)
-      call surface_stl%analize(aabb_refinement_levels=aabb_ref_levels_)
-      call surface_stl%sanitize
 
       if ((self%signature%emin%x >= surface_stl%bmax%x).or.(self%signature%emax%x <= surface_stl%bmin%x).or.&
           (self%signature%emin%y >= surface_stl%bmax%y).or.(self%signature%emax%y <= surface_stl%bmin%y).or.&

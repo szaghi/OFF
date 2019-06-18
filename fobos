@@ -21,7 +21,6 @@ $EXDIRS      = legacy
                FORESEER/src/third_party/ FORESEER/src/tests/
                FOSSIL/src/third_party/ FOSSIL/src/tests/ FOSSIL/docs/ FOSSIL/src/app/
                FoXy/src/third_party/ FoXy/src/tests/
-               FriVolous/src/third_party/ FriVolous/src/tests/
                PENF/src/third_party/ PENF/src/tests/
                StringiFor/src/third_party/ StringiFor/src/tests/
                VecFor/src/third_party/ VecFor/src/tests/

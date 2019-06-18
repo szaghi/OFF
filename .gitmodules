@@ -50,10 +50,6 @@
    path = src/third_party/WenOOF
    url = https://github.com/Fortran-FOSS-Programmers/WenOOF
    branch = master
-[submodule "src/third_party/FriVolous"]
-   path = src/third_party/FriVolous
-   url = https://github.com/szaghi/FriVolous
-   branch = master
 [submodule "src/third_party/FOSSIL"]
 	path = src/third_party/FOSSIL
 	url = https://github.com/szaghi/FOSSIL

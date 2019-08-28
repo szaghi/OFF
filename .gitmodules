@@ -53,3 +53,4 @@
 [submodule "src/third_party/FOSSIL"]
 	path = src/third_party/FOSSIL
 	url = https://github.com/szaghi/FOSSIL
+   branch = master

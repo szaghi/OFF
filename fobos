@@ -8,7 +8,7 @@ $CSHARED_INT = -c -fpic -assume realloc_lhs
 $LSHARED     = -shared
 $CSTATIC_GNU = -c -frealloc-lhs
 $CSTATIC_INT = -c -assume realloc_lhs
-$DEBUG_GNU   = -DDEBUG -O0 -g3 -Warray-bounds -Wcharacter-truncation -Wline-truncation -Wimplicit-interface -Wimplicit-procedure -Wunderflow -fmodule-private -ffree-line-length-132 -fimplicit-none -fbacktrace -fdump-core -finit-real=nan -std=f2008 -fall-intrinsics
+$DEBUG_GNU   = -DDEBUG -O0 -g3 -Warray-bounds -Wcharacter-truncation -Wline-truncation -Wimplicit-interface -Wimplicit-procedure -Wunderflow -fmodule-private -ffree-line-length-132 -fimplicit-none -fbacktrace -fdump-core -finit-real=nan -std=f2018 -fall-intrinsics
 $DEBUG_INT   = -DDEBUG -O0 -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit -debug all -warn all -extend-source 132 -traceback
 $OPTIMIZE    = -O2
 $EXDIRS      = legacy

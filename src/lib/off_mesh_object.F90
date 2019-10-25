@@ -20,7 +20,7 @@ use fossil, only : file_stl_object, surface_stl_object
 use off_solver_object, only : solver_object
 use penf, only : I4P, I8P, R8P, str, strz
 use stringifor, only : string
-use vecfor, only : vector, ex, ey, ez
+use vecfor, only : vector, ex, ey, ez, ex_R8P, ey_R8P, ez_R8P
 use vtk_fortran, only : vtm_file
 
 implicit none
@@ -707,7 +707,7 @@ contains
 
                call file_stl%load_from_file(facet=surface_stl%facet, file_name=trim(adjustl(file_name)), guess_format=.true.)
                print '(A)', file_stl%statistics()
-               call surface_stl%resize(factor=resize_factor(1) * ex + resize_factor(2) * ey + resize_factor(3) * ez)
+               call surface_stl%resize(factor=resize_factor(1) * ex_R8P + resize_factor(2) * ey_R8P + resize_factor(3) * ez_R8P)
                ! call surface_stl%analize(aabb_refinement_levels=aabb_ref_levels)
                ! call surface_stl%sanitize
                call surface_stl%analize(aabb_refinement_levels=aabb_ref_levels)

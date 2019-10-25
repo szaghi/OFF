@@ -97,7 +97,7 @@ use flow, only : conservative_compressible, primitive_compressible,             
 use foreseer, only : riemann_solver_object
 use fossil, only : surface_stl_object
 use penf, only : FR8P, FI4P, I1P, I4P, I8P, MaxR8P, MinR8P, R8P, str
-use vecfor, only : vector, ex, ey, ez, normL2, sq_norm
+use vecfor, only : vector, ex, ey, ez, normL2, sq_norm, vector_R8P
 use vtk_fortran, only : vtk_file
 
 implicit none
@@ -616,7 +616,9 @@ contains
             do j=1, self%signature%nj
                do i=1, self%signature%ni
                   self%cell(i,j,k)%level_set%distances(n) = distance_sign * &
-                                                            surface_stl%distance(point=self%cell(i,j,k)%center, &
+                                                            surface_stl%distance(point=vector_R8P(self%cell(i,j,k)%center%x,  &
+                                                                                                  self%cell(i,j,k)%center%y,  &
+                                                                                                  self%cell(i,j,k)%center%z), &
                                                                                  is_signed=.true.,              &
                                                                                  sign_algorithm=trim(distance_sign_algorithm_))
                enddo
